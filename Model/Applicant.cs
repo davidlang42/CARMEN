@@ -5,7 +5,7 @@ namespace Model
 {
     public class Applicant
     {
-        public Guid Id { get; set; }
+        public Guid ApplicantId { get; set; }
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         public Gender Gender { get; set; }

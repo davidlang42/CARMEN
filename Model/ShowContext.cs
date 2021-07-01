@@ -7,7 +7,7 @@ namespace Model
 {
     public class ShowContext : DbContext
     {
-        //TODO public DbSet<Applicant> Applicants { get; set; }
+        public DbSet<Applicant> Applicants => Set<Applicant>();
         public DbSet<Section> Sections => Set<Section>();
         public DbSet<Item> Items => Set<Item>();
 
