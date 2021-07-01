@@ -1,0 +1,41 @@
+﻿<Window x:Class="App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:App"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
+    <Window.Resources>
+        <CollectionViewSource x:Key="sectionViewSource"/>
+        <CollectionViewSource x:Key="sectionItemsViewSource" 
+                              Source="{Binding Items, Source={StaticResource sectionViewSource}}"/>
+    </Window.Resources>
+    <Grid>
+        <DataGrid x:Name="sectionsDataGrid" AutoGenerateColumns="False" 
+                  EnableRowVirtualization="True" 
+                  ItemsSource="{Binding Source={StaticResource sectionViewSource}}" 
+                  Margin="13,13,43,229" RowDetailsVisibilityMode="VisibleWhenSelected">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Id}"
+                                    Header="Section Id" Width="SizeToHeader"
+                                    IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding Name}" Header="Section Name" 
+                                    Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid x:Name="itemsDataGrid" AutoGenerateColumns="False" 
+                  EnableRowVirtualization="True" 
+                  ItemsSource="{Binding Source={StaticResource sectionItemsViewSource}}" 
+                  Margin="13,205,43,108" RowDetailsVisibilityMode="VisibleWhenSelected" 
+                  RenderTransformOrigin="0.488,0.251">
+            <DataGrid.Columns>
+                <DataGridTextColumn Binding="{Binding Id}" Header="Item Id" 
+                                    Width="SizeToHeader" IsReadOnly="True"/>
+                <DataGridTextColumn Binding="{Binding Name}" Header="Item Name" Width="*"/>
+            </DataGrid.Columns>
+        </DataGrid>
+        <Button Content="Save" HorizontalAlignment="Center" Margin="0,240,0,0" 
+                Click="Button_Click" Height="20" Width="123"/>
+    </Grid>
+</Window>
