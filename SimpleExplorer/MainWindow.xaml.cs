@@ -23,7 +23,10 @@ namespace App
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ShowContext _context = new ShowContext();
+        private readonly DbContextOptions<ShowContext> contextOptions = new DbContextOptionsBuilder<ShowContext>()
+            .UseSqlite("Data Source=test.db").Options; //TODO real connection string
+
+        private ShowContext _context;
 
         private readonly CollectionViewSource sectionsViewSource;
         private readonly CollectionViewSource applicantsViewSource;
@@ -33,6 +36,7 @@ namespace App
             InitializeComponent();
             sectionsViewSource = (CollectionViewSource)FindResource(nameof(sectionsViewSource));
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
+            _context = new ShowContext(contextOptions);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -69,7 +73,7 @@ namespace App
         private void UndoButton_Click(object sender, RoutedEventArgs e)
         {
             _context.Dispose();
-            _context = new ShowContext();
+            _context = new ShowContext(contextOptions);
             PopulateViews();
         }
 

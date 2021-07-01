@@ -11,9 +11,13 @@ namespace Model
         public DbSet<Section> Sections => Set<Section>();
         public DbSet<Item> Items => Set<Item>();
 
+        public ShowContext(DbContextOptions<ShowContext> options)
+            : base(options)
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite("Data Source=test.db");//TODO real connection string
             optionsBuilder.UseLazyLoadingProxies();
             base.OnConfiguring(optionsBuilder);
         }

@@ -14,6 +14,7 @@ namespace Model
         //TODO photo
         //TODO calculate weighted overall mark
         //TODO public virtual List<Ability> Abilities { get; set; }
+        public int Age => (int)((DateTime.Now - DateOfBirth).TotalDays / 365.2425); // correct on average, good enough
     }
 
     public enum Gender
