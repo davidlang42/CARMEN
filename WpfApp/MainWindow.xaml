@@ -5,37 +5,60 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:App"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800" Loaded="Window_Loaded">
+        Title="CARMEN: Simple Explorer" Height="450" Width="800" Loaded="Window_Loaded">
     <Window.Resources>
-        <CollectionViewSource x:Key="sectionViewSource"/>
-        <CollectionViewSource x:Key="sectionItemsViewSource" 
-                              Source="{Binding Items, Source={StaticResource sectionViewSource}}"/>
+        <CollectionViewSource x:Key="sectionsViewSource"/>
+        <CollectionViewSource x:Key="itemsViewSource" 
+                              Source="{Binding Items, Source={StaticResource sectionsViewSource}}"/>
+        <CollectionViewSource x:Key="rolesViewSource" 
+                              Source="{Binding Roles, Source={StaticResource itemsViewSource}}"/>
     </Window.Resources>
     <Grid>
-        <DataGrid x:Name="sectionsDataGrid" AutoGenerateColumns="False" 
+        <TabControl Margin="0,0,0,35" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+            <TabItem Header="Show Structure">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="sectionsDataGrid" AutoGenerateColumns="False" 
                   EnableRowVirtualization="True" 
-                  ItemsSource="{Binding Source={StaticResource sectionViewSource}}" 
-                  Margin="13,13,43,229" RowDetailsVisibilityMode="VisibleWhenSelected">
-            <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Id}"
+                  ItemsSource="{Binding Source={StaticResource sectionsViewSource}}" 
+                  RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding SectionId}"
                                     Header="Section Id" Width="SizeToHeader"
                                     IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding Name}" Header="Section Name" 
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Section Name" 
                                     Width="*"/>
-            </DataGrid.Columns>
-        </DataGrid>
-        <DataGrid x:Name="itemsDataGrid" AutoGenerateColumns="False" 
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid x:Name="itemsDataGrid" AutoGenerateColumns="False" 
                   EnableRowVirtualization="True" 
-                  ItemsSource="{Binding Source={StaticResource sectionItemsViewSource}}" 
-                  Margin="13,205,43,108" RowDetailsVisibilityMode="VisibleWhenSelected" 
-                  RenderTransformOrigin="0.488,0.251">
-            <DataGrid.Columns>
-                <DataGridTextColumn Binding="{Binding Id}" Header="Item Id" 
+                  ItemsSource="{Binding Source={StaticResource itemsViewSource}}" RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding ItemId}" Header="Item Id" 
                                     Width="SizeToHeader" IsReadOnly="True"/>
-                <DataGridTextColumn Binding="{Binding Name}" Header="Item Name" Width="*"/>
-            </DataGrid.Columns>
-        </DataGrid>
-        <Button Content="Save" HorizontalAlignment="Center" Margin="0,240,0,0" 
-                Click="Button_Click" Height="20" Width="123"/>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Item Name" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid x:Name="rolesDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource rolesViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding RoleId}" Header="Role Id" 
+                                    Width="SizeToHeader" IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Role Name" Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Applicants">
+                <Grid Background="#FFE5E5E5"/>
+            </TabItem>
+        </TabControl>
+        <Button Content="Save Changes" HorizontalAlignment="Right" Margin="0,0,10,10" 
+                Click="SaveButton_Click" Height="20" Width="123" VerticalAlignment="Bottom"/>
+        <Button Content="Undo Changes" HorizontalAlignment="Right" Margin="0,0,138,10" 
+            Click="UndoButton_Click" Height="20" Width="123" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

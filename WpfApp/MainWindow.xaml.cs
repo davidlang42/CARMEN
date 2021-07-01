@@ -23,27 +23,46 @@ namespace App
     /// </summary>
     public partial class MainWindow : Window
     {
-        private readonly ShowContext _context = new ShowContext();
+        private ShowContext _context = new ShowContext();
 
-        private CollectionViewSource sectionViewSource;
+        private readonly CollectionViewSource sectionsViewSource;
+
         public MainWindow()
         {
             InitializeComponent();
-            sectionViewSource = (CollectionViewSource)FindResource(nameof(sectionViewSource));
+            sectionsViewSource = (CollectionViewSource)FindResource(nameof(sectionsViewSource));
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             _context.Database.EnsureCreated(); // for demo purposes
-            _context.Sections.Load(); // load the entities into EF Core
-            sectionViewSource.Source = _context.Sections.Local.ToObservableCollection();
+            PopulateViews();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void PopulateViews()
         {
-            _context.SaveChanges(); // all changes were tracked, including deletes
+            _context.Sections.Load(); // load the entities into EF Core
+            sectionsViewSource.Source = _context.Sections.Local.ToObservableCollection();
+        }
+
+        private void RefreshViews()
+        {
             sectionsDataGrid.Items.Refresh();
             itemsDataGrid.Items.Refresh();
+            rolesDataGrid.Items.Refresh();
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            _context.SaveChanges(); // all changes were tracked, including deletes
+            RefreshViews();
+        }
+
+        private void UndoButton_Click(object sender, RoutedEventArgs e)
+        {
+            _context.Dispose();
+            _context = new ShowContext();
+            PopulateViews();
         }
 
         protected override void OnClosing(CancelEventArgs e)
