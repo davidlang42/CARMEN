@@ -14,7 +14,7 @@ namespace Model
     public class Section : Node
     {
         #region Database fields
-        public SectionType? SectionType { get; set; }
+        public virtual SectionType SectionType { get; set; } = null!;
         #endregion
     }
 }

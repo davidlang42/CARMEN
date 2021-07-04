@@ -8,6 +8,6 @@ namespace Model
     {
         public int SectionTypeId { get; private set; }
         public string Name { get; set; } = "";
-        public Show Show { get; set; } = null!;
+        public virtual Show Show { get; set; } = null!;
     }
 }

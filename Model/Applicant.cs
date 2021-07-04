@@ -21,6 +21,7 @@ namespace Model
         public DateTime DateOfBirth { get; set; }
         public string? ExternalID { get; set; }
         public virtual Image? Photo { get; set; }
+        public string Notes { get; set; } = "";
         public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
         public virtual ICollection<CastGroup> CastGroups { get; private set; } = new ObservableCollection<CastGroup>();
         #endregion
