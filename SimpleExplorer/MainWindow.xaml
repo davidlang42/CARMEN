@@ -14,6 +14,8 @@
                               Source="{Binding Items, Source={StaticResource sectionsViewSource}}"/>
         <CollectionViewSource x:Key="rolesViewSource" 
                               Source="{Binding Roles, Source={StaticResource itemsViewSource}}"/>
+        <CollectionViewSource x:Key="countsViewSource"
+                              Source="{Binding CountByGroups, Source={StaticResource rolesViewSource}}"/>
         <CollectionViewSource x:Key="applicantsViewSource"
                               Source="{Binding Applicants, Source={StaticResource showsViewSource}}"/>
         <CollectionViewSource x:Key="groupsViewSource"
@@ -25,9 +27,9 @@
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
                         <DataGrid x:Name="showsDataGrid" AutoGenerateColumns="False" 
-                  EnableRowVirtualization="True" 
-                  ItemsSource="{Binding Source={StaticResource showsViewSource}}" 
-                  RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource showsViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding ShowId}"
                                     Header="Show Id" Width="SizeToHeader"
@@ -37,9 +39,9 @@
                             </DataGrid.Columns>
                         </DataGrid>
                         <DataGrid x:Name="sectionsDataGrid" AutoGenerateColumns="False" 
-                  EnableRowVirtualization="True" 
-                  ItemsSource="{Binding Source={StaticResource sectionsViewSource}}" 
-                  RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource sectionsViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding SectionId}"
                                     Header="Section Id" Width="SizeToHeader"
@@ -49,8 +51,8 @@
                             </DataGrid.Columns>
                         </DataGrid>
                         <DataGrid x:Name="itemsDataGrid" AutoGenerateColumns="False" 
-                  EnableRowVirtualization="True" 
-                  ItemsSource="{Binding Source={StaticResource itemsViewSource}}" RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource itemsViewSource}}" RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding ItemId}" Header="Item Id" 
                                     Width="SizeToHeader" IsReadOnly="True"/>
@@ -67,6 +69,16 @@
                                 <DataGridTextColumn Binding="{Binding Name}" Header="Role Name" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <DataGrid x:Name="countsDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource countsViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding CastGroup.Name}" Header="Cast Group Name" IsReadOnly="True"/>
+                                <DataGridComboBoxColumn TextBinding="{Binding Name}" SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource groupsViewSource}}" Header="Cast Group"/>
+                                <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -74,9 +86,9 @@
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
                         <DataGrid x:Name="applicantsDataGrid" AutoGenerateColumns="True" 
-                  EnableRowVirtualization="True" 
-                  ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" 
-                  RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
@@ -85,9 +97,9 @@
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
                         <DataGrid x:Name="groupsDataGrid" AutoGenerateColumns="True" 
-                  EnableRowVirtualization="True" 
-                  ItemsSource="{Binding Source={StaticResource groupsViewSource}}" 
-                  RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource groupsViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
@@ -96,6 +108,6 @@
         <Button Content="Save Changes" HorizontalAlignment="Right" Margin="0,0,10,10" 
                 Click="SaveButton_Click" Height="20" Width="123" VerticalAlignment="Bottom"/>
         <Button Content="Undo Changes" HorizontalAlignment="Right" Margin="0,0,138,10" 
-            Click="UndoButton_Click" Height="20" Width="123" VerticalAlignment="Bottom"/>
+                Click="UndoButton_Click" Height="20" Width="123" VerticalAlignment="Bottom"/>
     </Grid>
 </Window>

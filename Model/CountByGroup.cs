@@ -15,6 +15,7 @@ namespace Model
     {
         internal virtual int RoleId { get; set; }
         internal virtual int CastGroupId { get; set; }
+        public virtual CastGroup CastGroup { get; set; } = null!;
         public uint Count { get; set; }
     }
 }

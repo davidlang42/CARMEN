@@ -15,11 +15,11 @@ namespace Model
         public string Name { get; set; } = "";
         public virtual ICollection<Item> Items { get; private set; } = new ObservableCollection<Item>();
         //TODO public virtual ICollection<Requirement> Requirements { get; private set; } = new ObservableCollection<Requirement>();
-        internal virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
+        public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
         #endregion
 
         public uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroupId == group.CastGroupId).Select(c => c.Count).SingleOrDefault();
+            => CountByGroups.Where(c => c.CastGroupId == group.CastGroupId).Select(c => c.Count).SingleOrDefault(); // defaults to 0
 
         public uint TotalCount()
             => Convert.ToUInt32(CountByGroups.Sum(c => c.Count)); // will crash if greater than UInt32.MaxValue

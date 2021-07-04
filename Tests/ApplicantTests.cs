@@ -10,7 +10,7 @@ namespace Tests
     public class ApplicantTests
     {
         readonly DbContextOptions<ShowContext> contextOptions = new DbContextOptionsBuilder<ShowContext>()
-            .UseSqlite("Filename=UnitTests.db").Options;
+            .UseSqlite($"Filename={nameof(ApplicantTests)}.db").Options;
 
         [SetUp]
         public void Setup()
