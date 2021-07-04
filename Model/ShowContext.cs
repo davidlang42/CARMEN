@@ -21,5 +21,13 @@ namespace Model
             optionsBuilder.UseLazyLoadingProxies();
             base.OnConfiguring(optionsBuilder);
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<Ability>()
+                .HasKey(c => new { c.Applicant, c.Criteria });
+            modelBuilder.Entity<CountByGroup>()
+                .HasKey(c => new { c.Role, c.Group });
+        }
     }
 }

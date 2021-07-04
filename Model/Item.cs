@@ -5,9 +5,12 @@ using System.Text;
 
 namespace Model
 {
+    /// <summary>
+    /// An item within the show.
+    /// </summary>
     public class Item : IOrdered
     {
-        public Guid ItemId { get; set; }
+        public int ItemId { get; set; }
         public virtual Section Section { get; set; } = null!;
         public string Name { get; set; } = "";
         public int Order { get; set; }

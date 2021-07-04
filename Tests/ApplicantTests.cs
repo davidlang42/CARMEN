@@ -9,7 +9,7 @@ namespace Tests
 {
     public class ApplicantTests
     {
-        DbContextOptions<ShowContext> contextOptions = new DbContextOptionsBuilder<ShowContext>()
+        readonly DbContextOptions<ShowContext> contextOptions = new DbContextOptionsBuilder<ShowContext>()
             .UseSqlite("Filename=UnitTests.db").Options;
 
         [SetUp]
@@ -53,7 +53,25 @@ namespace Tests
         public void Positive_Ages()
         {
             using var context = new ShowContext(contextOptions);
-            context.Applicants.ToList().All(a => a.Age > 0).Should().BeTrue();
+            context.Applicants.ToList().All(a => a.AgeToday() > 0).Should().BeTrue();
+        }
+
+        [Test]
+        public void Negative_Ages()
+        {
+            var invalid = new Applicant
+            {
+                FirstName = "Not-Bjorn",
+                LastName = "Yet",
+                Gender = Gender.Male,
+                DateOfBirth = new DateTime(3000, 1, 1)
+            };
+            try
+            {
+                invalid.AgeToday();
+                Assert.Fail();
+            }
+            catch { }
         }
     }
 }
