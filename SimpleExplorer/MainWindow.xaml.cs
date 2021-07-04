@@ -65,8 +65,17 @@ namespace App
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            _context.SaveChanges(); // all changes were tracked, including deletes
-            RefreshViews();
+            try
+            {
+                _context.SaveChanges(); // all changes were tracked, including deletes
+                RefreshViews();
+            } catch (InvalidOperationException ex)
+            {
+                MessageBox.Show("Could not save changes: \n" + ex.Message);
+                _context.Dispose();
+                _context = new ShowContext(contextOptions);
+                PopulateViews();
+            }
         }
 
         private void UndoButton_Click(object sender, RoutedEventArgs e)
