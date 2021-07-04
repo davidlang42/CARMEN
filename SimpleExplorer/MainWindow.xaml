@@ -74,8 +74,7 @@
                         ItemsSource="{Binding Source={StaticResource countsViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding CastGroup.Name}" Header="Cast Group Name" IsReadOnly="True"/>
-                                <DataGridComboBoxColumn TextBinding="{Binding Name}" SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource groupsViewSource}}" Header="Cast Group"/>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource groupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
                             </DataGrid.Columns>
                         </DataGrid>
