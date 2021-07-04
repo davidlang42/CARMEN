@@ -21,6 +21,6 @@ namespace Model
         public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
         #endregion
 
-        public IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
+        public virtual IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
     }
 }

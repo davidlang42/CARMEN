@@ -15,5 +15,7 @@ namespace Model
         #region Database fields
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
+
+        public override IEnumerable<Item> ItemsInOrder() => new[] { this };
     }
 }
