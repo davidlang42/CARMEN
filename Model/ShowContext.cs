@@ -25,9 +25,9 @@ namespace Model
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Ability>()
-                .HasKey(c => new { c.Applicant, c.Criteria });
+                .HasKey(c => new { c.ApplicantId, c.CriteriaId });
             modelBuilder.Entity<CountByGroup>()
-                .HasKey(c => new { c.Role, c.Group });
+                .HasKey(c => new { c.RoleId, c.CastGroupId });
         }
     }
 }

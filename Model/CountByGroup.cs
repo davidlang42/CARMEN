@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace Model
@@ -11,7 +13,9 @@ namespace Model
     /// </summary>
     public class CountByGroup
     {
-        internal virtual Role Role { get; set; } = null!;
+        internal virtual int RoleId { get; set; }
+        [ForeignKey(nameof(CastGroup))]
+        internal virtual int CastGroupId { get; set; }
         public virtual CastGroup Group { get; set; } = null!;
         public uint Count { get; set; }
     }
