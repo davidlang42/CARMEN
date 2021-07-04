@@ -19,7 +19,7 @@ namespace Model
         #endregion
 
         public uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.Group == group).Select(c => c.Count).SingleOrDefault();
+            => CountByGroups.Where(c => c.CastGroupId == group.CastGroupId).Select(c => c.Count).SingleOrDefault();
 
         public uint TotalCount()
             => Convert.ToUInt32(CountByGroups.Sum(c => c.Count)); // will crash if greater than UInt32.MaxValue

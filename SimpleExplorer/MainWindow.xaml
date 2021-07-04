@@ -16,6 +16,8 @@
                               Source="{Binding Roles, Source={StaticResource itemsViewSource}}"/>
         <CollectionViewSource x:Key="applicantsViewSource"
                               Source="{Binding Applicants, Source={StaticResource showsViewSource}}"/>
+        <CollectionViewSource x:Key="groupsViewSource"
+                              Source="{Binding CastGroups, Source={StaticResource showsViewSource}}"/>
     </Window.Resources>
     <Grid>
         <TabControl Margin="0,0,0,35" ScrollViewer.HorizontalScrollBarVisibility="Auto">
@@ -74,6 +76,17 @@
                         <DataGrid x:Name="applicantsDataGrid" AutoGenerateColumns="True" 
                   EnableRowVirtualization="True" 
                   ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" 
+                  RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Groups">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="groupsDataGrid" AutoGenerateColumns="True" 
+                  EnableRowVirtualization="True" 
+                  ItemsSource="{Binding Source={StaticResource groupsViewSource}}" 
                   RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                         </DataGrid>
                     </StackPanel>

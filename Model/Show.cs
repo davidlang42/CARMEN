@@ -14,6 +14,7 @@ namespace Model
         public virtual ICollection<Applicant> Applicants { get; set; } = new ObservableCollection<Applicant>();
         public virtual ICollection<Section> Sections { get; set; } = new ObservableCollection<Section>();
         public virtual ICollection<Item> Items { get; set; } = new ObservableCollection<Item>();//TODO probably dont need both sections and items
+        public virtual ICollection<CastGroup> CastGroups { get; set; } = new ObservableCollection<CastGroup>();
         public string Name { get; set; } = "";
         public DateTime? ShowDate { get; set; }
     }

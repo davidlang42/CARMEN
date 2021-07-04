@@ -14,9 +14,7 @@ namespace Model
     public class CountByGroup
     {
         internal virtual int RoleId { get; set; }
-        // might require: [ForeignKey(nameof(CastGroup))]
-        internal virtual int CastGroupId { get; set; }//TODO check this works
-        public virtual CastGroup Group { get; set; } = null!;
+        internal virtual int CastGroupId { get; set; }
         public uint Count { get; set; }
     }
 }

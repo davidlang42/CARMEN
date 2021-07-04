@@ -59,6 +59,7 @@ namespace App
             itemsDataGrid.Items.Refresh();
             rolesDataGrid.Items.Refresh();
             applicantsDataGrid.Items.Refresh();
+            groupsDataGrid.Items.Refresh();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)

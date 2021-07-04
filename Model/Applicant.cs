@@ -22,7 +22,7 @@ namespace Model
         public string? ExternalID { get; set; }
         public virtual Image? Photo { get; set; }
         public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
-        public virtual ICollection<CastGroup> Groups { get; private set; } = new ObservableCollection<CastGroup>();
+        public virtual ICollection<CastGroup> CastGroups { get; private set; } = new ObservableCollection<CastGroup>();
         #endregion
 
         public uint AgeToday() => AgeAt(DateTime.Now);
