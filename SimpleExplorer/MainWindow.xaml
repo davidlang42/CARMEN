@@ -14,7 +14,8 @@
                               Source="{Binding Items, Source={StaticResource sectionsViewSource}}"/>
         <CollectionViewSource x:Key="rolesViewSource" 
                               Source="{Binding Roles, Source={StaticResource itemsViewSource}}"/>
-        <CollectionViewSource x:Key="applicantsViewSource"/>
+        <CollectionViewSource x:Key="applicantsViewSource"
+                              Source="{Binding Applicants, Source={StaticResource showsViewSource}}"/>
     </Window.Resources>
     <Grid>
         <TabControl Margin="0,0,0,35" ScrollViewer.HorizontalScrollBarVisibility="Auto">
