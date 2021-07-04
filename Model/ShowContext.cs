@@ -2,19 +2,18 @@
 using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace Model
 {
     public class ShowContext : DbContext
     {
-        public DbSet<Applicant> Applicants => Set<Applicant>();
-        public DbSet<Section> Sections => Set<Section>();
-        public DbSet<Item> Items => Set<Item>();
+        public DbSet<Show> Shows => Set<Show>();
 
-        public ShowContext(DbContextOptions<ShowContext> options)
-            : base(options)
-        {
-        }
+        public Show ShowById(int show_id) => Shows.Where(s => s.ShowId == show_id).Single();
+
+        public ShowContext(DbContextOptions<ShowContext> options) : base(options)
+        { }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -25,7 +24,7 @@ namespace Model
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Ability>()
-                .HasKey(c => new { c.ApplicantId, c.CriteriaId });
+                .HasKey(a => new { a.ApplicantId, a.CriteriaId });
             modelBuilder.Entity<CountByGroup>()
                 .HasKey(c => new { c.RoleId, c.CastGroupId });
         }

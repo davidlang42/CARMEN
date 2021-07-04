@@ -7,7 +7,9 @@
         mc:Ignorable="d"
         Title="CARMEN: Simple Explorer" Height="450" Width="800" Loaded="Window_Loaded">
     <Window.Resources>
-        <CollectionViewSource x:Key="sectionsViewSource"/>
+        <CollectionViewSource x:Key="showsViewSource"/>
+        <CollectionViewSource x:Key="sectionsViewSource" 
+                              Source="{Binding Sections, Source={StaticResource showsViewSource}}"/>
         <CollectionViewSource x:Key="itemsViewSource" 
                               Source="{Binding Items, Source={StaticResource sectionsViewSource}}"/>
         <CollectionViewSource x:Key="rolesViewSource" 
@@ -19,6 +21,18 @@
             <TabItem Header="Show Structure">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="showsDataGrid" AutoGenerateColumns="False" 
+                  EnableRowVirtualization="True" 
+                  ItemsSource="{Binding Source={StaticResource showsViewSource}}" 
+                  RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding ShowId}"
+                                    Header="Show Id" Width="SizeToHeader"
+                                    IsReadOnly="True"/>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Show Name" 
+                                    Width="*"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
                         <DataGrid x:Name="sectionsDataGrid" AutoGenerateColumns="False" 
                   EnableRowVirtualization="True" 
                   ItemsSource="{Binding Source={StaticResource sectionsViewSource}}" 

@@ -37,7 +37,15 @@ namespace Tests
                 DateOfBirth = new DateTime(2000, 1, 1)
             };
 
-            context.AddRange(john, jane);
+            var show = new Show
+            {
+                Name = "Test"
+            };
+
+            show.Applicants.Add(john);
+            show.Applicants.Add(jane);
+
+            context.Shows.Add(show);
 
             context.SaveChanges();
         }
@@ -46,14 +54,14 @@ namespace Tests
         public void Applicants_Exist()
         {
             using var context = new ShowContext(contextOptions);
-            context.Applicants.Count().Should().Be(2);
+            context.Shows.First().Applicants.Count().Should().Be(2);
         }
 
         [Test]
         public void Positive_Ages()
         {
             using var context = new ShowContext(contextOptions);
-            context.Applicants.ToList().All(a => a.AgeToday() > 0).Should().BeTrue();
+            context.Shows.First().Applicants.ToList().All(a => a.AgeToday() > 0).Should().BeTrue();
         }
 
         [Test]

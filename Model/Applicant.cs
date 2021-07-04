@@ -13,7 +13,8 @@ namespace Model
     {
         #region Database fields
         [Key]
-        public int ApplicantId { get; set; }
+        public int ApplicantId { get; private set; }
+        public virtual Show Show { get; set; } = null!;
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         public Gender Gender { get; set; }
@@ -25,6 +26,9 @@ namespace Model
         #endregion
 
         public uint AgeToday() => AgeAt(DateTime.Now);
+
+        /// <summary>Applicant's age at the show date, or null if show date is not set.</summary>
+        public uint? AgeAtShow() => Show.ShowDate.HasValue ? AgeAt(Show.ShowDate.Value) : (uint?)null;
 
         public uint AgeAt(DateTime date)
         {
