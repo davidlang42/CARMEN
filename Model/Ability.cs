@@ -10,8 +10,8 @@ namespace Model
     /// </summary>
     public class Ability
     {
-        internal int ApplicantId { get; set; }
-        internal int CriteriaId { get; set; }
+        internal int ApplicantId { get; private set; }
+        internal int CriteriaId { get; private set; }
         public virtual Criteria Criteria { get; set; } = null!;
         public uint Mark { get; set; }
     }

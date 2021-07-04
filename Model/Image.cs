@@ -11,7 +11,7 @@ namespace Model
     public class Image
     {
         [Key]
-        public int ImageId { get; set; }
+        public int ImageId { get; private set; }
         public string Name { get; set; } = "";
         public byte[] ImageData { get; set; } = new byte[0];
     }

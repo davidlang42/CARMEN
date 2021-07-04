@@ -61,7 +61,7 @@ namespace Tests
         public void Positive_Ages()
         {
             using var context = new ShowContext(contextOptions);
-            context.Shows.First().Applicants.ToList().All(a => a.AgeToday() > 0).Should().BeTrue();
+            context.Shows.First().Applicants.All(a => a.AgeToday() > 0).Should().BeTrue();
         }
 
         [Test]

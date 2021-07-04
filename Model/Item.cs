@@ -10,7 +10,7 @@ namespace Model
     /// </summary>
     public class Item : IOrdered
     {
-        public int ItemId { get; set; }
+        public int ItemId { get; private set; }
         public virtual Section Section { get; set; } = null!;
         public string Name { get; set; } = "";
         public int Order { get; set; }

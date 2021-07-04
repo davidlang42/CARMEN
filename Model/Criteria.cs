@@ -11,7 +11,7 @@ namespace Model
     public class Criteria : IOrdered
     {
         [Key]
-        public int CriteriaId { get; set; }
+        public int CriteriaId { get; private set; }
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
         public int MaxMark { get; set; }

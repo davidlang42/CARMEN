@@ -9,7 +9,7 @@ namespace Model
     public class Section : IOrdered
     {
         [Key]
-        public int SectionId { get; set; }
+        public int SectionId { get; private set; }
         public virtual Show Show { get; set; } = null!;
         public string Name { get; set; } = "";
         public virtual ICollection<Item> Items { get; private set; } = new ObservableCollection<Item>();

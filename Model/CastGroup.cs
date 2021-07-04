@@ -12,7 +12,7 @@ namespace Model
     public class CastGroup : IOrdered
     {
         [Key]
-        public int CastGroupId { get; set; }
+        public int CastGroupId { get; private set; }
         public virtual Show Show { get; set; } = null!;
         public int Order { get; set; }
         public string Name { get; set; } = "";

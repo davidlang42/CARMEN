@@ -11,7 +11,7 @@ namespace Model
     {
         #region Database fields
         [Key]
-        public int RoleId { get; set; }
+        public int RoleId { get; private set; }
         public string Name { get; set; } = "";
         public virtual ICollection<Item> Items { get; private set; } = new ObservableCollection<Item>();
         //TODO public virtual ICollection<Requirement> Requirements { get; private set; } = new ObservableCollection<Requirement>();
