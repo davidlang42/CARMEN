@@ -22,6 +22,6 @@ namespace Model
             => CountByGroups.Where(c => c.Group == group).Select(c => c.Count).SingleOrDefault();
 
         public uint TotalCount()
-            => Convert.ToUInt32(CountByGroups.Sum(c => c.Count)); // may crash if total count is greater than UInt32.MaxValue
+            => Convert.ToUInt32(CountByGroups.Sum(c => c.Count)); // will crash if greater than UInt32.MaxValue
     }
 }
