@@ -13,5 +13,8 @@ namespace Model
     /// </summary>
     public class Section : Node
     {
+        #region Database fields
+        public SectionType? SectionType { get; set; }
+        #endregion
     }
 }
