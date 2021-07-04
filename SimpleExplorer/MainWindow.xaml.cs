@@ -15,6 +15,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Section = Model.Section;
 
 namespace App
 {
@@ -34,6 +35,7 @@ namespace App
         {
             InitializeComponent();
             showsViewSource = (CollectionViewSource)FindResource(nameof(showsViewSource));
+            CreateTestData();
             _context = new ShowContext(contextOptions);
         }
 
@@ -41,6 +43,44 @@ namespace App
         {
             _context.Database.EnsureCreated(); // for demo purposes
             PopulateViews();
+        }
+
+        private void CreateTestData()
+        {
+            using var context = new ShowContext(contextOptions);
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+            context.Shows.Add(new Show
+            {
+                Name = "Test Show"
+            });
+            context.SaveChanges();
+            var show = context.Shows.First();
+            show.Children.Add(new Section
+            {
+                Name = "Section 1"
+            });
+            show.Children.Add(new Section
+            {
+                Name = "Section 2"
+            });
+            show.Children.Add(new Item
+            {
+                Name = "Item 3"
+            });
+            context.SaveChanges();
+            var sections = show.Children.ToArray();
+            var item1 = new Item
+            {
+                Name = "Item 1"
+            };
+            var item2 = new Item
+            {
+                Name = "Item 2",
+            };
+            sections[0].Children.Add(item1);
+            sections[1].Children.Add(item2);
+            context.SaveChanges();
         }
 
         private void PopulateViews()

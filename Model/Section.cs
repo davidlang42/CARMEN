@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Linq;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Model
 {
@@ -12,12 +13,5 @@ namespace Model
     /// </summary>
     public class Section : Node
     {
-        #region Database fields
-        /// <summary>A list of nodes (eg. Section or Item) whose parent is this node.</summary>
-        public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
-        #endregion
-
-        internal override IEnumerable<Item> ItemsInOrder()
-            => Children.InOrder().SelectMany(n => n.ItemsInOrder());
     }
 }

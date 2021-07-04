@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:App"
+        xmlns:model="clr-namespace:Model;assembly=Model"
         mc:Ignorable="d"
         Title="CARMEN: Simple Explorer" Height="450" Width="800" Loaded="Window_Loaded">
     <Window.Resources>
@@ -20,6 +21,8 @@
                               Source="{Binding Applicants, Source={StaticResource showsViewSource}}"/>
         <CollectionViewSource x:Key="groupsViewSource"
                               Source="{Binding CastGroups, Source={StaticResource showsViewSource}}"/>
+        <CollectionViewSource x:Key="nodesViewSource" 
+                              Source="{Binding Children, Source={StaticResource showsViewSource}}"/>
     </Window.Resources>
     <Grid>
         <TabControl Margin="0,0,0,35" ScrollViewer.HorizontalScrollBarVisibility="Auto">
@@ -38,6 +41,13 @@
                                     Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <TreeView x:Name="itemsTreeView" ItemsSource="{Binding Source={StaticResource nodesViewSource}}">
+                            <TreeView.Resources>
+                                <HierarchicalDataTemplate DataType="{x:Type model:Node}" ItemsSource="{Binding Children}">
+                                    <TextBlock Text="{Binding Path=Name}"/>
+                                </HierarchicalDataTemplate>
+                            </TreeView.Resources>
+                        </TreeView>
                         <DataGrid x:Name="sectionsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource sectionsViewSource}}" 

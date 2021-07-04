@@ -10,7 +10,7 @@ namespace Model
     {
         public DbSet<Show> Shows => Set<Show>();
 
-        public Show ShowById(int show_id) => Shows.Where(s => s.ShowId == show_id).Single();
+        //TODO public Show ShowById(int show_id) => Shows.Where(s => s.ShowId == show_id).Single();
 
         public ShowContext(DbContextOptions<ShowContext> options) : base(options)
         { }
@@ -27,6 +27,9 @@ namespace Model
                 .HasKey(a => new { a.ApplicantId, a.CriteriaId });
             modelBuilder.Entity<CountByGroup>()
                 .HasKey(c => new { c.RoleId, c.CastGroupId });
+            modelBuilder.Entity<Node>();
+            modelBuilder.Entity<Item>();
+            modelBuilder.Entity<Section>();
         }
     }
 }

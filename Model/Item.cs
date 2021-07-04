@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Linq;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Model
 {
@@ -14,7 +15,5 @@ namespace Model
         #region Database fields
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
-
-        internal override IEnumerable<Item> ItemsInOrder() => new[] { this };
     }
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using System.Linq;
 
 namespace Model
 {
@@ -16,11 +17,10 @@ namespace Model
         public int NodeId { get; private set; }
         public string Name { get; set; } = "";
         public int Order { get; set; }
-        public Show Show { get; set; } = null!;
-        /// <summary>The parent section (or null if root) of this node.</summary>
-        public Section? Parent { get; set; }
+        public virtual Node? Parent { get; set; }
+        public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
         #endregion
 
-        internal abstract IEnumerable<Item> ItemsInOrder();
+        public IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
     }
 }
