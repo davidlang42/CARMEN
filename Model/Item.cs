@@ -11,7 +11,9 @@ namespace Model
     /// </summary>
     public class Item : Node
     {
+        #region Database fields
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
+        #endregion
 
         internal override IEnumerable<Item> ItemsInOrder() => new[] { this };
     }

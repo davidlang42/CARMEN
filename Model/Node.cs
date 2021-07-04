@@ -7,8 +7,7 @@ using System.Text;
 namespace Model
 {
     /// <summary>
-    /// A node in the item tree.
-    /// Eg. Section or Item
+    /// A node in the item tree (eg. Section or Item).
     /// </summary>
     public abstract class Node : IOrdered
     {

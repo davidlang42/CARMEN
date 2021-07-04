@@ -13,7 +13,7 @@ namespace Model
     public class Section : Node
     {
         #region Database fields
-        /// <summary>A list of nodes (eg. Section or Item) which are children to this node.</summary>
+        /// <summary>A list of nodes (eg. Section or Item) whose parent is this node.</summary>
         public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
         #endregion
 
