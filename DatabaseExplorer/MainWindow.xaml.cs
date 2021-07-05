@@ -158,9 +158,6 @@ namespace App
             {
                 Name = "Item 3"
             };
-            Context.AddRange(s1, s2, i3);
-            Context.SaveChanges();//TODO do I really need to save these first?
-            var sections = Context.Nodes.OfType<Section>().ToList();
             var i1 = new Item
             {
                 Name = "Item 1a"
@@ -169,8 +166,9 @@ namespace App
             {
                 Name = "Item 2a",
             };
-            sections[0].Children.Add(i1);
-            sections[1].Children.Add(i2);
+            s1.Children.Add(i1);
+            s2.Children.Add(i2);
+            Context.AddRange(s1, s2, i3);
             Context.SaveChanges();
             RefreshViews();
         }
