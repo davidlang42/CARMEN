@@ -10,14 +10,9 @@ namespace Model
         #region Database fields
         [Key]
         public int SectionTypeId { get; private set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = "";
         #endregion
 
-        public SectionType(string name = "")
-        {
-            Name = name;
-        }
-
-        public static SectionType CreateDefault() => new SectionType("Section");
+        public static SectionType CreateDefault() => new SectionType { Name = "Section" };
     }
 }

@@ -14,10 +14,6 @@
         <CollectionViewSource x:Key="criteriaViewSource"/>
         <CollectionViewSource x:Key="imagesViewSource"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
-        <CollectionViewSource x:Key="rolesViewSource" 
-                              Source="{Binding Roles, Source={StaticResource rootNodesViewSource}}"/>
-        <CollectionViewSource x:Key="countsViewSource"
-                              Source="{Binding CountByGroups, Source={StaticResource rolesViewSource}}"/>
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -39,7 +35,7 @@
             <TabItem Header="Show Structure">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <TreeView x:Name="itemsTreeView" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}">
+                        <TreeView x:Name="itemsTreeView" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}">
                             <TreeView.Resources>
                                 <HierarchicalDataTemplate DataType="{x:Type model:Section}" ItemsSource="{Binding Children}">
                                     <TextBlock Text="{Binding Path=Name, StringFormat='Section: {0}'}"/>
@@ -51,7 +47,7 @@
                         </TreeView>
                         <DataGrid x:Name="rolesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
-                        ItemsSource="{Binding Source={StaticResource rolesViewSource}}" 
+                        ItemsSource="{Binding ElementName=itemsTreeView, Path=SelectedItem.Roles}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding RoleId}" Header="Role Id" 
@@ -61,7 +57,7 @@
                         </DataGrid>
                         <DataGrid x:Name="countsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
-                        ItemsSource="{Binding Source={StaticResource countsViewSource}}" 
+                        ItemsSource="{Binding ElementName=rolesDataGrid, Path=SelectedItem.CountByGroups}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
