@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Model
@@ -13,6 +14,6 @@ namespace Model
         internal int ApplicantId { get; private set; }
         internal int CriteriaId { get; private set; }
         public virtual Criteria Criteria { get; set; } = null!;
-        public uint Mark { get; set; }
+        public uint Mark { get; set; } //TODO add validation: Mark <= Criteria.MaxMark
     }
 }

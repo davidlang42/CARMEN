@@ -17,10 +17,9 @@ namespace Model
         public int NodeId { get; private set; }
         public string Name { get; set; } = "";
         public int Order { get; set; }
-        public virtual Node? Parent { get; set; }
-        public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
+        public virtual Section? Parent { get; set; }
         #endregion
 
-        public virtual IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
+        public abstract IEnumerable<Item> ItemsInOrder();
     }
 }

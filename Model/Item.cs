@@ -16,6 +16,6 @@ namespace Model
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
 
-        public override IEnumerable<Item> ItemsInOrder() => new[] { this };
+        public override IEnumerable<Item> ItemsInOrder() => this.Yield();
     }
 }

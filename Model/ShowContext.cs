@@ -8,9 +8,13 @@ namespace Model
 {
     public class ShowContext : DbContext
     {
-        public DbSet<Show> Shows => Set<Show>();
+        public DbSet<Applicant> Applicants => Set<Applicant>();
+        public DbSet<CastGroup> CastGroups => Set<CastGroup>();
+        public DbSet<Node> Nodes => Set<Node>();
 
-        //TODO public Show ShowById(int show_id) => Shows.Where(s => s.ShowId == show_id).Single();
+        public IEnumerable<Node> RootNodes => Nodes.Where(n => n.Parent == null).InOrder();
+
+        public IEnumerable<Item> ItemsInOrder() => RootNodes.SelectMany(n => n.ItemsInOrder());
 
         public ShowContext(DbContextOptions<ShowContext> options) : base(options)
         { }

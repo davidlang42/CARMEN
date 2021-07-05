@@ -15,6 +15,9 @@ namespace Model
     {
         #region Database fields
         public virtual SectionType SectionType { get; set; } = null!;
+        public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
         #endregion
+
+        public override IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
     }
 }

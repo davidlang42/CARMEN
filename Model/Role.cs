@@ -22,6 +22,6 @@ namespace Model
             => CountByGroups.Where(c => c.CastGroupId == group.CastGroupId).Select(c => c.Count).SingleOrDefault(); // defaults to 0
 
         public uint TotalCount()
-            => Convert.ToUInt32(CountByGroups.Sum(c => c.Count)); // will crash if greater than UInt32.MaxValue
+            => Convert.ToUInt32(CountByGroups.Sum(c => c.Count)); //TODO will crash if greater than UInt32.MaxValue
     }
 }

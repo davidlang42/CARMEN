@@ -50,11 +50,6 @@ namespace App
             using var context = new ShowContext(contextOptions);
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
-            context.Shows.Add(new Show
-            {
-                Name = "Test Show"
-            });
-            context.SaveChanges();
             var show = context.Shows.First();
             show.Children.Add(new Section
             {
