@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:App"
         xmlns:model="clr-namespace:Model;assembly=Model"
         mc:Ignorable="d"
-        Title="CARMEN: Simple Explorer" Height="450" Width="800" Loaded="Window_Loaded">
+        Title="CARMEN: Database Explorer" Height="600" Width="800">
     <Window.Resources>
         <CollectionViewSource x:Key="applicantsViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
@@ -19,8 +19,23 @@
         <CollectionViewSource x:Key="countsViewSource"
                               Source="{Binding CountByGroups, Source={StaticResource rolesViewSource}}"/>
     </Window.Resources>
-    <Grid>
-        <TabControl Margin="0,0,0,35" ScrollViewer.HorizontalScrollBarVisibility="Auto">
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Create" Click="CreateMenu_Click"/>
+                <MenuItem Header="_Open" Click="OpenMenu_Click"/>
+                <Separator />
+                <MenuItem Header="_Save" Click="SaveMenu_Click" IsEnabled="False"/>
+                <MenuItem Header="_Revert" Click="RevertMenu_Click" IsEnabled="False"/>
+                <Separator />
+                <MenuItem Header="_Exit" Click="ExitMenu_Click"/>
+            </MenuItem>
+            <MenuItem Header="_Tools" IsEnabled="False">
+                <MenuItem Header="Add _Test Data" Click="TestDataMenu_Click" />
+                <MenuItem Header="_Clear Database" Click="ClearDataMenu_Click" />
+            </MenuItem>
+        </Menu>
+        <TabControl ScrollViewer.HorizontalScrollBarVisibility="Auto" IsEnabled="False">
             <TabItem Header="Show Structure">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
@@ -56,6 +71,17 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+            <TabItem Header="Section Types">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="sectionTypesDataGrid" AutoGenerateColumns="True" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
             <TabItem Header="Applicants">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
@@ -67,10 +93,10 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Groups">
+            <TabItem Header="Cast Groups">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="groupsDataGrid" AutoGenerateColumns="True" 
+                        <DataGrid x:Name="castGroupsDataGrid" AutoGenerateColumns="True" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
@@ -78,10 +104,28 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+            <TabItem Header="Criteria">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="criteriaDataGrid" AutoGenerateColumns="True" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Images">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="imagesDataGrid" AutoGenerateColumns="True" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource imagesViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
         </TabControl>
-        <Button Content="Save Changes" HorizontalAlignment="Right" Margin="0,0,10,10" 
-                Click="SaveButton_Click" Height="20" Width="123" VerticalAlignment="Bottom"/>
-        <Button Content="Undo Changes" HorizontalAlignment="Right" Margin="0,0,138,10" 
-                Click="UndoButton_Click" Height="20" Width="123" VerticalAlignment="Bottom"/>
-    </Grid>
+    </DockPanel>
 </Window>

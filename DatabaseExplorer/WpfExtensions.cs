@@ -12,15 +12,14 @@ namespace SimpleExplorer
         // Source: https://stackoverflow.com/questions/974598/find-all-controls-in-wpf-window-by-type
         public static IEnumerable<T> AllControls<T>(this DependencyObject depObj) where T : DependencyObject
         {
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(depObj); i++)
+            foreach (var child in LogicalTreeHelper.GetChildren(depObj))
             {
-                var child = VisualTreeHelper.GetChild(depObj, i);
-
                 if (child is T)
                     yield return (T)child;
 
-                foreach (T childOfChild in AllControls<T>(child))
-                    yield return childOfChild;
+                if (child is DependencyObject childDepObj)
+                    foreach (T childOfChild in AllControls<T>(childDepObj))
+                        yield return childOfChild;
             }
         }
         //TODO I can do a better job of this, maybe using .Children and Include()
