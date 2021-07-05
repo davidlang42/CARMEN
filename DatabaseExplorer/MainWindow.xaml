@@ -14,6 +14,7 @@
         <CollectionViewSource x:Key="criteriaViewSource"/>
         <CollectionViewSource x:Key="imagesViewSource"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
+        <local:SortIOrdered x:Key="sortIOrdered" />
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -37,7 +38,7 @@
                     <StackPanel Background="#FFE5E5E5">
                         <TreeView x:Name="itemsTreeView" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}">
                             <TreeView.Resources>
-                                <HierarchicalDataTemplate DataType="{x:Type model:Section}" ItemsSource="{Binding Children}">
+                                <HierarchicalDataTemplate DataType="{x:Type model:Section}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
                                     <TextBlock Text="{Binding Path=Name, StringFormat='Section: {0}'}"/>
                                 </HierarchicalDataTemplate>
                                 <HierarchicalDataTemplate DataType="{x:Type model:Item}">

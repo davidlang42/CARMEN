@@ -5,7 +5,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Media;
 
-namespace SimpleExplorer
+namespace App
 {
     static class WpfExtensions
     {

@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using Model;
-using SimpleExplorer;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -108,6 +107,7 @@ namespace App
             castGroupsViewSource.Source = Context.CastGroups.Local.ToObservableCollection();
             rootNodesViewSource.Source = Context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
+            rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
             criteriaViewSource.Source = Context.Criteria.Local.ToObservableCollection();
             imagesViewSource.Source = Context.Images.Local.ToObservableCollection();
             sectionTypesViewSource.Source = Context.SectionTypes.Local.ToObservableCollection();
@@ -144,7 +144,7 @@ namespace App
 
         private void ExitMenu_Click(object sender, RoutedEventArgs e) => Close();
 
-        private void TestDataMenu_Click(object sender, RoutedEventArgs e)
+        private void TestDataMenu_Click(object sender, RoutedEventArgs e)//TODO make a better test data generator
         {
             var s1 = new Section
             {
