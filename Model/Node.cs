@@ -8,18 +8,28 @@ using System.Linq;
 namespace Model
 {
     /// <summary>
-    /// A node in the item tree (eg. Section or Item).
+    /// A node in the item tree, which may or may not be able to have children.
     /// </summary>
     public abstract class Node : IOrdered
     {
         #region Database fields
         [Key]
         public int NodeId { get; private set; }
-        public string Name { get; set; } = "";
+        public abstract string Name { get; set; }
         public int Order { get; set; }
-        public virtual Section? Parent { get; set; }
+        public virtual InnerNode? Parent { get; set; }
         #endregion
 
         public abstract IEnumerable<Item> ItemsInOrder();
+    }
+
+    /// <summary>
+    /// An internal node of the item tree, which can have children.
+    /// </summary>
+    public abstract class InnerNode : Node
+    {
+        public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
+
+        public override IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
     }
 }

@@ -15,16 +15,10 @@ namespace Model
         public DbSet<Criteria> Criteria => Set<Criteria>();
         public DbSet<Image> Images => Set<Image>();
         public DbSet<SectionType> SectionTypes => Set<SectionType>();
-        private DbSet<ShowSettings> showSettings => Set<ShowSettings>();
         #endregion
 
-        public ShowSettings ShowSettings => showSettings.SingleOrDefault() ?? Add(new ShowSettings()).Entity;
-
-        /// <summary>List nodes without parents, in order.</summary>
-        public IEnumerable<Node> RootNodes => Nodes.Where(n => n.Parent == null).InOrder();
-
-        /// <summary>Recursively list all items, in order.</summary>
-        public IEnumerable<Item> ItemsInOrder() => RootNodes.SelectMany(n => n.ItemsInOrder());
+        /// <summary>The root node of the show structure</summary>
+        public ShowRoot ShowRoot => Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;
 
         public ShowContext(DbContextOptions<ShowContext> options) : base(options)
         { }
@@ -37,15 +31,16 @@ namespace Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Create composite keys
             modelBuilder.Entity<Ability>()
                 .HasKey(a => new { a.ApplicantId, a.CriteriaId });
             modelBuilder.Entity<CountByGroup>()
                 .HasKey(c => new { c.RoleId, c.CastGroupId });
+            // Add inheritance structure for item tree
             modelBuilder.Entity<Node>();
             modelBuilder.Entity<Item>();
             modelBuilder.Entity<Section>();
-            modelBuilder.Entity<ShowSettings>()
-                .HasKey("_id");
+            modelBuilder.Entity<ShowRoot>();
         }
     }
 }

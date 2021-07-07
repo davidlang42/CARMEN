@@ -12,10 +12,12 @@ namespace Model
     /// </summary>
     public class Item : Node
     {
-        #region Database fields
+        public override string Name { get; set; } = "Item";
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
-        #endregion
 
         public override IEnumerable<Item> ItemsInOrder() => this.Yield();
+
+        public Item? NextItem() => throw new NotImplementedException(); //TODO implement NextItem
+        public Item? PreviousItem() => throw new NotImplementedException(); //TODO implement PreviousItem
     }
 }

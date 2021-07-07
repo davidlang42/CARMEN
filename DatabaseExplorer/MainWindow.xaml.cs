@@ -146,18 +146,21 @@ namespace App
 
         private void TestDataMenu_Click(object sender, RoutedEventArgs e)//TODO make a better test data generator
         {
-            Context.ShowSettings.Name = "Test Name";
+            var show = Context.ShowRoot;
             var s1 = new Section
             {
-                Name = "Section 1"
+                Name = "Section 1",
+                Parent = show
             };
             var s2 = new Section
             {
-                Name = "Section 2"
+                Name = "Section 2",
+                Parent = show
             };
             var i3 = new Item
             {
-                Name = "Item 3"
+                Name = "Item 3",
+                Parent = show
             };
             var i1 = new Item
             {
