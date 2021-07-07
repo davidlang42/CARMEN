@@ -146,6 +146,7 @@ namespace App
 
         private void TestDataMenu_Click(object sender, RoutedEventArgs e)//TODO make a better test data generator
         {
+            Context.ShowSettings.Name = "Test Name";
             var s1 = new Section
             {
                 Name = "Section 1"

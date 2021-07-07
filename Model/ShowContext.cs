@@ -15,7 +15,10 @@ namespace Model
         public DbSet<Criteria> Criteria => Set<Criteria>();
         public DbSet<Image> Images => Set<Image>();
         public DbSet<SectionType> SectionTypes => Set<SectionType>();
+        private DbSet<ShowSettings> showSettings => Set<ShowSettings>();
         #endregion
+
+        public ShowSettings ShowSettings => showSettings.SingleOrDefault() ?? Add(new ShowSettings()).Entity;
 
         /// <summary>List nodes without parents, in order.</summary>
         public IEnumerable<Node> RootNodes => Nodes.Where(n => n.Parent == null).InOrder();
@@ -41,6 +44,8 @@ namespace Model
             modelBuilder.Entity<Node>();
             modelBuilder.Entity<Item>();
             modelBuilder.Entity<Section>();
+            modelBuilder.Entity<ShowSettings>()
+                .HasKey("_id");
         }
     }
 }
