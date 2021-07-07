@@ -11,6 +11,7 @@ namespace Model
         [Key]
         public int SectionTypeId { get; private set; }
         public string Name { get; set; } = "";
+        public Image? Icon { get; set; }
         #endregion
 
         public static SectionType CreateDefault() => new SectionType { Name = "Section" };

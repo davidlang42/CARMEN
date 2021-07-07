@@ -15,6 +15,7 @@ namespace Model
         public int CastGroupId { get; private set; }
         public int Order { get; set; }
         public string Name { get; set; } = "";
+        public Image? Icon { get; set; }
         public virtual ICollection<Applicant> Members { get; private set; } = new ObservableCollection<Applicant>();
     }
 }
