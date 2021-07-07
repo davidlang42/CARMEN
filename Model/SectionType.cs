@@ -14,6 +14,6 @@ namespace Model
         public Image? Icon { get; set; }
         #endregion
 
-        public static SectionType CreateDefault() => new SectionType { Name = "Section" };
+        public static SectionType CreateDefault() => new() { Name = "Section" };
     }
 }
