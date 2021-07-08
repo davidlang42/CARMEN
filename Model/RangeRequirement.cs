@@ -8,7 +8,7 @@ namespace Model
 {
     public abstract class RangeRequirement : Requirement
     {
-        public uint? Minimum { get; set; }//TODO validate that at least 1 of Minimum/Maximum is not null
+        public uint? Minimum { get; set; }
         public uint? Maximum { get; set; }
 
         protected bool IsInRange(uint value)
