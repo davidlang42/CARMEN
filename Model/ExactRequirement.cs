@@ -22,6 +22,6 @@ namespace Model
         public virtual Criteria Criteria { get; set; } = null!;
 
         public override bool IsSatisfiedBy(Applicant applicant)
-            => applicant.GetMarkFor(Criteria) == RequiredValue;
+            => applicant.MarkFor(Criteria) == RequiredValue;
     }
 }

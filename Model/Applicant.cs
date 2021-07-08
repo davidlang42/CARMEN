@@ -39,9 +39,9 @@ namespace Model
 
         public string DisplayName() => FirstName + " " + LastName;
 
-        public int OverallAbility() => Convert.ToInt32(Abilities.Sum(a => a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); // may crash if Criteria Weights sum to greater than Int32.MaxValue
+        public int OverallAbility() => Convert.ToInt32(Abilities.Sum(a => a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); //TODO may crash if Criteria Weights sum to greater than Int32.MaxValue
 
-        public uint GetMarkFor(Criteria criteria)
+        public uint MarkFor(Criteria criteria)
             => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark ?? 0;
     }
 

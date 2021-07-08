@@ -33,11 +33,11 @@ namespace Model
         public bool ScaleSuitability { get; set; }
 
         public override bool IsSatisfiedBy(Applicant applicant)
-            => IsInRange(applicant.GetMarkFor(Criteria));
+            => IsInRange(applicant.MarkFor(Criteria));
 
         public override double SuitabilityOf(Applicant applicant)
         {
-            var mark = applicant.GetMarkFor(Criteria);
+            var mark = applicant.MarkFor(Criteria);
             if (!IsInRange(mark))
                 return 0;
             else if (ScaleSuitability)
