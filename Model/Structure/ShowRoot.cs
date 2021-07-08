@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Model.Structure
 {
     /// <summary>
     /// The (singular) root node of the item tree, including various details about the show

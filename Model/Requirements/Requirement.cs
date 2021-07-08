@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Text;
 
-namespace Model
+namespace Model.Requirements
 {
     /// <summary>
     /// A requirement which can be satisfied by an Applicant

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Linq;
 
-namespace Model
+namespace Model.Structure
 {
     /// <summary>
     /// A node in the item tree, which may or may not be able to have children.

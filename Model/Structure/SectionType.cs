@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Linq;
 
-namespace Model
+namespace Model.Structure
 {
     public class SectionType : ICounted
     {

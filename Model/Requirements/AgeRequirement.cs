@@ -4,13 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Model
+namespace Model.Requirements
 {
-    public class CastGroupRequirement : Requirement
+    public class AgeRequirement : RangeRequirement
     {
-        public virtual CastGroup CastGroup { get; set; } = null!;
-
         public override bool IsSatisfiedBy(Applicant applicant)
-            => applicant.CastGroups.Contains(CastGroup);
+            => IsInRange(applicant.AgeToday()); //TODO should be age at show
     }
 }

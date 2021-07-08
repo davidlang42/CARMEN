@@ -6,7 +6,7 @@ using System.Text;
 using System.Linq;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Model
+namespace Model.Structure
 {
     /// <summary>
     /// A section of the show, containing items or other sections.

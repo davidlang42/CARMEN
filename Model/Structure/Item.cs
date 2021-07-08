@@ -5,7 +5,7 @@ using System.Text;
 using System.Linq;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Model
+namespace Model.Structure
 {
     /// <summary>
     /// An item within the show.
