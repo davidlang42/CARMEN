@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Model
 {
-    public class Role
+    public class Role : ICounted
     {
         #region Database fields
         [Key]
@@ -20,8 +20,5 @@ namespace Model
 
         public uint CountFor(CastGroup group)
             => CountByGroups.Where(c => c.CastGroupId == group.CastGroupId).Select(c => c.Count).SingleOrDefault(); // defaults to 0
-
-        public uint TotalCount()
-            => Convert.ToUInt32(CountByGroups.Sum(c => c.Count)); //TODO will crash if greater than UInt32.MaxValue
     }
 }

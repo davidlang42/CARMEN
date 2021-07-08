@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Model
 {
@@ -10,5 +11,8 @@ namespace Model
         {
             yield return obj;
         }
+
+        public static uint Sum(this IEnumerable<uint> list)
+            => (uint)list.Cast<int>().Sum();
     }
 }
