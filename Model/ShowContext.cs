@@ -37,10 +37,15 @@ namespace Model
             modelBuilder.Entity<CountByGroup>()
                 .HasKey(c => new { c.RoleId, c.CastGroupId });
             // Add inheritance structure for item tree
-            modelBuilder.Entity<Node>();
             modelBuilder.Entity<Item>();
             modelBuilder.Entity<Section>();
             modelBuilder.Entity<ShowRoot>();
+            // Add inheritance structure for requirements
+            modelBuilder.Entity<AgeRequirement>();
+            modelBuilder.Entity<GenderRequirement>();
+            modelBuilder.Entity<CastGroupRequirement>();
+            modelBuilder.Entity<AbilityExactRequirement>();
+            modelBuilder.Entity<AbilityRangeRequirement>();
         }
     }
 }
