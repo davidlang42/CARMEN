@@ -46,6 +46,9 @@ namespace Model
             modelBuilder.Entity<CastGroupRequirement>();
             modelBuilder.Entity<AbilityExactRequirement>();
             modelBuilder.Entity<AbilityRangeRequirement>();
+            modelBuilder.Entity<AndRequirement>();
+            modelBuilder.Entity<OrRequirement>();
+            modelBuilder.Entity<XorRequirement>();
         }
     }
 }
