@@ -21,6 +21,6 @@ namespace Model
         public virtual ICollection<Applicant> Members { get; private set; } = new ObservableCollection<Applicant>();
         /// <summary>The number of applicants which should be allocated to this group</summary>
         public uint? RequiredCount { get; set; }
-        //TODO public virtual ICollection<Requirement<Applicant>> Requirements {get;set;} = new ObservableCollection<Requirement<Applicant>>();
+        public virtual ICollection<Requirement> Requirements { get; set; } = new ObservableCollection<Requirement>();
     }
 }

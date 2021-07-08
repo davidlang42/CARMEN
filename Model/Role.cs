@@ -14,7 +14,7 @@ namespace Model
         public int RoleId { get; private set; }
         public string Name { get; set; } = "";
         public virtual ICollection<Item> Items { get; private set; } = new ObservableCollection<Item>();
-        //TODO public virtual ICollection<Requirement<Applicant>> Requirements { get; private set; } = new ObservableCollection<Requirement<Applicant>>();
+        public virtual ICollection<Requirement> Requirements { get; set; } = new ObservableCollection<Requirement>();
         public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
         #endregion
 

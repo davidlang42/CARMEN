@@ -5,6 +5,9 @@ using System.Text;
 
 namespace Model
 {
+    /// <summary>
+    /// An object which can be ordered when in a collection
+    /// </summary>
     public interface IOrdered
     {
         int Order { get; }

@@ -10,6 +10,7 @@ namespace Model
     /// </summary>
     public class Criteria : IOrdered
     {
+        //TODO differentiate numeric criteria from "select from list" criteria, maybe also bool crit?
         [Key]
         public int CriteriaId { get; private set; }
         public string Name { get; set; } = "";
