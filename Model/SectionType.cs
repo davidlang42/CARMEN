@@ -17,7 +17,7 @@ namespace Model
         public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
         #endregion
 
-        public uint CountFor(CastGroup group)
+        uint ICounted.CountFor(CastGroup group)
             => throw new NotImplementedException("Section types cannot be counted.");
     }
 }
