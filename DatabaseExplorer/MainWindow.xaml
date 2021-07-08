@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:App"
-        xmlns:model="clr-namespace:Model;assembly=Model"
+        xmlns:modelStructure="clr-namespace:Model.Structure;assembly=Model"
         mc:Ignorable="d"
         Title="CARMEN: Database Explorer" Height="600" Width="800">
     <Window.Resources>
@@ -38,13 +38,13 @@
                     <StackPanel Background="#FFE5E5E5">
                         <TreeView x:Name="itemsTreeView" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}">
                             <TreeView.Resources>
-                                <HierarchicalDataTemplate DataType="{x:Type model:ShowRoot}" ItemsSource="{Binding Children}">
+                                <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children}">
                                     <TextBlock Text="{Binding Path=Name, StringFormat='Show: {0}'}"/>
                                 </HierarchicalDataTemplate>
-                                <HierarchicalDataTemplate DataType="{x:Type model:Section}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
+                                <HierarchicalDataTemplate DataType="{x:Type modelStructure:Section}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
                                     <TextBlock Text="{Binding Path=Name, StringFormat='Section: {0}'}"/>
                                 </HierarchicalDataTemplate>
-                                <HierarchicalDataTemplate DataType="{x:Type model:Item}">
+                                <HierarchicalDataTemplate DataType="{x:Type modelStructure:Item}">
                                     <TextBlock Text="{Binding Path=Name, StringFormat='Item: {0}'}"/>
                                 </HierarchicalDataTemplate>
                             </TreeView.Resources>

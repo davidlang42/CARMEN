@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using Model.Structure;
+using Model.Requirements;
 
 namespace Model
 {
