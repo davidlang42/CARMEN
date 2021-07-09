@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace Model.Criterias
 {
+    /// <summary>
+    /// A criteria which is marked as one of a set of discreet options.
+    /// This can also be a numeric scale in the order of the options.
+    /// </summary>
     public class SelectCriteria : Criteria
     {
-        private string[] options = new[] { "", "" };//TODO set up value converter so this can be saved to the db
+        /// <summary>ValueConverter configured in <c cref="ShowContext.OnModelCreating">DbContext</c>.</summary>
+        private string[] options = new[] { "", "" };
         /// <summary>A list of options which are available for this criteria.
         /// NOTE: Changing this will not update the indicies which are already set as applicant ability marks.</summary>
         public string[] Options

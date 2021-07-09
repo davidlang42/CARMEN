@@ -6,6 +6,7 @@ using System.Linq;
 using Model.Structure;
 using Model.Requirements;
 using Model.Criterias;
+using System.Text.Json;
 
 namespace Model
 {
@@ -55,7 +56,10 @@ namespace Model
             modelBuilder.Entity<NotRequirement>();
             // Add inheritance structure for critiera
             modelBuilder.Entity<NumericCriteria>();
-            modelBuilder.Entity<SelectCriteria>();
+            modelBuilder.Entity<SelectCriteria>()
+                .Property(s => s.Options)
+                .HasConversion(obj => JsonSerializer.Serialize(obj, null),
+                      json => JsonSerializer.Deserialize<string[]>(json, null) ?? Array.Empty<string>());
             modelBuilder.Entity<BooleanCriteria>();
         }
     }

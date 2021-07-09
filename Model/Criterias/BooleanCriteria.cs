@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Model.Criterias
 {
+    /// <summary>
+    /// A criteria which is marked as True or False.
+    /// </summary>
     public class BooleanCriteria : Criteria
     {
         public override uint MaxMark

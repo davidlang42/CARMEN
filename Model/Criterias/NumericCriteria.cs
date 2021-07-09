@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Model.Criterias
 {
+    /// <summary>
+    /// A criteria which is marked on a numeric scale.
+    /// </summary>
     public class NumericCriteria : Criteria
     {
         public override uint MaxMark { get; set; }
