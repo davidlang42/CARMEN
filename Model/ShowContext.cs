@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Model.Structure;
 using Model.Requirements;
+using Model.Criterias;
 
 namespace Model
 {

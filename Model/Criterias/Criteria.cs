@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Model.Criteria
+namespace Model.Criterias
 {
     /// <summary>
     /// A criteria on which applicants are assessed, and assigned a mark.
