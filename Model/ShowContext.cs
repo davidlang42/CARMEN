@@ -52,6 +52,7 @@ namespace Model
             modelBuilder.Entity<AndRequirement>();
             modelBuilder.Entity<OrRequirement>();
             modelBuilder.Entity<XorRequirement>();
+            modelBuilder.Entity<NotRequirement>();
         }
     }
 }
