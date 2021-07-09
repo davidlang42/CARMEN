@@ -10,11 +10,6 @@ namespace Model.Requirements
     {
         public virtual Requirement SubRequirement { get; set; } = null!;
 
-        public NotRequirement(Requirement requirement)
-        {
-            SubRequirement = requirement;
-        }
-
         public override bool IsSatisfiedBy(Applicant applicant)
             => !SubRequirement.IsSatisfiedBy(applicant);
 
