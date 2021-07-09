@@ -53,6 +53,10 @@ namespace Model
             modelBuilder.Entity<OrRequirement>();
             modelBuilder.Entity<XorRequirement>();
             modelBuilder.Entity<NotRequirement>();
+            // Add inheritance structure for critiera
+            modelBuilder.Entity<NumericCriteria>();
+            modelBuilder.Entity<SelectCriteria>();
+            modelBuilder.Entity<BooleanCriteria>();
         }
     }
 }
