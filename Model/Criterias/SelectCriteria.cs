@@ -8,7 +8,7 @@ namespace Model.Criterias
 {
     public class SelectCriteria : Criteria
     {
-        private string[] options = new[] { "" };
+        private string[] options = new[] { "", "" };//TODO set up value converter so this can be saved to the db
         /// <summary>A list of options which are available for this criteria.
         /// NOTE: Changing this will not update the indicies which are already set as applicant ability marks.</summary>
         public string[] Options
