@@ -1,4 +1,6 @@
-﻿using Model.Structure;
+﻿using Model.Criterias;
+using Model.Requirements;
+using Model.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,13 +14,27 @@ namespace Model
     /// </summary>
     public class TestDataGenerator : IDisposable
     {
+        // SOURCE: https://namecensus.com/ (16 May 2021)
+        static string[] LAST_NAMES = "SMITH,JOHNSON,WILLIAMS,JONES,BROWN,DAVIS,MILLER,WILSON,MOORE,TAYLOR,ANDERSON,THOMAS,JACKSON,WHITE,HARRIS,MARTIN,THOMPSON,GARCIA,MARTINEZ,ROBINSON,CLARK,RODRIGUEZ,LEWIS,LEE,WALKER,HALL,ALLEN,YOUNG,HERNANDEZ,KING,WRIGHT,LOPEZ,HILL,SCOTT,GREEN,ADAMS,BAKER,GONZALEZ,NELSON,CARTER,MITCHELL,PEREZ,ROBERTS,TURNER,PHILLIPS,CAMPBELL,PARKER,EVANS,EDWARDS,COLLINS,STEWART,SANCHEZ,MORRIS,ROGERS,REED,COOK,MORGAN,BELL,MURPHY,BAILEY,RIVERA,COOPER,RICHARDSON,COX,HOWARD,WARD,TORRES,PETERSON,GRAY,RAMIREZ,JAMES,WATSON,BROOKS,KELLY,SANDERS,PRICE,BENNETT,WOOD,BARNES,ROSS,HENDERSON,COLEMAN,JENKINS,PERRY,POWELL,LONG,PATTERSON,HUGHES,FLORES,WASHINGTON,BUTLER,SIMMONS,FOSTER,GONZALES,BRYANT,ALEXANDER,RUSSELL,GRIFFIN,DIAZ,HAYES".Split(',');
+        static string[] MALE_FIRST_NAMES = "JAMES,JOHN,ROBERT,MICHAEL,WILLIAM,DAVID,RICHARD,CHARLES,JOSEPH,THOMAS,CHRISTOPHER,DANIEL,PAUL,MARK,DONALD,GEORGE,KENNETH,STEVEN,EDWARD,BRIAN,RONALD,ANTHONY,KEVIN,JASON,MATTHEW,GARY,TIMOTHY,JOSE,LARRY,JEFFREY,FRANK,SCOTT,ERIC,STEPHEN,ANDREW,RAYMOND,GREGORY,JOSHUA,JERRY,DENNIS,WALTER,PATRICK,PETER,HAROLD,DOUGLAS,HENRY,CARL,ARTHUR,RYAN,ROGER,JOE,JUAN,JACK,ALBERT,JONATHAN,JUSTIN,TERRY,GERALD,KEITH,SAMUEL,WILLIE,RALPH,LAWRENCE,NICHOLAS,ROY,BENJAMIN,BRUCE,BRANDON,ADAM,HARRY,FRED,WAYNE,BILLY,STEVE,LOUIS,JEREMY,AARON,RANDY,HOWARD,EUGENE,CARLOS,RUSSELL,BOBBY,VICTOR,MARTIN,ERNEST,PHILLIP,TODD,JESSE,CRAIG,ALAN,SHAWN,CLARENCE,SEAN,PHILIP,CHRIS,JOHNNY,EARL,JIMMY,ANTONIO".Split(',');
+        static string[] FEMALE_FIRST_NAMES = "MARY,PATRICIA,LINDA,BARBARA,ELIZABETH,JENNIFER,MARIA,SUSAN,MARGARET,DOROTHY,LISA,NANCY,KAREN,BETTY,HELEN,SANDRA,DONNA,CAROL,RUTH,SHARON,MICHELLE,LAURA,SARAH,KIMBERLY,DEBORAH,JESSICA,SHIRLEY,CYNTHIA,ANGELA,MELISSA,BRENDA,AMY,ANNA,REBECCA,VIRGINIA,KATHLEEN,PAMELA,MARTHA,DEBRA,AMANDA,STEPHANIE,CAROLYN,CHRISTINE,MARIE,JANET,CATHERINE,FRANCES,ANN,JOYCE,DIANE,ALICE,JULIE,HEATHER,TERESA,DORIS,GLORIA,EVELYN,JEAN,CHERYL,MILDRED,KATHERINE,JOAN,ASHLEY,JUDITH,ROSE,JANICE,KELLY,NICOLE,JUDY,CHRISTINA,KATHY,THERESA,BEVERLY,DENISE,TAMMY,IRENE,JANE,LORI,RACHEL,MARILYN,ANDREA,KATHRYN,LOUISE,SARA,ANNE,JACQUELINE,WANDA,BONNIE,JULIA,RUBY,LOIS,TINA,PHYLLIS,NORMA,PAULA,DIANA,ANNIE,LILLIAN,EMILY,ROBIN".Split(',');
+
+        static DateTime MINIMUM_DOB = new DateTime(1970, 1, 1);
+        static DateTime MAXIMUM_DOB = new DateTime(2011, 1, 1);
+
         ShowContext? _context;
+        Random random;
 
         internal ShowContext Context => _context ?? throw new ApplicationException("Context is not set, has this already been disposed?");
 
-        public TestDataGenerator(ShowContext context)
+        public TestDataGenerator(ShowContext context, int random_seed)
+            : this(context, new Random(random_seed))
+        { }
+
+        public TestDataGenerator(ShowContext context, Random? random = null)
         {
             this._context = context;
+            this.random = random ?? new Random();
         }
 
         public void Dispose()
@@ -28,7 +44,7 @@ namespace Model
 
         private void AddToNode(InnerNode node, ref uint next_item_number, ref uint next_section_number, uint items_in_this_node, uint sections_in_this_node, uint items_per_sub_section, uint sections_per_sub_section, uint section_depth, SectionType section_type, bool include_items_at_every_depth)
         {
-            int order_in_node = node.Children.Any() ? node.Children.Select(c => c.Order).Max() + 1 : 0;
+            int order_in_node = node.Children.NextOrder();
             if (section_depth != 0)
             {
                 for (var s = 0; s < sections_in_this_node; s++)
@@ -108,7 +124,174 @@ namespace Model
                 throw new ApplicationException($"Tried to add {total_sections} sections, but added {next_section_number - 1}");
         }
 
+        public void AddApplicants(uint count, double gender_ratio = 0.5, bool include_abilities = true)
+        {
+            if (gender_ratio > 1 || gender_ratio < 0)
+                throw new ArgumentException($"{nameof(gender_ratio)} must be between 0 and 1 (inclusive)");
+            uint male = (uint)(count * gender_ratio);
+            uint female = count - male;
+            AddApplicants(male, Gender.Male, include_abilities);
+            AddApplicants(female, Gender.Female, include_abilities);
+        }
+
+        public void AddApplicants(uint count, Gender gender, bool include_abilities = true)
+        {
+            var first_names = gender == Gender.Male ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
+            var criterias = Context.Criteria.ToArray();
+            for (var i = 0; i < count; i++)
+            {
+                var applicant = new Applicant
+                {
+                    FirstName = first_names[random.Next(first_names.Length)],
+                    LastName = LAST_NAMES[random.Next(LAST_NAMES.Length)],
+                    Gender = gender,
+                    DateOfBirth = RandomDate(random, MINIMUM_DOB, MAXIMUM_DOB)
+                };
+                if (include_abilities)
+                {
+                    foreach (var criteria in criterias)
+                    {
+                        var ability = new Ability
+                        {
+                            Criteria = criteria,
+                            Mark = (uint)random.Next((int)criteria.MaxMark)
+                        };
+                        applicant.Abilities.Add(ability);
+                    }
+                }
+                Context.Applicants.Add(applicant);
+            }
+        }
+
         private uint TotalSections(uint sections_per_section, uint section_depth)
             => Convert.ToUInt32(Enumerable.Range(1, (int)section_depth).Select(d => Math.Pow(sections_per_section, d)).Sum());
+
+        private DateTime RandomDate(Random r, DateTime minimum, DateTime maximum)
+        {
+            var span = maximum - minimum;
+            int days = Convert.ToInt32(span.TotalDays);
+            return maximum.AddDays(r.Next(days));
+        }
+
+        public void AddCastGroups(uint count, bool mutually_exclusive = true, uint? required_count = null)
+        {
+            int order = Context.CastGroups.NextOrder();
+            for (var i = 0; i < count; i++)
+            {
+                var cast_group = new CastGroup
+                {
+                    Name = $"Group {i + 1}",
+                    Order = order++,
+                    MutuallyExclusive = mutually_exclusive,
+                    RequiredCount = required_count
+                };
+                Context.CastGroups.Add(cast_group);
+            }
+        }
+
+        public void AddCriteriaAndRequirements()
+        {
+            int order = Context.Criteria.NextOrder();
+            var numeric = new NumericCriteria
+            {
+                Name = $"Numeric Criteria",
+                Order = order++,
+                MaxMark = 100,
+            };
+            var select = new SelectCriteria
+            {
+                Name = $"Select Criteria",
+                Order = order++,
+                Options = new[] { "Option A", "Option B", "Option C" }
+            };
+            var boolean = new BooleanCriteria
+            {
+                Name = $"Boolean Criteria",
+                Order = order++,
+            };
+            Context.Criteria.AddRange(numeric, select, boolean);
+            order = Context.Requirements.NextOrder();
+            var ability_exact = new AbilityExactRequirement
+            {
+                Criteria = boolean,
+                Name = "Boolean is True",
+                Order = order++,
+                RequiredValue = 1
+            };
+            var ability_range = new AbilityRangeRequirement
+            {
+                Criteria = numeric,
+                Name = "Numeric > 70",
+                Order = order++,
+                Minimum = 70
+            };
+            var age = new AgeRequirement
+            {
+                Name = "Adult",
+                Minimum = 18,
+                Order = order++
+            };
+            var gender = new GenderRequirement
+            {
+                Name = "Male",
+                RequiredValue = (int)Gender.Male,
+                Order = order++
+            };
+            var not_req = new NotRequirement
+            {
+                Name = "Not Male",
+                SubRequirement = gender,
+                Order = order++
+            };
+            if (!Context.CastGroups.Any())
+                AddCastGroups(1);
+            var cast_group = new CastGroupRequirement
+            {
+                Name = "First Cast Group",
+                CastGroup = Context.CastGroups.First(),
+                Order = order++
+            };
+            var and_req = new AndRequirement
+            {
+                Name = "Adult Male",
+            };
+            and_req.SubRequirements.Add(age);
+            and_req.SubRequirements.Add(gender);
+            var or_req = new OrRequirement
+            {
+                Name = "Numeric > 70, or Male",
+            };
+            or_req.SubRequirements.Add(ability_range);
+            or_req.SubRequirements.Add(gender);
+            var xor_req = new XorRequirement
+            {
+                Name = "Bool is True, or Male, but not both",
+            };
+            xor_req.SubRequirements.Add(ability_exact);
+            xor_req.SubRequirements.Add(gender);
+            Context.Requirements.AddRange(ability_exact, ability_range, age, cast_group, gender, not_req, and_req, or_req, xor_req);
+        }
+
+        public void AddRoles(uint roles_per_item, bool include_count_by_groups = true)
+        {
+            var cast_groups = Context.CastGroups.ToArray();
+            foreach (var item in Context.ShowRoot.ItemsInOrder())
+            {
+                for (var i = 0; i < roles_per_item; i++)
+                {
+                    var role = new Role { Name = $"Role {i + 1}" };
+                    if (include_count_by_groups)
+                    {
+                        var count_by_group = new CountByGroup
+                        {
+                            CastGroup = cast_groups[random.Next(cast_groups.Length)],
+                            Count = (uint)i
+                        };
+                        role.CountByGroups.Add(count_by_group);
+                    }
+                    item.Roles.Add(role);
+                }
+            }
+        }
     }
 }

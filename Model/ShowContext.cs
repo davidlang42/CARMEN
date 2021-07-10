@@ -17,6 +17,7 @@ namespace Model
         public DbSet<CastGroup> CastGroups => Set<CastGroup>();
         public DbSet<Node> Nodes => Set<Node>();
         public DbSet<Criteria> Criteria => Set<Criteria>();
+        public DbSet<Requirement> Requirements => Set<Requirement>();
         public DbSet<Image> Images => Set<Image>();
         public DbSet<SectionType> SectionTypes => Set<SectionType>();
         #endregion
