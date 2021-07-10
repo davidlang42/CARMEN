@@ -145,37 +145,35 @@ namespace App
 
         private void ExitMenu_Click(object sender, RoutedEventArgs e) => Close();
 
-        private void TestDataMenu_Click(object sender, RoutedEventArgs e)//TODO make a better test data generator
+        private void TestDataMenu_Click(object sender, RoutedEventArgs e)
         {
-            var show = Context.ShowRoot;
-            var s1 = new Section
-            {
-                Name = "Section 1",
-                Parent = show
-            };
-            var s2 = new Section
-            {
-                Name = "Section 2",
-                Parent = show
-            };
-            var i3 = new Item
-            {
-                Name = "Item 3",
-                Parent = show
-            };
-            var i1 = new Item
-            {
-                Name = "Item 1a"
-            };
-            var i2 = new Item
-            {
-                Name = "Item 2a",
-            };
-            s1.Children.Add(i1);
-            s2.Children.Add(i2);
-            Context.AddRange(s1, s2, i3);
-            Context.SaveChanges();
-            RefreshViews();
+            using var test_data = new TestDataGenerator(Context);
+            if (!TryInputNumber("How many ITEMS would you like to add?", "Test Data", out var items, 3))
+                return;
+            if (!TryInputNumber("How many SECTIONS would you like to add?", "Test Data", out var sections, 2))
+                return;
+            if (!TryInputNumber("How DEEP should the structure be?", "Test Data", out var depth, 1))
+                return;
+            var every_depth = MessageBox.Show("Should items be included at EVERY depth?", "Test Data", MessageBoxButton.YesNoCancel);
+            if (every_depth == MessageBoxResult.Cancel)
+                return;
+            test_data.AddShowStructure(items, sections, depth, include_items_at_every_depth: every_depth == MessageBoxResult.Yes);
+            SaveMenu_Click(sender, e);
+        }
+
+        private bool TryInputNumber(string message, string title, out uint value, uint? default_response= null)
+        {
+            var response = default_response?.ToString() ?? "";
+            while (true) {
+                response = Microsoft.VisualBasic.Interaction.InputBox(message, title, response);
+                if (response == null)
+                {
+                    value = default;
+                    return false;
+                }
+                else if (uint.TryParse(response, out value))
+                    return true;
+            }
         }
 
         private void ClearDataMenu_Click(object sender, RoutedEventArgs e)
@@ -186,6 +184,7 @@ namespace App
             Context.Criteria.RemoveRange(Context.Criteria);
             Context.Images.RemoveRange(Context.Images);
             Context.SectionTypes.RemoveRange(Context.SectionTypes);
+            SaveMenu_Click(sender, e);
         }
 
         protected override void OnClosing(CancelEventArgs e)
