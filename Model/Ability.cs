@@ -13,6 +13,7 @@ namespace Model
     public class Ability
     {
         internal int ApplicantId { get; private set; }
+        internal virtual Applicant Applicant { get; private set; } = null!;
         internal int CriteriaId { get; private set; }
         public virtual Criteria Criteria { get; set; } = null!;
         private uint mark;
