@@ -21,6 +21,8 @@ namespace Model.Structure
         #endregion
 
         public abstract IEnumerable<Item> ItemsInOrder();
+
+        public Node RootParent() => Parent?.RootParent() ?? this;
     }
 
     /// <summary>

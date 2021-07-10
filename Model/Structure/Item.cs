@@ -24,7 +24,28 @@ namespace Model.Structure
             => CountByGroups.Where(c => c.CastGroupId == group.CastGroupId).SingleOrDefault()?.Count
             ?? Roles.Select(r => r.CountFor(group)).Sum();
 
-        public Item? NextItem() => throw new NotImplementedException(); //TODO implement NextItem
-        public Item? PreviousItem() => throw new NotImplementedException(); //TODO implement PreviousItem
+        public Item? NextItem()
+        {
+            var e = RootParent().ItemsInOrder().GetEnumerator();
+            while (e.MoveNext())
+            {
+                if (e.Current == this)
+                    return e.MoveNext() ? e.Current : null;
+            }
+            throw new ApplicationException("Item not found in root parent's items.");
+        }
+
+        public Item? PreviousItem()
+        {
+            var e = RootParent().ItemsInOrder().GetEnumerator();
+            Item? last_item = null;
+            while (e.MoveNext())
+            {
+                if (e.Current == this)
+                    return last_item;
+                last_item = e.Current;
+            }
+            throw new ApplicationException("Item not found in root parent's items.");
+        }
     }
 }
