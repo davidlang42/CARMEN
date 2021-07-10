@@ -85,7 +85,6 @@ namespace Model
                 extra_sections_in_root = total_sections - TotalSections(sections_per_section, section_depth);
             }
             
-
             // Calculate items
             //TODO implement include_items_at_every_depth flag
             uint items_per_section = total_items / (total_sections + 1); // include show root
