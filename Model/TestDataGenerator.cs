@@ -124,6 +124,8 @@ namespace Model
                 throw new ApplicationException($"Tried to add {total_sections} sections, but added {next_section_number - 1}");
         }
 
+        /// <summary>Adds applicants in a specified gender ratio with random first and last name, optionally filling their abilities with random marks for each existing criteria.
+        /// NOTE: Must be called after Criteria have been committed.</summary>
         public void AddApplicants(uint count, double gender_ratio = 0.5, bool include_abilities = true)
         {
             if (gender_ratio > 1 || gender_ratio < 0)
@@ -134,6 +136,8 @@ namespace Model
             AddApplicants(female, Gender.Female, include_abilities);
         }
 
+        /// <summary>Adds applicants of a specified gender with random first and last name, optionally filling their abilities with random marks for each existing criteria.
+        /// NOTE: Must be called after Criteria have been committed.</summary>
         public void AddApplicants(uint count, Gender gender, bool include_abilities = true)
         {
             var first_names = gender == Gender.Male ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
@@ -142,8 +146,8 @@ namespace Model
             {
                 var applicant = new Applicant
                 {
-                    FirstName = first_names[random.Next(first_names.Length)],
-                    LastName = LAST_NAMES[random.Next(LAST_NAMES.Length)],
+                    FirstName = FormatName(first_names[random.Next(first_names.Length)]),
+                    LastName = FormatName(LAST_NAMES[random.Next(LAST_NAMES.Length)]),
                     Gender = gender,
                     DateOfBirth = RandomDate(random, MINIMUM_DOB, MAXIMUM_DOB)
                 };
@@ -173,6 +177,7 @@ namespace Model
             return maximum.AddDays(r.Next(days));
         }
 
+        /// <summary>Adds cast groups, mutually exclusive by default, optionally with a required count.</summary>
         public void AddCastGroups(uint count, bool mutually_exclusive = true, uint? required_count = null)
         {
             int order = Context.CastGroups.NextOrder();
@@ -189,6 +194,8 @@ namespace Model
             }
         }
 
+        /// <summary>Adds one of each type of Criteria, and one of each type of Requirements.
+        /// NOTE: Must be called after at least one Cast Group has been committed.</summary>
         public void AddCriteriaAndRequirements()
         {
             int order = Context.Criteria.NextOrder();
@@ -272,9 +279,12 @@ namespace Model
             Context.Requirements.AddRange(ability_exact, ability_range, age, cast_group, gender, not_req, and_req, or_req, xor_req);
         }
 
-        public void AddRoles(uint roles_per_item, bool include_count_by_groups = true)
+        /// <summary>Adds roles to items, optionally with random counts of a single cast group and random requirements.
+        /// NOTE: Must be called after Items, Cast Groups and Requirements have been committed.</summary>
+        public void AddRoles(uint roles_per_item, bool include_count_by_groups = true, bool include_requirements = true)
         {
             var cast_groups = Context.CastGroups.ToArray();
+            var requirements = Context.Requirements.ToArray();
             foreach (var item in Context.ShowRoot.ItemsInOrder())
             {
                 for (var i = 0; i < roles_per_item; i++)
@@ -289,9 +299,14 @@ namespace Model
                         };
                         role.CountByGroups.Add(count_by_group);
                     }
+                    if (include_requirements)
+                        role.Requirements.Add(requirements[random.Next(requirements.Length)]);
                     item.Roles.Add(role);
                 }
             }
         }
+
+        private string FormatName(string name)
+            => name == "" ? "" : name.Substring(0, 1).ToUpper() + name.Substring(1).ToLower();
     }
 }

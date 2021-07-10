@@ -147,10 +147,9 @@ namespace App
 
         private void TestDataMenu_Click(object sender, RoutedEventArgs e)
         {
-            using var test_data = new TestDataGenerator(Context);
-            if (!TryInputNumber("How many ITEMS would you like to add?", "Test Data", out var items, 3))
+            if (!TryInputNumber("How many ITEMS would you like to add?", "Test Data", out var items, 30))
                 return;
-            if (!TryInputNumber("How many SECTIONS would you like to add?", "Test Data", out var sections, 2))
+            if (!TryInputNumber("How many SECTIONS would you like to add?", "Test Data", out var sections, 6))
                 return;
             uint depth;
             bool every_depth;
@@ -163,20 +162,34 @@ namespace App
             {
                 if (!TryInputNumber("How DEEP should the structure be?", "Test Data", out depth, 1))
                     return;
-                var result = MessageBox.Show("Should items be included at EVERY depth?", "Test Data", MessageBoxButton.YesNoCancel);
+                var result = MessageBox.Show("Should items be included at EVERY depth?", "Test Data", MessageBoxButton.YesNoCancel, MessageBoxImage.Question, MessageBoxResult.No);
                 if (result == MessageBoxResult.Cancel)
                     return;
                 every_depth = result == MessageBoxResult.Yes;
             }
+            if (!TryInputNumber("How many CAST GROUPS would you like to add?", "Test Data", out var cast_groups, 4))
+                return;
+            if (!TryInputNumber("How many APPLICANTS would you like to add?", "Test Data", out var applicants, 100))
+                return;
+            if (!TryInputNumber("How many ROLES PER ITEM would you like to add?", "Test Data", out var roles, 5))
+                return;
+            using var test_data = new TestDataGenerator(Context);
             test_data.AddShowStructure(items, sections, depth, include_items_at_every_depth: every_depth);
-            SaveMenu_Click(sender, e);
+            test_data.AddCastGroups(cast_groups);
+            Context.SaveChanges();
+            test_data.AddCriteriaAndRequirements(); // after cast groups committed
+            Context.SaveChanges();
+            test_data.AddApplicants(applicants); // after criteria committed
+            Context.SaveChanges();
+            test_data.AddRoles(roles); // after items, cast groups, requirements committed
+            Context.SaveChanges();
         }
 
         private bool TryInputNumber(string message, string title, out uint value, uint? default_response= null)
         {
             var response = default_response?.ToString() ?? "";
             while (true) {
-                response = Microsoft.VisualBasic.Interaction.InputBox(message, title, response);
+                response = Microsoft.VisualBasic.Interaction.InputBox(message, title, response); // I'm sorry
                 if (string.IsNullOrEmpty(response))
                 {
                     value = default;
