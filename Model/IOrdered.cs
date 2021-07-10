@@ -19,8 +19,6 @@ namespace Model
             => objects.OrderBy(o => o.Order);
 
         public static int NextOrder<T>(this IEnumerable<T> objects) where T : IOrdered
-            => objects.Any() ? objects.Select(o => o.Order).Max() + 1 : 0;
-
-        //TODO helpers to set order as well
+            => objects.Select(o => o.Order).DefaultIfEmpty().Max() + 1;
     }
 }

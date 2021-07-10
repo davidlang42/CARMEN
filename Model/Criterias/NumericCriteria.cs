@@ -10,5 +10,12 @@ namespace Model.Criterias
     /// A criteria which is marked on a numeric scale.
     /// </summary>
     public class NumericCriteria : Criteria
-    { }
+    {
+        const uint DEFAULT_MAX_MARK = 100;
+
+        public NumericCriteria()
+        {
+            MaxMark = DEFAULT_MAX_MARK;
+        }
+    }
 }

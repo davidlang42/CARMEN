@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
@@ -16,9 +17,11 @@ namespace Model.Criterias
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
         public int Order { get; set; }
+        [Range(-1000,1000)]
         public double Weight { get; set; }
-        internal virtual ICollection<Ability>? Abilities { get; set; } = null;
+        internal virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
         private uint maxMark;
+        [Range(0, uint.MaxValue)]
         public virtual uint MaxMark
         {
             get => maxMark;
@@ -26,10 +29,11 @@ namespace Model.Criterias
             {
                 if (value == 0)
                     throw new ArgumentException($"{nameof(MaxMark)} cannot be set to 0.");
-                if (Abilities?.Select(a => a.Mark).DefaultIfEmpty().Max() is uint max && max > value)
+                var max_ability = Abilities.Select(a => a.Mark).DefaultIfEmpty().Max();
+                if (max_ability > value)
                 {
-                    var max_applicant = Abilities.Where(a => a.Mark == max).First().Applicant;
-                    throw new ArgumentException($"{nameof(MaxMark)} cannot be set to {value} as {max_applicant.DisplayName()}'s mark for {Name} is set to {max}.");
+                    var max_applicant = Abilities.Where(a => a.Mark == max_ability).First().Applicant;
+                    throw new ArgumentException($"{nameof(MaxMark)} cannot be set to {value} as {max_applicant.DisplayName()}'s mark for {Name} is set to {max_ability}.");
                 }
                 maxMark = value;
             }

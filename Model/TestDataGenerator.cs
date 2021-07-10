@@ -297,6 +297,8 @@ namespace Model
                             CastGroup = cast_groups[random.Next(cast_groups.Length)],
                             Count = (uint)i
                         };
+                        if (i == 0)
+                            count_by_group.Everyone = true;
                         role.CountByGroups.Add(count_by_group);
                     }
                     if (include_requirements)
