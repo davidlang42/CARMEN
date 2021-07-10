@@ -38,7 +38,7 @@
                     <StackPanel Background="#FFE5E5E5">
                         <TreeView x:Name="itemsTreeView" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}">
                             <TreeView.Resources>
-                                <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children}">
+                                <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
                                     <TextBlock Text="{Binding Path=Name, StringFormat='Show: {0}'}"/>
                                 </HierarchicalDataTemplate>
                                 <HierarchicalDataTemplate DataType="{x:Type modelStructure:Section}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">

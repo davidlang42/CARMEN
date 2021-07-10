@@ -152,12 +152,23 @@ namespace App
                 return;
             if (!TryInputNumber("How many SECTIONS would you like to add?", "Test Data", out var sections, 2))
                 return;
-            if (!TryInputNumber("How DEEP should the structure be?", "Test Data", out var depth, 1))
-                return;
-            var every_depth = MessageBox.Show("Should items be included at EVERY depth?", "Test Data", MessageBoxButton.YesNoCancel);
-            if (every_depth == MessageBoxResult.Cancel)
-                return;
-            test_data.AddShowStructure(items, sections, depth, include_items_at_every_depth: every_depth == MessageBoxResult.Yes);
+            uint depth;
+            bool every_depth;
+            if (sections == 0)
+            {
+                depth = 0;
+                every_depth = true;
+            }
+            else
+            {
+                if (!TryInputNumber("How DEEP should the structure be?", "Test Data", out depth, 1))
+                    return;
+                var result = MessageBox.Show("Should items be included at EVERY depth?", "Test Data", MessageBoxButton.YesNoCancel);
+                if (result == MessageBoxResult.Cancel)
+                    return;
+                every_depth = result == MessageBoxResult.Yes;
+            }
+            test_data.AddShowStructure(items, sections, depth, include_items_at_every_depth: every_depth);
             SaveMenu_Click(sender, e);
         }
 
