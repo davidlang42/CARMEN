@@ -8,7 +8,7 @@ namespace Model.Requirements
     /// <summary>
     /// A requirement which can be satisfied by an Applicant
     /// </summary>
-    public abstract class Requirement : IOrdered
+    public abstract class Requirement : IOrdered //TODO fix showcontext db layout for requirements, its very wrong, including badly formed relationships
     {
         #region Database fields
         public int RequirementId { get; set; }

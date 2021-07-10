@@ -29,7 +29,7 @@ namespace Model.Criterias
         public override uint MaxMark
         {
             get => (uint)(Options.Length - 1);
-            set => throw new NotImplementedException("SelectCriteria.MaxMark cannot be set."); //TODO confirm save/load still works
+            set => throw new NotImplementedException("SelectCriteria.MaxMark cannot be set."); //TODO FIX- this doesn't allow loading from db
         }
     }
 }

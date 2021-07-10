@@ -14,7 +14,7 @@ namespace Model.Criterias
         public override uint MaxMark
         {
             get => 1;
-            set => throw new NotImplementedException("BooleanCriteria.MaxMark cannot be set."); //TODO confirm save/load still works
+            set => throw new NotImplementedException("BooleanCriteria.MaxMark cannot be set."); //TODO FIX- this doesn't allow loading from db
         }
     }
 }
