@@ -10,7 +10,5 @@ namespace Model.Criterias
     /// A criteria which is marked on a numeric scale.
     /// </summary>
     public class NumericCriteria : Criteria
-    {
-        public override uint MaxMark { get; set; }
-    }
+    { }
 }

@@ -16,7 +16,16 @@ namespace Model.Criterias
         public string Description { get; set; } = "";
         public int Order { get; set; }
         public double Weight { get; set; }
-        [Range(1, uint.MaxValue)]
-        public abstract uint MaxMark { get; set; }
+        private uint maxMark;
+        public virtual uint MaxMark
+        {
+            get => maxMark;
+            set
+            {
+                if (value == 0)
+                    throw new ArgumentException($"{nameof(MaxMark)} cannot be set to 0.");
+                maxMark = value; //TODO validation that new MaxMark isn't greater than any of the currently set marks
+            }
+        }
     }
 }

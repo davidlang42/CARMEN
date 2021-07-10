@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,12 +25,12 @@ namespace Model.Criterias
                 if (value.Length < 2)
                     throw new ArgumentException("SelectCriteria.Options must contain at least 2 elements.");
                 options = value;
+                base.MaxMark = (uint)(options.Length - 1);
             }
         }
         public override uint MaxMark
         {
-            get => (uint)(Options.Length - 1);
-            set => throw new NotImplementedException("SelectCriteria.MaxMark cannot be set."); //TODO FIX- this doesn't allow loading from db
+            set => throw new NotImplementedException("SelectCriteria.MaxMark cannot be set.");
         }
     }
 }

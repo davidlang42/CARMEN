@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,8 +14,12 @@ namespace Model.Criterias
     {
         public override uint MaxMark
         {
-            get => 1;
-            set => throw new NotImplementedException("BooleanCriteria.MaxMark cannot be set."); //TODO FIX- this doesn't allow loading from db
+            set => throw new NotImplementedException("BooleanCriteria.MaxMark cannot be set.");
+        }
+
+        public BooleanCriteria()
+        {
+            base.MaxMark = 1;
         }
     }
 }
