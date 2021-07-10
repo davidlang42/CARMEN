@@ -21,7 +21,7 @@ namespace Model.Requirements
             if (!IsInRange(mark))
                 return 0;
             else if (ScaleSuitability)
-                return mark / Criteria.MaxMark;//TODO validate applicant ability not > MaxMark and MaxMark != 0
+                return mark / Criteria.MaxMark;
             else
                 return 1;
         }
