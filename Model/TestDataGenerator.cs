@@ -67,14 +67,24 @@ namespace Model
                 section_type = Context.SectionTypes.FirstOrDefault() ?? Context.Add(new SectionType()).Entity;
 
             // Calculate sections
-            if (section_depth == 0 && total_sections != 0)
-                section_depth = 1;
-            if (section_depth > total_sections)
-                section_depth = total_sections;
-            uint sections_per_section = 1;
-            while (TotalSections(sections_per_section + 1, section_depth) <= total_sections)
-                sections_per_section++;
-            uint extra_sections_in_root = total_sections - TotalSections(sections_per_section, section_depth);
+            uint extra_sections_in_root;
+            uint sections_per_section;
+            if (total_sections == 0)
+            {
+                extra_sections_in_root = 0;
+                sections_per_section = 0;
+            } else
+            {
+                if (section_depth == 0)
+                    section_depth = 1;
+                if (section_depth > total_sections)
+                    section_depth = total_sections;
+                sections_per_section = 1;
+                while (TotalSections(sections_per_section + 1, section_depth) <= total_sections)
+                    sections_per_section++;
+                extra_sections_in_root = total_sections - TotalSections(sections_per_section, section_depth);
+            }
+            
 
             // Calculate items
             //TODO implement include_items_at_every_depth flag
