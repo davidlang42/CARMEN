@@ -174,7 +174,7 @@ namespace Model
         {
             var span = maximum - minimum;
             int days = Convert.ToInt32(span.TotalDays);
-            return maximum.AddDays(r.Next(days));
+            return minimum.AddDays(r.Next(days));
         }
 
         /// <summary>Adds cast groups, mutually exclusive by default, optionally with a required count.</summary>
