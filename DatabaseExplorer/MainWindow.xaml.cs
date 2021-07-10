@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using Model;
 using Model.Structure;
@@ -93,7 +94,8 @@ namespace App
 
         private void OpenDatabase(string filename)
         {
-            CreateContext($"Data Source={filename}"); //TODO unsafe injection
+            var connection = new SqliteConnectionStringBuilder { DataSource = filename };
+            CreateContext(connection.ToString());
             foreach (var ui_element in this.AllControls<UIElement>())
                 ui_element.IsEnabled = true;
         }

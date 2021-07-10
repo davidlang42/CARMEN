@@ -22,6 +22,5 @@ namespace App
                         yield return childOfChild;
             }
         }
-        //TODO I can do a better job of this, maybe using .Children and Include()
     }
 }
