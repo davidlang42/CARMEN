@@ -177,7 +177,7 @@ namespace App
             var response = default_response?.ToString() ?? "";
             while (true) {
                 response = Microsoft.VisualBasic.Interaction.InputBox(message, title, response);
-                if (response == null)
+                if (string.IsNullOrEmpty(response))
                 {
                     value = default;
                     return false;
