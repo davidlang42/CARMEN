@@ -26,7 +26,7 @@ namespace Model
             _context = null;
         }
 
-        private void AddToNode(InnerNode node, ref uint next_item_number, ref uint next_section_number, uint items_in_this_node, uint sections_in_this_node, uint items_per_sub_section, uint sections_per_sub_section, uint section_depth, SectionType section_type)
+        private void AddToNode(InnerNode node, ref uint next_item_number, ref uint next_section_number, uint items_in_this_node, uint sections_in_this_node, uint items_per_sub_section, uint sections_per_sub_section, uint section_depth, SectionType section_type, bool include_items_at_every_depth)
         {
             int order_in_node = node.Children.Any() ? node.Children.Select(c => c.Order).Max() + 1 : 0;
             if (section_depth != 0)
@@ -38,18 +38,21 @@ namespace Model
                         Order = order_in_node++,
                         SectionType = section_type
                     };
-                    AddToNode(section, ref next_item_number, ref next_section_number, items_per_sub_section, sections_per_sub_section, items_per_sub_section, sections_per_sub_section, section_depth - 1, section_type);
+                    AddToNode(section, ref next_item_number, ref next_section_number, items_per_sub_section, sections_per_sub_section, items_per_sub_section, sections_per_sub_section, section_depth - 1, section_type, include_items_at_every_depth);
                     node.Children.Add(section);
                 }
             }
-            for (var i = 0; i < items_in_this_node; i++)
+            if (include_items_at_every_depth || section_depth == 0)
             {
-                var item = new Item
+                for (var i = 0; i < items_in_this_node; i++)
                 {
-                    Name = $"Item {next_item_number++}",
-                    Order = order_in_node++
-                };
-                node.Children.Add(item);
+                    var item = new Item
+                    {
+                        Name = $"Item {next_item_number++}",
+                        Order = order_in_node++
+                    };
+                    node.Children.Add(item);
+                }
             }
         }
 
@@ -69,12 +72,10 @@ namespace Model
             // Calculate sections
             uint extra_sections_in_root;
             uint sections_per_section;
-            if (total_sections == 0)
-            {
+            if (total_sections == 0) {
                 extra_sections_in_root = 0;
                 sections_per_section = 0;
-            } else
-            {
+            } else {
                 if (section_depth == 0)
                     section_depth = 1;
                 if (section_depth > total_sections)
@@ -84,17 +85,21 @@ namespace Model
                     sections_per_section++;
                 extra_sections_in_root = total_sections - TotalSections(sections_per_section, section_depth);
             }
-            
+
             // Calculate items
-            //TODO implement include_items_at_every_depth flag
-            uint items_per_section = total_items / (total_sections + 1); // include show root
-            uint extra_items_in_root = total_items - items_per_section * (total_sections + 1);
+            uint sections_with_items;
+            if (include_items_at_every_depth)
+                sections_with_items = total_sections + 1; // all new sections + show root
+            else
+                sections_with_items = Convert.ToUInt32(Math.Pow(sections_per_section, section_depth)) + extra_sections_in_root; // only sections with no children
+            uint items_per_section = total_items / sections_with_items;
+            uint extra_items_in_root = total_items - items_per_section * sections_with_items;
             
             // Add sections & items recursively
             uint next_item_number = 1;
             uint next_section_number = 1;
-            AddToNode(show, ref next_item_number, ref next_section_number, items_per_section, sections_per_section, items_per_section, sections_per_section, section_depth, section_type);
-            AddToNode(show, ref next_item_number, ref next_section_number, extra_items_in_root, extra_sections_in_root, items_per_section, 0, 1, section_type);
+            AddToNode(show, ref next_item_number, ref next_section_number, items_per_section, sections_per_section, items_per_section, sections_per_section, section_depth, section_type, include_items_at_every_depth);
+            AddToNode(show, ref next_item_number, ref next_section_number, extra_items_in_root, extra_sections_in_root, items_per_section, 0, 1, section_type, true);
 
             // Assert the correct number of things added
             if (next_item_number - 1 != total_items)
