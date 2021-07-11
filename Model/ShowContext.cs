@@ -66,15 +66,24 @@ namespace Model
                 .WithMany(nameof(CombinedRequirement));
 
             // Add inheritance structure for requirements
+            // Foreign keys are manually defined to avoid IndexOutOfRangeException being
+            // thrown on DbSet.Load(). I suspect this is due to the object properties
+            // being non-nullable on their concrete type, but nullable in the database,
+            // as they need to be null for the other Requirement concrete types.
             modelBuilder.Entity<AgeRequirement>();
             modelBuilder.Entity<GenderRequirement>();
             modelBuilder.Entity<CastGroupRequirement>()
-                .HasOne(cgr => cgr.RequiredGroup);
+                .HasOne(cgr => cgr.RequiredGroup)
+                .WithMany()
+                .HasForeignKey(nameof(CastGroupRequirement.RequiredGroupId));
             modelBuilder.Entity<AbilityExactRequirement>()
                 .CommonProperty(nameof(AbilityExactRequirement.Criteria.CriteriaId));
             modelBuilder.Entity<AbilityRangeRequirement>()
                 .CommonProperty(nameof(AbilityRangeRequirement.Criteria.CriteriaId));
-            modelBuilder.Entity<NotRequirement>();
+            modelBuilder.Entity<NotRequirement>()
+                .HasOne(nr => nr.SubRequirement)
+                .WithMany()
+                .HasForeignKey(nameof(NotRequirement.SubRequirementId));
             modelBuilder.Entity<AndRequirement>()
                 .CommonProperty(nameof(AndRequirement.AverageSuitability));
             modelBuilder.Entity<OrRequirement>()

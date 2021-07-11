@@ -9,6 +9,7 @@ namespace Model.Requirements
 {
     public class AbilityRangeRequirement : RangeRequirement
     {
+        internal int CriteriaId { get; private set; } // DbSet.Load() throws IndexOutOfRangeException if foreign key is not defined
         public virtual Criteria Criteria { get; set; } = null!;
         public bool ScaleSuitability { get; set; }
 
