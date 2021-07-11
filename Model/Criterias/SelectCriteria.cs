@@ -13,8 +13,11 @@ namespace Model.Criterias
     /// </summary>
     public class SelectCriteria : Criteria
     {
+        internal static string[] DEFAULT_OPTIONS = new[] { "", "" };
+
         /// <summary>ValueConverter configured in <c cref="ShowContext.OnModelCreating">DbContext</c>.</summary>
-        private string[] options = new[] { "", "" };
+        private string[] options;
+
         /// <summary>A list of options which are available for this criteria.
         /// NOTE: Changing this will not update the indicies which are already set as applicant ability marks.</summary>
         public string[] Options
@@ -28,9 +31,16 @@ namespace Model.Criterias
                 base.MaxMark = (uint)(options.Length - 1);
             }
         }
+
         public override uint MaxMark
         {
             set => throw new NotImplementedException("SelectCriteria.MaxMark cannot be set.");
+        }
+
+        public SelectCriteria()
+        {
+            options = DEFAULT_OPTIONS;
+            base.MaxMark = (uint)(options.Length - 1);
         }
     }
 }

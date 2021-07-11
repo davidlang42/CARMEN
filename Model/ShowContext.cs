@@ -61,7 +61,7 @@ namespace Model
             modelBuilder.Entity<SelectCriteria>()
                 .Property(s => s.Options)
                 .HasConversion(obj => JsonSerializer.Serialize(obj, null),
-                      json => JsonSerializer.Deserialize<string[]>(json, null) ?? Array.Empty<string>());
+                      json => JsonSerializer.Deserialize<string[]>(json, null) ?? SelectCriteria.DEFAULT_OPTIONS);
             modelBuilder.Entity<BooleanCriteria>();
         }
     }
