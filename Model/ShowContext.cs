@@ -51,25 +51,42 @@ namespace Model
                 st => st.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(SectionType.SectionTypeId)));
             modelBuilder.Entity<Node>().OwnsMany(
                 n => n.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Node.NodeId)));
+
             // Add inheritance structure for item tree
             modelBuilder.Entity<Item>();
             modelBuilder.Entity<Section>();
             modelBuilder.Entity<ShowRoot>();
+
+            // Configure many-many relationships
+            modelBuilder.Entity<CastGroup>()
+                .HasMany(g => g.Requirements)
+                .WithMany(nameof(CastGroup.CastGroupId));
+            modelBuilder.Entity<Role>()
+                .HasMany(r => r.Requirements)
+                .WithMany(nameof(Role.RoleId));
+            
             // Add inheritance structure for requirements
             modelBuilder.Entity<AgeRequirement>();
             modelBuilder.Entity<GenderRequirement>();
-            modelBuilder.Entity<CastGroupRequirement>();
-            modelBuilder.Entity<AbilityExactRequirement>();
-            modelBuilder.Entity<AbilityRangeRequirement>();
-            modelBuilder.Entity<AndRequirement>();
-            modelBuilder.Entity<OrRequirement>();
-            modelBuilder.Entity<XorRequirement>();
+            //TODO figure out how castgroup/requreiment is going to work
+            //modelBuilder.Entity<CastGroupRequirement>();
+            modelBuilder.Entity<AbilityExactRequirement>()
+                .Property(nameof(AbilityExactRequirement.Criteria.CriteriaId))
+                .HasColumnName(nameof(AbilityExactRequirement.Criteria.CriteriaId));
+            modelBuilder.Entity<AbilityRangeRequirement>()
+                .Property(nameof(AbilityRangeRequirement.Criteria.CriteriaId))
+                .HasColumnName(nameof(AbilityRangeRequirement.Criteria.CriteriaId));
             modelBuilder.Entity<NotRequirement>();
+            //TODO figure out how combined requirements will be stored, also what about circular dependencies?
+            //modelBuilder.Entity<AndRequirement>();
+            //modelBuilder.Entity<OrRequirement>();
+            //modelBuilder.Entity<XorRequirement>();
+
             // Add inheritance structure for critiera
             modelBuilder.Entity<NumericCriteria>();
             modelBuilder.Entity<SelectCriteria>()
                 .Property(sc => sc.Options)
-                .HasConversion(obj => JsonSerializer.Serialize(obj, null),
+                .HasConversion(obj => JsonSerializer.Serialize(obj, null), // store array as json
                       json => JsonSerializer.Deserialize<string[]>(json, null) ?? SelectCriteria.DEFAULT_OPTIONS);
             modelBuilder.Entity<BooleanCriteria>();
         }
