@@ -42,9 +42,11 @@ namespace App
         private readonly CollectionViewSource applicantsViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
         private readonly CollectionViewSource rootNodesViewSource;
+        private readonly CollectionViewSource itemsViewSource;
         private readonly CollectionViewSource criteriaViewSource;
         private readonly CollectionViewSource imagesViewSource;
         private readonly CollectionViewSource sectionTypesViewSource;
+        private readonly CollectionViewSource requirementsViewSource;
 
         public MainWindow()
         {
@@ -55,6 +57,8 @@ namespace App
             criteriaViewSource = (CollectionViewSource)FindResource(nameof(criteriaViewSource));
             imagesViewSource = (CollectionViewSource)FindResource(nameof(imagesViewSource));
             sectionTypesViewSource = (CollectionViewSource)FindResource(nameof(sectionTypesViewSource));
+            itemsViewSource = (CollectionViewSource)FindResource(nameof(itemsViewSource));
+            requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
             //TODO (UI) add extra UI for missing db elements
             //TODO (UI) fix UI for editing roles with item selection
             //TODO (UI) add editing count by group for each node type and section type
@@ -108,15 +112,19 @@ namespace App
             Context.Criterias.Load();
             Context.Images.Load();
             Context.SectionTypes.Load();
+            Context.Requirements.Load();
             // Put collections into view source
             applicantsViewSource.Source = Context.Applicants.Local.ToObservableCollection();
             castGroupsViewSource.Source = Context.CastGroups.Local.ToObservableCollection();
             rootNodesViewSource.Source = Context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
+            itemsViewSource.Source = Context.Nodes.Local.ToObservableCollection(); //TODO try Context.RootNode.ItemsInOrder()
+            itemsViewSource.View.Filter = n => n is Item;
             criteriaViewSource.Source = Context.Criterias.Local.ToObservableCollection();
             imagesViewSource.Source = Context.Images.Local.ToObservableCollection();
             sectionTypesViewSource.Source = Context.SectionTypes.Local.ToObservableCollection();
+            requirementsViewSource.Source = Context.Requirements.Local.ToObservableCollection();
         }
 
         private void SaveMenu_Click(object sender, RoutedEventArgs e)
@@ -213,6 +221,7 @@ namespace App
             Context.Criterias.RemoveRange(Context.Criterias);
             Context.Images.RemoveRange(Context.Images);
             Context.SectionTypes.RemoveRange(Context.SectionTypes);
+            Context.Requirements.RemoveRange(Context.Requirements);
             SaveMenu_Click(sender, e);
         }
 

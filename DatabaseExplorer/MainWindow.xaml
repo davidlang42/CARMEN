@@ -11,7 +11,9 @@
         <CollectionViewSource x:Key="applicantsViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
         <CollectionViewSource x:Key="rootNodesViewSource"/>
+        <CollectionViewSource x:Key="itemsViewSource"/>
         <CollectionViewSource x:Key="criteriaViewSource"/>
+        <CollectionViewSource x:Key="requirementsViewSource"/>
         <CollectionViewSource x:Key="imagesViewSource"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
         <local:SortIOrdered x:Key="sortIOrdered" />
@@ -49,9 +51,26 @@
                                 </HierarchicalDataTemplate>
                             </TreeView.Resources>
                         </TreeView>
+                        <DataGrid x:Name="nodeCountsDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding ElementName=itemsTreeView, Path=SelectedItem.CountByGroups}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
+                            <DataGrid.Columns>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
+                                <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Item Roles">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <ListView x:Name="itemsListView" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource itemsViewSource}}">
+                        </ListView>
                         <DataGrid x:Name="rolesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
-                        ItemsSource="{Binding ElementName=itemsTreeView, Path=SelectedItem.Roles}" 
+                        ItemsSource="{Binding ElementName=itemsListView, Path=SelectedItem.Roles}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding RoleId}" Header="Role Id" 
@@ -59,7 +78,7 @@
                                 <DataGridTextColumn Binding="{Binding Name}" Header="Role Name" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <DataGrid x:Name="countsDataGrid" AutoGenerateColumns="False" 
+                        <DataGrid x:Name="roleCountsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding ElementName=rolesDataGrid, Path=SelectedItem.CountByGroups}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
@@ -79,6 +98,15 @@
                         ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                         </DataGrid>
+                        <DataGrid x:Name="sectionTypeCountsDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding ElementName=sectionTypesDataGrid, Path=SelectedItem.CountByGroups}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
+                            <DataGrid.Columns>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
+                                <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -89,6 +117,15 @@
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        </DataGrid>
+                        <DataGrid x:Name="abilitiesDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.Abilities}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
+                            <DataGrid.Columns>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
+                                <DataGridTextColumn Binding="{Binding Mark}" Header="Mark"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
@@ -110,6 +147,17 @@
                         <DataGrid x:Name="criteriaDataGrid" AutoGenerateColumns="True" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Requirements">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="requirementsDataGrid" AutoGenerateColumns="True" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource requirementsViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                         </DataGrid>
                     </StackPanel>
