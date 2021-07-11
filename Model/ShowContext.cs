@@ -37,7 +37,6 @@ namespace Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //TODO (NEXT) pull IDS out of POCOs, keep in the EF (maybe?)
             // Configure owned entities
             modelBuilder.Entity<Applicant>().OwnsMany(
                 a => a.Abilities, ab =>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Model.Requirements
@@ -11,7 +12,8 @@ namespace Model.Requirements
     public abstract class Requirement : IOrdered
     {
         #region Database fields
-        public int RequirementId { get; set; }
+        [Key]
+        public int RequirementId { get; private set; }
         public string Name { get; set; } = "";
         public int Order { get; set; }
         public string? Reason { get; set; }
