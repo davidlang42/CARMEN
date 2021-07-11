@@ -12,6 +12,6 @@ namespace Model.Requirements
         public virtual Criteria Criteria { get; set; } = null!;
 
         public override bool IsSatisfiedBy(Applicant applicant)
-            => applicant.MarkFor(Criteria) == RequiredValue;
+            => applicant.MarkFor(Criteria) == ExactValue;
     }
 }

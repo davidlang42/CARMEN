@@ -223,7 +223,7 @@ namespace Model
                 Criteria = boolean,
                 Name = "Boolean is True",
                 Order = order++,
-                RequiredValue = 1
+                ExactValue = 1
             };
             var ability_range = new AbilityRangeRequirement
             {
@@ -241,7 +241,7 @@ namespace Model
             var gender = new GenderRequirement
             {
                 Name = "Male",
-                RequiredValue = (int)Gender.Male,
+                ExactValue = (int)Gender.Male,
                 Order = order++
             };
             var not_req = new NotRequirement
