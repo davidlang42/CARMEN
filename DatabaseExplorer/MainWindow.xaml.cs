@@ -105,7 +105,7 @@ namespace App
             Context.Applicants.Load();
             Context.CastGroups.Load();
             Context.Nodes.Load();
-            Context.Criteria.Load();
+            Context.Criterias.Load();
             Context.Images.Load();
             Context.SectionTypes.Load();
             // Put collections into view source
@@ -114,7 +114,7 @@ namespace App
             rootNodesViewSource.Source = Context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
-            criteriaViewSource.Source = Context.Criteria.Local.ToObservableCollection();
+            criteriaViewSource.Source = Context.Criterias.Local.ToObservableCollection();
             imagesViewSource.Source = Context.Images.Local.ToObservableCollection();
             sectionTypesViewSource.Source = Context.SectionTypes.Local.ToObservableCollection();
         }
@@ -210,7 +210,7 @@ namespace App
             Context.Applicants.RemoveRange(Context.Applicants);
             Context.CastGroups.RemoveRange(Context.CastGroups);
             Context.Nodes.RemoveRange(Context.Nodes);
-            Context.Criteria.RemoveRange(Context.Criteria);
+            Context.Criterias.RemoveRange(Context.Criterias);
             Context.Images.RemoveRange(Context.Images);
             Context.SectionTypes.RemoveRange(Context.SectionTypes);
             SaveMenu_Click(sender, e);

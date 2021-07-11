@@ -141,7 +141,7 @@ namespace Model
         public void AddApplicants(uint count, Gender gender, bool include_abilities = true)
         {
             var first_names = gender == Gender.Male ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
-            var criterias = Context.Criteria.ToArray();
+            var criterias = Context.Criterias.ToArray();
             for (var i = 0; i < count; i++)
             {
                 var applicant = new Applicant
@@ -198,7 +198,7 @@ namespace Model
         /// NOTE: Must be called after at least one Cast Group has been committed.</summary>
         public void AddCriteriaAndRequirements()
         {
-            int order = Context.Criteria.NextOrder();
+            int order = Context.Criterias.NextOrder();
             var numeric = new NumericCriteria
             {
                 Name = $"Numeric Criteria",
@@ -216,7 +216,7 @@ namespace Model
                 Name = $"Boolean Criteria",
                 Order = order++,
             };
-            Context.Criteria.AddRange(numeric, select, boolean);
+            Context.Criterias.AddRange(numeric, select, boolean);
             order = Context.Requirements.NextOrder();
             var ability_exact = new AbilityExactRequirement
             {
