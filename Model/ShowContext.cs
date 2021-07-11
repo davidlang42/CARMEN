@@ -39,8 +39,12 @@ namespace Model
         {
             //TODO pull IDS out of POCOs, keep in the EF (maybe?)
             // Configure owned entities
-            modelBuilder.Entity<Ability>()//TODO ability owned by applicant
-                .HasKey(a => new { a.ApplicantId, a.CriteriaId });
+            modelBuilder.Entity<Applicant>().OwnsMany(
+                a => a.Abilities, ab =>
+                {
+                    ab.WithOwner().HasForeignKey(nameof(Applicant.ApplicantId));
+                    ab.HasKey(nameof(Applicant.ApplicantId), nameof(Ability.Criteria.CriteriaId));
+                });
             modelBuilder.Entity<Role>().OwnsMany(
                 r => r.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Role.RoleId)));
             modelBuilder.Entity<SectionType>().OwnsMany(
