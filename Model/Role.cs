@@ -21,6 +21,6 @@ namespace Model
         #endregion
 
         public uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroupId == group.CastGroupId).Select(c => c.Count).SingleOrDefault(); // defaults to 0
+            => CountByGroups.Where(c => c.CastGroup == group).Select(c => c.Count).SingleOrDefault(); // defaults to 0
     }
 }

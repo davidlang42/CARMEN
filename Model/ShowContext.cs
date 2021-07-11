@@ -39,8 +39,6 @@ namespace Model
             // Create composite keys
             modelBuilder.Entity<Ability>()
                 .HasKey(a => new { a.ApplicantId, a.CriteriaId });
-            modelBuilder.Entity<CountByGroup>()
-                .HasKey(c => new { c.RoleId, c.CastGroupId });
             // Store private properties
             modelBuilder.Entity<CountByGroup>()
                 .Property(CountByGroup.CountExpression);

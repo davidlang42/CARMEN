@@ -30,7 +30,7 @@ namespace Model.Structure
         #endregion
 
         public uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroupId == group.CastGroupId).SingleOrDefault()?.Count
+            => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
             ?? ItemsInOrder().SelectMany(i => i.Roles).Distinct().Select(r => r.CountFor(group)).Sum();
     }
 }

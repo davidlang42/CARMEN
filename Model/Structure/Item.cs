@@ -21,7 +21,7 @@ namespace Model.Structure
         public override IEnumerable<Item> ItemsInOrder() => this.Yield();
 
         public uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroupId == group.CastGroupId).SingleOrDefault()?.Count
+            => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
             ?? Roles.Select(r => r.CountFor(group)).Sum();
 
         public Item? NextItem()

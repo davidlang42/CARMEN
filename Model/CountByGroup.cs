@@ -13,15 +13,14 @@ namespace Model
     /// Groups used with counts must be mutually exclusive.
     /// Composite Key configured in <c cref="ShowContext.OnModelCreating">DbContext</c>.
     /// </summary>
-    public class CountByGroup
+    public class CountByGroup//TODO configure composite key/relationships
     {
         internal static Expression<Func<CountByGroup, uint?>> CountExpression = c => c.count;
 
         const uint DEFAULT_COUNT = 0;
 
         #region Database fields
-        internal virtual int RoleId { get; private set; }//TODO configure composite key/relationships
-        internal virtual int CastGroupId { get; private set; }
+        public int CountByGroupId { get; private set; }//TODO can this be internal?
         public virtual CastGroup CastGroup { get; set; } = null!;
         private uint? count = DEFAULT_COUNT; // null means include everyone
         #endregion
