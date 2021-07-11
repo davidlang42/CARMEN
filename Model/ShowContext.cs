@@ -45,12 +45,8 @@ namespace Model
                 r => r.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Role.RoleId)));
             modelBuilder.Entity<SectionType>().OwnsMany(
                 st => st.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(SectionType.SectionTypeId)));
-            modelBuilder.Entity<Item>().OwnsMany(
-                i => i.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Item.NodeId), nameof(Item)));
-            modelBuilder.Entity<Section>().OwnsMany(
-                s => s.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Section.NodeId), nameof(Section)));
-            modelBuilder.Entity<ShowRoot>().OwnsMany(
-                sr => sr.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(ShowRoot.NodeId), nameof(ShowRoot)));
+            modelBuilder.Entity<Node>().OwnsMany(
+                n => n.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Node.NodeId)));
             // Add inheritance structure for item tree
             modelBuilder.Entity<Item>();
             modelBuilder.Entity<Section>();
@@ -74,14 +70,12 @@ namespace Model
             modelBuilder.Entity<BooleanCriteria>();
         }
 
-        private void ConfigureCountByGroup<T>(OwnedNavigationBuilder<T, CountByGroup> cbg, string foreign_key, string? override_object_name_in_table_name = null) where T : class
+        private void ConfigureCountByGroup<T>(OwnedNavigationBuilder<T, CountByGroup> cbg, string foreign_key) where T : class
         {
             cbg.WithOwner().HasForeignKey(foreign_key);
             cbg.HasKey(foreign_key, nameof(CountByGroup.CastGroup.CastGroupId));
             cbg.Property(CountByGroup.CountExpression) // store private nullable property for Count/Everyone
                 .HasColumnName(nameof(CountByGroup.Count));
-            if (override_object_name_in_table_name != null)
-                cbg.ToTable($"{override_object_name_in_table_name}_{nameof(CountByGroup)}s");
         }
     }
 }

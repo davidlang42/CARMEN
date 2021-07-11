@@ -10,17 +10,16 @@ namespace Model.Structure
     /// <summary>
     /// An item within the show.
     /// </summary>
-    public class Item : Node, ICounted
+    public class Item : Node
     {
         #region Database fields
         public override string Name { get; set; } = "Item";
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
-        public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
         #endregion
 
         public override IEnumerable<Item> ItemsInOrder() => this.Yield();
 
-        public uint CountFor(CastGroup group)
+        public override uint CountFor(CastGroup group)
             => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
             ?? Roles.Select(r => r.CountFor(group)).Sum();
 

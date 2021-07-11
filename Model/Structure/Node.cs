@@ -10,7 +10,7 @@ namespace Model.Structure
     /// <summary>
     /// A node in the item tree, which may or may not be able to have children.
     /// </summary>
-    public abstract class Node : IOrdered
+    public abstract class Node : IOrdered, ICounted
     {
         #region Database fields
         [Key]
@@ -18,11 +18,15 @@ namespace Model.Structure
         public abstract string Name { get; set; }
         public int Order { get; set; }
         public virtual InnerNode? Parent { get; set; }
+        public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
         #endregion
 
         public abstract IEnumerable<Item> ItemsInOrder();
 
+        public abstract uint CountFor(CastGroup group);
+
         public Node RootParent() => Parent?.RootParent() ?? this;
+
     }
 
     /// <summary>
