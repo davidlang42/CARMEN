@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace Model
@@ -14,17 +15,19 @@ namespace Model
     /// </summary>
     public class CountByGroup
     {
+        internal static Expression<Func<CountByGroup, uint?>> CountExpression = c => c.count;
+
         const uint DEFAULT_COUNT = 0;
 
         #region Database fields
-        internal virtual int RoleId { get; private set; }
+        internal virtual int RoleId { get; private set; }//TODO configure composite key/relationships
         internal virtual int CastGroupId { get; private set; }
         public virtual CastGroup CastGroup { get; set; } = null!;
-        protected uint? count = DEFAULT_COUNT; // null means include everyone
+        private uint? count = DEFAULT_COUNT; // null means include everyone
         #endregion
 
         /// <summary>The number of applicants required of this CastGroup</summary>
-        [BackingField(nameof(count))]//TODO this isnt storing nulls, and Everyone is stored as an int
+        [NotMapped]
         public uint Count
         {
             get => count ?? (uint)CastGroup.Members.Count;
@@ -32,6 +35,7 @@ namespace Model
         }
 
         /// <summary>When true, Count is overriden to be the current number of members of this CastGroup</summary>
+        [NotMapped]
         public bool Everyone
         {
             get => count == null;

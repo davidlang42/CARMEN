@@ -41,6 +41,9 @@ namespace Model
                 .HasKey(a => new { a.ApplicantId, a.CriteriaId });
             modelBuilder.Entity<CountByGroup>()
                 .HasKey(c => new { c.RoleId, c.CastGroupId });
+            // Store private properties
+            modelBuilder.Entity<CountByGroup>()
+                .Property(CountByGroup.CountExpression);
             // Add inheritance structure for item tree
             modelBuilder.Entity<Item>();
             modelBuilder.Entity<Section>();
