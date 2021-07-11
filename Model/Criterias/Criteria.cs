@@ -19,7 +19,7 @@ namespace Model.Criterias
         public int Order { get; set; }
         [Range(-1000,1000)]
         public double Weight { get; set; }
-        internal virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
+        public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
         private uint maxMark;
         [Range(0, uint.MaxValue)]
         public virtual uint MaxMark

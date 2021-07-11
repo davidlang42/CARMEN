@@ -37,13 +37,11 @@ namespace Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            // Configure composite keys
+            modelBuilder.Entity<Ability>()
+                .HasKey(nameof(Ability.Applicant.ApplicantId), nameof(Ability.Criteria.CriteriaId));
+
             // Configure owned entities
-            modelBuilder.Entity<Applicant>().OwnsMany(
-                a => a.Abilities, ab =>
-                {
-                    ab.WithOwner().HasForeignKey(nameof(Applicant.ApplicantId));
-                    ab.HasKey(nameof(Applicant.ApplicantId), nameof(Ability.Criteria.CriteriaId));
-                });
             modelBuilder.Entity<Role>().OwnsMany(
                 r => r.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Role.RoleId)));
             modelBuilder.Entity<SectionType>().OwnsMany(
