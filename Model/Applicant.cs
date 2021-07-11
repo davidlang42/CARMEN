@@ -28,9 +28,6 @@ namespace Model
 
         public uint AgeToday() => AgeAt(DateTime.Now);
 
-        /// <summary>Applicant's age at the show date, or null if show date is not set.</summary>
-        //TODO public uint? AgeAtShow() => Show.ShowDate.HasValue ? AgeAt(Show.ShowDate.Value) : (uint?)null;
-
         public uint AgeAt(DateTime date)
         {
             if (DateOfBirth > date)

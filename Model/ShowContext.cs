@@ -37,7 +37,7 @@ namespace Model
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            //TODO pull IDS out of POCOs, keep in the EF (maybe?)
+            //TODO (NEXT) pull IDS out of POCOs, keep in the EF (maybe?)
             // Configure owned entities
             modelBuilder.Entity<Applicant>().OwnsMany(
                 a => a.Abilities, ab =>
@@ -71,8 +71,8 @@ namespace Model
             // Add inheritance structure for requirements
             modelBuilder.Entity<AgeRequirement>();
             modelBuilder.Entity<GenderRequirement>();
-            //TODO figure out how castgroup/requreiment is going to work, and whether there are circular dependencies
-            //modelBuilder.Entity<CastGroupRequirement>();
+            //TODO (NOW) figure out how castgroup/requreiment is going to work, and whether there are circular dependencies
+            modelBuilder.Entity<CastGroupRequirement>();
             modelBuilder.Entity<AbilityExactRequirement>()
                 .CommonProperty(nameof(AbilityExactRequirement.Criteria.CriteriaId));
             modelBuilder.Entity<AbilityRangeRequirement>()

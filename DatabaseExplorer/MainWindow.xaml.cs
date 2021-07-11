@@ -56,10 +56,10 @@ namespace App
             criteriaViewSource = (CollectionViewSource)FindResource(nameof(criteriaViewSource));
             imagesViewSource = (CollectionViewSource)FindResource(nameof(imagesViewSource));
             sectionTypesViewSource = (CollectionViewSource)FindResource(nameof(sectionTypesViewSource));
-            //TODO add extra UI for missing db elements
-            //TODO fix UI for editing roles with item selection
-            //TODO add editing count by group for each node type and section type
-            //TODO make sure everything which should be editable is editable via the db explorer
+            //TODO (UI) add extra UI for missing db elements
+            //TODO (UI) fix UI for editing roles with item selection
+            //TODO (UI) add editing count by group for each node type and section type
+            //TODO (UI) make sure everything which should be editable is editable via the db explorer
         }
 
         private void CreateMenu_Click(object sender, RoutedEventArgs e)
