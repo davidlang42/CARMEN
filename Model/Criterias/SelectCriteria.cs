@@ -28,7 +28,7 @@ namespace Model.Criterias
                 if (value.Length < 2)
                     throw new ArgumentException("SelectCriteria.Options must contain at least 2 elements.");
                 options = value;
-                base.MaxMark = (uint)(options.Length - 1);
+                maxMark = (uint)(options.Length - 1);
             }
         }
 
@@ -40,7 +40,7 @@ namespace Model.Criterias
         public SelectCriteria()
         {
             options = DEFAULT_OPTIONS;
-            base.MaxMark = (uint)(options.Length - 1);
+            maxMark = (uint)(options.Length - 1);
         }
     }
 }

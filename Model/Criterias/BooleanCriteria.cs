@@ -19,7 +19,7 @@ namespace Model.Criterias
 
         public BooleanCriteria()
         {
-            base.MaxMark = 1;
+            maxMark = 1;
         }
     }
 }

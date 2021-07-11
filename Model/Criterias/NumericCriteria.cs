@@ -15,7 +15,7 @@ namespace Model.Criterias
 
         public NumericCriteria()
         {
-            MaxMark = DEFAULT_MAX_MARK;
+            maxMark = DEFAULT_MAX_MARK;
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Model.Criterias
         [Range(-1000,1000)]
         public double Weight { get; set; }
         public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
-        private uint maxMark;
+        protected uint maxMark;
         [Range(0, uint.MaxValue)]
         public virtual uint MaxMark
         {
