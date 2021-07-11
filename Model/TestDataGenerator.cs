@@ -223,7 +223,7 @@ namespace Model
                 Criteria = boolean,
                 Name = "Boolean is True",
                 Order = order++,
-                ExactValue = 1
+                RequiredValue = 1
             };
             var ability_range = new AbilityRangeRequirement
             {
@@ -241,7 +241,7 @@ namespace Model
             var gender = new GenderRequirement
             {
                 Name = "Male",
-                ExactValue = (int)Gender.Male,
+                RequiredValue = (int)Gender.Male,
                 Order = order++
             };
             var not_req = new NotRequirement
@@ -253,7 +253,7 @@ namespace Model
             var cast_group = new CastGroupRequirement
             {
                 Name = "First Cast Group",
-                CastGroup = Context.CastGroups.FirstOrDefault() ?? new CastGroup
+                RequiredGroup = Context.CastGroups.FirstOrDefault() ?? new CastGroup
                 {
                     Name = "New Group",
                     Order = 0

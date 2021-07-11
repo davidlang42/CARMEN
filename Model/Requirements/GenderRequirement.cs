@@ -9,6 +9,6 @@ namespace Model.Requirements
     public class GenderRequirement : ExactRequirement
     {
         public override bool IsSatisfiedBy(Applicant applicant)
-            => (uint)applicant.Gender == ExactValue;
+            => (uint)applicant.Gender == RequiredValue;
     }
 }

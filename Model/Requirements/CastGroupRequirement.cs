@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace Model.Requirements
 {
-    public class CastGroupRequirement : Requirement
+    public class CastGroupRequirement : Requirement //TODO detect circular dependencies when using CastGroupRequirements on CastGroups
     {
-        public virtual CastGroup CastGroup { get; set; } = null!;
+        public virtual CastGroup RequiredGroup { get; set; } = null!;
 
         public override bool IsSatisfiedBy(Applicant applicant)
-            => applicant.CastGroups.Contains(CastGroup);
+            => applicant.CastGroups.Contains(RequiredGroup);
     }
 }

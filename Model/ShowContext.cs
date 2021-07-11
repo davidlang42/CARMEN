@@ -71,8 +71,8 @@ namespace Model
             // Add inheritance structure for requirements
             modelBuilder.Entity<AgeRequirement>();
             modelBuilder.Entity<GenderRequirement>();
-            //TODO (NOW) figure out how castgroup/requreiment is going to work, and whether there are circular dependencies
-            modelBuilder.Entity<CastGroupRequirement>();
+            modelBuilder.Entity<CastGroupRequirement>()
+                .HasOne(cgr => cgr.RequiredGroup);
             modelBuilder.Entity<AbilityExactRequirement>()
                 .CommonProperty(nameof(AbilityExactRequirement.Criteria.CriteriaId));
             modelBuilder.Entity<AbilityRangeRequirement>()

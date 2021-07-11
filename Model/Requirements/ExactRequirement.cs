@@ -8,6 +8,6 @@ namespace Model.Requirements
 {
     public abstract class ExactRequirement : Requirement
     {
-        public uint ExactValue { get; set; }
+        public uint RequiredValue { get; set; }
     }
 }
