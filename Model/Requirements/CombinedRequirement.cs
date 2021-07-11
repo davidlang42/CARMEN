@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Model.Requirements
 {
-    public abstract class CombinedRequirement : Requirement
+    public abstract class CombinedRequirement : Requirement //TODO detect circular references in combined requirements & not requirements
     {
         public virtual ICollection<Requirement> SubRequirements { get; private set; } = new ObservableCollection<Requirement>();
 

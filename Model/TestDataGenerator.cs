@@ -261,26 +261,29 @@ namespace Model
             //    },
             //    Order = order++
             //};
-            //var and_req = new AndRequirement
-            //{
-            //    Name = "Adult Male",
-            //};
-            //and_req.SubRequirements.Add(age);
-            //and_req.SubRequirements.Add(gender);
-            //var or_req = new OrRequirement
-            //{
-            //    Name = "Numeric > 70, or Male",
-            //};
-            //or_req.SubRequirements.Add(ability_range);
-            //or_req.SubRequirements.Add(gender);
-            //var xor_req = new XorRequirement
-            //{
-            //    Name = "Bool is True, or Male, but not both",
-            //};
-            //xor_req.SubRequirements.Add(ability_exact);
-            //xor_req.SubRequirements.Add(gender);
-            Context.Requirements.AddRange(ability_exact, ability_range, age, gender, not_req);
-            //Context.Requirements.AddRange(ability_exact, ability_range, age, cast_group, gender, not_req, and_req, or_req, xor_req);
+            var and_req = new AndRequirement
+            {
+                Name = "Adult Male",
+                Order = order++
+            };
+            and_req.SubRequirements.Add(age);
+            and_req.SubRequirements.Add(gender);
+            var or_req = new OrRequirement
+            {
+                Name = "Numeric > 70, or Male",
+                Order = order++
+            };
+            or_req.SubRequirements.Add(ability_range);
+            or_req.SubRequirements.Add(gender);
+            var xor_req = new XorRequirement
+            {
+                Name = "Bool is True, or Male, but not both",
+                Order = order++
+            };
+            xor_req.SubRequirements.Add(ability_exact);
+            xor_req.SubRequirements.Add(gender);
+            Context.Requirements.AddRange(ability_exact, ability_range, age, gender, not_req, and_req, or_req, xor_req);
+            //TODO Context.Requirements.AddRange(ability_exact, ability_range, age, cast_group, gender, not_req, and_req, or_req, xor_req);
         }
 
         /// <summary>Adds roles to items, optionally with random counts of a single cast group and random requirements.

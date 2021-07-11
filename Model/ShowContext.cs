@@ -60,27 +60,29 @@ namespace Model
             // Configure many-many relationships
             modelBuilder.Entity<CastGroup>()
                 .HasMany(g => g.Requirements)
-                .WithMany(nameof(CastGroup.CastGroupId));
+                .WithMany(nameof(CastGroup));
             modelBuilder.Entity<Role>()
                 .HasMany(r => r.Requirements)
-                .WithMany(nameof(Role.RoleId));
-            
+                .WithMany(nameof(Role));
+            modelBuilder.Entity<CombinedRequirement>()
+                .HasMany(cr => cr.SubRequirements)
+                .WithMany(nameof(CombinedRequirement));
+
             // Add inheritance structure for requirements
             modelBuilder.Entity<AgeRequirement>();
             modelBuilder.Entity<GenderRequirement>();
-            //TODO figure out how castgroup/requreiment is going to work
+            //TODO figure out how castgroup/requreiment is going to work, and whether there are circular dependencies
             //modelBuilder.Entity<CastGroupRequirement>();
             modelBuilder.Entity<AbilityExactRequirement>()
-                .Property(nameof(AbilityExactRequirement.Criteria.CriteriaId))
-                .HasColumnName(nameof(AbilityExactRequirement.Criteria.CriteriaId));
+                .CommonProperty(nameof(AbilityExactRequirement.Criteria.CriteriaId));
             modelBuilder.Entity<AbilityRangeRequirement>()
-                .Property(nameof(AbilityRangeRequirement.Criteria.CriteriaId))
-                .HasColumnName(nameof(AbilityRangeRequirement.Criteria.CriteriaId));
+                .CommonProperty(nameof(AbilityRangeRequirement.Criteria.CriteriaId));
             modelBuilder.Entity<NotRequirement>();
-            //TODO figure out how combined requirements will be stored, also what about circular dependencies?
-            //modelBuilder.Entity<AndRequirement>();
-            //modelBuilder.Entity<OrRequirement>();
-            //modelBuilder.Entity<XorRequirement>();
+            modelBuilder.Entity<AndRequirement>()
+                .CommonProperty(nameof(AndRequirement.AverageSuitability));
+            modelBuilder.Entity<OrRequirement>()
+                .CommonProperty(nameof(OrRequirement.AverageSuitability));
+            modelBuilder.Entity<XorRequirement>();
 
             // Add inheritance structure for critiera
             modelBuilder.Entity<NumericCriteria>();
