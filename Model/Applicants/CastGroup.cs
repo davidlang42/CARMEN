@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using Model.Requirements;
 
-namespace Model
+namespace Model.Applicants
 {
     /// <summary>
     /// A group of people which an applicant can be cast into.

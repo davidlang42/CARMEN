@@ -1,9 +1,8 @@
-﻿using System;
+﻿using Model.Applicants;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Text;
 using System.Linq;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Model.Structure
 {

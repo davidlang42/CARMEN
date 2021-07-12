@@ -1,6 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
 using Model;
+using Model.Applicants;
 using NUnit.Framework;
 using System;
 using System.Linq;

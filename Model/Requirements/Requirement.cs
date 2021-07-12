@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using Model.Applicants;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace Model.Requirements
 {

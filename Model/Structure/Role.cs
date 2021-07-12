@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
 using System.Linq;
-using Model.Structure;
+using Model.Applicants;
 using Model.Requirements;
 
-namespace Model
+namespace Model.Structure
 {
     public class Role : ICounted
     {

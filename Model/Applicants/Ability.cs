@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
 using Model.Criterias;
 
-namespace Model
+namespace Model.Applicants
 {
     /// <summary>
     /// The assessed ability of an applicant in a certain criteria.

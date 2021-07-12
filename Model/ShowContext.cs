@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using Model.Structure;
-using Model.Requirements;
-using Model.Criterias;
-using System.Text.Json;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Linq;
+using System.Text.Json;
+using Model.Applicants;
+using Model.Criterias;
+using Model.Requirements;
+using Model.Structure;
 
 namespace Model
 {

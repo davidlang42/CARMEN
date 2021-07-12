@@ -5,7 +5,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace Model
+namespace Model.Applicants
 {
     /// <summary>
     /// A person who has auditioned to be in a show.

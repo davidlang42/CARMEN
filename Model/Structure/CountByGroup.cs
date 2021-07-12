@@ -1,12 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Model.Applicants;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
-using System.Text;
 
-namespace Model
+namespace Model.Structure
 {
     /// <summary>
     /// The count of applicants required for a role from a certain group.
