@@ -44,8 +44,6 @@ namespace Model
             // Configure owned entities
             modelBuilder.Entity<Role>().OwnsMany(
                 r => r.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Role.RoleId)));
-            modelBuilder.Entity<SectionType>().OwnsMany(
-                st => st.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(SectionType.SectionTypeId)));
             modelBuilder.Entity<Node>().OwnsMany(
                 n => n.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Node.NodeId)));
 

@@ -7,17 +7,13 @@ using System.Linq;
 
 namespace Model.Structure
 {
-    public class SectionType : ICounted
+    public class SectionType
     {
-        #region Database fields
         [Key]
         public int SectionTypeId { get; private set; }
         public string Name { get; set; } = "Section";
         public virtual Image? Icon { get; set; }
-        public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
-        #endregion
-
-        uint ICounted.CountFor(CastGroup group)
-            => throw new NotImplementedException("Section types cannot be counted.");
+        public bool AllowMultipleRoles { get; set; } = false;
+        public bool AllowNoRoles { get; set; } = false;
     }
 }
