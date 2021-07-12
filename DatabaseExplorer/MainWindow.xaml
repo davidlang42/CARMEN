@@ -58,6 +58,7 @@
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
+                                <DataGridCheckBoxColumn Binding="{Binding Everyone}" Header="Everyone"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
@@ -67,6 +68,11 @@
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
                         <ListView x:Name="itemsListView" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource itemsViewSource}}">
+                            <ListView.ItemTemplate>
+                                <DataTemplate DataType="{x:Type modelStructure:Item}">
+                                    <TextBlock Text="{Binding Path=Name}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
                         </ListView>
                         <DataGrid x:Name="rolesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
