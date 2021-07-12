@@ -13,12 +13,13 @@ namespace Model
     {
         #region Database collections
         public DbSet<Applicant> Applicants => Set<Applicant>();
+        public DbSet<Identifier> Identifiers => Set<Identifier>();
         public DbSet<CastGroup> CastGroups => Set<CastGroup>();
-        public DbSet<Node> Nodes => Set<Node>();
         public DbSet<Criteria> Criterias => Set<Criteria>();
         public DbSet<Requirement> Requirements => Set<Requirement>();
-        public DbSet<Image> Images => Set<Image>();
+        public DbSet<Node> Nodes => Set<Node>();
         public DbSet<SectionType> SectionTypes => Set<SectionType>();
+        public DbSet<Image> Images => Set<Image>();
         #endregion
 
         /// <summary>The root node of the show structure</summary>
@@ -40,6 +41,12 @@ namespace Model
                 .HasKey(nameof(Ability.Applicant.ApplicantId), nameof(Ability.Criteria.CriteriaId));
 
             // Configure owned entities
+            modelBuilder.Entity<Applicant>().OwnsMany(
+                a => a.Identities, id =>
+                {
+                    id.WithOwner().HasForeignKey(nameof(Applicant.ApplicantId));
+                    id.HasKey(nameof(Applicant.ApplicantId), nameof(Identity.Identifier.IdentifierId));
+                });
             modelBuilder.Entity<Role>().OwnsMany(
                 r => r.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Role.RoleId)));
             modelBuilder.Entity<Node>().OwnsMany(

@@ -26,8 +26,7 @@ namespace Tests
                 FirstName = "John",
                 LastName = "Smith",
                 Gender = Gender.Male,
-                DateOfBirth = new DateTime(1990, 1, 1),
-                ExternalID = "John123"
+                DateOfBirth = new DateTime(1990, 1, 1)
             };
 
             var jane = new Applicant

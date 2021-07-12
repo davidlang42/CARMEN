@@ -19,11 +19,11 @@ namespace Model.Applicants
         public string LastName { get; set; } = "";
         public Gender Gender { get; set; }
         public DateTime DateOfBirth { get; set; }
-        public string? ExternalID { get; set; }
         public virtual Image? Photo { get; set; }
         public string Notes { get; set; } = "";
         public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
         public virtual ICollection<CastGroup> CastGroups { get; private set; } = new ObservableCollection<CastGroup>();
+        public virtual ICollection<Identity> Identities { get; private set; } = new ObservableCollection<Identity>();
         #endregion
 
         public uint AgeToday() => AgeAt(DateTime.Now);
