@@ -165,6 +165,20 @@ namespace Model
             }
         }
 
+        public void AddIdentifiers(uint count = 1)
+        {
+            int order = Context.Identifiers.NextOrder();
+            for (var i = 0; i < count; i++)
+            {
+                var identifier = new Identifier
+                {
+                    Name = $"External ID {i + 1}",
+                    Order = order++
+                };
+                Context.Identifiers.Add(identifier);
+            }
+        }
+
         private uint TotalSections(uint sections_per_section, uint section_depth)
             => Convert.ToUInt32(Enumerable.Range(1, (int)section_depth).Select(d => Math.Pow(sections_per_section, d)).Sum());
 

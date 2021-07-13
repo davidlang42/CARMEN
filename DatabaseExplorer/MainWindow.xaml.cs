@@ -186,11 +186,14 @@ namespace App
             }
             if (!TryInputNumber("How many CAST GROUPS would you like to add?", "Test Data", out var cast_groups, 4))
                 return;
+            if (!TryInputNumber("How many IDENTIFIERS would you like to add?", "Test Data", out var identifiers, 1))
+                return;
             if (!TryInputNumber("How many APPLICANTS would you like to add?", "Test Data", out var applicants, 100))
                 return;
             if (!TryInputNumber("How many ROLES PER ITEM would you like to add?", "Test Data", out var roles, 5))
                 return;
             using var test_data = new TestDataGenerator(Context);
+            test_data.AddIdentifiers(identifiers);
             test_data.AddShowStructure(items, sections, depth, include_items_at_every_depth: every_depth);
             test_data.AddCastGroups(cast_groups);
             Context.SaveChanges();
