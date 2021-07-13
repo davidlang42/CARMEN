@@ -16,6 +16,7 @@
         <CollectionViewSource x:Key="requirementsViewSource"/>
         <CollectionViewSource x:Key="imagesViewSource"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
+        <CollectionViewSource x:Key="identifiersViewSource"/>
         <local:SortIOrdered x:Key="sortIOrdered" />
     </Window.Resources>
     <DockPanel>
@@ -104,15 +105,6 @@
                         ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                         </DataGrid>
-                        <DataGrid x:Name="sectionTypeCountsDataGrid" AutoGenerateColumns="False" 
-                        EnableRowVirtualization="True" 
-                        ItemsSource="{Binding ElementName=sectionTypesDataGrid, Path=SelectedItem.CountByGroups}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
-                            <DataGrid.Columns>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
-                                <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -132,6 +124,28 @@
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Mark}" Header="Mark"/>
                             </DataGrid.Columns>
+                        </DataGrid>
+                        <DataGrid x:Name="identitiesDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.Identities}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
+                            <DataGrid.Columns>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Identifier}" ItemsSource="{Binding Source={StaticResource identifiersViewSource}}" Header="Identifier" DisplayMemberPath="Name"/>
+                                <DataGridTextColumn Binding="{Binding Prefix}" Header="Prefix"/>
+                                <DataGridTextColumn Binding="{Binding Number}" Header="Number"/>
+                                <DataGridTextColumn Binding="{Binding Suffix}" Header="Suffix"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Identifiers">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="identifiersDataGrid" AutoGenerateColumns="True" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource identifiersViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
