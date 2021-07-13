@@ -68,16 +68,16 @@
             <TabItem Header="Item Roles">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <ListView x:Name="itemsListView" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource itemsViewSource}}">
-                            <ListView.ItemTemplate>
+                        <ComboBox x:Name="itemsComboBox" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource itemsViewSource}}">
+                            <ComboBox.ItemTemplate>
                                 <DataTemplate DataType="{x:Type modelStructure:Item}">
                                     <TextBlock Text="{Binding Path=Name}"/>
                                 </DataTemplate>
-                            </ListView.ItemTemplate>
-                        </ListView>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                         <DataGrid x:Name="rolesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
-                        ItemsSource="{Binding ElementName=itemsListView, Path=SelectedItem.Roles}" 
+                        ItemsSource="{Binding ElementName=itemsComboBox, Path=SelectedItem.Roles}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding RoleId}" Header="Role Id" 
