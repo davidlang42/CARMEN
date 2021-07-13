@@ -233,6 +233,7 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Name}" Header="Requirement Name"/>
                                 <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
+                                <DataGridCheckBoxColumn Binding="{Binding Primary}" Header="Primary"/>
                                 <DataGridTextColumn Binding="{Binding Reason}" Header="Reason" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>

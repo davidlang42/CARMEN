@@ -13,6 +13,7 @@ namespace Model.Requirements
         public int RequirementId { get; private set; }
         public string Name { get; set; } = "";
         public int Order { get; set; }
+        public bool Primary { get; set; }
         public string? Reason { get; set; }
         #endregion
 
