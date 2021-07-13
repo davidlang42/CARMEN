@@ -58,15 +58,17 @@ namespace Model
             modelBuilder.Entity<ShowRoot>();
 
             // Configure many-many relationships
+            // Navigation collections must exist in both directions, otherwise loading will
+            // fail with ArgumentNullException "Value cannot be null. (Parameter 'member')".
             modelBuilder.Entity<CastGroup>()
                 .HasMany(g => g.Requirements)
-                .WithMany(nameof(CastGroup));
+                .WithMany(r => r.UsedByCastGroups);
             modelBuilder.Entity<Role>()
                 .HasMany(r => r.Requirements)
-                .WithMany(nameof(Role));
+                .WithMany(r => r.UsedByRoles);
             modelBuilder.Entity<CombinedRequirement>()
                 .HasMany(cr => cr.SubRequirements)
-                .WithMany(nameof(CombinedRequirement));
+                .WithMany(r => r.UsedByCombinedRequirements);
 
             // Add inheritance structure for requirements
             // Foreign keys are manually defined to avoid IndexOutOfRangeException being

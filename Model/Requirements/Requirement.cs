@@ -1,4 +1,7 @@
 ﻿using Model.Applicants;
+using Model.Structure;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Model.Requirements
@@ -15,6 +18,9 @@ namespace Model.Requirements
         public int Order { get; set; }
         public bool Primary { get; set; }
         public string? Reason { get; set; }
+        internal virtual ICollection<Role> UsedByRoles { get; set; } = new ObservableCollection<Role>();
+        internal virtual ICollection<CastGroup> UsedByCastGroups { get; set; } = new ObservableCollection<CastGroup>();
+        internal virtual ICollection<CombinedRequirement> UsedByCombinedRequirements { get; set; } = new ObservableCollection<CombinedRequirement>();
         #endregion
 
         /// <summary>Calculates the suitability of an Applicant.

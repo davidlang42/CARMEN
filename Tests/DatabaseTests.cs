@@ -1,5 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FluentAssertions;
+using Microsoft.EntityFrameworkCore;
 using Model;
+using Model.Requirements;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -43,6 +45,64 @@ namespace Tests
             context.Images.Load();
             context.SectionTypes.Load();
             context.Requirements.Load();
+        }
+
+        [Test]
+        public void Role_CanLoadRequirement()
+        {
+            using var context = new ShowContext(contextOptions);
+            var items = context.ShowRoot.ItemsInOrder();
+            var item = items.First();
+            var role = item.Roles.First();
+            var req = role.Requirements.First();
+            req.RequirementId.Should().NotBe(0);
+        }
+
+        [Test]
+        public void CastGroup_CanSaveAndLoadRequirement()
+        {
+            int req_id;
+            using (var context = new ShowContext(contextOptions))
+            {
+                //TODO put this into test data generation, so running tests only reads DB not writes
+                var req = context.Requirements.Skip(1).First();
+                req_id = req.RequirementId;
+                req_id.Should().NotBe(0);
+                var group = context.CastGroups.First();
+                group.Requirements.Should().BeEmpty();
+                group.Requirements.Add(req);
+                context.SaveChanges();
+            }
+            using (var context = new ShowContext(contextOptions))
+            {
+                var group = context.CastGroups.First();
+                var loaded_req = group.Requirements.First();
+                loaded_req.RequirementId.Should().Be(req_id);
+            }
+        }
+
+        [Test]
+        public void NotRequirement_CanLoadRequirement()
+        {
+            using var context = new ShowContext(contextOptions);
+            var not_req = context.Requirements.OfType<NotRequirement>().First();
+            not_req.RequirementId.Should().NotBe(0);
+            var sub_req = not_req.SubRequirement;
+            sub_req.Should().NotBeNull();
+            sub_req.RequirementId.Should().NotBe(0);
+            sub_req.RequirementId.Should().NotBe(not_req.RequirementId);
+        }
+
+        [Test]
+        public void CombinedRequirement_CanLoadRequirement()
+        {
+            using var context = new ShowContext(contextOptions);
+            var req = context.Requirements.OfType<CombinedRequirement>().First();
+            req.RequirementId.Should().NotBe(0);
+            req.SubRequirements.Count.Should().BeGreaterOrEqualTo(2);
+            var sub_req = req.SubRequirements.First();
+            sub_req.RequirementId.Should().NotBe(0);
+            sub_req.RequirementId.Should().NotBe(req.RequirementId);
         }
     }
 }
