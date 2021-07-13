@@ -72,6 +72,23 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
+            <TabItem Header="Section Types">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="sectionTypesDataGrid" AutoGenerateColumns="True" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Name"/>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
+                                <DataGridCheckBoxColumn Binding="{Binding AllowMultipleRoles}" Header="Allow Multiple Roles"/>
+                                <DataGridCheckBoxColumn Binding="{Binding AllowNoRoles}" Header="Allow No Roles"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
             <TabItem Header="Item Roles">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
@@ -99,23 +116,6 @@
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-            <TabItem Header="Section Types">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="sectionTypesDataGrid" AutoGenerateColumns="True" 
-                        EnableRowVirtualization="True" 
-                        ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Name}" Header="Name"/>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
-                                <DataGridCheckBoxColumn Binding="{Binding AllowMultipleRoles}" Header="Allow Multiple Roles"/>
-                                <DataGridCheckBoxColumn Binding="{Binding AllowNoRoles}" Header="Allow No Roles"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
@@ -182,23 +182,23 @@
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
-            <TabItem Header="Cast Groups">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="castGroupsDataGrid" AutoGenerateColumns="True" 
-                        EnableRowVirtualization="True" 
-                        ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
-                        </DataGrid>
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
             <TabItem Header="Criteria">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
                         <DataGrid x:Name="criteriaDataGrid" AutoGenerateColumns="True" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                        </DataGrid>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="Cast Groups">
+                <ScrollViewer  VerticalScrollBarVisibility="Auto">
+                    <StackPanel Background="#FFE5E5E5">
+                        <DataGrid x:Name="castGroupsDataGrid" AutoGenerateColumns="True" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                         </DataGrid>
                     </StackPanel>
