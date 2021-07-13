@@ -215,7 +215,7 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Name}" Header="Cast Group Name"/>
                                 <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
-                                <DataGridCheckBoxColumn Binding="{Binding MutuallyExclusive}" Header="Mutually Exclusive"/>
+                                <DataGridCheckBoxColumn Binding="{Binding Primary}" Header="Primary"/>
                                 <DataGridTextColumn Binding="{Binding RequiredCount}" Header="Required Count"/>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
                             </DataGrid.Columns>

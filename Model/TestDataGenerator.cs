@@ -185,7 +185,7 @@ namespace Model
                 {
                     Name = $"Group {i + 1}",
                     Order = order++,
-                    MutuallyExclusive = mutually_exclusive,
+                    Primary = mutually_exclusive,
                     RequiredCount = required_count
                 };
                 Context.CastGroups.Add(cast_group);
