@@ -5,6 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:App"
         xmlns:modelStructure="clr-namespace:Model.Structure;assembly=Model"
+        xmlns:modelApplicants="clr-namespace:Model.Applicants;assembly=Model"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="CARMEN: Database Explorer" Height="600" Width="800">
     <Window.Resources>
@@ -18,6 +20,11 @@
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
         <CollectionViewSource x:Key="identifiersViewSource"/>
         <local:SortIOrdered x:Key="sortIOrdered" />
+        <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="modelApplicants:Gender"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -104,6 +111,12 @@
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Name"/>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
+                                <DataGridCheckBoxColumn Binding="{Binding AllowMultipleRoles}" Header="Allow Multiple Roles"/>
+                                <DataGridCheckBoxColumn Binding="{Binding AllowNoRoles}" Header="Allow No Roles"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
@@ -111,10 +124,29 @@
             <TabItem Header="Applicants">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="applicantsDataGrid" AutoGenerateColumns="True" 
+                        <DataGrid x:Name="applicantsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding FirstName}" Header="First Name"/>
+                                <DataGridTextColumn Binding="{Binding LastName}" Header="Last Name"/>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Gender}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}" Header="Gender"/>
+                                <DataGridTemplateColumn Header="Date of Birth" Width="120">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding DateOfBirth, StringFormat=dd/MM/yyyy}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <DatePicker SelectedDate="{Binding DateOfBirth, StringFormat=dd/MM/yyyy}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Photo}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Photo" DisplayMemberPath="Name"/>
+                                <DataGridTextColumn Binding="{Binding Notes}" Header="Notes" Width="*"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                         <DataGrid x:Name="abilitiesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
