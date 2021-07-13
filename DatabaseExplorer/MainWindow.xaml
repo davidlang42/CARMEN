@@ -75,12 +75,12 @@
             <TabItem Header="Section Types">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="sectionTypesDataGrid" AutoGenerateColumns="True" 
+                        <DataGrid x:Name="sectionTypesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Name}" Header="Name"/>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Section Type Name"/>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
                                 <DataGridCheckBoxColumn Binding="{Binding AllowMultipleRoles}" Header="Allow Multiple Roles"/>
                                 <DataGridCheckBoxColumn Binding="{Binding AllowNoRoles}" Header="Allow No Roles"/>
@@ -104,8 +104,6 @@
                         ItemsSource="{Binding ElementName=itemsComboBox, Path=SelectedItem.Roles}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding RoleId}" Header="Role Id" 
-                                    Width="SizeToHeader" IsReadOnly="True"/>
                                 <DataGridTextColumn Binding="{Binding Name}" Header="Role Name" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
@@ -116,6 +114,7 @@
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
+                                <DataGridCheckBoxColumn Binding="{Binding Everyone}" Header="Everyone"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
@@ -145,7 +144,7 @@
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding Photo}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Photo" DisplayMemberPath="Name"/>
-                                <DataGridTextColumn Binding="{Binding Notes}" Header="Notes" Width="*"/>
+                                <DataGridTextColumn Binding="{Binding Notes}" Header="Notes" Width="*" IsReadOnly="True"/>
                             </DataGrid.Columns>
                         </DataGrid>
                         <DataGrid x:Name="abilitiesDataGrid" AutoGenerateColumns="False" 
@@ -153,7 +152,7 @@
                         ItemsSource="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.Abilities}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
                             <DataGrid.Columns>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" Header="Criteria" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Mark}" Header="Mark"/>
                             </DataGrid.Columns>
                         </DataGrid>
@@ -174,10 +173,17 @@
             <TabItem Header="Identifiers">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="identifiersDataGrid" AutoGenerateColumns="True" 
+                        <DataGrid x:Name="identifiersDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource identifiersViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Identifier Name"/>
+                                <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
+                                <DataGridTextColumn Binding="{Binding DefaultPrefix}" Header="Default Prefix"/>
+                                <DataGridTextColumn Binding="{Binding AssignNumbersFrom}" Header="Auto-Assign Numbers Starting From"/>
+                                <DataGridTextColumn Binding="{Binding DefaultSuffix}" Header="Default Suffix"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
@@ -185,10 +191,16 @@
             <TabItem Header="Criteria">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="criteriaDataGrid" AutoGenerateColumns="True" 
+                        <DataGrid x:Name="criteriaDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Criteria Name"/>
+                                <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
+                                <DataGridTextColumn Binding="{Binding Description}" Header="Description"/>
+                                <DataGridTextColumn Binding="{Binding MaxMark}" Header="Max Mark" IsReadOnly="True"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
@@ -196,10 +208,17 @@
             <TabItem Header="Cast Groups">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="castGroupsDataGrid" AutoGenerateColumns="True" 
+                        <DataGrid x:Name="castGroupsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Cast Group Name"/>
+                                <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
+                                <DataGridCheckBoxColumn Binding="{Binding MutuallyExclusive}" Header="Mutually Exclusive"/>
+                                <DataGridTextColumn Binding="{Binding RequiredCount}" Header="Required Count"/>
+                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
@@ -207,10 +226,15 @@
             <TabItem Header="Requirements">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="requirementsDataGrid" AutoGenerateColumns="True" 
+                        <DataGrid x:Name="requirementsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource requirementsViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Requirement Name"/>
+                                <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
+                                <DataGridTextColumn Binding="{Binding Reason}" Header="Reason" Width="*"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
@@ -218,10 +242,13 @@
             <TabItem Header="Images">
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="imagesDataGrid" AutoGenerateColumns="True" 
+                        <DataGrid x:Name="imagesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource imagesViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Binding="{Binding Name}" Header="Image Name"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
