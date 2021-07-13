@@ -69,6 +69,9 @@ namespace Model
             modelBuilder.Entity<CombinedRequirement>()
                 .HasMany(cr => cr.SubRequirements)
                 .WithMany(r => r.UsedByCombinedRequirements);
+            modelBuilder.Entity<Identifier>()
+                .HasMany(id => id.Requirements)
+                .WithMany(r => r.UsedByIdentifiers);
 
             // Add inheritance structure for requirements
             // Foreign keys are manually defined to avoid IndexOutOfRangeException being

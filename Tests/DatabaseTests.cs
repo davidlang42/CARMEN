@@ -23,6 +23,7 @@ namespace Tests
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
             using var test_data = new TestDataGenerator(context, 0);
+            test_data.AddIdentifiers();
             test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false);
             test_data.AddCastGroups(4);
             context.SaveChanges();
@@ -103,6 +104,29 @@ namespace Tests
             var sub_req = req.SubRequirements.First();
             sub_req.RequirementId.Should().NotBe(0);
             sub_req.RequirementId.Should().NotBe(req.RequirementId);
+        }
+
+        [Test]
+        public void Identifier_CanSaveAndLoadRequirement()
+        {
+            int req_id;
+            using (var context = new ShowContext(contextOptions))
+            {
+                //TODO put this into test data generation, so running tests only reads DB not writes
+                var req = context.Requirements.Skip(2).First();
+                req_id = req.RequirementId;
+                req_id.Should().NotBe(0);
+                var identifier = context.Identifiers.First();
+                identifier.Requirements.Should().BeEmpty();
+                identifier.Requirements.Add(req);
+                context.SaveChanges();
+            }
+            using (var context = new ShowContext(contextOptions))
+            {
+                var identifier = context.Identifiers.First();
+                var loaded_req = identifier.Requirements.First();
+                loaded_req.RequirementId.Should().Be(req_id);
+            }
         }
     }
 }

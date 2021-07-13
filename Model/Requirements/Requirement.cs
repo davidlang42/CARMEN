@@ -21,6 +21,7 @@ namespace Model.Requirements
         internal virtual ICollection<Role> UsedByRoles { get; set; } = new ObservableCollection<Role>();
         internal virtual ICollection<CastGroup> UsedByCastGroups { get; set; } = new ObservableCollection<CastGroup>();
         internal virtual ICollection<CombinedRequirement> UsedByCombinedRequirements { get; set; } = new ObservableCollection<CombinedRequirement>();
+        internal virtual ICollection<Identifier> UsedByIdentifiers { get; set; } = new ObservableCollection<Identifier>();
         #endregion
 
         /// <summary>Calculates the suitability of an Applicant.
