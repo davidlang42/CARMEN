@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:App"
         xmlns:modelStructure="clr-namespace:Model.Structure;assembly=Model"
         xmlns:modelApplicants="clr-namespace:Model.Applicants;assembly=Model"
+        xmlns:modelRequirements="clr-namespace:Model.Requirements;assembly=Model"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="CARMEN: Database Explorer" Height="600" Width="800">
@@ -117,6 +118,11 @@
                                 <DataGridCheckBoxColumn Binding="{Binding Everyone}" Header="Everyone"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <DataGrid x:Name="roleRequirementsDataGrid" AutoGenerateColumns="True" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Requirements}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="False">
+                        </DataGrid>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -220,6 +226,30 @@
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="1*" />
+                            </Grid.ColumnDefinitions>
+                            <ListBox Grid.Column="0"
+                            ItemsSource="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
+                            SelectionMode="Extended">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                            <ListBox Grid.Column="1"
+                            ItemsSource="{Binding Source={StaticResource requirementsViewSource}}"
+                            SelectionMode="Extended">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
