@@ -69,6 +69,52 @@
                                 </HierarchicalDataTemplate>
                             </TreeView.Resources>
                         </TreeView>
+                        <ContentControl DataContext="{Binding ElementName=itemsTreeView, Path=SelectedItem}" Content="{Binding}" Margin="10,10,10,10">
+                            <ContentControl.Resources>
+                                <DataTemplate DataType="{x:Type modelStructure:ShowRoot}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Show Name:" Grid.Column="0"/>
+                                        <TextBox Text="{Binding Name}" Grid.Column="1"/>
+                                        <Label Content="Show Date:" Grid.Column="2"/>
+                                        <DatePicker SelectedDate="{Binding ShowDate}" Grid.Column="3"/>
+                                        <Label Content="Logo:" Grid.Column="4"/>
+                                        <ComboBox SelectedItem="{Binding Logo}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" DisplayMemberPath="Name" Grid.Column="5"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelStructure:Section}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Section Name:" Grid.Column="0"/>
+                                        <TextBox Text="{Binding Name}" Grid.Column="1"/>
+                                        <Label Content="Section Type:" Grid.Column="2"/>
+                                        <ComboBox SelectedItem="{Binding SectionType}" ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" DisplayMemberPath="Name" Grid.Column="3"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelStructure:Item}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Item Name:" Grid.Column="0"/>
+                                        <TextBox Text="{Binding Name}" Grid.Column="1"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ContentControl.Resources>
+                        </ContentControl>
                         <DataGrid x:Name="nodeCountsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding ElementName=itemsTreeView, Path=SelectedItem.CountByGroups}" 
