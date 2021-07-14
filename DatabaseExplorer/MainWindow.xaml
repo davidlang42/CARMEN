@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:App"
+        xmlns:db="clr-namespace:DatabaseExplorer"
         xmlns:modelStructure="clr-namespace:Model.Structure;assembly=Model"
         xmlns:modelApplicants="clr-namespace:Model.Applicants;assembly=Model"
         xmlns:modelRequirements="clr-namespace:Model.Requirements;assembly=Model"
@@ -226,49 +227,9 @@
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="1*" />
-                                <ColumnDefinition Width="50"/>
-                                <ColumnDefinition Width="1*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <ListBox x:Name="selectedList" Grid.Column="0" Grid.RowSpan="4"
-                            ItemsSource="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
-                            SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
-                                        <TextBlock Text="{Binding Path=Name}"/>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                            <Button x:Name="addButton" Grid.Column="1" Grid.Row="0" Click="addButton_Click">
-                                <TextBlock>&lt;</TextBlock>
-                            </Button>
-                            <Button x:Name="addAllButton" Grid.Column="1" Grid.Row="1" Click="addAllButton_Click">
-                                <TextBlock>&lt;&lt;</TextBlock>
-                            </Button>
-                            <Button x:Name="removeButton" Grid.Column="1" Grid.Row="2" Click="removeButton_Click">
-                                <TextBlock>&gt;</TextBlock>
-                            </Button>
-                            <Button x:Name="removeAllButton" Grid.Column="1" Grid.Row="3" Click="removeAllButton_Click">
-                                <TextBlock>&gt;&gt;</TextBlock>
-                            </Button>
-                            <ListBox x:Name="availableList" Grid.Column="2" Grid.RowSpan="4"
-                            ItemsSource="{Binding Source={StaticResource requirementsViewSource}}"
-                            SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick">
-                                <ListBox.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
-                                        <TextBlock Text="{Binding Path=Name}"/>
-                                    </DataTemplate>
-                                </ListBox.ItemTemplate>
-                            </ListBox>
-                        </Grid>
+                        <db:SelectableListControl SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
+                                                  AvailableItems="{Binding Source={StaticResource requirementsViewSource}}">
+                        </db:SelectableListControl>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
