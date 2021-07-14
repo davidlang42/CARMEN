@@ -18,10 +18,10 @@ namespace Model.Requirements
         public int Order { get; set; }
         public bool Primary { get; set; }
         public string? Reason { get; set; }
-        internal virtual ICollection<Role> UsedByRoles { get; set; } = new ObservableCollection<Role>();
-        internal virtual ICollection<CastGroup> UsedByCastGroups { get; set; } = new ObservableCollection<CastGroup>();
-        internal virtual ICollection<CombinedRequirement> UsedByCombinedRequirements { get; set; } = new ObservableCollection<CombinedRequirement>();
-        internal virtual ICollection<Identifier> UsedByIdentifiers { get; set; } = new ObservableCollection<Identifier>();
+        public virtual ICollection<Role> UsedByRoles { get; set; } = new ObservableCollection<Role>();
+        public virtual ICollection<CastGroup> UsedByCastGroups { get; set; } = new ObservableCollection<CastGroup>();
+        public virtual ICollection<CombinedRequirement> UsedByCombinedRequirements { get; set; } = new ObservableCollection<CombinedRequirement>();
+        public virtual ICollection<Identifier> UsedByIdentifiers { get; set; } = new ObservableCollection<Identifier>();
         #endregion
 
         /// <summary>Calculates the suitability of an Applicant.

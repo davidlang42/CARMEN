@@ -4,22 +4,19 @@ using Model;
 using Model.Applicants;
 using NUnit.Framework;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
-namespace Tests
+namespace UnitTests
 {
     public class ApplicantTests
     {
-        readonly DbContextOptions<ShowContext> contextOptions = new DbContextOptionsBuilder<ShowContext>()//TODO make this not use db
-            .UseSqlite($"Filename={nameof(ApplicantTests)}.db").Options;
+        readonly List<Applicant> Applicants = new List<Applicant>();
 
-        [SetUp]
-        public void Setup()
+        [OneTimeSetUp]
+        public void CreateTestData()
         {
-            using var context = new ShowContext(contextOptions);
-
-            context.Database.EnsureDeleted();
-            context.Database.EnsureCreated();
+            Applicants.Clear();
 
             var john = new Applicant
             {
@@ -37,24 +34,14 @@ namespace Tests
                 DateOfBirth = new DateTime(2000, 1, 1)
             };
 
-            context.Applicants.Add(john);
-            context.Applicants.Add(jane);
-
-            context.SaveChanges();
-        }
-
-        [Test]
-        public void Applicants_Exist()
-        {
-            using var context = new ShowContext(contextOptions);
-            context.Applicants.Count().Should().Be(2);
+            Applicants.Add(john);
+            Applicants.Add(jane);
         }
 
         [Test]
         public void Positive_Ages()
         {
-            using var context = new ShowContext(contextOptions);
-            context.Applicants.ToList().All(a => a.AgeToday() > 0).Should().BeTrue();
+            Applicants.All(a => a.AgeToday() > 0).Should().BeTrue();
         }
 
         [Test]
