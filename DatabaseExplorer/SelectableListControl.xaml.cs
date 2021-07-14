@@ -29,6 +29,8 @@ namespace DatabaseExplorer
             set => SetValue(AvailableItemsProperty, value);
         }
 
+        public string Title { get; set; } = "";
+
         public SelectableListControl() //TODO implement drag & drop between selectedList and availableList
         {
             InitializeComponent();

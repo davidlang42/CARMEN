@@ -30,7 +30,7 @@ namespace DatabaseExplorer
             set => SetValue(ItemsSourceProperty, value);
         }
 
-        //TODO add a parameter for title of list
+        public string Title { get; set; } = "";
 
         public EditableListControl()
         {

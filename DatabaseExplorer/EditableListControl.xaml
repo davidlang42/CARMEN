@@ -19,7 +19,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Label Content="Options:" Grid.ColumnSpan="3"/>
+        <Label Content="{Binding Title}" Grid.ColumnSpan="3"/>
         <ListBox x:Name="optionsList" ItemsSource="{Binding ItemsSource}" Grid.ColumnSpan="2" Grid.RowSpan="3" Grid.Row="1" MouseDoubleClick="optionsList_MouseDoubleClick" KeyDown="optionsList_KeyDown" />
         <Button x:Name="optionsMoveUp" Grid.Row="1" Grid.Column="2" Content="Move Up" Click="optionsMoveUp_Click"/>
         <Button x:Name="optionsDelete" Grid.Row="2" Grid.Column="2" Content="Delete" Click="optionsDelete_Click"/>

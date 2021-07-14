@@ -166,7 +166,7 @@
                         </DataGrid>
                         <local:SelectableListControl SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Items}"
                                                      AvailableItems="{Binding Source={StaticResource itemsViewSource}}"
-                                                     Margin="10,10,10,10"/>
+                                                     Title="Items:" Margin="10,10,10,10"/>
                         <DataGrid x:Name="roleCountsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding ElementName=rolesDataGrid, Path=SelectedItem.CountByGroups}" 
@@ -179,7 +179,7 @@
                         </DataGrid>
                         <local:SelectableListControl SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Requirements}"
                                                      AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
-                                                     Margin="10,10,10,10"/>
+                                                     Title="Requirements:" Margin="10,10,10,10"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -232,7 +232,7 @@
                         </DataGrid>
                         <local:SelectableListControl SelectedItems="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.CastGroups}"
                                                      AvailableItems="{Binding Source={StaticResource castGroupsViewSource}}"
-                                                     Margin="10,10,10,10"/>
+                                                     Title="Cast Groups:" Margin="10,10,10,10"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -253,7 +253,7 @@
                         </DataGrid>
                         <local:SelectableListControl SelectedItems="{Binding ElementName=identifiersDataGrid, Path=SelectedItem.Requirements}"
                                                      AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
-                                                     Margin="10,10,10,10" />
+                                                     Title="Requirements:" Margin="10,10,10,10" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -284,7 +284,8 @@
                                     </Grid>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
-                                    <local:EditableListControl ItemsSource="{Binding ElementName=criteriaDataGrid, Path=SelectedItem.Options, Mode=TwoWay}"/>
+                                    <local:EditableListControl Title="Options:"
+                                                               ItemsSource="{Binding ElementName=criteriaDataGrid, Path=SelectedItem.Options, Mode=TwoWay}"/>
                                 </DataTemplate>
                                 <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}"/>
                             </ContentControl.Resources>
@@ -309,7 +310,7 @@
                         </DataGrid>
                         <local:SelectableListControl SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
                                                      AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
-                                                     Margin="10,10,10,10"/>
+                                                     Title="Requirements:" Margin="10,10,10,10"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

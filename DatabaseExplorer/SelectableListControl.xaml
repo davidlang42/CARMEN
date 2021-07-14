@@ -18,24 +18,27 @@
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
+            <RowDefinition/>
         </Grid.RowDefinitions>
-        <ListBox x:Name="selectedList" Grid.Column="0" Grid.RowSpan="4"
+        <Label Content="{Binding Title}" ContentStringFormat="Selected {0}" />
+        <ListBox x:Name="selectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="4"
                             ItemsSource="{Binding SelectedItems}"
                             SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick">
         </ListBox>
-        <Button x:Name="addButton" Grid.Column="1" Grid.Row="0" Click="addButton_Click">
+        <Button x:Name="addButton" Grid.Column="1" Grid.Row="1" Click="addButton_Click">
             <TextBlock>&lt;</TextBlock>
         </Button>
-        <Button x:Name="addAllButton" Grid.Column="1" Grid.Row="1" Click="addAllButton_Click">
+        <Button x:Name="addAllButton" Grid.Column="1" Grid.Row="2" Click="addAllButton_Click">
             <TextBlock>&lt;&lt;</TextBlock>
         </Button>
-        <Button x:Name="removeButton" Grid.Column="1" Grid.Row="2" Click="removeButton_Click">
+        <Button x:Name="removeButton" Grid.Column="1" Grid.Row="3" Click="removeButton_Click">
             <TextBlock>&gt;</TextBlock>
         </Button>
-        <Button x:Name="removeAllButton" Grid.Column="1" Grid.Row="3" Click="removeAllButton_Click">
+        <Button x:Name="removeAllButton" Grid.Column="1" Grid.Row="4" Click="removeAllButton_Click">
             <TextBlock>&gt;&gt;</TextBlock>
         </Button>
-        <ListBox x:Name="availableList" Grid.Column="2" Grid.RowSpan="4"
+        <Label Content="{Binding Title}" ContentStringFormat="Available {0}" Grid.Column="2"/>
+        <ListBox x:Name="availableList" Grid.Column="2" Grid.Row="1" Grid.RowSpan="4"
                             ItemsSource="{Binding AvailableItems}"
                             SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick">
         </ListBox>
