@@ -41,6 +41,10 @@ namespace Model.Applicants
 
         public uint MarkFor(Criteria criteria)
             => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark ?? 0;
+
+        /// <summary>Determines if an Applicant has been accepted into the cast.
+        /// This is determined by membership in a CastGroup with Primary set to true.</summary>
+        public bool IsAccepted() => CastGroups.Any(g => g.Primary);
     }
 
     public enum Gender
