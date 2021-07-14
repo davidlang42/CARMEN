@@ -2,6 +2,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using Model;
+using Model.Applicants;
+using Model.Requirements;
 using Model.Structure;
 using System;
 using System.Collections.Generic;
@@ -238,5 +240,47 @@ namespace App
             Context.Dispose();
             base.OnClosing(e);
         }
+
+        private void addButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (castGroupsDataGrid.SelectedItem is not CastGroup group)
+                return;
+            foreach (var requirement in availableList.SelectedItems.OfType<Requirement>())
+                if (!group.Requirements.Contains(requirement))
+                    group.Requirements.Add(requirement);
+        }
+
+        private void addAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (castGroupsDataGrid.SelectedItem is not CastGroup group)
+                return;
+            foreach (var requirement in availableList.Items.OfType<Requirement>())
+                if (!group.Requirements.Contains(requirement))
+                    group.Requirements.Add(requirement);
+        }
+
+        private void removeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (castGroupsDataGrid.SelectedItem is not CastGroup group)
+                return;
+            foreach (var requirement in selectedList.SelectedItems.OfType<Requirement>().ToList())
+                if (group.Requirements.Contains(requirement))
+                    group.Requirements.Remove(requirement);
+        }
+
+        private void removeAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (castGroupsDataGrid.SelectedItem is not CastGroup group)
+                return;
+            foreach (var requirement in selectedList.Items.OfType<Requirement>().ToList())
+                if (group.Requirements.Contains(requirement))
+                    group.Requirements.Remove(requirement);
+        }
+
+        private void availableList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => addButton_Click(sender, new RoutedEventArgs());
+
+        private void selectedList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => removeButton_Click(sender, new RoutedEventArgs());
     }
 }
