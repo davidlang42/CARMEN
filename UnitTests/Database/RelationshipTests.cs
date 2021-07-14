@@ -9,12 +9,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Tests
+namespace Tests.Database
 {
-    public class DatabaseTests
+    public class RelationshipTests
     {
+        //TODO add test data for all entities, testing every relationship
+        //TODO make sure many relationships create at least 2
+        //TODO add/update relationship tests for every relationship, and test in both directions
         readonly DbContextOptions<ShowContext> contextOptions = new DbContextOptionsBuilder<ShowContext>()
-            .UseSqlite($"Filename={nameof(DatabaseTests)}.db").Options;
+            .UseSqlite($"Filename={nameof(RelationshipTests)}.db").Options;
 
         [SetUp]
         public void Setup()
