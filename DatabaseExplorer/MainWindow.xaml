@@ -4,9 +4,10 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:DatabaseExplorer"
-        xmlns:modelStructure="clr-namespace:Model.Structure;assembly=Model"
         xmlns:modelApplicants="clr-namespace:Model.Applicants;assembly=Model"
+        xmlns:modelCriterias="clr-namespace:Model.Criterias;assembly=Model"
         xmlns:modelRequirements="clr-namespace:Model.Requirements;assembly=Model"
+        xmlns:modelStructure="clr-namespace:Model.Structure;assembly=Model"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="CARMEN: Database Explorer" Height="600" Width="800">
@@ -270,6 +271,24 @@
                                 <DataGridTextColumn Binding="{Binding MaxMark}" Header="Max Mark" IsReadOnly="True"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <ContentControl DataContext="{Binding ElementName=criteriaDataGrid, Path=SelectedItem}" Content="{Binding}" Margin="10,10,10,10">
+                            <ContentControl.Resources>
+                                <DataTemplate DataType="{x:Type modelCriterias:NumericCriteria}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Max Mark:" Grid.Column="0"/>
+                                        <TextBox Text="{Binding MaxMark}" Grid.Column="1"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
+                                    <local:EditableListControl ItemsSource="{Binding ElementName=criteriaDataGrid, Path=SelectedItem.Options, Mode=TwoWay}"/>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}"/>
+                            </ContentControl.Resources>
+                        </ContentControl>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
