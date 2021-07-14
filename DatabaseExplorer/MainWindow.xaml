@@ -1,10 +1,9 @@
-﻿<Window x:Class="App.MainWindow"
+﻿<Window x:Class="DatabaseExplorer.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:App"
-        xmlns:db="clr-namespace:DatabaseExplorer"
+        xmlns:local="clr-namespace:DatabaseExplorer"
         xmlns:modelStructure="clr-namespace:Model.Structure;assembly=Model"
         xmlns:modelApplicants="clr-namespace:Model.Applicants;assembly=Model"
         xmlns:modelRequirements="clr-namespace:Model.Requirements;assembly=Model"
@@ -27,6 +26,9 @@
                 <x:Type TypeName="modelApplicants:Gender"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+        <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -227,9 +229,9 @@
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <db:SelectableListControl SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
+                        <local:SelectableListControl SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
                                                   AvailableItems="{Binding Source={StaticResource requirementsViewSource}}">
-                        </db:SelectableListControl>
+                        </local:SelectableListControl>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>

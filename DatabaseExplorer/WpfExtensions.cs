@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Windows;
-using System.Windows.Media;
 
-namespace App
+namespace DatabaseExplorer
 {
     static class WpfExtensions
     {

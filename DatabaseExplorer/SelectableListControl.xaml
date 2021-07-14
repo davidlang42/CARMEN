@@ -22,11 +22,6 @@
         <ListBox x:Name="selectedList" Grid.Column="0" Grid.RowSpan="4"
                             ItemsSource="{Binding SelectedItems}"
                             SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
-                    <TextBlock Text="{Binding Path=Name}"/>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
         </ListBox>
         <Button x:Name="addButton" Grid.Column="1" Grid.Row="0" Click="addButton_Click">
             <TextBlock>&lt;</TextBlock>
@@ -43,11 +38,6 @@
         <ListBox x:Name="availableList" Grid.Column="2" Grid.RowSpan="4"
                             ItemsSource="{Binding AvailableItems}"
                             SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
-                    <TextBlock Text="{Binding Path=Name}"/>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
         </ListBox>
     </Grid>
 </UserControl>
