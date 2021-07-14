@@ -123,7 +123,6 @@
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
-                                <DataGridCheckBoxColumn Binding="{Binding Everyone}" Header="Everyone"/>
                             </DataGrid.Columns>
                         </DataGrid>
                     </StackPanel>
@@ -162,6 +161,7 @@
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Name}" Header="Role Name" Width="*"/>
+                                <DataGridCheckBoxColumn Binding="{Binding VariableCounts}" Header="Variable Counts"/>
                             </DataGrid.Columns>
                         </DataGrid>
                         <local:SelectableListControl SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Items}"
@@ -174,7 +174,6 @@
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
-                                <DataGridCheckBoxColumn Binding="{Binding Everyone}" Header="Everyone"/>
                             </DataGrid.Columns>
                         </DataGrid>
                         <local:SelectableListControl SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Requirements}"

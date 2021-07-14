@@ -20,7 +20,7 @@ namespace Model.Structure
 
         public override uint CountFor(CastGroup group)
             => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
-            ?? Roles.Select(r => r.CountFor(group)).Sum();
+            ?? Roles.Select(r => r.CountFor(group)).Sum(); //TODO ensure this runs as a single SQL query
 
         public Item? NextItem()
         {

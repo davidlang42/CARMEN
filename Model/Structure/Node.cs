@@ -36,5 +36,9 @@ namespace Model.Structure
         public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
 
         public override IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
+
+        public override uint CountFor(CastGroup group)
+            => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
+            ?? ItemsInOrder().SelectMany(i => i.Roles).Distinct().Select(r => r.CountFor(group)).Sum(); //TODO ensure this runs as a single SQL query
     }
 }

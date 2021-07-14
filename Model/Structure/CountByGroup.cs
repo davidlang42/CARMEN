@@ -12,36 +12,8 @@ namespace Model.Structure
     [Owned]
     public class CountByGroup
     {
-        internal static Expression<Func<CountByGroup, uint?>> CountExpression = c => c.count;
-
-        const uint DEFAULT_COUNT = 0;
-
-        #region Database fields
         public virtual CastGroup CastGroup { get; set; } = null!;
-        private uint? count = DEFAULT_COUNT; // null means include everyone
-        #endregion
-
-        /// <summary>The number of applicants required of this CastGroup</summary>
-        [NotMapped]
-        public uint Count
-        {
-            get => count ?? (uint)CastGroup.Members.Count;
-            set => count = value;
-        }
-
-        /// <summary>When true, Count is overriden to be the current number of members of this CastGroup</summary>
-        [NotMapped]
-        public bool Everyone
-        {
-            get => count == null;
-            set
-            {
-                if (value)
-                    count = null;
-                else if (count == null)
-                    count = DEFAULT_COUNT;
-                // else: do nothing
-            }
-        }
+        /// <summary>The number of applicants required of this CastGroup, or null if FillRemaining is true.</summary>
+        public uint Count { get; set; }
     }
 }

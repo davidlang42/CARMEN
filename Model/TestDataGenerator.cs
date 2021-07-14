@@ -314,10 +314,10 @@ namespace Model
                             CastGroup = cast_groups[random.Next(cast_groups.Length)],
                             Count = (uint)i
                         };
-                        if (i == 0)
-                            count_by_group.Everyone = true;
                         role.CountByGroups.Add(count_by_group);
                     }
+                    if (i == 0)
+                        role.VariableCounts = true;
                     if (include_requirements)
                         role.Requirements.Add(requirements[random.Next(requirements.Length)]);
                     item.Roles.Add(role);

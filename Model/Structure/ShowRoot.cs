@@ -9,7 +9,6 @@ namespace Model.Structure
     /// </summary>
     public class ShowRoot : InnerNode
     {
-        #region Database fields
         public override string Name { get; set; } = "Show";
         public DateTime? ShowDate { get; set; }
         public virtual Image? Logo { get; set; }
@@ -22,10 +21,5 @@ namespace Model.Structure
                     throw new InvalidOperationException("Parent of ShowRoot must be null.");
             }
         }
-        #endregion
-
-        public override uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
-            ?? ItemsInOrder().SelectMany(i => i.Roles).Distinct().Select(r => r.CountFor(group)).Sum();
     }
 }

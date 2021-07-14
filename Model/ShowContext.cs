@@ -41,16 +41,15 @@ namespace Model
                 .HasKey(nameof(Ability.Applicant.ApplicantId), nameof(Ability.Criteria.CriteriaId));
 
             // Configure owned entities
-            modelBuilder.Entity<Applicant>().OwnsMany(
-                a => a.Identities, id =>
-                {
-                    id.WithOwner().HasForeignKey(nameof(Applicant.ApplicantId));
-                    id.HasKey(nameof(Applicant.ApplicantId), nameof(Identity.Identifier.IdentifierId));
-                });
-            modelBuilder.Entity<Role>().OwnsMany(
-                r => r.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Role.RoleId)));
-            modelBuilder.Entity<Node>().OwnsMany(
-                n => n.CountByGroups, cbg => ConfigureCountByGroup(cbg, nameof(Node.NodeId)));
+            modelBuilder.Entity<Applicant>()
+                .OwnsMany(a => a.Identities)
+                .WithOwnerCompositeKey(nameof(Applicant.ApplicantId), nameof(Identity.Identifier.IdentifierId));
+            modelBuilder.Entity<Role>()
+                .OwnsMany(r => r.CountByGroups)
+                .WithOwnerCompositeKey(nameof(Role.RoleId), nameof(CountByGroup.CastGroup.CastGroupId));
+            modelBuilder.Entity<Node>()
+                .OwnsMany(n => n.CountByGroups)
+                .WithOwnerCompositeKey(nameof(Node.NodeId), nameof(CountByGroup.CastGroup.CastGroupId));
 
             // Add inheritance structure for item tree
             modelBuilder.Entity<Item>();
@@ -105,14 +104,6 @@ namespace Model
                 .HasConversion(obj => JsonSerializer.Serialize(obj, null), // store array as json
                       json => JsonSerializer.Deserialize<string[]>(json, null) ?? SelectCriteria.DEFAULT_OPTIONS);
             modelBuilder.Entity<BooleanCriteria>();
-        }
-
-        private void ConfigureCountByGroup<T>(OwnedNavigationBuilder<T, CountByGroup> cbg, string foreign_key) where T : class
-        {
-            cbg.WithOwner().HasForeignKey(foreign_key);
-            cbg.HasKey(foreign_key, nameof(CountByGroup.CastGroup.CastGroupId));
-            cbg.Property(CountByGroup.CountExpression) // store private nullable property for Count/Everyone
-                .HasColumnName(nameof(CountByGroup.Count));
         }
     }
 }
