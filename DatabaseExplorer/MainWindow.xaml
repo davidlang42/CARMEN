@@ -29,6 +29,12 @@
         <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type modelApplicants:CastGroup}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type modelStructure:Item}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
     </Window.Resources>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
@@ -111,6 +117,9 @@
                                 <DataGridTextColumn Binding="{Binding Name}" Header="Role Name" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <local:SelectableListControl SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Items}"
+                                                     AvailableItems="{Binding Source={StaticResource itemsViewSource}}"
+                                                     Margin="10,10,10,10"/>
                         <DataGrid x:Name="roleCountsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding ElementName=rolesDataGrid, Path=SelectedItem.CountByGroups}" 
@@ -121,11 +130,9 @@
                                 <DataGridCheckBoxColumn Binding="{Binding Everyone}" Header="Everyone"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <DataGrid x:Name="roleRequirementsDataGrid" AutoGenerateColumns="True" 
-                        EnableRowVirtualization="True" 
-                        ItemsSource="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Requirements}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="False">
-                        </DataGrid>
+                        <local:SelectableListControl SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Requirements}"
+                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
+                                                     Margin="10,10,10,10"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -176,6 +183,9 @@
                                 <DataGridTextColumn Binding="{Binding Suffix}" Header="Suffix"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <local:SelectableListControl SelectedItems="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.CastGroups}"
+                                                     AvailableItems="{Binding Source={StaticResource castGroupsViewSource}}"
+                                                     Margin="10,10,10,10"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -194,6 +204,9 @@
                                 <DataGridTextColumn Binding="{Binding DefaultSuffix}" Header="Default Suffix"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <local:SelectableListControl SelectedItems="{Binding ElementName=identifiersDataGrid, Path=SelectedItem.Requirements}"
+                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
+                                                     Margin="10,10,10,10" />
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -230,8 +243,8 @@
                             </DataGrid.Columns>
                         </DataGrid>
                         <local:SelectableListControl SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
-                                                  AvailableItems="{Binding Source={StaticResource requirementsViewSource}}">
-                        </local:SelectableListControl>
+                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
+                                                     Margin="10,10,10,10"/>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
@@ -239,7 +252,7 @@
                 <ScrollViewer  VerticalScrollBarVisibility="Auto">
                     <StackPanel Background="#FFE5E5E5">
                         <DataGrid x:Name="requirementsDataGrid" AutoGenerateColumns="False" 
-                        EnableRowVirtualization="True" 
+                        EnableRowVirtualization="True"
                         ItemsSource="{Binding Source={StaticResource requirementsViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
                             <DataGrid.Columns>
