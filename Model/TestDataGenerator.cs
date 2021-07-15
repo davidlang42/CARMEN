@@ -275,7 +275,8 @@ namespace Model
                 Criteria = numeric,
                 Name = "Numeric > 70",
                 Order = order++,
-                Minimum = 70
+                Minimum = 70,
+                ScaleSuitability = true
             };
             var age = new AgeRequirement
             {

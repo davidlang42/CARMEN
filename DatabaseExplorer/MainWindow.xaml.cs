@@ -36,6 +36,7 @@ namespace DatabaseExplorer
         private readonly CollectionViewSource imagesViewSource;
         private readonly CollectionViewSource sectionTypesViewSource;
         private readonly CollectionViewSource requirementsViewSource;
+        private readonly CollectionViewSource requirementsSelectionSource;
         private readonly CollectionViewSource identifiersViewSource;
 
         public MainWindow()
@@ -49,6 +50,7 @@ namespace DatabaseExplorer
             sectionTypesViewSource = (CollectionViewSource)FindResource(nameof(sectionTypesViewSource));
             itemsViewSource = (CollectionViewSource)FindResource(nameof(itemsViewSource));
             requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
+            requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));
             identifiersViewSource = (CollectionViewSource)FindResource(nameof(identifiersViewSource));
         }
 
@@ -113,6 +115,7 @@ namespace DatabaseExplorer
             imagesViewSource.Source = Context.Images.Local.ToObservableCollection();
             sectionTypesViewSource.Source = Context.SectionTypes.Local.ToObservableCollection();
             requirementsViewSource.Source = Context.Requirements.Local.ToObservableCollection();
+            requirementsSelectionSource.Source = Context.Requirements.Local.ToObservableCollection(); // separate collection for combo boxes
             identifiersViewSource.Source = Context.Identifiers.Local.ToObservableCollection();
         }
 

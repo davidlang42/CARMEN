@@ -18,6 +18,7 @@
         <CollectionViewSource x:Key="itemsViewSource"/>
         <CollectionViewSource x:Key="criteriaViewSource"/>
         <CollectionViewSource x:Key="requirementsViewSource"/>
+        <CollectionViewSource x:Key="requirementsSelectionSource"/>
         <CollectionViewSource x:Key="imagesViewSource"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
         <CollectionViewSource x:Key="identifiersViewSource"/>
@@ -327,6 +328,96 @@
                                 <DataGridTextColumn Binding="{Binding Reason}" Header="Reason" Width="*"/>
                             </DataGrid.Columns>
                         </DataGrid>
+                        <ContentControl DataContext="{Binding ElementName=requirementsDataGrid, Path=SelectedItem}" Content="{Binding}" Margin="10,10,10,10">
+                            <ContentControl.Resources>
+                                <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Criteria:" Grid.Column="0"/>
+                                        <ComboBox SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" DisplayMemberPath="Name" Grid.Column="1"/>
+                                        <Label Content="Required Value:" Grid.Column="2"/>
+                                        <TextBox Text="{Binding RequiredValue}" Grid.Column="3"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelRequirements:AbilityRangeRequirement}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Criteria:" Grid.Column="0"/>
+                                        <ComboBox SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" DisplayMemberPath="Name" Grid.Column="1"/>
+                                        <Label Content="Minimum:" Grid.Column="2"/>
+                                        <TextBox Text="{Binding Minimum}" Grid.Column="3"/>
+                                        <Label Content="Maximum:" Grid.Column="4"/>
+                                        <TextBox Text="{Binding Maximum}" Grid.Column="5"/>
+                                        <Label Content="Higher is better:" Grid.Column="6"/>
+                                        <CheckBox IsChecked="{Binding ScaleSuitability}" Grid.Column="7"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelRequirements:AgeRequirement}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Minimum Age:" Grid.Column="0"/>
+                                        <TextBox Text="{Binding Minimum}" Grid.Column="1"/>
+                                        <Label Content="Maximum Age:" Grid.Column="2"/>
+                                        <TextBox Text="{Binding Maximum}" Grid.Column="3"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelRequirements:GenderRequirement}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Required Gender:" Grid.Column="0"/>
+                                        <ComboBox Grid.Column="1" SelectedIndex="{Binding RequiredValue}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelRequirements:CastGroupRequirement}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Required Cast Group:" Grid.Column="0"/>
+                                        <ComboBox Grid.Column="1" SelectedItem="{Binding RequiredGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelRequirements:NotRequirement}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <Label Content="Not Requirement:" Grid.Column="0"/>
+                                        <ComboBox Grid.Column="1" SelectedItem="{Binding SubRequirement}" ItemsSource="{Binding Source={StaticResource requirementsSelectionSource}}">
+                                            <ComboBox.ItemTemplate>
+                                                <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
+                                                    <TextBlock Text="{Binding Name}"/>
+                                                </DataTemplate>
+                                            </ComboBox.ItemTemplate>
+                                        </ComboBox>
+                                    </Grid>
+                                </DataTemplate>
+                            </ContentControl.Resources>
+                        </ContentControl>
                     </StackPanel>
                 </ScrollViewer>
             </TabItem>
