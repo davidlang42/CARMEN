@@ -78,6 +78,18 @@ namespace Model
             var show = Context.ShowRoot; // adds blank ShowRoot if it doesn't exist
             if (show.Name == "")
                 show.Name = "Test Show";
+            if (!show.CountByGroups.Any())
+            {
+                foreach (var cast_group in Context.CastGroups.Where(g => g.Primary))
+                {
+                    var cbg = new CountByGroup
+                    {
+                        CastGroup = cast_group,
+                        Count = 42
+                    };
+                    show.CountByGroups.Add(cbg);
+                }
+            }
 
             // Set up section type
             if (section_type == null)
@@ -124,22 +136,26 @@ namespace Model
 
         /// <summary>Adds applicants in a specified gender ratio with random first and last name, optionally filling their abilities with random marks for each existing criteria.
         /// NOTE: Must be called after Criteria have been committed.</summary>
-        public void AddApplicants(uint count, double gender_ratio = 0.5, bool include_criteria_abilities = true)
+        public void AddApplicants(uint count, double gender_ratio = 0.5, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_identities = true)
         {
             if (gender_ratio > 1 || gender_ratio < 0)
                 throw new ArgumentException($"{nameof(gender_ratio)} must be between 0 and 1 (inclusive)");
             uint male = (uint)(count * gender_ratio);
             uint female = count - male;
-            AddApplicants(male, Gender.Male, include_criteria_abilities);
-            AddApplicants(female, Gender.Female, include_criteria_abilities);
+            AddApplicants(male, Gender.Male, include_criteria_abilities, include_cast_groups, include_identities);
+            AddApplicants(female, Gender.Female, include_criteria_abilities, include_cast_groups, include_identities);
         }
 
-        /// <summary>Adds applicants of a specified gender with random first and last name, optionally filling their abilities with random marks for each existing criteria.
-        /// NOTE: Must be called after Criteria have been committed.</summary>
-        public void AddApplicants(uint count, Gender gender, bool include_criteria_abilities = true)
+        /// <summary>Adds applicants of a specified gender with random first and last name, optionally filling their abilities with random marks for each criteria, their identities with random numbers for each identifier, and setting their cast groups.
+        /// NOTE: Must be called after Criteria, Cast Groups and Identifiers have been committed.</summary>
+        public void AddApplicants(uint count, Gender gender, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_identities = true)
         {
+            var groups = Context.CastGroups.Where(g => g.Primary).ToArray();
+            if (groups.Length == 0)
+                groups = Context.CastGroups.ToArray();
             var first_names = gender == Gender.Male ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
             var criterias = Context.Criterias.ToArray();
+            var identifiers = Context.Identifiers.ToArray();
             for (var i = 0; i < count; i++)
             {
                 var applicant = new Applicant
@@ -161,6 +177,20 @@ namespace Model
                         applicant.Abilities.Add(ability);
                     }
                 }
+                if (include_identities)
+                {
+                    foreach (var identifier in identifiers)
+                    {
+                        var identity = new Identity
+                        {
+                            Identifier = identifier,
+                            Number = random.Next(1000, 9999)
+                        };
+                        applicant.Identities.Add(identity);
+                    }
+                }
+                if (include_cast_groups)
+                    applicant.CastGroups.Add(groups[random.Next(groups.Length)]);
                 Context.Applicants.Add(applicant);
             }
         }
@@ -349,5 +379,19 @@ namespace Model
 
         private string FormatName(string name)
             => name == "" ? "" : name.Substring(0, 1).ToUpper() + name.Substring(1).ToLower();
+
+        /// <summary>Adds images, optionally assigning to various objects.
+        /// NOTE: Must be called after Applicants and Cast Groups have been committed.</summary>
+        public void AddImages(uint count = 5, bool assign_to_show = true, bool assign_to_applicant = true, bool assign_to_cast_group = true)
+        {
+            var images = Enumerable.Range(0, (int)count).Select(i => new Image { Name = $"Image {i + 1}" }).ToArray();
+            Context.Images.AddRange(images);
+            if (assign_to_show)
+                Context.ShowRoot.Logo = images.Random(random);
+            if (assign_to_applicant)
+                Context.Applicants.ToList().Random(random).Photo = images.Random(random);
+            if (assign_to_cast_group)
+                Context.CastGroups.ToList().Random(random).Icon = images.Random(random);
+        }
     }
 }

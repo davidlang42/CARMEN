@@ -50,10 +50,6 @@ namespace DatabaseExplorer
             itemsViewSource = (CollectionViewSource)FindResource(nameof(itemsViewSource));
             requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
             identifiersViewSource = (CollectionViewSource)FindResource(nameof(identifiersViewSource));
-            //TODO (UI) add extra UI for missing db elements
-            //TODO (UI) fix UI for editing roles with item selection
-            //TODO (UI) add editing count by group for each node type and section type
-            //TODO (UI) make sure everything which should be editable is editable via the db explorer
         }
 
         private void CreateMenu_Click(object sender, RoutedEventArgs e)
@@ -184,8 +180,9 @@ namespace DatabaseExplorer
             if (!TryInputNumber("How many ROLES PER ITEM would you like to add?", "Test Data", out var roles, 5))
                 return;
             using var test_data = new TestDataGenerator(Context);
-            test_data.AddShowStructure(items, sections, depth, include_items_at_every_depth: every_depth);
             test_data.AddPrimaryCastGroups(primary_cast_groups);
+            Context.SaveChanges();
+            test_data.AddShowStructure(items, sections, depth, include_items_at_every_depth: every_depth);
             Context.SaveChanges();
             test_data.AddCriteriaAndRequirements(); // after cast groups committed
             Context.SaveChanges();
@@ -195,6 +192,7 @@ namespace DatabaseExplorer
             test_data.AddApplicants(applicants); // after criteria committed
             Context.SaveChanges();
             test_data.AddRoles(roles); // after items, cast groups, requirements committed
+            test_data.AddImages(); // after applicants, cast groups committed
             Context.SaveChanges();
         }
 

@@ -20,10 +20,10 @@ namespace UnitTests.Database
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
             using var test_data = new TestDataGenerator(context, 0);
-            test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false);
             test_data.AddPrimaryCastGroups(4);
             context.SaveChanges();
-            //TODO TestDataGenerator.AddCriteriaAndRequirements() - add parameter for including cast group req
+            test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false); // after cast groups committed
+            context.SaveChanges();
             test_data.AddCriteriaAndRequirements(); // after cast groups committed
             context.SaveChanges();
             test_data.AddIdentifiers(); // after requirements committed
@@ -32,6 +32,7 @@ namespace UnitTests.Database
             test_data.AddApplicants(100); // after criteria committed
             context.SaveChanges();
             test_data.AddRoles(5); // after items, cast groups, requirements committed
+            test_data.AddImages(); // after applicants, cast groups committed
             context.SaveChanges();
         }
 
@@ -57,7 +58,7 @@ namespace UnitTests.Database
             var applicant = context.Applicants.Where(a => a.Photo != null).First();
             applicant.ApplicantId.Should().NotBe(0);
             var image = applicant.Photo;
-            image.Should().NotBeNull(); //TODO TestDataGenerator.AddImages() - Applicant
+            image.Should().NotBeNull();
             image!.ImageId.Should().NotBe(0);
             // Reverse navigation not defined
         }
@@ -79,7 +80,7 @@ namespace UnitTests.Database
             using var context = new ShowContext(contextOptions);
             var applicant = context.Applicants.First();
             applicant.ApplicantId.Should().NotBe(0);
-            var group = applicant.CastGroups.First(); //TODO TestDataGenerator.AddApplicants() - add parameter for include_cast_groups
+            var group = applicant.CastGroups.First();
             group.CastGroupId.Should().NotBe(0);
             group.Members.Should().Contain(applicant);
         }
@@ -90,7 +91,7 @@ namespace UnitTests.Database
             using var context = new ShowContext(contextOptions);
             var applicant = context.Applicants.First();
             applicant.ApplicantId.Should().NotBe(0);
-            var identity = applicant.Identities.First(); //TODO TestDataGenerator.AddApplicants() - add parameter for include_identifiers
+            var identity = applicant.Identities.First();
             identity.Identifier.Should().NotBeNull();
             // Reverse navigation not defined
         }
@@ -102,7 +103,7 @@ namespace UnitTests.Database
             var group = context.CastGroups.Where(g => g.Icon != null).First();
             group.CastGroupId.Should().NotBe(0);
             var image = group.Icon;
-            image.Should().NotBeNull(); //TODO TestDataGenerator.AddImages() - CastGroup
+            image.Should().NotBeNull();
             image!.ImageId.Should().NotBe(0);
             // Reverse navigation not defined
         }
@@ -111,7 +112,7 @@ namespace UnitTests.Database
         public void Identity_Identifier_ManyToOne()
         {
             using var context = new ShowContext(contextOptions);
-            var identity = context.Applicants.First().Identities.First(); //TODO TestDataGenerator.AddApplicants() - add parameter for include_identifiers
+            var identity = context.Applicants.First().Identities.First();
             var identifier = identity.Identifier;
             identifier.Should().NotBeNull();
             identifier.IdentifierId.Should().NotBe(0);
@@ -234,7 +235,7 @@ namespace UnitTests.Database
             var show = context.ShowRoot;
             show.NodeId.Should().NotBe(0);
             var image = show.Logo;
-            image.Should().NotBeNull(); //TODO TestDataGenerator.AddImages() - ShowRoot
+            image.Should().NotBeNull();
             image!.ImageId.Should().NotBe(0);
             // Reverse navigation not defined
         }
@@ -255,7 +256,7 @@ namespace UnitTests.Database
         {
             using var context = new ShowContext(contextOptions);
             var node = context.ShowRoot;
-            var cbg = node.CountByGroups.First(); //TODO TestDataGenerator.AddShowStructure() - add at least one CBG to ShowRoot
+            var cbg = node.CountByGroups.First();
             cbg.CastGroup.Should().NotBeNull();
             // Reverse navigation not defined
         }

@@ -39,6 +39,9 @@ namespace Model
                 return default;
             return first;
         }
+
+        public static T Random<T>(this IList<T> list, Random? random = null)
+            => list[(random ?? new Random()).Next(list.Count)];
     }
 
     internal static class EntityExtensions
