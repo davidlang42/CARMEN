@@ -4,10 +4,13 @@ using Microsoft.Win32;
 using Model;
 using Model.Structure;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace DatabaseExplorer
 {
@@ -38,6 +41,7 @@ namespace DatabaseExplorer
         private readonly CollectionViewSource requirementsViewSource;
         private readonly CollectionViewSource requirementsSelectionSource;
         private readonly CollectionViewSource identifiersViewSource;
+        private readonly CallbackCommand addNodeCommand;
 
         public MainWindow()
         {
@@ -52,6 +56,8 @@ namespace DatabaseExplorer
             requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
             requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));
             identifiersViewSource = (CollectionViewSource)FindResource(nameof(identifiersViewSource));
+            addNodeCommand = (CallbackCommand)FindResource(nameof(addNodeCommand));
+            addNodeCommand.Callback = AddNode;
         }
 
         private void CreateMenu_Click(object sender, RoutedEventArgs e)
@@ -231,6 +237,40 @@ namespace DatabaseExplorer
         {
             Context.Dispose();
             base.OnClosing(e);
+        }
+
+        private void AddNode(object? parameter)
+        {
+            (var parent, var after) = itemsTreeView.SelectedItem switch
+            {
+                Item item => (item.Parent ?? throw new Exception("Item did not have a parent."), item),
+                Section section => (section, null),
+                ShowRoot show => (show, null),
+                _ => (Context.ShowRoot, null)
+            };
+            Node new_node = parameter switch
+            {
+                SectionType section_type => new Section
+                {
+                    Name = $"New {section_type.Name}",
+                    SectionType = section_type
+                },
+                _ => new Item
+                {
+                    Name = "New Item"
+                }
+            };
+            new_node.Parent = parent;
+            parent.Children.InsertInOrder(new_node, after);
+        }
+
+        private void itemsTreeView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && itemsTreeView.SelectedItem is Node node && node is not ShowRoot && itemsViewSource.Source is ICollection<Node> collection)
+            {
+                collection.Remove(node); //TODO children should be cascade deleted, but are not
+                itemsTreeView.Items.Refresh(); //TODO doesn't show deletion until db context saved
+            }
         }
     }
 }

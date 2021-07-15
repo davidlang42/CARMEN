@@ -22,6 +22,7 @@
         <CollectionViewSource x:Key="imagesViewSource"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
         <CollectionViewSource x:Key="identifiersViewSource"/>
+        <local:CallbackCommand x:Key="addNodeCommand"/>
         <local:SortIOrdered x:Key="sortIOrdered" />
         <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -57,7 +58,7 @@
         <TabControl ScrollViewer.HorizontalScrollBarVisibility="Auto" IsEnabled="False">
             <TabItem Header="Show Structure">
                 <DockPanel>
-                    <TreeView DockPanel.Dock="Left" x:Name="itemsTreeView" Margin="5" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}">
+                    <TreeView DockPanel.Dock="Left" x:Name="itemsTreeView" Margin="5" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}" KeyDown="itemsTreeView_KeyDown">
                         <TreeView.Resources>
                             <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
                                 <TextBlock Text="{Binding Path=Name, StringFormat='Show: {0}'}"/>
@@ -69,6 +70,30 @@
                                 <TextBlock Text="{Binding Path=Name, StringFormat='Item: {0}'}"/>
                             </HierarchicalDataTemplate>
                         </TreeView.Resources>
+                        <TreeView.ContextMenu>
+                            <ContextMenu>
+                                <ContextMenu.ItemsSource>
+                                    <CompositeCollection>
+                                        <MenuItem Header="Add Item" Command="{Binding Source={StaticResource addNodeCommand}}"/>
+                                        <CollectionContainer Collection="{Binding Source={StaticResource sectionTypesViewSource}}"/>
+                                    </CompositeCollection>
+                                </ContextMenu.ItemsSource>
+                                <ContextMenu.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock>
+                                            <Run Text="Add"/>
+                                            <Run Text="{Binding Name}"/>
+                                        </TextBlock>
+                                    </DataTemplate>
+                                </ContextMenu.ItemTemplate>
+                                <ContextMenu.ItemContainerStyle>
+                                    <Style TargetType="{x:Type MenuItem}">
+                                        <Setter Property="Command" Value="{Binding Source={StaticResource addNodeCommand}}"/>
+                                        <Setter Property="CommandParameter" Value="{Binding}"/>
+                                    </Style>
+                                </ContextMenu.ItemContainerStyle>
+                            </ContextMenu>
+                        </TreeView.ContextMenu>
                     </TreeView>
                     <ContentControl DockPanel.Dock="Bottom" DataContext="{Binding ElementName=itemsTreeView, Path=SelectedItem}" Content="{Binding}" Margin="5">
                         <ContentControl.Resources>
