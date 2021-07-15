@@ -56,173 +56,158 @@
         </Menu>
         <TabControl ScrollViewer.HorizontalScrollBarVisibility="Auto" IsEnabled="False">
             <TabItem Header="Show Structure">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <TreeView x:Name="itemsTreeView" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}">
-                            <TreeView.Resources>
-                                <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
-                                    <TextBlock Text="{Binding Path=Name, StringFormat='Show: {0}'}"/>
-                                </HierarchicalDataTemplate>
-                                <HierarchicalDataTemplate DataType="{x:Type modelStructure:Section}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
-                                    <TextBlock Text="{Binding Path=Name, StringFormat='Section: {0}'}"/>
-                                </HierarchicalDataTemplate>
-                                <HierarchicalDataTemplate DataType="{x:Type modelStructure:Item}">
-                                    <TextBlock Text="{Binding Path=Name, StringFormat='Item: {0}'}"/>
-                                </HierarchicalDataTemplate>
-                            </TreeView.Resources>
-                        </TreeView>
-                        <ContentControl DataContext="{Binding ElementName=itemsTreeView, Path=SelectedItem}" Content="{Binding}" Margin="10,10,10,10">
-                            <ContentControl.Resources>
-                                <DataTemplate DataType="{x:Type modelStructure:ShowRoot}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Show Name:" Grid.Column="0"/>
-                                        <TextBox Text="{Binding Name}" Grid.Column="1"/>
-                                        <Label Content="Show Date:" Grid.Column="2"/>
-                                        <DatePicker SelectedDate="{Binding ShowDate}" Grid.Column="3"/>
-                                        <Label Content="Logo:" Grid.Column="4"/>
-                                        <ComboBox SelectedItem="{Binding Logo}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" DisplayMemberPath="Name" Grid.Column="5"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelStructure:Section}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Section Name:" Grid.Column="0"/>
-                                        <TextBox Text="{Binding Name}" Grid.Column="1"/>
-                                        <Label Content="Section Type:" Grid.Column="2"/>
-                                        <ComboBox SelectedItem="{Binding SectionType}" ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" DisplayMemberPath="Name" Grid.Column="3"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelStructure:Item}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Item Name:" Grid.Column="0"/>
-                                        <TextBox Text="{Binding Name}" Grid.Column="1"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ContentControl.Resources>
-                        </ContentControl>
-                        <DataGrid x:Name="nodeCountsDataGrid" AutoGenerateColumns="False" 
+                <DockPanel>
+                    <TreeView DockPanel.Dock="Left" x:Name="itemsTreeView" Margin="5" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}">
+                        <TreeView.Resources>
+                            <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
+                                <TextBlock Text="{Binding Path=Name, StringFormat='Show: {0}'}"/>
+                            </HierarchicalDataTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type modelStructure:Section}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
+                                <TextBlock Text="{Binding Path=Name, StringFormat='Section: {0}'}"/>
+                            </HierarchicalDataTemplate>
+                            <HierarchicalDataTemplate DataType="{x:Type modelStructure:Item}">
+                                <TextBlock Text="{Binding Path=Name, StringFormat='Item: {0}'}"/>
+                            </HierarchicalDataTemplate>
+                        </TreeView.Resources>
+                    </TreeView>
+                    <ContentControl DockPanel.Dock="Bottom" DataContext="{Binding ElementName=itemsTreeView, Path=SelectedItem}" Content="{Binding}" Margin="5">
+                        <ContentControl.Resources>
+                            <DataTemplate DataType="{x:Type modelStructure:ShowRoot}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Show Name:" Grid.Column="0"/>
+                                    <TextBox Text="{Binding Name}" Grid.Column="1"/>
+                                    <Label Content="Show Date:" Grid.Column="2"/>
+                                    <DatePicker SelectedDate="{Binding ShowDate}" Grid.Column="3"/>
+                                    <Label Content="Logo:" Grid.Column="4"/>
+                                    <ComboBox SelectedItem="{Binding Logo}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" DisplayMemberPath="Name" Grid.Column="5"/>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelStructure:Section}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Section Name:" Grid.Column="0"/>
+                                    <TextBox Text="{Binding Name}" Grid.Column="1"/>
+                                    <Label Content="Section Type:" Grid.Column="2"/>
+                                    <ComboBox SelectedItem="{Binding SectionType}" ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" DisplayMemberPath="Name" Grid.Column="3"/>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelStructure:Item}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Item Name:" Grid.Column="0"/>
+                                    <TextBox Text="{Binding Name}" Grid.Column="1"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ContentControl.Resources>
+                    </ContentControl>
+                    <DataGrid x:Name="nodeCountsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding ElementName=itemsTreeView, Path=SelectedItem.CountByGroups}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
-                            <DataGrid.Columns>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
-                                <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
-                </ScrollViewer>
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5" CanUserAddRows="True">
+                        <DataGrid.Columns>
+                            <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
+                            <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Section Types">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="sectionTypesDataGrid" AutoGenerateColumns="False" 
+                <DataGrid x:Name="sectionTypesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Name}" Header="Section Type Name"/>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
-                                <DataGridCheckBoxColumn Binding="{Binding AllowMultipleRoles}" Header="Allow Multiple Roles"/>
-                                <DataGridCheckBoxColumn Binding="{Binding AllowNoRoles}" Header="Allow No Roles"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
-                </ScrollViewer>
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Binding="{Binding Name}" Header="Section Type Name"/>
+                        <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
+                        <DataGridCheckBoxColumn Binding="{Binding AllowMultipleRoles}" Header="Allow Multiple Roles"/>
+                        <DataGridCheckBoxColumn Binding="{Binding AllowNoRoles}" Header="Allow No Roles"/>
+                    </DataGrid.Columns>
+                </DataGrid>
             </TabItem>
             <TabItem Header="Item Roles">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <ComboBox x:Name="itemsComboBox" Margin="10,10,10,10" ItemsSource="{Binding Source={StaticResource itemsViewSource}}">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate DataType="{x:Type modelStructure:Item}">
-                                    <TextBlock Text="{Binding Path=Name}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                <DockPanel>
+                    <ComboBox DockPanel.Dock="Top" x:Name="itemsComboBox" Margin="5" ItemsSource="{Binding Source={StaticResource itemsViewSource}}">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate DataType="{x:Type modelStructure:Item}">
+                                <TextBlock Text="{Binding Path=Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*"/>
+                            <ColumnDefinition Width="2*"/>
+                        </Grid.ColumnDefinitions>
                         <DataGrid x:Name="rolesDataGrid" AutoGenerateColumns="False" 
-                        EnableRowVirtualization="True" 
-                        ItemsSource="{Binding ElementName=itemsComboBox, Path=SelectedItem.Roles}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
+                    EnableRowVirtualization="True" 
+                    ItemsSource="{Binding ElementName=itemsComboBox, Path=SelectedItem.Roles}" 
+                    RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Name}" Header="Role Name" Width="*"/>
                                 <DataGridCheckBoxColumn Binding="{Binding VariableCounts}" Header="Variable Counts"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <local:SelectableListControl SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Items}"
-                                                     AvailableItems="{Binding Source={StaticResource itemsViewSource}}"
-                                                     Title="Items:" Margin="10,10,10,10"/>
-                        <DataGrid x:Name="roleCountsDataGrid" AutoGenerateColumns="False" 
-                        EnableRowVirtualization="True" 
-                        ItemsSource="{Binding ElementName=rolesDataGrid, Path=SelectedItem.CountByGroups}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
+                        <local:SelectableListControl Grid.Column="1" SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Items}"
+                                                    AvailableItems="{Binding Source={StaticResource itemsViewSource}}"
+                                                    Title="Items:" Margin="5"/>
+                        <DataGrid Grid.Row="1" x:Name="roleCountsDataGrid" AutoGenerateColumns="False" 
+                    EnableRowVirtualization="True" 
+                    ItemsSource="{Binding ElementName=rolesDataGrid, Path=SelectedItem.CountByGroups}" 
+                    RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5" CanUserAddRows="True">
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <local:SelectableListControl SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Requirements}"
-                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
-                                                     Title="Requirements:" Margin="10,10,10,10"/>
-                    </StackPanel>
-                </ScrollViewer>
+                        <local:SelectableListControl Grid.Row="1" Grid.Column="1" SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Requirements}"
+                                                    AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
+                                                    Title="Requirements:" Margin="5"/>
+                    </Grid>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Applicants">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="applicantsDataGrid" AutoGenerateColumns="False" 
-                        EnableRowVirtualization="True" 
-                        ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding FirstName}" Header="First Name"/>
-                                <DataGridTextColumn Binding="{Binding LastName}" Header="Last Name"/>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Gender}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}" Header="Gender"/>
-                                <DataGridTemplateColumn Header="Date of Birth" Width="120">
-                                    <DataGridTemplateColumn.CellTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding DateOfBirth, StringFormat=dd/MM/yyyy}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellTemplate>
-                                    <DataGridTemplateColumn.CellEditingTemplate>
-                                        <DataTemplate>
-                                            <DatePicker SelectedDate="{Binding DateOfBirth, StringFormat=dd/MM/yyyy}" />
-                                        </DataTemplate>
-                                    </DataGridTemplateColumn.CellEditingTemplate>
-                                </DataGridTemplateColumn>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Photo}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Photo" DisplayMemberPath="Name"/>
-                                <DataGridTextColumn Binding="{Binding Notes}" Header="Notes" Width="*" IsReadOnly="True"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
+                <DockPanel>
+                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="130" SelectedItems="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.CastGroups}"
+                                                     AvailableItems="{Binding Source={StaticResource castGroupsViewSource}}"
+                                                     Title="Cast Groups:" Margin="5"/>
+                    <Grid DockPanel.Dock="Bottom" MaxHeight="120">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
                         <DataGrid x:Name="abilitiesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.Abilities}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5" CanUserAddRows="True">
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" Header="Criteria" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Mark}" Header="Mark"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <DataGrid x:Name="identitiesDataGrid" AutoGenerateColumns="False" 
+                        <DataGrid Grid.Column="1" x:Name="identitiesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.Identities}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10" CanUserAddRows="True">
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5" CanUserAddRows="True">
                             <DataGrid.Columns>
                                 <DataGridComboBoxColumn SelectedItemBinding="{Binding Identifier}" ItemsSource="{Binding Source={StaticResource identifiersViewSource}}" Header="Identifier" DisplayMemberPath="Name"/>
                                 <DataGridTextColumn Binding="{Binding Prefix}" Header="Prefix"/>
@@ -230,244 +215,253 @@
                                 <DataGridTextColumn Binding="{Binding Suffix}" Header="Suffix"/>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <local:SelectableListControl SelectedItems="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.CastGroups}"
-                                                     AvailableItems="{Binding Source={StaticResource castGroupsViewSource}}"
-                                                     Title="Cast Groups:" Margin="10,10,10,10"/>
-                    </StackPanel>
-                </ScrollViewer>
+                    </Grid>
+                    <DataGrid x:Name="applicantsDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding FirstName}" Header="First Name"/>
+                            <DataGridTextColumn Binding="{Binding LastName}" Header="Last Name"/>
+                            <DataGridComboBoxColumn SelectedItemBinding="{Binding Gender}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}" Header="Gender"/>
+                            <DataGridTemplateColumn Header="Date of Birth" Width="120">
+                                <DataGridTemplateColumn.CellTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding DateOfBirth, StringFormat=dd/MM/yyyy}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellTemplate>
+                                <DataGridTemplateColumn.CellEditingTemplate>
+                                    <DataTemplate>
+                                        <DatePicker SelectedDate="{Binding DateOfBirth, StringFormat=dd/MM/yyyy}" />
+                                    </DataTemplate>
+                                </DataGridTemplateColumn.CellEditingTemplate>
+                            </DataGridTemplateColumn>
+                            <DataGridComboBoxColumn SelectedItemBinding="{Binding Photo}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Photo" DisplayMemberPath="Name"/>
+                            <DataGridTextColumn Binding="{Binding Notes}" Header="Notes" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Identifiers">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="identifiersDataGrid" AutoGenerateColumns="False" 
+                <DockPanel>
+                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="300" SelectedItems="{Binding ElementName=identifiersDataGrid, Path=SelectedItem.Requirements}"
+                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
+                                                     Title="Requirements:" Margin="5" />
+                    <DataGrid x:Name="identifiersDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource identifiersViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Name}" Header="Identifier Name"/>
-                                <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
-                                <DataGridTextColumn Binding="{Binding DefaultPrefix}" Header="Default Prefix"/>
-                                <DataGridTextColumn Binding="{Binding AssignNumbersFrom}" Header="Auto-Assign Numbers Starting From"/>
-                                <DataGridTextColumn Binding="{Binding DefaultSuffix}" Header="Default Suffix"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <local:SelectableListControl SelectedItems="{Binding ElementName=identifiersDataGrid, Path=SelectedItem.Requirements}"
-                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
-                                                     Title="Requirements:" Margin="10,10,10,10" />
-                    </StackPanel>
-                </ScrollViewer>
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" Header="Identifier Name"/>
+                            <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
+                            <DataGridTextColumn Binding="{Binding DefaultPrefix}" Header="Default Prefix"/>
+                            <DataGridTextColumn Binding="{Binding AssignNumbersFrom}" Header="Auto-Assign Numbers Starting From"/>
+                            <DataGridTextColumn Binding="{Binding DefaultSuffix}" Header="Default Suffix"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Criteria">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="criteriaDataGrid" AutoGenerateColumns="False" 
+                <DockPanel>
+                    <ContentControl DockPanel.Dock="Bottom" MaxHeight="300" DataContext="{Binding ElementName=criteriaDataGrid, Path=SelectedItem}" Content="{Binding}" Margin="5">
+                        <ContentControl.Resources>
+                            <DataTemplate DataType="{x:Type modelCriterias:NumericCriteria}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Max Mark:" Grid.Column="0"/>
+                                    <TextBox Text="{Binding MaxMark}" Grid.Column="1"/>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
+                                <local:EditableListControl Title="Options:"
+                                                               ItemsSource="{Binding ElementName=criteriaDataGrid, Path=SelectedItem.Options, Mode=TwoWay}"/>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}"/>
+                        </ContentControl.Resources>
+                    </ContentControl>
+                    <DataGrid x:Name="criteriaDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Name}" Header="Criteria Name"/>
-                                <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
-                                <DataGridTextColumn Binding="{Binding Description}" Header="Description"/>
-                                <DataGridTextColumn Binding="{Binding MaxMark}" Header="Max Mark" IsReadOnly="True"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <ContentControl DataContext="{Binding ElementName=criteriaDataGrid, Path=SelectedItem}" Content="{Binding}" Margin="10,10,10,10">
-                            <ContentControl.Resources>
-                                <DataTemplate DataType="{x:Type modelCriterias:NumericCriteria}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Max Mark:" Grid.Column="0"/>
-                                        <TextBox Text="{Binding MaxMark}" Grid.Column="1"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
-                                    <local:EditableListControl Title="Options:"
-                                                               ItemsSource="{Binding ElementName=criteriaDataGrid, Path=SelectedItem.Options, Mode=TwoWay}"/>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}"/>
-                            </ContentControl.Resources>
-                        </ContentControl>
-                    </StackPanel>
-                </ScrollViewer>
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" Header="Criteria Name"/>
+                            <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
+                            <DataGridTextColumn Binding="{Binding Description}" Header="Description"/>
+                            <DataGridTextColumn Binding="{Binding MaxMark}" Header="Max Mark" IsReadOnly="True"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Cast Groups">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="castGroupsDataGrid" AutoGenerateColumns="False" 
+                <DockPanel>
+                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="300" SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
+                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
+                                                     Title="Requirements:" Margin="5"/>
+                    <DataGrid x:Name="castGroupsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Name}" Header="Cast Group Name"/>
-                                <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
-                                <DataGridCheckBoxColumn Binding="{Binding Primary}" Header="Primary"/>
-                                <DataGridTextColumn Binding="{Binding RequiredCount}" Header="Required Count"/>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <local:SelectableListControl SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
-                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
-                                                     Title="Requirements:" Margin="10,10,10,10"/>
-                    </StackPanel>
-                </ScrollViewer>
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" Header="Cast Group Name"/>
+                            <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
+                            <DataGridCheckBoxColumn Binding="{Binding Primary}" Header="Primary"/>
+                            <DataGridTextColumn Binding="{Binding RequiredCount}" Header="Required Count"/>
+                            <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Requirements">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="requirementsDataGrid" AutoGenerateColumns="False" 
-                        EnableRowVirtualization="True"
-                        ItemsSource="{Binding Source={StaticResource requirementsViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Name}" Header="Requirement Name"/>
-                                <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
-                                <DataGridCheckBoxColumn Binding="{Binding Primary}" Header="Primary"/>
-                                <DataGridTextColumn Binding="{Binding Reason}" Header="Reason" Width="*"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <ContentControl DataContext="{Binding ElementName=requirementsDataGrid, Path=SelectedItem}" Content="{Binding}" Margin="10,10,10,10">
-                            <ContentControl.Resources>
-                                <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Criteria:" Grid.Column="0"/>
-                                        <ComboBox SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" DisplayMemberPath="Name" Grid.Column="1"/>
-                                        <Label Content="Required Value:" Grid.Column="2"/>
-                                        <TextBox Text="{Binding RequiredValue}" Grid.Column="3"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelRequirements:AbilityRangeRequirement}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Criteria:" Grid.Column="0"/>
-                                        <ComboBox SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" DisplayMemberPath="Name" Grid.Column="1"/>
-                                        <Label Content="Minimum:" Grid.Column="2"/>
-                                        <TextBox Text="{Binding Minimum}" Grid.Column="3"/>
-                                        <Label Content="Maximum:" Grid.Column="4"/>
-                                        <TextBox Text="{Binding Maximum}" Grid.Column="5"/>
-                                        <Label Content="Higher is better:" Grid.Column="6"/>
-                                        <CheckBox IsChecked="{Binding ScaleSuitability}" Grid.Column="7"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelRequirements:AgeRequirement}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Minimum Age:" Grid.Column="0"/>
-                                        <TextBox Text="{Binding Minimum}" Grid.Column="1"/>
-                                        <Label Content="Maximum Age:" Grid.Column="2"/>
-                                        <TextBox Text="{Binding Maximum}" Grid.Column="3"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelRequirements:GenderRequirement}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Required Gender:" Grid.Column="0"/>
-                                        <ComboBox Grid.Column="1" SelectedIndex="{Binding RequiredValue}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelRequirements:CastGroupRequirement}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Required Cast Group:" Grid.Column="0"/>
-                                        <ComboBox Grid.Column="1" SelectedItem="{Binding RequiredGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelRequirements:NotRequirement}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"></ColumnDefinition>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <Label Content="Not Requirement:" Grid.Column="0"/>
-                                        <ComboBox Grid.Column="1" SelectedItem="{Binding SubRequirement}" ItemsSource="{Binding Source={StaticResource requirementsSelectionSource}}">
-                                            <ComboBox.ItemTemplate>
-                                                <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
-                                                    <TextBlock Text="{Binding Name}"/>
-                                                </DataTemplate>
-                                            </ComboBox.ItemTemplate>
-                                        </ComboBox>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelRequirements:AndRequirement}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                        </Grid.RowDefinitions>
-                                        <CheckBox IsChecked="{Binding AverageSuitability}" Content="Average Suitability? (otherwise product)"/>
-                                        <local:SelectableListControl Grid.Row="1" SelectedItems="{Binding ElementName=requirementsDataGrid, Path=SelectedItem.SubRequirements}"
+                <DockPanel>
+                    <ContentControl DockPanel.Dock="Bottom" MaxHeight="300" DataContext="{Binding ElementName=requirementsDataGrid, Path=SelectedItem}" Content="{Binding}" Margin="5">
+                        <ContentControl.Resources>
+                            <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Criteria:" Grid.Column="0"/>
+                                    <ComboBox SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" DisplayMemberPath="Name" Grid.Column="1"/>
+                                    <Label Content="Required Value:" Grid.Column="2"/>
+                                    <TextBox Text="{Binding RequiredValue}" Grid.Column="3"/>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelRequirements:AbilityRangeRequirement}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Criteria:" Grid.Column="0"/>
+                                    <ComboBox SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" DisplayMemberPath="Name" Grid.Column="1"/>
+                                    <Label Content="Minimum:" Grid.Column="2"/>
+                                    <TextBox Text="{Binding Minimum}" Grid.Column="3"/>
+                                    <Label Content="Maximum:" Grid.Column="4"/>
+                                    <TextBox Text="{Binding Maximum}" Grid.Column="5"/>
+                                    <CheckBox VerticalAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}" Grid.Column="6"/>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelRequirements:AgeRequirement}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Minimum Age:" Grid.Column="0"/>
+                                    <TextBox Text="{Binding Minimum}" Grid.Column="1"/>
+                                    <Label Content="Maximum Age:" Grid.Column="2"/>
+                                    <TextBox Text="{Binding Maximum}" Grid.Column="3"/>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelRequirements:GenderRequirement}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Required Gender:" Grid.Column="0"/>
+                                    <ComboBox Grid.Column="1" SelectedIndex="{Binding RequiredValue}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}"/>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelRequirements:CastGroupRequirement}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Required Cast Group:" Grid.Column="0"/>
+                                    <ComboBox Grid.Column="1" SelectedItem="{Binding RequiredGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}"/>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelRequirements:NotRequirement}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"></ColumnDefinition>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <Label Content="Not Requirement:" Grid.Column="0"/>
+                                    <ComboBox Grid.Column="1" SelectedItem="{Binding SubRequirement}" ItemsSource="{Binding Source={StaticResource requirementsSelectionSource}}">
+                                        <ComboBox.ItemTemplate>
+                                            <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
+                                                <TextBlock Text="{Binding Name}"/>
+                                            </DataTemplate>
+                                        </ComboBox.ItemTemplate>
+                                    </ComboBox>
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelRequirements:AndRequirement}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <CheckBox IsChecked="{Binding AverageSuitability}" Content="Average Suitability? (otherwise product)"/>
+                                    <local:SelectableListControl Grid.Row="1" SelectedItems="{Binding ElementName=requirementsDataGrid, Path=SelectedItem.SubRequirements}"
                                                      AvailableItems="{Binding Source={StaticResource requirementsSelectionSource}}"
                                                      Title="AND Requirements:" ItemDisplayMemberPath="Name"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelRequirements:OrRequirement}">
-                                    <Grid>
-                                        <Grid.RowDefinitions>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                            <RowDefinition Height="Auto"></RowDefinition>
-                                        </Grid.RowDefinitions>
-                                        <CheckBox IsChecked="{Binding AverageSuitability}" Content="Average Suitability? (otherwise maximum)"/>
-                                        <local:SelectableListControl Grid.Row="1" SelectedItems="{Binding ElementName=requirementsDataGrid, Path=SelectedItem.SubRequirements}"
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelRequirements:OrRequirement}">
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                        <RowDefinition Height="Auto"></RowDefinition>
+                                    </Grid.RowDefinitions>
+                                    <CheckBox IsChecked="{Binding AverageSuitability}" Content="Average Suitability? (otherwise maximum)"/>
+                                    <local:SelectableListControl Grid.Row="1" SelectedItems="{Binding ElementName=requirementsDataGrid, Path=SelectedItem.SubRequirements}"
                                                      AvailableItems="{Binding Source={StaticResource requirementsSelectionSource}}"
                                                      Title="OR Requirements:" ItemDisplayMemberPath="Name"/>
-                                    </Grid>
-                                </DataTemplate>
-                                <DataTemplate DataType="{x:Type modelRequirements:XorRequirement}">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="*"></ColumnDefinition>
-                                        </Grid.ColumnDefinitions>
-                                        <local:SelectableListControl SelectedItems="{Binding ElementName=requirementsDataGrid, Path=SelectedItem.SubRequirements}"
+                                </Grid>
+                            </DataTemplate>
+                            <DataTemplate DataType="{x:Type modelRequirements:XorRequirement}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"></ColumnDefinition>
+                                    </Grid.ColumnDefinitions>
+                                    <local:SelectableListControl SelectedItems="{Binding ElementName=requirementsDataGrid, Path=SelectedItem.SubRequirements}"
                                                      AvailableItems="{Binding Source={StaticResource requirementsSelectionSource}}"
                                                      Title="XOR Requirements:" ItemDisplayMemberPath="Name"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </ContentControl.Resources>
-                        </ContentControl>
-                    </StackPanel>
-                </ScrollViewer>
+                                </Grid>
+                            </DataTemplate>
+                        </ContentControl.Resources>
+                    </ContentControl>
+                    <DataGrid x:Name="requirementsDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True"
+                        ItemsSource="{Binding Source={StaticResource requirementsViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" Header="Requirement Name"/>
+                            <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
+                            <DataGridCheckBoxColumn Binding="{Binding Primary}" Header="Primary"/>
+                            <DataGridTextColumn Binding="{Binding Reason}" Header="Reason" Width="*"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
             <TabItem Header="Images">
-                <ScrollViewer  VerticalScrollBarVisibility="Auto">
-                    <StackPanel Background="#FFE5E5E5">
-                        <DataGrid x:Name="imagesDataGrid" AutoGenerateColumns="False" 
+                <DockPanel>
+                    <DataGrid x:Name="imagesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource imagesViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="10,10,10,10">
-                            <DataGrid.Columns>
-                                <DataGridTextColumn Binding="{Binding Name}" Header="Image Name"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </StackPanel>
-                </ScrollViewer>
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" Header="Image Name"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
             </TabItem>
         </TabControl>
     </DockPanel>
