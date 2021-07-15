@@ -22,8 +22,9 @@
         </Grid.RowDefinitions>
         <Label Content="{Binding Title}" ContentStringFormat="Selected {0}" />
         <ListBox x:Name="selectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="4"
-                            ItemsSource="{Binding SelectedItems}"
-                            SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick">
+                 ItemsSource="{Binding SelectedItems}"
+                 SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick"
+                 DisplayMemberPath="{Binding ItemDisplayMemberPath}">
         </ListBox>
         <Button x:Name="addButton" Grid.Column="1" Grid.Row="1" Click="addButton_Click">
             <TextBlock>&lt;</TextBlock>
@@ -39,8 +40,9 @@
         </Button>
         <Label Content="{Binding Title}" ContentStringFormat="Available {0}" Grid.Column="2"/>
         <ListBox x:Name="availableList" Grid.Column="2" Grid.Row="1" Grid.RowSpan="4"
-                            ItemsSource="{Binding AvailableItems}"
-                            SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick">
+                 ItemsSource="{Binding AvailableItems}"
+                 SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick"
+                 DisplayMemberPath="{Binding ItemDisplayMemberPath}">
         </ListBox>
     </Grid>
 </UserControl>

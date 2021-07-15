@@ -416,6 +416,40 @@
                                         </ComboBox>
                                     </Grid>
                                 </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelRequirements:AndRequirement}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <CheckBox IsChecked="{Binding AverageSuitability}" Content="Average Suitability? (otherwise product)"/>
+                                        <local:SelectableListControl Grid.Row="1" SelectedItems="{Binding ElementName=requirementsDataGrid, Path=SelectedItem.SubRequirements}"
+                                                     AvailableItems="{Binding Source={StaticResource requirementsSelectionSource}}"
+                                                     Title="AND Requirements:" ItemDisplayMemberPath="Name"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelRequirements:OrRequirement}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                            <RowDefinition Height="Auto"></RowDefinition>
+                                        </Grid.RowDefinitions>
+                                        <CheckBox IsChecked="{Binding AverageSuitability}" Content="Average Suitability? (otherwise maximum)"/>
+                                        <local:SelectableListControl Grid.Row="1" SelectedItems="{Binding ElementName=requirementsDataGrid, Path=SelectedItem.SubRequirements}"
+                                                     AvailableItems="{Binding Source={StaticResource requirementsSelectionSource}}"
+                                                     Title="OR Requirements:" ItemDisplayMemberPath="Name"/>
+                                    </Grid>
+                                </DataTemplate>
+                                <DataTemplate DataType="{x:Type modelRequirements:XorRequirement}">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"></ColumnDefinition>
+                                        </Grid.ColumnDefinitions>
+                                        <local:SelectableListControl SelectedItems="{Binding ElementName=requirementsDataGrid, Path=SelectedItem.SubRequirements}"
+                                                     AvailableItems="{Binding Source={StaticResource requirementsSelectionSource}}"
+                                                     Title="XOR Requirements:" ItemDisplayMemberPath="Name"/>
+                                    </Grid>
+                                </DataTemplate>
                             </ContentControl.Resources>
                         </ContentControl>
                     </StackPanel>
