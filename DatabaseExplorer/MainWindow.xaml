@@ -63,7 +63,13 @@
         <TabControl ScrollViewer.HorizontalScrollBarVisibility="Auto" IsEnabled="False">
             <TabItem Header="Show Structure">
                 <DockPanel>
-                    <TreeView DockPanel.Dock="Left" x:Name="itemsTreeView" Margin="5" ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}" KeyDown="itemsTreeView_KeyDown">
+                    <TreeView DockPanel.Dock="Left" x:Name="itemsTreeView" Margin="5" KeyDown="itemsTreeView_KeyDown"
+                              ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}"
+                              MinWidth="150" MaxWidth="300" AllowDrop="True"
+                              PreviewMouseLeftButtonDown="itemsTreeView_PreviewMouseLeftButtonDown"
+                              MouseMove="itemsTreeView_MouseMove" 
+                              DragOver="itemsTreeView_DragOver" 
+                              Drop="itemsTreeView_Drop">
                         <TreeView.Resources>
                             <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
                                 <TextBlock Text="{Binding Path=Name, StringFormat='Show: {0}'}"/>

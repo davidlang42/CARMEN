@@ -20,6 +20,10 @@ namespace Model
         public static IOrderedEnumerable<T> InOrder<T>(this IEnumerable<T> objects) where T : IOrdered
             => objects.OrderBy(o => o.Order);
 
+        /// <summary>Finds the first Order value of this collection.</summary>
+        public static int FirstOrder<T>(this IEnumerable<T> objects) where T : IOrdered
+            => objects.Select(o => o.Order).DefaultIfEmpty().Min();
+
         /// <summary>Finds the Order value which would place a new object at the end of this collection.</summary>
         public static int NextOrder<T>(this IEnumerable<T> objects) where T : IOrdered
             => objects.Select(o => o.Order).DefaultIfEmpty().Max() + 1;
@@ -72,10 +76,25 @@ namespace Model
         {
             if (!objects.Contains(after))
                 throw new ArgumentException($"'{nameof(after)}' must be in this collection.");
+            var new_order = move_object.Order < after.Order ? after.Order : after.Order + 1;
+            MoveInOrder(objects, move_object, new_order);
+        }
+
+        /// <summary>Updates the Order value of objects in this collection to move an object to
+        /// a new order value.</summary>
+        public static void MoveInOrder<T>(this ICollection<T> objects, T move_object, int new_order) where T : class, IOrdered
+            => MoveInOrder(new CollectionWrapper<T>(objects), move_object, new_order);
+
+        /// <summary>Updates the Order value of objects in this collection to move an object to
+        /// a new order value.</summary>
+        public static void MoveInOrder<T>(this DbSet<T> objects, T move_object, int new_order) where T : class, IOrdered
+            => MoveInOrder(new DbSetWrapper<T>(objects), move_object, new_order);
+
+        private static void MoveInOrder<T>(this IDbSetOrCollection<T> objects, T move_object, int new_order) where T : class, IOrdered
+        {
             if (!objects.Contains(move_object))
                 throw new ArgumentException($"'{nameof(move_object)}' must be in this collection.");
-            var old_order = move_object.Order;
-            var new_order = after.Order + 1;
+            var old_order = move_object.Order;   
             if (new_order == old_order || new_order == old_order + 1)
                 return; // no change
             Dictionary<int, T> objects_between;
