@@ -25,7 +25,10 @@
         <local:CallbackCommand x:Key="addNodeCommand"/>
         <local:CallbackCommand x:Key="addCriteriaCommand"/>
         <local:CallbackCommand x:Key="addRequirementCommand"/>
+        <local:CallbackCommand x:Key="uploadImageCommand"/>
+        <local:CallbackCommand x:Key="pasteImageCommand"/>
         <local:SortIOrdered x:Key="sortIOrdered" />
+        <local:BytesToImage x:Key="bytesToImage"/>
         <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="modelApplicants:Gender"/>
@@ -514,14 +517,22 @@
             </TabItem>
             <TabItem Header="Images">
                 <DockPanel>
-                    <DataGrid x:Name="imagesDataGrid" AutoGenerateColumns="False" 
+                    <DataGrid DockPanel.Dock="Left" x:Name="imagesDataGrid" AutoGenerateColumns="False"
+                              CanUserAddRows="False"
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource imagesViewSource}}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Name}" Header="Image Name"/>
                         </DataGrid.Columns>
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Upload Image" Command="{Binding Source={StaticResource uploadImageCommand}}"/>
+                                <MenuItem Header="Paste Image" Command="{Binding Source={StaticResource pasteImageCommand}}"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                     </DataGrid>
+                    <Image Source="{Binding Source={StaticResource imagesViewSource}, Path=ImageData, Converter={StaticResource bytesToImage}}"/>
                 </DockPanel>
             </TabItem>
         </TabControl>

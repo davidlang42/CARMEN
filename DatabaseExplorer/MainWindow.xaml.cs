@@ -6,13 +6,14 @@ using Model.Structure;
 using Model.Criterias;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 using Model.Requirements;
+using System.IO;
+using System.Windows.Media.Imaging;
 
 namespace DatabaseExplorer
 {
@@ -46,6 +47,8 @@ namespace DatabaseExplorer
         private readonly CallbackCommand addNodeCommand;
         private readonly CallbackCommand addCriteriaCommand;
         private readonly CallbackCommand addRequirementCommand;
+        private readonly CallbackCommand uploadImageCommand;
+        private readonly CallbackCommand pasteImageCommand;
 
         public MainWindow()
         {
@@ -66,6 +69,10 @@ namespace DatabaseExplorer
             addCriteriaCommand.Callback = AddCriteria;
             addRequirementCommand = (CallbackCommand)FindResource(nameof(addRequirementCommand));
             addRequirementCommand.Callback = AddRequirement;
+            uploadImageCommand = (CallbackCommand)FindResource(nameof(uploadImageCommand));
+            uploadImageCommand.Callback = UploadImage;
+            pasteImageCommand = (CallbackCommand)FindResource(nameof(pasteImageCommand));
+            pasteImageCommand.Callback = PasteImage;
         }
 
         private void CreateMenu_Click(object sender, RoutedEventArgs e)
@@ -309,6 +316,41 @@ namespace DatabaseExplorer
                 _ => throw new ArgumentException($"Requirement type '{parameter}' does not exist.")
             };
             Context.Requirements.InsertInOrder(requirement); //TODO this re-allocates the last order value if more than one requirement is added without saving
+        }
+
+        private void UploadImage(object? _)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Title = "Upload Image",
+                Filter = "Images|*.jpg;*.jpeg;*.png;*.bmp|All Files (*.*)|*.*"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                var image = new Model.Image
+                {
+                    Name = Path.GetFileName(dialog.FileName),
+                    ImageData = File.ReadAllBytes(dialog.FileName)
+                };
+                Context.Images.Add(image);
+            }
+        }
+
+        private void PasteImage(object? _)
+        {
+            if (Clipboard.GetImage() is BitmapSource source)
+            {
+                var encoder = new PngBitmapEncoder();
+                encoder.Frames.Add(BitmapFrame.Create(source));
+                using var stream = new MemoryStream();
+                encoder.Save(stream);
+                var image = new Model.Image
+                {
+                    Name = $"Pasted at {DateTime.Now:yyyy-MM-dd HH:mm}",
+                    ImageData = stream.ToArray()
+                };
+                Context.Images.Add(image);
+            }
         }
     }
 }
