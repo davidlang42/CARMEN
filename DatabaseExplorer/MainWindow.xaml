@@ -23,6 +23,8 @@
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
         <CollectionViewSource x:Key="identifiersViewSource"/>
         <local:CallbackCommand x:Key="addNodeCommand"/>
+        <local:CallbackCommand x:Key="addCriteriaCommand"/>
+        <local:CallbackCommand x:Key="addRequirementCommand"/>
         <local:SortIOrdered x:Key="sortIOrdered" />
         <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -296,15 +298,17 @@
                                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <Label Content="Max Mark:" Grid.Column="0"/>
+                                    <Label Content="Maximum value of Numeric Criteria:" Grid.Column="0"/>
                                     <TextBox Text="{Binding MaxMark}" Grid.Column="1"/>
                                 </Grid>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
-                                <local:EditableListControl Title="Options:"
+                                <local:EditableListControl Title="Selectable options for Select Criteria:"
                                                                ItemsSource="{Binding ElementName=criteriaDataGrid, Path=SelectedItem.Options, Mode=TwoWay}"/>
                             </DataTemplate>
-                            <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}"/>
+                            <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">
+                                <TextBlock>Yes/No Criteria</TextBlock>
+                            </DataTemplate>
                         </ContentControl.Resources>
                     </ContentControl>
                     <DataGrid x:Name="criteriaDataGrid" AutoGenerateColumns="False" 
@@ -317,6 +321,16 @@
                             <DataGridTextColumn Binding="{Binding Description}" Header="Description"/>
                             <DataGridTextColumn Binding="{Binding MaxMark}" Header="Max Mark" IsReadOnly="True"/>
                         </DataGrid.Columns>
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Add Numeric Criteria" Command="{Binding Source={StaticResource addCriteriaCommand}}"
+                                          CommandParameter="NumericCriteria"/>
+                                <MenuItem Header="Add Select Criteria" Command="{Binding Source={StaticResource addCriteriaCommand}}"
+                                          CommandParameter="SelectCriteria"/>
+                                <MenuItem Header="Add Yes/No Criteria" Command="{Binding Source={StaticResource addCriteriaCommand}}"
+                                          CommandParameter="BooleanCriteria"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                     </DataGrid>
                 </DockPanel>
             </TabItem>
@@ -473,6 +487,28 @@
                             <DataGridCheckBoxColumn Binding="{Binding Primary}" Header="Primary"/>
                             <DataGridTextColumn Binding="{Binding Reason}" Header="Reason" Width="*"/>
                         </DataGrid.Columns>
+                        <DataGrid.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="Add Age Requirement" Command="{Binding Source={StaticResource addRequirementCommand}}"
+                                          CommandParameter="AgeRequirement"/>
+                                <MenuItem Header="Add Gender Requirement" Command="{Binding Source={StaticResource addRequirementCommand}}"
+                                          CommandParameter="GenderRequirement"/>
+                                <MenuItem Header="Add Cast Group Requirement" Command="{Binding Source={StaticResource addRequirementCommand}}"
+                                          CommandParameter="CastGroupRequirement"/>
+                                <MenuItem Header="Add Ability Range Requirement" Command="{Binding Source={StaticResource addRequirementCommand}}"
+                                          CommandParameter="AbilityRangeRequirement"/>
+                                <MenuItem Header="Add Exact Ability Requirement" Command="{Binding Source={StaticResource addRequirementCommand}}"
+                                          CommandParameter="AbilityExactRequirement"/>
+                                <MenuItem Header="Add NOT Requirement" Command="{Binding Source={StaticResource addRequirementCommand}}"
+                                          CommandParameter="NotRequirement"/>
+                                <MenuItem Header="Add AND Requirement" Command="{Binding Source={StaticResource addRequirementCommand}}"
+                                          CommandParameter="AndRequirement"/>
+                                <MenuItem Header="Add OR Requirement" Command="{Binding Source={StaticResource addRequirementCommand}}"
+                                          CommandParameter="OrRequirement"/>
+                                <MenuItem Header="Add XOR Requirement" Command="{Binding Source={StaticResource addRequirementCommand}}"
+                                          CommandParameter="XorRequirement"/>
+                            </ContextMenu>
+                        </DataGrid.ContextMenu>
                     </DataGrid>
                 </DockPanel>
             </TabItem>

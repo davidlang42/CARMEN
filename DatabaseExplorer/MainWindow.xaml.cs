@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using Model;
 using Model.Structure;
+using Model.Criterias;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using Model.Requirements;
 
 namespace DatabaseExplorer
 {
@@ -42,6 +44,8 @@ namespace DatabaseExplorer
         private readonly CollectionViewSource requirementsSelectionSource;
         private readonly CollectionViewSource identifiersViewSource;
         private readonly CallbackCommand addNodeCommand;
+        private readonly CallbackCommand addCriteriaCommand;
+        private readonly CallbackCommand addRequirementCommand;
 
         public MainWindow()
         {
@@ -58,6 +62,10 @@ namespace DatabaseExplorer
             identifiersViewSource = (CollectionViewSource)FindResource(nameof(identifiersViewSource));
             addNodeCommand = (CallbackCommand)FindResource(nameof(addNodeCommand));
             addNodeCommand.Callback = AddNode;
+            addCriteriaCommand = (CallbackCommand)FindResource(nameof(addCriteriaCommand));
+            addCriteriaCommand.Callback = AddCriteria;
+            addRequirementCommand = (CallbackCommand)FindResource(nameof(addRequirementCommand));
+            addRequirementCommand.Callback = AddRequirement;
         }
 
         private void CreateMenu_Click(object sender, RoutedEventArgs e)
@@ -271,6 +279,36 @@ namespace DatabaseExplorer
                 collection.Remove(node); //TODO children should be cascade deleted, but are not
                 itemsTreeView.Items.Refresh(); //TODO doesn't show deletion until db context saved
             }
+        }
+
+        private void AddCriteria(object? parameter)
+        {
+            Criteria criteria = parameter switch
+            {
+                nameof(NumericCriteria) => new NumericCriteria(),
+                nameof(SelectCriteria) => new SelectCriteria(),
+                nameof(BooleanCriteria) => new BooleanCriteria(),
+                _ => throw new ArgumentException($"Criteria type '{parameter}' does not exist.")
+            };
+            Context.Criterias.InsertInOrder(criteria); //TODO this re-allocates the last order value if more than one criteria is added without saving
+        }
+
+        private void AddRequirement(object? parameter)
+        {
+            Requirement requirement = parameter switch
+            {
+                nameof(AbilityExactRequirement) => new AbilityExactRequirement(),
+                nameof(AbilityRangeRequirement) => new AbilityRangeRequirement(),
+                nameof(AgeRequirement) => new AgeRequirement(),
+                nameof(CastGroupRequirement) => new CastGroupRequirement(),
+                nameof(GenderRequirement) => new GenderRequirement(),
+                nameof(AndRequirement) => new AndRequirement(),
+                nameof(OrRequirement) => new OrRequirement(),
+                nameof(XorRequirement) => new XorRequirement(),
+                nameof(NotRequirement) => new NotRequirement(),
+                _ => throw new ArgumentException($"Requirement type '{parameter}' does not exist.")
+            };
+            Context.Requirements.InsertInOrder(requirement); //TODO this re-allocates the last order value if more than one requirement is added without saving
         }
     }
 }

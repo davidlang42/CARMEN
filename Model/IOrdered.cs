@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -25,6 +27,14 @@ namespace Model
         /// <summary>Updates the Order value of objects in this collection to make space for the new object
         /// after the provided object, and adds the new object. If after==null, object is placed at the end.</summary>
         public static void InsertInOrder<T>(this ICollection<T> objects, T add_object, T? after = null) where T : class, IOrdered
+            => InsertInOrder(new CollectionWrapper<T>(objects), add_object, after);
+
+        /// <summary>Updates the Order value of objects in this collection to make space for the new object
+        /// after the provided object, and adds the new object. If after==null, object is placed at the end.</summary>
+        public static void InsertInOrder<T>(this DbSet<T> objects, T add_object, T? after = null) where T : class, IOrdered
+            => InsertInOrder(new DbSetWrapper<T>(objects), add_object, after);
+
+        private static void InsertInOrder<T>(this IDbSetOrCollection<T> objects, T add_object, T? after = null) where T : class, IOrdered
         {
             if (after != null)
             {
@@ -51,6 +61,14 @@ namespace Model
         /// <summary>Updates the Order value of objects in this collection to move an object to
         /// after another object.</summary>
         public static void MoveInOrder<T>(this ICollection<T> objects, T move_object, T after) where T : class, IOrdered
+            => MoveInOrder(new CollectionWrapper<T>(objects), move_object, after);
+
+        /// <summary>Updates the Order value of objects in this collection to move an object to
+        /// after another object.</summary>
+        public static void MoveInOrder<T>(this DbSet<T> objects, T move_object, T after) where T : class, IOrdered
+            => MoveInOrder(new DbSetWrapper<T>(objects), move_object, after);
+
+        private static void MoveInOrder<T>(this IDbSetOrCollection<T> objects, T move_object, T after) where T : class, IOrdered
         {
             if (!objects.Contains(after))
                 throw new ArgumentException($"'{nameof(after)}' must be in this collection.");
@@ -80,6 +98,33 @@ namespace Model
                 shift_order += delta;
             }
             move_object.Order = new_order;
+        }
+
+        private interface IDbSetOrCollection<T> : IEnumerable<T>
+        {
+            public void Add(T item);
+        }
+
+        private class DbSetWrapper<T> : IDbSetOrCollection<T> where T : class
+        {
+            private DbSet<T> dbSet;
+
+            public DbSetWrapper(DbSet<T> dbSet) => this.dbSet = dbSet;
+
+            public void Add(T item) => dbSet.Add(item);
+            public IEnumerator<T> GetEnumerator() => ((IEnumerable<T>)dbSet).GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        private class CollectionWrapper<T> : IDbSetOrCollection<T> where T : class
+        {
+            private ICollection<T> collection;
+
+            public CollectionWrapper(ICollection<T> collection) => this.collection = collection;
+
+            public void Add(T item) => collection.Add(item);
+            public IEnumerator<T> GetEnumerator() => collection.GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
     }
 }
