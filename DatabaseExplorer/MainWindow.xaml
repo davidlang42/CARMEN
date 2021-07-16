@@ -371,7 +371,7 @@
                                     <Label Content="Criteria:" Grid.Column="0"/>
                                     <ComboBox SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" DisplayMemberPath="Name" Grid.Column="1"/>
                                     <Label Content="Required Value:" Grid.Column="2"/>
-                                    <TextBox Text="{Binding RequiredValue}" Grid.Column="3"/>
+                                    <local:CriteriaMarkControl Mark="{Binding RequiredValue}" Criteria="{Binding Criteria}" Grid.Column="3"/>
                                 </Grid>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type modelRequirements:AbilityRangeRequirement}">
@@ -388,9 +388,9 @@
                                     <Label Content="Criteria:" Grid.Column="0"/>
                                     <ComboBox SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" DisplayMemberPath="Name" Grid.Column="1"/>
                                     <Label Content="Minimum:" Grid.Column="2"/>
-                                    <TextBox Text="{Binding Minimum}" Grid.Column="3"/>
+                                    <local:CriteriaMarkControl Mark="{Binding Minimum}" Criteria="{Binding Criteria}" Grid.Column="3"/>
                                     <Label Content="Maximum:" Grid.Column="4"/>
-                                    <TextBox Text="{Binding Maximum}" Grid.Column="5"/>
+                                    <local:CriteriaMarkControl Mark="{Binding Maximum}" Criteria="{Binding Criteria}" Grid.Column="5"/>
                                     <CheckBox VerticalAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}" Grid.Column="6"/>
                                 </Grid>
                             </DataTemplate>
