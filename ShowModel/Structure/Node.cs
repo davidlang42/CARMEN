@@ -9,7 +9,7 @@ namespace ShowModel.Structure
     /// <summary>
     /// A node in the item tree, which may or may not be able to have children.
     /// </summary>
-    public abstract class Node : IOrdered, ICounted
+    public abstract class Node : IOrdered, ICounted, IValidatable
     {
         #region Database fields
         [Key]
@@ -22,10 +22,22 @@ namespace ShowModel.Structure
 
         public abstract IEnumerable<Item> ItemsInOrder();
 
-        public abstract uint CountFor(CastGroup group);
+        public uint CountFor(CastGroup group)
+            => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
+            ?? ItemsInOrder().SelectMany(i => i.Roles).Distinct().Select(r => r.CountFor(group)).Sum();
 
         public Node RootParent() => Parent?.RootParent() ?? this;
 
+        /// <summary>Checks if this node's required counts equals the sum of the roles within it.</summary>
+        public virtual IEnumerable<string> Validate()
+        {
+            foreach (var cbg in CountByGroups)
+            {
+                var actual = ItemsInOrder().SelectMany(i => i.Roles).Distinct().Select(r => r.CountFor(cbg.CastGroup)).Sum();
+                if (cbg.Count != actual)
+                    yield return $"Actual roles for {cbg.CastGroup.Name} ({actual}) does not equal required count ({cbg.Count}).";
+            }
+        }
     }
 
     /// <summary>
@@ -36,9 +48,5 @@ namespace ShowModel.Structure
         public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
 
         public override IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
-
-        public override uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
-            ?? ItemsInOrder().SelectMany(i => i.Roles).Distinct().Select(r => r.CountFor(group)).Sum(); //TODO ensure this runs as a single SQL query
     }
 }

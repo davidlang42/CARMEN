@@ -18,10 +18,6 @@ namespace ShowModel.Structure
 
         public override IEnumerable<Item> ItemsInOrder() => this.Yield();
 
-        public override uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
-            ?? Roles.Select(r => r.CountFor(group)).Sum(); //TODO ensure this runs as a single SQL query
-
         public Item? NextItem()
         {
             var e = RootParent().ItemsInOrder().GetEnumerator();

@@ -3,13 +3,14 @@ using ShowModel.Structure;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace ShowModel.Requirements
 {
     /// <summary>
     /// A requirement which can be satisfied by an Applicant
     /// </summary>
-    public abstract class Requirement : IOrdered
+    public abstract class Requirement : IOrdered, IValidatable
     {
         #region Database fields
         [Key]
@@ -31,5 +32,15 @@ namespace ShowModel.Requirements
 
         /// <summary>Checks if an Applicant satisfies this requirement.</summary>
         public abstract bool IsSatisfiedBy(Applicant applicant);
+
+        internal virtual bool HasCircularReference(HashSet<Requirement> visited) => false;
+
+        /// <summary>Checks if this requirement has a circular reference.</summary>
+        public IEnumerable<string> Validate()
+        {
+            var visited = new HashSet<Requirement>();
+            if (HasCircularReference(visited))
+                yield return $"Requirement has a circular reference: ({string.Join(", ", visited.Select(r => r.Name))})";
+        }
     }
 }

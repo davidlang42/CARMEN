@@ -10,7 +10,7 @@ namespace ShowModel.Applicants
     /// <summary>
     /// A person who has auditioned to be in a show.
     /// </summary>
-    public class Applicant
+    public class Applicant : IValidatable
     {
         #region Database fields
         [Key]
@@ -28,7 +28,7 @@ namespace ShowModel.Applicants
 
         public uint AgeToday() => AgeAt(DateTime.Now);
 
-        public uint AgeAt(DateTime date) //TODO handle errors more nicely, probably return nullable
+        public uint AgeAt(DateTime date) //TODO handle errors more nicely, probably return nullable, move errors to validation
         {
             if (DateOfBirth == null)
                 throw new ApplicationException($"{DisplayName()}'s DOB is not set.");
@@ -42,19 +42,26 @@ namespace ShowModel.Applicants
         public int OverallAbility() => Convert.ToInt32(Abilities.Sum(a => a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
 
         public uint MarkFor(Criteria criteria)
-            => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark ?? 0; //TODO is defaulting to 0 okay for SelectCriteria?
+            => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark
+            ?? throw new ArgumentException($"Mark not set for {criteria.Name} criteria.");
 
         /// <summary>Determines if an Applicant has been accepted into the cast.
         /// This is determined by membership in a CastGroup with Primary set to true.</summary>
         public bool IsAccepted() => CastGroups.Any(g => g.Primary);
 
-        /// <summary>Checks whether all required fields are set, to make this a vaild applicant who has completed an audition.
-        /// Specifically, name cannot be blank, gender and date of birth must be set, and all criteria must have a mark.</summary>
-        public bool IsComplete()
-            => !string.IsNullOrEmpty(FirstName)
-            && !string.IsNullOrEmpty(LastName)
-            && Gender.HasValue
-            && DateOfBirth.HasValue; //TODO confirm all criteria have a mark
+        /// <summary>Checks that names are not blank, gender and date of birth are set, and all criteria have marks within range.</summary>
+        public IEnumerable<string> Validate()
+        {
+            if (string.IsNullOrEmpty(FirstName))
+                yield return "First Name cannot be blank.";
+            if (string.IsNullOrEmpty(LastName))
+                yield return "Last Name cannot be blank.";
+            if (!Gender.HasValue)
+                yield return "Gender must be set.";
+            if (!DateOfBirth.HasValue)
+                yield return "Date of Birth must be set.";
+            //TODO confirm all criteria have a mark, and that they are <= MaxMark
+        }
     }
 
     public enum Gender

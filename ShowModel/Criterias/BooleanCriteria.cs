@@ -14,7 +14,7 @@ namespace ShowModel.Criterias
 
         public BooleanCriteria()
         {
-            maxMark = 1;
+            base.MaxMark = 1;
         }
     }
 }

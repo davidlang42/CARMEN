@@ -16,6 +16,16 @@ namespace ShowModel.Requirements
         }
 
         public abstract override double SuitabilityOf(Applicant applicant);
+
+        internal override bool HasCircularReference(HashSet<Requirement> visited)
+        {
+            if (!visited.Add(this))
+                return true;
+            if (SubRequirements.Any(sr => sr.HasCircularReference(visited)))
+                return true;
+            visited.Remove(this);
+            return false;
+        }
     }
 
     public class AndRequirement : CombinedRequirement
