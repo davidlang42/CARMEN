@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using Model;
-using Model.Applicants;
+using ShowModel;
+using ShowModel.Applicants;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

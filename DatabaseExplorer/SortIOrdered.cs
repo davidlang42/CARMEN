@@ -13,7 +13,7 @@ namespace DatabaseExplorer
         {
             var collection = (IList)value;
             var view = new ListCollectionView(collection);
-            SortDescription sort = new SortDescription(nameof(Model.IOrdered.Order), ListSortDirection.Ascending);
+            SortDescription sort = new SortDescription(nameof(ShowModel.IOrdered.Order), ListSortDirection.Ascending);
             view.SortDescriptions.Add(sort);
             return view;
         }
