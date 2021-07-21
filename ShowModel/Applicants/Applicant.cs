@@ -42,8 +42,7 @@ namespace ShowModel.Applicants
         public int OverallAbility() => Convert.ToInt32(Abilities.Sum(a => a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
 
         public uint MarkFor(Criteria criteria)
-            => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark
-            ?? throw new ArgumentException($"Mark not set for {criteria.Name} criteria.");
+            => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark ?? 0;
 
         /// <summary>Determines if an Applicant has been accepted into the cast.
         /// This is determined by membership in a CastGroup with Primary set to true.</summary>
@@ -60,7 +59,10 @@ namespace ShowModel.Applicants
                 yield return "Gender must be set.";
             if (!DateOfBirth.HasValue)
                 yield return "Date of Birth must be set.";
-            //TODO confirm all criteria have a mark, and that they are <= MaxMark
+            foreach (var ability in Abilities)
+                if (ability.Mark > ability.Criteria.MaxMark)
+                    yield return $"Mark for {ability.Criteria.Name} ({ability.Mark}) is greater than the maximum ({ability.Criteria.MaxMark}).";
+            //TODO confirm all criteria have a mark
         }
     }
 
