@@ -42,6 +42,9 @@
         <DataTemplate DataType="{x:Type modelApplicants:Tag}">
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type modelApplicants:AlternativeCast}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type modelStructure:Item}">
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
@@ -347,11 +350,27 @@
                     </DataGrid>
                 </DockPanel>
             </TabItem>
+            <TabItem Header="Alternative Casts">
+                <DockPanel>
+                    <DataGrid x:Name="alternativeCastsDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource alternativeCastsViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" Header="Alternative Cast Name"/>
+                            <DataGridTextColumn Binding="{Binding Initial}" Header="Initial"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
             <TabItem Header="Cast Groups">
                 <DockPanel>
-                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="300" SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
+                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="200" SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
                                                      AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
                                                      Title="Requirements:" Margin="5"/>
+                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="100" SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.AlternativeCasts}"
+                                                     AvailableItems="{Binding Source={StaticResource alternativeCastsViewSource}}"
+                                                     Title="Alternative Casts:" Margin="5"/>
                     <DataGrid x:Name="castGroupsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" 
