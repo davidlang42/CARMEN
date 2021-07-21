@@ -19,6 +19,13 @@ namespace CastingEngine
         IEnumerable<Applicant> SelectCastGroup(IEnumerable<Applicant> applicants, CastGroup cast_group);
         //TODO apply tags to cast
         //TODO set cast numbers/identifiers
+        //TODO handle alternative casts
+        //- need to have buddies
+        //- need to match casting between buddies(by default but with exceptions?)
+        //- need to be able to "swap" buddies between casts
+        //- need to lock sets of applicants to be in the same cast(across cast groups, eg.junior boy, junior girl)
+        //- need to be able to balance talent between casts
+        //- need to have counts by group same for both casts
         #endregion
 
         #region Role allocation
