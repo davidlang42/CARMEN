@@ -200,7 +200,6 @@
                     RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
                             <DataGrid.Columns>
                                 <DataGridTextColumn Binding="{Binding Name}" Header="Role Name" Width="*"/>
-                                <DataGridCheckBoxColumn Binding="{Binding VariableCounts}" Header="Variable Counts"/>
                             </DataGrid.Columns>
                         </DataGrid>
                         <local:SelectableListControl Grid.Column="1" SelectedItems="{Binding ElementName=rolesDataGrid, Path=SelectedItem.Items}"
