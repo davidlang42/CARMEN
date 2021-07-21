@@ -378,9 +378,34 @@
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Name}" Header="Cast Group Name"/>
                             <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
-                            <DataGridCheckBoxColumn Binding="{Binding Primary}" Header="Primary"/>
                             <DataGridTextColumn Binding="{Binding RequiredCount}" Header="Required Count"/>
                             <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </DockPanel>
+            </TabItem>
+            <TabItem Header="Tags">
+                <DockPanel>
+                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="200" SelectedItems="{Binding ElementName=tagsDataGrid, Path=SelectedItem.Requirements}"
+                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
+                                                     Title="Requirements:" Margin="5"/>
+                    <DataGrid DockPanel.Dock="Bottom" MaxHeight="100" x:Name="tagCountsDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding ElementName=tagsDataGrid, Path=SelectedItem.CountByGroups}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5" CanUserAddRows="True">
+                        <DataGrid.Columns>
+                            <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
+                            <DataGridTextColumn Binding="{Binding Count}" Header="Count"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <DataGrid x:Name="tagsDataGrid" AutoGenerateColumns="False" 
+                        EnableRowVirtualization="True" 
+                        ItemsSource="{Binding Source={StaticResource tagsViewSource}}" 
+                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Binding="{Binding Name}" Header="Tag Name"/>
+                            <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
+                            <DataGridTextColumn Binding="{Binding Description}" Width="*" Header="Description"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>
