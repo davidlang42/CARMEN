@@ -136,24 +136,23 @@ namespace ShowModel
 
         /// <summary>Adds applicants in a specified gender ratio with random first and last name, optionally filling their abilities with random marks for each existing criteria.
         /// NOTE: Must be called after Criteria, Cast Groups, Tags, Alternative Casts and Identifiers have been committed.</summary>
-        public void AddApplicants(uint count, double gender_ratio = 0.5, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_identities = true, bool include_tags = true)
+        public void AddApplicants(uint count, double gender_ratio = 0.5, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_tags = true)
         {
             if (gender_ratio > 1 || gender_ratio < 0)
                 throw new ArgumentException($"{nameof(gender_ratio)} must be between 0 and 1 (inclusive)");
             uint male = (uint)(count * gender_ratio);
             uint female = count - male;
-            AddApplicants(male, Gender.Male, include_criteria_abilities, include_cast_groups, include_identities, include_tags);
-            AddApplicants(female, Gender.Female, include_criteria_abilities, include_cast_groups, include_identities, include_tags);
+            AddApplicants(male, Gender.Male, include_criteria_abilities, include_cast_groups, include_tags);
+            AddApplicants(female, Gender.Female, include_criteria_abilities, include_cast_groups, include_tags);
         }
 
         /// <summary>Adds applicants of a specified gender with random first and last name, optionally filling their abilities with random marks for each criteria, their identities with random numbers for each identifier, and setting their cast groups.
         /// NOTE: Must be called after Criteria, Cast Groups, Tags, Alternative Casts and Identifiers have been committed.</summary>
-        public void AddApplicants(uint count, Gender gender, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_identities = true, bool include_tags = true)
+        public void AddApplicants(uint count, Gender gender, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_tags = true)
         {
             var groups = Context.CastGroups.ToArray();
             var first_names = gender == Gender.Male ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
             var criterias = Context.Criterias.ToArray();
-            var identifiers = Context.Identifiers.ToArray();
             var tags = Context.Tags.ToArray();
             for (var i = 0; i < count; i++)
             {
@@ -176,18 +175,6 @@ namespace ShowModel
                         applicant.Abilities.Add(ability);
                     }
                 }
-                if (include_identities)
-                {
-                    foreach (var identifier in identifiers)
-                    {
-                        var identity = new Identity
-                        {
-                            Identifier = identifier,
-                            Number = random.Next(1000, 9999)
-                        };
-                        applicant.Identities.Add(identity);
-                    }
-                }
                 if (include_cast_groups)
                 {
                     applicant.CastGroup = groups[random.Next(groups.Length)];
@@ -197,23 +184,6 @@ namespace ShowModel
                 if (include_tags)
                     applicant.Tags.Add(tags[random.Next(tags.Length)]);
                 Context.Applicants.Add(applicant);
-            }
-        }
-
-        public void AddIdentifiers(uint count = 1, bool include_requirements = true)
-        {
-            var requirements = Context.Requirements.ToArray();
-            int order = Context.Identifiers.NextOrder();
-            for (var i = 0; i < count; i++)
-            {
-                var identifier = new Identifier
-                {
-                    Name = $"External ID {i + 1}",
-                    Order = order++
-                };
-                if (include_requirements)
-                    identifier.Requirements.Add(requirements[random.Next(requirements.Length)]);
-                Context.Identifiers.Add(identifier);
             }
         }
 

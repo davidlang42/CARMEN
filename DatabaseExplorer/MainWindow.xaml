@@ -23,7 +23,6 @@
         <CollectionViewSource x:Key="requirementsSelectionSource"/>
         <CollectionViewSource x:Key="imagesViewSource"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
-        <CollectionViewSource x:Key="identifiersViewSource"/>
         <local:CallbackCommand x:Key="addNodeCommand"/>
         <local:CallbackCommand x:Key="addCriteriaCommand"/>
         <local:CallbackCommand x:Key="addRequirementCommand"/>
@@ -230,32 +229,15 @@
                     <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="130" SelectedItems="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.Tags}"
                                                      AvailableItems="{Binding Source={StaticResource tagsViewSource}}"
                                                      Title="Tags:" Margin="5"/>
-                    <Grid DockPanel.Dock="Bottom" MaxHeight="120">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                        </Grid.ColumnDefinitions>
-                        <DataGrid x:Name="abilitiesDataGrid" AutoGenerateColumns="False" 
+                    <DataGrid DockPanel.Dock="Bottom" MaxHeight="120" x:Name="abilitiesDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.Abilities}" 
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5" CanUserAddRows="True">
-                            <DataGrid.Columns>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" Header="Criteria" DisplayMemberPath="Name"/>
-                                <DataGridTextColumn Binding="{Binding Mark}" Header="Mark"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                        <DataGrid Grid.Column="1" x:Name="identitiesDataGrid" AutoGenerateColumns="False" 
-                        EnableRowVirtualization="True" 
-                        ItemsSource="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.Identities}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5" CanUserAddRows="True">
-                            <DataGrid.Columns>
-                                <DataGridComboBoxColumn SelectedItemBinding="{Binding Identifier}" ItemsSource="{Binding Source={StaticResource identifiersViewSource}}" Header="Identifier" DisplayMemberPath="Name"/>
-                                <DataGridTextColumn Binding="{Binding Prefix}" Header="Prefix"/>
-                                <DataGridTextColumn Binding="{Binding Number}" Header="Number"/>
-                                <DataGridTextColumn Binding="{Binding Suffix}" Header="Suffix"/>
-                            </DataGrid.Columns>
-                        </DataGrid>
-                    </Grid>
+                        <DataGrid.Columns>
+                            <DataGridComboBoxColumn SelectedItemBinding="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriaViewSource}}" Header="Criteria" DisplayMemberPath="Name"/>
+                            <DataGridTextColumn Binding="{Binding Mark}" Header="Mark"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
                     <DataGrid x:Name="applicantsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" 
@@ -280,26 +262,8 @@
                             <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
                             <DataGridTextColumn Binding="{Binding CastNumber}" Header="Cast Number"/>
                             <DataGridComboBoxColumn SelectedItemBinding="{Binding AlternativeCast}" ItemsSource="{Binding Source={StaticResource alternativeCastsViewSource}}" Header="Alt. Cast" DisplayMemberPath="Name"/>
+                            <DataGridTextColumn Binding="{Binding ExternalData}" Header="ExternalData"/>
                             <DataGridTextColumn Binding="{Binding Notes}" Header="Notes" Width="*"/>
-                        </DataGrid.Columns>
-                    </DataGrid>
-                </DockPanel>
-            </TabItem>
-            <TabItem Header="Identifiers">
-                <DockPanel>
-                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="300" SelectedItems="{Binding ElementName=identifiersDataGrid, Path=SelectedItem.Requirements}"
-                                                     AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
-                                                     Title="Requirements:" Margin="5" />
-                    <DataGrid x:Name="identifiersDataGrid" AutoGenerateColumns="False" 
-                        EnableRowVirtualization="True" 
-                        ItemsSource="{Binding Source={StaticResource identifiersViewSource}}" 
-                        RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
-                        <DataGrid.Columns>
-                            <DataGridTextColumn Binding="{Binding Name}" Header="Identifier Name"/>
-                            <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
-                            <DataGridTextColumn Binding="{Binding DefaultPrefix}" Header="Default Prefix"/>
-                            <DataGridTextColumn Binding="{Binding AssignNumbersFrom}" Header="Auto-Assign Numbers Starting From"/>
-                            <DataGridTextColumn Binding="{Binding DefaultSuffix}" Header="Default Suffix"/>
                         </DataGrid.Columns>
                     </DataGrid>
                 </DockPanel>

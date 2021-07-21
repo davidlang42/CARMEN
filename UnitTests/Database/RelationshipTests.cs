@@ -28,7 +28,6 @@ namespace UnitTests.Database
             context.SaveChanges();
             test_data.AddCriteriaAndRequirements(); // after cast groups committed
             context.SaveChanges();
-            test_data.AddIdentifiers(); // after requirements committed
             test_data.AddTags(1); // after requirements committed
             context.SaveChanges();
             test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
@@ -49,7 +48,8 @@ namespace UnitTests.Database
             context.Images.Load();
             context.SectionTypes.Load();
             context.Requirements.Load();
-            context.Identifiers.Load();
+            context.AlternativeCasts.Load();
+            context.Tags.Load();
         }
 
         #region Applicants
@@ -112,17 +112,6 @@ namespace UnitTests.Database
         }
 
         [Test]
-        public void Applicant_Identity_OneToMany()
-        {
-            using var context = new ShowContext(contextOptions);
-            var applicant = context.Applicants.First();
-            applicant.ApplicantId.Should().NotBe(0);
-            var identity = applicant.Identities.First();
-            identity.Identifier.Should().NotBeNull();
-            // Reverse navigation not defined
-        }
-
-        [Test]
         public void CastGroup_Image_ManyToOne()
         {
             using var context = new ShowContext(contextOptions);
@@ -131,17 +120,6 @@ namespace UnitTests.Database
             var image = group.Icon;
             image.Should().NotBeNull();
             image!.ImageId.Should().NotBe(0);
-            // Reverse navigation not defined
-        }
-
-        [Test]
-        public void Identity_Identifier_ManyToOne()
-        {
-            using var context = new ShowContext(contextOptions);
-            var identity = context.Applicants.First().Identities.First();
-            var identifier = identity.Identifier;
-            identifier.Should().NotBeNull();
-            identifier.IdentifierId.Should().NotBe(0);
             // Reverse navigation not defined
         }
 
@@ -215,17 +193,6 @@ namespace UnitTests.Database
             sub_req.RequirementId.Should().NotBe(0);
             sub_req.RequirementId.Should().NotBe(req.RequirementId);
             sub_req.UsedByCombinedRequirements.Should().Contain(req);
-        }
-
-        [Test]
-        public void Requirement_Identifier_ManyToMany()
-        {
-            using var context = new ShowContext(contextOptions);
-            var identifier = context.Identifiers.First();
-            identifier.IdentifierId.Should().NotBe(0);
-            var req = identifier.Requirements.First();
-            req.RequirementId.Should().NotBe(0);
-            req.UsedByIdentifiers.Should().Contain(identifier);
         }
 
         [Test]

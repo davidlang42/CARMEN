@@ -45,7 +45,6 @@ namespace DatabaseExplorer
         private readonly CollectionViewSource sectionTypesViewSource;
         private readonly CollectionViewSource requirementsViewSource;
         private readonly CollectionViewSource requirementsSelectionSource;
-        private readonly CollectionViewSource identifiersViewSource;
         private readonly CallbackCommand addNodeCommand;
         private readonly CallbackCommand addCriteriaCommand;
         private readonly CallbackCommand addRequirementCommand;
@@ -66,7 +65,6 @@ namespace DatabaseExplorer
             itemsViewSource = (CollectionViewSource)FindResource(nameof(itemsViewSource));
             requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
             requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));
-            identifiersViewSource = (CollectionViewSource)FindResource(nameof(identifiersViewSource));
             addNodeCommand = (CallbackCommand)FindResource(nameof(addNodeCommand));
             addNodeCommand.Callback = AddNode;
             addCriteriaCommand = (CallbackCommand)FindResource(nameof(addCriteriaCommand));
@@ -129,7 +127,6 @@ namespace DatabaseExplorer
             Context.Images.Load();
             Context.SectionTypes.Load();
             Context.Requirements.Load();
-            Context.Identifiers.Load();
             // Put collections into view source
             applicantsViewSource.Source = Context.Applicants.Local.ToObservableCollection();
             castGroupsViewSource.Source = Context.CastGroups.Local.ToObservableCollection();
@@ -145,7 +142,6 @@ namespace DatabaseExplorer
             sectionTypesViewSource.Source = Context.SectionTypes.Local.ToObservableCollection();
             requirementsViewSource.Source = Context.Requirements.Local.ToObservableCollection();
             requirementsSelectionSource.Source = Context.Requirements.Local.ToObservableCollection(); // separate collection for combo boxes
-            identifiersViewSource.Source = Context.Identifiers.Local.ToObservableCollection();
         }
 
         private void SaveMenu_Click(object sender, RoutedEventArgs e)
@@ -219,7 +215,6 @@ namespace DatabaseExplorer
             Context.SaveChanges();
             test_data.AddCriteriaAndRequirements(); // after cast groups committed
             Context.SaveChanges();
-            test_data.AddIdentifiers(identifiers); // after requirements committed
             test_data.AddTags(tags); // after requirements, cast groups committed
             Context.SaveChanges();
             test_data.AddApplicants(applicants); // after criteria, tags, alternative casts committed
@@ -253,7 +248,8 @@ namespace DatabaseExplorer
             Context.Images.RemoveRange(Context.Images);
             Context.SectionTypes.RemoveRange(Context.SectionTypes);
             Context.Requirements.RemoveRange(Context.Requirements);
-            Context.Identifiers.RemoveRange(Context.Identifiers);
+            Context.AlternativeCasts.RemoveRange(Context.AlternativeCasts);
+            Context.Tags.RemoveRange(Context.Tags);
             SaveMenu_Click(sender, e);
         }
 

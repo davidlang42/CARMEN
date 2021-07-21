@@ -20,7 +20,7 @@ namespace ShowModel.Applicants
         public string LastName { get; set; } = "";
         public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public virtual ICollection<Identity> Identities { get; private set; } = new ObservableCollection<Identity>();
+        public string ExternalData { get; set; } = "";
         #endregion
 
         #region Database fields (auditioning)

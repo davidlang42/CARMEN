@@ -14,7 +14,6 @@ namespace ShowModel
         #region Database collections
         public DbSet<Applicant> Applicants => Set<Applicant>();
         public DbSet<AlternativeCast> AlternativeCasts => Set<AlternativeCast>();
-        public DbSet<Identifier> Identifiers => Set<Identifier>();
         public DbSet<CastGroup> CastGroups => Set<CastGroup>();
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<Criteria> Criterias => Set<Criteria>();
@@ -43,9 +42,6 @@ namespace ShowModel
                 .HasKey(nameof(Ability.Applicant.ApplicantId), nameof(Ability.Criteria.CriteriaId));
 
             // Configure owned entities
-            modelBuilder.Entity<Applicant>()
-                .OwnsMany(a => a.Identities)
-                .WithOwnerCompositeKey(nameof(Applicant.ApplicantId), nameof(Identity.Identifier.IdentifierId));
             modelBuilder.Entity<Role>()
                 .OwnsMany(r => r.CountByGroups)
                 .WithOwnerCompositeKey(nameof(Role.RoleId), nameof(CountByGroup.CastGroup.CastGroupId));
@@ -79,9 +75,6 @@ namespace ShowModel
             modelBuilder.Entity<CombinedRequirement>()
                 .HasMany(cr => cr.SubRequirements)
                 .WithMany(r => r.UsedByCombinedRequirements);
-            modelBuilder.Entity<Identifier>()
-                .HasMany(id => id.Requirements)
-                .WithMany(r => r.UsedByIdentifiers);
 
             // Add inheritance structure for requirements
             // Foreign keys are manually defined to avoid IndexOutOfRangeException being

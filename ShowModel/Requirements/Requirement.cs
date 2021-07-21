@@ -22,7 +22,6 @@ namespace ShowModel.Requirements
         public virtual ICollection<Role> UsedByRoles { get; private set; } = new ObservableCollection<Role>();
         public virtual ICollection<CastGroup> UsedByCastGroups { get; private set; } = new ObservableCollection<CastGroup>();
         public virtual ICollection<CombinedRequirement> UsedByCombinedRequirements { get; private set; } = new ObservableCollection<CombinedRequirement>();
-        public virtual ICollection<Identifier> UsedByIdentifiers { get; private set; } = new ObservableCollection<Identifier>();
         public virtual ICollection<Tag> UsedByTags { get; private set; } = new ObservableCollection<Tag>();
         #endregion
 
