@@ -1,4 +1,5 @@
 ﻿using ShowModel.Criterias;
+using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,6 +25,7 @@ namespace ShowModel.Applicants
         public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
         public virtual ICollection<CastGroup> CastGroups { get; private set; } = new ObservableCollection<CastGroup>();
         public virtual ICollection<Identity> Identities { get; private set; } = new ObservableCollection<Identity>();
+        public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
 
         public uint AgeToday() => AgeAt(DateTime.Now);
