@@ -40,7 +40,7 @@ namespace ShowModel
             return first;
         }
 
-        public static T Random<T>(this IList<T> list, Random? random = null)
+        public static T Random<T>(this IList<T> list, Random? random = null)//TODO refactor to Random.NextOf(IList)
             => list[(random ?? new Random()).Next(list.Count)];
     }
 

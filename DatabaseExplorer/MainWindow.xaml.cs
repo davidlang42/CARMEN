@@ -36,6 +36,8 @@ namespace DatabaseExplorer
 
         private readonly CollectionViewSource applicantsViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
+        private readonly CollectionViewSource alternativeCastsViewSource;
+        private readonly CollectionViewSource tagsViewSource;
         private readonly CollectionViewSource rootNodesViewSource;
         private readonly CollectionViewSource itemsViewSource;
         private readonly CollectionViewSource criteriaViewSource;
@@ -55,6 +57,8 @@ namespace DatabaseExplorer
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
+            alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
+            tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
             criteriaViewSource = (CollectionViewSource)FindResource(nameof(criteriaViewSource));
             imagesViewSource = (CollectionViewSource)FindResource(nameof(imagesViewSource));
@@ -117,6 +121,8 @@ namespace DatabaseExplorer
         {
             // Load the entities into EF Core
             Context.Applicants.Load();
+            Context.AlternativeCasts.Load();
+            Context.Tags.Load();
             Context.CastGroups.Load();
             Context.Nodes.Load();
             Context.Criterias.Load();
@@ -127,6 +133,8 @@ namespace DatabaseExplorer
             // Put collections into view source
             applicantsViewSource.Source = Context.Applicants.Local.ToObservableCollection();
             castGroupsViewSource.Source = Context.CastGroups.Local.ToObservableCollection();
+            alternativeCastsViewSource.Source = Context.AlternativeCasts.Local.ToObservableCollection();
+            tagsViewSource.Source = Context.Tags.Local.ToObservableCollection();
             rootNodesViewSource.Source = Context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
@@ -193,9 +201,9 @@ namespace DatabaseExplorer
                     return;
                 every_depth = result == MessageBoxResult.Yes;
             }
-            if (!TryInputNumber("How many PRIMARY CAST GROUPS would you like to add?", "Test Data", out var primary_cast_groups, 4))
+            if (!TryInputNumber("How many CAST GROUPS would you like to add?", "Test Data", out var cast_groups, 4))
                 return;
-            if (!TryInputNumber("How many SECONDARY CAST GROUPS would you like to add?", "Test Data", out var secondary_cast_groups, 1))
+            if (!TryInputNumber("How many TAGS would you like to add?", "Test Data", out var tags, 1))
                 return;
             if (!TryInputNumber("How many IDENTIFIERS would you like to add?", "Test Data", out var identifiers, 1))
                 return;
@@ -204,19 +212,20 @@ namespace DatabaseExplorer
             if (!TryInputNumber("How many ROLES PER ITEM would you like to add?", "Test Data", out var roles, 5))
                 return;
             using var test_data = new TestDataGenerator(Context);
-            test_data.AddPrimaryCastGroups(primary_cast_groups);
+            test_data.AddCastGroups(cast_groups);
             Context.SaveChanges();
+            test_data.AddAlternativeCasts(); // after cast groups committed
             test_data.AddShowStructure(items, sections, depth, include_items_at_every_depth: every_depth);
             Context.SaveChanges();
             test_data.AddCriteriaAndRequirements(); // after cast groups committed
             Context.SaveChanges();
             test_data.AddIdentifiers(identifiers); // after requirements committed
-            test_data.AddSecondaryCastGroups(secondary_cast_groups); // after requirements committed
+            test_data.AddTags(tags); // after requirements, cast groups committed
             Context.SaveChanges();
-            test_data.AddApplicants(applicants); // after criteria committed
+            test_data.AddApplicants(applicants); // after criteria, tags, alternative casts committed
             Context.SaveChanges();
             test_data.AddRoles(roles); // after items, cast groups, requirements committed
-            test_data.AddImages(); // after applicants, cast groups committed
+            test_data.AddImages(); // after applicants, cast groups, tags committed
             Context.SaveChanges();
         }
 
@@ -342,7 +351,7 @@ namespace DatabaseExplorer
                 nameof(AbilityExactRequirement) => new AbilityExactRequirement(),
                 nameof(AbilityRangeRequirement) => new AbilityRangeRequirement(),
                 nameof(AgeRequirement) => new AgeRequirement(),
-                nameof(CastGroupRequirement) => new CastGroupRequirement(),
+                nameof(TagRequirement) => new TagRequirement(),
                 nameof(GenderRequirement) => new GenderRequirement(),
                 nameof(AndRequirement) => new AndRequirement(),
                 nameof(OrRequirement) => new OrRequirement(),

@@ -80,7 +80,7 @@ namespace ShowModel
                 show.Name = "Test Show";
             if (!show.CountByGroups.Any())
             {
-                foreach (var cast_group in Context.CastGroups.Where(g => g.Primary))
+                foreach (var cast_group in Context.CastGroups)
                 {
                     var cbg = new CountByGroup
                     {
@@ -135,27 +135,26 @@ namespace ShowModel
         }
 
         /// <summary>Adds applicants in a specified gender ratio with random first and last name, optionally filling their abilities with random marks for each existing criteria.
-        /// NOTE: Must be called after Criteria have been committed.</summary>
-        public void AddApplicants(uint count, double gender_ratio = 0.5, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_identities = true)
+        /// NOTE: Must be called after Criteria, Cast Groups, Tags, Alternative Casts and Identifiers have been committed.</summary>
+        public void AddApplicants(uint count, double gender_ratio = 0.5, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_identities = true, bool include_tags = true)
         {
             if (gender_ratio > 1 || gender_ratio < 0)
                 throw new ArgumentException($"{nameof(gender_ratio)} must be between 0 and 1 (inclusive)");
             uint male = (uint)(count * gender_ratio);
             uint female = count - male;
-            AddApplicants(male, Gender.Male, include_criteria_abilities, include_cast_groups, include_identities);
-            AddApplicants(female, Gender.Female, include_criteria_abilities, include_cast_groups, include_identities);
+            AddApplicants(male, Gender.Male, include_criteria_abilities, include_cast_groups, include_identities, include_tags);
+            AddApplicants(female, Gender.Female, include_criteria_abilities, include_cast_groups, include_identities, include_tags);
         }
 
         /// <summary>Adds applicants of a specified gender with random first and last name, optionally filling their abilities with random marks for each criteria, their identities with random numbers for each identifier, and setting their cast groups.
-        /// NOTE: Must be called after Criteria, Cast Groups and Identifiers have been committed.</summary>
-        public void AddApplicants(uint count, Gender gender, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_identities = true)
+        /// NOTE: Must be called after Criteria, Cast Groups, Tags, Alternative Casts and Identifiers have been committed.</summary>
+        public void AddApplicants(uint count, Gender gender, bool include_criteria_abilities = true, bool include_cast_groups = true, bool include_identities = true, bool include_tags = true)
         {
-            var groups = Context.CastGroups.Where(g => g.Primary).ToArray();
-            if (groups.Length == 0)
-                groups = Context.CastGroups.ToArray();
+            var groups = Context.CastGroups.ToArray();
             var first_names = gender == Gender.Male ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
             var criterias = Context.Criterias.ToArray();
             var identifiers = Context.Identifiers.ToArray();
+            var tags = Context.Tags.ToArray();
             for (var i = 0; i < count; i++)
             {
                 var applicant = new Applicant
@@ -190,7 +189,13 @@ namespace ShowModel
                     }
                 }
                 if (include_cast_groups)
-                    applicant.CastGroups.Add(groups[random.Next(groups.Length)]);
+                {
+                    applicant.CastGroup = groups[random.Next(groups.Length)];
+                    if (applicant.CastGroup.AlternativeCasts.Any())
+                        applicant.AlternativeCast = applicant.CastGroup.AlternativeCasts.ToArray().Random(random);
+                }
+                if (include_tags)
+                    applicant.Tags.Add(tags[random.Next(tags.Length)]);
                 Context.Applicants.Add(applicant);
             }
         }
@@ -222,17 +227,16 @@ namespace ShowModel
             return minimum.AddDays(r.Next(days));
         }
 
-        /// <summary>Adds cast groups, set to primary optionally with a required count.</summary>
-        public void AddPrimaryCastGroups(uint count, uint? required_count = null)
+        /// <summary>Adds cast groups, optionally with a required count.</summary>
+        public void AddCastGroups(uint count, uint? required_count = null)
         {
             int order = Context.CastGroups.NextOrder();
             for (var i = 0; i < count; i++)
             {
                 var cast_group = new CastGroup
                 {
-                    Name = $"Primary Group {i + 1}",
+                    Name = $"Cast Group {i + 1}",
                     Order = order++,
-                    Primary = true,
                     RequiredCount = required_count
                 };
                 Context.CastGroups.Add(cast_group);
@@ -240,7 +244,8 @@ namespace ShowModel
         }
 
         /// <summary>Adds one of each type of Criteria, and one of each type of Requirements.
-        /// NOTE: Must be called after at least one Cast Group has been committed.</summary>
+        /// Also creates a new Tag if none are defined.
+        /// NOTE: Must be called after Cast Groups have been committed.</summary>
         public void AddCriteriaAndRequirements()
         {
             int order = Context.Criterias.NextOrder();
@@ -296,13 +301,12 @@ namespace ShowModel
                 SubRequirement = gender,
                 Order = order++
             };
-            var cast_group = new CastGroupRequirement
+            var cast_group = new TagRequirement
             {
-                Name = "First Cast Group",
-                RequiredGroup = Context.CastGroups.FirstOrDefault() ?? new CastGroup
+                Name = "First Tag",
+                RequiredTag = Context.Tags.FirstOrDefault() ?? new Tag
                 {
-                    Name = "New Group",
-                    Order = 0
+                    Name = "New Tag",
                 },
                 Order = order++
             };
@@ -327,25 +331,35 @@ namespace ShowModel
             };
             xor_req.SubRequirements.Add(ability_exact);
             xor_req.SubRequirements.Add(gender);
+            Context.CastGroups.First().Requirements.Add(age);
+            Context.CastGroups.First().Requirements.Add(gender);
             Context.Requirements.AddRange(ability_exact, ability_range, age, cast_group, gender, not_req, and_req, or_req, xor_req);
         }
 
-        /// <summary>Adds cast groups, not set to primary, optionally with requirements.</summary>
-        public void AddSecondaryCastGroups(uint count, bool include_requirements = true)
+        /// <summary>Adds tags, optionally with requirements and count by groups.
+        /// NOTE: Must be called after Requirements and Cast Groups have been comitted.</summary>
+        public void AddTags(uint count, bool include_requirements = true, bool include_castgroup_count_by_groups = true)
         {
+            var cast_groups = Context.CastGroups.ToArray();
             var requirements = Context.Requirements.ToArray();
-            int order = Context.CastGroups.NextOrder();
             for (var i = 0; i < count; i++)
             {
-                var cast_group = new CastGroup
+                var tag = new Tag
                 {
-                    Name = $"Secondary Group {i + 1}",
-                    Order = order++,
-                    Primary = false,
+                    Name = $"Tag {i + 1}",
                 };
                 if (include_requirements)
-                    cast_group.Requirements.Add(requirements[random.Next(requirements.Length)]);
-                Context.CastGroups.Add(cast_group);
+                    tag.Requirements.Add(requirements[random.Next(requirements.Length)]);
+                if (include_castgroup_count_by_groups)
+                {
+                    var count_by_group = new CountByGroup
+                    {
+                        CastGroup = cast_groups[random.Next(cast_groups.Length)],
+                        Count = (uint)i
+                    };
+                    tag.CountByGroups.Add(count_by_group);
+                }
+                Context.Tags.Add(tag);
             }
         }
 
@@ -381,7 +395,7 @@ namespace ShowModel
 
         /// <summary>Adds images, optionally assigning to various objects.
         /// NOTE: Must be called after Applicants and Cast Groups have been committed.</summary>
-        public void AddImages(uint count = 5, bool assign_to_show = true, bool assign_to_applicant = true, bool assign_to_cast_group = true)
+        public void AddImages(uint count = 5, bool assign_to_show = true, bool assign_to_applicant = true, bool assign_to_cast_group = true, bool assign_to_tag = true)
         {
             var images = Enumerable.Range(0, (int)count).Select(i => new Image { Name = $"Image {i + 1}" }).ToArray();
             Context.Images.AddRange(images);
@@ -391,6 +405,27 @@ namespace ShowModel
                 Context.Applicants.ToList().Random(random).Photo = images.Random(random);
             if (assign_to_cast_group)
                 Context.CastGroups.ToList().Random(random).Icon = images.Random(random);
+            if (assign_to_tag)
+                Context.Tags.ToList().Random(random).Icon = images.Random(random);
+        }
+
+        /// <summary>Adds alternative casts and applies them to some cast groups.
+        /// NOTE: Must be called after Cast Groups have been committed.</summary>
+        public void AddAlternativeCasts(uint count = 2, uint apply_to_cast_groups = 2)
+        {
+            var groups = Context.CastGroups.Take((int)apply_to_cast_groups).ToArray();
+            for (var i = 0; i < count; i++)
+            {
+                var cast_letter = Convert.ToChar(i + 65);
+                var alternative_cast = new AlternativeCast
+                {
+                    Name = $"Cast {cast_letter}",
+                    Initial = cast_letter
+                };
+                foreach (var group in groups)
+                    group.AlternativeCasts.Add(alternative_cast);
+                Context.AlternativeCasts.Add(alternative_cast);
+            }
         }
     }
 }

@@ -13,8 +13,10 @@ namespace ShowModel
     {
         #region Database collections
         public DbSet<Applicant> Applicants => Set<Applicant>();
+        public DbSet<AlternativeCast> AlternativeCasts => Set<AlternativeCast>();
         public DbSet<Identifier> Identifiers => Set<Identifier>();
         public DbSet<CastGroup> CastGroups => Set<CastGroup>();
+        public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<Criteria> Criterias => Set<Criteria>();
         public DbSet<Requirement> Requirements => Set<Requirement>();
         public DbSet<Node> Nodes => Set<Node>();
@@ -50,6 +52,9 @@ namespace ShowModel
             modelBuilder.Entity<Node>()
                 .OwnsMany(n => n.CountByGroups)
                 .WithOwnerCompositeKey(nameof(Node.NodeId), nameof(CountByGroup.CastGroup.CastGroupId));
+            modelBuilder.Entity<Tag>()
+                .OwnsMany(r => r.CountByGroups)
+                .WithOwnerCompositeKey(nameof(Tag.TagId), nameof(CountByGroup.CastGroup.CastGroupId));
 
             // Add inheritance structure for item tree
             modelBuilder.Entity<Item>();
@@ -60,8 +65,14 @@ namespace ShowModel
             // Navigation collections must exist in both directions, otherwise loading will
             // fail with ArgumentNullException "Value cannot be null. (Parameter 'member')".
             modelBuilder.Entity<CastGroup>()
+                .HasMany(g => g.AlternativeCasts)
+                .WithMany(r => r.CastGroups);
+            modelBuilder.Entity<CastGroup>()
                 .HasMany(g => g.Requirements)
                 .WithMany(r => r.UsedByCastGroups);
+            modelBuilder.Entity<Tag>()
+                .HasMany(t => t.Requirements)
+                .WithMany(r => r.UsedByTags);
             modelBuilder.Entity<Role>()
                 .HasMany(r => r.Requirements)
                 .WithMany(r => r.UsedByRoles);
@@ -79,10 +90,10 @@ namespace ShowModel
             // as they need to be null for the other Requirement concrete types.
             modelBuilder.Entity<AgeRequirement>();
             modelBuilder.Entity<GenderRequirement>();
-            modelBuilder.Entity<CastGroupRequirement>()
-                .HasOne(cgr => cgr.RequiredGroup)
+            modelBuilder.Entity<TagRequirement>()
+                .HasOne(cgr => cgr.RequiredTag)
                 .WithMany()
-                .HasForeignKey(nameof(CastGroupRequirement.RequiredGroupId));
+                .HasForeignKey(nameof(TagRequirement.RequiredTagId));
             modelBuilder.Entity<AbilityExactRequirement>()
                 .CommonProperty(nameof(AbilityExactRequirement.Criteria.CriteriaId));
             modelBuilder.Entity<AbilityRangeRequirement>()

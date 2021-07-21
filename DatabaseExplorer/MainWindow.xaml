@@ -14,6 +14,8 @@
     <Window.Resources>
         <CollectionViewSource x:Key="applicantsViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
+        <CollectionViewSource x:Key="alternativeCastsViewSource"/>
+        <CollectionViewSource x:Key="tagsViewSource"/>
         <CollectionViewSource x:Key="rootNodesViewSource"/>
         <CollectionViewSource x:Key="itemsViewSource"/>
         <CollectionViewSource x:Key="criteriaViewSource"/>
@@ -37,7 +39,7 @@
         <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
-        <DataTemplate DataType="{x:Type modelApplicants:CastGroup}">
+        <DataTemplate DataType="{x:Type modelApplicants:Tag}">
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type modelStructure:Item}">
@@ -222,9 +224,9 @@
             </TabItem>
             <TabItem Header="Applicants">
                 <DockPanel>
-                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="130" SelectedItems="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.CastGroups}"
-                                                     AvailableItems="{Binding Source={StaticResource castGroupsViewSource}}"
-                                                     Title="Cast Groups:" Margin="5"/>
+                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="130" SelectedItems="{Binding ElementName=applicantsDataGrid, Path=SelectedItem.Tags}"
+                                                     AvailableItems="{Binding Source={StaticResource tagsViewSource}}"
+                                                     Title="Tags:" Margin="5"/>
                     <Grid DockPanel.Dock="Bottom" MaxHeight="120">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -272,6 +274,9 @@
                                 </DataGridTemplateColumn.CellEditingTemplate>
                             </DataGridTemplateColumn>
                             <DataGridComboBoxColumn SelectedItemBinding="{Binding Photo}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Photo" DisplayMemberPath="Name"/>
+                            <DataGridComboBoxColumn SelectedItemBinding="{Binding CastGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" Header="Cast Group" DisplayMemberPath="Name"/>
+                            <DataGridTextColumn Binding="{Binding CastNumber}" Header="Cast Number"/>
+                            <DataGridComboBoxColumn SelectedItemBinding="{Binding AlternativeCast}" ItemsSource="{Binding Source={StaticResource alternativeCastsViewSource}}" Header="Alt. Cast" DisplayMemberPath="Name"/>
                             <DataGridTextColumn Binding="{Binding Notes}" Header="Notes" Width="*"/>
                         </DataGrid.Columns>
                     </DataGrid>
@@ -423,14 +428,14 @@
                                     <ComboBox Grid.Column="1" SelectedIndex="{Binding RequiredValue}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}"/>
                                 </Grid>
                             </DataTemplate>
-                            <DataTemplate DataType="{x:Type modelRequirements:CastGroupRequirement}">
+                            <DataTemplate DataType="{x:Type modelRequirements:TagRequirement}">
                                 <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="Auto"></ColumnDefinition>
                                         <ColumnDefinition Width="*"></ColumnDefinition>
                                     </Grid.ColumnDefinitions>
-                                    <Label Content="Required Cast Group:" Grid.Column="0"/>
-                                    <ComboBox Grid.Column="1" SelectedItem="{Binding RequiredGroup}" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}"/>
+                                    <Label Content="Required Tag:" Grid.Column="0"/>
+                                    <ComboBox Grid.Column="1" SelectedItem="{Binding RequiredTag}" ItemsSource="{Binding Source={StaticResource tagsViewSource}}"/>
                                 </Grid>
                             </DataTemplate>
                             <DataTemplate DataType="{x:Type modelRequirements:NotRequirement}">

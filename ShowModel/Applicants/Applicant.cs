@@ -13,18 +13,27 @@ namespace ShowModel.Applicants
     /// </summary>
     public class Applicant : IValidatable
     {
-        #region Database fields
+        #region Database fields (registering)
         [Key]
         public int ApplicantId { get; private set; }
         public string FirstName { get; set; } = "";
         public string LastName { get; set; } = "";
         public Gender? Gender { get; set; }
         public DateTime? DateOfBirth { get; set; }
-        public virtual Image? Photo { get; set; }
-        public string Notes { get; set; } = "";
-        public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
-        public virtual ICollection<CastGroup> CastGroups { get; private set; } = new ObservableCollection<CastGroup>();
         public virtual ICollection<Identity> Identities { get; private set; } = new ObservableCollection<Identity>();
+        #endregion
+
+        #region Database fields (auditioning)
+        public virtual Image? Photo { get; set; }
+        public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
+        public string Notes { get; set; } = "";
+        #endregion
+
+        #region Database fields (selection & casting)
+        public virtual CastGroup? CastGroup { get; set; }
+        public int? CastNumber { get; set; }
+        public virtual AlternativeCast? AlternativeCast { get; set; }
+        public virtual ICollection<Tag> Tags { get; private set; } = new ObservableCollection<Tag>();
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
 
@@ -47,8 +56,8 @@ namespace ShowModel.Applicants
             => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark ?? 0;
 
         /// <summary>Determines if an Applicant has been accepted into the cast.
-        /// This is determined by membership in a CastGroup with Primary set to true.</summary>
-        public bool IsAccepted() => CastGroups.Any(g => g.Primary);
+        /// This is determined by membership in a CastGroup.</summary>
+        public bool IsAccepted() => CastGroup != null;
 
         /// <summary>Checks that names are not blank, gender and date of birth are set, and all criteria have marks within range.</summary>
         public IEnumerable<string> Validate()

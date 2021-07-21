@@ -5,6 +5,7 @@ using ShowModel.Requirements;
 using ShowModel.Structure;
 using NUnit.Framework;
 using System.Linq;
+using ShowModel.Applicants;
 
 namespace UnitTests.Database
 {
@@ -20,19 +21,20 @@ namespace UnitTests.Database
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
             using var test_data = new TestDataGenerator(context, 0);
-            test_data.AddPrimaryCastGroups(4);
+            test_data.AddCastGroups(4);
             context.SaveChanges();
+            test_data.AddAlternativeCasts(); // after cast groups committed
             test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false); // after cast groups committed
             context.SaveChanges();
             test_data.AddCriteriaAndRequirements(); // after cast groups committed
             context.SaveChanges();
             test_data.AddIdentifiers(); // after requirements committed
-            test_data.AddSecondaryCastGroups(1); // after requirements committed
+            test_data.AddTags(1); // after requirements committed
             context.SaveChanges();
-            test_data.AddApplicants(100); // after criteria committed
+            test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
             context.SaveChanges();
             test_data.AddRoles(5); // after items, cast groups, requirements committed
-            test_data.AddImages(); // after applicants, cast groups committed
+            test_data.AddImages(); // after applicants, cast groups, tags committed
             context.SaveChanges();
         }
 
@@ -75,14 +77,38 @@ namespace UnitTests.Database
         }
 
         [Test]
-        public void Applicant_CastGroup_ManyToMany()
+        public void Applicant_CastGroup_ManyToOne()
         {
             using var context = new ShowContext(contextOptions);
             var applicant = context.Applicants.First();
             applicant.ApplicantId.Should().NotBe(0);
-            var group = applicant.CastGroups.First();
-            group.CastGroupId.Should().NotBe(0);
+            var group = applicant.CastGroup;
+            group.Should().NotBeNull();
+            group!.CastGroupId.Should().NotBe(0);
             group.Members.Should().Contain(applicant);
+        }
+
+        [Test]
+        public void Applicant_AlternativeCast_ManyToOne()
+        {
+            using var context = new ShowContext(contextOptions);
+            var applicant = context.Applicants.ToList().First(a => a.CastGroup?.AlternativeCasts.Any() == true);
+            applicant.ApplicantId.Should().NotBe(0);
+            var alternative_cast = applicant.AlternativeCast;
+            alternative_cast.Should().NotBeNull();
+            alternative_cast!.AlternativeCastId.Should().NotBe(0);
+            alternative_cast.Members.Should().Contain(applicant);
+        }
+
+        [Test]
+        public void Applicant_Tag_ManyToMany()
+        {
+            using var context = new ShowContext(contextOptions);
+            var applicant = context.Applicants.First();
+            applicant.ApplicantId.Should().NotBe(0);
+            var tag = applicant.Tags.First();
+            tag.TagId.Should().NotBe(0);
+            tag.Members.Should().Contain(applicant);
         }
 
         [Test]
@@ -118,6 +144,17 @@ namespace UnitTests.Database
             identifier.IdentifierId.Should().NotBe(0);
             // Reverse navigation not defined
         }
+
+        [Test]
+        public void AlternativeCast_CastGroup_ManyToMany()
+        {
+            using var context = new ShowContext(contextOptions);
+            var alternative_cast = context.AlternativeCasts.First();
+            alternative_cast.AlternativeCastId.Should().NotBe(0);
+            var group = alternative_cast.CastGroups.First();
+            group.CastGroupId.Should().NotBe(0);
+            group.AlternativeCasts.Should().Contain(alternative_cast);
+        }
         #endregion
 
         #region Criterias
@@ -149,11 +186,22 @@ namespace UnitTests.Database
         public void Requirement_CastGroup_ManyToMany()
         {
             using var context = new ShowContext(contextOptions);
-            var group = context.CastGroups.Where(g => !g.Primary).First();
+            var group = context.CastGroups.First(g => g.Requirements.Any());
             group.CastGroupId.Should().NotBe(0);
             var req = group.Requirements.First();
             req.RequirementId.Should().NotBe(0);
             req.UsedByCastGroups.Should().Contain(group);
+        }
+
+        [Test]
+        public void Requirement_Tag_ManyToMany()
+        {
+            using var context = new ShowContext(contextOptions);
+            var tag = context.Tags.First(t => t.Requirements.Any());
+            tag.TagId.Should().NotBe(0);
+            var req = tag.Requirements.First();
+            req.RequirementId.Should().NotBe(0);
+            req.UsedByTags.Should().Contain(tag);
         }
 
         [Test]
@@ -181,13 +229,13 @@ namespace UnitTests.Database
         }
 
         [Test]
-        public void CastGroupRequirement_CastGroup_ManyToOne()
+        public void TagRequirement_Tag_ManyToOne()
         {
             using var context = new ShowContext(contextOptions);
-            var req = context.Requirements.OfType<CastGroupRequirement>().First();
+            var req = context.Requirements.OfType<TagRequirement>().First();
             req.RequirementId.Should().NotBe(0);
-            var group = req.RequiredGroup;
-            group.CastGroupId.Should().NotBe(0);
+            var tag = req.RequiredTag;
+            tag.TagId.Should().NotBe(0);
             // Reverse navigation not defined
         }
 
@@ -289,6 +337,16 @@ namespace UnitTests.Database
             using var context = new ShowContext(contextOptions);
             var role = context.ShowRoot.ItemsInOrder().First().Roles.First();
             var cbg = role.CountByGroups.First();
+            cbg.CastGroup.Should().NotBeNull();
+            // Reverse navigation not defined
+        }
+
+        [Test]
+        public void Tag_CountByGroup_OneToMany()
+        {
+            using var context = new ShowContext(contextOptions);
+            var tag = context.Tags.First(t => t.CountByGroups.Any());
+            var cbg = tag.CountByGroups.First();
             cbg.CastGroup.Should().NotBeNull();
             // Reverse navigation not defined
         }
