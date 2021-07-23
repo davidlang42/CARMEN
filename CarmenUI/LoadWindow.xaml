@@ -1,0 +1,58 @@
+﻿<Window x:Class="CarmenUI.LoadDatabase"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CarmenUI"
+        mc:Ignorable="d"
+        Title="Load Casting Database..." Height="440" Width="500" ResizeMode="NoResize" WindowStartupLocation="CenterScreen" Topmost="True">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <TextBlock Grid.Row="0" FontSize="84" HorizontalAlignment="Center">
+            C.A.R.M.E.N.
+        </TextBlock>
+        <TextBlock Grid.Row="1" FontSize="20" HorizontalAlignment="Center">
+            Casting And Role Management Equality Network
+        </TextBlock>
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Width="100" Height="100">
+                <StackPanel>
+                    <Image Source="Icons/NewFile_16x.png" Width="32"/>
+                    <TextBlock HorizontalAlignment="Center">New</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="1" Width="100" Height="100">
+                <StackPanel>
+                    <Image Source="Icons/OpenFile_16x.png" Width="32"/>
+                    <TextBlock HorizontalAlignment="Center">Open</TextBlock>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2" Width="100" Height="100">
+                <StackPanel>
+                    <Image Source="Icons/Database_16x.png" Width="32"/>
+                    <TextBlock HorizontalAlignment="Center">Connect</TextBlock>
+                </StackPanel>
+            </Button>
+        </Grid>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0" Content="Recent" Width="100" Height="100"/>
+            <Button Grid.Column="1" Content="Recent" Width="100" Height="100"/>
+            <Button Grid.Column="2" Content="Recent" Width="100" Height="100"/>
+        </Grid>
+    </Grid>
+</Window>
