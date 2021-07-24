@@ -17,6 +17,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Resource Include="Icons\NewFile_16x.png" />
+    <Resource Include="Icons\OpenFile_16x.png" />
+    <Resource Include="Icons\Database_16x.png" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>

@@ -23,7 +23,7 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class StartWindow : Window
     {
-        const int MAX_RECENT_SHOWS = 5;
+        const int MAX_RECENT_SHOWS = 4;
 
         public StartWindow()
         {
