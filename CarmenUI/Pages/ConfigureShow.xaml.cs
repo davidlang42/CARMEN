@@ -24,5 +24,35 @@ namespace CarmenUI.Pages
         {
             InitializeComponent();
         }
+
+        private void Criteria_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void CastGroups_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Tags_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void SectionTypes_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Requirements_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Import_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
