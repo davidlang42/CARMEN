@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.Sqlite;
+﻿using CarmenUI.ViewModels;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using ShowModel;
@@ -42,16 +43,18 @@ namespace CarmenUI.Windows
             };
             if (dialog.ShowDialog() == true)
             {
-                var connection = FileConnection(dialog.FileName);
+                var show = RecentShow.FromLocalFile(dialog.FileName);
+                var options = show.CreateOptions();
                 //TODO show loading screen before main window (use using)
-                using (var context = new ShowContext(connection))
+                using (var context = new ShowContext(options))
                 {
                     context.Database.EnsureDeleted();
                     context.Database.EnsureCreated();//TODO handle io errors
                     context.ShowRoot.Name = System.IO.Path.GetFileNameWithoutExtension(dialog.FileName);
                     context.SaveChanges();
                 }
-                LaunchMainWindow(connection);
+                AddToRecentList(show);
+                LaunchMainWindow(options);
             }
         }
 
@@ -64,32 +67,31 @@ namespace CarmenUI.Windows
             };
             if (dialog.ShowDialog() == true)
             {
-                var connection = FileConnection(dialog.FileName);
+                var show = RecentShow.FromLocalFile(dialog.FileName);
+                var options = show.CreateOptions();
                 //TODO show loading screen before main window (use using)
-                using (var context = new ShowContext(connection))
+                using (var context = new ShowContext(options))
                 {
                     //TODO handle io errors
                     //TODO ensure that db matches schema
                 }
-                LaunchMainWindow(connection);
+                AddToRecentList(show);
+                LaunchMainWindow(options);
             }
         }
 
-        private ShowConnection FileConnection(string filename)
-            => new ShowConnection
-            {
-                ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString(),
-                Label = System.IO.Path.GetFileName(filename)
-            };
-
-        private void LaunchMainWindow(ShowConnection connection)
+        private void AddToRecentList(RecentShow show)
         {
             var recent = Properties.Settings.Default.RecentShows;
-            recent.Remove(connection);
-            recent.Insert(0, connection);
+            recent.Remove(show);
+            recent.Insert(0, show);
             while (recent.Count > MAX_RECENT_SHOWS)
                 recent.RemoveAt(recent.Count - 1);
-            var main = new MainWindow(connection);
+        }
+
+        private void LaunchMainWindow(DbContextOptions<ShowContext> options)
+        {
+            var main = new MainWindow(options);
             main.Show();
             this.Close();
         }

@@ -26,9 +26,6 @@ namespace ShowModel
         /// <summary>The root node of the show structure</summary>
         public ShowRoot ShowRoot => Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;//TODO this doesn't work
 
-        public ShowContext(ShowConnection connection) : base(connection.CreateOptions())
-        { }
-
         public ShowContext(DbContextOptions<ShowContext> context_options) : base(context_options)
         { }
 

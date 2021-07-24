@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarmenUI"
-        xmlns:model="clr-namespace:ShowModel;assembly=ShowModel"
+        xmlns:vm="clr-namespace:CarmenUI.ViewModels"
         mc:Ignorable="d"
         Title="CARMEN: Show Selection" Height="440" Width="500" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
     <Grid>
@@ -47,9 +47,9 @@
         </Grid>
         <ListBox Grid.Row="3" ItemsSource="{local:SettingBinding RecentShows}" Margin="20" BorderThickness="0">
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type model:ShowConnection}">
+                <DataTemplate DataType="{x:Type vm:RecentShow}">
                     <StackPanel Orientation="Horizontal">
-                        <Image Source="/Icons/Database_16x.png" Width="16"/>
+                        <Image Source="{Binding IconPath}" Width="16"/>
                         <TextBlock Text="{Binding Label}"/>
                     </StackPanel>
                 </DataTemplate>

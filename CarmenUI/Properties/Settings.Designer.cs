@@ -92,9 +92,9 @@ namespace CarmenUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<ShowModel.ShowConnection> RecentShows {
+        public global::System.Collections.Generic.List<CarmenUI.ViewModels.RecentShow> RecentShows {
             get {
-                return ((global::System.Collections.Generic.List<ShowModel.ShowConnection>)(this["RecentShows"]));
+                return ((global::System.Collections.Generic.List<CarmenUI.ViewModels.RecentShow>)(this["RecentShows"]));
             }
             set {
                 this["RecentShows"] = value;
