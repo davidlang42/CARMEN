@@ -20,5 +20,8 @@
     <Setting Name="WindowState" Type="System.Windows.WindowState" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="RecentShows" Type="System.Collections.Generic.List&lt;ShowModel.ShowConnection&gt;" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -26,10 +26,10 @@ namespace CarmenUI.Windows
     {
         ShowContext context;
 
-        public MainWindow(DbContextOptions<ShowContext> connection_options)
+        public MainWindow(ShowConnection connection)
         {
             InitializeComponent();
-            context = new ShowContext(connection_options);
+            context = new ShowContext(connection);
             Title = $"CARMEN: {context.ShowRoot.Name}"; //TODO should be bound: Title="{MultiBinding StringFormat='CARMEN: {0}', Bindings={Binding Name}}"
         }
 

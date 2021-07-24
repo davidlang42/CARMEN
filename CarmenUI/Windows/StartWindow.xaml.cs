@@ -23,6 +23,8 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class StartWindow : Window
     {
+        const int MAX_RECENT_SHOWS = 5;
+
         public StartWindow()
         {
             InitializeComponent();
@@ -41,7 +43,7 @@ namespace CarmenUI.Windows
             if (dialog.ShowDialog() == true)
             {
                 var connection = FileConnection(dialog.FileName);
-                //TODO show loading screen before main window
+                //TODO show loading screen before main window (use using)
                 using (var context = new ShowContext(connection))
                 {
                     context.Database.EnsureDeleted();
@@ -63,6 +65,7 @@ namespace CarmenUI.Windows
             if (dialog.ShowDialog() == true)
             {
                 var connection = FileConnection(dialog.FileName);
+                //TODO show loading screen before main window (use using)
                 using (var context = new ShowContext(connection))
                 {
                     //TODO handle io errors
@@ -72,15 +75,21 @@ namespace CarmenUI.Windows
             }
         }
 
-        private DbContextOptions<ShowContext> FileConnection(string filename)
-        {
-            var connection_string = new SqliteConnectionStringBuilder { DataSource = filename }.ToString();
-            return new DbContextOptionsBuilder<ShowContext>().UseSqlite(connection_string).Options;
-        }
+        private ShowConnection FileConnection(string filename)
+            => new ShowConnection
+            {
+                ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString(),
+                Label = System.IO.Path.GetFileName(filename)
+            };
 
-        private void LaunchMainWindow(DbContextOptions<ShowContext> connection_options)
+        private void LaunchMainWindow(ShowConnection connection)
         {
-            var main = new MainWindow(connection_options);
+            var recent = Properties.Settings.Default.RecentShows;
+            recent.Remove(connection);
+            recent.Insert(0, connection);
+            while (recent.Count > MAX_RECENT_SHOWS)
+                recent.RemoveAt(recent.Count - 1);
+            var main = new MainWindow(connection);
             main.Show();
             this.Close();
         }

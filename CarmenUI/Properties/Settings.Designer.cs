@@ -89,5 +89,16 @@ namespace CarmenUI.Properties {
                 this["WindowState"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Generic.List<ShowModel.ShowConnection> RecentShows {
+            get {
+                return ((global::System.Collections.Generic.List<ShowModel.ShowConnection>)(this["RecentShows"]));
+            }
+            set {
+                this["RecentShows"] = value;
+            }
+        }
     }
 }

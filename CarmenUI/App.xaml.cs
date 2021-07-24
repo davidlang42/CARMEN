@@ -1,5 +1,7 @@
-﻿using System;
+﻿using ShowModel;
+using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Linq;
@@ -33,6 +35,7 @@ namespace CarmenUI
             settings.Left = (SystemParameters.PrimaryScreenWidth - settings.Width) / 2;
             settings.Top = (SystemParameters.PrimaryScreenHeight - settings.Height) / 2;
             settings.WindowState = WindowState.Normal;
+            settings.RecentShows = new List<ShowConnection>();
         }
     }
 }
