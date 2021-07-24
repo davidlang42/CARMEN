@@ -24,6 +24,7 @@
     <Resource Include="Icons\Cancel_grey_16x.png" />
     <Resource Include="Icons\Checkmark_16x.png" />
     <Resource Include="Icons\Checkmark_blue_16x.png" />
+    <Resource Include="Icons\Ellipsis_bold_16x.png" />
   </ItemGroup>
 
   <ItemGroup>

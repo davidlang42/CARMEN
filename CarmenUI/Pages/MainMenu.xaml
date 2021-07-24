@@ -9,7 +9,7 @@
       Title="Main Menu">
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="400"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -20,28 +20,47 @@
             <TextBlock Text="Show Name" HorizontalAlignment="Center" FontSize="48"/>
             <TextBlock Text="opening 1st July 2021" HorizontalAlignment="Center" FontSize="20" FontStyle="Italic"/>
         </StackPanel>
-        <StackPanel x:Name="ProcessList" Grid.Row="1" Grid.Column="0" Background="AliceBlue" Margin="20" VerticalAlignment="Center">
+        <StackPanel Grid.Row="1" Grid.Column="0" Margin="20" VerticalAlignment="Bottom">
             <ListViewItem x:Name="ConfigureShow" MouseUp="ConfigureShow_MouseUp" MouseEnter="ConfigureShow_MouseEnter">
-                <TextBlock Text="Configuring Show" HorizontalAlignment="Left" FontSize="20"/>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Checkmark_16x.png" Width="20" Height="20" Margin="2 0"/>
+                    <TextBlock Text="Configuring Show" HorizontalAlignment="Left" FontSize="20" Margin="2 0"/>
+                </StackPanel>
             </ListViewItem>
             <ListViewItem x:Name="RegisterApplicants" MouseUp="RegisterApplicants_MouseUp" MouseEnter="RegisterApplicants_MouseEnter">
-                <TextBlock Text="Registering Applicants" HorizontalAlignment="Left" FontSize="20"/>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Ellipsis_bold_16x.png" Width="20" Height="20" Margin="2 0"/>
+                    <TextBlock Text="Registering Applicants" HorizontalAlignment="Left" FontSize="20"/>
+                </StackPanel>
             </ListViewItem>
             <ListViewItem x:Name="AuditionApplicants" MouseUp="AuditionApplicants_MouseUp" MouseEnter="AuditionApplicants_MouseEnter">
-                <TextBlock Text="Auditioning" HorizontalAlignment="Left" FontSize="20"/>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Ellipsis_bold_16x.png" Width="20" Height="20" Margin="2 0"/>
+                    <TextBlock Text="Auditioning" HorizontalAlignment="Left" FontSize="20"/>
+                </StackPanel>
             </ListViewItem>
             <ListViewItem x:Name="SelectCast" MouseUp="SelectCast_MouseUp" MouseEnter="SelectCast_MouseEnter">
-                <TextBlock Text="Selecting Cast" HorizontalAlignment="Left" FontSize="20"/>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Cancel_16x.png" Width="20" Height="20" Margin="2 0"/>
+                    <TextBlock Text="Selecting Cast" HorizontalAlignment="Left" FontSize="20"/>
+                </StackPanel>
             </ListViewItem>
             <ListViewItem x:Name="ConfigureItems" MouseUp="ConfigureItems_MouseUp" MouseEnter="ConfigureItems_MouseEnter">
-                <TextBlock Text="Configuring Items" HorizontalAlignment="Left" FontSize="20"/>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Checkmark_16x.png" Width="20" Height="20" Margin="2 0"/>
+                    <TextBlock Text="Configuring Items" HorizontalAlignment="Left" FontSize="20"/>
+                </StackPanel>
             </ListViewItem>
             <ListViewItem x:Name="AllocateRoles" MouseUp="AllocateRoles_MouseUp" MouseEnter="AllocateRoles_MouseEnter">
-                <TextBlock Text="Allocating Roles" HorizontalAlignment="Left" FontSize="20"/>
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Checkmark_16x.png" Width="20" Height="20" Margin="2 0"/>
+                    <TextBlock Text="Allocating Roles" HorizontalAlignment="Left" FontSize="20"/>
+                </StackPanel>
             </ListViewItem>
-            <ListViewItem>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Image Height="20" Margin="2 0"/>
                 <TextBlock Text="IT'S SHOWTIME" HorizontalAlignment="Left" FontStyle="Italic" FontSize="20"/>
-            </ListViewItem>
+            </StackPanel>
         </StackPanel>
         <Image Grid.Row="0" Grid.Column="1" Source="/Icons/Database_16x.png"/>
         <StackPanel Grid.Row="1" Grid.Column="1" x:Name="SummaryPanel" Background="AliceBlue" Margin="20" VerticalAlignment="Center">
