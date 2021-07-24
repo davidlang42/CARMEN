@@ -48,25 +48,24 @@ namespace CarmenUI.ViewModels
                 _ => throw new NotImplementedException($"Database provider {Provider} not implemented.") //TODO test & handle other DB providers
             };
 
-        //TODO are these needed?
-        //public override bool Equals(object? obj)
-        //{
-        //    if (obj is not ShowConnection other)
-        //        return false;
-        //    if (this.Provider != other.Provider)
-        //        return false;
-        //    if (this.ConnectionString != other.ConnectionString)
-        //        return false;
-        //    // Label does not determine equality
-        //    return true;
-        //}
+        public override bool Equals(object? obj)
+        {
+            if (obj is not RecentShow other)
+                return false;
+            if (this.Provider != other.Provider)
+                return false;
+            if (this.ConnectionString != other.ConnectionString)
+                return false;
+            // Label & LastOpened don't matter
+            return true;
+        }
 
-        //public override int GetHashCode()
-        //{
-        //    var hc = ConnectionString.GetHashCode();
-        //    if (Provider != null)
-        //        hc ^= Provider.GetHashCode();
-        //    return hc;
-        //}
+        public override int GetHashCode()
+        {
+            var hc = ConnectionString.GetHashCode();
+            if (Provider != null)
+                hc ^= Provider.GetHashCode();
+            return hc;
+        }
     }
 }
