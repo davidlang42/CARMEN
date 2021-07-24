@@ -24,7 +24,7 @@ namespace ShowModel
         #endregion
 
         /// <summary>The root node of the show structure</summary>
-        public ShowRoot ShowRoot => Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;
+        public ShowRoot ShowRoot => Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;//TODO this doesn't work
 
         public ShowContext(DbContextOptions<ShowContext> options) : base(options)
         { }

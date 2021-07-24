@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using ShowModel;
+using ShowModel.Structure;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,22 +17,31 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace CarmenUI
+namespace CarmenUI.Windows
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainWindow : Window
     {
-        public MainWindow()
+        ShowContext context;
+
+        public MainWindow(DbContextOptions<ShowContext> connection_options)
         {
             InitializeComponent();
+            context = new ShowContext(connection_options);
+            Title = $"CARMEN: {context.ShowRoot.Name}"; //TODO should be bound: Title="{MultiBinding StringFormat='CARMEN: {0}', Bindings={Binding Name}}"
+        }
+
+        protected override void OnClosing(CancelEventArgs e)
+        {
+            context.Dispose();
+            base.OnClosing(e);
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            var x = new LoadDatabase();
-            x.ShowDialog();
+            //TODO
         }
     }
 }
