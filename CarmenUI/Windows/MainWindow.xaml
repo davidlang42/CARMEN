@@ -11,5 +11,5 @@
         Width="{local:SettingBinding Width}"
         WindowState="{local:SettingBinding WindowState}" Loaded="Window_Loaded"
         MinHeight="600" MinWidth="800">
-    <Frame Source="/Pages/MainMenu.xaml"/>
+    <Frame Source="/Pages/MainMenu.xaml" NavigationUIVisibility="Hidden"/>
 </Window>

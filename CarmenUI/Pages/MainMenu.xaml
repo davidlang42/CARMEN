@@ -20,19 +20,31 @@
             <TextBlock Text="Show Name" HorizontalAlignment="Center" FontSize="48"/>
             <TextBlock Text="opening 1st July 2021" HorizontalAlignment="Center" FontSize="20" FontStyle="Italic"/>
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="0" Background="AliceBlue" Margin="20" VerticalAlignment="Center">
-            <TextBlock Text="Step in process" HorizontalAlignment="Left" FontSize="20"/>
-            <TextBlock Text="Step in process" HorizontalAlignment="Left" FontSize="20"/>
-            <TextBlock Text="Step in process" HorizontalAlignment="Left" FontSize="20"/>
-            <TextBlock Text="Step in process" HorizontalAlignment="Left" FontSize="20"/>
-            <TextBlock Text="Step in process" HorizontalAlignment="Left" FontSize="20"/>
-            <TextBlock Text="Step in process" HorizontalAlignment="Left" FontSize="20"/>
-            <TextBlock Text="Step in process" HorizontalAlignment="Left" FontSize="20"/>
-            <TextBlock Text="Step in process" HorizontalAlignment="Left" FontSize="20"/>
-            <TextBlock Text="Step in process" HorizontalAlignment="Left" FontSize="20"/>
-        </StackPanel>
+        <ListBox Grid.Row="1" Grid.Column="0" Background="AliceBlue" Margin="20" VerticalAlignment="Center" BorderThickness="0">
+            <ListBoxItem x:Name="ConfigureShow" Selected="ConfigureShow_Selected" MouseEnter="ConfigureShow_MouseEnter">
+                <TextBlock Text="Conifguring Show" HorizontalAlignment="Left" FontSize="20"/>
+            </ListBoxItem>
+            <ListBoxItem x:Name="RegisterApplicants" Selected="RegisterApplicants_Selected" MouseEnter="RegisterApplicants_MouseEnter">
+                <TextBlock Text="Registering Applicants" HorizontalAlignment="Left" FontSize="20"/>
+            </ListBoxItem>
+            <ListBoxItem x:Name="AuditionApplicants" Selected="AuditionApplicants_Selected" MouseEnter="AuditionApplicants_MouseEnter">
+                <TextBlock Text="Auditioning" HorizontalAlignment="Left" FontSize="20"/>
+            </ListBoxItem>
+            <ListBoxItem x:Name="SelectCast" Selected="SelectCast_Selected" MouseEnter="SelectCast_MouseEnter">
+                <TextBlock Text="Selecting Cast" HorizontalAlignment="Left" FontSize="20"/>
+            </ListBoxItem>
+            <ListBoxItem x:Name="ConfigureItems" Selected="ConfigureItems_Selected" MouseEnter="ConfigureItems_MouseEnter">
+                <TextBlock Text="Configuring Items" HorizontalAlignment="Left" FontSize="20"/>
+            </ListBoxItem>
+            <ListBoxItem x:Name="AllocateRoles" Selected="AllocateRoles_Selected" MouseEnter="AllocateRoles_MouseEnter">
+                <TextBlock Text="Allocating Roles" HorizontalAlignment="Left" FontSize="20"/>
+            </ListBoxItem>
+            <ListBoxItem>
+                <TextBlock Text="IT'S SHOWTIME" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic"/>
+            </ListBoxItem>
+        </ListBox>
         <Image Grid.Row="0" Grid.Column="1" Source="/Icons/Database_16x.png"/>
-        <StackPanel Grid.Row="1" Grid.Column="1" Background="AliceBlue" Margin="20" VerticalAlignment="Center">
+        <StackPanel Grid.Row="1" Grid.Column="1" x:Name="SummaryPanel" Background="AliceBlue" Margin="20" VerticalAlignment="Center">
             <TextBlock Text="Summary goes here" HorizontalAlignment="Left" FontSize="20"/>
         </StackPanel>
     </Grid>
