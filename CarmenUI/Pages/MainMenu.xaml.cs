@@ -26,48 +26,63 @@ namespace CarmenUI.Pages
             InitializeComponent();
         }
 
-        private void ConfigureShow_Selected(object sender, RoutedEventArgs e)
-            => this.NavigationService.Navigate(new Uri("/Pages/ConfigureShow.xaml", UriKind.Relative));
+        /// <summary>Handles return events from sub-pages.
+        /// e==null for cancel, e.Result==true when context save is required, e.Result==false when no save is required</summary>
+        private void SaveOnReturn(object sender, ReturnEventArgs<bool> e)
+        {
+            if (e?.Result == true)
+                MessageBox.Show("Save required."); //TODO save context, probably with saving/loading dialog
+        }
+
+        private void NavigateAndSaveOnReturn<T>() where T : PageFunction<bool>, new()
+        {
+            var page_function = new T();
+            page_function.Return += SaveOnReturn;
+            this.NavigationService.Navigate(page_function);
+        }
+
+        private void ConfigureShow_MouseUp(object sender, MouseButtonEventArgs e)
+            => NavigateAndSaveOnReturn<ConfigureShow>();
+
+        private void AllocateRoles_MouseUp(object sender, MouseButtonEventArgs e)
+            => NavigateAndSaveOnReturn<AllocateRoles>();
+
+        private void ConfigureItems_MouseUp(object sender, MouseButtonEventArgs e)
+            => NavigateAndSaveOnReturn<ConfigureItems>();
+
+        private void SelectCast_MouseUp(object sender, MouseButtonEventArgs e)
+            => NavigateAndSaveOnReturn<SelectCast>();
+
+        private void AuditionApplicants_MouseUp(object sender, MouseButtonEventArgs e)
+            => NavigateAndSaveOnReturn<EditApplicants>();
+
+        private void RegisterApplicants_MouseUp(object sender, MouseButtonEventArgs e)
+            => NavigateAndSaveOnReturn<EditApplicants>();
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
         {
             UpdateSummaryPanel("Summary panel for configuring the show.");
         }
 
-        private void RegisterApplicants_Selected(object sender, RoutedEventArgs e)
-            => this.NavigationService.Navigate(new Uri("/Pages/Applicants.xaml", UriKind.Relative));
-
         private void RegisterApplicants_MouseEnter(object sender, MouseEventArgs e)
         {
             UpdateSummaryPanel("Summary panel for registering applicants.");
         }
-
-        private void AuditionApplicants_Selected(object sender, RoutedEventArgs e)
-            => this.NavigationService.Navigate(new Uri("/Pages/Applicants.xaml", UriKind.Relative));
 
         private void AuditionApplicants_MouseEnter(object sender, MouseEventArgs e)
         {
             UpdateSummaryPanel("Summary panel for auditioning applicants.");
         }
 
-        private void SelectCast_Selected(object sender, RoutedEventArgs e)
-            => this.NavigationService.Navigate(new Uri("/Pages/SelectCast.xaml", UriKind.Relative));
-
         private void SelectCast_MouseEnter(object sender, MouseEventArgs e)
         {
             UpdateSummaryPanel("Summary panel for selecting cast.");
         }
 
-        private void ConfigureItems_Selected(object sender, RoutedEventArgs e)
-            => this.NavigationService.Navigate(new Uri("/Pages/ConfigureItems.xaml", UriKind.Relative));
-
         private void ConfigureItems_MouseEnter(object sender, MouseEventArgs e)
         {
             UpdateSummaryPanel("Summary panel for configuring items and roles.");
         }
-
-        private void AllocateRoles_Selected(object sender, RoutedEventArgs e)
-            => this.NavigationService.Navigate(new Uri("/Pages/AllocateRoles.xaml", UriKind.Relative));
 
         private void AllocateRoles_MouseEnter(object sender, MouseEventArgs e)
         {

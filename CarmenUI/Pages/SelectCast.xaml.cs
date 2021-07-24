@@ -18,11 +18,21 @@ namespace CarmenUI.Pages
     /// <summary>
     /// Interaction logic for SelectCast.xaml
     /// </summary>
-    public partial class SelectCast : Page
+    public partial class SelectCast : PageFunction<bool>
     {
         public SelectCast()
         {
             InitializeComponent();
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(null);
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(new ReturnEventArgs<bool>(true));
         }
     }
 }

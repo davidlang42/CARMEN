@@ -16,9 +16,9 @@ using System.Windows.Shapes;
 namespace CarmenUI.Pages
 {
     /// <summary>
-    /// Interaction logic for ConfigureShow.xaml
+    /// Interaction logic for PageFunction1.xaml
     /// </summary>
-    public partial class ConfigureShow : Page
+    public partial class ConfigureShow : PageFunction<bool>
     {
         public ConfigureShow()
         {
@@ -53,6 +53,16 @@ namespace CarmenUI.Pages
         private void Import_Selected(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(null);
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(new ReturnEventArgs<bool>(true));
         }
     }
 }

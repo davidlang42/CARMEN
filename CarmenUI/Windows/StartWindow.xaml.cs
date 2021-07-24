@@ -54,7 +54,7 @@ namespace CarmenUI.Windows
                     context.SaveChanges();
                 }
                 AddToRecentList(show);
-                LaunchMainWindow(options);
+                LaunchMainWindow(options, show.Label);
             }
         }
 
@@ -72,7 +72,7 @@ namespace CarmenUI.Windows
                 //TODO show loading screen before main window (use using)
                 CheckIntegrity(options);
                 AddToRecentList(show);
-                LaunchMainWindow(options);
+                LaunchMainWindow(options, show.Label);
             }
         }
 
@@ -94,9 +94,9 @@ namespace CarmenUI.Windows
                 recent.RemoveAt(recent.Count - 1);
         }
 
-        private void LaunchMainWindow(DbContextOptions<ShowContext> options)
+        private void LaunchMainWindow(DbContextOptions<ShowContext> options, string label)
         {
-            var main = new MainWindow(options);
+            var main = new MainWindow(options, label);
             main.Show();
             this.Close();
         }
@@ -109,7 +109,7 @@ namespace CarmenUI.Windows
                 CheckIntegrity(options);
                 show.LastOpened = DateTime.Now;
                 AddToRecentList(show);
-                LaunchMainWindow(options);
+                LaunchMainWindow(options, show.Label);
             }
         }
     }

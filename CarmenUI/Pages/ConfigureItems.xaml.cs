@@ -18,11 +18,21 @@ namespace CarmenUI.Pages
     /// <summary>
     /// Interaction logic for ConfigureItems.xaml
     /// </summary>
-    public partial class ConfigureItems : Page
+    public partial class ConfigureItems : PageFunction<bool>
     {
         public ConfigureItems()
         {
             InitializeComponent();
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(null);
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(new ReturnEventArgs<bool>(true));
         }
     }
 }

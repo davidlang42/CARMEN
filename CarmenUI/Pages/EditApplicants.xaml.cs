@@ -16,13 +16,23 @@ using System.Windows.Shapes;
 namespace CarmenUI.Pages
 {
     /// <summary>
-    /// Interaction logic for Applicants.xaml
+    /// Interaction logic for EditApplicants.xaml
     /// </summary>
-    public partial class Applicants : Page
+    public partial class EditApplicants : PageFunction<bool>
     {
-        public Applicants()
+        public EditApplicants()
         {
             InitializeComponent();
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(null);
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(new ReturnEventArgs<bool>(true));
         }
     }
 }

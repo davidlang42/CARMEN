@@ -25,12 +25,13 @@ namespace CarmenUI.Windows
     public partial class MainWindow : Window
     {
         ShowContext context;
+        string connectionLabel;
 
-        public MainWindow(DbContextOptions<ShowContext> context_options)
+        public MainWindow(DbContextOptions<ShowContext> context_options, string connection_label)
         {
             InitializeComponent();
             context = new ShowContext(context_options);
-            Title = $"CARMEN: {context.ShowRoot.Name}"; //TODO should be bound: Title="{MultiBinding StringFormat='CARMEN: {0}', Bindings={Binding Name}}"
+            connectionLabel = connection_label;
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -39,9 +40,10 @@ namespace CarmenUI.Windows
             base.OnClosing(e);
         }
 
-        private void Window_Loaded(object sender, RoutedEventArgs e)
+        private void MainFrame_Navigated(object sender, NavigationEventArgs e)
         {
-            //TODO
+            if (e.Content is Page page)
+                Title = $"CARMEN: {page.Title} ({connectionLabel})";
         }
     }
 }

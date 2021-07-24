@@ -18,11 +18,21 @@ namespace CarmenUI.Pages
     /// <summary>
     /// Interaction logic for AllocateRoles.xaml
     /// </summary>
-    public partial class AllocateRoles : Page
+    public partial class AllocateRoles : PageFunction<bool>
     {
         public AllocateRoles()
         {
             InitializeComponent();
+        }
+
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(null);
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            OnReturn(new ReturnEventArgs<bool>(true));
         }
     }
 }
