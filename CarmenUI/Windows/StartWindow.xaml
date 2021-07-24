@@ -48,10 +48,17 @@
         <ListBox Grid.Row="3" ItemsSource="{local:SettingBinding RecentShows}" Margin="20" BorderThickness="0">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:RecentShow}">
-                    <StackPanel Orientation="Horizontal">
-                        <Image Source="{Binding IconPath}" Width="16"/>
-                        <TextBlock Text="{Binding Label}"/>
-                    </StackPanel>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="24"/>
+                            <ColumnDefinition Width="280"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Image HorizontalAlignment="Left" Source="{Binding IconPath}" Height="18"/>
+                        <TextBlock HorizontalAlignment="Stretch" Grid.Column="1" Text="{Binding Label}"/>
+                        <TextBlock HorizontalAlignment="Right" Grid.Column="2" Text="{Binding LastOpened, StringFormat='h:mmtt ddd dd MMM yyyy'}"/>
+
+                    </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
