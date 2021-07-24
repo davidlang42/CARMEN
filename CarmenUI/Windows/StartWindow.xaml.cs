@@ -70,13 +70,18 @@ namespace CarmenUI.Windows
                 var show = RecentShow.FromLocalFile(dialog.FileName);
                 var options = show.CreateOptions();
                 //TODO show loading screen before main window (use using)
-                using (var context = new ShowContext(options))
-                {
-                    //TODO handle io errors
-                    //TODO ensure that db matches schema
-                }
+                CheckIntegrity(options);
                 AddToRecentList(show);
                 LaunchMainWindow(options);
+            }
+        }
+
+        private void CheckIntegrity(DbContextOptions<ShowContext> options)
+        {
+            using (var context = new ShowContext(options))
+            {
+                //TODO handle io errors
+                //TODO ensure that db matches schema
             }
         }
 
@@ -94,6 +99,18 @@ namespace CarmenUI.Windows
             var main = new MainWindow(options);
             main.Show();
             this.Close();
+        }
+
+        private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if(e.AddedItems.Count > 0 && e.AddedItems[0] is RecentShow show)
+            {
+                var options = show.CreateOptions();
+                CheckIntegrity(options);
+                show.LastOpened = DateTime.Now;
+                AddToRecentList(show);
+                LaunchMainWindow(options);
+            }
         }
     }
 }

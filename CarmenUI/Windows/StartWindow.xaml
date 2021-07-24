@@ -45,7 +45,7 @@
                 </StackPanel>
             </Button>
         </Grid>
-        <ListBox Grid.Row="3" ItemsSource="{local:SettingBinding RecentShows}" Margin="20" BorderThickness="0">
+        <ListBox x:Name="RecentList" Grid.Row="3" ItemsSource="{local:SettingBinding RecentShows}" Margin="20" BorderThickness="0" SelectionChanged="RecentList_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:RecentShow}">
                     <Grid>
@@ -57,7 +57,6 @@
                         <Image HorizontalAlignment="Left" Source="{Binding IconPath}" Height="18"/>
                         <TextBlock HorizontalAlignment="Stretch" Grid.Column="1" Text="{Binding Label}"/>
                         <TextBlock HorizontalAlignment="Right" Grid.Column="2" Text="{Binding LastOpened, StringFormat='h:mmtt ddd dd MMM yyyy'}"/>
-
                     </Grid>
                 </DataTemplate>
             </ListBox.ItemTemplate>
