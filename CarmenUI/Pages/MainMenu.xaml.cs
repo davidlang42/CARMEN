@@ -60,48 +60,27 @@ namespace CarmenUI.Pages
             => NavigateAndSaveOnReturn<EditApplicants>();
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
-        {
-            UpdateSummaryPanel("Summary panel for configuring the show.");
-        }
+            => ShowOneChild(SummaryPanel, ConfigureShowSummary);
 
         private void RegisterApplicants_MouseEnter(object sender, MouseEventArgs e)
-        {
-            UpdateSummaryPanel("Summary panel for registering applicants.");
-        }
+            => ShowOneChild(SummaryPanel, RegisterApplicantsSummary);
 
         private void AuditionApplicants_MouseEnter(object sender, MouseEventArgs e)
-        {
-            UpdateSummaryPanel("Summary panel for auditioning applicants.");
-        }
+            => ShowOneChild(SummaryPanel, AuditionApplicantsSummary);
 
         private void SelectCast_MouseEnter(object sender, MouseEventArgs e)
-        {
-            UpdateSummaryPanel("Summary panel for selecting cast.");
-        }
+            => ShowOneChild(SummaryPanel, SelectCastSummary);
 
         private void ConfigureItems_MouseEnter(object sender, MouseEventArgs e)
-        {
-            UpdateSummaryPanel("Summary panel for configuring items and roles.");
-        }
+            => ShowOneChild(SummaryPanel, ConfigureItemsSummary);
 
         private void AllocateRoles_MouseEnter(object sender, MouseEventArgs e)
-        {
-            UpdateSummaryPanel("Summary panel for allocating roles.");
-        }
+            => ShowOneChild(SummaryPanel, AllocateRolesSummary);
 
-        private async void UpdateSummaryPanel(string text)
+        private void ShowOneChild(StackPanel panel, UIElement visible_child)
         {
-            SummaryPanel.Children.Clear();
-            SummaryPanel.Children.Add(new TextBlock
-            {
-                Text = "loading..."
-            });
-            await Task.Run(() => Thread.Sleep(2000));
-            SummaryPanel.Children.Clear();
-            SummaryPanel.Children.Add(new TextBlock
-            {
-                Text = text
-            });
+            foreach (UIElement child in panel.Children)
+                child.Visibility = child == visible_child ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 }
