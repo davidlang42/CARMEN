@@ -89,8 +89,14 @@ namespace CarmenUI.Pages
             UpdateSummaryPanel("Summary panel for allocating roles.");
         }
 
-        private void UpdateSummaryPanel(string text)
+        private async void UpdateSummaryPanel(string text)
         {
+            SummaryPanel.Children.Clear();
+            SummaryPanel.Children.Add(new TextBlock
+            {
+                Text = "loading..."
+            });
+            await Task.Run(() => Thread.Sleep(2000));
             SummaryPanel.Children.Clear();
             SummaryPanel.Children.Add(new TextBlock
             {
