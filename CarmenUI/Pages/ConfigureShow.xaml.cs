@@ -69,5 +69,10 @@ namespace CarmenUI.Pages
         {
 
         }
+
+        private void ResetToDefaultButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

@@ -82,10 +82,13 @@
                 </ListBoxItem>
             </ListBox>
         </DockPanel>
-        <StackPanel Grid.Column="2" Background="LightPink">
+        <StackPanel Grid.Column="2" Background="LightPink" Margin="5">
             <TextBlock Text="Edit object details here based on selected object type" TextWrapping="Wrap"/>
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Button Grid.Row="1" x:Name="ResetToDefaultButton" Width="200" Height="35" Margin="5" Click="ResetToDefaultButton_Click" HorizontalAlignment="Left">
+            <TextBlock Text="Reset to default configuration" Margin="2 0"/>
+        </Button>
+        <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="CancelButton" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/Cancel_grey_16x.png" Width="16" Margin="2 0"/>
