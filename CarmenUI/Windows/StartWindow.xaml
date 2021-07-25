@@ -48,10 +48,10 @@
         <ListBox x:Name="RecentList" Grid.Row="3" ItemsSource="{local:SettingBinding RecentShows}" Margin="20" BorderThickness="0" SelectionChanged="RecentList_SelectionChanged">
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:RecentShow}">
-                    <Grid>
+                    <Grid ToolTip="{Binding ConnectionString}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="24"/>
-                            <ColumnDefinition Width="280"/>
+                            <ColumnDefinition Width="270"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Image HorizontalAlignment="Left" Source="{Binding IconPath}" Height="18"/>
