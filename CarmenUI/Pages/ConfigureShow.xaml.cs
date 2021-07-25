@@ -64,5 +64,10 @@ namespace CarmenUI.Pages
         {
             OnReturn(new ReturnEventArgs<bool>(true));
         }
+
+        private void AlternativeCasts_Selected(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
