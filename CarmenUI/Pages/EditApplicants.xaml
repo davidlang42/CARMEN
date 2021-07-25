@@ -11,12 +11,179 @@
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Edit Applicants">
     <Grid Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="1*" MinWidth="200" MaxWidth="350"/>
+            <ColumnDefinition Width="3*"/>
+        </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+        <DockPanel Grid.RowSpan="2">
+            <Grid DockPanel.Dock="Top" Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Filter: "/>
+                <TextBox x:Name="FilterTextBox" Grid.Column="1"/>
+            </Grid>
+            <Grid DockPanel.Dock="Top" Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Group by: "/>
+                <ComboBox x:Name="GroupComboBox" Grid.Column="1"/>
+            </Grid>
+            <Button DockPanel.Dock="Bottom" x:Name="ImportApplicants" Content="Import Applicants" Margin="5" Click="ImportApplicants_Click"/>
+            <Button DockPanel.Dock="Bottom" x:Name="AddApplicant" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click"/>
+            <TreeView x:Name="ApplicantTree" Margin="5"/>
+        </DockPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5">
+            <TextBlock Text="Audition Groups" FontSize="16"/>
+            <TextBlock Text=" &gt; " FontSize="16"/>
+            <TextBlock Text="Audition Group 1" FontSize="16"/>
+            <TextBlock Text=" &gt; " FontSize="16"/>
+            <TextBlock Text="Smith, John" FontSize="16"/>
+        </StackPanel>
+        <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.ColumnSpan="2" Text="Smith, John" FontSize="28"/>
+                        <TextBlock Grid.Row="1" Text="Incomplete" Foreground="Red" FontStyle="Italic" FontSize="16"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Male, 28 years old" ToolTip="as of 1st July 2022" FontSize="16"/>
+                    </Grid>
+                    <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="1" Margin="0 10 0 0">
+                        <StackPanel>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="First Name: " VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Last Name: " VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Gender: " VerticalAlignment="Center"/>
+                                <RadioButton Grid.Column="1">Male</RadioButton>
+                                <RadioButton Grid.Column="2">Female</RadioButton>
+                            </Grid>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Date of Birth: " VerticalAlignment="Center"/>
+                                <DatePicker Grid.Column="1"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Audition Group: " VerticalAlignment="Center"/>
+                                <ComboBox Grid.Column="1"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Height: " VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Voice Type: " VerticalAlignment="Center"/>
+                                <ComboBox Grid.Column="1"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Singing: " VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Acting: " VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1"/>
+                            </Grid>
+                            <Grid Margin="0 0 0 10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Dancing: " VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1"/>
+                            </Grid>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="Production: " VerticalAlignment="Center"/>
+                                <TextBox Grid.Column="1"/>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+                </Grid>
+                <Grid Grid.Column="1" Margin="5">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" MinHeight="200"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <Image Source="/Icons/Database_16x.png"/>
+                    <Grid Grid.Row="1">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Notes:"/>
+                        <TextBox Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"/>
+                    </Grid>
+                </Grid>
+            </Grid>
+        </Border>
+        <!--<StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="CancelButton" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/Cancel_grey_16x.png" Width="16" Margin="2 0"/>
@@ -29,6 +196,6 @@
                     <TextBlock Text="Save" Margin="2 0"/>
                 </StackPanel>
             </Button>
-        </StackPanel>
+        </StackPanel>-->
     </Grid>
 </PageFunction>

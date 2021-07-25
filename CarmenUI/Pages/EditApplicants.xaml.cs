@@ -34,5 +34,15 @@ namespace CarmenUI.Pages
         {
             OnReturn(new ReturnEventArgs<bool>(true));
         }
+
+        private void ImportApplicants_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AddApplicant_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }
