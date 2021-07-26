@@ -47,19 +47,49 @@
             <ListBoxItem Margin="20 0 0 0">
                 <TextBlock Text="Production Team"/>
             </ListBoxItem>
-            <ListBoxItem IsEnabled="False" Margin="0 20 0 0">
+            <ListBoxItem IsEnabled="True" Margin="0 20 0 0">
                 <TextBlock Text="Cast Numbers"/>
             </ListBoxItem>
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="(All)"/>
-            </ListBoxItem>
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="Gilbert"/>
-            </ListBoxItem>
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="Sullivan"/>
-            </ListBoxItem>
         </ListBox>
+        <DockPanel Grid.Column="1">
+            <Grid DockPanel.Dock="Top" Margin="7 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="#" FontSize="22"/>
+                <UniformGrid Grid.Column="1" Rows="1">
+                    <TextBlock Text="Gilbert" HorizontalAlignment="Center" FontSize="22"/>
+                    <TextBlock Text="Sullivan" HorizontalAlignment="Center" FontSize="22"/>
+                </UniformGrid>
+            </Grid>
+            <ListBox ItemsSource="{Binding CastNumbers}" HorizontalContentAlignment="Stretch">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding CastNumber}" VerticalAlignment="Center"/>
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding GetNames}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Rows="1"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ListBoxItem Content="{Binding}" HorizontalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+        <!-- Cast Groups / Tags (Cast Numbers above)
         <Grid Grid.Column="1" Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
@@ -116,6 +146,7 @@
                  SelectionMode="Extended" MouseDoubleClick="AvailableList_MouseDoubleClick">
             </ListBox>
         </Grid>
+        -->
         <Button Grid.Row="1" x:Name="SelectCastButton" Width="200" Height="35" Margin="5" HorizontalAlignment="Left" Click="SelectCastButton_Click">
             <TextBlock Text="Auto-Select Cast" FontSize="16"/>
         </Button>

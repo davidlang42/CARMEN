@@ -20,9 +20,38 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class SelectCast : PageFunction<bool>
     {
+        public CastNumberModel[] CastNumbers { get; set; }
         public SelectCast()
         {
+            CastNumbers = new CastNumberModel[]
+            {
+                new AlternateCastMembers
+                {
+                     CastNumber = 1,
+                     TotalCasts = 2,
+                     Names = new[] {"Name 1a", "Name 1b"}
+                },
+                new AlternateCastMembers
+                {
+                     CastNumber = 2,
+                     TotalCasts = 2,
+                     Names = new[] {"Name 2a", "Name 2b"}
+                },
+                new SingleCastMember
+                {
+                     CastNumber = 3,
+                     TotalCasts = 2,
+                     Name ="Both cast 1"
+                },
+                new SingleCastMember
+                {
+                     CastNumber = 4,
+                     TotalCasts = 2,
+                     Name ="Both cast 2"
+                }
+            };
             InitializeComponent();
+            DataContext = this;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -69,5 +98,29 @@ namespace CarmenUI.Pages
         {
 
         }
+    }
+
+    public abstract class CastNumberModel//TODO test only
+    {
+        public int CastNumber { get; set; }
+        public int TotalCasts { get; set; }
+        public abstract string[] GetNames { get; }
+        public int CountNames => GetNames.Length;
+        public IEnumerable<TextBlock> TextBlocks
+            => GetNames.Select(n => new TextBlock { Text = n });
+    }
+
+    public class SingleCastMember : CastNumberModel
+    {
+        public string Name { get; set; } = "";
+        public override string[] GetNames => new[] { Name };
+
+    }
+
+    public class AlternateCastMembers : CastNumberModel
+    {
+        public string[] Names { get; set; } = new string[0];
+
+        public override string[] GetNames => Names;
     }
 }
