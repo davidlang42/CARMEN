@@ -34,5 +34,40 @@ namespace CarmenUI.Pages
         {
             OnReturn(new ReturnEventArgs<bool>(true));
         }
+
+        private void SelectCastButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AvailableList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void SelectedList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void RemoveAllButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void RemoveButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void addAllButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void AddButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

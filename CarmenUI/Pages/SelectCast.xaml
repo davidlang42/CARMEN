@@ -15,8 +15,111 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MaxWidth="400"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <ListBox FontSize="22" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBoxItem IsEnabled="False">
+                <TextBlock Text="Cast Groups"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="Junior Boys (18)x2"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="Junior Girls (18)x2"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="Senior Boys (36)"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="Senior Girls (36)"/>
+            </ListBoxItem>
+            <ListBoxItem IsEnabled="False" Margin="0 20 0 0">
+                <TextBlock Text="Tags"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="Dance Team"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="Microphones"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="Production Team"/>
+            </ListBoxItem>
+            <ListBoxItem IsEnabled="False" Margin="0 20 0 0">
+                <TextBlock Text="Cast Numbers"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="(All)"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="Gilbert"/>
+            </ListBoxItem>
+            <ListBoxItem Margin="20 0 0 0">
+                <TextBlock Text="Sullivan"/>
+            </ListBoxItem>
+        </ListBox>
+        <Grid Grid.Column="1" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Selected applicants" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="18" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
+            </Grid>
+            <ListBox x:Name="SelectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="7"
+                 SelectionMode="Extended" MouseDoubleClick="SelectedList_MouseDoubleClick">
+            </ListBox>
+            <Button x:Name="AddButton" Grid.Column="1" Grid.Row="1" Click="AddButton_Click" Margin="5 0">
+                <TextBlock>&lt;</TextBlock>
+            </Button>
+            <Button x:Name="addAllButton" Grid.Column="1" Grid.Row="3" Click="addAllButton_Click" Margin="5 0">
+                <TextBlock>&lt;&lt;</TextBlock>
+            </Button>
+            <Button x:Name="RemoveButton" Grid.Column="1" Grid.Row="5" Click="RemoveButton_Click" Margin="5 0">
+                <TextBlock>&gt;</TextBlock>
+            </Button>
+            <Button x:Name="RemoveAllButton" Grid.Column="1" Grid.Row="7" Click="RemoveAllButton_Click" Margin="5 0">
+                <TextBlock>&gt;&gt;</TextBlock>
+            </Button>
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox FontSize="18" SelectedIndex="0">
+                    <ComboBoxItem Content="Available"/>
+                    <ComboBoxItem Content="Eligible"/>
+                </ComboBox>
+                <TextBlock Grid.Column="1" Text=" applicants" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="18" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
+            </Grid>
+            <ListBox x:Name="AvailableList" Grid.Column="2" Grid.Row="1" Grid.RowSpan="7"
+                 SelectionMode="Extended" MouseDoubleClick="AvailableList_MouseDoubleClick">
+            </ListBox>
+        </Grid>
+        <Button Grid.Row="1" x:Name="SelectCastButton" Width="200" Height="35" Margin="5" HorizontalAlignment="Left" Click="SelectCastButton_Click">
+            <TextBlock Text="Auto-Select Cast" FontSize="16"/>
+        </Button>
+        <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="CancelButton" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/Cancel_grey_16x.png" Width="16" Margin="2 0"/>
