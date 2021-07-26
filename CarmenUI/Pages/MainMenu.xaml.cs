@@ -1,4 +1,7 @@
-﻿using System;
+﻿using CarmenUI.Windows;
+using Microsoft.EntityFrameworkCore;
+using ShowModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -21,8 +24,11 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class MainMenu : Page
     {
-        public MainMenu()
+        ShowContext context;
+
+        public MainMenu(ShowContext context)
         {
+            this.context = context;
             InitializeComponent();
         }
 
@@ -35,8 +41,10 @@ namespace CarmenUI.Pages
         }
 
         private void NavigateAndSaveOnReturn<T>() where T : PageFunction<bool>, new()
+            => NavigateAndSaveOnReturn(new T());
+
+        private void NavigateAndSaveOnReturn(PageFunction<bool> page_function)
         {
-            var page_function = new T();
             page_function.Return += SaveOnReturn;
             this.NavigationService.Navigate(page_function);
         }
@@ -48,7 +56,10 @@ namespace CarmenUI.Pages
             => NavigateAndSaveOnReturn<AllocateRoles>();
 
         private void ConfigureItems_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateAndSaveOnReturn<ConfigureItems>();
+        {
+            context.Nodes.Load();//TODO this shouldn't be here
+            NavigateAndSaveOnReturn(new ConfigureItems(context.Nodes.Local.ToObservableCollection()));
+        }
 
         private void SelectCast_MouseUp(object sender, MouseButtonEventArgs e)
             => NavigateAndSaveOnReturn<SelectCast>();

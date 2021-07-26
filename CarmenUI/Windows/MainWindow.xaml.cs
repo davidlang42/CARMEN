@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CarmenUI.Pages;
+using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Structure;
 using System;
@@ -24,7 +25,7 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
-        ShowContext context;
+        public ShowContext context;
         string connectionLabel;
 
         public MainWindow(DbContextOptions<ShowContext> context_options, string connection_label)
@@ -32,6 +33,8 @@ namespace CarmenUI.Windows
             InitializeComponent();
             context = new ShowContext(context_options);
             connectionLabel = connection_label;
+            var main_menu = new MainMenu(context);
+            MainFrame.Navigate(main_menu);
         }
 
         protected override void OnClosing(CancelEventArgs e)

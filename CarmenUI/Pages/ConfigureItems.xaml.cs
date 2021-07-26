@@ -1,5 +1,9 @@
-﻿using System;
+﻿using ShowModel;
+using ShowModel.Structure;
+using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,9 +24,15 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureItems : PageFunction<bool>
     {
-        public ConfigureItems()
+        private readonly CollectionViewSource rootNodesViewSource;
+
+        public ConfigureItems(ObservableCollection<Node> nodes)
         {
             InitializeComponent();
+            rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
+            rootNodesViewSource.Source = nodes;
+            rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
+            rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -33,6 +43,31 @@ namespace CarmenUI.Pages
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             OnReturn(new ReturnEventArgs<bool>(true));
+        }
+
+        private void ItemsTreeView_KeyDown(object sender, KeyEventArgs e)
+        {
+
+        }
+
+        private void ItemsTreeView_MouseMove(object sender, MouseEventArgs e)
+        {
+
+        }
+
+        private void ItemsTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void ItemsTreeView_DragOver(object sender, DragEventArgs e)
+        {
+
+        }
+
+        private void ItemsTreeView_Drop(object sender, DragEventArgs e)
+        {
+
         }
     }
 }

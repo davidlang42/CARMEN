@@ -12,5 +12,5 @@
         WindowState="{local:SettingBinding WindowState}"
         MinHeight="600" MinWidth="800"
         Title="CARMEN">
-    <Frame x:Name="MainFrame" Source="/Pages/MainMenu.xaml" NavigationUIVisibility="Hidden" Navigated="MainFrame_Navigated"/>
+    <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" Navigated="MainFrame_Navigated"/>
 </Window>
