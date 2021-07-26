@@ -7,28 +7,194 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CarmenUI.Pages"
+    xmlns:modelStructure="clr-namespace:ShowModel.Structure;assembly=ShowModel"
+    xmlns:cv="clr-namespace:CarmenUI.Converters"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Allocate Roles">
+    <Page.Resources>
+        <CollectionViewSource x:Key="rootNodesViewSource"/>
+        <cv:SortIOrdered x:Key="sortIOrdered" />
+    </Page.Resources>
     <Grid Margin="5">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="CancelButton" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/Cancel_grey_16x.png" Width="16" Margin="2 0"/>
-                    <TextBlock Text="Cancel" Margin="2 0"/>
-                </StackPanel>
-            </Button>
-            <Button x:Name="SaveButton" IsDefault="True" Width="100" Height="35" Margin="5" Click="SaveButton_Click">
-                <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/Checkmark_blue_16x.png" Width="16" Margin="2 0"/>
-                    <TextBlock Text="Save" Margin="2 0"/>
-                </StackPanel>
-            </Button>
-        </StackPanel>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="200" MaxWidth="400"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Margin="5 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Roles:" FontSize="22"/>
+            <TreeView Grid.Row="1" x:Name="RolesTreeView" KeyDown="RolesTreeView_KeyDown"
+                            ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}"
+                            AllowDrop="True"
+                            PreviewMouseLeftButtonDown="RolesTreeView_PreviewMouseLeftButtonDown"
+                            MouseMove="RolesTreeView_MouseMove" 
+                            DragOver="RolesTreeView_DragOver" 
+                            Drop="RolesTreeView_Drop">
+                <TreeView.Resources>
+                    <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Icons/Checkmark_16x.png" Width="16"/>
+                            <TextBlock Text="{Binding Path=Name, StringFormat='Show: {0}'}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type modelStructure:Section}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Icons/Ellipsis_bold_16x.png" Width="16"/>
+                            <TextBlock Text="{Binding Path=Name, StringFormat='Section: {0}'}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type modelStructure:Item}" ItemsSource="{Binding Roles, Converter={StaticResource sortIOrdered}}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Icons/Cancel_16x.png" Width="16"/>
+                            <TextBlock Text="{Binding Path=Name, StringFormat='Item: {0}'}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type modelStructure:Role}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="/Icons/Ellipsis_bold_16x.png" Width="16"/>
+                            <TextBlock Text="{Binding Path=Name, StringFormat='Role: {0}'}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.Resources>
+            </TreeView>
+            <CheckBox Grid.Row="2" IsChecked="True" Content="Show completed" Margin="0 5"/>
+            <Grid Grid.Row="3" Margin="0 0 0 5">
+                <ProgressBar x:Name="CastingProgress" Value="50" Height="20"/>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=CastingProgress, Path=Value, StringFormat='\{0\}%'}"/>
+            </Grid>
+        </Grid>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5"/>
+        <Grid Grid.Column="2" Margin="5 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Role 1" FontSize="22"/>
+                <TextBlock Grid.Column="1" Text="  requires Singer, Actor" FontSize="14" VerticalAlignment="Bottom"/>
+                <Button Grid.Column="2" Content="Edit Roles" Width="100"/>
+            </Grid>
+            <Grid Grid.Row="1">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock Grid.Row="1" Text="Required"/>
+                    <TextBlock Grid.Row="2" Text="Selected"/>
+                    <UniformGrid Grid.Column="1" Rows="1" Width="150" HorizontalAlignment="Left">
+                        <TextBlock Text="JB" HorizontalAlignment="Center"/>
+                        <TextBlock Text="JG" HorizontalAlignment="Center"/>
+                        <TextBlock Text="SB" HorizontalAlignment="Center"/>
+                        <TextBlock Text="SG" HorizontalAlignment="Center"/>
+                    </UniformGrid>
+                    <UniformGrid Grid.Row="1" Grid.Column="1" Rows="1" Width="150" HorizontalAlignment="Left">
+                        <TextBlock Text="1" HorizontalAlignment="Center"/>
+                        <TextBlock Text="2" HorizontalAlignment="Center"/>
+                        <TextBlock Text="3" HorizontalAlignment="Center"/>
+                        <TextBlock Text="4" HorizontalAlignment="Center"/>
+                    </UniformGrid>
+                    <UniformGrid Grid.Row="2" Grid.Column="1" Rows="1" Width="150" HorizontalAlignment="Left">
+                        <TextBlock Text="1" HorizontalAlignment="Center"/>
+                        <TextBlock Text="1" HorizontalAlignment="Center"/>
+                        <TextBlock Text="1" HorizontalAlignment="Center"/>
+                        <TextBlock Text="1" HorizontalAlignment="Center"/>
+                    </UniformGrid>
+                </Grid>
+                <UniformGrid Grid.Column="1" Columns="1" VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="Sort applicants by " VerticalAlignment="Center"/>
+                        <ComboBox SelectedIndex="0">
+                            <ComboBoxItem Content="Suitability"/>
+                            <ComboBoxItem Content="etc"/>
+                        </ComboBox>
+                    </StackPanel>
+                    <CheckBox Content="Show unavailable applicants"/>
+                </UniformGrid>
+            </Grid>
+            <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <ListView Grid.ColumnSpan="2">
+                        <ListView.View>
+                            <GridView AllowsColumnReorder="False">
+                                <GridViewColumn>
+                                    <GridViewColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox/>
+                                        </DataTemplate>
+                                    </GridViewColumn.CellTemplate>
+                                </GridViewColumn>
+                                <GridViewColumn Header="Suitability"/>
+                                <GridViewColumn Header="Cast Number"/>
+                                <GridViewColumn Header="Name"/>
+                                <GridViewColumn Header="Singing"/>
+                                <GridViewColumn Header="Roles"/>
+                                <GridViewColumn Header="Acting"/>
+                                <GridViewColumn Header="Roles"/>
+                                <GridViewColumn Header="Dancing"/>
+                                <GridViewColumn Header="Roles"/>
+                                <GridViewColumn Header="Overall"/>
+                                <GridViewColumn Header="Brac"/>
+                                <GridViewColumn Header="Same"/>
+                                <GridViewColumn Header="Prev"/>
+                                <GridViewColumn Header="Next"/>
+                            </GridView>
+                        </ListView.View>
+                        <TextBlock/>
+                        <TextBlock/>
+                        <TextBlock/>
+                        <TextBlock/>
+                        <TextBlock/>
+                    </ListView>
+                    <Button Grid.Row="1" x:Name="AutoCastButton" Width="200" Height="35" Margin="5" Click="AutoCastButton_Click" HorizontalAlignment="Left">
+                        <TextBlock Text="Allocate most suitable cast"/>
+                    </Button>
+                    <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button x:Name="CancelButton" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/Icons/Cancel_grey_16x.png" Width="16" Margin="2 0"/>
+                                <TextBlock Text="Cancel" Margin="2 0"/>
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="SaveButton" IsDefault="True" Width="100" Height="35" Margin="5" Click="SaveButton_Click">
+                            <StackPanel Orientation="Horizontal">
+                                <Image Source="/Icons/Checkmark_blue_16x.png" Width="16" Margin="2 0"/>
+                                <TextBlock Text="Save" Margin="2 0"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </PageFunction>

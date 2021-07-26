@@ -53,7 +53,10 @@ namespace CarmenUI.Pages
             => NavigateAndSaveOnReturn<ConfigureShow>();
 
         private void AllocateRoles_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateAndSaveOnReturn<AllocateRoles>();
+        {
+            context.Nodes.Load();//TODO this shouldn't be here
+            NavigateAndSaveOnReturn(new AllocateRoles(context.Nodes.Local.ToObservableCollection()));
+        }
 
         private void ConfigureItems_MouseUp(object sender, MouseButtonEventArgs e)
         {
