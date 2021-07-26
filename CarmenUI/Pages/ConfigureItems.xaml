@@ -21,10 +21,20 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel>
-            <TreeView DockPanel.Dock="Left" x:Name="ItemsTreeView" Margin="5" KeyDown="ItemsTreeView_KeyDown"
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="400"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Margin="5 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Items:" FontSize="22"/>
+            <TreeView Grid.Row="1" x:Name="ItemsTreeView" KeyDown="ItemsTreeView_KeyDown"
                             ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}"
-                            MinWidth="150" MaxWidth="400" AllowDrop="True"
+                            AllowDrop="True"
                             PreviewMouseLeftButtonDown="ItemsTreeView_PreviewMouseLeftButtonDown"
                             MouseMove="ItemsTreeView_MouseMove" 
                             DragOver="ItemsTreeView_DragOver" 
@@ -41,9 +51,101 @@
                     </HierarchicalDataTemplate>
                 </TreeView.Resources>
             </TreeView>
-            <TextBlock Text="blah"/>
-        </DockPanel>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right">
+        </Grid>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5"/>
+        <Grid Grid.Column="2" Margin="5 0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Roles in Item 1:" FontSize="22"/>
+            <DataGrid x:Name="RolesDataGrid" Grid.Row="1" AutoGenerateColumns="False" CanUserSortColumns="False" CanUserAddRows="True" CanUserDeleteRows="True">
+                <DataGrid.Columns>
+                    <DataGridTextColumn x:Name="HeaderName" Header="Name" Width="*"/>
+                    <DataGridTextColumn x:Name="HeaderJB" Header="JB"/>
+                    <DataGridTextColumn x:Name="HeaderJG" Header="JG"/>
+                    <DataGridTextColumn x:Name="HeaderSB" Header="SB"/>
+                    <DataGridTextColumn x:Name="HeaderSG" Header="SG"/>
+                    <DataGridTextColumn x:Name="HeaderTotal" Header="Total"/>
+                    <DataGridCheckBoxColumn x:Name="HeaderSinger" Header="Singer"/>
+                    <DataGridCheckBoxColumn x:Name="HeaderActor" Header="Actor"/>
+                    <DataGridCheckBoxColumn x:Name="HeaderDancer" Header="Dancer"/>
+                    <DataGridTemplateColumn x:Name="HeaderOther" Header="Other" Width="*">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="Baritone, Adult, blah, etc."/>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                        <DataGridTemplateColumn.CellEditingTemplate>
+                            <DataTemplate>
+                                <ComboBox />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellEditingTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+                <TextBlock/>
+            </DataGrid>
+            <Grid Grid.Row="2" >
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderName, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderJB, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderJG, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderSB, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderSG, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderTotal, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderSinger, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderActor, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderDancer, Path=ActualWidth}"/>
+                    <ColumnDefinition Width="{Binding ElementName=HeaderOther, Path=ActualWidth}"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition/>
+                </Grid.RowDefinitions>
+                <TextBlock Grid.Column="1" Text="Total Required Counts"/>
+                <TextBlock Grid.Column="2" Text="18" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="3" Text="18" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="4" Text="36" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="5" Text="36" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="6" Text="144" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="7" Text="1" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="8" Text="24" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Column="9" Text="12" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="Required in Bracket"/>
+                <TextBlock Grid.Row="1" Grid.Column="2" Text="18" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Grid.Column="3" Text="18" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Grid.Column="4" Text="36" HorizontalAlignment="Center"/>
+                <TextBlock Grid.Row="1" Grid.Column="5" Text="37" HorizontalAlignment="Center" Background="Red"/>
+                <TextBlock Grid.Row="1" Grid.Column="6" Text="144" HorizontalAlignment="Center"/>
+            </Grid>
+        </Grid>
+        <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button x:Name="CancelButton" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/Cancel_grey_16x.png" Width="16" Margin="2 0"/>
