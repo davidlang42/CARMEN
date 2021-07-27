@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using ShowModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,10 +20,10 @@ namespace CarmenUI.Pages
     /// <summary>
     /// Interaction logic for SelectCast.xaml
     /// </summary>
-    public partial class SelectCast : PageFunction<bool>
+    public partial class SelectCast : SubPage
     {
         public CastNumberModel[] CastNumbers { get; set; }
-        public SelectCast()
+        public SelectCast(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             CastNumbers = new CastNumberModel[]
             {
@@ -61,7 +63,7 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            OnReturn(new ReturnEventArgs<bool>(true));
+            OnReturn(DataObjects.Nodes);
         }
 
         private void SelectCastButton_Click(object sender, RoutedEventArgs e)

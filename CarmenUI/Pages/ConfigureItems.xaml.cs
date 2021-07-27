@@ -1,4 +1,5 @@
-﻿using ShowModel;
+﻿using Microsoft.EntityFrameworkCore;
+using ShowModel;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -22,15 +23,16 @@ namespace CarmenUI.Pages
     /// <summary>
     /// Interaction logic for ConfigureItems.xaml
     /// </summary>
-    public partial class ConfigureItems : PageFunction<bool>
+    public partial class ConfigureItems : SubPage
     {
         private readonly CollectionViewSource rootNodesViewSource;
 
-        public ConfigureItems(ObservableCollection<Node> nodes)
+        public ConfigureItems(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
-            rootNodesViewSource.Source = nodes;
+            context.Nodes.Load(); //TODO load async
+            rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
         }
@@ -42,7 +44,7 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            OnReturn(new ReturnEventArgs<bool>(true));
+            OnReturn(DataObjects.Nodes);
         }
 
         private void ItemsTreeView_KeyDown(object sender, KeyEventArgs e)

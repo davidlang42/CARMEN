@@ -25,53 +25,54 @@ namespace CarmenUI.Pages
     public partial class MainMenu : Page
     {
         ShowContext context;
+        DbContextOptions<ShowContext> contextOptions;
 
-        public MainMenu(ShowContext context)
+        public MainMenu(ShowContext context, DbContextOptions<ShowContext> context_options)
         {
             this.context = context;
+            this.contextOptions = context_options;
             InitializeComponent();
         }
 
-        /// <summary>Handles return events from sub-pages.
-        /// e==null for cancel, e.Result==true when context save is required, e.Result==false when no save is required</summary>
-        private void SaveOnReturn(object sender, ReturnEventArgs<bool> e)
+        /// <summary>Handles return events from sub-pages (e==null for cancel,
+        /// otherwise e.Result indicates which objects may have changed)</summary>
+        private void HandleChangesOnReturn(object sender, ReturnEventArgs<DataObjects> e)
         {
-            if (e?.Result == true)
-                MessageBox.Show("Save required."); //TODO save context, probably with saving/loading dialog
+            if (e?.Result is DataObjects changes)
+            {
+                //TODO handle changed objects
+                MessageBox.Show($"The following objects have changed: {changes}");
+            }
+            //TODO save context at the other end
         }
 
-        private void NavigateAndSaveOnReturn<T>() where T : PageFunction<bool>, new()
-            => NavigateAndSaveOnReturn(new T());
-
-        private void NavigateAndSaveOnReturn(PageFunction<bool> page_function)
+        private void NavigateToSubPage(SubPage sub_page)
         {
-            page_function.Return += SaveOnReturn;
-            this.NavigationService.Navigate(page_function);
+            sub_page.Return += HandleChangesOnReturn;
+            this.NavigationService.Navigate(sub_page);
         }
 
         private void ConfigureShow_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateAndSaveOnReturn<ConfigureShow>();
+            => NavigateToSubPage(new ConfigureShow(contextOptions));
 
         private void AllocateRoles_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            context.Nodes.Load();//TODO this shouldn't be here
-            NavigateAndSaveOnReturn(new AllocateRoles(context.Nodes.Local.ToObservableCollection()));
+            NavigateToSubPage(new AllocateRoles(contextOptions));
         }
 
         private void ConfigureItems_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            context.Nodes.Load();//TODO this shouldn't be here
-            NavigateAndSaveOnReturn(new ConfigureItems(context.Nodes.Local.ToObservableCollection()));
+            NavigateToSubPage(new ConfigureItems(contextOptions));
         }
 
         private void SelectCast_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateAndSaveOnReturn<SelectCast>();
+            => NavigateToSubPage(new SelectCast(contextOptions));
 
         private void AuditionApplicants_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateAndSaveOnReturn<EditApplicants>();
+            => NavigateToSubPage(new EditApplicants(contextOptions));
 
         private void RegisterApplicants_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateAndSaveOnReturn<EditApplicants>();
+            => NavigateToSubPage(new EditApplicants(contextOptions));
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
             => ShowOneChild(SummaryPanel, ConfigureShowSummary);

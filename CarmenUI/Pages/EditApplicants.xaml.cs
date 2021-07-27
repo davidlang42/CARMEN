@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using ShowModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,9 +20,9 @@ namespace CarmenUI.Pages
     /// <summary>
     /// Interaction logic for EditApplicants.xaml
     /// </summary>
-    public partial class EditApplicants : PageFunction<bool>
+    public partial class EditApplicants : SubPage
     {
-        public EditApplicants()
+        public EditApplicants(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
         }
@@ -32,7 +34,7 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            OnReturn(new ReturnEventArgs<bool>(true));
+            OnReturn(DataObjects.Applicants);
         }
 
         private void ImportApplicants_Click(object sender, RoutedEventArgs e)

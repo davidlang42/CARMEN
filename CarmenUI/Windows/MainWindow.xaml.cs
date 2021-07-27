@@ -25,7 +25,7 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
-        public ShowContext context;
+        private ShowContext context;//TODO move this into the page
         string connectionLabel;
 
         public MainWindow(DbContextOptions<ShowContext> context_options, string connection_label)
@@ -33,7 +33,7 @@ namespace CarmenUI.Windows
             InitializeComponent();
             context = new ShowContext(context_options);
             connectionLabel = connection_label;
-            var main_menu = new MainMenu(context);
+            var main_menu = new MainMenu(context, context_options);
             MainFrame.Navigate(main_menu);
         }
 

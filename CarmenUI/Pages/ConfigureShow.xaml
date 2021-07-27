@@ -1,9 +1,8 @@
-﻿<PageFunction
+﻿<local:SubPage
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:sys="clr-namespace:System;assembly=System.Runtime"
     x:Class="CarmenUI.Pages.ConfigureShow"
-    x:TypeArguments="sys:Boolean"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CarmenUI.Pages"
@@ -103,4 +102,4 @@
             </Button>
         </StackPanel>
     </Grid>
-</PageFunction>
+</local:SubPage>

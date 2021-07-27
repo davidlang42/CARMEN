@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore;
+using ShowModel;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,9 +20,9 @@ namespace CarmenUI.Pages
     /// <summary>
     /// Interaction logic for PageFunction1.xaml
     /// </summary>
-    public partial class ConfigureShow : PageFunction<bool>
+    public partial class ConfigureShow : SubPage
     {
-        public ConfigureShow()
+        public ConfigureShow(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
         }
@@ -62,7 +64,7 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            OnReturn(new ReturnEventArgs<bool>(true));
+            OnReturn(DataObjects.AlternativeCasts | DataObjects.CastGroups | DataObjects.Criterias | DataObjects.Images | DataObjects.Requirements | DataObjects.SectionTypes | DataObjects.Tags);
         }
 
         private void AlternativeCasts_Selected(object sender, RoutedEventArgs e)
