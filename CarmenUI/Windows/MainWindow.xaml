@@ -4,12 +4,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarmenUI"
+        xmlns:bd="clr-namespace:CarmenUI.Bindings"
         mc:Ignorable="d"
-        Top="{local:SettingBinding Top}"
-        Left="{local:SettingBinding Left}"
-        Height="{local:SettingBinding Height}"
-        Width="{local:SettingBinding Width}"
-        WindowState="{local:SettingBinding WindowState}"
+        Top="{bd:SettingBinding Top}"
+        Left="{bd:SettingBinding Left}"
+        Height="{bd:SettingBinding Height}"
+        Width="{bd:SettingBinding Width}"
+        WindowState="{bd:SettingBinding WindowState}"
         MinHeight="600" MinWidth="800"
         Title="CARMEN">
     <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" Navigated="MainFrame_Navigated"/>
