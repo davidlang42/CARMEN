@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -38,49 +39,47 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            int i = 0; //TODO remove test code
-            var remaining = new HashSet<CollectionViewSource>()
+            // make tasks to load each collection view source
+            var tasks = new Dictionary<CollectionViewSource, Task<IList>>()
             {
-                criteriasViewSource, castGroupsViewSource, alternativeCastsViewSource, tagsViewSource, sectionTypesViewSource, requirementsViewSource
+                { criteriasViewSource, TaskToLoad(context, c => c.Criterias) },
+                { castGroupsViewSource, TaskToLoad(context, c => c.CastGroups) },
+                { alternativeCastsViewSource, TaskToLoad(context, c => c.AlternativeCasts) },
+                { tagsViewSource, TaskToLoad(context, c => c.Tags) },
+                { sectionTypesViewSource, TaskToLoad(context, c => c.SectionTypes) },
+                { requirementsViewSource, TaskToLoad(context, c => c.Requirements) }
             };
-            CollectionViewSource load_next;
-            while (remaining.Count != 0)
+            // initialise all sources with "Loading..."
+            var loading = new[] { "Loading..." };
+            foreach (var view_source in tasks.Keys)
+                view_source.Source = loading;
+            // load one at a time because DbContext is not thread safe
+            CollectionViewSource next_source;
+            Task<IList> next_task;
+            while (tasks.Count != 0)
             {
-                // prioritsing loading whatever is in view
-                if (objectList.GetBindingExpression(ItemsControl.ItemsSourceProperty).ParentBinding.Source is CollectionViewSource source_in_view
-                    && remaining.Contains(source_in_view))
-                    load_next = source_in_view;
+                // prioritise loading whatever is in view
+                if (objectList.GetBindingExpression(ItemsControl.ItemsSourceProperty)?.ParentBinding.Source is CollectionViewSource source_in_view
+                    && tasks.ContainsKey(source_in_view))
+                    next_source = source_in_view;
                 else
-                    load_next = remaining.First();
-                // remove from remaining list
-                remaining.Remove(load_next);
-                // handle individually due to strict generic typing
-                if (load_next == criteriasViewSource)
-                    await PopulateView(criteriasViewSource, c => c.Criterias, i++);
-                else if (load_next == castGroupsViewSource)
-                    await PopulateView(castGroupsViewSource, c => c.CastGroups, i++);
-                else if (load_next == alternativeCastsViewSource)
-                    await PopulateView(alternativeCastsViewSource, c => c.AlternativeCasts, i++);
-                else if (load_next == tagsViewSource)
-                    await PopulateView(tagsViewSource, c => c.Tags, i++);
-                else if (load_next == sectionTypesViewSource)
-                    await PopulateView(sectionTypesViewSource, c => c.SectionTypes, i++);
-                else if (load_next == requirementsViewSource)
-                    await PopulateView(requirementsViewSource, c => c.Requirements, i++);
-                else
-                    throw new ApplicationException("View source not implemented.");
+                    next_source = tasks.Keys.First();
+                // extract task & remove from list
+                next_task = tasks[next_source];
+                tasks.Remove(next_source);
+                // populate source asynchronously
+                next_task.Start();
+                next_source.Source = await next_task;
             }
         }
 
-        private async Task PopulateView<T>(CollectionViewSource view, Func<ShowContext,DbSet<T>> db_set_getter, int i) where T : class //TODO this will crash if still running when the page is cancelled, maybe I need to wrap this in a LoadingOverlay afterall
-        {
-            view.Source = new[] { $"Sleeping #{i}" };
-            await Task.Run(() => Thread.Sleep(1000));//TODO remove test code
-            view.Source = new[] { $"Loading #{i}" };//TODO remove test code
-            var db_set = await context.ColdLoadAsync(db_set_getter);
-            //TODO view.Source = db_set.Local.ToObservableCollection();
-            view.Source = new[] { $"Loaded #{i}" };//TODO remove test code
-        }
+        private static Task<IList> TaskToLoad<T>(ShowContext context, Func<ShowContext, DbSet<T>> db_set_getter) where T : class //TODO this will crash if still running when the page is cancelled, maybe I need to wrap this in a LoadingOverlay afterall
+            => new Task<IList>(() =>
+            {
+                var db_set = db_set_getter(context);
+                db_set.Load();
+                return db_set.Local.ToObservableCollection();
+            });
 
         private void BindObjectList(string header, CollectionViewSource view_source)
         {
@@ -108,7 +107,11 @@ namespace CarmenUI.Pages
             => BindObjectList("Role Requirements", requirementsViewSource);
 
         private void Import_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Import Settings", castGroupsViewSource);//TODO
+        {
+            //TODO (FUTURE) import show config from another show
+            MessageBox.Show("Importing setting from another show is not yet implemented. Please populate manually.");
+        }
+
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
@@ -122,7 +125,7 @@ namespace CarmenUI.Pages
 
         private void ResetToDefaultButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO implement reset to default
         }
     }
 }

@@ -16,7 +16,7 @@ namespace CarmenUI
         /// perform the DbSet__get and DbSet.Load() asyncronously. The result of the returned task
         /// is the DbSet itself, to assist in chaining.</summary>
         public static Task<DbSet<U>> ColdLoadAsync<T, U>(this T context, Func<T, DbSet<U>> db_set_getter) where T : DbContext where U : class
-            => Task.Run<DbSet<U>>(() =>
+            => Task.Run(() =>
             {
                 var db_set = db_set_getter(context);
                 db_set.Load();
