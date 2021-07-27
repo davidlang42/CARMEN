@@ -17,11 +17,23 @@ namespace CarmenUI.Windows
     /// <summary>
     /// Interaction logic for LoadingWindow.xaml
     /// </summary>
-    public partial class LoadingWindow : Window
+    public partial class LoadingWindow : Window, IDisposable
     {
-        public LoadingWindow()
+        public LoadingWindow(Window owner)
         {
+            Owner = owner;
+            owner.IsEnabled = false;
             InitializeComponent();
+            Show();
+        }
+
+        public LoadingWindow(Page page) : this(GetWindow(page))
+        { }
+
+        public void Dispose()
+        {
+            Owner.IsEnabled = true;
+            Hide();
         }
     }
 }

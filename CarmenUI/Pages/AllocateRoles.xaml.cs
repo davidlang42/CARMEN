@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CarmenUI.Windows;
+using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Structure;
 using System;
@@ -7,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,11 +33,17 @@ namespace CarmenUI.Pages
         {
             InitializeComponent();
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
             PopulateViews();
         }
 
         private async void PopulateViews()
         {
+            using var loading = new LoadingWindow(this);
+            await Task.Run(() => Thread.Sleep(3000));
             await Task.Run(() => context.Nodes.Load());
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
