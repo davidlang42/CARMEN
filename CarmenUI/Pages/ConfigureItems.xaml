@@ -10,7 +10,8 @@
     xmlns:cv="clr-namespace:CarmenUI.Converters"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
-    Title="Configure Items">
+    Title="Configure Items"
+    Loaded="Page_Loaded">
     <Page.Resources>
         <CollectionViewSource x:Key="rootNodesViewSource"/>
         <cv:SortIOrdered x:Key="sortIOrdered" />

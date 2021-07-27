@@ -42,10 +42,10 @@ namespace CarmenUI.Pages
 
         private async void PopulateViews()
         {
-            using var loading = new LoadingWindow(this);
+            using var loading = new LoadingOverlay(this);
             loading.Progress = 0;
             loading.SubText = "Waiting for sleep";
-            await Task.Run(() => Thread.Sleep(3000));
+            await Task.Run(() => Thread.Sleep(1000));//TODO remove test code
             loading.Progress = 30;
             loading.SubText = "Loading nodes";
             await Task.Run(() => context.Nodes.Load());

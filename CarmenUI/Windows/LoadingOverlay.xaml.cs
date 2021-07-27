@@ -17,12 +17,12 @@ using System.Windows.Shapes;
 namespace CarmenUI.Windows
 {
     /// <summary>
-    /// Interaction logic for LoadingWindow.xaml
+    /// Interaction logic for LoadingOverlay.xaml
     /// </summary>
-    public partial class LoadingWindow : Window, IDisposable
+    public partial class LoadingOverlay : Window, IDisposable
     {
         public static readonly DependencyProperty MainTextProperty = DependencyProperty.Register(
-            nameof(MainText), typeof(string), typeof(LoadingWindow), new PropertyMetadata("Loading..."));
+            nameof(MainText), typeof(string), typeof(LoadingOverlay), new PropertyMetadata("Loading..."));
 
         public string MainText
         {
@@ -31,7 +31,7 @@ namespace CarmenUI.Windows
         }
 
         public static readonly DependencyProperty SubTextProperty = DependencyProperty.Register(
-            nameof(SubText), typeof(string), typeof(LoadingWindow), new PropertyMetadata(null));
+            nameof(SubText), typeof(string), typeof(LoadingOverlay), new PropertyMetadata(null));
 
         public string? SubText
         {
@@ -44,7 +44,7 @@ namespace CarmenUI.Windows
         }
 
         public static readonly DependencyProperty ProgressProperty = DependencyProperty.Register(
-            nameof(Progress), typeof(int?), typeof(LoadingWindow), new PropertyMetadata(null));
+            nameof(Progress), typeof(int?), typeof(LoadingOverlay), new PropertyMetadata(null));
 
         public int? Progress
         {
@@ -56,7 +56,7 @@ namespace CarmenUI.Windows
             }
         }
 
-        public LoadingWindow(Window owner)
+        public LoadingOverlay(Window owner)
         {
             Owner = owner;
             owner.IsEnabled = false;
@@ -66,7 +66,7 @@ namespace CarmenUI.Windows
             Show();
         }
 
-        public LoadingWindow(Page page) : this(GetWindow(page))
+        public LoadingOverlay(Page page) : this(GetWindow(page))
         { }
 
         public void Dispose()

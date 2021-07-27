@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CarmenUI.Windows;
+using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Structure;
 using System;
@@ -32,15 +33,29 @@ namespace CarmenUI.Pages
         {
             InitializeComponent();
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
             PopulateViews();
         }
 
         private async void PopulateViews()
         {
+            using var loading = new LoadingOverlay(this);
+            loading.Progress = 0;
+            loading.SubText = "Waiting for sleep";
+            await Task.Run(() => Thread.Sleep(1000));//TODO remove test code
+            loading.Progress = 30;
+            loading.SubText = "Loading nodes";
             await Task.Run(() => context.Nodes.Load());
+            loading.Progress = 60;
+            loading.SubText = "Observing collection";
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
+            loading.Progress = 90;
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
+            loading.Progress = 100;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
