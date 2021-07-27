@@ -75,27 +75,21 @@ namespace CarmenUI.Pages
             => NavigateToSubPage(new EditApplicants(contextOptions));
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
-            => ShowOneChild(SummaryPanel, ConfigureShowSummary);
+            => SummaryPanel.ShowOneChild(ConfigureShowSummary);
 
         private void RegisterApplicants_MouseEnter(object sender, MouseEventArgs e)
-            => ShowOneChild(SummaryPanel, RegisterApplicantsSummary);
+            => SummaryPanel.ShowOneChild(RegisterApplicantsSummary);
 
         private void AuditionApplicants_MouseEnter(object sender, MouseEventArgs e)
-            => ShowOneChild(SummaryPanel, AuditionApplicantsSummary);
+            => SummaryPanel.ShowOneChild(AuditionApplicantsSummary);
 
         private void SelectCast_MouseEnter(object sender, MouseEventArgs e)
-            => ShowOneChild(SummaryPanel, SelectCastSummary);
+            => SummaryPanel.ShowOneChild(SelectCastSummary);
 
         private void ConfigureItems_MouseEnter(object sender, MouseEventArgs e)
-            => ShowOneChild(SummaryPanel, ConfigureItemsSummary);
+            => SummaryPanel.ShowOneChild(ConfigureItemsSummary);
 
         private void AllocateRoles_MouseEnter(object sender, MouseEventArgs e)
-            => ShowOneChild(SummaryPanel, AllocateRolesSummary);
-
-        private void ShowOneChild(StackPanel panel, UIElement visible_child)
-        {
-            foreach (UIElement child in panel.Children)
-                child.Visibility = child == visible_child ? Visibility.Visible : Visibility.Collapsed;
-        }
+            => SummaryPanel.ShowOneChild(AllocateRolesSummary);
     }
 }

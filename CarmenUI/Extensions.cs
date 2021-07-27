@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace CarmenUI
 {
@@ -20,5 +22,12 @@ namespace CarmenUI
                 db_set.Load();
                 return db_set;
             });
+
+        /// <summary>Collapses all children of the panel, except the given child, which is made visible.</summary>
+        public static void ShowOneChild(this Panel panel, UIElement visible_child)
+        {
+            foreach (UIElement child in panel.Children)
+                child.Visibility = child == visible_child ? Visibility.Visible : Visibility.Collapsed;
+        }
     }
 }
