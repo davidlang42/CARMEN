@@ -21,12 +21,48 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class LoadingWindow : Window, IDisposable
     {
+        public static readonly DependencyProperty MainTextProperty = DependencyProperty.Register(
+            nameof(MainText), typeof(string), typeof(LoadingWindow), new PropertyMetadata("Loading..."));
+
+        public string MainText
+        {
+            get => (string)GetValue(MainTextProperty);
+            set => SetValue(MainTextProperty, value);
+        }
+
+        public static readonly DependencyProperty SubTextProperty = DependencyProperty.Register(
+            nameof(SubText), typeof(string), typeof(LoadingWindow), new PropertyMetadata(null));
+
+        public string? SubText
+        {
+            get => (string?)GetValue(SubTextProperty);
+            set
+            {
+                SetValue(SubTextProperty, value);
+                SubTextElement.Visibility = string.IsNullOrEmpty(value) ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
+
+        public static readonly DependencyProperty ProgressProperty = DependencyProperty.Register(
+            nameof(Progress), typeof(int?), typeof(LoadingWindow), new PropertyMetadata(null));
+
+        public int? Progress
+        {
+            get => (int?)GetValue(ProgressProperty);
+            set
+            {
+                SetValue(ProgressProperty, value);
+                ProgressElement.Visibility = value == null ? Visibility.Collapsed : Visibility.Visible;
+            }
+        }
+
         public LoadingWindow(Window owner)
         {
             Owner = owner;
             owner.IsEnabled = false;
             WinUser.EnableWindow(Owner, false);
             InitializeComponent();
+            DataContext = this;
             Show();
         }
 

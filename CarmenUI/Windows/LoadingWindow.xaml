@@ -6,7 +6,9 @@
         xmlns:local="clr-namespace:CarmenUI.Windows"
         mc:Ignorable="d"
         Title="Loading..." Height="100" Width="200" ShowInTaskbar="False" Topmost="True" WindowStartupLocation="CenterOwner" WindowStyle="None" BorderThickness="1,1,1,1">
-    <Grid>
-        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24">Loading...</TextBlock>
-    </Grid>
+    <UniformGrid Columns="1">
+        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Text="{Binding MainText}"/>
+        <TextBlock x:Name="SubTextElement" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" TextWrapping="Wrap" Text="{Binding SubText}"/>
+        <ProgressBar x:Name="ProgressElement" Visibility="Collapsed" Value="{Binding Progress}" Width="180" Height="20"/>
+    </UniformGrid>
 </Window>

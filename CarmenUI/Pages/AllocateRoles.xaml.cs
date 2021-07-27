@@ -43,11 +43,19 @@ namespace CarmenUI.Pages
         private async void PopulateViews()
         {
             using var loading = new LoadingWindow(this);
+            loading.Progress = 0;
+            loading.SubText = "Waiting for sleep";
             await Task.Run(() => Thread.Sleep(3000));
+            loading.Progress = 30;
+            loading.SubText = "Loading nodes";
             await Task.Run(() => context.Nodes.Load());
+            loading.Progress = 60;
+            loading.SubText = "Observing collection";
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
+            loading.Progress = 90;
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
+            loading.Progress = 100;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
