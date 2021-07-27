@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -22,9 +23,41 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureShow : SubPage
     {
+        private CollectionViewSource criteriasViewSource;
+        private CollectionViewSource castGroupsViewSource;
+        private CollectionViewSource alternativeCastsViewSource;
+        private CollectionViewSource tagsViewSource;
+        private CollectionViewSource sectionTypesViewSource;
+        private CollectionViewSource requirementsViewSource;
+
         public ConfigureShow(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
+            criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
+            castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
+            alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
+            tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
+            sectionTypesViewSource = (CollectionViewSource)FindResource(nameof(sectionTypesViewSource));
+            requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            await PopulateView(criteriasViewSource, c => c.Criterias);
+            await PopulateView(castGroupsViewSource, c => c.CastGroups);//TODO ideally load whatever is in view, first
+            await PopulateView(alternativeCastsViewSource, c => c.AlternativeCasts);
+            await PopulateView(tagsViewSource, c => c.Tags);
+            await PopulateView(sectionTypesViewSource, c => c.SectionTypes);
+            await PopulateView(requirementsViewSource, c => c.Requirements);
+        }
+
+        private async Task PopulateView<T>(CollectionViewSource view, Func<ShowContext,DbSet<T>> db_set_getter) where T : class //TODO this will crash if still running when the page is cancelled, maybe I need to wrap this in a LoadingOverlay afterall
+        {
+            view.Source = new[] { "Loading..." };
+            await Task.Run(() => Thread.Sleep(1000));//TODO remove test code
+            view.Source = new[] { "Actually loading..." };//TODO remove test code
+            var db_set = await context.ColdLoadAsync(db_set_getter);
+            view.Source = db_set.Local.ToObservableCollection();
         }
 
         private void Criteria_Selected(object sender, RoutedEventArgs e)

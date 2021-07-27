@@ -8,7 +8,15 @@
     xmlns:local="clr-namespace:CarmenUI.Pages"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
-    Title="Configure Show">
+    Title="Configure Show" Loaded="Page_Loaded">
+    <Page.Resources>
+        <CollectionViewSource x:Key="criteriasViewSource"/>
+        <CollectionViewSource x:Key="castGroupsViewSource"/>
+        <CollectionViewSource x:Key="alternativeCastsViewSource"/>
+        <CollectionViewSource x:Key="tagsViewSource"/>
+        <CollectionViewSource x:Key="sectionTypesViewSource"/>
+        <CollectionViewSource x:Key="requirementsViewSource"/>
+    </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="300"/>
@@ -60,25 +68,7 @@
                     <TextBlock Text="Add List Criteria" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="5"/>
                 </Button>
             </Grid>
-            <ListBox x:Name="ObjectList" FontSize="22" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ToolTip="Drag to re-order">
-                <ListBoxItem>
-                    <TextBlock Text="Criteria 1"/>
-                </ListBoxItem>
-                <ListBoxItem>
-                    <TextBlock Text="Criteria 2"/>
-                </ListBoxItem>
-                <ListBoxItem>
-                    <TextBlock Text="Criteria 3"/>
-                </ListBoxItem>
-                <ListBoxItem>
-                    <TextBlock Text="Criteria 4"/>
-                </ListBoxItem>
-                <ListBoxItem>
-                    <TextBlock Text="Criteria 5"/>
-                </ListBoxItem>
-                <ListBoxItem>
-                    <TextBlock Text="Criteria 6"/>
-                </ListBoxItem>
+            <ListBox x:Name="ObjectList" ItemsSource="{Binding Source={StaticResource criteriasViewSource}}" FontSize="22" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ToolTip="Drag to re-order">
             </ListBox>
         </DockPanel>
         <StackPanel Grid.Column="2" Background="LightPink" Margin="5">

@@ -48,7 +48,7 @@ namespace CarmenUI.Pages
             await Task.Run(() => Thread.Sleep(1000));//TODO remove test code
             loading.Progress = 30;
             loading.SubText = "Loading nodes";
-            await context.Nodes.LoadAsyncAwaitable();
+            await Task.Run(() => context.Nodes.Load());
             loading.Progress = 60;
             loading.SubText = "Observing collection";
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
