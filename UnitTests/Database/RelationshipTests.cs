@@ -5,7 +5,6 @@ using ShowModel.Requirements;
 using ShowModel.Structure;
 using NUnit.Framework;
 using System.Linq;
-using ShowModel.Applicants;
 
 namespace UnitTests.Database
 {
