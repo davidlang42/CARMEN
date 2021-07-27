@@ -1,5 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CarmenUI.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using ShowModel;
+using ShowModel.Applicants;
+using ShowModel.Criterias;
+using ShowModel.Requirements;
+using ShowModel.Structure;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -81,30 +86,68 @@ namespace CarmenUI.Pages
                 return db_set.Local.ToObservableCollection();
             });
 
-        private void BindObjectList(string header, CollectionViewSource view_source)
+        private void BindObjectList(string header, CollectionViewSource view_source, IEnumerable<AddableObject>? add_buttons)
         {
             objectHeading.Text = header;
             objectList.SetBinding(ItemsControl.ItemsSourceProperty, new Binding { Source = view_source });
-            //TODO also change the buttons somehow, probably populate a list with types, and use a uniform grid
+            objectAddButtons.ItemsSource = add_buttons;
         }
 
+        static readonly AddableObject[] criteriasButtons = new[]
+        {
+            new AddableObject("Add Numeric Criteria", () => new NumericCriteria { Name = "New Numeric Criteria" }),
+            new AddableObject("Add Tick Criteria", () => new BooleanCriteria { Name = "New Tick Criteria" }),
+            new AddableObject("Add List Criteria", () => new SelectCriteria { Name = "New List Criteria" })
+        };
+
         private void Criteria_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Audition Criteria", criteriasViewSource);
+            => BindObjectList("Audition Criteria", criteriasViewSource, criteriasButtons);
+
+        static readonly AddableObject[] castGroupsButtons = new[]
+        {
+            new AddableObject("Add Cast Group", () => new CastGroup { Name = "New Cast Group" })
+        };
 
         private void CastGroups_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Cast Groups", castGroupsViewSource);
+            => BindObjectList("Cast Groups", castGroupsViewSource, castGroupsButtons);
+
+
+        static readonly AddableObject[] alternativeCastsButtons = new[]
+        {
+            new AddableObject("Add Alternative Cast", () => new AlternativeCast { Name = "New Alternative Cast" })
+        };
 
         private void AlternativeCasts_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Alternative Casts", alternativeCastsViewSource);
+            => BindObjectList("Alternative Casts", alternativeCastsViewSource, alternativeCastsButtons);
+
+        static readonly AddableObject[] tagsButtons = new[]
+        {
+            new AddableObject("Add Tag", () => new Tag { Name = "New Tag" })
+        };
 
         private void Tags_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Tags", tagsViewSource);
+            => BindObjectList("Tags", tagsViewSource, tagsButtons);
+
+        static readonly AddableObject[] sectionTypesButtons = new[]
+        {
+            new AddableObject("Add Section Type", () => new SectionType { Name = "New Section Type" })
+        };
 
         private void SectionTypes_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Section Types", sectionTypesViewSource);
+            => BindObjectList("Section Types", sectionTypesViewSource, sectionTypesButtons);
+
+        static readonly AddableObject[] requirementsButtons = new[]
+        {
+            new AddableObject("Add Exact Ability", () => new AbilityExactRequirement { Name = "New Ability Requirement (Exact)" }),
+            new AddableObject("Add Ability Range", () => new AbilityRangeRequirement { Name = "New Ability Requirement (Range)" }),
+            new AddableObject("Add Age", () => new AgeRequirement { Name = "New Age Requirement" }),
+            new AddableObject("Add Gender", () => new GenderRequirement { Name = "New Gender Requirement" }),
+            new AddableObject("Add Tag", () => new TagRequirement { Name = "New Tag Requirement" })
+            //TODO combined requirements: And/Or/Xor/Not, probably add these from the edit pane, OR make buttons a list of lists, or simplier: have exactly 2 docked sets of buttons (but empty is allowed)
+        };
 
         private void Requirements_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Role Requirements", requirementsViewSource);
+            => BindObjectList("Role Requirements", requirementsViewSource, requirementsButtons);
 
         private void Import_Selected(object sender, RoutedEventArgs e)
         {
@@ -126,6 +169,18 @@ namespace CarmenUI.Pages
         private void ResetToDefaultButton_Click(object sender, RoutedEventArgs e)
         {
             //TODO implement reset to default
+        }
+
+        private void AddObjectButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (objectList.GetBindingExpression(ItemsControl.ItemsSourceProperty)?.ParentBinding.Source is CollectionViewSource view_source
+                && view_source.Source is IList list)
+            {
+                var button = (Button)sender;
+                var addable = (AddableObject)button.DataContext;
+                var new_object = addable.CreateObject();
+                list.Add(new_object);
+            }
         }
     }
 }

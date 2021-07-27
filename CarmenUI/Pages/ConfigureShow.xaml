@@ -11,15 +11,15 @@
     Title="Configure Show" Loaded="Page_Loaded">
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="300"/>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="250"/>
+            <ColumnDefinition Width="*" MinWidth="275"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ListBox Grid.Column="0" x:Name="configList" FontSize="22" BorderThickness="0">
+        <ListBox Grid.Column="0" x:Name="configList" FontSize="18" BorderThickness="0">
             <ListBoxItem Selected="Criteria_Selected">
                 <TextBlock Text="Audition cast based on..."/>
             </ListBoxItem>
@@ -43,24 +43,24 @@
             </ListBoxItem>
         </ListBox>
         <DockPanel Grid.Column="1" Margin="5">
-            <TextBlock DockPanel.Dock="Top" x:Name="objectHeading" Text="Audition Criteria" FontSize="28"/>
-            <Grid DockPanel.Dock="Bottom">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0">
-                    <TextBlock Text="Add Numeric Criteria" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="5"/>
-                </Button>
-                <Button Grid.Column="1">
-                    <TextBlock Text="Add Tick Criteria" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="5"/>
-                </Button>
-                <Button Grid.Column="2">
-                    <TextBlock Text="Add List Criteria" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="5"/>
-                </Button>
-            </Grid>
-            <ListBox x:Name="objectList" FontSize="22" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ToolTip="Drag to re-order"/>
+            <TextBlock DockPanel.Dock="Top" x:Name="objectHeading" Text="Audition Criteria" FontSize="22"/>
+            <ItemsControl DockPanel.Dock="Bottom" x:Name="objectAddButtons">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <UniformGrid Rows="1">
+
+                        </UniformGrid>
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Button Click="AddObjectButton_Click">
+                            <TextBlock Text="{Binding AddButtonText}" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="5"/>
+                        </Button>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ToolTip="Drag to re-order"/>
         </DockPanel>
             <StackPanel Grid.Column="2" Background="LightPink" Margin="5">
             <TextBlock Text="Edit object details here based on selected object type" TextWrapping="Wrap"/>
