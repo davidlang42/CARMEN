@@ -26,29 +26,34 @@ using System.Windows.Shapes;
 namespace CarmenUI.Pages
 {
     /// <summary>
-    /// Interaction logic for PageFunction1.xaml
+    /// Interaction logic for ConfigureShow.xaml
     /// </summary>
     public partial class ConfigureShow : SubPage
     {
         //TODO (LATER) editing panel heading fails to bind when a string (eg. "Loading...") is selected in objectList. The observed behaviour is that the text block is blank, which is the desired behaviour, but binding fails are bad.
-        //TODO need to make edit panels for cast groups, alternative casts, tags, section types, requirements
         //TODO implement drag to re-order (only if selection is IOrdered)
+        //TODO create EditableImage control (for CastGroup.Icon)
+        //TODO create CheckBoxList / CheckBoxCombo control (for CastGroup.Requirements)
+        //TODO fix binding issue with CastGroup.Abbreviation not updating when Name changes (or move that logic into CarmenUI rather than ShowModel)
+        //TODO need to make edit panels for: alternative casts, tags, section types, requirements
 
         static readonly SortDescription sortByOrder = new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending);
         static readonly SortDescription sortByName = new SortDescription(nameof(INamed.Name), ListSortDirection.Ascending);
 
-        private CollectionViewSource criteriasViewSource = new() { SortDescriptions = { sortByOrder } };
-        private CollectionViewSource castGroupsViewSource = new() { SortDescriptions = { sortByOrder } };
-        private CollectionViewSource alternativeCastsViewSource = new() { SortDescriptions = { sortByName } };
-        private CollectionViewSource tagsViewSource = new() { SortDescriptions = { sortByName } };
-        private CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { sortByName } };
-        private CollectionViewSource requirementsViewSource = new() { SortDescriptions = { sortByOrder } };
+        private readonly CollectionViewSource criteriasViewSource = new() { SortDescriptions = { sortByOrder } };
+        private readonly CollectionViewSource castGroupsViewSource = new() { SortDescriptions = { sortByOrder } };
+        private readonly CollectionViewSource alternativeCastsViewSource; // xaml resource loaded in constructor
+        private readonly CollectionViewSource tagsViewSource = new() { SortDescriptions = { sortByName } };
+        private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { sortByName } };
+        private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { sortByOrder } };
 
         private CollectionViewSource? currentViewSource;
 
         public ConfigureShow(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
+            alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
+            alternativeCastsViewSource.SortDescriptions.Add(sortByName);
             configList.SelectedIndex = 0; // must be set after InitializeComponent() because it triggers Selected event below
         }
 
