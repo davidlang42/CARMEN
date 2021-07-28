@@ -85,7 +85,15 @@
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type modelCriterias:NumericCriteria}">
                         <ScrollViewer  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-                            <Grid Margin="0 5">
+                            <Grid>
+                                <Grid.Resources>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="Margin" Value="5 0 0 5"/>
+                                    </Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Margin" Value="0 0 0 5"/>
+                                    </Style>
+                                </Grid.Resources>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
@@ -95,13 +103,13 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap">
+                                <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                     This is a numeric criteria, for which an Applicant can be given a whole number mark between 0 and a maximum value, inclusive.
                                 </TextBlock>
-                                <TextBlock Grid.Row="1" Text="Name"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}"/>
-                                <TextBlock Grid.Row="2" Text="Maximum value"/>
-                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding MaxMark}"/>
+                                <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                                <TextBlock Grid.Row="2" Text="Maximum" FontSize="14"/>
+                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding MaxMark}" FontSize="14"/>
                             </Grid>
                         </ScrollViewer>
                     </DataTemplate>
@@ -114,17 +122,20 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap">
-                                This is a list criteria, for which an Applicant can be marked as having a value selected from a list.<LineBreak/>
-                                The 'mark' an Applicant receives for a list criteria is a number representing the position of the selected value within the list, where the 1st option is 0.<LineBreak/>
-                                The maximum this 'mark' will be is N-1, where N is the number of options.<LineBreak/>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14" Margin="0 0 0 5">
+                                This is a list criteria, for which an Applicant can be marked as having a value selected from a list.
+                                The 'mark' an Applicant receives for a list criteria is a number representing the position of the selected value within the list, where the 1st option is 0.
+                                The maximum this 'mark' will be is N-1, where N is the number of options.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Grid.ColumnSpan="2" TextWrapping="Wrap" FontStyle="Italic" FontSize="12"  Margin="0 0 0 10">
                                 NOTE: Changing or re-ordering the options for this criteria is only changing the text which is shown, the Applicant's 'mark' number is not updated when the options are changed, so care must be taken when updating this criteria after Applicant's marks have been entered.
                             </TextBlock>
-                            <TextBlock Grid.Row="1" Text="Name"/>
-                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}"/>
-                            <uc:EditableList Grid.Row="2" Grid.ColumnSpan="2" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
+                            <TextBlock Grid.Row="2" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Name}"  Margin="5 0 0 5" FontSize="14"/>
+                            <uc:EditableList Grid.Row="3" Grid.ColumnSpan="2" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">
@@ -138,11 +149,11 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap">
+                                <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14" Margin="0 0 0 5">
                                     This is a tick criteria, like a Yes/No question, for which an Applicant can either be marked Yes or No.
                                 </TextBlock>
-                                <TextBlock Grid.Row="1" Text="Name"/>
-                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}"/>
+                                <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" Margin="5 0 0 5"/>
                             </Grid>
                         </ScrollViewer>
                     </DataTemplate>

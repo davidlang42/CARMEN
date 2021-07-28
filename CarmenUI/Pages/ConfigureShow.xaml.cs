@@ -30,8 +30,9 @@ namespace CarmenUI.Pages
     public partial class ConfigureShow : SubPage
     {
         //TODO (LATER) editing panel heading fails to bind when a string (eg. "Loading...") is selected in objectList. The observed behaviour is that the text block is blank, which is the desired behaviour, but binding fails are bad.
-        //TODO layout needs some margins added (and font size changed) for all criteria edit panels
         //TODO need to make edit panels for cast groups, alternative casts, tags, section types, requirements
+        //TODO make sure that IOrdered objects are shown in order (ie. CastGroup, Criteria, Requirement), otherwise alpahbetical for consistency
+        //TODO implement drag to re-order (only if IOrdered)
 
         private CollectionViewSource criteriasViewSource = new();
         private CollectionViewSource castGroupsViewSource = new();

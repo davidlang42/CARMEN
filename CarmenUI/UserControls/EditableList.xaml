@@ -23,7 +23,7 @@
         <Button x:Name="optionsMoveUp" Grid.Row="1" Grid.Column="2" Content="Move Up" Click="optionsMoveUp_Click"/>
         <Button x:Name="optionsDelete" Grid.Row="2" Grid.Column="2" Content="Delete" Click="optionsDelete_Click"/>
         <Button x:Name="optionsMoveDown" Grid.Row="3" Grid.Column="2" Content="Move Down" Click="optionsMoveDown_Click"/>
-        <Label Content="New Option:" Grid.Row="4"/>
+        <Label Content="New option:" Grid.Row="4"/>
         <TextBox x:Name="optionsNewItem" Grid.Row="4" Grid.Column="1" KeyDown="optionsNewItem_KeyDown"/>
         <Button x:Name="optionsAdd" Grid.Row="4" Grid.Column="2" Content="Add" Click="optionsAdd_Click"/>
     </Grid>
