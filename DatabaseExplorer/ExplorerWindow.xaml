@@ -332,9 +332,6 @@
                     <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="200" SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.Requirements}"
                                                      AvailableItems="{Binding Source={StaticResource requirementsViewSource}}"
                                                      Title="Requirements:" Margin="5"/>
-                    <local:SelectableListControl DockPanel.Dock="Bottom" MaxHeight="100" SelectedItems="{Binding ElementName=castGroupsDataGrid, Path=SelectedItem.AlternativeCasts}"
-                                                     AvailableItems="{Binding Source={StaticResource alternativeCastsViewSource}}"
-                                                     Title="Alternative Casts:" Margin="5"/>
                     <DataGrid x:Name="castGroupsDataGrid" AutoGenerateColumns="False" 
                         EnableRowVirtualization="True" 
                         ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}" 
@@ -343,6 +340,7 @@
                             <DataGridTextColumn Binding="{Binding Name}" Header="Cast Group Name"/>
                             <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
                             <DataGridTextColumn Binding="{Binding RequiredCount}" Header="Required Count"/>
+                            <DataGridCheckBoxColumn Binding="{Binding AlternateCasts}" Header="Alternate Casts"/>
                             <DataGridComboBoxColumn SelectedItemBinding="{Binding Icon}" ItemsSource="{Binding Source={StaticResource imagesViewSource}}" Header="Icon" DisplayMemberPath="Name"/>
                         </DataGrid.Columns>
                     </DataGrid>
