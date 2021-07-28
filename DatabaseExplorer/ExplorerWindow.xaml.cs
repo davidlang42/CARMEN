@@ -20,7 +20,7 @@ namespace DatabaseExplorer
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class ExplorerWindow : Window
     {
         private ShowContext? _context;
 
@@ -51,7 +51,7 @@ namespace DatabaseExplorer
         private readonly CallbackCommand uploadImageCommand;
         private readonly CallbackCommand pasteImageCommand;
 
-        public MainWindow()
+        public ExplorerWindow()
         {
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
