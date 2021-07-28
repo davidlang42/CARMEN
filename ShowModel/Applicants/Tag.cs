@@ -14,7 +14,7 @@ namespace ShowModel.Applicants
     /// A group of people which an applicant can be selected into.
     /// An applicant can have many Tags.
     /// </summary>
-    public class Tag : ICounted //TODO consider abstraction of CastGroup and Tag
+    public class Tag : ICounted, INamed //TODO consider abstraction of CastGroup and Tag
     {
         #region Database fields
         [Key]

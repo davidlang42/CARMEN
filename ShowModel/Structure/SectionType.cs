@@ -2,7 +2,7 @@
 
 namespace ShowModel.Structure
 {
-    public class SectionType
+    public class SectionType : INamed
     {
         [Key]
         public int SectionTypeId { get; private set; }

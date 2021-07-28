@@ -10,7 +10,7 @@ namespace ShowModel.Requirements
     /// <summary>
     /// A requirement which can be satisfied by an Applicant
     /// </summary>
-    public abstract class Requirement : IOrdered, IValidatable
+    public abstract class Requirement : IOrdered, IValidatable, INamed
     {
         #region Database fields
         [Key]

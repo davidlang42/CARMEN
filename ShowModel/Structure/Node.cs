@@ -9,7 +9,7 @@ namespace ShowModel.Structure
     /// <summary>
     /// A node in the item tree, which may or may not be able to have children.
     /// </summary>
-    public abstract class Node : IOrdered, ICounted, IValidatable
+    public abstract class Node : IOrdered, ICounted, IValidatable, INamed
     {
         #region Database fields
         [Key]

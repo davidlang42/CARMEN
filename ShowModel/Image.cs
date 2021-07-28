@@ -5,7 +5,7 @@ namespace ShowModel
     /// <summary>
     /// A stored image containing binary data.
     /// </summary>
-    public class Image
+    public class Image : INamed
     {
         [Key]
         public int ImageId { get; private set; }

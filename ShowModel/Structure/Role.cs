@@ -7,7 +7,7 @@ using ShowModel.Requirements;
 
 namespace ShowModel.Structure
 {
-    public class Role : ICounted
+    public class Role : ICounted, INamed
     {
         #region Database fields
         [Key]

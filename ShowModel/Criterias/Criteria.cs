@@ -10,7 +10,7 @@ namespace ShowModel.Criterias
     /// <summary>
     /// A criteria on which applicants are assessed, and assigned a mark.
     /// </summary>
-    public abstract class Criteria : IOrdered
+    public abstract class Criteria : IOrdered, INamed
     {
         [Key]
         public int CriteriaId { get; private set; }

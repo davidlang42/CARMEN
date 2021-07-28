@@ -10,7 +10,7 @@ namespace ShowModel.Applicants
     /// A group of people which an applicant can be selected into.
     /// Cast groups are mutually exclusive.
     /// </summary>
-    public class CastGroup : IOrdered
+    public class CastGroup : IOrdered, INamed
     {
         #region Database fields
         [Key]
