@@ -5,6 +5,10 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarmenUI"
         xmlns:bd="clr-namespace:CarmenUI.Bindings"
+        xmlns:modelCriterias="clr-namespace:ShowModel.Criterias;assembly=ShowModel"
+        xmlns:modelRequirements="clr-namespace:ShowModel.Requirements;assembly=ShowModel"
+        xmlns:modelStructure="clr-namespace:ShowModel.Structure;assembly=ShowModel"
+        xmlns:modelApplicants="clr-namespace:ShowModel.Applicants;assembly=ShowModel"
         mc:Ignorable="d"
         Top="{bd:SettingBinding Top}"
         Left="{bd:SettingBinding Left}"
@@ -13,5 +17,25 @@
         WindowState="{bd:SettingBinding WindowState}"
         MinHeight="600" MinWidth="800"
         Title="CARMEN">
+    <Window.Resources>
+        <DataTemplate DataType="{x:Type modelCriterias:Criteria}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type modelApplicants:CastGroup}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type modelApplicants:AlternativeCast}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type modelApplicants:Tag}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type modelStructure:SectionType}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type modelRequirements:Requirement}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
+    </Window.Resources>
     <Frame x:Name="MainFrame" NavigationUIVisibility="Hidden" Navigated="MainFrame_Navigated"/>
 </Window>
