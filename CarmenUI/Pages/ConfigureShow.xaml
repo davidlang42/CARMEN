@@ -19,6 +19,7 @@
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <CollectionViewSource x:Key="alternativeCastsViewSource"/>
         <cv:EnumerateCountByGroups x:Key="enumerateCountByGroups"/>
+        <cv:InverseBoolean x:Key="inverseBoolean"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -314,6 +315,9 @@
                                 <Style TargetType="TextBlock">
                                     <Setter Property="Margin" Value="0 0 0 5"/>
                                 </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
                             </Grid.Resources>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
@@ -323,14 +327,20 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
-                                This is a numeric criteria, for which an Applicant can be given a whole number mark between 0 and a maximum value, inclusive.
+                                This defines a type of Section which can be used to add structure to the items in your show.
+                                This allows the show structure to match your chosen terminology, but also to contain different business logic about the number of roles per person within a Section.
+                                If no Section Types are defined, then no checks will be performed about the number of Roles per person.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
-                            <TextBlock Grid.Row="2" Text="Maximum" FontSize="14"/>
-                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding MaxMark}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Icon" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="TODO" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding AllowNoRoles, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Everyone must have a role" VerticalContentAlignment="Center"/>
+                            <CheckBox Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding AllowMultipleRoles}" FontSize="14" Content="A person can have multiple roles" VerticalContentAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                 </ContentControl.Resources>
