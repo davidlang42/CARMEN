@@ -19,31 +19,34 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <ListBox Grid.Column="0" x:Name="configList" FontSize="18" BorderThickness="0">
-            <ListBoxItem Selected="Criteria_Selected">
-                <TextBlock Text="Audition cast based on..."/>
-            </ListBoxItem>
-            <ListBoxItem Selected="CastGroups_Selected">
-                <TextBlock Text="Select cast into..."/>
-            </ListBoxItem>
-            <ListBoxItem Selected="AlternativeCasts_Selected">
-                <TextBlock Text="With alternating casts..."/>
-            </ListBoxItem>
-            <ListBoxItem Selected="Tags_Selected">
-                <TextBlock Text="Apply tags to cast members..."/>
-            </ListBoxItem>
-            <ListBoxItem Selected="SectionTypes_Selected">
-                <TextBlock Text="Structure items into..."/>
-            </ListBoxItem>
-            <ListBoxItem Selected="Requirements_Selected">
-                <TextBlock Text="Allocate roles based on..."/>
-            </ListBoxItem>
-            <ListBoxItem Selected="Import_Selected">
-                <TextBlock Text="Import settings from..." FontStyle="Italic"/>
-            </ListBoxItem>
-        </ListBox>
+        <DockPanel Margin="5">
+            <TextBlock DockPanel.Dock="Top" Text="Configuration" FontSize="22"/>
+            <ListBox x:Name="configList" FontSize="16" BorderThickness="0">
+                <ListBoxItem Selected="Criteria_Selected">
+                    <TextBlock Text="Audition cast based on..."/>
+                </ListBoxItem>
+                <ListBoxItem Selected="CastGroups_Selected">
+                    <TextBlock Text="Select cast into..."/>
+                </ListBoxItem>
+                <ListBoxItem Selected="AlternativeCasts_Selected">
+                    <TextBlock Text="With alternating casts..."/>
+                </ListBoxItem>
+                <ListBoxItem Selected="Tags_Selected">
+                    <TextBlock Text="Apply tags to cast members..."/>
+                </ListBoxItem>
+                <ListBoxItem Selected="SectionTypes_Selected">
+                    <TextBlock Text="Structure items into..."/>
+                </ListBoxItem>
+                <ListBoxItem Selected="Requirements_Selected">
+                    <TextBlock Text="Allocate roles based on..."/>
+                </ListBoxItem>
+                <ListBoxItem Selected="Import_Selected">
+                    <TextBlock Text="Import settings from..." FontStyle="Italic"/>
+                </ListBoxItem>
+            </ListBox>
+        </DockPanel>
         <DockPanel Grid.Column="1" Margin="5">
-            <TextBlock DockPanel.Dock="Top" x:Name="objectHeading" Text="Audition Criteria" FontSize="22"/>
+            <TextBlock DockPanel.Dock="Top" x:Name="objectHeading" FontSize="22"/>
             <ItemsControl DockPanel.Dock="Bottom" x:Name="objectAddButtons">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
@@ -55,9 +58,7 @@
                         <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding}">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Rows="1">
-
-                                    </UniformGrid>
+                                    <UniformGrid Rows="1"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>

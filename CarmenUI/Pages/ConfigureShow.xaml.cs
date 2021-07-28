@@ -36,6 +36,8 @@ namespace CarmenUI.Pages
         private CollectionViewSource sectionTypesViewSource = new();
         private CollectionViewSource requirementsViewSource = new();
 
+        private CollectionViewSource? currentViewSource;
+
         public ConfigureShow(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
@@ -64,9 +66,8 @@ namespace CarmenUI.Pages
             while (tasks.Count != 0)
             {
                 // prioritise loading whatever is in view
-                if (objectList.GetBindingExpression(ItemsControl.ItemsSourceProperty)?.ParentBinding.Source is CollectionViewSource source_in_view
-                    && tasks.ContainsKey(source_in_view))
-                    next_source = source_in_view;
+                if (currentViewSource != null && tasks.ContainsKey(currentViewSource))
+                    next_source = currentViewSource;
                 else
                     next_source = tasks.Keys.First();
                 // extract task & remove from list
@@ -90,6 +91,7 @@ namespace CarmenUI.Pages
         {
             objectHeading.Text = header;
             objectList.SetBinding(ItemsControl.ItemsSourceProperty, new Binding { Source = view_source });
+            currentViewSource = view_source;
             objectAddButtons.ItemsSource = add_buttons;
         }
 
@@ -187,6 +189,8 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            //TODO save here
+            //TODO (FUTURE) only flag changes on objects which actually changed, rather than all possible changes on this form
             OnReturn(DataObjects.AlternativeCasts | DataObjects.CastGroups | DataObjects.Criterias | DataObjects.Images | DataObjects.Requirements | DataObjects.SectionTypes | DataObjects.Tags);
         }
 
@@ -197,13 +201,13 @@ namespace CarmenUI.Pages
 
         private void AddObjectButton_Click(object sender, RoutedEventArgs e)
         {
-            if (objectList.GetBindingExpression(ItemsControl.ItemsSourceProperty)?.ParentBinding.Source is CollectionViewSource view_source
-                && view_source.Source is IList list)
+            if (currentViewSource?.Source is IList list && !list.IsFixedSize)
             {
                 var button = (Button)sender;
                 var addable = (AddableObject)button.DataContext;
                 var new_object = addable.CreateObject();
                 list.Add(new_object);
+                objectList.SelectedItem = new_object;
             }
         }
     }
