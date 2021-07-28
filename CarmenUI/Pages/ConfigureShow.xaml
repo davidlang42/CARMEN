@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CarmenUI.Pages"
     xmlns:uc="clr-namespace:CarmenUI.UserControls"
+    xmlns:cv="clr-namespace:CarmenUI.Converters"
     xmlns:modelCriterias="clr-namespace:ShowModel.Criterias;assembly=ShowModel"
     xmlns:modelRequirements="clr-namespace:ShowModel.Requirements;assembly=ShowModel"
     xmlns:modelStructure="clr-namespace:ShowModel.Structure;assembly=ShowModel"
@@ -17,6 +18,7 @@
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <CollectionViewSource x:Key="alternativeCastsViewSource"/>
+        <cv:EnumerateCountByGroups x:Key="enumerateCountByGroups"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -245,6 +247,90 @@
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Initial" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Initial}" FontSize="14"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelApplicants:Tag}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                A tag can be applied to a successful Applicant to indicate that form part of a special team, or have an external attribute, such as wearing a microphone. An Applicant can have many tags.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Description" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" FontSize="14"/>
+                            <TextBlock Grid.Row="3" Text="Icon" FontSize="14"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="TODO" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirements" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="TODO" FontSize="14"/>
+                            <TextBlock Grid.Row="5" Grid.ColumnSpan="2" Text="Required Counts:" FontSize="14"/>
+                            <ItemsControl Grid.Row="6" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource enumerateCountByGroups}}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="1"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding CastGroup.Name}" FontSize="14"/>
+                                            <TextBox Grid.Column="1" Text="{Binding Count}" FontSize="14"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelStructure:SectionType}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is a numeric criteria, for which an Applicant can be given a whole number mark between 0 and a maximum value, inclusive.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Maximum" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding MaxMark}" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
                 </ContentControl.Resources>

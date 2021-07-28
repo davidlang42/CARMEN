@@ -1,4 +1,5 @@
-﻿using CarmenUI.ViewModels;
+﻿using CarmenUI.Converters;
+using CarmenUI.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Applicants;
@@ -51,11 +52,15 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { sortByName } };
         private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { sortByOrder } };
 
+        private readonly EnumerateCountByGroups enumerateCountByGroups;
+
         private CollectionViewSource? currentViewSource;
 
         public ConfigureShow(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
+            enumerateCountByGroups = (EnumerateCountByGroups)FindResource(nameof(enumerateCountByGroups));
+            enumerateCountByGroups.CastGroups = castGroupsViewSource;
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
             alternativeCastsViewSource.SortDescriptions.Add(sortByName);
             configList.SelectedIndex = 0; // must be set after InitializeComponent() because it triggers Selected event below
