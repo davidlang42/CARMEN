@@ -47,16 +47,27 @@
             <ItemsControl DockPanel.Dock="Bottom" x:Name="objectAddButtons">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Rows="1">
-
-                        </UniformGrid>
+                        <StackPanel/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <Button Click="AddObjectButton_Click">
-                            <TextBlock Text="{Binding AddButtonText}" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="5"/>
-                        </Button>
+                        <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding}">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <UniformGrid Rows="1">
+
+                                    </UniformGrid>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button Click="AddObjectButton_Click">
+                                        <TextBlock Text="{Binding AddButtonText}" TextWrapping="Wrap" HorizontalAlignment="Center" Margin="5"/>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
