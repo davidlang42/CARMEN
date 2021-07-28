@@ -28,12 +28,9 @@ namespace ShowModel.Applicants
         public string Abbreviation { get; set; } = "";
         public virtual Image? Icon { get; set; }
         public virtual ICollection<Applicant> Members { get; private set; } = new ObservableCollection<Applicant>();
-        /// <summary>The number of applicants which should be allocated to this group</summary>
+        /// <summary>The number of applicants which should be allocated to this group (per alternate cast)</summary>
         public uint? RequiredCount { get; set; }
-        public virtual ICollection<AlternativeCast> AlternativeCasts { get; private set; } = new ObservableCollection<AlternativeCast>();
+        public bool AlternateCasts { get; set; }
         public virtual ICollection<Requirement> Requirements { get; private set; } = new ObservableCollection<Requirement>();
-#endregion
-
-        public bool AlternatingCasts() => AlternativeCasts.Any();
     }
 }

@@ -61,9 +61,6 @@ namespace ShowModel
             // Navigation collections must exist in both directions, otherwise loading will
             // fail with ArgumentNullException "Value cannot be null. (Parameter 'member')".
             modelBuilder.Entity<CastGroup>()
-                .HasMany(g => g.AlternativeCasts)
-                .WithMany(r => r.CastGroups);
-            modelBuilder.Entity<CastGroup>()
                 .HasMany(g => g.Requirements)
                 .WithMany(r => r.UsedByCastGroups);
             modelBuilder.Entity<Tag>()

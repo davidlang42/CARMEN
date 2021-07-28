@@ -154,6 +154,7 @@ namespace ShowModel
             var first_names = gender == Gender.Male ? MALE_FIRST_NAMES : FEMALE_FIRST_NAMES;
             var criterias = Context.Criterias.ToArray();
             var tags = Context.Tags.ToArray();
+            var alternative_casts = Context.AlternativeCasts.ToArray();
             for (var i = 0; i < count; i++)
             {
                 var applicant = new Applicant
@@ -178,8 +179,8 @@ namespace ShowModel
                 if (include_cast_groups)
                 {
                     applicant.CastGroup = groups[random.Next(groups.Length)];
-                    if (applicant.CastGroup.AlternativeCasts.Any())
-                        applicant.AlternativeCast = applicant.CastGroup.AlternativeCasts.ToArray().Random(random);
+                    if (applicant.CastGroup.AlternateCasts)
+                        applicant.AlternativeCast = alternative_casts.Random(random);
                 }
                 if (include_tags)
                     applicant.Tags.Add(tags[random.Next(tags.Length)]);
@@ -207,8 +208,9 @@ namespace ShowModel
                 {
                     Name = $"Cast Group {i + 1}",
                     Order = order++,
-                    RequiredCount = required_count
-                };
+                    RequiredCount = required_count,
+                    AlternateCasts = i % 2 == 0
+                }; 
                 Context.CastGroups.Add(cast_group);
             }
         }
@@ -379,11 +381,9 @@ namespace ShowModel
                 Context.Tags.ToList().Random(random).Icon = images.Random(random);
         }
 
-        /// <summary>Adds alternative casts and applies them to some cast groups.
-        /// NOTE: Must be called after Cast Groups have been committed.</summary>
-        public void AddAlternativeCasts(uint count = 2, uint apply_to_cast_groups = 2)
+        /// <summary>Adds alternative casts</summary>
+        public void AddAlternativeCasts(uint count = 2)
         {
-            var groups = Context.CastGroups.Take((int)apply_to_cast_groups).ToArray();
             for (var i = 0; i < count; i++)
             {
                 var cast_letter = Convert.ToChar(i + 65);
@@ -392,8 +392,7 @@ namespace ShowModel
                     Name = $"Cast {cast_letter}",
                     Initial = cast_letter
                 };
-                foreach (var group in groups)
-                    group.AlternativeCasts.Add(alternative_cast);
+
                 Context.AlternativeCasts.Add(alternative_cast);
             }
         }

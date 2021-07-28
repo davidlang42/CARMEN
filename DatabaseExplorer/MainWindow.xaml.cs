@@ -208,9 +208,9 @@ namespace DatabaseExplorer
             if (!TryInputNumber("How many ROLES PER ITEM would you like to add?", "Test Data", out var roles, 5))
                 return;
             using var test_data = new TestDataGenerator(Context);
+            test_data.AddAlternativeCasts();
             test_data.AddCastGroups(cast_groups);
             Context.SaveChanges();
-            test_data.AddAlternativeCasts(); // after cast groups committed
             test_data.AddShowStructure(items, sections, depth, include_items_at_every_depth: every_depth);
             Context.SaveChanges();
             test_data.AddCriteriaAndRequirements(); // after cast groups committed

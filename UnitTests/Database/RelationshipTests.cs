@@ -20,9 +20,9 @@ namespace UnitTests.Database
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
             using var test_data = new TestDataGenerator(context, 0);
+            test_data.AddAlternativeCasts();
             test_data.AddCastGroups(4);
             context.SaveChanges();
-            test_data.AddAlternativeCasts(); // after cast groups committed
             test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false); // after cast groups committed
             context.SaveChanges();
             test_data.AddCriteriaAndRequirements(); // after cast groups committed
@@ -88,18 +88,6 @@ namespace UnitTests.Database
         }
 
         [Test]
-        public void Applicant_AlternativeCast_ManyToOne()
-        {
-            using var context = new ShowContext(contextOptions);
-            var applicant = context.Applicants.ToList().First(a => a.CastGroup?.AlternativeCasts.Any() == true);
-            applicant.ApplicantId.Should().NotBe(0);
-            var alternative_cast = applicant.AlternativeCast;
-            alternative_cast.Should().NotBeNull();
-            alternative_cast!.AlternativeCastId.Should().NotBe(0);
-            alternative_cast.Members.Should().Contain(applicant);
-        }
-
-        [Test]
         public void Applicant_Tag_ManyToMany()
         {
             using var context = new ShowContext(contextOptions);
@@ -120,17 +108,6 @@ namespace UnitTests.Database
             image.Should().NotBeNull();
             image!.ImageId.Should().NotBe(0);
             // Reverse navigation not defined
-        }
-
-        [Test]
-        public void AlternativeCast_CastGroup_ManyToMany()
-        {
-            using var context = new ShowContext(contextOptions);
-            var alternative_cast = context.AlternativeCasts.First();
-            alternative_cast.AlternativeCastId.Should().NotBe(0);
-            var group = alternative_cast.CastGroups.First();
-            group.CastGroupId.Should().NotBe(0);
-            group.AlternativeCasts.Should().Contain(alternative_cast);
         }
         #endregion
 
