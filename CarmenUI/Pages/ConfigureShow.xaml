@@ -6,6 +6,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CarmenUI.Pages"
+    xmlns:uc="clr-namespace:CarmenUI.UserControls"
+    xmlns:modelCriterias="clr-namespace:ShowModel.Criterias;assembly=ShowModel"
+    xmlns:modelRequirements="clr-namespace:ShowModel.Requirements;assembly=ShowModel"
+    xmlns:modelStructure="clr-namespace:ShowModel.Structure;assembly=ShowModel"
+    xmlns:modelApplicants="clr-namespace:ShowModel.Applicants;assembly=ShowModel"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Configure Show" Loaded="Page_Loaded">
@@ -74,9 +79,76 @@
             </ItemsControl>
             <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ToolTip="Drag to re-order"/>
         </DockPanel>
-            <StackPanel Grid.Column="2" Background="LightPink" Margin="5">
-            <TextBlock Text="Edit object details here based on selected object type" TextWrapping="Wrap"/>
-        </StackPanel>
+        <DockPanel Grid.Column="2" Margin="5" DataContext="{Binding ElementName=objectList,Path=SelectedItem}">
+            <TextBlock DockPanel.Dock="Top" Text="{Binding Name, StringFormat='Editing: \{0\}'}" FontSize="22"/>
+            <ContentControl Content="{Binding}">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type modelCriterias:NumericCriteria}">
+                        <ScrollViewer  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                            <Grid Margin="0 5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap">
+                                    This is a numeric criteria, for which an Applicant can be given a whole number mark between 0 and a maximum value, inclusive.
+                                </TextBlock>
+                                <TextBlock Grid.Row="1" Text="Name"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}"/>
+                                <TextBlock Grid.Row="2" Text="Maximum value"/>
+                                <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding MaxMark}"/>
+                            </Grid>
+                        </ScrollViewer>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
+                        <Grid Margin="0 5">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap">
+                                This is a list criteria, for which an Applicant can be marked as having a value selected from a list.<LineBreak/>
+                                The 'mark' an Applicant receives for a list criteria is a number representing the position of the selected value within the list, where the 1st option is 0.<LineBreak/>
+                                The maximum this 'mark' will be is N-1, where N is the number of options.<LineBreak/>
+                                NOTE: Changing or re-ordering the options for this criteria is only changing the text which is shown, the Applicant's 'mark' number is not updated when the options are changed, so care must be taken when updating this criteria after Applicant's marks have been entered.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}"/>
+                            <uc:EditableList Grid.Row="2" Grid.ColumnSpan="2" Title="List of options:" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">
+                        <ScrollViewer  HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                            <Grid Margin="0 5">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap">
+                                    This is a tick criteria, like a Yes/No question, for which an Applicant can either be marked Yes or No.
+                                </TextBlock>
+                                <TextBlock Grid.Row="1" Text="Name"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}"/>
+                            </Grid>
+                        </ScrollViewer>
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
+        </DockPanel>
         <Button Grid.Row="1" x:Name="ResetToDefaultButton" Width="200" Height="35" Margin="5" Click="ResetToDefaultButton_Click" HorizontalAlignment="Left">
             <TextBlock Text="Reset to default configuration"/>
         </Button>

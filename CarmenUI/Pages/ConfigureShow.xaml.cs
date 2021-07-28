@@ -29,6 +29,11 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureShow : SubPage
     {
+        //TODO (LATER) editing panel heading fails to bind when a string (eg. "Loading...") is selected in objectList. The observed behaviour is that the text block is blank, which is the desired behaviour, but binding fails are bad.
+        //TODO pressing enter in new option text box adds the option (I think) but also presses save on the form. Probably need a e.Handled= true somewhere. Also fix case of label for text box to "New option"
+        //TODO layout needs some margins added (and font size changed) for all criteria edit panels
+        //TODO need to make edit panels for cast groups, alternative casts, tags, section types, requirements
+
         private CollectionViewSource criteriasViewSource = new();
         private CollectionViewSource castGroupsViewSource = new();
         private CollectionViewSource alternativeCastsViewSource = new();
