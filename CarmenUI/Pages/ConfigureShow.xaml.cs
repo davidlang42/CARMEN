@@ -8,6 +8,7 @@ using ShowModel.Structure;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -31,15 +32,17 @@ namespace CarmenUI.Pages
     {
         //TODO (LATER) editing panel heading fails to bind when a string (eg. "Loading...") is selected in objectList. The observed behaviour is that the text block is blank, which is the desired behaviour, but binding fails are bad.
         //TODO need to make edit panels for cast groups, alternative casts, tags, section types, requirements
-        //TODO make sure that IOrdered objects are shown in order (ie. CastGroup, Criteria, Requirement), otherwise alpahbetical for consistency
-        //TODO implement drag to re-order (only if IOrdered)
+        //TODO implement drag to re-order (only if selection is IOrdered)
 
-        private CollectionViewSource criteriasViewSource = new();
-        private CollectionViewSource castGroupsViewSource = new();
-        private CollectionViewSource alternativeCastsViewSource = new();
-        private CollectionViewSource tagsViewSource = new();
-        private CollectionViewSource sectionTypesViewSource = new();
-        private CollectionViewSource requirementsViewSource = new();
+        static readonly SortDescription sortByOrder = new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending);
+        static readonly SortDescription sortByName = new SortDescription(nameof(INamed.Name), ListSortDirection.Ascending);
+
+        private CollectionViewSource criteriasViewSource = new() { SortDescriptions = { sortByOrder } };
+        private CollectionViewSource castGroupsViewSource = new() { SortDescriptions = { sortByOrder } };
+        private CollectionViewSource alternativeCastsViewSource = new() { SortDescriptions = { sortByName } };
+        private CollectionViewSource tagsViewSource = new() { SortDescriptions = { sortByName } };
+        private CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { sortByName } };
+        private CollectionViewSource requirementsViewSource = new() { SortDescriptions = { sortByOrder } };
 
         private CollectionViewSource? currentViewSource;
 
@@ -92,15 +95,16 @@ namespace CarmenUI.Pages
                 return db_set.Local.ToObservableCollection();
             });
 
-        private void BindObjectList(string header, CollectionViewSource view_source, AddableObject[][] add_buttons)
+        private void BindObjectList(string header, string tool_tip, CollectionViewSource view_source, AddableObject[][] add_buttons)
         {
             objectHeading.Text = header;
+            objectList.ToolTip = tool_tip;
             objectList.SetBinding(ItemsControl.ItemsSourceProperty, new Binding { Source = view_source });
             currentViewSource = view_source;
             objectAddButtons.ItemsSource = add_buttons;
         }
 
-        static readonly AddableObject[][] criteriasButtons = new[]
+        readonly AddableObject[][] criteriasButtons = new[]
         {
             new[]
             {
@@ -111,9 +115,9 @@ namespace CarmenUI.Pages
         };
 
         private void Criteria_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Audition Criteria", criteriasViewSource, criteriasButtons);
+            => BindObjectList("Audition Criteria", "Drag to re-order", criteriasViewSource, criteriasButtons);
 
-        static readonly AddableObject[][] castGroupsButtons = new[]
+        readonly AddableObject[][] castGroupsButtons = new[]
         {
             new[]
             {
@@ -122,10 +126,10 @@ namespace CarmenUI.Pages
         };
 
         private void CastGroups_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Cast Groups", castGroupsViewSource, castGroupsButtons);
+            => BindObjectList("Cast Groups", "Drag to re-order", castGroupsViewSource, castGroupsButtons);
 
 
-        static readonly AddableObject[][] alternativeCastsButtons = new[]
+        readonly AddableObject[][] alternativeCastsButtons = new[]
         {
             new[]
             {
@@ -134,9 +138,9 @@ namespace CarmenUI.Pages
         };
 
         private void AlternativeCasts_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Alternative Casts", alternativeCastsViewSource, alternativeCastsButtons);
+            => BindObjectList("Alternative Casts", "Sorted by name", alternativeCastsViewSource, alternativeCastsButtons);
 
-        static readonly AddableObject[][] tagsButtons = new[]
+        readonly AddableObject[][] tagsButtons = new[]
         {
             new[]
             {
@@ -145,9 +149,9 @@ namespace CarmenUI.Pages
         };
 
         private void Tags_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Tags", tagsViewSource, tagsButtons);
+            => BindObjectList("Tags", "Sorted by name", tagsViewSource, tagsButtons);
 
-        static readonly AddableObject[][] sectionTypesButtons = new[]
+        readonly AddableObject[][] sectionTypesButtons = new[]
         {
             new[]
             {
@@ -156,9 +160,9 @@ namespace CarmenUI.Pages
         };
 
         private void SectionTypes_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Section Types", sectionTypesViewSource, sectionTypesButtons);
+            => BindObjectList("Section Types", "Sorted by name", sectionTypesViewSource, sectionTypesButtons);
 
-        static readonly AddableObject[][] requirementsButtons = new[]
+        readonly AddableObject[][] requirementsButtons = new[]
         {
             new[]
             {
@@ -178,7 +182,7 @@ namespace CarmenUI.Pages
         };
 
         private void Requirements_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Role Requirements", requirementsViewSource, requirementsButtons);
+            => BindObjectList("Role Requirements", "Drag to re-order", requirementsViewSource, requirementsButtons);
 
         private void Import_Selected(object sender, RoutedEventArgs e)
         {
@@ -211,6 +215,8 @@ namespace CarmenUI.Pages
                 var button = (Button)sender;
                 var addable = (AddableObject)button.DataContext;
                 var new_object = addable.CreateObject();
+                if (new_object is IOrdered ordered)
+                    ordered.Order = list.OfType<IOrdered>().NextOrder();
                 list.Add(new_object);
                 objectList.SelectedItem = new_object;
             }
