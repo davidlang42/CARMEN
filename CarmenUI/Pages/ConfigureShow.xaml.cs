@@ -34,7 +34,8 @@ namespace CarmenUI.Pages
         //TODO implement drag to re-order (only if selection is IOrdered)
         //TODO create EditableImage control (for CastGroup.Icon)
         //TODO create CheckBoxList / CheckBoxCombo control (for CastGroup.Requirements)
-        //TODO fix binding issue with CastGroup.Abbreviation not updating when Name changes (or move that logic into CarmenUI rather than ShowModel)
+        //TODO (FUTURE) set CastGroup.Abbreviation when Name changes
+        //TODO (FUTURE) set AlternativeCast.Initial when Name changes
         //TODO need to make edit panels for: alternative casts, tags, section types, requirements
 
         static readonly SortDescription sortByOrder = new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending);

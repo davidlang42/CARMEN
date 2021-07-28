@@ -15,16 +15,7 @@ namespace ShowModel.Applicants
         [Key]
         public int CastGroupId { get; private set; }
         public int Order { get; set; }
-        private string name = "";
-        public string Name
-        {
-            get => name;
-            set
-            {
-                name = value;
-                Abbreviation = value.Abbreviate();
-            }
-        }
+        public string Name { get; set; } = "";
         public string Abbreviation { get; set; } = "";
         public virtual Image? Icon { get; set; }
         public virtual ICollection<Applicant> Members { get; private set; } = new ObservableCollection<Applicant>();
