@@ -12,18 +12,27 @@ namespace ShowModel.Applicants
     /// </summary>
     public class CastGroup : IOrdered, INamed
     {
-        #region Database fields
         [Key]
         public int CastGroupId { get; private set; }
         public int Order { get; set; }
-        public string Name { get; set; } = "Cast";
+        private string name = "";
+        public string Name
+        {
+            get => name;
+            set
+            {
+                name = value;
+                Abbreviation = value.Abbreviate();
+            }
+        }
+        public string Abbreviation { get; set; } = "";
         public virtual Image? Icon { get; set; }
         public virtual ICollection<Applicant> Members { get; private set; } = new ObservableCollection<Applicant>();
         /// <summary>The number of applicants which should be allocated to this group</summary>
         public uint? RequiredCount { get; set; }
         public virtual ICollection<AlternativeCast> AlternativeCasts { get; private set; } = new ObservableCollection<AlternativeCast>();
         public virtual ICollection<Requirement> Requirements { get; private set; } = new ObservableCollection<Requirement>();
-        #endregion
+#endregion
 
         public bool AlternatingCasts() => AlternativeCasts.Any();
     }
