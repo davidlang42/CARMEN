@@ -36,7 +36,10 @@ namespace CarmenUI.Pages
         //TODO create CheckBoxList / CheckBoxCombo control (for CastGroup.Requirements)
         //TODO (FUTURE) set CastGroup.Abbreviation when Name changes
         //TODO (FUTURE) set AlternativeCast.Initial when Name changes
-        //TODO need to make edit panels for: alternative casts, tags, section types, requirements
+        //TODO need to make edit panels for: tags, section types, requirements
+        //TODO (LATER) add validation to all edit panel fields
+        //TODO disable castgroup.alternatingcasts checkbox if less than 2 alternative casts, with tooltip explaining why
+        //TODO handle delete key on objectList to delete selected object, but obey rules about minimums: at least one criteria, at least one cast group, at least 2 alternative casts if any cast group has alternatecasts, at least one section type
 
         static readonly SortDescription sortByOrder = new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending);
         static readonly SortDescription sortByName = new SortDescription(nameof(INamed.Name), ListSortDirection.Ascending);

@@ -218,6 +218,35 @@
                             <TextBlock Grid.Row="6" Grid.Column="1" Text="TODO" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelApplicants:AlternativeCast}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                If any Cast Groups are set to "Alternate Casts" then these Alternative Casts are the casts which they alternate between.
+                                There must be at least two Alternative Casts in order to enable "Alternate Casts" on a Cast Group.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Initial" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Initial}" FontSize="14"/>
+                        </Grid>
+                    </DataTemplate>
                 </ContentControl.Resources>
             </ContentControl>
         </DockPanel>
