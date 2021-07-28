@@ -37,7 +37,7 @@ namespace CarmenUI.UserControls
         public EditableList()
         {
             InitializeComponent();
-            DataContext = this; //TODO this causes a normal {Binding Options} to not work on ItemsSource, see if there is a way to do this without setting DataContext
+            DataContext = this; //TODO this causes a normal {Binding Options} to not work on ItemsSource, see if there is a way to do this without setting DataContext -- see CriteriaMarkSelector for example
         }
 
         private void optionsMoveUp_Click(object sender, RoutedEventArgs e)

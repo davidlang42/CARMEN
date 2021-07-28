@@ -18,8 +18,16 @@
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <CollectionViewSource x:Key="alternativeCastsViewSource"/>
+        <CollectionViewSource x:Key="criteriasViewSource"/>
+        <CollectionViewSource x:Key="tagsViewSource"/>
+        <CollectionViewSource x:Key="requirementsSelectionSource"/>
         <cv:EnumerateCountByGroups x:Key="enumerateCountByGroups"/>
         <cv:InverseBoolean x:Key="inverseBoolean"/>
+        <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="modelApplicants:Gender"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -90,6 +98,22 @@
             <TextBlock DockPanel.Dock="Top" Text="{Binding Name, StringFormat='Editing: \{0\}'}" FontSize="22"/>
             <ContentControl Content="{Binding}">
                 <ContentControl.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="0 0 0 5"/>
+                        <Setter Property="FontSize" Value="14"/>
+                    </Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="Margin" Value="5 0 0 5"/>
+                        <Setter Property="FontSize" Value="14"/>
+                    </Style>
+                    <Style TargetType="CheckBox">
+                        <Setter Property="Margin" Value="5 0 0 5"/>
+                        <Setter Property="FontSize" Value="14"/>
+                    </Style>
+                    <Style TargetType="ComboBox">
+                        <Setter Property="Margin" Value="5 0 0 5"/>
+                        <Setter Property="FontSize" Value="14"/>
+                    </Style>
                     <DataTemplate DataType="{x:Type modelCriterias:NumericCriteria}">
                         <Grid Margin="0 5">
                             <Grid.Resources>
@@ -341,6 +365,363 @@
                             <TextBlock Grid.Row="2" Grid.Column="1" Text="TODO" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding AllowNoRoles, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Everyone must have a role" VerticalContentAlignment="Center"/>
                             <CheckBox Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding AllowMultipleRoles}" FontSize="14" Content="A person can have multiple roles" VerticalContentAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is an Exact Ability requirement, which means that an Applicant must have a specific Mark in the specified Criteria.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Criteria" FontSize="14"/>
+                            <ComboBox Grid.Row="4" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasViewSource}}" DisplayMemberPath="Name" />
+                            <TextBlock Grid.Row="5" Text="Required Value" FontSize="14"/>
+                            <uc:CriteriaMarkSelector Grid.Row="5" Grid.Column="1" Mark="{Binding RequiredValue}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelRequirements:AbilityRangeRequirement}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is an Ability Range requirement, which means that an Applicant must have a Mark within a range for the specified Criteria.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Criteria" FontSize="14"/>
+                            <ComboBox Grid.Row="4" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasViewSource}}" DisplayMemberPath="Name"/>
+                            <TextBlock Grid.Row="5" Text="Minimum" FontSize="14"/>
+                            <uc:CriteriaMarkSelector Grid.Row="5" Grid.Column="1" Mark="{Binding Minimum}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="6" Text="Maximum" FontSize="14"/>
+                            <uc:CriteriaMarkSelector Grid.Row="6" Grid.Column="1" Mark="{Binding Maximum}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <CheckBox Grid.Row="7" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelRequirements:AgeRequirement}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                    <Setter Property="FontSize" Value="14"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is an Age requirement, which means that an Applicant must have an age within the specified range.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Minimum" FontSize="14"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Minimum}" FontSize="14"/>
+                            <TextBlock Grid.Row="5" Text="Maximum" FontSize="14"/>
+                            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Maximum}" FontSize="14"/>
+                            <CheckBox Grid.Row="6" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelRequirements:GenderRequirement}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is a Gender requirement, which means that an Applicant must be the specified gender.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Gender" FontSize="14"/>
+                            <ComboBox Grid.Row="4" Grid.Column="1" SelectedIndex="{Binding RequiredValue}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelRequirements:TagRequirement}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is a Tag requirement, which means that an Applicant must be assigned the specified tag.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Tag" FontSize="14"/>
+                            <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding RequiredTag}" ItemsSource="{Binding Source={StaticResource tagsViewSource}}" DisplayMemberPath="Name"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelRequirements:NotRequirement}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is a NOT requirement, which means that an Applicant must not meet the specified requirement.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="NOT" FontSize="14"/>
+                            <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding SubRequirement}" ItemsSource="{Binding Source={StaticResource requirementsSelectionSource}}" DisplayMemberPath="Name"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelRequirements:AndRequirement}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is an AND requirement, which means that an Applicant must meet ALL of the specified sub-requirements.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="ALL of" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="TODO" FontSize="14"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelRequirements:OrRequirement}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is an OR requirement, which means that an Applicant must meet ANY of the specified sub-requirements.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="ANY of" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="TODO" FontSize="14"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelRequirements:XorRequirement}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is an XOR requirement, which means that an Applicant must meet EXACTLY ONE of the specified sub-requirements.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="ONE of" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Grid.Column="1" Text="TODO" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
                 </ContentControl.Resources>
