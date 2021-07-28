@@ -124,7 +124,7 @@
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}"/>
-                            <uc:EditableList Grid.Row="2" Grid.ColumnSpan="2" Title="List of options:" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
+                            <uc:EditableList Grid.Row="2" Grid.ColumnSpan="2" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">

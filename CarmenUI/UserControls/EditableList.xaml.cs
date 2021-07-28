@@ -30,6 +30,8 @@ namespace CarmenUI.UserControls
             set => SetValue(ItemsSourceProperty, value);
         }
 
+        public int MinimumCount { get; set; }
+
         public string Title { get; set; } = "";
 
         public EditableList()
@@ -50,7 +52,8 @@ namespace CarmenUI.UserControls
                 return;
             var index = optionsList.SelectedIndex;
             using (var list = new EditableListWrapper<string>(ItemsSource, new_list => ItemsSource = new_list))
-                list.RemoveAt(index);
+                if (list.Count > MinimumCount)
+                    list.RemoveAt(index);
             optionsList.SelectedIndex = index;
             optionsNewItem.Focus();
         }
@@ -86,12 +89,13 @@ namespace CarmenUI.UserControls
                     list.Insert(optionsList.SelectedIndex, value);
             optionsNewItem.Text = "";
             optionsNewItem.Focus();
+            e.Handled = true;
         }
 
         private void optionsNewItem_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
-                optionsAdd_Click(sender, new RoutedEventArgs());
+                optionsAdd_Click(sender, e);
         }
 
         private void optionsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
