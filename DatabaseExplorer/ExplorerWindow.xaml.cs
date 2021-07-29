@@ -255,7 +255,7 @@ namespace DatabaseExplorer
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            Context.Dispose();
+            _context?.Dispose();
             base.OnClosing(e);
         }
 
