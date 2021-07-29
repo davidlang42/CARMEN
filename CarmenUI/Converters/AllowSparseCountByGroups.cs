@@ -16,16 +16,15 @@ namespace CarmenUI.Converters
     /// <summary>
     /// This converter wraps an ObservableCollection&lt;CountByGroup&gt; as a List&lt;NullableCountByGroup&gt;,
     /// allowing a non-set CountByGroups to be modelled as null.
+    /// ConverterParameter must be a CollectionViewSource representing the CastGroups.
     /// </summary>
     public class AllowSparseCountByGroups : IValueConverter
     {
-        public CollectionViewSource? CastGroups;
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (CastGroups == null)
-                throw new ApplicationException("Tried to wrap CountByGroups without setting CastGroups.");
-            if (value is ObservableCollection<CountByGroup> collection && CastGroups.Source is IList list)
+            if (parameter is not CollectionViewSource view_source)
+                throw new ApplicationException("ConverterParameter must be a CollectionViewSource representing the CastGroups.");
+            if (value is ObservableCollection<CountByGroup> collection && view_source.Source is IList list)
                 return list.OfType<CastGroup>().Select(g => new NullableCountByGroup(collection, g)).ToList();
             return value;
         }

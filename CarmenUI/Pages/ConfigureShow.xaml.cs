@@ -32,26 +32,24 @@ namespace CarmenUI.Pages
     public partial class ConfigureShow : SubPage
     {
         private readonly CollectionViewSource criteriasViewSource; // xaml resource loaded in constructor
-        private readonly CollectionViewSource castGroupsViewSource = new() { SortDescriptions = { StandardSort.IOrdered } };
+        private readonly CollectionViewSource castGroupsViewSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource alternativeCastsViewSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource tagsViewSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { StandardSort.INamed } };
         private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { StandardSort.IOrdered } };
         private readonly CollectionViewSource requirementsSelectionSource; // xaml resource loaded in constructor
 
-        private readonly AllowSparseCountByGroups allowSparseCountByGroups; // xaml resource loaded in constructor
-
         private CollectionViewSource? currentViewSource;
 
         public ConfigureShow(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
-            allowSparseCountByGroups = (AllowSparseCountByGroups)FindResource(nameof(allowSparseCountByGroups));
-            allowSparseCountByGroups.CastGroups = castGroupsViewSource;
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.INamed);
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
             criteriasViewSource.SortDescriptions.Add(StandardSort.IOrdered);
+            castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
+            castGroupsViewSource.SortDescriptions.Add(StandardSort.IOrdered);
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
             tagsViewSource.SortDescriptions.Add(StandardSort.INamed);
             requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));

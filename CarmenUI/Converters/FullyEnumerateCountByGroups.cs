@@ -14,17 +14,16 @@ namespace CarmenUI.Converters
 {
     /// <summary>
     /// This converter passes through an ObservableCollection&lt;CountByGroup&gt;, adding adds any missing CastGroups to the collection.
+    /// ConverterParameter must be a CollectionViewSource representing the CastGroups.
     /// </summary>
     public class FullyEnumerateCountByGroups : IValueConverter
     {
-        public CollectionViewSource? CastGroups;
-
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (CastGroups == null)
-                throw new ApplicationException("Tried to enumerate CountByGroups without setting CastGroups.");
-            if (value is ObservableCollection<CountByGroup> collection && CastGroups.Source is IList list)
-                foreach (var cast_group in list.OfType<CastGroup>()) // filter out non-CastGroup objects, as the source may contain "Loading..."
+            if (parameter is not CollectionViewSource view_source)
+                throw new ApplicationException("ConverterParameter must be a CollectionViewSource representing the CastGroups.");
+            if (value is ObservableCollection<CountByGroup> collection && view_source.Source is IList list)
+                foreach (var cast_group in list.OfType<CastGroup>())
                     if (!collection.Any(cbg => cbg.CastGroup == cast_group))
                         collection.Add(new CountByGroup { CastGroup = cast_group });
             return value;
