@@ -11,7 +11,7 @@ namespace ShowModel.Applicants
     /// <summary>
     /// A person who has auditioned to be in a show.
     /// </summary>
-    public class Applicant : IValidatable
+    public class Applicant : IValidatable, INamed
     {
         #region Database fields (registering)
         [Key]
@@ -37,18 +37,18 @@ namespace ShowModel.Applicants
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
 
+        public string Name => LastName + ", " + FirstName;//LATER make name format a user setting
+
         public uint AgeToday() => AgeAt(DateTime.Now);
 
         public uint AgeAt(DateTime date) //LATER handle errors more nicely, probably return nullable, move errors to validation
         {
             if (DateOfBirth == null)
-                throw new ApplicationException($"{DisplayName()}'s DOB is not set.");
+                throw new ApplicationException($"{Name}'s DOB is not set.");
             if (DateOfBirth > date)
-                throw new ArgumentOutOfRangeException($"{DisplayName()}'s DOB is after the provided {nameof(date)}.");
+                throw new ArgumentOutOfRangeException($"{Name}'s DOB is after the provided {nameof(date)}.");
             return (uint)((date - DateOfBirth.Value).TotalDays / 365.2425); // correct on average, good enough
         }
-
-        public string DisplayName() => FirstName + " " + LastName;
 
         public int OverallAbility() => Convert.ToInt32(Abilities.Sum(a => a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
 

@@ -6,9 +6,13 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CarmenUI.Pages"
+    xmlns:modelApplicants="clr-namespace:ShowModel.Applicants;assembly=ShowModel"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
-    Title="Edit Applicants">
+    Title="Edit Applicants" Loaded="Page_Loaded">
+    <Page.Resources>
+        <CollectionViewSource x:Key="applicantsViewSource"/>
+    </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="1*" MinWidth="200" MaxWidth="350"/>
@@ -37,7 +41,7 @@
             </Grid>
             <Button DockPanel.Dock="Bottom" x:Name="ImportApplicants" Content="Import Applicants" Margin="5" Click="ImportApplicants_Click" Height="30"/>
             <Button DockPanel.Dock="Bottom" x:Name="AddApplicant" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
-            <TreeView x:Name="ApplicantTree" Margin="5"/>
+            <ListBox x:Name="ApplicantTree" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5"/>
         </DockPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5">
             <TextBlock Text="Audition Groups" FontSize="16"/>

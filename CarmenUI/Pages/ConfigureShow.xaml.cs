@@ -62,12 +62,12 @@ namespace CarmenUI.Pages
             // make tasks to load each collection view source
             var tasks = new Dictionary<CollectionViewSource, Task<IList>>()
             {
-                { criteriasViewSource, TaskToLoad(context, c => c.Criterias) },
-                { castGroupsViewSource, TaskToLoad(context, c => c.CastGroups) },
-                { alternativeCastsViewSource, TaskToLoad(context, c => c.AlternativeCasts) },
-                { tagsViewSource, TaskToLoad(context, c => c.Tags) },
-                { sectionTypesViewSource, TaskToLoad(context, c => c.SectionTypes) },
-                { requirementsViewSource, TaskToLoad(context, c => c.Requirements) },
+                { criteriasViewSource, TaskToLoad(c => c.Criterias) },
+                { castGroupsViewSource, TaskToLoad(c => c.CastGroups) },
+                { alternativeCastsViewSource, TaskToLoad(c => c.AlternativeCasts) },
+                { tagsViewSource, TaskToLoad(c => c.Tags) },
+                { sectionTypesViewSource, TaskToLoad(c => c.SectionTypes) },
+                { requirementsViewSource, TaskToLoad(c => c.Requirements) },
                 { requirementsSelectionSource, new Task<IList>(() => null!) } // see special case below
             };
             // initialise all sources with "Loading..."
@@ -94,15 +94,6 @@ namespace CarmenUI.Pages
             // special case
             requirementsSelectionSource.Source = requirementsViewSource.Source;
         }
-
-        //LATER this will crash if still running when the page is cancelled, maybe I need to wrap this in a LoadingOverlay afterall
-        private static Task<IList> TaskToLoad<T>(ShowContext context, Func<ShowContext, DbSet<T>> db_set_getter) where T : class
-            => new Task<IList>(() =>
-            {
-                var db_set = db_set_getter(context);
-                db_set.Load();
-                return db_set.Local.ToObservableCollection();
-            });
 
         private void BindObjectList(string header, string tool_tip, CollectionViewSource view_source, AddableObject[][] add_buttons)
         {

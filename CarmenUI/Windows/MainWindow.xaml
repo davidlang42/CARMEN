@@ -30,6 +30,9 @@
         <DataTemplate DataType="{x:Type modelApplicants:Tag}">
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
+        <DataTemplate DataType="{x:Type modelApplicants:Applicant}">
+            <TextBlock Text="{Binding Path=Name}"/>
+        </DataTemplate>
         <DataTemplate DataType="{x:Type modelStructure:SectionType}">
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
