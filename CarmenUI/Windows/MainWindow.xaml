@@ -16,7 +16,7 @@
         Width="{bd:SettingBinding Width}"
         WindowState="{bd:SettingBinding WindowState}"
         MinHeight="600" MinWidth="800"
-        Title="CARMEN">
+        Title="CARMEN" Icon="/Icons/CarmenC_64.png">
     <Window.Resources>
         <DataTemplate DataType="{x:Type modelCriterias:Criteria}">
             <TextBlock Text="{Binding Path=Name}"/>

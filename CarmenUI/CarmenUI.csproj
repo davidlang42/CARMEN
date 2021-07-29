@@ -5,6 +5,7 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
+    <ApplicationIcon>Icons\CarmenC.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +26,7 @@
     <Resource Include="Icons\Checkmark_16x.png" />
     <Resource Include="Icons\Checkmark_blue_16x.png" />
     <Resource Include="Icons\Ellipsis_bold_16x.png" />
+    <Resource Include="Icons\CarmenC_64.png" />
   </ItemGroup>
 
   <ItemGroup>

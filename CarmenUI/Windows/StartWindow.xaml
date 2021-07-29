@@ -6,7 +6,7 @@
         xmlns:bd="clr-namespace:CarmenUI.Bindings"
         xmlns:vm="clr-namespace:CarmenUI.ViewModels"
         mc:Ignorable="d"
-        Title="CARMEN: Show Selection" Height="440" Width="500" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen">
+        Title="CARMEN: Show Selection" Height="440" Width="500" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Icon="/Icons/CarmenC_64.png">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
