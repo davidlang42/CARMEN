@@ -1,8 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using ShowModel;
+using ShowModel.Applicants;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,6 +31,7 @@ namespace CarmenUI.Pages
         {
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
+            applicantsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.Gender),1));
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)

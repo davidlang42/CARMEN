@@ -41,7 +41,17 @@
             </Grid>
             <Button DockPanel.Dock="Bottom" x:Name="ImportApplicants" Content="Import Applicants" Margin="5" Click="ImportApplicants_Click" Height="30"/>
             <Button DockPanel.Dock="Bottom" x:Name="AddApplicant" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
-            <ListBox x:Name="ApplicantTree" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5"/>
+            <ListBox x:Name="ApplicantTree" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5">
+                <ItemsControl.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.HeaderTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="HEADER" />
+                            </DataTemplate>
+                        </GroupStyle.HeaderTemplate>
+                    </GroupStyle>
+                </ItemsControl.GroupStyle>
+            </ListBox>
         </DockPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5">
             <TextBlock Text="Audition Groups" FontSize="16"/>
