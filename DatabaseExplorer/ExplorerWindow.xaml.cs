@@ -431,5 +431,19 @@ namespace DatabaseExplorer
             e.Effects = target_item != null && draggedItem != null && target_item != draggedItem ? DragDropEffects.Move : DragDropEffects.None;
         }
         #endregion
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (Properties.Settings.Default.ShowWarning)
+            {
+                if (MessageBox.Show("WARNING: The Database Explorer is an administrative tool designed for super-users only. It allows manual manipulation of the database fields and mistakes will corrupt the database. Backing up the database before manipulation is highly recommended. Use at your own risk.", this.Title, MessageBoxButton.OKCancel) == MessageBoxResult.OK)
+                {
+                    Properties.Settings.Default.ShowWarning = false;
+                    Properties.Settings.Default.Save();
+                }
+                else
+                    Close();
+            }
+        }
     }
 }
