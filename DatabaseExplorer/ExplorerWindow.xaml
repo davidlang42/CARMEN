@@ -23,11 +23,11 @@
         <CollectionViewSource x:Key="requirementsSelectionSource"/>
         <CollectionViewSource x:Key="imagesViewSource"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
-        <local:CallbackCommand x:Key="addNodeCommand"/>
-        <local:CallbackCommand x:Key="addCriteriaCommand"/>
-        <local:CallbackCommand x:Key="addRequirementCommand"/>
-        <local:CallbackCommand x:Key="uploadImageCommand"/>
-        <local:CallbackCommand x:Key="pasteImageCommand"/>
+        <RoutedUICommand x:Key="addNodeCommand"/>
+        <RoutedUICommand x:Key="addCriteriaCommand"/>
+        <RoutedUICommand x:Key="addRequirementCommand"/>
+        <RoutedUICommand x:Key="uploadImageCommand"/>
+        <RoutedUICommand x:Key="pasteImageCommand"/>
         <local:SortIOrdered x:Key="sortIOrdered" />
         <local:BytesToImage x:Key="bytesToImage"/>
         <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
@@ -48,6 +48,13 @@
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
     </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource addNodeCommand}" Executed="AddNode"/>
+        <CommandBinding Command="{StaticResource addCriteriaCommand}" Executed="AddCriteria"/>
+        <CommandBinding Command="{StaticResource addRequirementCommand}" Executed="AddRequirement"/>
+        <CommandBinding Command="{StaticResource uploadImageCommand}" Executed="UploadImage"/>
+        <CommandBinding Command="{StaticResource pasteImageCommand}" Executed="PasteImage"/>
+    </Window.CommandBindings>
     <DockPanel>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">

@@ -45,11 +45,6 @@ namespace DatabaseExplorer
         private readonly CollectionViewSource sectionTypesViewSource;
         private readonly CollectionViewSource requirementsViewSource;
         private readonly CollectionViewSource requirementsSelectionSource;
-        private readonly CallbackCommand addNodeCommand;
-        private readonly CallbackCommand addCriteriaCommand;
-        private readonly CallbackCommand addRequirementCommand;
-        private readonly CallbackCommand uploadImageCommand;
-        private readonly CallbackCommand pasteImageCommand;
 
         public ExplorerWindow()
         {
@@ -65,16 +60,6 @@ namespace DatabaseExplorer
             itemsViewSource = (CollectionViewSource)FindResource(nameof(itemsViewSource));
             requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
             requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));
-            addNodeCommand = (CallbackCommand)FindResource(nameof(addNodeCommand));
-            addNodeCommand.Callback = AddNode;
-            addCriteriaCommand = (CallbackCommand)FindResource(nameof(addCriteriaCommand));
-            addCriteriaCommand.Callback = AddCriteria;
-            addRequirementCommand = (CallbackCommand)FindResource(nameof(addRequirementCommand));
-            addRequirementCommand.Callback = AddRequirement;
-            uploadImageCommand = (CallbackCommand)FindResource(nameof(uploadImageCommand));
-            uploadImageCommand.Callback = UploadImage;
-            pasteImageCommand = (CallbackCommand)FindResource(nameof(pasteImageCommand));
-            pasteImageCommand.Callback = PasteImage;
         }
 
         private void CreateMenu_Click(object sender, RoutedEventArgs e)
@@ -259,7 +244,7 @@ namespace DatabaseExplorer
             base.OnClosing(e);
         }
 
-        private void AddNode(object? parameter)
+        private void AddNode(object sender, ExecutedRoutedEventArgs e)
         {
             (var parent, var after) = itemsTreeView.SelectedItem switch
             {
@@ -268,7 +253,7 @@ namespace DatabaseExplorer
                 ShowRoot show => (show, null),
                 _ => (Context.ShowRoot, null)
             };
-            Node new_node = parameter switch
+            Node new_node = e.Parameter switch
             {
                 SectionType section_type => new Section
                 {
@@ -283,6 +268,7 @@ namespace DatabaseExplorer
             new_node.Parent = parent;
             parent.Children.InsertInOrder(new_node, after);
         }
+
         private void MoveNode(Node dragged, Node target)
         {
             if (dragged is ShowRoot)
@@ -328,21 +314,21 @@ namespace DatabaseExplorer
             }
         }
 
-        private void AddCriteria(object? parameter)
+        private void AddCriteria(object sender, ExecutedRoutedEventArgs e)
         {
-            Criteria criteria = parameter switch
+            Criteria criteria = e.Parameter switch
             {
                 nameof(NumericCriteria) => new NumericCriteria(),
                 nameof(SelectCriteria) => new SelectCriteria(),
                 nameof(BooleanCriteria) => new BooleanCriteria(),
-                _ => throw new ArgumentException($"Criteria type '{parameter}' does not exist.")
+                _ => throw new ArgumentException($"Criteria type '{e.Parameter}' does not exist.")
             };
             Context.Criterias.InsertInOrder(criteria); //TODO this re-allocates the last order value if more than one criteria is added without saving
         }
 
-        private void AddRequirement(object? parameter)
+        private void AddRequirement(object sender, ExecutedRoutedEventArgs e)
         {
-            Requirement requirement = parameter switch
+            Requirement requirement = e.Parameter switch
             {
                 nameof(AbilityExactRequirement) => new AbilityExactRequirement(),
                 nameof(AbilityRangeRequirement) => new AbilityRangeRequirement(),
@@ -353,12 +339,12 @@ namespace DatabaseExplorer
                 nameof(OrRequirement) => new OrRequirement(),
                 nameof(XorRequirement) => new XorRequirement(),
                 nameof(NotRequirement) => new NotRequirement(),
-                _ => throw new ArgumentException($"Requirement type '{parameter}' does not exist.")
+                _ => throw new ArgumentException($"Requirement type '{e.Parameter}' does not exist.")
             };
             Context.Requirements.InsertInOrder(requirement); //TODO this re-allocates the last order value if more than one requirement is added without saving
         }
 
-        private void UploadImage(object? _)
+        private void UploadImage(object sender, ExecutedRoutedEventArgs e)
         {
             var dialog = new OpenFileDialog
             {
@@ -376,7 +362,7 @@ namespace DatabaseExplorer
             }
         }
 
-        private void PasteImage(object? _)
+        private void PasteImage(object sender, ExecutedRoutedEventArgs e)
         {
             if (Clipboard.GetImage() is BitmapSource source)
             {
