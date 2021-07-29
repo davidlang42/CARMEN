@@ -20,7 +20,7 @@
   <ItemGroup>
     <Resource Include="Icons\NewFile.png" />
     <Resource Include="Icons\OpenFile.png" />
-    <Resource Include="Icons\Database.png" />
+    <Resource Include="Icons\CloudDatabase.png" />
     <Resource Include="Icons\Cancel.png" />
     <Resource Include="Icons\Cancel_grey.png" />
     <Resource Include="Icons\Checkmark.png" />

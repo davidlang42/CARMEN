@@ -40,7 +40,7 @@
             </Button>
             <Button x:Name="ConnectButton" Grid.Column="2" Width="100" Height="100" Click="ConnectButton_Click">
                 <StackPanel>
-                    <Image Source="/Icons/Database.png" Width="32"/>
+                    <Image Source="/Icons/CloudDatabase.png" Width="32"/>
                     <TextBlock HorizontalAlignment="Center">Connect</TextBlock>
                 </StackPanel>
             </Button>
