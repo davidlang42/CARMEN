@@ -40,25 +40,25 @@
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Icons/Checkmark_16x.png" Width="16"/>
+                            <Image Source="/Icons/Checkmark.png" Width="16"/>
                             <TextBlock Text="{Binding Path=Name, StringFormat='Show: {0}'}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type modelStructure:Section}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Icons/Ellipsis_bold_16x.png" Width="16"/>
+                            <Image Source="/Icons/Ellipsis_bold.png" Width="16"/>
                             <TextBlock Text="{Binding Path=Name, StringFormat='Section: {0}'}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type modelStructure:Item}" ItemsSource="{Binding Roles, Converter={StaticResource sortIOrdered}}">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Icons/Cancel_16x.png" Width="16"/>
+                            <Image Source="/Icons/Cancel.png" Width="16"/>
                             <TextBlock Text="{Binding Path=Name, StringFormat='Item: {0}'}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type modelStructure:Role}">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Icons/Ellipsis_bold_16x.png" Width="16"/>
+                            <Image Source="/Icons/Ellipsis_bold.png" Width="16"/>
                             <TextBlock Text="{Binding Path=Name, StringFormat='Role: {0}'}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
@@ -182,13 +182,13 @@
                     <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                         <Button x:Name="CancelButton" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="/Icons/Cancel_grey_16x.png" Width="16" Margin="2 0"/>
+                                <Image Source="/Icons/Cancel_grey.png" Width="16" Margin="2 0"/>
                                 <TextBlock Text="Cancel" Margin="2 0"/>
                             </StackPanel>
                         </Button>
                         <Button x:Name="SaveButton" IsDefault="True" Width="100" Height="35" Margin="5" Click="SaveButton_Click">
                             <StackPanel Orientation="Horizontal">
-                                <Image Source="/Icons/Checkmark_blue_16x.png" Width="16" Margin="2 0"/>
+                                <Image Source="/Icons/Checkmark_blue.png" Width="16" Margin="2 0"/>
                                 <TextBlock Text="Save" Margin="2 0"/>
                             </StackPanel>
                         </Button>

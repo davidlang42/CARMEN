@@ -18,15 +18,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Icons\NewFile_16x.png" />
-    <Resource Include="Icons\OpenFile_16x.png" />
-    <Resource Include="Icons\Database_16x.png" />
-    <Resource Include="Icons\Cancel_16x.png" />
-    <Resource Include="Icons\Cancel_grey_16x.png" />
-    <Resource Include="Icons\Checkmark_16x.png" />
-    <Resource Include="Icons\Checkmark_blue_16x.png" />
-    <Resource Include="Icons\Ellipsis_bold_16x.png" />
-    <Resource Include="Icons\CarmenC_64.png" />
+    <Resource Include="Icons\NewFile.png" />
+    <Resource Include="Icons\OpenFile.png" />
+    <Resource Include="Icons\Database.png" />
+    <Resource Include="Icons\Cancel.png" />
+    <Resource Include="Icons\Cancel_grey.png" />
+    <Resource Include="Icons\Checkmark.png" />
+    <Resource Include="Icons\Checkmark_blue.png" />
+    <Resource Include="Icons\Ellipsis_bold.png" />
+    <Resource Include="Icons\CarmenC.png" />
   </ItemGroup>
 
   <ItemGroup>

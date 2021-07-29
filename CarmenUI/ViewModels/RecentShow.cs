@@ -32,7 +32,7 @@ namespace CarmenUI.ViewModels
         public DateTime LastOpened { get; set; } = DateTime.Now;
 
         public string IconPath
-            => Provider == null ? @"\Icons\OpenFile_16x.png" : @"\Icons\Database_16x.png";
+            => Provider == null ? @"\Icons\OpenFile.png" : @"\Icons\Database.png";
 
         public static RecentShow FromLocalFile(string filename)
             => new RecentShow
