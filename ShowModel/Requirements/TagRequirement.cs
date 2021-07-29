@@ -2,7 +2,7 @@
 
 namespace ShowModel.Requirements
 {
-    public class TagRequirement : Requirement //TODO detect circular dependencies when using CastGroupRequirements on CastGroups
+    public class TagRequirement : Requirement
     {
         internal int RequiredTagId { get; set; } // DbSet.Load() throws IndexOutOfRangeException if foreign key is not defined
         public virtual Tag RequiredTag { get; set; } = null!;

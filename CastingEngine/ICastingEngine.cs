@@ -6,20 +6,27 @@ using ShowModel.Structure;
 
 namespace CastingEngine
 {
-    public interface ICastingEngine//TODO WIP
+    /// <summary>
+    /// WIP
+    /// </summary>
+    public interface ICastingEngine
     {
         #region Applicant abilities
         /// <summary>Calculate the overall ability of an applicant</summary>
         int OverallAbility(Applicant applicant);
-        //TODO analyse distribution of sets of marks
+
+        // analyse distribution of sets of marks
         #endregion
 
         #region Cast selection
         /// <summary>Select applicants into a cast group</summary>
         IEnumerable<Applicant> SelectCastGroup(IEnumerable<Applicant> applicants, CastGroup cast_group);
-        //TODO apply tags to cast
-        //TODO set cast numbers/identifiers
-        //TODO handle alternative casts
+        
+        // apply tags to cast
+        
+        // set cast numbers/identifiers
+
+        // handle alternative casts
         //- need to have buddies
         //- need to match casting between buddies(by default but with exceptions?)
         //- need to be able to "swap" buddies between casts
@@ -37,7 +44,7 @@ namespace CastingEngine
 
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
-        bool AvailabilityOf(Applicant applicant, Role role);//TODO somehow (enum? string?) return why they aren't available
+        bool AvailabilityOf(Applicant applicant, Role role);
 
         /// <summary>Pick the cast for a role</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);

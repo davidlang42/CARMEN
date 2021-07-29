@@ -38,7 +38,7 @@
                     <TextBlock HorizontalAlignment="Center">Open</TextBlock>
                 </StackPanel>
             </Button>
-            <Button x:Name="ConnectButton" Grid.Column="2" Width="100" Height="100" Click="ConnectButton_Click">
+            <Button x:Name="ConnectButton" Grid.Column="2" Width="100" Height="100" IsEnabled="False">
                 <StackPanel>
                     <Image Source="/Icons/CloudDatabase.png" Width="32"/>
                     <TextBlock HorizontalAlignment="Center">Connect</TextBlock>

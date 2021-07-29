@@ -22,16 +22,28 @@ namespace CarmenUI.Pages
     /// <summary>
     /// Interaction logic for MainMenu.xaml
     /// </summary>
-    public partial class MainMenu : Page
+    public partial class MainMenu : Page, IDisposable
     {
-        ShowContext context;
         DbContextOptions<ShowContext> contextOptions;
 
-        public MainMenu(ShowContext context, DbContextOptions<ShowContext> context_options)
+        private ShowContext? _context;
+        private ShowContext context => _context
+            ?? throw new ApplicationException("Tried to use context after it was disposed.");
+
+        public MainMenu(DbContextOptions<ShowContext> context_options)
         {
-            this.context = context;
-            this.contextOptions = context_options;
+            _context = new ShowContext(context_options);
+            contextOptions = context_options;
             InitializeComponent();
+        }
+
+        public void Dispose()
+        {
+            if (_context != null)
+            {
+                _context.Dispose();
+                _context = null;
+            }
         }
 
         /// <summary>Handles return events from sub-pages (e==null for cancel,
@@ -39,11 +51,7 @@ namespace CarmenUI.Pages
         private void HandleChangesOnReturn(object sender, ReturnEventArgs<DataObjects> e)
         {
             if (e?.Result is DataObjects changes)
-            {
-                //TODO handle changed objects
                 MessageBox.Show($"The following objects have changed: {changes}");
-            }
-            //TODO save context at the other end
         }
 
         private void NavigateToSubPage(SubPage sub_page)

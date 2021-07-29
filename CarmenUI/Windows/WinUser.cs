@@ -29,7 +29,7 @@ namespace CarmenUI.Windows
         public static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
 
         #region Window styles (https://docs.microsoft.com/en-us/windows/win32/winmsg/window-styles)
-        public const int GWL_STYLE = -16;//TODO make these into enums
+        public const int GWL_STYLE = -16;
         public const int WS_DLGFRAME = 0x00400000;
         public const int WS_MAXIMIZEBOX = 0x10000;
         public const int WS_MINIMIZEBOX = 0x20000;
@@ -44,9 +44,6 @@ namespace CarmenUI.Windows
         #endregion
 
         #region Helper functions
-        public static bool AddWindowFlag(Window window, int nIndex, int flag)
-            => AddWindowFlag(GetHwnd(window), nIndex, flag);
-
         public static bool AddWindowFlag(IntPtr hWnd, int nIndex, int flag)
         {
             var new_value = new IntPtr(GetWindowLongPtr(hWnd, nIndex).ToInt32() | flag);
@@ -54,25 +51,11 @@ namespace CarmenUI.Windows
             return result.ToInt32() != 0;
         }
 
-        public static bool RemoveWindowFlag(Window window, int nIndex, int flag)
-            => RemoveWindowFlag(GetHwnd(window), nIndex, flag);
-
         public static bool RemoveWindowFlag(IntPtr hWnd, int nIndex, int flag)
         {
             var new_value = new IntPtr(GetWindowLongPtr(hWnd, nIndex).ToInt32() & ~flag);
             var result = SetWindowLongPtr(hWnd, nIndex, new_value);
             return result.ToInt32() != 0;
-        }
-
-        public static bool EnableWindow(Window window, bool bEnable)
-            => EnableWindow(GetHwnd(window), bEnable);
-
-        public static IntPtr GetHwnd(Window window)
-        {
-            var handle = new WindowInteropHelper(window).Handle;
-            if (handle == IntPtr.Zero)
-                throw new InvalidOperationException("Could not get window handle, wait until window is fully initialised.");
-            return handle;
         }
         #endregion
     }

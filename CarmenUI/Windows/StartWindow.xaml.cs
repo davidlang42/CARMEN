@@ -31,9 +31,6 @@ namespace CarmenUI.Windows
             InitializeComponent();
         }
 
-        private void ConnectButton_Click(object sender, RoutedEventArgs e)
-            => MessageBox.Show("Not yet implemented, please choose another option."); //TODO implement connect to db
-
         private void NewButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new SaveFileDialog
@@ -45,16 +42,19 @@ namespace CarmenUI.Windows
             {
                 var show = RecentShow.FromLocalFile(dialog.FileName);
                 var options = show.CreateOptions();
-                //TODO show loading screen before main window (use using)
-                using (var context = new ShowContext(options))
+                using (var loading = new LoadingOverlay(this))
                 {
-                    context.Database.EnsureDeleted();
-                    context.Database.EnsureCreated();//TODO handle io errors
-                    context.ShowRoot.Name = System.IO.Path.GetFileNameWithoutExtension(dialog.FileName);
-                    context.SaveChanges();
+                    using (var context = new ShowContext(options))
+                    {
+                        //LATER handle io errors
+                        context.Database.EnsureDeleted();
+                        context.Database.EnsureCreated();
+                        context.ShowRoot.Name = System.IO.Path.GetFileNameWithoutExtension(dialog.FileName);
+                        context.SaveChanges();
+                    }
+                    AddToRecentList(show);
+                    LaunchMainWindow(options, show.Label);
                 }
-                AddToRecentList(show);
-                LaunchMainWindow(options, show.Label);
             }
         }
 
@@ -69,10 +69,12 @@ namespace CarmenUI.Windows
             {
                 var show = RecentShow.FromLocalFile(dialog.FileName);
                 var options = show.CreateOptions();
-                //TODO show loading screen before main window (use using)
-                CheckIntegrity(options);
-                AddToRecentList(show);
-                LaunchMainWindow(options, show.Label);
+                using (var loading = new LoadingOverlay(this))
+                {
+                    CheckIntegrity(options);
+                    AddToRecentList(show);
+                    LaunchMainWindow(options, show.Label);
+                }
             }
         }
 
@@ -80,8 +82,8 @@ namespace CarmenUI.Windows
         {
             using (var context = new ShowContext(options))
             {
-                //TODO handle io errors
-                //TODO ensure that db matches schema
+                //LATER handle io errors
+                //LATER ensure that db matches schema
             }
         }
 
@@ -105,11 +107,14 @@ namespace CarmenUI.Windows
         {
             if(e.AddedItems.Count > 0 && e.AddedItems[0] is RecentShow show)
             {
-                var options = show.CreateOptions();
-                CheckIntegrity(options);
-                show.LastOpened = DateTime.Now;
-                AddToRecentList(show);
-                LaunchMainWindow(options, show.Label);
+                using (var loading = new LoadingOverlay(this))
+                {
+                    var options = show.CreateOptions();
+                    CheckIntegrity(options);
+                    show.LastOpened = DateTime.Now;
+                    AddToRecentList(show);
+                    LaunchMainWindow(options, show.Label);
+                }
             }
         }
     }

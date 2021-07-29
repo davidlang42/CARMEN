@@ -17,13 +17,13 @@ namespace DatabaseExplorer
         public static readonly DependencyProperty AvailableItemsProperty = DependencyProperty.Register(
             nameof(AvailableItems), typeof(IEnumerable), typeof(SelectableListControl), new PropertyMetadata(null));
 
-        public IList? SelectedItems //TODO SelectedList doesn't remove items when they are deleted
+        public IList? SelectedItems
         {
             get => (IList?)GetValue(SelectedItemsProperty);
             set => SetValue(SelectedItemsProperty, value);
         }
 
-        public IEnumerable? AvailableItems //TODO filter selected items out of availableList 
+        public IEnumerable? AvailableItems
         {
             get => (IEnumerable?)GetValue(AvailableItemsProperty);
             set => SetValue(AvailableItemsProperty, value);
@@ -33,7 +33,7 @@ namespace DatabaseExplorer
 
         public string Title { get; set; } = "";
 
-        public SelectableListControl() //TODO implement drag & drop between selectedList and availableList
+        public SelectableListControl()
         {
             InitializeComponent();
             DataContext = this;

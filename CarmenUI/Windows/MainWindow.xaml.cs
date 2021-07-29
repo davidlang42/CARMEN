@@ -25,22 +25,14 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
-        private ShowContext context;//TODO move this into the page
         string connectionLabel;
 
         public MainWindow(DbContextOptions<ShowContext> context_options, string connection_label)
         {
             InitializeComponent();
-            context = new ShowContext(context_options);
             connectionLabel = connection_label;
-            var main_menu = new MainMenu(context, context_options);
+            var main_menu = new MainMenu(context_options);
             MainFrame.Navigate(main_menu);
-        }
-
-        protected override void OnClosing(CancelEventArgs e)
-        {
-            context.Dispose();
-            base.OnClosing(e);
         }
 
         private void MainFrame_Navigated(object sender, NavigationEventArgs e)

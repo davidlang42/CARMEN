@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ShowModel.Requirements
 {
-    public abstract class CombinedRequirement : Requirement //TODO detect circular references in combined requirements & not requirements
+    public abstract class CombinedRequirement : Requirement
     {
         public virtual ICollection<Requirement> SubRequirements { get; private set; } = new ObservableCollection<Requirement>();
 

@@ -27,6 +27,13 @@ namespace CarmenUI.Pages
         protected void OnReturn(DataObjects changes)
             => OnReturn(new ReturnEventArgs<DataObjects>(changes));
 
+        /// <summary>Save changes to the database and return true if succeeded</summary>
+        protected bool SaveChanges()
+        {
+            context.SaveChanges(); //LATER handle db errors
+            return true;
+        }
+
         public void Dispose()
         {
             if (_context != null)

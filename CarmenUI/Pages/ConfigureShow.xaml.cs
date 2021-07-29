@@ -31,20 +31,6 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureShow : SubPage
     {
-        //TODO (LATER) editing panel heading fails to bind when a string (eg. "Loading...") is selected in objectList. The observed behaviour is that the text block is blank, which is the desired behaviour, but binding fails are bad.
-        //TODO implement drag to re-order (only if selection is IOrdered)
-        //TODO create EditableImage control (for CastGroup.Icon, Tag.Icon, SectionType.Icon)
-        //TODO make images owned entities (does cast group even need one now that it has abbreviation?)
-        //TODO create CheckBoxList / CheckBoxCombo control (for CastGroup.Requirements, Tag.Requirements, AndRequirement.SubRequirements, OrRequirement.SubRequirements, XorRequirement.SubRequirements)
-        //TODO (FUTURE) set CastGroup.Abbreviation when Name changes
-        //TODO (FUTURE) set AlternativeCast.Initial when Name changes
-        //TODO (LATER) add validation to all edit panel fields
-        //TODO disable castgroup.alternatingcasts checkbox if less than 2 alternative casts, with tooltip explaining why
-        //TODO handle delete key on objectList to delete selected object, but obey rules about minimums: at least one criteria, at least one cast group, at least 2 alternative casts if any cast group has alternatecasts, at least one section type
-        //TODO (LATER) factor out common styling in xaml in edit panel
-        //TODO fix criteriamarkselector not allowing null for min/max on ability range requirements
-        //TODO add general shortcuts to all pages (or window?): Esc => cancel, Ctrl+Enter => save
-
         static readonly SortDescription sortByOrder = new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending);
         static readonly SortDescription sortByName = new SortDescription(nameof(INamed.Name), ListSortDirection.Ascending);
 
@@ -78,7 +64,6 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            //TODO think about how to handle any prerequisites (ie. cast groups before tags for count by groups) -- or maybe that issue is avoidable if i correctly bind the castGroupsViewSource in XAML to the Converter Parameter?
             // make tasks to load each collection view source
             var tasks = new Dictionary<CollectionViewSource, Task<IList>>()
             {
@@ -113,10 +98,10 @@ namespace CarmenUI.Pages
             }
             // special case
             requirementsSelectionSource.Source = requirementsViewSource.Source;
-            //TODO figure out if there is a nicer way to do this, ie. ref the same task twice in the tasks dictionary, then check if already complete before calling start
         }
 
-        private static Task<IList> TaskToLoad<T>(ShowContext context, Func<ShowContext, DbSet<T>> db_set_getter) where T : class //TODO this will crash if still running when the page is cancelled, maybe I need to wrap this in a LoadingOverlay afterall
+        //LATER this will crash if still running when the page is cancelled, maybe I need to wrap this in a LoadingOverlay afterall
+        private static Task<IList> TaskToLoad<T>(ShowContext context, Func<ShowContext, DbSet<T>> db_set_getter) where T : class
             => new Task<IList>(() =>
             {
                 var db_set = db_set_getter(context);
@@ -213,13 +198,6 @@ namespace CarmenUI.Pages
         private void Requirements_Selected(object sender, RoutedEventArgs e)
             => BindObjectList("Role Requirements", "Drag to re-order", requirementsViewSource, requirementsButtons);
 
-        private void Import_Selected(object sender, RoutedEventArgs e)
-        {
-            //TODO (FUTURE) import show config from another show
-            MessageBox.Show("Importing setting from another show is not yet implemented. Please populate manually.");
-        }
-
-
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             OnReturn(null);
@@ -227,14 +205,9 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO save here
-            //TODO (FUTURE) only flag changes on objects which actually changed, rather than all possible changes on this form
-            OnReturn(DataObjects.AlternativeCasts | DataObjects.CastGroups | DataObjects.Criterias | DataObjects.Images | DataObjects.Requirements | DataObjects.SectionTypes | DataObjects.Tags);
-        }
-
-        private void ResetToDefaultButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO implement reset to default
+            if (SaveChanges())
+                //LATER only flag changes on objects which actually changed, rather than all possible changes on this form
+                OnReturn(DataObjects.AlternativeCasts | DataObjects.CastGroups | DataObjects.Criterias | DataObjects.Images | DataObjects.Requirements | DataObjects.SectionTypes | DataObjects.Tags);
         }
 
         private void AddObjectButton_Click(object sender, RoutedEventArgs e)

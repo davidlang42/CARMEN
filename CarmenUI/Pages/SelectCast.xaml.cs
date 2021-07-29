@@ -63,7 +63,8 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            OnReturn(DataObjects.Nodes);
+            if (SaveChanges())
+                OnReturn(DataObjects.Nodes);
         }
 
         private void SelectCastButton_Click(object sender, RoutedEventArgs e)
@@ -102,7 +103,7 @@ namespace CarmenUI.Pages
         }
     }
 
-    public abstract class CastNumberModel//TODO test only
+    public abstract class CastNumberModel
     {
         public int CastNumber { get; set; }
         public int TotalCasts { get; set; }

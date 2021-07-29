@@ -34,7 +34,8 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            OnReturn(DataObjects.Applicants);
+            if (SaveChanges())
+                OnReturn(DataObjects.Applicants);
         }
 
         private void ImportApplicants_Click(object sender, RoutedEventArgs e)

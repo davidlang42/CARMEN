@@ -9,22 +9,21 @@ namespace CarmenUI.Bindings
 {
     /// <summary>
     /// A two-way binding to the settings properties.
-    /// SOURCE: https://thomaslevesque.com/2008/11/18/wpf-binding-to-application-settings-using-a-markup-extension/
     /// </summary>
     public class SettingBinding : Binding
     {
         public SettingBinding()
         {
-            Initialize();
+            Initialise();
         }
 
         public SettingBinding(string path)
             : base(path)
         {
-            Initialize();
+            Initialise();
         }
 
-        private void Initialize()
+        private void Initialise()
         {
             Source = Properties.Settings.Default;
             Mode = BindingMode.TwoWay;

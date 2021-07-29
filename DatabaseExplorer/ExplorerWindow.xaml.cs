@@ -120,7 +120,7 @@ namespace DatabaseExplorer
             rootNodesViewSource.Source = Context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
-            itemsViewSource.Source = Context.Nodes.Local.ToObservableCollection(); //TODO try Context.RootNode.ItemsInOrder(), but it wouldn't update automatically
+            itemsViewSource.Source = Context.Nodes.Local.ToObservableCollection();
             itemsViewSource.View.Filter = n => n is Item;
             criteriaViewSource.Source = Context.Criterias.Local.ToObservableCollection();
             imagesViewSource.Source = Context.Images.Local.ToObservableCollection();
@@ -310,7 +310,7 @@ namespace DatabaseExplorer
             {
                 var parent = node.Parent ?? throw new ApplicationException("Non-ShowRoot must have a parent.");
                 parent.Children.Remove(node);
-                Context.Remove(node); //TODO children should be cascade deleted, but are not
+                Context.Remove(node);
             }
         }
 
@@ -323,7 +323,7 @@ namespace DatabaseExplorer
                 nameof(BooleanCriteria) => new BooleanCriteria(),
                 _ => throw new ArgumentException($"Criteria type '{e.Parameter}' does not exist.")
             };
-            Context.Criterias.InsertInOrder(criteria); //TODO this re-allocates the last order value if more than one criteria is added without saving
+            Context.Criterias.InsertInOrder(criteria);
         }
 
         private void AddRequirement(object sender, ExecutedRoutedEventArgs e)
@@ -341,7 +341,7 @@ namespace DatabaseExplorer
                 nameof(NotRequirement) => new NotRequirement(),
                 _ => throw new ArgumentException($"Requirement type '{e.Parameter}' does not exist.")
             };
-            Context.Requirements.InsertInOrder(requirement); //TODO this re-allocates the last order value if more than one requirement is added without saving
+            Context.Requirements.InsertInOrder(requirement);
         }
 
         private void UploadImage(object sender, ExecutedRoutedEventArgs e)

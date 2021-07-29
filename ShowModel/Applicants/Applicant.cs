@@ -39,7 +39,7 @@ namespace ShowModel.Applicants
 
         public uint AgeToday() => AgeAt(DateTime.Now);
 
-        public uint AgeAt(DateTime date) //TODO handle errors more nicely, probably return nullable, move errors to validation
+        public uint AgeAt(DateTime date) //LATER handle errors more nicely, probably return nullable, move errors to validation
         {
             if (DateOfBirth == null)
                 throw new ApplicationException($"{DisplayName()}'s DOB is not set.");
@@ -73,7 +73,6 @@ namespace ShowModel.Applicants
             foreach (var ability in Abilities)
                 if (ability.Mark > ability.Criteria.MaxMark)
                     yield return $"Mark for {ability.Criteria.Name} ({ability.Mark}) is greater than the maximum ({ability.Criteria.MaxMark}).";
-            //TODO confirm all criteria have a mark
         }
     }
 

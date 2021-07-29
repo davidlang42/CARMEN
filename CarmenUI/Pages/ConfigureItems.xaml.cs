@@ -45,7 +45,7 @@ namespace CarmenUI.Pages
             using var loading = new LoadingOverlay(this);
             loading.Progress = 0;
             loading.SubText = "Waiting for sleep";
-            await Task.Run(() => Thread.Sleep(1000));//TODO remove test code
+            await Task.Run(() => Thread.Sleep(1000));
             loading.Progress = 30;
             loading.SubText = "Loading nodes";
             await Task.Run(() => context.Nodes.Load());
@@ -65,7 +65,8 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            OnReturn(DataObjects.Nodes);
+            if (SaveChanges())
+                OnReturn(DataObjects.Nodes);
         }
 
         private void ItemsTreeView_KeyDown(object sender, KeyEventArgs e)

@@ -13,7 +13,7 @@ namespace CarmenUI.ViewModels
     /// <summary>
     /// An item in the recent shows list, with all details required to reconnect to the database
     /// </summary>
-    public class RecentShow //TODO this whole class needs a refactor once I know how I'm connecting to external dbs
+    public class RecentShow
     {
         public enum DbProvider
         {
@@ -45,7 +45,7 @@ namespace CarmenUI.ViewModels
             => Provider switch
             {
                 null => new DbContextOptionsBuilder<ShowContext>().UseSqlite(ConnectionString).Options,
-                _ => throw new NotImplementedException($"Database provider {Provider} not implemented.") //TODO test & handle other DB providers
+                _ => throw new NotImplementedException($"Database provider {Provider} not implemented.")
             };
 
         public override bool Equals(object? obj)

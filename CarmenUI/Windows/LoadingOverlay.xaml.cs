@@ -24,6 +24,8 @@ namespace CarmenUI.Windows
         public static readonly DependencyProperty MainTextProperty = DependencyProperty.Register(
             nameof(MainText), typeof(string), typeof(LoadingOverlay), new PropertyMetadata("Loading..."));
 
+        private IntPtr ownerHwnd;
+
         public string MainText
         {
             get => (string)GetValue(MainTextProperty);
@@ -59,10 +61,13 @@ namespace CarmenUI.Windows
         public LoadingOverlay(Window owner)
         {
             Owner = owner;
+            ownerHwnd = new WindowInteropHelper(owner).Handle;
+            if (ownerHwnd == IntPtr.Zero)
+                throw new InvalidOperationException("Could not get window handle, wait until window is fully initialised.");
             owner.IsEnabled = false;
-            WinUser.EnableWindow(Owner, false);
-            InitializeComponent();
+            WinUser.EnableWindow(ownerHwnd, false);
             DataContext = this;
+            InitializeComponent();
             Show();
         }
 
@@ -71,7 +76,7 @@ namespace CarmenUI.Windows
 
         public void Dispose()
         {
-            WinUser.EnableWindow(Owner, true);
+            WinUser.EnableWindow(ownerHwnd, true);
             Owner.IsEnabled = true;
             Hide();
         }
