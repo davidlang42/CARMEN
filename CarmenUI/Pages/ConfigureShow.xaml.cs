@@ -220,5 +220,10 @@ namespace CarmenUI.Pages
                 objectList.SelectedItem = new_object;
             }
         }
+
+        private void Name_LostFocus(object sender, RoutedEventArgs e)
+        {
+            currentViewSource?.View.Refresh();
+        }
     }
 }

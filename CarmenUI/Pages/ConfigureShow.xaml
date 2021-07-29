@@ -163,7 +163,7 @@
                                 NOTE: Changing or re-ordering the options for this criteria is only changing the text which is shown, the Applicant's 'mark' number is not updated when the options are changed, so care must be taken when updating this criteria after Applicant's marks have been entered.
                             </TextBlock>
                             <TextBlock Grid.Row="2" Text="Name" FontSize="14"/>
-                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Name}"  Margin="5 0 0 5" FontSize="14"/>
+                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Name}" Margin="5 0 0 5" FontSize="14"/>
                             <uc:EditableList Grid.Row="3" Grid.ColumnSpan="2" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
                         </Grid>
                     </DataTemplate>
@@ -269,7 +269,7 @@
                                 There must be at least two Alternative Casts in order to enable "Alternate Casts" on a Cast Group.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
-                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
                             <TextBlock Grid.Row="2" Text="Initial" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Initial}" FontSize="14"/>
                         </Grid>
@@ -301,7 +301,7 @@
                                 A tag can be applied to a successful Applicant to indicate that form part of a special team, or have an external attribute, such as wearing a microphone. An Applicant can have many tags.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
-                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
                             <TextBlock Grid.Row="2" Text="Description" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" FontSize="14"/>
                             <TextBlock Grid.Row="3" Text="Icon" FontSize="14"/>
@@ -360,7 +360,7 @@
                                 If no Section Types are defined, then no checks will be performed about the number of Roles per person.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
-                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
                             <TextBlock Grid.Row="2" Text="Icon" FontSize="14"/>
                             <TextBlock Grid.Row="2" Grid.Column="1" Text="TODO" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding AllowNoRoles, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Everyone must have a role" VerticalContentAlignment="Center"/>
