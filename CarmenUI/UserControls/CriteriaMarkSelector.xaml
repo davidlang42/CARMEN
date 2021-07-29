@@ -13,10 +13,10 @@
                 <CheckBox IsChecked="{Binding ElementName=ControlRoot, Path=Mark}"/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type modelCriterias:NumericCriteria}">
-                <TextBox Text="{Binding ElementName=ControlRoot, Path=Mark}"/>
+                <TextBox Text="{Binding ElementName=ControlRoot, Path=Mark, TargetNullValue=''}"/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
-                <ComboBox SelectedIndex="{Binding ElementName=ControlRoot, Path=Mark}" ItemsSource="{Binding Options}"/>
+                <ComboBox SelectedIndex="{Binding ElementName=ControlRoot, Path=Mark, TargetNullValue=''}" ItemsSource="{Binding Options}"/>
             </DataTemplate>
         </ContentControl.Resources>
     </ContentControl>

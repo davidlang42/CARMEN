@@ -29,7 +29,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Filter: "/>
-                <TextBox x:Name="FilterTextBox" Grid.Column="1"/>
+                <TextBox x:Name="filterText" Grid.Column="1" TextChanged="filterText_TextChanged"/>
             </Grid>
             <Grid DockPanel.Dock="Top" Margin="5">
                 <Grid.ColumnDefinitions>
@@ -37,20 +37,34 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Group by: "/>
-                <ComboBox x:Name="GroupComboBox" Grid.Column="1"/>
+                <ComboBox x:Name="groupCombo" Grid.Column="1"/>
             </Grid>
-            <Button DockPanel.Dock="Bottom" x:Name="ImportApplicants" Content="Import Applicants" Margin="5" Click="ImportApplicants_Click" Height="30"/>
-            <Button DockPanel.Dock="Bottom" x:Name="AddApplicant" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
-            <ListBox x:Name="ApplicantTree" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5">
-                <ItemsControl.GroupStyle>
+            <Button DockPanel.Dock="Bottom" Content="Import Applicants" Margin="5" Click="ImportApplicants_Click" Height="30"/>
+            <Button DockPanel.Dock="Bottom" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
+            <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5">
+                <ListBox.GroupStyle>
                     <GroupStyle>
-                        <GroupStyle.HeaderTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="HEADER" />
-                            </DataTemplate>
-                        </GroupStyle.HeaderTemplate>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Expander IsExpanded="True">
+                                                <Expander.Header>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name}"/>
+                                                        <TextBlock Text="{Binding Items.Count, StringFormat=' ({0})'}"/>
+                                                    </StackPanel>
+                                                </Expander.Header>
+                                                <ItemsPresenter />
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
                     </GroupStyle>
-                </ItemsControl.GroupStyle>
+                </ListBox.GroupStyle>
             </ListBox>
         </DockPanel>
         <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5">
@@ -61,7 +75,7 @@
             <TextBlock Text="Smith, John" FontSize="16"/>
         </StackPanel>
         <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
+            <!--<ScrollViewer VerticalScrollBarVisibility="Auto">
                 <WrapPanel x:Name="GroupView">
                     <Border BorderBrush="Gray" BorderThickness="1" Margin="10" Height="116" Width="116">
                         <Grid Margin="5">
@@ -199,8 +213,8 @@
                         <TextBlock Text="Blah asdkfj askdfj     "/>
                     </Border>
                 </WrapPanel>
-            </ScrollViewer>
-            <!--<Grid x:Name="ApplicantView" Visibility="Collapsed">
+            </ScrollViewer>-->
+            <Grid DataContext="{Binding ElementName=applicantsList, Path=SelectedItem}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -219,9 +233,16 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.ColumnSpan="2" Text="Smith, John" FontSize="28"/>
+                        <TextBlock Grid.ColumnSpan="2" Text="{Binding Name}" FontSize="28"/>
                         <TextBlock Grid.Row="1" Text="Incomplete" Foreground="Red" FontStyle="Italic" FontSize="16"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="Male, 28 years old" ToolTip="as of 1st July 2022" FontSize="16"/>
+                        <TextBlock Grid.Row="1" Grid.Column="1" ToolTip="as of 1st July 2022" FontSize="16">
+                            <TextBlock.Text>
+                                <MultiBinding  StringFormat="{}{0}, {1} years old">
+                                    <Binding Path="Gender"/>
+                                    <Binding Path="AgeToday"/>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                     </Grid>
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="1" Margin="0 10 0 0">
                         <StackPanel>
@@ -231,7 +252,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="First Name: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1"/>
+                                <TextBox Grid.Column="1" Text="{Binding FirstName}"/>
                             </Grid>
                             <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
@@ -239,7 +260,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Last Name: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1"/>
+                                <TextBox Grid.Column="1" Text="{Binding LastName}"/>
                             </Grid>
                             <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
@@ -257,7 +278,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Date of Birth: " VerticalAlignment="Center"/>
-                                <DatePicker Grid.Column="1"/>
+                                <DatePicker Grid.Column="1"  Text="{Binding DateOfBirth}"/>
                             </Grid>
                             <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
@@ -330,10 +351,10 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="Notes:"/>
-                        <TextBox Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible"/>
+                        <TextBox Grid.Row="1" TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Visible" Text="{Binding Notes}"/>
                     </Grid>
                 </Grid>
-            </Grid>-->
+            </Grid>
         </Border>
     </Grid>
 </local:SubPage>

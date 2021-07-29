@@ -25,7 +25,7 @@ namespace CarmenUI.UserControls
             nameof(Criteria), typeof(Criteria), typeof(CriteriaMarkSelector), new PropertyMetadata(null));
 
         public static readonly DependencyProperty MarkProperty = DependencyProperty.Register(
-            nameof(Mark), typeof(uint), typeof(CriteriaMarkSelector), new PropertyMetadata(null));
+            nameof(Mark), typeof(uint?), typeof(CriteriaMarkSelector), new PropertyMetadata(null));
 
         public Criteria Criteria
         {
@@ -33,9 +33,9 @@ namespace CarmenUI.UserControls
             set => SetValue(CriteriaProperty, value);
         }
 
-        public uint Mark
+        public uint? Mark
         {
-            get => (uint)GetValue(MarkProperty);
+            get => (uint?)GetValue(MarkProperty);
             set => SetValue(MarkProperty, value);
         }
         

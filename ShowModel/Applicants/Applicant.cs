@@ -37,9 +37,10 @@ namespace ShowModel.Applicants
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
 
-        public string Name => LastName + ", " + FirstName;//LATER make name format a user setting
+        public string Name => LastName + ", " + FirstName; //TODO don't do this here, use a value converter, because otherwise the name doesnt update when you change first name
+        //LATER make name format a user setting
 
-        public uint AgeToday() => AgeAt(DateTime.Now);
+        public uint AgeToday => AgeAt(DateTime.Now); //TODO dont do this here, because age wont update with bday, use a value converter
 
         public uint AgeAt(DateTime date) //LATER handle errors more nicely, probably return nullable, move errors to validation
         {
