@@ -40,8 +40,8 @@ namespace ShowModel
             return first;
         }
 
-        public static T Random<T>(this IList<T> list, Random? random = null)
-            => list[(random ?? new Random()).Next(list.Count)];
+        public static T NextOf<T>(this Random random, IList<T> list)
+            => list[random.Next(list.Count)];
     }
 
     internal static class EntityExtensions

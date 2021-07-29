@@ -159,8 +159,8 @@ namespace ShowModel
             {
                 var applicant = new Applicant
                 {
-                    FirstName = FormatName(first_names[random.Next(first_names.Length)]),
-                    LastName = FormatName(LAST_NAMES[random.Next(LAST_NAMES.Length)]),
+                    FirstName = FormatName(random.NextOf(first_names)),
+                    LastName = FormatName(random.NextOf(LAST_NAMES)),
                     Gender = gender,
                     DateOfBirth = RandomDate(random, MINIMUM_DOB, MAXIMUM_DOB)
                 };
@@ -180,10 +180,10 @@ namespace ShowModel
                 {
                     applicant.CastGroup = groups[random.Next(groups.Length)];
                     if (applicant.CastGroup.AlternateCasts)
-                        applicant.AlternativeCast = alternative_casts.Random(random);
+                        applicant.AlternativeCast = random.NextOf(alternative_casts);
                 }
                 if (include_tags)
-                    applicant.Tags.Add(tags[random.Next(tags.Length)]);
+                    applicant.Tags.Add(random.NextOf(tags));
                 Context.Applicants.Add(applicant);
             }
         }
@@ -321,12 +321,12 @@ namespace ShowModel
                     Name = $"Tag {i + 1}",
                 };
                 if (include_requirements)
-                    tag.Requirements.Add(requirements[random.Next(requirements.Length)]);
+                    tag.Requirements.Add(random.NextOf(requirements));
                 if (include_castgroup_count_by_groups)
                 {
                     var count_by_group = new CountByGroup
                     {
-                        CastGroup = cast_groups[random.Next(cast_groups.Length)],
+                        CastGroup = random.NextOf(cast_groups),
                         Count = (uint)i
                     };
                     tag.CountByGroups.Add(count_by_group);
@@ -372,13 +372,13 @@ namespace ShowModel
             var images = Enumerable.Range(0, (int)count).Select(i => new Image { Name = $"Image {i + 1}" }).ToArray();
             Context.Images.AddRange(images);
             if (assign_to_show)
-                Context.ShowRoot.Logo = images.Random(random);
+                Context.ShowRoot.Logo = random.NextOf(images);
             if (assign_to_applicant)
-                Context.Applicants.ToList().Random(random).Photo = images.Random(random);
+                random.NextOf(Context.Applicants.ToArray()).Photo = random.NextOf(images);
             if (assign_to_cast_group)
-                Context.CastGroups.ToList().Random(random).Icon = images.Random(random);
+                random.NextOf(Context.CastGroups.ToArray()).Icon = random.NextOf(images);
             if (assign_to_tag)
-                Context.Tags.ToList().Random(random).Icon = images.Random(random);
+                random.NextOf(Context.Tags.ToArray()).Icon = random.NextOf(images);
         }
 
         /// <summary>Adds alternative casts</summary>
@@ -392,7 +392,6 @@ namespace ShowModel
                     Name = $"Cast {cast_letter}",
                     Initial = cast_letter
                 };
-
                 Context.AlternativeCasts.Add(alternative_cast);
             }
         }
