@@ -9,6 +9,6 @@
     <UniformGrid Columns="1">
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Text="{Binding MainText}"/>
         <TextBlock x:Name="SubTextElement" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" TextWrapping="Wrap" Text="{Binding SubText}"/>
-        <ProgressBar x:Name="ProgressElement" Visibility="Collapsed" Value="{Binding Progress}" Width="180" Height="20"/>
+        <ProgressBar x:Name="ProgressElement" Visibility="Collapsed" Value="{Binding Progress, TargetNullValue=0}" Width="180" Height="20"/>
     </UniformGrid>
 </Window>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace ShowModel
@@ -11,7 +12,7 @@ namespace ShowModel
     /// </summary>
     public interface IOrdered
     {
-        int Order { get; set;  }
+        int Order { get; set; }
     }
 
     public static class IOrderedExtensions

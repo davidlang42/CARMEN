@@ -119,7 +119,7 @@ namespace DatabaseExplorer
             tagsViewSource.Source = Context.Tags.Local.ToObservableCollection();
             rootNodesViewSource.Source = Context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
-            rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
+            rootNodesViewSource.View.SortDescriptions.Add(SortIOrdered.SortDescription); // sorts top level only, other levels sorted by SortIOrdered converter
             itemsViewSource.Source = Context.Nodes.Local.ToObservableCollection();
             itemsViewSource.View.Filter = n => n is Item;
             criteriaViewSource.Source = Context.Criterias.Local.ToObservableCollection();

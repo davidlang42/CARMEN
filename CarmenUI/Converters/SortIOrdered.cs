@@ -10,11 +10,8 @@ namespace CarmenUI.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is IList list) {
-                var view = new ListCollectionView(list);
-                view.SortDescriptions.Add(new SortDescription(nameof(ShowModel.IOrdered.Order), ListSortDirection.Ascending));
-                value = view;
-            }
+            if (value is IList list)
+                value = new ListCollectionView(list) { SortDescriptions = { StandardSort.IOrdered } };
             return value;
         }
 

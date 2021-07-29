@@ -31,15 +31,12 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureShow : SubPage
     {
-        static readonly SortDescription sortByOrder = new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending);
-        static readonly SortDescription sortByName = new SortDescription(nameof(INamed.Name), ListSortDirection.Ascending);
-
         private readonly CollectionViewSource criteriasViewSource; // xaml resource loaded in constructor
-        private readonly CollectionViewSource castGroupsViewSource = new() { SortDescriptions = { sortByOrder } };
+        private readonly CollectionViewSource castGroupsViewSource = new() { SortDescriptions = { StandardSort.IOrdered } };
         private readonly CollectionViewSource alternativeCastsViewSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource tagsViewSource; // xaml resource loaded in constructor
-        private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { sortByName } };
-        private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { sortByOrder } };
+        private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { StandardSort.INamed } };
+        private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { StandardSort.IOrdered } };
         private readonly CollectionViewSource requirementsSelectionSource; // xaml resource loaded in constructor
 
         private readonly EnumerateCountByGroups enumerateCountByGroups; // xaml resource loaded in constructor
@@ -52,13 +49,13 @@ namespace CarmenUI.Pages
             enumerateCountByGroups = (EnumerateCountByGroups)FindResource(nameof(enumerateCountByGroups));
             enumerateCountByGroups.CastGroups = castGroupsViewSource;
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
-            alternativeCastsViewSource.SortDescriptions.Add(sortByName);
+            alternativeCastsViewSource.SortDescriptions.Add(StandardSort.INamed);
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
-            criteriasViewSource.SortDescriptions.Add(sortByOrder);
+            criteriasViewSource.SortDescriptions.Add(StandardSort.IOrdered);
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
-            tagsViewSource.SortDescriptions.Add(sortByName);
+            tagsViewSource.SortDescriptions.Add(StandardSort.INamed);
             requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));
-            requirementsSelectionSource.SortDescriptions.Add(sortByOrder);
+            requirementsSelectionSource.SortDescriptions.Add(StandardSort.IOrdered);
             configList.SelectedIndex = 0; // must be set after InitializeComponent() because it triggers Selected event below
         }
 

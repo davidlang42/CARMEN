@@ -1,4 +1,5 @@
-﻿using CarmenUI.Windows;
+﻿using CarmenUI.Converters;
+using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Structure;
@@ -54,7 +55,7 @@ namespace CarmenUI.Pages
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             loading.Progress = 90;
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
-            rootNodesViewSource.View.SortDescriptions.Add(new SortDescription(nameof(IOrdered.Order), ListSortDirection.Ascending)); // sorts top level only, other levels sorted by SortIOrdered converter
+            rootNodesViewSource.View.SortDescriptions.Add(StandardSort.IOrdered); // sorts top level only, other levels sorted by SortIOrdered converter
             loading.Progress = 100;
         }
 
