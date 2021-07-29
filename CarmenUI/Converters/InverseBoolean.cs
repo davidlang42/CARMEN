@@ -16,7 +16,7 @@ namespace CarmenUI.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool b_value)
-                value = !b_value;
+                return !b_value;
             return value;
         }
 

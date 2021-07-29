@@ -39,15 +39,15 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { StandardSort.IOrdered } };
         private readonly CollectionViewSource requirementsSelectionSource; // xaml resource loaded in constructor
 
-        private readonly EnumerateCountByGroups enumerateCountByGroups; // xaml resource loaded in constructor
+        private readonly AllowSparseCountByGroups allowSparseCountByGroups; // xaml resource loaded in constructor
 
         private CollectionViewSource? currentViewSource;
 
         public ConfigureShow(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
-            enumerateCountByGroups = (EnumerateCountByGroups)FindResource(nameof(enumerateCountByGroups));
-            enumerateCountByGroups.CastGroups = castGroupsViewSource;
+            allowSparseCountByGroups = (AllowSparseCountByGroups)FindResource(nameof(allowSparseCountByGroups));
+            allowSparseCountByGroups.CastGroups = castGroupsViewSource;
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.INamed);
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));

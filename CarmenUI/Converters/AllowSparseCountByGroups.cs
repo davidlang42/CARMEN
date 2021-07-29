@@ -1,4 +1,5 @@
-﻿using ShowModel.Applicants;
+﻿using CarmenUI.ViewModels;
+using ShowModel.Applicants;
 using ShowModel.Structure;
 using System;
 using System.Collections;
@@ -13,20 +14,19 @@ using System.Windows.Data;
 namespace CarmenUI.Converters
 {
     /// <summary>
-    /// This converter passes through an ObservableCollection&lt;CountByGroup&gt;, adding adds any missing CastGroups to the collection.
+    /// This converter wraps an ObservableCollection&lt;CountByGroup&gt; as a List&lt;NullableCountByGroup&gt;,
+    /// allowing a non-set CountByGroups to be modelled as null.
     /// </summary>
-    public class EnumerateCountByGroups : IValueConverter
+    public class AllowSparseCountByGroups : IValueConverter
     {
         public CollectionViewSource? CastGroups;
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (CastGroups == null)
-                throw new ApplicationException("Tried to enumerate CountByGroups without setting CastGroups.");
+                throw new ApplicationException("Tried to wrap CountByGroups without setting CastGroups.");
             if (value is ObservableCollection<CountByGroup> collection && CastGroups.Source is IList list)
-                foreach (var cast_group in list.OfType<CastGroup>()) // filter out non-CastGroup objects, as the source may contain "Loading..."
-                    if (!collection.Any(cbg => cbg.CastGroup == cast_group))
-                        collection.Add(new CountByGroup { CastGroup = cast_group });
+                return list.OfType<CastGroup>().Select(g => new NullableCountByGroup(collection, g)).ToList();
             return value;
         }
 
