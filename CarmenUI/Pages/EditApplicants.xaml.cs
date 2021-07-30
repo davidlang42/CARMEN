@@ -39,14 +39,12 @@ namespace CarmenUI.Pages
         //     if hide complete applicants is unticked, (containing ...) is shown if filterText is set. If count is exactly 1, text should be
         //     "Selected 1 (incomplete) applicant (containing 'Walt')". If none, "No (incomplete) applicants found (containing 'Walt')"
         //TODO add right click on applicantsList for expand all/collapse all
-
-        //TODO make applicant Status shown by a Converter Binding / to whole object
-        //TODO make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set
-        //TODO generate and populate criterias
-        //TODO show/edit photo
         //TODO fix bug with dob, where it doesn't change when i chaneg applicants, probably a dd/mm/yyyy vs mm/dd/yyyy format thing
-        //TODO handle add new applicant
-        //TODO delete with confirmation in applicant list
+        //TODO generate and populate criterias
+
+        //TODO make applicant Status shown by a Converter Binding / to whole object -- OR implement getter on model, but requires INotifyPropertyChanged
+        //TODO make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set -- OR implement getter on model, but requires INotifyPropertyChanged
+        //TODO show/edit photo
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;
@@ -61,7 +59,7 @@ namespace CarmenUI.Pages
             groupCombo.SelectedIndex = 0; // must be after InitializeComponent() because it triggers groupCombo_SelectionChanged
         }
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)//LATER perform this loading before showing page, using a loadingoverlay
         {
             // initialise with "Loading..."
             applicantsViewSource.Source = new[] { "Loading..." };
@@ -86,39 +84,33 @@ namespace CarmenUI.Pages
                 OnReturn(DataObjects.Applicants);
         }
 
-        private void ImportApplicants_Click(object sender, RoutedEventArgs e)
+        private void ImportApplicants_Click(object sender, RoutedEventArgs e)//LATER fix name
         {
 
         }
 
-        private void AddApplicant_Click(object sender, RoutedEventArgs e)
+        private void AddApplicant_Click(object sender, RoutedEventArgs e)//LATER fix name
         {
-
+            if (applicantsViewSource.Source is IList list)//LATER change ilist/not null view checks into hard casts (once loading is done before showing page)
+            {
+                filterText.Text = "";
+                var applicant = new Applicant();
+                list.Add(applicant);
+                applicantsList.SelectedItem = applicant;
+            }
         }
 
         private void filterText_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (applicantsViewSource.View is ICollectionView view)
-            {
-                var previous_counts = GetGroupCounts(view);
-                view.Filter = a => FullName.Format((Applicant)a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase);
-                var new_counts = GetGroupCounts(view);
-                foreach (var (key, new_count) in new_counts)
-                {
-                    if (!previous_counts.TryGetValue(key, out var old_count) // the group wasn't previously shown
-                        || ((old_count > AUTO_COLLAPSE_GROUP_THRESHOLD) != (new_count > AUTO_COLLAPSE_GROUP_THRESHOLD))) // or it crossed the threshold
-                    {
-                        groupExpansionLookup.Dictionary[key] = new_count <= AUTO_COLLAPSE_GROUP_THRESHOLD;
-                    }
-                }
-            }
+            ConfigureFiltering();
         }
 
         private Dictionary<string, int> GetGroupCounts(ICollectionView view)
-            => view.Groups.OfType<CollectionViewGroup>()
+            => view.Groups?.OfType<CollectionViewGroup>()
             .Where(g => g.Name != null)
             .Where(g => g.ItemCount > 0)
-            .ToDictionary(g => g.Name.ToString()!, g => g.ItemCount);
+            .ToDictionary(g => g.Name.ToString()!, g => g.ItemCount)
+            ?? new();
 
         private void GroupExpander_Expanded(object sender, RoutedEventArgs e)
             => StoreExpanderState((Expander)sender, true);
@@ -185,6 +177,37 @@ namespace CarmenUI.Pages
             foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
                 if (!applicantsViewSource.View.SortDescriptions.Contains(sd))
                     applicantsViewSource.View.SortDescriptions.Add(sd);
+            // re-configure filtering
+            ConfigureFiltering();
+        }
+
+        private void ConfigureFiltering()
+        {
+            if (applicantsViewSource.View is ICollectionView view)
+            {
+                var previous_counts = GetGroupCounts(view);
+                view.Filter = a => FullName.Format((Applicant)a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase);
+                var new_counts = GetGroupCounts(view);
+                foreach (var (key, new_count) in new_counts)
+                {
+                    if (!previous_counts.TryGetValue(key, out var old_count) // the group wasn't previously shown
+                        || ((old_count > AUTO_COLLAPSE_GROUP_THRESHOLD) != (new_count > AUTO_COLLAPSE_GROUP_THRESHOLD))) // or it crossed the threshold
+                    {
+                        groupExpansionLookup.Dictionary[key] = new_count <= AUTO_COLLAPSE_GROUP_THRESHOLD;
+                    }
+                }
+            }
+        }
+
+        private void applicantsList_KeyUp(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && applicantsList.SelectedItem is Applicant applicant)
+            {
+                e.Handled = true;
+                var msg = $"Are you sure you want to delete '{FullName.Format(applicant)}'?";
+                if (MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    ((IList)applicantsViewSource.Source).Remove(applicant);
+            }
         }
     }
 }

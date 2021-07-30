@@ -12,7 +12,7 @@
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Edit Applicants" Loaded="Page_Loaded">
     <Page.Resources>
-        <CollectionViewSource x:Key="applicantsViewSource"/>
+        <CollectionViewSource x:Key="applicantsViewSource" IsLiveSortingRequested="True" IsLiveFilteringRequested="True" IsLiveGroupingRequested="True"/>
         <CollectionViewSource x:Key="criteriasViewSource"/>
         <cv:FullName x:Key="fullName"/>
         <cv:MatchGenderValue x:Key="matchGenderValue"/>
@@ -57,7 +57,7 @@
             </Grid>
             <Button DockPanel.Dock="Bottom" Content="Import Applicants" Margin="5" Click="ImportApplicants_Click" Height="30"/>
             <Button DockPanel.Dock="Bottom" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
-            <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5">
+            <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5" KeyUp="applicantsList_KeyUp">
                 <ListBox.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.ContainerStyle>

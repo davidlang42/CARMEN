@@ -37,12 +37,12 @@ namespace ShowModel.Applicants
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
 
-        public uint AgeToday => AgeAt(DateTime.Now); //TODO dont do this here, because age wont update with bday, use a value converter
+        public uint? AgeToday => AgeAt(DateTime.Now); //TODO dont do this here, because age wont update with bday, use a value converter -- or actually it will, if I implement IPropertyNofieychanged
 
-        public uint AgeAt(DateTime date) //LATER handle errors more nicely, probably return nullable, move errors to validation
+        public uint? AgeAt(DateTime date) //LATER handle errors more nicely, move errors to validation
         {
             if (DateOfBirth == null)
-                throw new ApplicationException($"Date of birth is not set.");
+                return null;
             if (DateOfBirth > date)
                 throw new ArgumentOutOfRangeException($"Date of birth is after the provided {nameof(date)}.");
             return (uint)((date - DateOfBirth.Value).TotalDays / 365.2425); // correct on average, good enough
