@@ -282,10 +282,24 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Gender: " VerticalAlignment="Center"/>
                                 <RadioButton Grid.Column="1" IsChecked="{Binding Gender, Converter={StaticResource matchGenderValue}, ConverterParameter='Male'}">
-                                    Male
+                                    <RadioButton.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Clear Gender" Click="ClearGender_Click"/>
+                                        </ContextMenu>
+                                    </RadioButton.ContextMenu>
+                                    <RadioButton.Content>
+                                        Male
+                                    </RadioButton.Content>
                                 </RadioButton>
                                 <RadioButton Grid.Column="2" IsChecked="{Binding Gender, Converter={StaticResource matchGenderValue}, ConverterParameter='Female'}">
-                                    Female
+                                    <RadioButton.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Clear Gender" Click="ClearGender_Click"/>
+                                        </ContextMenu>
+                                    </RadioButton.ContextMenu>
+                                    <RadioButton.Content>
+                                        Female
+                                    </RadioButton.Content>
                                 </RadioButton>
                             </Grid>
                             <Grid Margin="0 0 0 10">

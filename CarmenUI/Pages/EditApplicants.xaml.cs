@@ -27,20 +27,23 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         //TODO value converter to expand groups by default if count less than 10 (as long as it doesn't reset whenever you type in the filter box)
-        //TODO checkbox setting for "Hide complete applicants", which defaults to false if you click "Register Applicants" but defaults to true if you click "Audition Applicants"
-        //TODO add checkbox setting for "Save changes per applicant", or something like that, so that changes are saved every time the applicant changes. persist in user settings. add save/cancel button to standard location. if save per applicant is unticked, save button works as normal, if ticked, save button changes to 'OK' rather than save and icon changes (or tick at least changes color), and implement saving
-        //TODO make header text "Selected from (123) (incomplete) applicants (containing 'Walt')" (123) is total count in view, (incomplete) is removed if hide complete applicants is unticked, (containing ...) is shown if filterText is set. If count is exactly 1, text should be "Selected 1 (incomplete) applicant (containing 'Walt')". If none, "No (incomplete) applicants found (containing 'Walt')"
-        //TODO on filter update, if exactly 1 applicant available, select it
+        //TODO checkbox setting for "Hide complete applicants", which defaults to false if you click "Register Applicants" but defaults to true if
+        //     you click "Audition Applicants"
+        //TODO add checkbox setting for "Save changes per applicant", or something like that, so that changes are saved every time the applicant changes.
+        //     persist in user settings. add save/cancel button to standard location. if save per applicant is unticked, save button works as normal,
+        //     if ticked, save button changes to 'OK' rather than save and icon changes (or tick at least changes color), and implement saving
+        //TODO make header text "Selected from (123) (incomplete) applicants (containing 'Walt')" (123) is total count in view, (incomplete) is removed
+        //     if hide complete applicants is unticked, (containing ...) is shown if filterText is set. If count is exactly 1, text should be
+        //     "Selected 1 (incomplete) applicant (containing 'Walt')". If none, "No (incomplete) applicants found (containing 'Walt')"
         //TODO make filter/group labels/controls have larger text
         //TODO populate group combox & make it work
-        //TODO populate gender field, with some way to clear (right click? ctrl click?)
-        //TODO make applicant Name shown by multi value converter (first name, last name) so that it can be a user setting
         //TODO make applicant Status shown by a Converter Binding / to whole object
         //TODO make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set
         //TODO generate and populate criterias
         //TODO show/edit photo
         //TODO fix bug with dob, where it doesn't change when i chaneg applicants, probably a dd/mm/yyyy vs mm/dd/yyyy format thing
         //TODO handle add new applicant
+        //TODO delete with confirmation in applicant list
 
         private CollectionViewSource applicantsViewSource; // xaml resource loaded in constructor
 
@@ -86,6 +89,17 @@ namespace CarmenUI.Pages
         {
             if (applicantsViewSource.View is ICollectionView view)
                 view.Filter = a => FullName.Format((Applicant)a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void ClearGender_Click(object sender, RoutedEventArgs e)
+        {
+            if (applicantsViewSource.View.CurrentItem is Applicant applicant)
+            {
+                applicant.Gender = null;
+                //LATER implement INotifyPropertyChanged on all objects in ShowModel, then the refresh below won't be required
+                applicantsList.SelectedItem = null;
+                applicantsList.SelectedItem = applicant;
+            }
         }
     }
 }
