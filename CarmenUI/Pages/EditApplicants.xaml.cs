@@ -32,7 +32,6 @@ namespace CarmenUI.Pages
         //     if hide complete applicants is unticked, (containing ...) is shown if filterText is set. If count is exactly 1, text should be
         //     "Selected 1 (incomplete) applicant (containing 'Walt')". If none, "No (incomplete) applicants found (containing 'Walt')"
         //TODO add right click on applicantsList for expand all/collapse all
-        //TODO fix bug with dob, where it doesn't change when i chaneg applicants, probably a dd/mm/yyyy vs mm/dd/yyyy format thing
         //TODO generate and populate criterias
 
         //TODO make applicant Status shown by a Converter Binding / to whole object -- OR implement getter on model, but requires INotifyPropertyChanged

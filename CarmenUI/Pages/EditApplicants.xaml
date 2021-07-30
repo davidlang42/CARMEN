@@ -183,7 +183,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Date of Birth: " VerticalAlignment="Center"/>
-                                <DatePicker Grid.Column="1"  Text="{Binding DateOfBirth}"/>
+                                <DatePicker Grid.Column="1" SelectedDate="{Binding DateOfBirth}"/>
                             </Grid>
                             <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
