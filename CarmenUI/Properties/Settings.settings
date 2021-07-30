@@ -23,5 +23,8 @@
     <Setting Name="RecentShows" Type="System.Collections.Generic.List&lt;CarmenUI.ViewModels.RecentShow&gt;" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="FullNameFormat" Type="CarmenUI.Converters.FullNameFormat" Scope="User">
+      <Value Profile="(Default)">LastCommaFirst</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

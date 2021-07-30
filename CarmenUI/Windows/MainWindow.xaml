@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarmenUI"
         xmlns:bd="clr-namespace:CarmenUI.Bindings"
+        xmlns:cv="clr-namespace:CarmenUI.Converters"
         xmlns:modelCriterias="clr-namespace:ShowModel.Criterias;assembly=ShowModel"
         xmlns:modelRequirements="clr-namespace:ShowModel.Requirements;assembly=ShowModel"
         xmlns:modelStructure="clr-namespace:ShowModel.Structure;assembly=ShowModel"
@@ -18,6 +19,7 @@
         MinHeight="600" MinWidth="800"
         Title="CARMEN" Icon="/Icons/CarmenC.png">
     <Window.Resources>
+        <cv:FullName x:Key="fullName"/>
         <DataTemplate DataType="{x:Type modelCriterias:Criteria}">
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
@@ -31,7 +33,16 @@
             <TextBlock Text="{Binding Path=Name}"/>
         </DataTemplate>
         <DataTemplate DataType="{x:Type modelApplicants:Applicant}">
-            <TextBlock Text="{Binding Path=Name}"/>
+            <TextBlock>
+                <TextBlock.Text>
+                    <MultiBinding Converter="{StaticResource fullName}">
+                        <MultiBinding.Bindings>
+                            <Binding Path="FirstName"/>
+                            <Binding Path="LastName"/>
+                        </MultiBinding.Bindings>
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
         </DataTemplate>
         <DataTemplate DataType="{x:Type modelStructure:SectionType}">
             <TextBlock Text="{Binding Path=Name}"/>

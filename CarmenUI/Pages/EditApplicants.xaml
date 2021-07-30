@@ -6,12 +6,14 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CarmenUI.Pages"
+    xmlns:cv="clr-namespace:CarmenUI.Converters"
     xmlns:modelApplicants="clr-namespace:ShowModel.Applicants;assembly=ShowModel"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Edit Applicants" Loaded="Page_Loaded">
     <Page.Resources>
         <CollectionViewSource x:Key="applicantsViewSource"/>
+        <cv:FullName x:Key="fullName"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -233,7 +235,16 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="Auto"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Grid.ColumnSpan="2" Text="{Binding Name}" FontSize="28"/>
+                        <TextBlock Grid.ColumnSpan="2" FontSize="28">
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource fullName}">
+                                    <MultiBinding.Bindings>
+                                        <Binding Path="FirstName"/>
+                                        <Binding Path="LastName"/>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </TextBlock.Text>
+                        </TextBlock>
                         <TextBlock Grid.Row="1" Text="Incomplete" Foreground="Red" FontStyle="Italic" FontSize="16"/>
                         <TextBlock Grid.Row="1" Grid.Column="1" ToolTip="as of 1st July 2022" FontSize="16">
                             <TextBlock.Text>

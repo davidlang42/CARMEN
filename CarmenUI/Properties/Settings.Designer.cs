@@ -100,5 +100,17 @@ namespace CarmenUI.Properties {
                 this["RecentShows"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("LastCommaFirst")]
+        public global::CarmenUI.Converters.FullNameFormat FullNameFormat {
+            get {
+                return ((global::CarmenUI.Converters.FullNameFormat)(this["FullNameFormat"]));
+            }
+            set {
+                this["FullNameFormat"] = value;
+            }
+        }
     }
 }

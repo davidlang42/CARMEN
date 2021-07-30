@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CarmenUI.Converters;
+using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Applicants;
 using System;
@@ -84,7 +85,7 @@ namespace CarmenUI.Pages
         private void filterText_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (applicantsViewSource.View is ICollectionView view)
-                view.Filter = a => ((Applicant)a).Name.Contains(filterText.Text, StringComparison.OrdinalIgnoreCase);
+                view.Filter = a => FullName.Format((Applicant)a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase);
         }
     }
 }
