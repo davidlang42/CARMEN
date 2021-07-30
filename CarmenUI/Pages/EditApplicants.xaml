@@ -24,11 +24,10 @@
             <ColumnDefinition Width="3*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <DockPanel Grid.RowSpan="2">
+        <DockPanel>
             <Grid DockPanel.Dock="Top" Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -84,14 +83,7 @@
                 </ListBox.GroupStyle>
             </ListBox>
         </DockPanel>
-        <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="5">
-            <TextBlock Text="Audition Groups" FontSize="16"/>
-            <TextBlock Text=" &gt; " FontSize="16"/>
-            <TextBlock Text="Audition Group 1" FontSize="16"/>
-            <TextBlock Text=" &gt; " FontSize="16"/>
-            <TextBlock Text="Smith, John" FontSize="16"/>
-        </StackPanel>
-        <Border Grid.Column="1" Grid.Row="1" BorderBrush="Black" BorderThickness="1" Margin="5">
+        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5">
             <Grid DataContext="{Binding ElementName=applicantsList, Path=SelectedItem}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -261,8 +253,8 @@
                 </Grid>
             </Grid>
         </Border>
-        <Button Grid.Row="2" DockPanel.Dock="Bottom" Content="Import Applicants" Margin="5" IsEnabled="False" Height="30"/>
-        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
+        <Button Grid.Row="1" Content="Import Applicants" Margin="5" IsEnabled="False" Height="35"/>
+        <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
