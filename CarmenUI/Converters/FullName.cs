@@ -1,6 +1,7 @@
 ﻿using ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -76,5 +77,30 @@ namespace CarmenUI.Converters
         Initials,
         /// <summary>D.L.</summary>
         InitialsDots,
+    }
+
+    public static class FullNameFormatExtensions
+    {
+        private static readonly SortDescription sortByFirstName = new(nameof(Applicant.FirstName), ListSortDirection.Ascending);
+        private static readonly SortDescription sortByLastName = new(nameof(Applicant.LastName), ListSortDirection.Ascending);
+
+        public static IEnumerable<SortDescription> ToSortDescriptions(this FullNameFormat format)
+        {
+            switch (format)
+            {
+                case FullNameFormat.FirstLast:
+                case FullNameFormat.InitialDotLast:
+                case FullNameFormat.FirstInitialDot:
+                case FullNameFormat.Initials:
+                case FullNameFormat.InitialsDots:
+                    return new[] { sortByFirstName, sortByLastName };
+                case FullNameFormat.LastCommaFirst:
+                case FullNameFormat.LastCommaInitialDot:
+                case FullNameFormat.InitialDotCommaFirst:
+                    return new[] { sortByLastName, sortByFirstName };
+                default:
+                    throw new NotImplementedException($"Enum not handled: {format}");
+            }
+        }
     }
 }

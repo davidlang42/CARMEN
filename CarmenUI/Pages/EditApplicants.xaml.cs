@@ -69,6 +69,7 @@ namespace CarmenUI.Pages
             var applicants = TaskToLoad(c => c.Applicants);
             applicants.Start();
             applicantsViewSource.Source = await applicants;
+            ConfigureGroupingAndSorting(groupCombo.SelectedItem);
             var criterias = TaskToLoad(c => c.Criterias);
             criterias.Start();
             criteriasViewSource.Source = await criterias;
@@ -144,22 +145,46 @@ namespace CarmenUI.Pages
 
         private void groupCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (e.AddedItems.Count == 0)
+            //LATER persist the "group by" in user settings, but as 2 separate settings for Register/Audition UI links
+            if (groupCombo.SelectedItem != null)
+                ConfigureGroupingAndSorting(groupCombo.SelectedItem);
+        }
+
+        private void ConfigureGroupingAndSorting(object selected_grouping)
+        {
+            if (applicantsViewSource.View == null)
                 return;
+            // clear old grouping
             applicantsViewSource.GroupDescriptions.Clear();
-            if (e.AddedItems[0] as string == string.Empty)
-                return; // don't group by anything
-            var new_group_description = e.AddedItems[0] switch
+            // add new grouping
+            if (selected_grouping is string group_by_string)
             {
-                "First Name" => new PropertyGroupDescription(nameof(Applicant.FirstName)),
-                "Last Name" => new PropertyGroupDescription(nameof(Applicant.LastName)),
-                "Gender" => new PropertyGroupDescription(nameof(Applicant.Gender)),
-                "Year of Birth" => new PropertyGroupDescription(nameof(Applicant.DateOfBirth), new DateToYear()),
-                string str => throw new NotImplementedException($"String value not implemented: {str}"),
-                Criteria c => throw new NotImplementedException(),//TODO implement grouping by criteria
-                var obj => throw new NotImplementedException($"Object value not implemented: {obj.GetType().Name}"),
-            };
-            applicantsViewSource.GroupDescriptions.Add(new_group_description);    
+                if (group_by_string != string.Empty) // empty string means don't group by anything
+                {
+                    PropertyGroupDescription gd = groupCombo.SelectedItem switch
+                    {
+                        "First Name" => new(nameof(Applicant.FirstName)),
+                        "Last Name" => new(nameof(Applicant.LastName)),
+                        "Gender" => new(nameof(Applicant.Gender)),
+                        "Year of Birth" => new(nameof(Applicant.DateOfBirth), new DateToYear()),
+                        _ => throw new NotImplementedException($"String value not implemented: {group_by_string}")
+                    }; 
+                    applicantsViewSource.GroupDescriptions.Add(gd);
+                    applicantsViewSource.View.SortDescriptions.Add(new(gd.PropertyName, ListSortDirection.Ascending)); //LATER this also worked: gd.SortDescriptions.Add(new("Name", ListSortDirection.Ascending));
+                }
+            }
+            else if (selected_grouping is Criteria group_by_criteria)
+            {
+                //TODO implement grouping by criteria, sorting might be tricky (probably use GroupDescriptions.CustomSort)
+            }
+            else
+            {
+                throw new NotImplementedException($"Object value not implemented: {selected_grouping.GetType().Name}");
+            }
+            // add sort by name (based on full name formatting setting)
+            foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
+                if (!applicantsViewSource.View.SortDescriptions.Contains(sd))
+                    applicantsViewSource.View.SortDescriptions.Add(sd);
         }
     }
 }
