@@ -13,6 +13,7 @@
     Title="Edit Applicants" Loaded="Page_Loaded">
     <Page.Resources>
         <CollectionViewSource x:Key="applicantsViewSource"/>
+        <CollectionViewSource x:Key="criteriasViewSource"/>
         <cv:FullName x:Key="fullName"/>
         <cv:MatchGenderValue x:Key="matchGenderValue"/>
         <cv:BooleanLookupDictionary x:Key="groupExpansionLookup"/>
@@ -32,16 +33,27 @@
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Filter: "/>
-                <TextBox x:Name="filterText" Grid.Column="1" TextChanged="filterText_TextChanged"/>
+                <TextBlock Text="Filter: " FontSize="14" VerticalAlignment="Center"/>
+                <TextBox x:Name="filterText" Grid.Column="1" TextChanged="filterText_TextChanged" FontSize="14"/>
             </Grid>
             <Grid DockPanel.Dock="Top" Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Group by: "/>
-                <ComboBox x:Name="groupCombo" Grid.Column="1"/>
+                <TextBlock Text="Group by: " FontSize="14" VerticalAlignment="Center"/>
+                <ComboBox x:Name="groupCombo" Grid.Column="1" FontSize="14" SelectionChanged="groupCombo_SelectionChanged">
+                    <ComboBox.ItemsSource>
+                        <CompositeCollection>
+                            <x:Static Member="sys:String.Empty" />
+                            <sys:String>First Name</sys:String>
+                            <sys:String>Last Name</sys:String>
+                            <sys:String>Gender</sys:String>
+                            <sys:String>Year of Birth</sys:String>
+                            <CollectionContainer Collection="{Binding Source={StaticResource criteriasViewSource}}"/>
+                        </CompositeCollection>
+                    </ComboBox.ItemsSource>
+                </ComboBox>
             </Grid>
             <Button DockPanel.Dock="Bottom" Content="Import Applicants" Margin="5" Click="ImportApplicants_Click" Height="30"/>
             <Button DockPanel.Dock="Bottom" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>

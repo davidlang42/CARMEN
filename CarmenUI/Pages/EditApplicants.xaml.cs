@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Applicants;
+using ShowModel.Criterias;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,16 +28,18 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
-        //TODO checkbox setting for "Hide complete applicants", which defaults to false if you click "Register Applicants" but defaults to true if
-        //     you click "Audition Applicants"
-        //TODO add checkbox setting for "Save changes per applicant", or something like that, so that changes are saved every time the applicant changes.
-        //     persist in user settings. add save/cancel button to standard location. if save per applicant is unticked, save button works as normal,
-        //     if ticked, save button changes to 'OK' rather than save and icon changes (or tick at least changes color), and implement saving
+        //TODO checkbox setting for "Hide complete applicants", which defaults to false if you
+        //     click "Register Applicants" but defaults to true if you click "Audition Applicants"
+        //TODO add checkbox setting for "Save changes per applicant", or something like that, so that
+        //     changes are saved every time the applicant changes. persist in user settings.
+        //     add save/cancel button to standard location. if save per applicant is unticked,
+        //     save button works as normal, if ticked, save button changes to 'OK' rather than save
+        //     and icon changes (or tick at least changes color), and implement saving
         //TODO make header text "Selected from (123) (incomplete) applicants (containing 'Walt')" (123) is total count in view, (incomplete) is removed
         //     if hide complete applicants is unticked, (containing ...) is shown if filterText is set. If count is exactly 1, text should be
         //     "Selected 1 (incomplete) applicant (containing 'Walt')". If none, "No (incomplete) applicants found (containing 'Walt')"
-        //TODO make filter/group labels/controls have larger text
-        //TODO populate group combox & make it work
+        //TODO add right click on applicantsList for expand all/collapse all
+
         //TODO make applicant Status shown by a Converter Binding / to whole object
         //TODO make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set
         //TODO generate and populate criterias
@@ -44,17 +47,18 @@ namespace CarmenUI.Pages
         //TODO fix bug with dob, where it doesn't change when i chaneg applicants, probably a dd/mm/yyyy vs mm/dd/yyyy format thing
         //TODO handle add new applicant
         //TODO delete with confirmation in applicant list
-        //TODO add right click on applicantsList for expand all/collapse all
 
-        private CollectionViewSource applicantsViewSource; // xaml resource loaded in constructor
-        private BooleanLookupDictionary groupExpansionLookup; // xaml resource loaded in constructor
+        private CollectionViewSource applicantsViewSource;
+        private CollectionViewSource criteriasViewSource;
+        private BooleanLookupDictionary groupExpansionLookup;
 
         public EditApplicants(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
-            applicantsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.Gender)));
+            criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
             groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
+            groupCombo.SelectedIndex = 0; // must be after InitializeComponent() because it triggers groupCombo_SelectionChanged
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -62,9 +66,12 @@ namespace CarmenUI.Pages
             // initialise with "Loading..."
             applicantsViewSource.Source = new[] { "Loading..." };
             // populate source asynchronously
-            var task = TaskToLoad(c => c.Applicants);
-            task.Start();
-            applicantsViewSource.Source = await task;
+            var applicants = TaskToLoad(c => c.Applicants);
+            applicants.Start();
+            applicantsViewSource.Source = await applicants;
+            var criterias = TaskToLoad(c => c.Criterias);
+            criterias.Start();
+            criteriasViewSource.Source = await criterias;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -133,6 +140,26 @@ namespace CarmenUI.Pages
                 applicantsList.SelectedItem = null;
                 applicantsList.SelectedItem = applicant;
             }
+        }
+
+        private void groupCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems.Count == 0)
+                return;
+            applicantsViewSource.GroupDescriptions.Clear();
+            if (e.AddedItems[0] as string == string.Empty)
+                return; // don't group by anything
+            var new_group_description = e.AddedItems[0] switch
+            {
+                "First Name" => new PropertyGroupDescription(nameof(Applicant.FirstName)),
+                "Last Name" => new PropertyGroupDescription(nameof(Applicant.LastName)),
+                "Gender" => new PropertyGroupDescription(nameof(Applicant.Gender)),
+                "Year of Birth" => new PropertyGroupDescription(nameof(Applicant.DateOfBirth), new DateToYear()),
+                string str => throw new NotImplementedException($"String value not implemented: {str}"),
+                Criteria c => throw new NotImplementedException(),//TODO implement grouping by criteria
+                var obj => throw new NotImplementedException($"Object value not implemented: {obj.GetType().Name}"),
+            };
+            applicantsViewSource.GroupDescriptions.Add(new_group_description);    
         }
     }
 }
