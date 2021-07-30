@@ -77,10 +77,10 @@ namespace CarmenUI.Pages
             => NavigateToSubPage(new SelectCast(contextOptions));
 
         private void AuditionApplicants_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateToSubPage(new EditApplicants(contextOptions));
+            => NavigateToSubPage(new EditApplicants(contextOptions, true));
 
         private void RegisterApplicants_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateToSubPage(new EditApplicants(contextOptions));
+            => NavigateToSubPage(new EditApplicants(contextOptions, false));
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
             => SummaryPanel.ShowOneChild(ConfigureShowSummary);

@@ -28,8 +28,6 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
-        //TODO checkbox setting for "Hide complete applicants", which defaults to false if you
-        //     click "Register Applicants" but defaults to true if you click "Audition Applicants"
         //TODO add checkbox setting for "Save changes per applicant", or something like that, so that
         //     changes are saved every time the applicant changes. persist in user settings.
         //     add save/cancel button to standard location. if save per applicant is unticked,
@@ -50,13 +48,14 @@ namespace CarmenUI.Pages
         private CollectionViewSource criteriasViewSource;
         private BooleanLookupDictionary groupExpansionLookup;
 
-        public EditApplicants(DbContextOptions<ShowContext> context_options) : base(context_options)
+        public EditApplicants(DbContextOptions<ShowContext> context_options, bool hide_complete_applicants) : base(context_options)
         {
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
             groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
             groupCombo.SelectedIndex = 0; // must be after InitializeComponent() because it triggers groupCombo_SelectionChanged
+            hideCompleteApplicants.IsChecked = hide_complete_applicants;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)//LATER perform this loading before showing page, using a loadingoverlay
@@ -68,6 +67,7 @@ namespace CarmenUI.Pages
             applicants.Start();
             applicantsViewSource.Source = await applicants;
             ConfigureGroupingAndSorting(groupCombo.SelectedItem);
+            applicantsList.SelectedItem = null; //LATER when nothing is selected, dont show editing panel at all
             var criterias = TaskToLoad(c => c.Criterias);
             criterias.Start();
             criteriasViewSource.Source = await criterias;
@@ -186,6 +186,7 @@ namespace CarmenUI.Pages
             if (applicantsViewSource.View is ICollectionView view)
             {
                 var previous_counts = GetGroupCounts(view);
+                //TODO implement hiding complete applicants if hideCompleteApplicants.IsChecked
                 view.Filter = a => FullName.Format((Applicant)a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase);
                 var new_counts = GetGroupCounts(view);
                 foreach (var (key, new_count) in new_counts)
@@ -209,5 +210,11 @@ namespace CarmenUI.Pages
                     ((IList)applicantsViewSource.Source).Remove(applicant);
             }
         }
+
+        private void hideCompleteApplicants_Checked(object sender, RoutedEventArgs e)
+            => ConfigureFiltering();
+
+        private void hideCompleteApplicants_Unchecked(object sender, RoutedEventArgs e)
+            => ConfigureFiltering();
     }
 }

@@ -57,6 +57,7 @@
             </Grid>
             <Button DockPanel.Dock="Bottom" Content="Import Applicants" Margin="5" Click="ImportApplicants_Click" Height="30"/>
             <Button DockPanel.Dock="Bottom" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
+            <CheckBox DockPanel.Dock="Bottom" x:Name="hideCompleteApplicants" Content="Hide complete applicants" Margin="5" Checked="hideCompleteApplicants_Checked" Unchecked="hideCompleteApplicants_Unchecked"/>
             <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5" KeyUp="applicantsList_KeyUp">
                 <ListBox.GroupStyle>
                     <GroupStyle>
