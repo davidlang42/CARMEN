@@ -26,7 +26,7 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class EditApplicants : SubPage
     {
-        //TODO value converter to expand groups by default if count less than 10 (as long as it doesn't reset whenever you type in the filter box)
+        const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
         //TODO checkbox setting for "Hide complete applicants", which defaults to false if you click "Register Applicants" but defaults to true if
         //     you click "Audition Applicants"
         //TODO add checkbox setting for "Save changes per applicant", or something like that, so that changes are saved every time the applicant changes.
@@ -91,8 +91,26 @@ namespace CarmenUI.Pages
         private void filterText_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (applicantsViewSource.View is ICollectionView view)
+            {
+                var previous_counts = GetGroupCounts(view);
                 view.Filter = a => FullName.Format((Applicant)a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase);
+                var new_counts = GetGroupCounts(view);
+                foreach (var (key, new_count) in new_counts)
+                {
+                    if (!previous_counts.TryGetValue(key, out var old_count) // the group wasn't previously shown
+                        || ((old_count > AUTO_COLLAPSE_GROUP_THRESHOLD) != (new_count > AUTO_COLLAPSE_GROUP_THRESHOLD))) // or it crossed the threshold
+                    {
+                        groupExpansionLookup.Dictionary[key] = new_count <= AUTO_COLLAPSE_GROUP_THRESHOLD;
+                    }
+                }
+            }
         }
+
+        private Dictionary<string, int> GetGroupCounts(ICollectionView view)
+            => view.Groups.OfType<CollectionViewGroup>()
+            .Where(g => g.Name != null)
+            .Where(g => g.ItemCount > 0)
+            .ToDictionary(g => g.Name.ToString()!, g => g.ItemCount);
 
         private void GroupExpander_Expanded(object sender, RoutedEventArgs e)
             => StoreExpanderState((Expander)sender, true);
