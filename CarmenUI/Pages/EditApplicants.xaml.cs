@@ -28,9 +28,7 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
-        //TODO add right click on applicantsList for expand all/collapse all
         //TODO generate and populate criterias
-
         //TODO make applicant Status shown by a Converter Binding / to whole object -- OR implement getter on model, but requires INotifyPropertyChanged
         //TODO make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set -- OR implement getter on model, but requires INotifyPropertyChanged
         //TODO show/edit photo
@@ -137,9 +135,16 @@ namespace CarmenUI.Pages
             // clear old grouping
             applicantsViewSource.GroupDescriptions.Clear();
             // add new grouping
+            applicantListContextMenu.IsOpen = false;
+            applicantListContextMenu.Visibility = Visibility.Visible;
             if (selected_grouping is string group_by_string)
             {
-                if (group_by_string != string.Empty) // empty string means don't group by anything
+                if (group_by_string == string.Empty)
+                {
+                    // don't group by anything
+                    applicantListContextMenu.Visibility = Visibility.Collapsed;
+                }
+                else
                 {
                     PropertyGroupDescription gd = groupCombo.SelectedItem switch
                     {
@@ -209,6 +214,18 @@ namespace CarmenUI.Pages
         {
             if (saveOnApplicantChange.IsChecked == true)
                 SaveChanges();
+        }
+
+        private void ExpandAll_Click(object sender, RoutedEventArgs e)
+            => ExpandListHeaders(true);
+
+        private void CollapseAll_Click(object sender, RoutedEventArgs e)
+            => ExpandListHeaders(false);
+
+        private void ExpandListHeaders(bool expanded)//TODO fix this, it isn't finding any controls
+        {
+            foreach (var expander in applicantsList.AllControls<Expander>())
+                expander.IsExpanded = expanded;
         }
     }
 }

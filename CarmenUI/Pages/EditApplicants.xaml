@@ -81,6 +81,12 @@
                         </GroupStyle.ContainerStyle>
                     </GroupStyle>
                 </ListBox.GroupStyle>
+                <ListBox.ContextMenu>
+                    <ContextMenu x:Name="applicantListContextMenu">
+                        <MenuItem Header="Expand all" Click="ExpandAll_Click"/>
+                        <MenuItem Header="Collapse all" Click="CollapseAll_Click"/>
+                    </ContextMenu>
+                </ListBox.ContextMenu>
             </ListBox>
         </DockPanel>
         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5">
@@ -169,6 +175,25 @@
                                     </RadioButton.Content>
                                 </RadioButton>
                             </Grid>
+                            <!--<ItemsControl Grid.Row="6" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource allowSparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="1"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding CastGroup.Name}" FontSize="14"/>
+                                            <TextBox Grid.Column="1" Text="{Binding Count, TargetNullValue=''}" FontSize="14"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>-->
                             <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>

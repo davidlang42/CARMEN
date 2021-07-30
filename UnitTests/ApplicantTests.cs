@@ -41,7 +41,7 @@ namespace UnitTests
         [Test]
         public void Positive_Ages()
         {
-            Applicants.All(a => a.AgeToday() > 0).Should().BeTrue();
+            Applicants.All(a => a.AgeToday > 0).Should().BeTrue();
         }
 
         [Test]
@@ -56,7 +56,7 @@ namespace UnitTests
             };
             try
             {
-                invalid.AgeToday();
+                _ = invalid.AgeToday;
                 Assert.Fail();
             }
             catch { }
