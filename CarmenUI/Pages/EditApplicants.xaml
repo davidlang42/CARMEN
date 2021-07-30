@@ -26,6 +26,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <DockPanel Grid.RowSpan="2">
             <Grid DockPanel.Dock="Top" Margin="5">
@@ -55,10 +56,9 @@
                     </ComboBox.ItemsSource>
                 </ComboBox>
             </Grid>
-            <Button DockPanel.Dock="Bottom" Content="Import Applicants" Margin="5" Click="ImportApplicants_Click" Height="30"/>
             <Button DockPanel.Dock="Bottom" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
             <CheckBox DockPanel.Dock="Bottom" x:Name="hideCompleteApplicants" Content="Hide complete applicants" Margin="5" Checked="hideCompleteApplicants_Checked" Unchecked="hideCompleteApplicants_Unchecked"/>
-            <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5" KeyUp="applicantsList_KeyUp">
+            <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5" KeyUp="applicantsList_KeyUp" SelectionChanged="applicantsList_SelectionChanged">
                 <ListBox.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.ContainerStyle>
@@ -261,5 +261,26 @@
                 </Grid>
             </Grid>
         </Border>
+        <Button Grid.Row="2" DockPanel.Dock="Bottom" Content="Import Applicants" Margin="5" IsEnabled="False" Height="30"/>
+        <Grid Grid.Row="2" Grid.Column="1" Grid.ColumnSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox DockPanel.Dock="Bottom" x:Name="saveOnApplicantChange" Content="Auto-save on applicant change" Margin="5" VerticalAlignment="Center"/>
+            <Button Grid.Column="1" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Cancel_grey.png" Width="16" Margin="2 0"/>
+                    <TextBlock Text="Cancel" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2" IsDefault="True" Width="100" Height="35" Margin="5" Click="SaveButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Checkmark_blue.png" Width="16" Margin="2 0"/>
+                    <TextBlock Text="Save" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+        </Grid>
     </Grid>
 </local:SubPage>

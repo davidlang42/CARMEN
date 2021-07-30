@@ -28,11 +28,6 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
-        //TODO add checkbox setting for "Save changes per applicant", or something like that, so that
-        //     changes are saved every time the applicant changes. persist in user settings.
-        //     add save/cancel button to standard location. if save per applicant is unticked,
-        //     save button works as normal, if ticked, save button changes to 'OK' rather than save
-        //     and icon changes (or tick at least changes color), and implement saving
         //TODO make header text "Selected from (123) (incomplete) applicants (containing 'Walt')" (123) is total count in view, (incomplete) is removed
         //     if hide complete applicants is unticked, (containing ...) is shown if filterText is set. If count is exactly 1, text should be
         //     "Selected 1 (incomplete) applicant (containing 'Walt')". If none, "No (incomplete) applicants found (containing 'Walt')"
@@ -43,6 +38,8 @@ namespace CarmenUI.Pages
         //TODO make applicant Status shown by a Converter Binding / to whole object -- OR implement getter on model, but requires INotifyPropertyChanged
         //TODO make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set -- OR implement getter on model, but requires INotifyPropertyChanged
         //TODO show/edit photo
+
+        //LATER persist saveOnApplicantChange as a user setting
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;
@@ -84,12 +81,7 @@ namespace CarmenUI.Pages
                 OnReturn(DataObjects.Applicants);
         }
 
-        private void ImportApplicants_Click(object sender, RoutedEventArgs e)//LATER fix name
-        {
-
-        }
-
-        private void AddApplicant_Click(object sender, RoutedEventArgs e)//LATER fix name
+        private void AddApplicant_Click(object sender, RoutedEventArgs e)//LATER fix names
         {
             if (applicantsViewSource.Source is IList list)//LATER change ilist/not null view checks into hard casts (once loading is done before showing page)
             {
@@ -216,5 +208,11 @@ namespace CarmenUI.Pages
 
         private void hideCompleteApplicants_Unchecked(object sender, RoutedEventArgs e)
             => ConfigureFiltering();
+
+        private void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (saveOnApplicantChange.IsChecked == true)
+                SaveChanges();
+        }
     }
 }
