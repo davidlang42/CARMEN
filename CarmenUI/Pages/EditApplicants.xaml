@@ -15,6 +15,7 @@
         <CollectionViewSource x:Key="applicantsViewSource"/>
         <cv:FullName x:Key="fullName"/>
         <cv:MatchGenderValue x:Key="matchGenderValue"/>
+        <cv:BooleanLookupDictionary x:Key="groupExpansionLookup"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -52,7 +53,7 @@
                                 <Setter Property="Template">
                                     <Setter.Value>
                                         <ControlTemplate>
-                                            <Expander IsExpanded="True">
+                                            <Expander Collapsed="GroupExpander_Collapsed" Expanded="GroupExpander_Expanded" IsExpanded="{Binding Name, Mode=OneWay, Converter={StaticResource groupExpansionLookup}, ConverterParameter=True}">
                                                 <Expander.Header>
                                                     <StackPanel Orientation="Horizontal">
                                                         <TextBlock Text="{Binding Name}"/>

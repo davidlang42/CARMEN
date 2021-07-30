@@ -44,14 +44,17 @@ namespace CarmenUI.Pages
         //TODO fix bug with dob, where it doesn't change when i chaneg applicants, probably a dd/mm/yyyy vs mm/dd/yyyy format thing
         //TODO handle add new applicant
         //TODO delete with confirmation in applicant list
+        //TODO add right click on applicantsList for expand all/collapse all
 
         private CollectionViewSource applicantsViewSource; // xaml resource loaded in constructor
+        private BooleanLookupDictionary groupExpansionLookup; // xaml resource loaded in constructor
 
         public EditApplicants(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
             applicantsViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.Gender)));
+            groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -89,6 +92,18 @@ namespace CarmenUI.Pages
         {
             if (applicantsViewSource.View is ICollectionView view)
                 view.Filter = a => FullName.Format((Applicant)a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void GroupExpander_Expanded(object sender, RoutedEventArgs e)
+            => StoreExpanderState((Expander)sender, true);
+
+        private void GroupExpander_Collapsed(object sender, RoutedEventArgs e)
+            => StoreExpanderState((Expander)sender, false);
+
+        private void StoreExpanderState(Expander expander, bool is_expanded)
+        {
+            if (expander.DataContext is CollectionViewGroup group && group.Name?.ToString() is string key)
+                groupExpansionLookup.Dictionary[key] = is_expanded;
         }
 
         private void ClearGender_Click(object sender, RoutedEventArgs e)
