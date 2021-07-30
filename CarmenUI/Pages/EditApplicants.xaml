@@ -14,6 +14,7 @@
     <Page.Resources>
         <CollectionViewSource x:Key="applicantsViewSource"/>
         <cv:FullName x:Key="fullName"/>
+        <cv:MatchGenderValue x:Key="matchGenderValue"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -280,8 +281,12 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="Gender: " VerticalAlignment="Center"/>
-                                <RadioButton Grid.Column="1">Male</RadioButton>
-                                <RadioButton Grid.Column="2">Female</RadioButton>
+                                <RadioButton Grid.Column="1" IsChecked="{Binding Gender, Converter={StaticResource matchGenderValue}, ConverterParameter='Male'}">
+                                    Male
+                                </RadioButton>
+                                <RadioButton Grid.Column="2" IsChecked="{Binding Gender, Converter={StaticResource matchGenderValue}, ConverterParameter='Female'}">
+                                    Female
+                                </RadioButton>
                             </Grid>
                             <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
