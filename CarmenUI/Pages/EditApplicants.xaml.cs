@@ -59,15 +59,13 @@ namespace CarmenUI.Pages
             criteriasViewSource.Source = await criterias;
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)//TODO abstract this to all pages
+        private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            if (context.ChangeTracker.HasChanges()
-                && MessageBox.Show("Are you sure you want to cancel?\nAny unsaved changes will be lost.", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
-                return;
-            OnReturn(null);
+            if (CancelChanges())
+                OnReturn(null);
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)//TODO abstract this to all pages
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (SaveChanges())
                 OnReturn(DataObjects.Applicants);

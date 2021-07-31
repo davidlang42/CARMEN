@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Navigation;
 
 namespace CarmenUI.Pages
@@ -33,6 +34,14 @@ namespace CarmenUI.Pages
         {
             context.SaveChanges(); //LATER handle db errors
             return true;
+        }
+
+        /// <summary>Confirms cancel with the user (if any changes have been made) and returns true if its okay to cancel</summary>
+        protected bool CancelChanges()
+        {
+            if (!context.ChangeTracker.HasChanges())
+                return true; // no changes, always okay to cancel
+            return MessageBox.Show("Are you sure you want to cancel?\nAny unsaved changes will be lost.", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
         }
 
         //LATER this will crash if still running when the page is cancelled, maybe I need to wrap this in a LoadingOverlay afterall
