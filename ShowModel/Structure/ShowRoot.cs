@@ -7,7 +7,7 @@ namespace ShowModel.Structure
     /// <summary>
     /// The (singular) root node of the item tree, including various details about the show
     /// </summary>
-    public class ShowRoot : InnerNode
+    public class ShowRoot : InnerNode //LATER implement INotifyPropertyChanged for completeness
     {
         public override string Name { get; set; } = "Show";
         public DateTime? ShowDate { get; set; }

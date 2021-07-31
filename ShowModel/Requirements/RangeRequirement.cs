@@ -2,7 +2,7 @@
 
 namespace ShowModel.Requirements
 {
-    public abstract class RangeRequirement : Requirement
+    public abstract class RangeRequirement : Requirement //LATER implement INotifyPropertyChanged for completeness
     {
         public uint? Minimum { get; set; }
         public uint? Maximum { get; set; }

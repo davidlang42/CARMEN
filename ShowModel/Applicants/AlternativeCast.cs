@@ -11,7 +11,7 @@ namespace ShowModel.Applicants
     /// <summary>
     /// An alternating cast within a cast group for which casting should be duplicated.
     /// </summary>
-    public class AlternativeCast : INamed
+    public class AlternativeCast : INamed //TODO implement INotifyPropertyChanged for auto-initial
     {
         [Key]
         public int AlternativeCastId { get; private set; }

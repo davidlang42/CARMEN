@@ -11,7 +11,7 @@ namespace ShowModel.Applicants
     /// <summary>
     /// A person who has auditioned to be in a show.
     /// </summary>
-    public class Applicant : IValidatable
+    public class Applicant : IValidatable //TODO implement INotifyPropertyChanged
     {
         #region Database fields (registering)
         [Key]

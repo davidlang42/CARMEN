@@ -6,7 +6,7 @@ namespace ShowModel.Applicants
     /// <summary>
     /// The assessed ability of an applicant in a certain criteria.
     /// </summary>
-    public class Ability
+    public class Ability //LATER implement INotifyPropertyChanged for completeness
     {
         public virtual Applicant Applicant { get; set; } = null!;
         public virtual Criteria Criteria { get; set; } = null!;

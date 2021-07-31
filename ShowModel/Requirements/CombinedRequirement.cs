@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace ShowModel.Requirements
 {
-    public abstract class CombinedRequirement : Requirement
+    public abstract class CombinedRequirement : Requirement //LATER implement INotifyPropertyChanged for completeness
     {
         public virtual ICollection<Requirement> SubRequirements { get; private set; } = new ObservableCollection<Requirement>();
 
@@ -28,7 +28,7 @@ namespace ShowModel.Requirements
         }
     }
 
-    public class AndRequirement : CombinedRequirement
+    public class AndRequirement : CombinedRequirement //LATER implement INotifyPropertyChanged for completeness
     {
         /// <summary>If false, Suitability will the product of the SubRequirement suitabilities</summary>
         public bool AverageSuitability { get; set; }
@@ -43,7 +43,7 @@ namespace ShowModel.Requirements
         }
     }
 
-    public class OrRequirement : CombinedRequirement
+    public class OrRequirement : CombinedRequirement //LATER implement INotifyPropertyChanged for completeness
     {
         /// <summary>If false, Suitability will the maximum of the SubRequirement suitabilities</summary>
         public bool AverageSuitability { get; set; }

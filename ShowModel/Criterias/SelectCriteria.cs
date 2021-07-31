@@ -6,7 +6,7 @@ namespace ShowModel.Criterias
     /// A criteria which is marked as one of a set of discreet options.
     /// This can also be a numeric scale in the order of the options.
     /// </summary>
-    public class SelectCriteria : Criteria
+    public class SelectCriteria : Criteria //LATER implement INotifyPropertyChanged for completeness
     {
         internal static string[] DEFAULT_OPTIONS = new[] { "", "" };
 

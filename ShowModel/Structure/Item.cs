@@ -9,10 +9,10 @@ namespace ShowModel.Structure
     /// <summary>
     /// An item within the show.
     /// </summary>
-    public class Item : Node
+    public class Item : Node //LATER implement INotifyPropertyChanged for completeness
     {
         #region Database fields
-        public override string Name { get; set; } = "Item";
+        public override string Name { get; set; } = "Item"; //LATER move this back into Node, and set the default value in constructor (if still required)
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ShowModel.Requirements
 {
-    public class NotRequirement : Requirement
+    public class NotRequirement : Requirement //LATER implement INotifyPropertyChanged for completeness
     {
         internal int SubRequirementId { get; private set; } // DbSet.Load() throws IndexOutOfRangeException if foreign key is not defined
         public virtual Requirement SubRequirement { get; set; } = null!;

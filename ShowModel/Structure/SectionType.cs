@@ -2,7 +2,7 @@
 
 namespace ShowModel.Structure
 {
-    public class SectionType : INamed
+    public class SectionType : INamed //LATER implement INotifyPropertyChanged for completeness
     {
         [Key]
         public int SectionTypeId { get; private set; }

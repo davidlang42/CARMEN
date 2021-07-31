@@ -9,7 +9,7 @@ namespace ShowModel.Structure
     /// <summary>
     /// A node in the item tree, which may or may not be able to have children.
     /// </summary>
-    public abstract class Node : IOrdered, ICounted, IValidatable, INamed
+    public abstract class Node : IOrdered, ICounted, IValidatable, INamed //LATER implement INotifyPropertyChanged for completeness
     {
         #region Database fields
         [Key]
@@ -43,7 +43,7 @@ namespace ShowModel.Structure
     /// <summary>
     /// An internal node of the item tree, which can have children.
     /// </summary>
-    public abstract class InnerNode : Node
+    public abstract class InnerNode : Node //LATER implement INotifyPropertyChanged for completeness
     {
         public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
 

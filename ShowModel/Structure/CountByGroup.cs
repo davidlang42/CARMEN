@@ -10,10 +10,10 @@ namespace ShowModel.Structure
     /// The count of applicants required for a role from a certain group.
     /// </summary>
     [Owned]
-    public class CountByGroup
+    public class CountByGroup //LATER implement INotifyPropertyChanged for completeness
     {
         public virtual CastGroup CastGroup { get; set; } = null!;
-        /// <summary>The number of applicants required of this CastGroup, or null if FillRemaining is true.</summary>
+        /// <summary>The number of applicants required of this CastGroup</summary>
         public uint Count { get; set; }
     }
 }
