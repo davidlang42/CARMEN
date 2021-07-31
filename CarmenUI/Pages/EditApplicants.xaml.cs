@@ -32,7 +32,6 @@ namespace CarmenUI.Pages
         //TODO 2) implement applicant Status (complete/incomplete/anything else?) on model, and add it to the view or show overall mark
         //TODO 1) make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set
         //TODO 4) show/edit photo
-        //TODO hide edit applicant panel if no applicants are selected
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;

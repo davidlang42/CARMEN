@@ -20,6 +20,7 @@
         <cv:MatchGenderValue x:Key="matchGenderValue"/>
         <cv:BooleanLookupDictionary x:Key="groupExpansionLookup"/>
         <cv:SparseAbilities x:Key="sparseAbilities"/>
+        <cv:HideIfNull x:Key="hideIfNull"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -93,7 +94,7 @@
             </ListBox>
         </DockPanel>
         <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5">
-            <Grid DataContext="{Binding ElementName=applicantsList, Path=SelectedItem}">
+            <Grid DataContext="{Binding ElementName=applicantsList, Path=SelectedItem}" Visibility="{Binding Converter={StaticResource hideIfNull}, ConverterParameter={x:Type modelApplicants:Applicant}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
