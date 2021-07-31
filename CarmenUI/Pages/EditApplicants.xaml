@@ -14,7 +14,7 @@
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Edit Applicants" Loaded="Page_Loaded">
     <Page.Resources>
-        <CollectionViewSource x:Key="applicantsViewSource" IsLiveSortingRequested="True" IsLiveFilteringRequested="True" IsLiveGroupingRequested="True"/>
+        <CollectionViewSource x:Key="applicantsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="criteriasViewSource"/>
         <cv:FullName x:Key="fullName"/>
         <cv:MatchGenderValue x:Key="matchGenderValue"/>
@@ -47,7 +47,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Filter: " FontSize="14" VerticalAlignment="Center"/>
-                <TextBox x:Name="filterText" Grid.Column="1" TextChanged="filterText_TextChanged" FontSize="14"/>
+                <TextBox x:Name="filterText" Grid.Column="1" TextChanged="filterText_TextChanged" FontSize="14" GotFocus="filterText_GotFocus"/>
             </Grid>
             <Grid DockPanel.Dock="Top" Margin="5">
                 <Grid.ColumnDefinitions>
@@ -96,6 +96,7 @@
                 </ListBox.GroupStyle>
                 <ListBox.ContextMenu>
                     <ContextMenu x:Name="applicantListContextMenu">
+                        <MenuItem Header="Refresh groups" Click="RefreshGroups_Click"/>
                         <MenuItem Header="Expand all" Click="ExpandAll_Click"/>
                         <MenuItem Header="Collapse all" Click="CollapseAll_Click"/>
                     </ContextMenu>

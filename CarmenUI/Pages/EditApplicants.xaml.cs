@@ -88,9 +88,7 @@ namespace CarmenUI.Pages
         }
 
         private void filterText_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            ConfigureFiltering();
-        }
+            => ConfigureFiltering();
 
         private Dictionary<string, int> GetGroupCounts(ICollectionView view)
             => view.Groups?.OfType<CollectionViewGroup>()
@@ -114,12 +112,7 @@ namespace CarmenUI.Pages
         private void ClearGender_Click(object sender, RoutedEventArgs e)
         {
             if (applicantsViewSource.View.CurrentItem is Applicant applicant)
-            {
                 applicant.Gender = null;
-                //TODO implement INotifyPropertyChanged on all objects in ShowModel, then the refresh below won't be required
-                applicantsList.SelectedItem = null;
-                applicantsList.SelectedItem = applicant;
-            }
         }
 
         private void groupCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -229,6 +222,9 @@ namespace CarmenUI.Pages
         private void CollapseAll_Click(object sender, RoutedEventArgs e)
             => ExpandListHeaders(false);
 
+        private void RefreshGroups_Click(object sender, RoutedEventArgs e)
+            => ConfigureGroupingAndSorting(groupCombo.SelectedItem);
+
         private void ExpandListHeaders(bool expanded)
         {
             foreach (var expander in applicantsList.VisualDescendants<Expander>())
@@ -240,5 +236,8 @@ namespace CarmenUI.Pages
             if (((MenuItem)sender).DataContext is NullableAbility nullable_ability)
                 nullable_ability.Mark = null;
         }
+
+        private void filterText_GotFocus(object sender, RoutedEventArgs e)
+            => ConfigureFiltering();
     }
 }
