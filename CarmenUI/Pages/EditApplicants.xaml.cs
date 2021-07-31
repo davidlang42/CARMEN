@@ -29,7 +29,7 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
-        //TODO 4) show/edit photo
+        //TODO make non-set boolean criteria show indeterminate
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;
@@ -60,12 +60,15 @@ namespace CarmenUI.Pages
             criteriasViewSource.Source = await criterias;
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private void CancelButton_Click(object sender, RoutedEventArgs e)//TODO abstract this to all pages
         {
+            if (context.ChangeTracker.HasChanges()
+                && MessageBox.Show("Are you sure you want to cancel?\nAny unsaved changes will be lost.", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
+                return;
             OnReturn(null);
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private void SaveButton_Click(object sender, RoutedEventArgs e)//TODO abstract this to all pages
         {
             if (SaveChanges())
                 OnReturn(DataObjects.Applicants);
@@ -178,8 +181,9 @@ namespace CarmenUI.Pages
             if (applicantsViewSource.View is ICollectionView view)
             {
                 var previous_counts = GetGroupCounts(view);
-                //TODO 3) implement hiding complete applicants if hideCompleteApplicants.IsChecked
-                view.Filter = a => FullName.Format((Applicant)a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase);
+                view.Filter = o => o is not Applicant a // always show "Loading..." text
+                    || (FullName.Format(a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase) // filter text
+                    && (hideCompleteApplicants.IsChecked == false || !IsApplicantComplete.Check(a, criteriasViewSource))); // hide complete applicants
                 var new_counts = GetGroupCounts(view);
                 foreach (var (key, new_count) in new_counts)
                 {

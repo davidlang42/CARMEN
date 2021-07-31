@@ -20,9 +20,14 @@ namespace CarmenUI.Converters
         {
             if (parameter is not CollectionViewSource view_source)
                 throw new ArgumentException("ConverterParameter must be an CollectionViewSource containing all criterias.");
-            if (view_source.Source is not IList list)
-                return false;
             if (value is not Applicant applicant)
+                return false;
+            return Check(applicant, view_source);
+        }
+
+        public static bool Check(Applicant applicant, CollectionViewSource view_source)
+        {
+            if (view_source.Source is not IList list)
                 return false;
             if (string.IsNullOrEmpty(applicant.FirstName))
                 return false;
