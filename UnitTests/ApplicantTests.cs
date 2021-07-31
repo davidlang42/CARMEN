@@ -70,10 +70,10 @@ namespace UnitTests
             var applicant = new Applicant();
             using var mon = applicant.Monitor();
             applicant.DateOfBirth = new DateTime(1990, 1, 1);
-            mon.Should().RaisePropertyChangeFor(ac => ac.DateOfBirth);
+            mon.Should().RaisePropertyChangeFor(a => a.DateOfBirth);
             mon.Clear();
             applicant.DateOfBirth = new DateTime(1990, 1, 1);
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.DateOfBirth);
+            mon.Should().NotRaisePropertyChangeFor(a => a.DateOfBirth);
         }
 
         [Test]
@@ -82,12 +82,12 @@ namespace UnitTests
             var applicant = new Applicant();
             using var mon = applicant.Monitor();
             applicant.DateOfBirth = new DateTime(1990, 1, 1);
-            mon.Should().RaisePropertyChangeFor(ac => ac.DateOfBirth);
-            mon.Should().RaisePropertyChangeFor(ac => ac.AgeToday);
+            mon.Should().RaisePropertyChangeFor(a => a.DateOfBirth);
+            mon.Should().RaisePropertyChangeFor(a => a.AgeToday);
             mon.Clear();
             applicant.DateOfBirth = new DateTime(1990, 1, 1);
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.DateOfBirth);
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.AgeToday);
+            mon.Should().NotRaisePropertyChangeFor(a => a.DateOfBirth);
+            mon.Should().NotRaisePropertyChangeFor(a => a.AgeToday);
         }
 
         [Test]
@@ -96,10 +96,10 @@ namespace UnitTests
             var applicant = new Applicant();
             using var mon = applicant.Monitor();
             applicant.Gender = Gender.Male;
-            mon.Should().RaisePropertyChangeFor(ac => ac.Gender);
+            mon.Should().RaisePropertyChangeFor(a => a.Gender);
             mon.Clear();
             applicant.Gender = Gender.Male;
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.Gender);
+            mon.Should().NotRaisePropertyChangeFor(a => a.Gender);
         }
 
         [Test]
@@ -109,28 +109,28 @@ namespace UnitTests
             var ability = new Ability();
             using var mon = applicant.Monitor();
             applicant.Abilities.Add(ability);
-            mon.Should().RaisePropertyChangeFor(ac => ac.Abilities);
+            mon.Should().RaisePropertyChangeFor(a => a.Abilities);
             mon.Clear();
             applicant.Abilities.Remove(ability);
-            mon.Should().RaisePropertyChangeFor(ac => ac.Abilities);
+            mon.Should().RaisePropertyChangeFor(a => a.Abilities);
         }
 
         [Test]
         public void PropertyChanged_AbilityToOverallAbility()
         {
             var applicant = new Applicant();
-            var ability = new Ability();
+            var ability = AbilityTests.TestAbility();
             using var mon = applicant.Monitor();
             applicant.Abilities.Add(ability);
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.OverallAbility);
+            mon.Should().NotRaisePropertyChangeFor(a => a.OverallAbility);
             ability.Mark = 100;
-            mon.Should().RaisePropertyChangeFor(ac => ac.OverallAbility);
+            mon.Should().RaisePropertyChangeFor(a => a.OverallAbility);
             mon.Clear();
             ability.Mark = 100;
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.OverallAbility);
+            mon.Should().NotRaisePropertyChangeFor(a => a.OverallAbility);
             applicant.Abilities.Remove(ability);
             ability.Mark = 50;
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.OverallAbility);
+            mon.Should().NotRaisePropertyChangeFor(a => a.OverallAbility);
         }
     }
 }

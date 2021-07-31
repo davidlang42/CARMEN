@@ -29,11 +29,9 @@ namespace CarmenUI.Pages
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
         //TODO generate and populate criterias
-        //TODO make applicant Status shown by a Converter Binding / to whole object -- OR implement getter on model, but requires INotifyPropertyChanged
-        //TODO make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set -- OR implement getter on model, but requires INotifyPropertyChanged
+        //TODO implement applicant Status (complete/incomplete/anything else?) on model, and add it to the view or show overall mark
+        //TODO make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set
         //TODO show/edit photo
-
-        //LATER persist saveOnApplicantChange as a user setting
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;
@@ -212,7 +210,7 @@ namespace CarmenUI.Pages
 
         private void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (saveOnApplicantChange.IsChecked == true)
+            if (saveOnApplicantChange.IsChecked == true) //TODO persist saveOnApplicantChange as a user setting
                 SaveChanges();
         }
 

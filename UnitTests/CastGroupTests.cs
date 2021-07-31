@@ -19,10 +19,10 @@ namespace UnitTests
             var cast_group = new CastGroup();
             using var mon = cast_group.Monitor();
             cast_group.Name = "New Name";
-            mon.Should().RaisePropertyChangeFor(ac => ac.Name);
+            mon.Should().RaisePropertyChangeFor(cg => cg.Name);
             mon.Clear();
             cast_group.Name = "New Name";
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.Name);
+            mon.Should().NotRaisePropertyChangeFor(cg => cg.Name);
         }
 
         [Test]
@@ -31,12 +31,12 @@ namespace UnitTests
             var cast_group = new CastGroup();
             using var mon = cast_group.Monitor();
             cast_group.Name = "New Name";
-            mon.Should().RaisePropertyChangeFor(ac => ac.Name);
-            mon.Should().RaisePropertyChangeFor(ac => ac.Abbreviation);
+            mon.Should().RaisePropertyChangeFor(cg => cg.Name);
+            mon.Should().RaisePropertyChangeFor(cg => cg.Abbreviation);
             mon.Clear();
             cast_group.Name = "Not New"; // but same abbreviation
-            mon.Should().RaisePropertyChangeFor(ac => ac.Name);
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.Abbreviation);
+            mon.Should().RaisePropertyChangeFor(cg => cg.Name);
+            mon.Should().NotRaisePropertyChangeFor(cg => cg.Abbreviation);
         }
 
         [Test]
@@ -45,10 +45,10 @@ namespace UnitTests
             var cast_group = new CastGroup();
             using var mon = cast_group.Monitor();
             cast_group.Abbreviation = "CG";
-            mon.Should().RaisePropertyChangeFor(ac => ac.Abbreviation);
+            mon.Should().RaisePropertyChangeFor(cg => cg.Abbreviation);
             mon.Clear();
             cast_group.Abbreviation = "CG";
-            mon.Should().NotRaisePropertyChangeFor(ac => ac.Abbreviation);
+            mon.Should().NotRaisePropertyChangeFor(cg => cg.Abbreviation);
         }
 
         [Test]
@@ -58,10 +58,10 @@ namespace UnitTests
             var applicant = new Applicant();
             using var mon = cast_group.Monitor();
             cast_group.Members.Add(applicant);
-            mon.Should().RaisePropertyChangeFor(ac => ac.Members);
+            mon.Should().RaisePropertyChangeFor(cg => cg.Members);
             mon.Clear();
             cast_group.Members.Remove(applicant);
-            mon.Should().RaisePropertyChangeFor(ac => ac.Members);
+            mon.Should().RaisePropertyChangeFor(cg => cg.Members);
         }
     }
 }
