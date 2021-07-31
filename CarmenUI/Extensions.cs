@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 
 namespace CarmenUI
 {
@@ -26,16 +27,30 @@ namespace CarmenUI
                 child.Visibility = child == visible_child ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public static IEnumerable<T> AllControls<T>(this DependencyObject depObj) where T : DependencyObject
-        {
-            foreach (var child in LogicalTreeHelper.GetChildren(depObj))
-            {
-                if (child is T)
-                    yield return (T)child;
+        public static IEnumerable<T> LogicalDescendants<T>(this DependencyObject dependency_object) where T : DependencyObject
+            => LogicalDescendants(dependency_object).OfType<T>();
 
-                if (child is DependencyObject childDepObj)
-                    foreach (T childOfChild in AllControls<T>(childDepObj))
-                        yield return childOfChild;
+        private static IEnumerable<DependencyObject> LogicalDescendants(this DependencyObject dependancy_object)
+        {
+            foreach (var child in LogicalTreeHelper.GetChildren(dependancy_object).OfType<DependencyObject>())
+            {
+                yield return child;
+                foreach (var child_of_child in LogicalDescendants(child))
+                    yield return child_of_child;
+            }
+        }
+
+        public static IEnumerable<T> VisualDescendants<T>(this DependencyObject dependency_object) where T : DependencyObject
+            => VisualDescendants(dependency_object).OfType<T>();
+
+        private static IEnumerable<DependencyObject> VisualDescendants(this DependencyObject dependency_object)
+        {
+            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(dependency_object); i++)
+            {
+                var child = VisualTreeHelper.GetChild(dependency_object, i);
+                yield return child;
+                foreach (var child_of_child in VisualDescendants(child))
+                    yield return child_of_child;
             }
         }
     }

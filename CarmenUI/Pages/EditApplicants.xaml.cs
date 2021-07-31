@@ -220,17 +220,16 @@ namespace CarmenUI.Pages
         private void CollapseAll_Click(object sender, RoutedEventArgs e)
             => ExpandListHeaders(false);
 
-        private void ExpandListHeaders(bool expanded)//TODO (?) fix this, it isn't finding any controls
+        private void ExpandListHeaders(bool expanded)
         {
-            foreach (var expander in applicantsList.AllControls<Expander>())
+            foreach (var expander in applicantsList.VisualDescendants<Expander>())
                 expander.IsExpanded = expanded;
         }
 
         private void ClearValue_Click(object sender, RoutedEventArgs e)
         {
-            var menu_item = (MenuItem)sender;
-            var nullable_ability = (NullableAbility)menu_item.DataContext;
-            nullable_ability.Mark = null;
+            if (((MenuItem)sender).DataContext is NullableAbility nullable_ability)
+                nullable_ability.Mark = null;
         }
     }
 }
