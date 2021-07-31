@@ -29,7 +29,6 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
-        //TODO fix add applicant button
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;
@@ -54,7 +53,7 @@ namespace CarmenUI.Pages
             applicants.Start();
             applicantsViewSource.Source = await applicants;
             ConfigureGroupingAndSorting(groupCombo.SelectedItem);
-            applicantsList.SelectedItem = null; //LATER when nothing is selected, dont show editing panel at all
+            applicantsList.SelectedItem = null;
             var criterias = TaskToLoad(c => c.Criterias);
             criterias.Start();
             criteriasViewSource.Source = await criterias;
@@ -82,6 +81,9 @@ namespace CarmenUI.Pages
                 var applicant = new Applicant();
                 list.Add(applicant);
                 applicantsList.SelectedItem = applicant;
+                applicantsList.ScrollIntoView(applicant);
+                if (applicantsViewSource.View.Groups?.FirstOrDefault(g => ((CollectionViewGroup)g).Items.Contains(applicant)) is CollectionViewGroup group)
+                    applicantsList.VisualDescendants<Expander>().First(ex => ex.DataContext == group).IsExpanded = true; // ensure new applicant group is expanded
             }
         }
 
@@ -114,7 +116,7 @@ namespace CarmenUI.Pages
             if (applicantsViewSource.View.CurrentItem is Applicant applicant)
             {
                 applicant.Gender = null;
-                //LATER implement INotifyPropertyChanged on all objects in ShowModel, then the refresh below won't be required
+                //TODO implement INotifyPropertyChanged on all objects in ShowModel, then the refresh below won't be required
                 applicantsList.SelectedItem = null;
                 applicantsList.SelectedItem = applicant;
             }
