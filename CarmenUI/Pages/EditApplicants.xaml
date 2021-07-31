@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:CarmenUI.Pages"
     xmlns:cv="clr-namespace:CarmenUI.Converters"
     xmlns:bd="clr-namespace:CarmenUI.Bindings"
+    xmlns:uc="clr-namespace:CarmenUI.UserControls"
     xmlns:modelApplicants="clr-namespace:ShowModel.Applicants;assembly=ShowModel"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
@@ -113,7 +114,7 @@
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.ColumnSpan="2" FontSize="28">
                             <TextBlock.Text>
-                                <MultiBinding Converter="{StaticResource fullName}">
+                                <MultiBinding Converter="{StaticResource fullName}" ConverterParameter="{x:Static cv:FullNameFormat.FirstLast}">
                                     <MultiBinding.Bindings>
                                         <Binding Path="FirstName"/>
                                         <Binding Path="LastName"/>
@@ -177,25 +178,6 @@
                                     </RadioButton.Content>
                                 </RadioButton>
                             </Grid>
-                            <ItemsControl Grid.Row="6" Grid.ColumnSpan="2" ItemsSource="{Binding Abiilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <UniformGrid Columns="1"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding CastGroup.Name}" FontSize="14"/>
-                                            <TextBox Grid.Column="1" Text="{Binding Count, TargetNullValue=''}" FontSize="14"/>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
                             <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
@@ -204,62 +186,25 @@
                                 <TextBlock Text="Date of Birth: " VerticalAlignment="Center"/>
                                 <DatePicker Grid.Column="1" SelectedDate="{Binding DateOfBirth}"/>
                             </Grid>
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Audition Group: " VerticalAlignment="Center"/>
-                                <ComboBox Grid.Column="1"/>
-                            </Grid>
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Height: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1"/>
-                            </Grid>
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Voice Type: " VerticalAlignment="Center"/>
-                                <ComboBox Grid.Column="1"/>
-                            </Grid>
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Singing: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1"/>
-                            </Grid>
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Acting: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1"/>
-                            </Grid>
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Dancing: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1"/>
-                            </Grid>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Production: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1"/>
-                            </Grid>
+                            <ItemsControl ItemsSource="{Binding Abilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="1"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0 0 0 10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding Criteria.Name, StringFormat='\{0\}: '}" VerticalAlignment="Center"/>
+                                            <uc:CriteriaMarkSelector Grid.Column="1" Mark="{Binding Mark, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>

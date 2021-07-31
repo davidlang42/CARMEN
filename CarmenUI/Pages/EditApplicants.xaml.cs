@@ -28,7 +28,6 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
-        //TODO generate and populate criterias
         //TODO implement applicant Status (complete/incomplete/anything else?) on model, and add it to the view or show overall mark
         //TODO make applicant Description (Female, 28 years old) shown by a multi converter, which can omit either field if not set
         //TODO show/edit photo
