@@ -10,7 +10,6 @@ namespace UnitTests
 {
     public class AlternativeCastTests
     {
-        // name, initial, castgroups, members
         [Test]
         public void PropertyChanged_Name()
         {

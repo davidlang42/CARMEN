@@ -35,7 +35,7 @@ namespace ShowModel
             base.OnConfiguring(optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder) //LATER may need to use this: .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
         {
             // Configure composite keys
             modelBuilder.Entity<Ability>()

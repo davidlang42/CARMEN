@@ -1,7 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using ShowModel.Requirements;
 
 namespace ShowModel.Applicants
@@ -10,18 +13,115 @@ namespace ShowModel.Applicants
     /// A group of people which an applicant can be selected into.
     /// Cast groups are mutually exclusive.
     /// </summary>
-    public class CastGroup : IOrdered, INamed //TODO implement INotifyPropertyChanged for auto-abbrev
+    public class CastGroup : IOrdered, INamed, INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         [Key]
         public int CastGroupId { get; private set; }
-        public int Order { get; set; }
-        public string Name { get; set; } = "";
-        public string Abbreviation { get; set; } = "";
-        public virtual Image? Icon { get; set; }
-        public virtual ICollection<Applicant> Members { get; private set; } = new ObservableCollection<Applicant>();
+
+        private int order;
+        public int Order
+        {
+            get => order;
+            set
+            {
+                if (order == value)
+                    return;
+                order = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string name = "";
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if (name == value)
+                    return;
+                name = value;
+                OnPropertyChanged();
+                if (name != "")
+                    Abbreviation = name.Abbreviate();
+            }
+        }
+
+        private string abbreviation = "";
+        public string Abbreviation
+        {
+            get => abbreviation;
+            set
+            {
+                if (abbreviation == value)
+                    return;
+                abbreviation = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Image? icon;
+        public virtual Image? Icon
+        {
+            get => icon;
+            set
+            {
+                if (icon == value)
+                    return;
+                icon = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<Applicant> members = new();
+        public virtual ICollection<Applicant> Members => members;
+
+        private uint? requiredCount;
         /// <summary>The number of applicants which should be allocated to this group (per alternate cast)</summary>
-        public uint? RequiredCount { get; set; }
-        public bool AlternateCasts { get; set; }
-        public virtual ICollection<Requirement> Requirements { get; private set; } = new ObservableCollection<Requirement>();
+        public uint? RequiredCount
+        {
+            get => requiredCount;
+            set
+            {
+                if (requiredCount == value)
+                    return;
+                requiredCount = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool alternateCasts;
+        public bool AlternateCasts
+        {
+            get => alternateCasts;
+            set
+            {
+                if (alternateCasts == value)
+                    return;
+                alternateCasts = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<Requirement> requirements = new();
+        public virtual ICollection<Requirement> Requirements => requirements;
+
+        public CastGroup()
+        {
+            members.CollectionChanged += Members_CollectionChanged;
+            requirements.CollectionChanged += Requirements_CollectionChanged;
+        }
+
+        private void Members_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => OnPropertyChanged(nameof(Members));
+
+        private void Requirements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => OnPropertyChanged(nameof(Requirements));
+
+        protected void OnPropertyChanged([CallerMemberName]string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
     }
 }
