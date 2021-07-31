@@ -182,7 +182,7 @@ namespace ShowModel.Applicants
         }
 
         public int OverallAbility //LATER notify OverallAbility changed if any criteria weights/maxmarks change
-            => Convert.ToInt32(Abilities.Sum(a => a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); //LATER handle overflow
+            => Convert.ToInt32(Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); //LATER handle overflow
 
         public Applicant()
         {

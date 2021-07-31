@@ -21,7 +21,15 @@
         <cv:BooleanLookupDictionary x:Key="groupExpansionLookup"/>
         <cv:SparseAbilities x:Key="sparseAbilities"/>
         <cv:HideIfNull x:Key="hideIfNull"/>
-        <cv:IsApplicantComplete x:Key="isApplicantComplete"/>
+        <cv:MultiConverter x:Key="showIfApplicantComplete">
+            <cv:IsApplicantComplete/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
+        <cv:MultiConverter x:Key="hideIfApplicantComplete">
+            <cv:IsApplicantComplete/>
+            <cv:InverseBoolean/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -124,7 +132,8 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
-                        <TextBlock Grid.Row="1" Text="{Binding Converter={StaticResource isApplicantComplete}, ConverterParameter={StaticResource criteriasViewSource}}" Foreground="Red" FontStyle="Italic" FontSize="16"/>
+                        <TextBlock Grid.Row="1" Text="Incomplete" Visibility="{Binding Converter={StaticResource hideIfApplicantComplete}, ConverterParameter={StaticResource criteriasViewSource}}" Foreground="Red" FontStyle="Italic" FontSize="16"/>
+                        <TextBlock Grid.Row="1" Text="{Binding OverallAbility}" Visibility="{Binding Converter={StaticResource showIfApplicantComplete}, ConverterParameter={StaticResource criteriasViewSource}}" Foreground="Green" FontWeight="Bold" FontSize="16"/>
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Description}" ToolTip="as of 1st July 2022" FontSize="16"/>
                     </Grid>
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="1" Margin="0 10 0 0">
