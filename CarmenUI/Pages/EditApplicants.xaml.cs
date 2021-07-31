@@ -29,7 +29,6 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
-        //TODO 2) implement applicant Status (complete/incomplete/anything else?) on model, and add it to the view or show overall mark
         //TODO 4) show/edit photo
 
         private CollectionViewSource applicantsViewSource;
