@@ -22,7 +22,7 @@
         <CollectionViewSource x:Key="castGroupsViewSource"/>
         <CollectionViewSource x:Key="tagsViewSource"/>
         <CollectionViewSource x:Key="requirementsSelectionSource"/>
-        <cv:AllowSparseCountByGroups x:Key="allowSparseCountByGroups"/>
+        <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:InverseBoolean x:Key="inverseBoolean"/>
         <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -310,7 +310,7 @@
                             <TextBlock Grid.Row="4" Text="Requirements" FontSize="14"/>
                             <TextBlock Grid.Row="4" Grid.Column="1" Text="TODO" FontSize="14"/>
                             <TextBlock Grid.Row="5" Grid.ColumnSpan="2" Text="Required Counts:" FontSize="14"/>
-                            <ItemsControl Grid.Row="6" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource allowSparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
+                            <ItemsControl Grid.Row="6" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource sparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Columns="1"/>

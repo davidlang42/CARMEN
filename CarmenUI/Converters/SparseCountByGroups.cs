@@ -18,7 +18,7 @@ namespace CarmenUI.Converters
     /// allowing a non-set CountByGroups to be modelled as null.
     /// ConverterParameter must be a CollectionViewSource representing the CastGroups.
     /// </summary>
-    public class AllowSparseCountByGroups : IValueConverter
+    public class SparseCountByGroups : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
