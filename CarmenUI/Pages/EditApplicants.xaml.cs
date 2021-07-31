@@ -188,6 +188,8 @@ namespace CarmenUI.Pages
                         groupExpansionLookup.Dictionary[key] = new_count <= AUTO_COLLAPSE_GROUP_THRESHOLD;
                     }
                 }
+                if (applicantsList.Items.Count == 1)
+                    applicantsList.SelectedIndex = 0;
             }
         }
 
