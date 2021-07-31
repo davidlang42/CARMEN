@@ -18,6 +18,7 @@
         <cv:FullName x:Key="fullName"/>
         <cv:MatchGenderValue x:Key="matchGenderValue"/>
         <cv:BooleanLookupDictionary x:Key="groupExpansionLookup"/>
+        <cv:SparseAbilities x:Key="sparseAbilities"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -176,7 +177,7 @@
                                     </RadioButton.Content>
                                 </RadioButton>
                             </Grid>
-                            <!--<ItemsControl Grid.Row="6" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource allowSparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
+                            <ItemsControl Grid.Row="6" Grid.ColumnSpan="2" ItemsSource="{Binding Abiilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Columns="1"/>
@@ -194,7 +195,7 @@
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
-                            </ItemsControl>-->
+                            </ItemsControl>
                             <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/>
