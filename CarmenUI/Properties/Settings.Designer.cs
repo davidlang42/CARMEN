@@ -112,5 +112,17 @@ namespace CarmenUI.Properties {
                 this["FullNameFormat"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SaveOnApplicantChange {
+            get {
+                return ((bool)(this["SaveOnApplicantChange"]));
+            }
+            set {
+                this["SaveOnApplicantChange"] = value;
+            }
+        }
     }
 }

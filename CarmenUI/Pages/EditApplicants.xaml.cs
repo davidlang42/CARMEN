@@ -210,7 +210,7 @@ namespace CarmenUI.Pages
 
         private void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (saveOnApplicantChange.IsChecked == true) //TODO persist saveOnApplicantChange as a user setting
+            if (Properties.Settings.Default.SaveOnApplicantChange)
                 SaveChanges();
         }
 

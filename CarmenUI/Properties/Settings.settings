@@ -26,5 +26,8 @@
     <Setting Name="FullNameFormat" Type="CarmenUI.Converters.FullNameFormat" Scope="User">
       <Value Profile="(Default)">LastCommaFirst</Value>
     </Setting>
+    <Setting Name="SaveOnApplicantChange" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
