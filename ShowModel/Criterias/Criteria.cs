@@ -15,7 +15,7 @@ namespace ShowModel.Criterias
         [Key]
         public int CriteriaId { get; private set; }
         public string Name { get; set; } = "";
-        public string Description { get; set; } = "";
+        public string Description { get; set; } = "";//TODO add priority, so height/audition group can be criterias, otherwise make a new object type for external data
         public int Order { get; set; }
         public double Weight { get; set; }
         public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
