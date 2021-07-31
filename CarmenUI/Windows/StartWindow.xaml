@@ -51,7 +51,7 @@
                     <Grid ToolTip="{Binding ConnectionString}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="24"/>
-                            <ColumnDefinition Width="270"/>
+                            <ColumnDefinition Width="260"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Image HorizontalAlignment="Left" Source="{Binding IconPath}" Height="18"/>

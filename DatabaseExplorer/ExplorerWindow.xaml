@@ -304,6 +304,7 @@
                         RowDetailsVisibilityMode="VisibleWhenSelected" Margin="5">
                         <DataGrid.Columns>
                             <DataGridTextColumn Binding="{Binding Name}" Header="Criteria Name"/>
+                            <DataGridCheckBoxColumn Binding="{Binding Primary}" Header="Primary"/>
                             <DataGridTextColumn Binding="{Binding Order}" Header="Order"/>
                             <DataGridTextColumn Binding="{Binding Description}" Header="Description"/>
                             <DataGridTextColumn Binding="{Binding MaxMark}" Header="Max Mark" IsReadOnly="True"/>

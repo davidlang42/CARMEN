@@ -133,14 +133,21 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a numeric criteria, for which an Applicant can be given a whole number mark between 0 and a maximum value, inclusive.
+                                If set to primary, this criteria will be shown on the role allocation screen and must be entered for every applicant.
+                                The weight specifies the importantance of this criteria in calculating applicants overall ability.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
-                            <TextBlock Grid.Row="2" Text="Maximum" FontSize="14"/>
-                            <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding MaxMark}" FontSize="14"/>
+                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
+                            <TextBlock Grid.Row="3" Text="Weight" FontSize="14"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Maximum" FontSize="14"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding MaxMark}" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
@@ -153,19 +160,26 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14" Margin="0 0 0 5">
                                 This is a list criteria, for which an Applicant can be marked as having a value selected from a list.
                                 The 'mark' an Applicant receives for a list criteria is a number representing the position of the selected value within the list, where the 1st option is 0.
                                 The maximum this 'mark' will be is N-1, where N is the number of options.
+                                If set to primary, this criteria will be shown on the role allocation screen and must be entered for every applicant.
+                                The weight specifies the importantance of this criteria in calculating applicants overall ability.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Grid.ColumnSpan="2" TextWrapping="Wrap" FontStyle="Italic" FontSize="12"  Margin="0 0 0 10">
                                 NOTE: Changing or re-ordering the options for this criteria is only changing the text which is shown, the Applicant's 'mark' number is not updated when the options are changed, so care must be taken when updating this criteria after Applicant's marks have been entered.
                             </TextBlock>
                             <TextBlock Grid.Row="2" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Name}" Margin="5 0 0 5" FontSize="14"/>
-                            <uc:EditableList Grid.Row="3" Grid.ColumnSpan="2" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
+                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
+                            <uc:EditableList Grid.Row="5" Grid.ColumnSpan="2" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">
@@ -185,12 +199,19 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
-                                    This is a tick criteria, like a Yes/No question, for which an Applicant can either be marked Yes or No.
+                                This is a tick criteria, like a Yes/No question, for which an Applicant can either be marked Yes or No.
+                                If set to primary, this criteria will be shown on the role allocation screen and must be entered for every applicant.
+                                The weight specifies the importantance of this criteria in calculating applicants overall ability.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
+                            <TextBlock Grid.Row="3" Text="Weight" FontSize="14"/>
+                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelApplicants:CastGroup}">
