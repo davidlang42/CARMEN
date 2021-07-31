@@ -153,12 +153,15 @@ namespace CarmenUI.Pages
                         _ => throw new NotImplementedException($"String value not implemented: {group_by_string}")
                     }; 
                     applicantsViewSource.GroupDescriptions.Add(gd);
-                    applicantsViewSource.View.SortDescriptions.Add(new(gd.PropertyName, ListSortDirection.Ascending)); //LATER this also worked: gd.SortDescriptions.Add(new("Name", ListSortDirection.Ascending));
+                    applicantsViewSource.View.SortDescriptions.Add(new(gd.PropertyName, ListSortDirection.Ascending));
                 }
             }
             else if (selected_grouping is Criteria group_by_criteria)
             {
-                //TODO implement grouping by criteria, sorting might be tricky (probably use GroupDescriptions.CustomSort)
+                var converter = new AbilitySelector(group_by_criteria);
+                PropertyGroupDescription gd = new(nameof(Applicant.Abilities), converter);
+                applicantsViewSource.GroupDescriptions.Add(gd);
+                gd.SortDescriptions.Add(new(nameof(CollectionViewGroup.Name), ListSortDirection.Ascending));
             }
             else
             {
