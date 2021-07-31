@@ -3,41 +3,190 @@ using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace ShowModel.Applicants
 {
     /// <summary>
     /// A person who has auditioned to be in a show.
     /// </summary>
-    public class Applicant : IValidatable //TODO implement INotifyPropertyChanged
+    public class Applicant : IValidatable, INotifyPropertyChanged
     {
-        #region Database fields (registering)
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        #region Registration properties
         [Key]
         public int ApplicantId { get; private set; }
-        public string FirstName { get; set; } = "";
-        public string LastName { get; set; } = "";
-        public Gender? Gender { get; set; }
-        public DateTime? DateOfBirth { get; set; }
-        public string ExternalData { get; set; } = "";
+
+        private string firstName = "";
+        public string FirstName
+        {
+            get => firstName;
+            set
+            {
+                if (firstName == value)
+                    return;
+                firstName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string lastName = "";
+        public string LastName
+        {
+            get => lastName;
+            set
+            {
+                if (lastName == value)
+                    return;
+                lastName = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Gender? gender;
+        public Gender? Gender
+        {
+            get => gender;
+            set
+            {
+                if (gender == value)
+                    return;
+                gender = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private DateTime? dateOfBirth;
+        public DateTime? DateOfBirth
+        {
+            get => dateOfBirth;
+            set
+            {
+                if (dateOfBirth == value)
+                    return;
+                dateOfBirth = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(AgeToday));
+            }
+        }
+
+        private string externalData = "";
+        public string ExternalData
+        {
+            get => externalData;
+            set
+            {
+                if (externalData == value)
+                    return;
+                externalData = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
-        #region Database fields (auditioning)
-        public virtual Image? Photo { get; set; }
-        public virtual ICollection<Ability> Abilities { get; private set; } = new ObservableCollection<Ability>();
-        public string Notes { get; set; } = "";
+        #region Audition properties
+        private Image? photo;
+        public virtual Image? Photo
+        {
+            get => photo;
+            set
+            {
+                if (photo == value)
+                    return;
+                photo = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private readonly ObservableCollection<Ability> abilities = new();
+        public virtual ICollection<Ability> Abilities => abilities;
+
+        private string notes = "";
+        public string Notes
+        {
+            get => notes;
+            set
+            {
+                if (notes == value)
+                    return;
+                notes = value;
+                OnPropertyChanged();
+            }
+        }
         #endregion
 
-        #region Database fields (selection & casting)
-        public virtual CastGroup? CastGroup { get; set; }
-        public int? CastNumber { get; set; }
-        public virtual AlternativeCast? AlternativeCast { get; set; }
-        public virtual ICollection<Tag> Tags { get; private set; } = new ObservableCollection<Tag>();
-        public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
+        #region Selection & Casting properties
+        private CastGroup? castGroup;
+        public virtual CastGroup? CastGroup
+        {
+            get => castGroup;
+            set
+            {
+                if (castGroup == value)
+                    return;
+                castGroup = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int? castNumber;
+        public int? CastNumber
+        {
+            get => castNumber;
+            set
+            {
+                if (castNumber == value)
+                    return;
+                castNumber = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private AlternativeCast? alternativeCast;
+        public virtual AlternativeCast? AlternativeCast
+        {
+            get => alternativeCast;
+            set
+            {
+                if (alternativeCast == value)
+                    return;
+                alternativeCast = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private readonly ObservableCollection<Tag> tags = new();
+        public virtual ICollection<Tag> Tags => tags;
+
+        private readonly ObservableCollection<Role> roles = new();
+        public virtual ICollection<Role> Roles => roles;
         #endregion
 
-        public uint? AgeToday => AgeAt(DateTime.Now); //TODO dont do this here, because age wont update with bday, use a value converter -- or actually it will, if I implement IPropertyNofieychanged
+        public uint? AgeToday => AgeAt(DateTime.Now);
+
+        public int OverallAbility
+            => Convert.ToInt32(Abilities.Sum(a => a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); //LATER handle overflow
+
+        public Applicant()
+        {
+            abilities.CollectionChanged += Abilities_CollectionChanged;
+            tags.CollectionChanged += Tags_CollectionChanged;
+            roles.CollectionChanged += Roles_CollectionChanged;
+        }
+
+        private void Abilities_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => OnPropertyChanged(nameof(Abilities));
+
+        private void Tags_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => OnPropertyChanged(nameof(Tags));
+
+        private void Roles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => OnPropertyChanged(nameof(Roles));
 
         public uint? AgeAt(DateTime date) //LATER handle errors more nicely, move errors to validation
         {
@@ -47,8 +196,6 @@ namespace ShowModel.Applicants
                 throw new ArgumentOutOfRangeException($"Date of birth is after the provided {nameof(date)}.");
             return (uint)((date - DateOfBirth.Value).TotalDays / 365.2425); // correct on average, good enough
         }
-
-        public int OverallAbility() => Convert.ToInt32(Abilities.Sum(a => a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
 
         public uint MarkFor(Criteria criteria)
             => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark ?? 0;
@@ -71,6 +218,11 @@ namespace ShowModel.Applicants
             foreach (var ability in Abilities)
                 if (ability.Mark > ability.Criteria.MaxMark)
                     yield return $"Mark for {ability.Criteria.Name} ({ability.Mark}) is greater than the maximum ({ability.Criteria.MaxMark}).";
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 

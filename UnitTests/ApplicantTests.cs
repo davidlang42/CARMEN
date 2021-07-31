@@ -61,5 +61,76 @@ namespace UnitTests
             }
             catch { }
         }
+
+        //LATER add other property changed tests for completeness
+
+        [Test]
+        public void PropertyChanged_DateOfBirth()
+        {
+            var applicant = new Applicant();
+            using var mon = applicant.Monitor();
+            applicant.DateOfBirth = new DateTime(1990, 1, 1);
+            mon.Should().RaisePropertyChangeFor(ac => ac.DateOfBirth);
+            mon.Clear();
+            applicant.DateOfBirth = new DateTime(1990, 1, 1);
+            mon.Should().NotRaisePropertyChangeFor(ac => ac.DateOfBirth);
+        }
+
+        [Test]
+        public void PropertyChanged_DateOfBirthToAge()
+        {
+            var applicant = new Applicant();
+            using var mon = applicant.Monitor();
+            applicant.DateOfBirth = new DateTime(1990, 1, 1);
+            mon.Should().RaisePropertyChangeFor(ac => ac.DateOfBirth);
+            mon.Should().RaisePropertyChangeFor(ac => ac.AgeToday);
+            mon.Clear();
+            applicant.DateOfBirth = new DateTime(1990, 1, 1);
+            mon.Should().NotRaisePropertyChangeFor(ac => ac.DateOfBirth);
+            mon.Should().NotRaisePropertyChangeFor(ac => ac.AgeToday);
+        }
+
+        [Test]
+        public void PropertyChanged_Gender()
+        {
+            var applicant = new Applicant();
+            using var mon = applicant.Monitor();
+            applicant.Gender = Gender.Male;
+            mon.Should().RaisePropertyChangeFor(ac => ac.Gender);
+            mon.Clear();
+            applicant.Gender = Gender.Male;
+            mon.Should().NotRaisePropertyChangeFor(ac => ac.Gender);
+        }
+
+        [Test]
+        public void PropertyChanged_Abilities()
+        {
+            var applicant = new Applicant();
+            var ability = new Ability();
+            using var mon = applicant.Monitor();
+            applicant.Abilities.Add(ability);
+            mon.Should().RaisePropertyChangeFor(ac => ac.Abilities);
+            mon.Clear();
+            applicant.Abilities.Remove(ability);
+            mon.Should().RaisePropertyChangeFor(ac => ac.Abilities);
+        }
+
+        [Test]
+        public void PropertyChanged_AbilityToOverallAbility()
+        {
+            var applicant = new Applicant();
+            var ability = new Ability();
+            using var mon = applicant.Monitor();
+            applicant.Abilities.Add(ability);
+            mon.Should().NotRaisePropertyChangeFor(ac => ac.OverallAbility);
+            ability.Mark = 100;
+            mon.Should().RaisePropertyChangeFor(ac => ac.OverallAbility);
+            mon.Clear();
+            ability.Mark = 100;
+            mon.Should().NotRaisePropertyChangeFor(ac => ac.OverallAbility);
+            applicant.Abilities.Remove(ability);
+            ability.Mark = 50;
+            mon.Should().NotRaisePropertyChangeFor(ac => ac.OverallAbility);
+        }
     }
 }
