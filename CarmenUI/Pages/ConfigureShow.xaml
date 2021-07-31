@@ -409,7 +409,7 @@
                             <TextBlock Grid.Row="4" Text="Criteria" FontSize="14"/>
                             <ComboBox Grid.Row="4" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasViewSource}}" DisplayMemberPath="Name" />
                             <TextBlock Grid.Row="5" Text="Required Value" FontSize="14"/>
-                            <uc:CriteriaMarkSelector Grid.Row="5" Grid.Column="1" Mark="{Binding RequiredValue}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <uc:CriteriaMarkSelector Grid.Row="5" Grid.Column="1" Mark="{Binding RequiredValue, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AbilityRangeRequirement}">
@@ -456,9 +456,9 @@
                             <TextBlock Grid.Row="4" Text="Criteria" FontSize="14"/>
                             <ComboBox Grid.Row="4" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasViewSource}}" DisplayMemberPath="Name"/>
                             <TextBlock Grid.Row="5" Text="Minimum" FontSize="14"/>
-                            <uc:CriteriaMarkSelector Grid.Row="5" Grid.Column="1" Mark="{Binding Minimum}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <uc:CriteriaMarkSelector Grid.Row="5" Grid.Column="1" Mark="{Binding Minimum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
                             <TextBlock Grid.Row="6" Text="Maximum" FontSize="14"/>
-                            <uc:CriteriaMarkSelector Grid.Row="6" Grid.Column="1" Mark="{Binding Maximum}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <uc:CriteriaMarkSelector Grid.Row="6" Grid.Column="1" Mark="{Binding Maximum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
                             <CheckBox Grid.Row="7" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
                         </Grid>
                     </DataTemplate>

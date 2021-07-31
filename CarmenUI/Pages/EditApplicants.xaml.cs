@@ -1,4 +1,5 @@
 ﻿using CarmenUI.Converters;
+using CarmenUI.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Applicants;
@@ -219,10 +220,17 @@ namespace CarmenUI.Pages
         private void CollapseAll_Click(object sender, RoutedEventArgs e)
             => ExpandListHeaders(false);
 
-        private void ExpandListHeaders(bool expanded)//TODO fix this, it isn't finding any controls
+        private void ExpandListHeaders(bool expanded)//TODO (?) fix this, it isn't finding any controls
         {
             foreach (var expander in applicantsList.AllControls<Expander>())
                 expander.IsExpanded = expanded;
+        }
+
+        private void ClearValue_Click(object sender, RoutedEventArgs e)
+        {
+            var menu_item = (MenuItem)sender;
+            var nullable_ability = (NullableAbility)menu_item.DataContext;
+            nullable_ability.Mark = null;
         }
     }
 }

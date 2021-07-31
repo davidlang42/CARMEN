@@ -170,7 +170,7 @@
                                 <RadioButton Grid.Column="2" IsChecked="{Binding Gender, Converter={StaticResource matchGenderValue}, ConverterParameter='Female'}">
                                     <RadioButton.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Clear Gender" Click="ClearGender_Click"/>
+                                            <MenuItem Header="Clear gender" Click="ClearGender_Click"/>
                                         </ContextMenu>
                                     </RadioButton.ContextMenu>
                                     <RadioButton.Content>
@@ -200,7 +200,13 @@
                                                 <ColumnDefinition Width="*"/>
                                             </Grid.ColumnDefinitions>
                                             <TextBlock Text="{Binding Criteria.Name, StringFormat='\{0\}: '}" VerticalAlignment="Center"/>
-                                            <uc:CriteriaMarkSelector Grid.Column="1" Mark="{Binding Mark, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                                            <uc:CriteriaMarkSelector Grid.Column="1" Mark="{Binding Mark, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center">
+                                                <Control.ContextMenu>
+                                                    <ContextMenu>
+                                                        <MenuItem Header="Clear value" Click="ClearValue_Click"/>
+                                                    </ContextMenu>
+                                                </Control.ContextMenu>
+                                            </uc:CriteriaMarkSelector>
                                         </Grid>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
