@@ -29,7 +29,7 @@ namespace CarmenUI.Pages
     public partial class EditApplicants : SubPage
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
-        //TODO make non-set boolean criteria show indeterminate
+        //TODO fix add applicant button
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;

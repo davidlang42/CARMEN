@@ -19,7 +19,7 @@ namespace CarmenUI.Converters
         {
             if (value == null)
                 return Visibility.Hidden;
-            if (parameter is Type type && !value.GetType().IsSubclassOf(type))
+            if (parameter is Type type && !(value.GetType() == type || value.GetType().IsSubclassOf(type)))
                 return Visibility.Hidden;
             return Visibility.Visible;
         }
