@@ -124,5 +124,11 @@ namespace ShowModel
                 return "";
             return word.Substring(0, 1).ToUpper() + word.Substring(1);
         }
+
+        public static string Plural(this uint number, string suffix_single, string? suffix_plural = null)
+        {
+            suffix_plural ??= suffix_single + "s";
+            return number == 1 ? $"{number} {suffix_single}" : $"{number} {suffix_plural}";
+        }
     }
 }

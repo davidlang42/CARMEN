@@ -77,17 +77,19 @@ namespace UnitTests
         }
 
         [Test]
-        public void PropertyChanged_DateOfBirthToAge()
+        public void PropertyChanged_DateOfBirthToAgeAndDescription()
         {
             var applicant = new Applicant();
             using var mon = applicant.Monitor();
             applicant.DateOfBirth = new DateTime(1990, 1, 1);
             mon.Should().RaisePropertyChangeFor(a => a.DateOfBirth);
             mon.Should().RaisePropertyChangeFor(a => a.AgeToday);
+            mon.Should().RaisePropertyChangeFor(a => a.Description);
             mon.Clear();
             applicant.DateOfBirth = new DateTime(1990, 1, 1);
             mon.Should().NotRaisePropertyChangeFor(a => a.DateOfBirth);
             mon.Should().NotRaisePropertyChangeFor(a => a.AgeToday);
+            mon.Should().NotRaisePropertyChangeFor(a => a.Description);
         }
 
         [Test]
@@ -100,6 +102,20 @@ namespace UnitTests
             mon.Clear();
             applicant.Gender = Gender.Male;
             mon.Should().NotRaisePropertyChangeFor(a => a.Gender);
+        }
+
+        [Test]
+        public void PropertyChanged_GenderToDescription()
+        {
+            var applicant = new Applicant();
+            using var mon = applicant.Monitor();
+            applicant.Gender = Gender.Male;
+            mon.Should().RaisePropertyChangeFor(a => a.Gender);
+            mon.Should().RaisePropertyChangeFor(a => a.Description);
+            mon.Clear();
+            applicant.Gender = Gender.Male;
+            mon.Should().NotRaisePropertyChangeFor(a => a.Gender);
+            mon.Should().NotRaisePropertyChangeFor(a => a.Description);
         }
 
         [Test]

@@ -58,6 +58,7 @@ namespace ShowModel.Applicants
                     return;
                 gender = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(Description));
             }
         }
 
@@ -72,6 +73,7 @@ namespace ShowModel.Applicants
                 dateOfBirth = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(AgeToday));
+                OnPropertyChanged(nameof(Description));
             }
         }
 
@@ -168,6 +170,16 @@ namespace ShowModel.Applicants
         #endregion
 
         public uint? AgeToday => AgeAt(DateTime.Now);
+
+        public string Description
+        {
+            get
+            {
+                var gender = Gender?.ToString();
+                var age = AgeToday?.Plural("year old", "years old");
+                return string.Join(", ", new[] { gender, age }.Where(s => !string.IsNullOrEmpty(s)));
+            }
+        }
 
         public int OverallAbility //LATER notify OverallAbility changed if any criteria weights/maxmarks change
             => Convert.ToInt32(Abilities.Sum(a => a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); //LATER handle overflow
