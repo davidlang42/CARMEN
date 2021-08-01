@@ -4,9 +4,14 @@
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:CarmenUI.Pages"
+      xmlns:cv="clr-namespace:CarmenUI.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="768" d:DesignWidth="1024"
-      Title="Main Menu">
+      Title="Main Menu" Loaded="Page_Loaded"
+      x:Name="PageRoot">
+    <Page.Resources>
+        <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
+    </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="400"/>
@@ -23,7 +28,7 @@
         <StackPanel Grid.Row="1" Grid.Column="0" Margin="20" VerticalAlignment="Bottom">
             <ListViewItem x:Name="ConfigureShow" MouseUp="ConfigureShow_MouseUp" MouseEnter="ConfigureShow_MouseEnter">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/Checkmark.png" Width="20" Height="20" Margin="2 0"/>
+                    <Image Source="{Binding ElementName=PageRoot, Path=ShowSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Configuring Show" HorizontalAlignment="Left" FontSize="20" Margin="2 0"/>
                 </StackPanel>
             </ListViewItem>
@@ -65,7 +70,22 @@
         <Image Grid.Row="0" Grid.Column="1" Source="/Icons/CloudDatabase.png"/>
         <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="20">
             <StackPanel x:Name="SummaryPanel" VerticalAlignment="Center">
-                <StackPanel x:Name="ConfigureShowSummary" Visibility="Collapsed">
+                <ItemsControl ItemsSource="{Binding Rows}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Success}" HorizontalAlignment="Left" FontSize="20" TextWrapping="Wrap" Margin="0 0 5 0"/>
+                                <TextBlock Text="{Binding Fail}" HorizontalAlignment="Left" FontSize="20" TextWrapping="Wrap" FontStyle="Italic" Foreground="Red"/>
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+                <!--<StackPanel x:Name="ConfigureShowSummary" Visibility="Collapsed">
                     <TextBlock Text="4 Audition Criteria" HorizontalAlignment="Left" FontSize="20"/>
                     <TextBlock Text="4 Cast Groups" HorizontalAlignment="Left" FontSize="20"/>
                     <TextBlock Text="6 Cast Tags" HorizontalAlignment="Left" FontSize="20"/>
@@ -137,7 +157,7 @@
                     <TextBlock Text="1 Applicant has no role in Bracket A" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
                     <TextBlock Text="1 Applicant has two roles in Bracket A" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
                     <TextBlock Text="1 Applicant is in two consecutive items" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                </StackPanel>
+                </StackPanel>-->
             </StackPanel>
         </ScrollViewer>
     </Grid>

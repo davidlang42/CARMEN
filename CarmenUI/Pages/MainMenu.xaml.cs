@@ -1,4 +1,5 @@
-﻿using CarmenUI.Windows;
+﻿using CarmenUI.ViewModels;
+using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using System;
@@ -29,6 +30,8 @@ namespace CarmenUI.Pages
         private ShowContext? _context;
         private ShowContext context => _context
             ?? throw new ApplicationException("Tried to use context after it was disposed.");
+
+        public ShowSummary ShowSummary { get; init; } = new();//TODO probably needs to be public so Icon can be bound 
 
         public MainMenu(DbContextOptions<ShowContext> context_options)
         {
@@ -83,21 +86,38 @@ namespace CarmenUI.Pages
             => NavigateToSubPage(new EditApplicants(contextOptions, false));
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.ShowOneChild(ConfigureShowSummary);
+            => SummaryPanel.DataContext = ShowSummary;
 
+        //TODO show summaries
         private void RegisterApplicants_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.ShowOneChild(RegisterApplicantsSummary);
+        {
+            //=> SummaryPanel.ShowOneChild(RegisterApplicantsSummary);
+        }
 
         private void AuditionApplicants_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.ShowOneChild(AuditionApplicantsSummary);
+        {
+            //=> SummaryPanel.ShowOneChild(AuditionApplicantsSummary);
+        }
 
         private void SelectCast_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.ShowOneChild(SelectCastSummary);
+        {
+            //=> SummaryPanel.ShowOneChild(SelectCastSummary);
+        }
 
         private void ConfigureItems_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.ShowOneChild(ConfigureItemsSummary);
+        {
+            //=> SummaryPanel.ShowOneChild(ConfigureItemsSummary);
+        }
 
         private void AllocateRoles_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.ShowOneChild(AllocateRolesSummary);
+        {
+            //=> SummaryPanel.ShowOneChild(AllocateRolesSummary);
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            //TODO start loading view models async, in order + priority
+            ShowSummary.LoadAsync(context);
+        }
     }
 }

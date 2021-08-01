@@ -62,7 +62,7 @@ namespace ShowModel
         }
     }
 
-    internal static class StringExtensions
+    public static class StringExtensions
     {
         static readonly char[] vowels = new[] { 'A', 'E', 'I', 'O', 'U' };
         static readonly char[] wordBoundaries = new[] { ' ', ',', '-', '\\', '/' };
