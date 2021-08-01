@@ -116,7 +116,7 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            //TODO start loading view models async, in order + priority
+            //TODO start loading view models async, in order + priority, probably abstract from ConfigrueShow
             await ShowSummary.LoadAsync(context);
         }
     }

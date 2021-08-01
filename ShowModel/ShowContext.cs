@@ -37,8 +37,7 @@ namespace ShowModel
         {
             optionsBuilder.UseLazyLoadingProxies();
 #if DEBUG
-            //TODO ask dad to measure his internet and put the ping in here
-            optionsBuilder.AddInterceptors(new DelayInterceptor(500)); // simulates a bad 3g connection
+            optionsBuilder.AddInterceptors(new DelayInterceptor(200)); // simulates a 3g connection
 #endif
             base.OnConfiguring(optionsBuilder);
         }
