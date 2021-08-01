@@ -1,4 +1,5 @@
 ﻿using ShowModel;
+using ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,31 +13,30 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext context)
         {
             StartLoad();
-            var criterias = await context.ColdCountAsync(c => c.Criterias);
-            Rows.Add(new Row { Success = $"{criterias} Audition Criteria" });
-            await context.ColdLoadAsync(c => c.CastGroups);
-            var cast_groups = context.CastGroups.Local.Count();
-            Rows.Add(new Row { Success = cast_groups.Plural("Cast Group") });
-            var any_groups_alternating = context.CastGroups.Local.Any(g => g.AlternateCasts);
-            var alternative_casts = await context.ColdCountAsync(c => c.AlternativeCasts);
-            if (any_groups_alternating)
-                Rows.Add(new Row { Success = alternative_casts.Plural("Alternative Cast") });
-            else
-                Rows.Add(new Row { Success = "Alternating Casts are disabled" });
-            var tags = await context.ColdCountAsync(c => c.Tags);
-            Rows.Add(new Row { Success = tags.Plural("Cast Tag") });
-            var section_types = await context.ColdCountAsync(c => c.SectionTypes);
-            Rows.Add(new Row { Success = section_types.Plural("Section Type") });
-            var requirements = await context.ColdCountAsync(c => c.Requirements);
-            Rows.Add(new Row { Success = requirements.Plural("Requirement") });
-            if (criterias == 0)
-                Rows.Add(new Row { Fail = "At least one Criteria is required" });
-            if (cast_groups == 0)
-                Rows.Add(new Row { Fail = "At least one Cast Group is required" });
-            if (any_groups_alternating && alternative_casts < 2)
-                Rows.Add(new Row { Fail = "At least 2 alternative casts are required" });
-            if (section_types == 0)
-                Rows.Add(new Row { Fail = "At least one Section Type is required" });
+            var cast_groups = await context.ColdLoadAsync(c => c.CastGroups);
+            var sum = 0;
+            foreach (var cast_group in cast_groups)
+            {
+                var count = cast_group.Members.Count();
+                var row = new Row { Success = $"{count} in {cast_group.Name}" };
+                var extra = count - cast_group.RequiredCount;
+                if (extra > 0)
+                    row.Fail = $"({extra} too many)";
+                else if (extra < 0)
+                    row.Fail = $"({-extra} missing)";
+                Rows.Add(row);
+                sum += count;
+            }
+            Rows.Insert(0, new Row { Success = $"{sum} Cast Selected" });
+            var tags = await context.ColdLoadAsync(c => c.Tags);
+            foreach (var tag in tags)
+            {
+                var count = tag.Members.Count();
+                var row = new Row { Success = $"{count} tagged {tag.Name}" };
+                if (tag.Members.GroupBy(a => a.CastGroup).Any(g => g.Key == null || tag.CountFor(g.Key) is not uint required_count || required_count != g.Count()))
+                    row.Fail = $"(doesn't match required)";
+                Rows.Add(row);
+            }
             FinishLoad(true);
         }
     }

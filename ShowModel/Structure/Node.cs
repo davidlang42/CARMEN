@@ -38,6 +38,25 @@ namespace ShowModel.Structure
                     yield return $"Actual roles for {cbg.CastGroup.Name} ({actual}) does not equal required count ({cbg.Count}).";
             }
         }
+
+        public bool CountMatchesSumOfRoles()
+        {
+            if (CountByGroups.Count == 0)
+                return true;
+            var remaining_counts = CountByGroups.ToDictionary(cbg => cbg.CastGroup, cbg => (int)cbg.Count);
+            foreach (var role in ItemsInOrder().SelectMany(i => i.Roles).Distinct())
+                foreach (var role_cbg in role.CountByGroups)
+                    if (remaining_counts.TryGetValue(role_cbg.CastGroup, out var old_remaining))
+                    {
+                        var new_remaining = old_remaining - (int)role_cbg.Count;
+                        if (new_remaining < 0)
+                            return false;
+                        remaining_counts[role_cbg.CastGroup] = new_remaining;
+                    }
+            if (remaining_counts.Values.Any(r => r != 0))
+                return false;
+            return true;
+        }
     }
 
     /// <summary>

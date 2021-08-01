@@ -90,65 +90,6 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <TextBlock Text="Loading..." FontSize="20" Visibility="{Binding Status, Converter={StaticResource showIfStatusValue}, ConverterParameter='Loading'}"/>
-                <!--
-                
-                
-                <StackPanel x:Name="AuditionApplicantsSummary" Visibility="Collapsed">
-                    <TextBlock Text="152 Applicants Auditioned" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="" HorizontalAlignment="Left" FontSize="10"/>
-                    <TextBlock Text="36 eligible for Senior Boy" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="60 eligible for Senior Girl" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="18 eligible for Junior Boy" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="28 eligible for Junior Girl" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="10 registered applicants have not auditioned" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                </StackPanel>
-                <StackPanel x:Name="SelectCastSummary" Visibility="Collapsed">
-                    <TextBlock Text="144 Cast Selected" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="" HorizontalAlignment="Left" FontSize="10"/>
-                    <TextBlock Text="36 in Senior Boy" HorizontalAlignment="Left" FontSize="20"/>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="60 in Senior Girl" HorizontalAlignment="Left" FontSize="20"/>
-                        <TextBlock Text=" (5 too many)" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="18 in Junior Boy" HorizontalAlignment="Left" FontSize="20"/>
-                        <TextBlock Text=" (2 missing)" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    </StackPanel>
-                    <TextBlock Text="28 in Junior Girl" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="" HorizontalAlignment="Left" FontSize="10"/>
-                    <TextBlock Text="16 tagged Dance Team" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="30 tagged Microphones" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="10 tagged Production Team" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="10 tagged More" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="10 tagged Tags" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="10 tagged To" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="10 tagged Scroll" HorizontalAlignment="Left" FontSize="20"/>
-                </StackPanel>
-                <StackPanel x:Name="ConfigureItemsSummary" Visibility="Collapsed">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="26 Items" HorizontalAlignment="Left" FontSize="20"/>
-                        <TextBlock Text=" (1 without roles, 1 incorrect sum)" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="6 Brackets" HorizontalAlignment="Left" FontSize="20"/>
-                        <TextBlock Text=" (1 missing roles, 1 with too many roles, 1 incorrect sum)" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Text="2 Sequences" HorizontalAlignment="Left" FontSize="20"/>
-                        <TextBlock Text=" (1 incorrect sum)" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    </StackPanel>
-                    <TextBlock Text="300 Roles" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="At least one Item/Role is required" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                </StackPanel>
-                <StackPanel x:Name="AllocateRolesSummary" Visibility="Collapsed">
-                    <TextBlock Text="290 Roles cast" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="5 Roles not cast" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="3 Roles partially cast" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="2 Roles with too many cast" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="1 Applicant has no role in Bracket A" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="1 Applicant has two roles in Bracket A" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="1 Applicant is in two consecutive items" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                </StackPanel>-->
             </StackPanel>
         </ScrollViewer>
     </Grid>

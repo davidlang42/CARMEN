@@ -106,7 +106,12 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            //TODO load based on view priority, abstract from ConfigureShow
+            //TODO a more sensible way to do this is load each set of objects into lists here,
+            //     then pass readonlycollections to each summary to calculate the stats. This would allow
+            //     parallelisation here, so all summaries are loading at once, which removes the need for
+            //     prioritisation and allows quick calculations to return first. It would also allow
+            //     the summaries themselves to multi-thread calculations, improving performance.
+            //     benchmark before and after to confirm performance improvement
             await ShowSummary.LoadAsync(context);
             await ApplicantsSummary.LoadAsync(context);
             await AuditionSummary.LoadAsync(context);

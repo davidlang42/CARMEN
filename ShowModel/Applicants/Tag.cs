@@ -14,7 +14,7 @@ namespace ShowModel.Applicants
     /// A group of people which an applicant can be selected into.
     /// An applicant can have many Tags.
     /// </summary>
-    public class Tag : ICounted, INamed //LATER implement INotifyPropertyChanged for completeness
+    public class Tag : INamed //LATER implement INotifyPropertyChanged for completeness
     {
         #region Database fields
         [Key]
@@ -27,7 +27,7 @@ namespace ShowModel.Applicants
         public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
         #endregion
 
-        public uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroup == group).Select(c => c.Count).SingleOrDefault(); // defaults to 0
+        public uint? CountFor(CastGroup group)
+            => CountByGroups.Where(c => c.CastGroup == group).Select(c => (uint?)c.Count).SingleOrDefault();
     }
 }

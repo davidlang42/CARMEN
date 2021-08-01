@@ -11,6 +11,17 @@ namespace CarmenUI.ViewModels
     {
         public override async Task LoadAsync(ShowContext context)//TODO this re-uses a lot of info & processing done by ApplicantsSummary
         {
+            /*
+                <StackPanel x:Name="AuditionApplicantsSummary" Visibility="Collapsed">
+                    <TextBlock Text="152 Applicants Auditioned" HorizontalAlignment="Left" FontSize="20"/>
+                    <TextBlock Text="" HorizontalAlignment="Left" FontSize="10"/>
+                    <TextBlock Text="36 eligible for Senior Boy" HorizontalAlignment="Left" FontSize="20"/>
+                    <TextBlock Text="60 eligible for Senior Girl" HorizontalAlignment="Left" FontSize="20"/>
+                    <TextBlock Text="18 eligible for Junior Boy" HorizontalAlignment="Left" FontSize="20"/>
+                    <TextBlock Text="28 eligible for Junior Girl" HorizontalAlignment="Left" FontSize="20"/>
+                    <TextBlock Text="10 registered applicants have not auditioned" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
+                </StackPanel>
+            */
             StartLoad();
             var criterias = await context.ColdCountAsync(c => c.Criterias);
             Rows.Add(new Row { Success = $"{criterias} Audition Criteria" });

@@ -11,6 +11,17 @@ namespace CarmenUI.ViewModels
     {
         public override async Task LoadAsync(ShowContext context)
         {
+            /*
+                <StackPanel x:Name="AllocateRolesSummary" Visibility="Collapsed">
+                    <TextBlock Text="290 Roles cast" HorizontalAlignment="Left" FontSize="20"/>
+                    <TextBlock Text="5 Roles not cast" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
+                    <TextBlock Text="3 Roles partially cast" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
+                    <TextBlock Text="2 Roles with too many cast" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
+                    <TextBlock Text="1 Applicant has no role in Bracket A" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
+                    <TextBlock Text="1 Applicant has two roles in Bracket A" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
+                    <TextBlock Text="1 Applicant is in two consecutive items" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
+                </StackPanel>
+            */
             StartLoad();
             var criterias = await context.ColdCountAsync(c => c.Criterias);
             Rows.Add(new Row { Success = $"{criterias} Audition Criteria" });
