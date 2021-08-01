@@ -26,14 +26,7 @@ namespace CarmenUI.ViewModels
             set => SetValue(StatusProperty, value);
         }
 
-        public static readonly DependencyProperty RowsProperty = DependencyProperty.Register(
-            nameof(Rows), typeof(ObservableCollection<Row>), typeof(Summary), new PropertyMetadata(new ObservableCollection<Row>()));
-
-        public ObservableCollection<Row> Rows
-        {
-            get => (ObservableCollection<Row>)GetValue(RowsProperty);
-            init => SetValue(RowsProperty, value);
-        }
+        public ObservableCollection<Row> Rows { get; init; } = new();
 
         public abstract Task LoadAsync(ShowContext context);
 

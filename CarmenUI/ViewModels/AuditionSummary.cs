@@ -9,7 +9,7 @@ namespace CarmenUI.ViewModels
 {
     public class AuditionSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext context)
+        public override async Task LoadAsync(ShowContext context)//TODO this re-uses a lot of info & processing done by ApplicantsSummary
         {
             StartLoad();
             var criterias = await context.ColdCountAsync(c => c.Criterias);

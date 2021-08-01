@@ -79,4 +79,10 @@ namespace CarmenUI
                 return db_set.Count();
             });
     }
+
+    internal static class AsyncExtensions
+    {
+        public static Task<int> CountAsync<T>(this IEnumerable<T> collection, Func<T, bool> predicate)
+            => Task.Run(() => collection.Count(predicate));
+    }
 }
