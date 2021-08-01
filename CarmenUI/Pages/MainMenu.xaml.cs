@@ -31,7 +31,12 @@ namespace CarmenUI.Pages
         private ShowContext context => _context
             ?? throw new ApplicationException("Tried to use context after it was disposed.");
 
-        public ShowSummary ShowSummary { get; init; } = new();//TODO probably needs to be public so Icon can be bound 
+        public ShowSummary ShowSummary { get; init; } = new();
+        public ApplicantsSummary ApplicantsSummary { get; init; } = new();
+        public AuditionSummary AuditionSummary { get; init; } = new();
+        public CastSummary CastSummary { get; init; } = new();
+        public ItemsSummary ItemsSummary { get; init; } = new();
+        public RolesSummary RolesSummary { get; init; } = new();
 
         public MainMenu(DbContextOptions<ShowContext> context_options)
         {
@@ -67,14 +72,10 @@ namespace CarmenUI.Pages
             => NavigateToSubPage(new ConfigureShow(contextOptions));
 
         private void AllocateRoles_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            NavigateToSubPage(new AllocateRoles(contextOptions));
-        }
+            => NavigateToSubPage(new AllocateRoles(contextOptions));
 
         private void ConfigureItems_MouseUp(object sender, MouseButtonEventArgs e)
-        {
-            NavigateToSubPage(new ConfigureItems(contextOptions));
-        }
+            => NavigateToSubPage(new ConfigureItems(contextOptions));
 
         private void SelectCast_MouseUp(object sender, MouseButtonEventArgs e)
             => NavigateToSubPage(new SelectCast(contextOptions));
@@ -88,36 +89,30 @@ namespace CarmenUI.Pages
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
             => SummaryPanel.DataContext = ShowSummary;
 
-        //TODO show summaries
         private void RegisterApplicants_MouseEnter(object sender, MouseEventArgs e)
-        {
-            //=> SummaryPanel.ShowOneChild(RegisterApplicantsSummary);
-        }
+            => SummaryPanel.DataContext = ApplicantsSummary;
 
         private void AuditionApplicants_MouseEnter(object sender, MouseEventArgs e)
-        {
-            //=> SummaryPanel.ShowOneChild(AuditionApplicantsSummary);
-        }
+            => SummaryPanel.DataContext = AuditionSummary;
 
         private void SelectCast_MouseEnter(object sender, MouseEventArgs e)
-        {
-            //=> SummaryPanel.ShowOneChild(SelectCastSummary);
-        }
+            => SummaryPanel.DataContext = CastSummary;
 
         private void ConfigureItems_MouseEnter(object sender, MouseEventArgs e)
-        {
-            //=> SummaryPanel.ShowOneChild(ConfigureItemsSummary);
-        }
+            => SummaryPanel.DataContext = ItemsSummary;
 
         private void AllocateRoles_MouseEnter(object sender, MouseEventArgs e)
-        {
-            //=> SummaryPanel.ShowOneChild(AllocateRolesSummary);
-        }
+            => SummaryPanel.DataContext = RolesSummary;
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            //TODO start loading view models async, in order + priority, probably abstract from ConfigrueShow
+            //TODO load based on view priority, abstract from ConfigureShow
             await ShowSummary.LoadAsync(context);
+            await ApplicantsSummary.LoadAsync(context);
+            await AuditionSummary.LoadAsync(context);
+            await CastSummary.LoadAsync(context);
+            await ItemsSummary.LoadAsync(context);
+            await RolesSummary.LoadAsync(context);
         }
     }
 }

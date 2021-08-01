@@ -25,10 +25,15 @@ namespace CarmenUI.Converters
             return Check(applicant, view_source);
         }
 
-        public static bool Check(Applicant applicant, CollectionViewSource view_source)
+        public static bool Check(Applicant applicant, CollectionViewSource all_criterias)
         {
-            if (view_source.Source is not IList list)
+            if (all_criterias.Source is not IList list)
                 return false;
+            return Check(applicant, list.OfType<Criteria>());
+        }
+
+        public static bool Check(Applicant applicant, IEnumerable<Criteria> all_criterias)
+        {
             if (string.IsNullOrEmpty(applicant.FirstName))
                 return false;
             if (string.IsNullOrEmpty(applicant.LastName))
@@ -40,7 +45,7 @@ namespace CarmenUI.Converters
             foreach (var ability in applicant.Abilities)
                 if (ability.Mark > ability.Criteria.MaxMark)
                     return false;
-            foreach (var required_criteria in list.OfType<Criteria>().Where(c => c.Primary))
+            foreach (var required_criteria in all_criterias.Where(c => c.Primary))
                 if (!applicant.Abilities.Any(ab => ab.Criteria == required_criteria))
                     return false;
             return true;

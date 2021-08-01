@@ -38,31 +38,31 @@
             </ListViewItem>
             <ListViewItem x:Name="RegisterApplicants" MouseUp="RegisterApplicants_MouseUp" MouseEnter="RegisterApplicants_MouseEnter">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/Ellipsis_bold.png" Width="20" Height="20" Margin="2 0"/>
+                    <Image Source="{Binding ElementName=PageRoot, Path=ApplicantsSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Registering Applicants" HorizontalAlignment="Left" FontSize="20"/>
                 </StackPanel>
             </ListViewItem>
             <ListViewItem x:Name="AuditionApplicants" MouseUp="AuditionApplicants_MouseUp" MouseEnter="AuditionApplicants_MouseEnter">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/Ellipsis_bold.png" Width="20" Height="20" Margin="2 0"/>
+                    <Image Source="{Binding ElementName=PageRoot, Path=AuditionSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Auditioning" HorizontalAlignment="Left" FontSize="20"/>
                 </StackPanel>
             </ListViewItem>
             <ListViewItem x:Name="SelectCast" MouseUp="SelectCast_MouseUp" MouseEnter="SelectCast_MouseEnter">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/Cancel.png" Width="20" Height="20" Margin="2 0"/>
+                    <Image Source="{Binding ElementName=PageRoot, Path=CastSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Selecting Cast" HorizontalAlignment="Left" FontSize="20"/>
                 </StackPanel>
             </ListViewItem>
             <ListViewItem x:Name="ConfigureItems" MouseUp="ConfigureItems_MouseUp" MouseEnter="ConfigureItems_MouseEnter">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/Checkmark.png" Width="20" Height="20" Margin="2 0"/>
+                    <Image Source="{Binding ElementName=PageRoot, Path=ItemsSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Configuring Items" HorizontalAlignment="Left" FontSize="20"/>
                 </StackPanel>
             </ListViewItem>
             <ListViewItem x:Name="AllocateRoles" MouseUp="AllocateRoles_MouseUp" MouseEnter="AllocateRoles_MouseEnter">
                 <StackPanel Orientation="Horizontal">
-                    <Image Source="/Icons/Checkmark.png" Width="20" Height="20" Margin="2 0"/>
+                    <Image Source="{Binding ElementName=PageRoot, Path=RolesSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Allocating Roles" HorizontalAlignment="Left" FontSize="20"/>
                 </StackPanel>
             </ListViewItem>
@@ -90,23 +90,9 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                 <TextBlock Text="Loading..." FontSize="20" Visibility="{Binding Status, Converter={StaticResource showIfStatusValue}, ConverterParameter='Loading'}"/>
-                <!--<StackPanel x:Name="ConfigureShowSummary" Visibility="Collapsed">
-                    <TextBlock Text="4 Audition Criteria" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="4 Cast Groups" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="6 Cast Tags" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="2 Section Types" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="12 Requirements" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="At least one Criteria/Group/SectionType is required" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                </StackPanel>
-                <StackPanel x:Name="RegisterApplicantsSummary" Visibility="Collapsed">
-                    <TextBlock Text="168 Applicants Registered" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="" HorizontalAlignment="Left" FontSize="10"/>
-                    <TextBlock Text="36 eligible for Senior Boy" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="60 eligible for Senior Girl" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="18 eligible for Junior Boy" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="28 eligible for Junior Girl" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="3 Applicants are incomplete" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                </StackPanel>
+                <!--
+                
+                
                 <StackPanel x:Name="AuditionApplicantsSummary" Visibility="Collapsed">
                     <TextBlock Text="152 Applicants Auditioned" HorizontalAlignment="Left" FontSize="20"/>
                     <TextBlock Text="" HorizontalAlignment="Left" FontSize="10"/>
