@@ -336,11 +336,12 @@ namespace ShowModel
         }
 
         /// <summary>Adds roles to items, optionally with random counts of a single cast group and random requirements.
-        /// NOTE: Must be called after Items, Cast Groups and Requirements have been committed.</summary>
+        /// NOTE: Must be called after Applicants, Items, Cast Groups and Requirements have been committed.</summary>
         public void AddRoles(uint roles_per_item, bool include_castgroup_count_by_groups = true, bool include_requirements = true)
         {
             var cast_groups = Context.CastGroups.ToArray();
             var requirements = Context.Requirements.ToArray();
+            var applicants = Context.Applicants.ToArray();
             foreach (var item in Context.ShowRoot.ItemsInOrder())
             {
                 for (var i = 0; i < roles_per_item; i++)
@@ -354,6 +355,7 @@ namespace ShowModel
                             Count = (uint)i
                         };
                         role.CountByGroups.Add(count_by_group);
+                        role.Cast.Add(random.NextOf(applicants));
                     }
                     if (include_requirements)
                         role.Requirements.Add(requirements[random.Next(requirements.Length)]);

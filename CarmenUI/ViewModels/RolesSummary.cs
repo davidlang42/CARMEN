@@ -1,9 +1,11 @@
 ﻿using ShowModel;
+using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static ShowModel.Structure.Role;
 
 namespace CarmenUI.ViewModels
 {
@@ -11,44 +13,43 @@ namespace CarmenUI.ViewModels
     {
         public override async Task LoadAsync(ShowContext context)
         {
-            /*
-                <StackPanel x:Name="AllocateRolesSummary" Visibility="Collapsed">
-                    <TextBlock Text="290 Roles cast" HorizontalAlignment="Left" FontSize="20"/>
-                    <TextBlock Text="5 Roles not cast" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="3 Roles partially cast" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="2 Roles with too many cast" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="1 Applicant has no role in Bracket A" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="1 Applicant has two roles in Bracket A" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                    <TextBlock Text="1 Applicant is in two consecutive items" TextWrapping="Wrap" HorizontalAlignment="Left" FontSize="20" FontStyle="Italic" Foreground="Red"/>
-                </StackPanel>
-            */
             StartLoad();
-            var criterias = await context.ColdCountAsync(c => c.Criterias);
-            Rows.Add(new Row { Success = $"{criterias} Audition Criteria" });
-            await context.ColdLoadAsync(c => c.CastGroups);
-            var cast_groups = context.CastGroups.Local.Count();
-            Rows.Add(new Row { Success = cast_groups.Plural("Cast Group") });
-            var any_groups_alternating = context.CastGroups.Local.Any(g => g.AlternateCasts);
-            var alternative_casts = await context.ColdCountAsync(c => c.AlternativeCasts);
-            if (any_groups_alternating)
-                Rows.Add(new Row { Success = alternative_casts.Plural("Alternative Cast") });
-            else
-                Rows.Add(new Row { Success = "Alternating Casts are disabled" });
-            var tags = await context.ColdCountAsync(c => c.Tags);
-            Rows.Add(new Row { Success = tags.Plural("Cast Tag") });
-            var section_types = await context.ColdCountAsync(c => c.SectionTypes);
-            Rows.Add(new Row { Success = section_types.Plural("Section Type") });
-            var requirements = await context.ColdCountAsync(c => c.Requirements);
-            Rows.Add(new Row { Success = requirements.Plural("Requirement") });
-            if (criterias == 0)
-                Rows.Add(new Row { Fail = "At least one Criteria is required" });
-            if (cast_groups == 0)
-                Rows.Add(new Row { Fail = "At least one Cast Group is required" });
-            if (any_groups_alternating && alternative_casts < 2)
-                Rows.Add(new Row { Fail = "At least 2 alternative casts are required" });
-            if (section_types == 0)
-                Rows.Add(new Row { Fail = "At least one Section Type is required" });
-            FinishLoad(true);
+            var roles = context.ShowRoot.ItemsInOrder().SelectMany(i => i.Roles).Distinct(); // TODO common with ItemsSummary
+            var counts = roles.GroupBy(r => r.Status).ToDictionary(g => g.Key, g => g.Count());
+            if (counts.TryGetValue(RoleStatus.FullyCast, out var roles_cast))
+                Rows.Add(new Row { Success = $"{roles_cast} Roles cast" });
+            if (counts.TryGetValue(RoleStatus.NotCast, out var roles_blank))
+                Rows.Add(new Row { Success = $"{roles_blank} Roles not cast" });
+            if (counts.TryGetValue(RoleStatus.UnderCast, out var roles_undercast))
+                Rows.Add(new Row { Fail = $"{roles_undercast} Roles partially cast" });
+            if (counts.TryGetValue(RoleStatus.OverCast, out var roles_overcast))
+                Rows.Add(new Row { Fail = $"{roles_overcast} Roles with too many cast" });
+            var section_types = await context.ColdLoadAsync(c => c.SectionTypes);
+            var cast_groups = await context.ColdLoadAsync(c => c.CastGroups);
+            var total_cast = cast_groups.Sum(cg => cg.Members.Count);
+            foreach (var section_type in section_types)
+            {
+                if (section_type.AllowNoRoles && section_type.AllowMultipleRoles)
+                    continue; // nothing to check
+                foreach (var section in section_type.Sections)
+                {
+                    var roles_in_section = section.ItemsInOrder().SelectMany(i => i.Roles).ToHashSet();
+                    if (section_type.AllowNoRoles == false)
+                    {
+                        var no_roles = total_cast - roles_in_section.SelectMany(r => r.Cast).Distinct().Count();
+                        if (no_roles > 0)
+                            Rows.Add(new Row { Fail = $"{no_roles.Plural("Applicant has", "Applicants have")} no role in {section.Name}" });
+                    }
+                    if (section_type.AllowMultipleRoles == false)
+                    {
+                        var multi_roles = roles_in_section.SelectMany(r => r.Cast).GroupBy(a => a).Where(g => g.Count() > 1).Count();
+                        if (multi_roles > 0)
+                            Rows.Add(new Row { Fail = $"{multi_roles.Plural("Applicant has", "Applicants have")} multiple roles in {section.Name}" });
+                    }
+                }
+            }
+            //TODO consecutive items check (eg. 1 Applicant is in two consecutive items)
+            FinishLoad(counts[RoleStatus.NotCast] == 0);
         }
     }
 }

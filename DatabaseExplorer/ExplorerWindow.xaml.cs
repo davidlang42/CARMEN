@@ -204,7 +204,7 @@ namespace DatabaseExplorer
             Context.SaveChanges();
             test_data.AddApplicants(applicants); // after criteria, tags, alternative casts committed
             Context.SaveChanges();
-            test_data.AddRoles(roles); // after items, cast groups, requirements committed
+            test_data.AddRoles(roles); // after applicants, items, cast groups, requirements committed
             test_data.AddImages(); // after applicants, cast groups, tags committed
             Context.SaveChanges();
         }

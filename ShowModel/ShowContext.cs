@@ -37,6 +37,7 @@ namespace ShowModel
         {
             optionsBuilder.UseLazyLoadingProxies();
 #if DEBUG
+            //TODO a delay of 200 seems to block unit tests
             optionsBuilder.AddInterceptors(new DelayInterceptor(200)); // simulates a 3g connection
 #endif
             base.OnConfiguring(optionsBuilder);
@@ -79,6 +80,9 @@ namespace ShowModel
             modelBuilder.Entity<CombinedRequirement>()
                 .HasMany(cr => cr.SubRequirements)
                 .WithMany(r => r.UsedByCombinedRequirements);
+            modelBuilder.Entity<Applicant>()
+                .HasMany(a => a.Roles)
+                .WithMany(r => r.Cast);
 
             // Add inheritance structure for requirements
             // Foreign keys are manually defined to avoid IndexOutOfRangeException being

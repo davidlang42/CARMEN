@@ -31,7 +31,7 @@ namespace UnitTests.Database
             context.SaveChanges();
             test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
             context.SaveChanges();
-            test_data.AddRoles(5); // after items, cast groups, requirements committed
+            test_data.AddRoles(5); // after applicants, items, cast groups, requirements committed
             test_data.AddImages(); // after applicants, cast groups, tags committed
             context.SaveChanges();
         }
@@ -108,6 +108,17 @@ namespace UnitTests.Database
             image.Should().NotBeNull();
             image!.ImageId.Should().NotBe(0);
             // Reverse navigation not defined
+        }
+
+        [Test]
+        public void Applicant_Role_ManyToMany()
+        {
+            using var context = new ShowContext(contextOptions);
+            var applicant = context.Applicants.First();
+            applicant.ApplicantId.Should().NotBe(0);
+            var role = applicant.Roles.First();
+            role.RoleId.Should().NotBe(0);
+            role.Cast.Should().Contain(applicant);
         }
         #endregion
 
