@@ -6,6 +6,10 @@ using ShowModel.Applicants;
 using ShowModel.Criterias;
 using ShowModel.Requirements;
 using ShowModel.Structure;
+using Microsoft.EntityFrameworkCore.Diagnostics;
+using System.Data.Common;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ShowModel
 {
@@ -32,6 +36,10 @@ namespace ShowModel
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseLazyLoadingProxies();
+#if DEBUG
+            //TODO ask dad to measure his internet and put the ping in here
+            optionsBuilder.AddInterceptors(new DelayInterceptor(500)); // simulates a bad 3g connection
+#endif
             base.OnConfiguring(optionsBuilder);
         }
 
@@ -106,5 +114,29 @@ namespace ShowModel
                       json => JsonSerializer.Deserialize<string[]>(json, null) ?? SelectCriteria.DEFAULT_OPTIONS);
             modelBuilder.Entity<BooleanCriteria>();
         }
+
+#if DEBUG
+        private class DelayInterceptor : DbCommandInterceptor
+        {
+            private int delay;
+
+            public DelayInterceptor(int delay)
+            {
+                this.delay = delay;
+            }
+
+            public override InterceptionResult<DbDataReader> ReaderExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result)
+            {
+                Thread.Sleep(delay);
+                return result;
+            }
+
+            public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
+            {
+                Task.Run(() => Thread.Sleep(delay));
+                return new ValueTask<InterceptionResult<DbDataReader>>(result);
+            }
+        }
+#endif
     }
 }

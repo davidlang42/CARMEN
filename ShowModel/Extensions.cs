@@ -126,6 +126,9 @@ namespace ShowModel
         }
 
         public static string Plural(this uint number, string suffix_single, string? suffix_plural = null)
+            => Plural((int)number, suffix_single, suffix_plural);
+
+        public static string Plural(this int number, string suffix_single, string? suffix_plural = null)
         {
             suffix_plural ??= suffix_single + "s";
             return number == 1 ? $"{number} {suffix_single}" : $"{number} {suffix_plural}";

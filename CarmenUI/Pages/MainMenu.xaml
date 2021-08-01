@@ -11,6 +11,10 @@
       x:Name="PageRoot">
     <Page.Resources>
         <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
+        <cv:MultiConverter x:Key="showIfStatusValue">
+            <cv:MatchStatusValue/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
     </Page.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -85,6 +89,7 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                <TextBlock Text="Loading..." FontSize="20" Visibility="{Binding Status, Converter={StaticResource showIfStatusValue}, ConverterParameter='Loading'}"/>
                 <!--<StackPanel x:Name="ConfigureShowSummary" Visibility="Collapsed">
                     <TextBlock Text="4 Audition Criteria" HorizontalAlignment="Left" FontSize="20"/>
                     <TextBlock Text="4 Cast Groups" HorizontalAlignment="Left" FontSize="20"/>

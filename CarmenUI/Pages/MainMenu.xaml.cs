@@ -114,10 +114,10 @@ namespace CarmenUI.Pages
             //=> SummaryPanel.ShowOneChild(AllocateRolesSummary);
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             //TODO start loading view models async, in order + priority
-            ShowSummary.LoadAsync(context);
+            await ShowSummary.LoadAsync(context);
         }
     }
 }

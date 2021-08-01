@@ -35,9 +35,15 @@ namespace CarmenUI.ViewModels
             init => SetValue(RowsProperty, value);
         }
 
-        public abstract void LoadAsync(ShowContext context);
+        public abstract Task LoadAsync(ShowContext context);
 
-        protected void UpdateStatus(bool complete_if_no_errors)
+        protected void StartLoad()
+        {
+            Status = ProcessStatus.Loading;
+            Rows.Clear();
+        }
+
+        protected void FinishLoad(bool complete_if_no_errors)
         {
             if (Rows.Any(r => r.IsFail))
                 Status = ProcessStatus.Error;

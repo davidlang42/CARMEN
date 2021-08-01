@@ -1,4 +1,5 @@
-﻿using ShowModel.Applicants;
+﻿using CarmenUI.ViewModels;
+using ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -36,5 +37,8 @@ namespace CarmenUI.Converters
     }
 
     public class MatchGenderValue : MatchEnumValue<Gender>
+    { }
+
+    public class MatchStatusValue : MatchEnumValue<ProcessStatus>
     { }
 }
