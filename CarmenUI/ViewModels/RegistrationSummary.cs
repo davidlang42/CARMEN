@@ -26,7 +26,7 @@ namespace CarmenUI.ViewModels
                 Rows.Add(row);
             }
             await c.Criterias.LoadAsync();
-            var incomplete = await c.Applicants.Local.CountAsync(a => IsApplicantComplete.Check(a, c.Criterias.Local));//LATER paralleise
+            var incomplete = await c.Applicants.Local.CountAsync(a => !a.IsRegistered);//LATER paralleise
             if (incomplete > 0)
                 Rows.Add(new Row { Fail = $"{incomplete} Applicants are Incomplete" });
             FinishLoad(true);

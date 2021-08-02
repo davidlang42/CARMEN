@@ -34,14 +34,16 @@ namespace CarmenUI.Pages
         private CollectionViewSource criteriasViewSource;
         private BooleanLookupDictionary groupExpansionLookup;
 
-        public EditApplicants(DbContextOptions<ShowContext> context_options, bool hide_complete_applicants) : base(context_options)
+        public EditApplicants(DbContextOptions<ShowContext> context_options, bool show_incomplete_applicants, bool show_registered_applicants, bool show_auditioned_applicants) : base(context_options)
         {
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
             groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
             groupCombo.SelectedIndex = 0; // must be after InitializeComponent() because it triggers groupCombo_SelectionChanged
-            hideCompleteApplicants.IsChecked = hide_complete_applicants;
+            showIncompleteApplicants.IsChecked = show_incomplete_applicants;
+            showRegisteredApplicants.IsChecked = show_registered_applicants;
+            showAuditionedApplicants.IsChecked = show_auditioned_applicants;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)//LATER perform this loading before showing page, using a loadingoverlay
@@ -174,9 +176,7 @@ namespace CarmenUI.Pages
             if (applicantsViewSource.View is ICollectionView view)
             {
                 var previous_counts = GetGroupCounts(view);
-                view.Filter = o => o is not Applicant a // always show "Loading..." text
-                    || (FullName.Format(a).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase) // filter text
-                    && (hideCompleteApplicants.IsChecked == false || !IsApplicantComplete.Check(a, criteriasViewSource))); // hide complete applicants
+                view.Filter = o => o is not Applicant a || FilterPredicate(a); // always show "Loading..." text
                 var new_counts = GetGroupCounts(view);
                 foreach (var (key, new_count) in new_counts)
                 {
@@ -191,6 +191,17 @@ namespace CarmenUI.Pages
             }
         }
 
+        private bool FilterPredicate(Applicant applicant)
+        {
+            if (!FullName.Format(applicant).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase))
+                return false;
+            if (!applicant.IsRegistered)
+                return showIncompleteApplicants.IsChecked == true;
+            if (ShowIfApplicantRegisteredAndAuditioned.Check(applicant.IsRegistered, applicant.Abilities, criteriasViewSource))
+                return showAuditionedApplicants.IsChecked == true;
+            return showRegisteredApplicants.IsChecked == true;
+        }
+
         private void applicantsList_KeyUp(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete && applicantsList.SelectedItem is Applicant applicant)
@@ -202,10 +213,7 @@ namespace CarmenUI.Pages
             }
         }
 
-        private void hideCompleteApplicants_Checked(object sender, RoutedEventArgs e)
-            => ConfigureFiltering();
-
-        private void hideCompleteApplicants_Unchecked(object sender, RoutedEventArgs e)
+        private void showApplicantsCheckbox_Changed(object sender, RoutedEventArgs e)
             => ConfigureFiltering();
 
         private void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)

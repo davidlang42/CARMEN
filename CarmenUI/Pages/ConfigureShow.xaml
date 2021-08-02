@@ -23,7 +23,7 @@
         <CollectionViewSource x:Key="tagsViewSource"/>
         <CollectionViewSource x:Key="requirementsSelectionSource"/>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
-        <cv:InverseBoolean x:Key="inverseBoolean"/>
+        <cv:InvertBoolean x:Key="inverseBoolean"/>
         <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="modelApplicants:Gender"/>

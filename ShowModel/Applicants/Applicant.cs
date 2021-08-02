@@ -32,6 +32,7 @@ namespace ShowModel.Applicants
                     return;
                 firstName = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsRegistered));
             }
         }
 
@@ -45,6 +46,7 @@ namespace ShowModel.Applicants
                     return;
                 lastName = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsRegistered));
             }
         }
 
@@ -59,6 +61,7 @@ namespace ShowModel.Applicants
                 gender = value;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(Description));
+                OnPropertyChanged(nameof(IsRegistered));
             }
         }
 
@@ -74,6 +77,7 @@ namespace ShowModel.Applicants
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(AgeToday));
                 OnPropertyChanged(nameof(Description));
+                OnPropertyChanged(nameof(IsRegistered));
             }
         }
 
@@ -184,13 +188,8 @@ namespace ShowModel.Applicants
         public int OverallAbility //LATER notify OverallAbility changed if any criteria weights/maxmarks change
             => Convert.ToInt32(Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); //LATER handle overflow
 
-        public bool HasAuditioned(IEnumerable<Criteria> all_criterias)
-        {
-            foreach (var required_criteria in all_criterias.Where(c => c.Primary))
-                if (!Abilities.Any(ab => ab.Criteria == required_criteria))
-                    return false;
-            return true;
-        }
+        public bool IsRegistered
+            => !string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName) && Gender.HasValue && DateOfBirth.HasValue;
 
         public Applicant()
         {
@@ -236,7 +235,7 @@ namespace ShowModel.Applicants
 
         /// <summary>Determines if an Applicant has been accepted into the cast.
         /// This is determined by membership in a CastGroup.</summary>
-        public bool IsAccepted() => CastGroup != null;
+        public bool IsAccepted => CastGroup != null;
 
         /// <summary>Checks that names are not blank, gender and date of birth are set, and all criteria have marks within range.</summary>
         public IEnumerable<string> Validate()

@@ -11,7 +11,7 @@ namespace CarmenUI.Converters
     /// <summary>
     /// A two-way converter which inverts the value of a boolean
     /// </summary>
-    public class InverseBoolean : IValueConverter
+    public class InvertBoolean : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

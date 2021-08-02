@@ -21,13 +21,9 @@
         <cv:BooleanLookupDictionary x:Key="groupExpansionLookup"/>
         <cv:SparseAbilities x:Key="sparseAbilities"/>
         <cv:HideIfNull x:Key="hideIfNull"/>
-        <cv:MultiConverter x:Key="showIfApplicantComplete">
-            <cv:IsApplicantComplete/>
-            <BooleanToVisibilityConverter/>
-        </cv:MultiConverter>
-        <cv:MultiConverter x:Key="hideIfApplicantComplete">
-            <cv:IsApplicantComplete/>
-            <cv:InverseBoolean/>
+        <cv:ShowIfApplicantRegisteredAndAuditioned x:Key="showIfApplicantRegisteredAndAuditioned"/>
+        <cv:MultiConverter x:Key="hideIfTrue">
+            <cv:InvertBoolean/>
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
     </Page.Resources>
@@ -49,6 +45,16 @@
                 <TextBlock Text="Filter: " FontSize="14" VerticalAlignment="Center"/>
                 <TextBox x:Name="filterText" Grid.Column="1" TextChanged="filterText_TextChanged" FontSize="14" GotFocus="filterText_GotFocus"/>
             </Grid>
+            <Grid DockPanel.Dock="Top">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <CheckBox x:Name="showIncompleteApplicants" Content="Incomplete" Margin="5" Checked="showApplicantsCheckbox_Changed" Unchecked="showApplicantsCheckbox_Changed"/>
+                <CheckBox Grid.Column="1" x:Name="showRegisteredApplicants" Content="Registered" Margin="5" Checked="showApplicantsCheckbox_Changed" Unchecked="showApplicantsCheckbox_Changed"/>
+                <CheckBox Grid.Column="2" x:Name="showAuditionedApplicants" Content="Auditioned" Margin="5" Checked="showApplicantsCheckbox_Changed" Unchecked="showApplicantsCheckbox_Changed"/>
+            </Grid>
             <Grid DockPanel.Dock="Top" Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -69,7 +75,6 @@
                 </ComboBox>
             </Grid>
             <Button DockPanel.Dock="Bottom" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
-            <CheckBox DockPanel.Dock="Bottom" x:Name="hideCompleteApplicants" Content="Hide complete applicants" Margin="5" Checked="hideCompleteApplicants_Checked" Unchecked="hideCompleteApplicants_Unchecked"/>
             <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5" KeyUp="applicantsList_KeyUp" SelectionChanged="applicantsList_SelectionChanged">
                 <ListBox.GroupStyle>
                     <GroupStyle>
@@ -133,9 +138,20 @@
                                 </MultiBinding>
                             </TextBlock.Text>
                         </TextBlock>
-                        <TextBlock Grid.Row="1" Text="Incomplete" Visibility="{Binding Converter={StaticResource hideIfApplicantComplete}, ConverterParameter={StaticResource criteriasViewSource}}" Foreground="Red" FontStyle="Italic" FontSize="16"/>
-                        <TextBlock Grid.Row="1" Text="{Binding OverallAbility}" Visibility="{Binding Converter={StaticResource showIfApplicantComplete}, ConverterParameter={StaticResource criteriasViewSource}}" Foreground="Green" FontWeight="Bold" FontSize="16"/>
-                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Description}" ToolTip="as of 1st July 2022" FontSize="16"/>
+                        <TextBlock Grid.Row="1" Text="Incomplete"
+                                   Visibility="{Binding IsRegistered, Converter={StaticResource hideIfTrue}}"
+                                   Foreground="Red" FontStyle="Italic" FontSize="16"/>
+                        <TextBlock Grid.Row="1" Text="{Binding OverallAbility}" Foreground="Green" FontWeight="Bold" FontSize="16">
+                            <TextBlock.Visibility>
+                                <MultiBinding Converter="{StaticResource showIfApplicantRegisteredAndAuditioned}" ConverterParameter="{StaticResource criteriasViewSource}">
+                                    <MultiBinding.Bindings>
+                                        <Binding Path="IsRegistered"/>
+                                        <Binding Path="Abilities"/>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </TextBlock.Visibility>
+                        </TextBlock>
+                        <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Description}" FontSize="16"/>
                     </Grid>
                     <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" Grid.Row="1" Margin="0 10 0 0">
                         <StackPanel>
