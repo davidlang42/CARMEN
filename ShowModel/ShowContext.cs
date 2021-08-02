@@ -36,8 +36,8 @@ namespace ShowModel
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseLazyLoadingProxies();
-#if DEBUG
-            //TODO a delay of 200 seems to block unit tests
+#if SLOW_DATABASE
+            // NOTE: Using a delay of 200 seems to block unit tests
             optionsBuilder.AddInterceptors(new DelayInterceptor(200)); // simulates a 3g connection
 #endif
             base.OnConfiguring(optionsBuilder);
@@ -118,7 +118,7 @@ namespace ShowModel
             modelBuilder.Entity<BooleanCriteria>();
         }
 
-#if DEBUG
+#if SLOW_DATABASE
         private class DelayInterceptor : DbCommandInterceptor
         {
             private int delay;
