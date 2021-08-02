@@ -49,7 +49,7 @@ namespace CarmenUI.ViewModels
                 }
             }
             //TODO consecutive items check (eg. 1 Applicant is in two consecutive items)
-            FinishLoad(counts[RoleStatus.NotCast] == 0);
+            FinishLoad(roles_blank == 0);
         }
     }
 }
