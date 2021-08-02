@@ -134,10 +134,10 @@ namespace ShowModel
                 return result;
             }
 
-            public override ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
+            public override async ValueTask<InterceptionResult<DbDataReader>> ReaderExecutingAsync(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result, CancellationToken cancellationToken = default)
             {
-                Task.Run(() => Thread.Sleep(delay));
-                return new ValueTask<InterceptionResult<DbDataReader>>(result);
+                await Task.Run(() => Thread.Sleep(delay));
+                return result;
             }
         }
 #endif
