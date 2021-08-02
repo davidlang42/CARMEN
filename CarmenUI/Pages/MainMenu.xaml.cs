@@ -2,6 +2,7 @@
 using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
+using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -113,13 +114,22 @@ namespace CarmenUI.Pages
             //     the summaries themselves to multi-thread calculations, improving performance.
             //     benchmark before and after to confirm performance improvement
             // Previously: 3s (no delay) / 72s (200ms delay)
+            // Now: 3s (no delay) / 66s (200ms delay)
             var start = DateTime.Now;
-            await ShowSummary.LoadAsync(context);
-            await RegistrationSummary.LoadAsync(context);
-            await AuditionSummary.LoadAsync(context);
-            await CastSummary.LoadAsync(context);
-            await ItemsSummary.LoadAsync(context);
-            await RolesSummary.LoadAsync(context);
+            var criterias = await context.ColdListAsync(c => c.Criterias);
+            var cast_groups = await context.ColdListAsync(c => c.CastGroups);
+            var alternative_casts = await context.ColdListAsync(c => c.AlternativeCasts);
+            var tags = await context.ColdListAsync(c => c.Tags);
+            var section_types = await context.ColdListAsync(c => c.SectionTypes);
+            var requirements = await context.ColdListAsync(c => c.Requirements);
+            ShowSummary.Load(criterias, cast_groups, alternative_casts, tags, section_types, requirements);
+            var applicants = await context.ColdListAsync(c => c.Applicants);
+            await RegistrationSummary.LoadAsync(applicants, cast_groups, criterias);
+            await AuditionSummary.LoadAsync(applicants, cast_groups, criterias);
+            CastSummary.Load(cast_groups, tags);
+            var items = (await context.ColdLoadAsync(c => c.Nodes)).OfType<ShowRoot>().First().ItemsInOrder().ToList();
+            ItemsSummary.Load(items, cast_groups, section_types);
+            RolesSummary.Load(items.AsReadOnly(), cast_groups, section_types);
             var duration = DateTime.Now - start;
             MessageBox.Show($"Loaded summaries in {duration.TotalSeconds} seconds");
         }

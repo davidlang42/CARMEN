@@ -3,6 +3,7 @@ using ShowModel.Applicants;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,10 +13,10 @@ namespace CarmenUI.ViewModels
 {
     public class RolesSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext context)
+        public void Load(ReadOnlyCollection<Item> items, IReadOnlyCollection<CastGroup> cast_groups,
+            IReadOnlyCollection<SectionType> section_types)
         {
             StartLoad();
-            var items = context.ShowRoot.ItemsInOrder().ToList();
             var roles = items.SelectMany(i => i.Roles).Distinct();
             var counts = roles.GroupBy(r => r.Status).ToDictionary(g => g.Key, g => g.Count());
             if (counts.TryGetValue(RoleStatus.FullyCast, out var roles_cast))
@@ -26,8 +27,6 @@ namespace CarmenUI.ViewModels
                 Rows.Add(new Row { Fail = $"{roles_undercast} Roles partially cast" });
             if (counts.TryGetValue(RoleStatus.OverCast, out var roles_overcast))
                 Rows.Add(new Row { Fail = $"{roles_overcast} Roles with too many cast" });
-            var section_types = await context.ColdLoadAsync(c => c.SectionTypes);
-            var cast_groups = await context.ColdLoadAsync(c => c.CastGroups);
             var total_cast = cast_groups.Sum(cg => cg.Members.Count);
             foreach (var section_type in section_types)
             {

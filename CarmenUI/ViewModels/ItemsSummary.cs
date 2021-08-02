@@ -11,17 +11,15 @@ namespace CarmenUI.ViewModels
 {
     public class ItemsSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext context)
+        public void Load(IReadOnlyCollection<Item> items, IReadOnlyCollection<CastGroup> cast_groups,
+            IReadOnlyCollection<SectionType> section_types)
         {
             StartLoad();
-            var nodes = await context.ColdLoadAsync(c => c.Nodes);
-            Rows.Add(CreateItemsRow(nodes.OfType<Item>(), out int item_count));
-            var cast_groups = await context.ColdLoadAsync(c => c.CastGroups);
+            Rows.Add(CreateItemsRow(items, out int item_count));
             var cast_members = cast_groups.ToDictionary(cg => cg, cg => (uint)cg.Members.Count);
-            var section_types = await context.ColdLoadAsync(c => c.SectionTypes);
             foreach (var section_type in section_types)
                 Rows.Add(CreateSectionTypeRow(section_type, cast_members));
-            var role_count = context.ShowRoot.ItemsInOrder().SelectMany(i => i.Roles).Distinct().Count();
+            var role_count = items.SelectMany(i => i.Roles).Distinct().Count();
             Rows.Add(new Row { Success = $"{role_count} Roles" });
             if (item_count == 0)
                 Rows.Add(new Row { Fail = "At least one Item is required" });
