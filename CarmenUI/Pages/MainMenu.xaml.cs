@@ -59,7 +59,7 @@ namespace CarmenUI.Pages
         private void HandleChangesOnReturn(object sender, ReturnEventArgs<DataObjects> e)
         {
             if (e?.Result is DataObjects changes)
-                MessageBox.Show($"The following objects have changed: {changes}");
+                LoadSummariesAsync(changes);
         }
 
         private void NavigateToSubPage(SubPage sub_page)
@@ -104,14 +104,38 @@ namespace CarmenUI.Pages
         private void AllocateRoles_MouseEnter(object sender, MouseEventArgs e)
             => SummaryPanel.DataContext = RolesSummary;
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)
+        private void Page_Initialized(object sender, EventArgs e)
+            => LoadSummariesAsync(DataObjects.All);
+
+        private async void LoadSummariesAsync(DataObjects changes)
         {
-            await ShowSummary.LoadAsync(context);
-            await RegistrationSummary.LoadAsync(context);
-            await AuditionSummary.LoadAsync(context);
-            await CastSummary.LoadAsync(context);
-            await ItemsSummary.LoadAsync(context);
-            await RolesSummary.LoadAsync(context);
+            // Determine which summaries need updating
+            List<Summary> summaries = new();
+            if (changes.HasFlag(DataObjects.Criterias)
+                || changes.HasFlag(DataObjects.CastGroups)
+                || changes.HasFlag(DataObjects.AlternativeCasts)
+                || changes.HasFlag(DataObjects.Tags)
+                || changes.HasFlag(DataObjects.SectionTypes)
+                || changes.HasFlag(DataObjects.Requirements))
+                summaries.Add(ShowSummary);
+            if (changes.HasFlag(DataObjects.Applicants)
+                || changes.HasFlag(DataObjects.CastGroups)
+                || changes.HasFlag(DataObjects.Requirements)
+                || changes.HasFlag(DataObjects.Criterias))
+                summaries.AddRange(new Summary[] { RegistrationSummary, AuditionSummary });
+            if (changes.HasFlag(DataObjects.CastGroups)
+                || changes.HasFlag(DataObjects.Tags))
+                summaries.Add(CastSummary);
+            if (changes.HasFlag(DataObjects.Nodes)
+                || changes.HasFlag(DataObjects.CastGroups)
+                || changes.HasFlag(DataObjects.SectionTypes))
+                summaries.AddRange(new Summary[] { ItemsSummary, RolesSummary });
+            // Mark them as 'Loading'
+            foreach (var summary in summaries)
+                summary.Status = ProcessStatus.Loading;
+            // Update them sequentially
+            foreach (var summary in summaries)
+                await summary.LoadAsync(context);
         }
     }
 }

@@ -22,6 +22,7 @@ namespace ShowModel
         Requirements = 32,
         Nodes = 64,
         SectionTypes = 128,
-        Images = 256
+        Images = 256,
+        All = 511
     }
 }

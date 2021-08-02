@@ -7,8 +7,8 @@
       xmlns:cv="clr-namespace:CarmenUI.Converters"
       mc:Ignorable="d" 
       d:DesignHeight="768" d:DesignWidth="1024"
-      Title="Main Menu" Loaded="Page_Loaded"
-      x:Name="PageRoot">
+      Title="Main Menu"
+      x:Name="PageRoot" Initialized="Page_Initialized">
     <Page.Resources>
         <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
         <cv:MultiConverter x:Key="showIfStatusValue">
