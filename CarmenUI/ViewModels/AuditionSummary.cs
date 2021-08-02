@@ -13,7 +13,7 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
-            await c.Applicants.Include(a => a.Tags).Include(a => a.Abilities).ThenInclude(ab => ab.Criteria).LoadAsync();
+            await c.Applicants.LoadAsync();
             await c.Criterias.LoadAsync();
             var auditioned = await c.Applicants.Local.Where(a => a.HasAuditioned(c.Criterias.Local)).ToListAsync();
             Rows.Add(new Row { Success = $"{auditioned.Count} Applicants Auditioned" });

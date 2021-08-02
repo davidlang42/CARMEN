@@ -35,7 +35,7 @@ namespace ShowModel
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseLazyLoadingProxies();
+            optionsBuilder.UseLazyLoadingProxies(); //LATER this has a huge performance risk, if I forget to include the right objects in my queries, however the alternative is I get incorrect values (eg. nulls and empty collections), which seems worse
 #if SLOW_DATABASE
             // NOTE: Using a delay of 200 seems to block unit tests
             optionsBuilder.AddInterceptors(new DelayInterceptor(200)); // simulates a 3g connection
@@ -117,8 +117,18 @@ namespace ShowModel
                       json => JsonSerializer.Deserialize<string[]>(json, null) ?? SelectCriteria.DEFAULT_OPTIONS);
             modelBuilder.Entity<BooleanCriteria>();
 
-            //TODO add any auto-includes here
-            //TODO maybe remove nav properties that are not needed, or if only needed for equality check keep ID (think carefully about this)
+            // Auto-include entities for normal use cases
+            modelBuilder.Entity<Ability>().Navigation(ab => ab.Criteria).AutoInclude();
+            modelBuilder.Entity<Applicant>().Navigation(a => a.Abilities).AutoInclude();
+            modelBuilder.Entity<Applicant>().Navigation(a => a.CastGroup).AutoInclude();
+            modelBuilder.Entity<Applicant>().Navigation(a => a.AlternativeCast).AutoInclude();
+            modelBuilder.Entity<Applicant>().Navigation(a => a.Tags).AutoInclude();
+            modelBuilder.Entity<TagRequirement>().Navigation(tr => tr.RequiredTag).AutoInclude();
+            modelBuilder.Entity<AbilityExactRequirement>().Navigation(aer => aer.Criteria).AutoInclude();
+            modelBuilder.Entity<AbilityRangeRequirement>().Navigation(arr => arr.Criteria).AutoInclude();
+            modelBuilder.Entity<Tag>().Navigation(t => t.CountByGroups).AutoInclude();
+            modelBuilder.Entity<Node>().Navigation(n => n.CountByGroups).AutoInclude();
+            modelBuilder.Entity<Role>().Navigation(r => r.CountByGroups).AutoInclude();
         }
 
 #if SLOW_DATABASE

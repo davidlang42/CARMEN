@@ -29,7 +29,7 @@ namespace CarmenUI.ViewModels
                 sum += count;
             }
             Rows.Insert(0, new Row { Success = $"{sum} Cast Selected" });
-            await c.Tags.Include(cg => cg.Members).ThenInclude(a => a.CastGroup).LoadAsync();
+            await c.Tags.Include(cg => cg.Members).LoadAsync();
             foreach (var tag in c.Tags.Local)
             {
                 var row = new Row { Success = $"{tag.Members.Count} tagged {tag.Name}" };
