@@ -13,8 +13,8 @@ namespace ShowModel.Structure
         {
             NotCast,
             FullyCast,
+            OverCast,
             UnderCast,
-            OverCast
         }
 
         [Key]
@@ -32,7 +32,25 @@ namespace ShowModel.Structure
         {
             get
             {
-                return RoleStatus.FullyCast;//TODO 1) Implement Role.Status
+                if (CountByGroups.Count == 0 || CountByGroups.All(cbg => cbg.Count == 0))
+                    return Cast.Count > 0 ? RoleStatus.OverCast : RoleStatus.FullyCast;
+                if (Cast.Count == 0)
+                    return RoleStatus.NotCast;
+                bool under_cast = false;
+                foreach (var cast_by_group in Cast.GroupBy(a => a.CastGroup))
+                {
+                    if (cast_by_group.Key is not CastGroup cast_group)
+                        return RoleStatus.OverCast;
+                    var required_count = CountFor(cast_group);
+                    var actual_count = cast_by_group.Count();
+                    if (required_count > actual_count)
+                        return RoleStatus.OverCast;
+                    if (required_count < actual_count)
+                        under_cast = true; // don't return yet, because if any count is over cast, we want to return that first
+                }
+                if (under_cast)
+                    return RoleStatus.UnderCast;
+                return RoleStatus.FullyCast;
             }
         }
     }
