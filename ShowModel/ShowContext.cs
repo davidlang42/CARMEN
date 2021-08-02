@@ -116,6 +116,9 @@ namespace ShowModel
                 .HasConversion(obj => JsonSerializer.Serialize(obj, null), // store array as json
                       json => JsonSerializer.Deserialize<string[]>(json, null) ?? SelectCriteria.DEFAULT_OPTIONS);
             modelBuilder.Entity<BooleanCriteria>();
+
+            //TODO add any auto-includes here
+            //TODO maybe remove nav properties that are not needed, or if only needed for equality check keep ID (think carefully about this)
         }
 
 #if SLOW_DATABASE

@@ -28,7 +28,7 @@ namespace CarmenUI.ViewModels
 
         public ObservableCollection<Row> Rows { get; init; } = new();
 
-        public abstract Task LoadAsync(ShowContext context);
+        public abstract Task LoadAsync(ShowContext c);
 
         protected void StartLoad()
         {

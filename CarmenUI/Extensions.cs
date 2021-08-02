@@ -1,4 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,34 +57,12 @@ namespace CarmenUI
         }
     }
 
-    internal static class EntityExtensions
-    {
-        /// <summary>There appears to be a significant delay the first time a DbSet<typeparamref name="T"/>
-        /// property is accessed on the DbContext, therefore this extension method has been added to
-        /// perform the DbSet__get and DbSet.Load() asyncronously. The result of the returned task
-        /// is the DbSet itself, to assist in chaining.</summary>
-        public static Task<DbSet<U>> ColdLoadAsync<T, U>(this T context, Func<T, DbSet<U>> db_set_getter) where T : DbContext where U : class
-            => Task.Run(() =>
-            {
-                var db_set = db_set_getter(context);
-                db_set.Load();
-                return db_set;
-            });
-
-        /// <summary>There appears to be a significant delay the first time a DbSet<typeparamref name="T"/>
-        /// property is accessed on the DbContext, therefore this extension method has been added to
-        /// perform the DbSet__get and DbSet.Count() asyncronously.</summary>
-        public static Task<int> ColdCountAsync<T, U>(this T context, Func<T, DbSet<U>> db_set_getter) where T : DbContext where U : class
-            => Task.Run(() =>
-            {
-                var db_set = db_set_getter(context);
-                return db_set.Count();
-            });
-    }
-
     internal static class AsyncExtensions
     {
         public static Task<int> CountAsync<T>(this IEnumerable<T> collection, Func<T, bool> predicate)
             => Task.Run(() => collection.Count(predicate));
+
+        public static Task<List<T>> ToListAsync<T>(this IEnumerable<T> collection)
+            => Task.Run(() => collection.ToList());
     }
 }

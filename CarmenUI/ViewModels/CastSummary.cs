@@ -1,4 +1,5 @@
-﻿using ShowModel;
+﻿using Microsoft.EntityFrameworkCore;
+using ShowModel;
 using ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
@@ -10,14 +11,14 @@ namespace CarmenUI.ViewModels
 {
     public class CastSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext context)
+        public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
-            var cast_groups = await context.ColdLoadAsync(c => c.CastGroups);
+            await c.CastGroups.Include(cg => cg.Members).LoadAsync();
             var sum = 0;
-            foreach (var cast_group in cast_groups)
+            foreach (var cast_group in c.CastGroups.Local)
             {
-                var count = cast_group.Members.Count();
+                var count = cast_group.Members.Count;
                 var row = new Row { Success = $"{count} in {cast_group.Name}" };
                 var extra = count - cast_group.RequiredCount;
                 if (extra > 0)
@@ -28,12 +29,11 @@ namespace CarmenUI.ViewModels
                 sum += count;
             }
             Rows.Insert(0, new Row { Success = $"{sum} Cast Selected" });
-            var tags = await context.ColdLoadAsync(c => c.Tags);
-            foreach (var tag in tags)
+            await c.Tags.Include(cg => cg.Members).ThenInclude(a => a.CastGroup).LoadAsync();
+            foreach (var tag in c.Tags.Local)
             {
-                var count = tag.Members.Count();
-                var row = new Row { Success = $"{count} tagged {tag.Name}" };
-                if (tag.Members.GroupBy(a => a.CastGroup).Any(g => g.Key == null || tag.CountFor(g.Key) is not uint required_count || required_count != g.Count()))
+                var row = new Row { Success = $"{tag.Members.Count} tagged {tag.Name}" };
+                if (tag.Members.GroupBy(a => a.CastGroup).Any(g => g.Key == null || tag.CountFor(g.Key) is not uint required_count || required_count != g.Count())) //LATER does this need await?
                     row.Fail = $"(doesn't match required)";
                 Rows.Add(row);
             }

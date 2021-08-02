@@ -1,4 +1,5 @@
-﻿using ShowModel;
+﻿using Microsoft.EntityFrameworkCore;
+using ShowModel;
 using ShowModel.Applicants;
 using ShowModel.Structure;
 using System;
@@ -11,17 +12,20 @@ namespace CarmenUI.ViewModels
 {
     public class ItemsSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext context)
+        public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
-            var nodes = await context.ColdLoadAsync(c => c.Nodes);
-            Rows.Add(CreateItemsRow(nodes.OfType<Item>(), out int item_count));
-            var cast_groups = await context.ColdLoadAsync(c => c.CastGroups);
-            var cast_members = cast_groups.ToDictionary(cg => cg, cg => (uint)cg.Members.Count);
-            var section_types = await context.ColdLoadAsync(c => c.SectionTypes);
-            foreach (var section_type in section_types)
+            await c.Nodes.Include(i => i.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
+            await c.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
+            await c.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
+            var items_in_order = c.ShowRoot.ItemsInOrder().ToList();
+            Rows.Add(CreateItemsRow(items_in_order, out int item_count));
+            await c.CastGroups.Include(cg => cg.Members).LoadAsync();
+            var cast_members = c.CastGroups.Local.ToDictionary(cg => cg, cg => (uint)cg.Members.Count);
+            await c.SectionTypes.Include(st => st.Sections).ThenInclude(s => s.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
+            foreach (var section_type in c.SectionTypes.Local)
                 Rows.Add(CreateSectionTypeRow(section_type, cast_members));
-            var role_count = context.ShowRoot.ItemsInOrder().SelectMany(i => i.Roles).Distinct().Count();
+            var role_count = items_in_order.SelectMany(i => i.Roles).Distinct().Count();
             Rows.Add(new Row { Success = $"{role_count} Roles" });
             if (item_count == 0)
                 Rows.Add(new Row { Fail = "At least one Item is required" });
@@ -35,11 +39,11 @@ namespace CarmenUI.ViewModels
             item_count = 0;
             var without_roles = 0;
             var incorrect_sum = 0;
-            foreach (var item in items)
+            foreach (var item in items) //LATER paralleise
             {
                 if (item.Roles.Count == 0)
                     without_roles += 1;
-                else if (!item.CountMatchesSumOfRoles())
+                else if (!item.CountMatchesSumOfRoles()) //LATER does this need await?
                     incorrect_sum += 1;
                 item_count += 1;
             }
@@ -59,9 +63,9 @@ namespace CarmenUI.ViewModels
             var missing_roles = 0;
             var too_many_roles = 0;
             var incorrect_sum = 0;
-            foreach (var section in section_type.Sections)
+            foreach (var section in section_type.Sections) //LATER parallelise
             {
-                var role_match = section.RolesMatchCastMembers(cast_members);
+                var role_match = section.RolesMatchCastMembers(cast_members); //LATER does this need await?
                 if (role_match == Section.RolesMatchResult.TooFewRoles)
                     missing_roles += 1;
                 else if (role_match == Section.RolesMatchResult.TooManyRoles)

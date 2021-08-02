@@ -82,6 +82,9 @@ namespace CarmenUI.Windows
         {
             using (var context = new ShowContext(options))
             {
+                // Accessing any model or entity related property on the context causes the model to be build, which takes ~1s synchronously.
+                // It is important to do this here, while the loading form is shown, to avoid a synchronous delay when the MainMenu is loaded.
+                _ = context.Model;
                 //LATER handle io errors
                 //LATER ensure that db matches schema
             }

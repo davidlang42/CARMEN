@@ -1,4 +1,5 @@
 ﻿using CarmenUI.Converters;
+using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using System;
 using System.Collections.Generic;
@@ -10,22 +11,22 @@ namespace CarmenUI.ViewModels
 {
     public class RegistrationSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext context)
+        public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
-            var applicants = (await context.ColdLoadAsync(c => c.Applicants)).ToList();
-            Rows.Add(new Row { Success = $"{applicants.Count} Applicants Registered" });
-            var cast_groups = (await context.ColdLoadAsync(c => c.CastGroups)).ToList();
-            foreach (var cast_group in cast_groups)
+            await c.Applicants.Include(a => a.Tags).Include(a => a.Abilities).ThenInclude(ab => ab.Criteria).LoadAsync();
+            Rows.Add(new Row { Success = $"{c.Applicants.Local.Count} Applicants Registered" });
+            await c.CastGroups.Include(cg => cg.Requirements).LoadAsync();
+            foreach (var cast_group in c.CastGroups.Local)
             {
-                var applicant_count = await applicants.CountAsync(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)));//LATER paralleise
+                var applicant_count = await c.Applicants.Local.CountAsync(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)));//LATER paralleise
                 var row = new Row { Success = $"{applicant_count} eligible for {cast_group.Name}" };
                 if (applicant_count < cast_group.RequiredCount)
                     row.Fail = $"({cast_group.RequiredCount} required)";
                 Rows.Add(row);
             }
-            var all_criterias = (await context.ColdLoadAsync(c => c.Criterias)).ToList();
-            var incomplete = await applicants.CountAsync(a => IsApplicantComplete.Check(a, all_criterias));//LATER paralleise
+            await c.Criterias.LoadAsync();
+            var incomplete = await c.Applicants.Local.CountAsync(a => IsApplicantComplete.Check(a, c.Criterias.Local));//LATER paralleise
             if (incomplete > 0)
                 Rows.Add(new Row { Fail = $"{incomplete} Applicants are Incomplete" });
             FinishLoad(true);

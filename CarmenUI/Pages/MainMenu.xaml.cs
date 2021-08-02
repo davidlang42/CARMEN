@@ -106,22 +106,12 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            //TODO a more sensible way to do this is load each set of objects into lists here,
-            //     then pass readonlycollections to each summary to calculate the stats. This would allow
-            //     parallelisation here, so all summaries are loading at once, which removes the need for
-            //     prioritisation and allows quick calculations to return first. It would also allow
-            //     the summaries themselves to multi-thread calculations, improving performance.
-            //     benchmark before and after to confirm performance improvement
-            // Previously: 3s (no delay) / 72s (200ms delay)
-            var start = DateTime.Now;
             await ShowSummary.LoadAsync(context);
             await RegistrationSummary.LoadAsync(context);
             await AuditionSummary.LoadAsync(context);
             await CastSummary.LoadAsync(context);
             await ItemsSummary.LoadAsync(context);
             await RolesSummary.LoadAsync(context);
-            var duration = DateTime.Now - start;
-            MessageBox.Show($"Loaded summaries in {duration.TotalSeconds} seconds");
         }
     }
 }

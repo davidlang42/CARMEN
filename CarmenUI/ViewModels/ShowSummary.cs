@@ -11,33 +11,32 @@ namespace CarmenUI.ViewModels
 {
     public class ShowSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext context)
+        public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
-            var criterias = await context.ColdCountAsync(c => c.Criterias);
-            Rows.Add(new Row { Success = $"{criterias} Audition Criteria" });
-            await context.ColdLoadAsync(c => c.CastGroups);
-            var cast_groups = context.CastGroups.Local.Count();
-            Rows.Add(new Row { Success = cast_groups.Plural("Cast Group") });
-            var any_groups_alternating = context.CastGroups.Local.Any(g => g.AlternateCasts);
-            var alternative_casts = await context.ColdCountAsync(c => c.AlternativeCasts);
+            await c.Criterias.LoadAsync();
+            Rows.Add(new Row { Success = $"{c.Criterias.Local.Count} Audition Criteria" });
+            await c.CastGroups.LoadAsync();
+            Rows.Add(new Row { Success = c.CastGroups.Local.Count.Plural("Cast Group") });
+            var any_groups_alternating = c.CastGroups.Local.Any(g => g.AlternateCasts);
+            await c.AlternativeCasts.LoadAsync();
             if (any_groups_alternating)
-                Rows.Add(new Row { Success = alternative_casts.Plural("Alternative Cast") });
+                Rows.Add(new Row { Success = c.AlternativeCasts.Local.Count.Plural("Alternative Cast") });
             else
                 Rows.Add(new Row { Success = "Alternating Casts are disabled" });
-            var tags = await context.ColdCountAsync(c => c.Tags);
-            Rows.Add(new Row { Success = tags.Plural("Cast Tag") });
-            var section_types = await context.ColdCountAsync(c => c.SectionTypes);
-            Rows.Add(new Row { Success = section_types.Plural("Section Type") });
-            var requirements = await context.ColdCountAsync(c => c.Requirements);
-            Rows.Add(new Row { Success = requirements.Plural("Requirement") });
-            if (criterias == 0)
+            await c.Tags.LoadAsync();
+            Rows.Add(new Row { Success = c.Tags.Local.Count.Plural("Cast Tag") });
+            await c.SectionTypes.LoadAsync();
+            Rows.Add(new Row { Success = c.SectionTypes.Local.Count.Plural("Section Type") });
+            await c.Requirements.LoadAsync();
+            Rows.Add(new Row { Success = c.Requirements.Local.Count.Plural("Requirement") });
+            if (c.Criterias.Local.Count == 0)
                 Rows.Add(new Row { Fail = "At least one Criteria is required" });
-            if (cast_groups == 0)
+            if (c.CastGroups.Local.Count == 0)
                 Rows.Add(new Row { Fail = "At least one Cast Group is required" });
-            if (any_groups_alternating && alternative_casts < 2)
+            if (any_groups_alternating && c.AlternativeCasts.Local.Count < 2)
                 Rows.Add(new Row { Fail = "At least 2 alternative casts are required" });
-            if (section_types == 0)
+            if (c.SectionTypes.Local.Count == 0)
                 Rows.Add(new Row { Fail = "At least one Section Type is required" });
             FinishLoad(true);
         }
