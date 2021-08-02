@@ -32,7 +32,7 @@ namespace ShowModel.Structure
         {
             get
             {
-                return RoleStatus.FullyCast;//TODO
+                return RoleStatus.FullyCast;//TODO 1) Implement Role.Status
             }
         }
     }

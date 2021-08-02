@@ -1,4 +1,5 @@
 ﻿using ShowModel;
+using ShowModel.Applicants;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,8 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext context)
         {
             StartLoad();
-            var roles = context.ShowRoot.ItemsInOrder().SelectMany(i => i.Roles).Distinct(); // TODO common with ItemsSummary
+            var items = context.ShowRoot.ItemsInOrder().ToList();
+            var roles = items.SelectMany(i => i.Roles).Distinct();
             var counts = roles.GroupBy(r => r.Status).ToDictionary(g => g.Key, g => g.Count());
             if (counts.TryGetValue(RoleStatus.FullyCast, out var roles_cast))
                 Rows.Add(new Row { Success = $"{roles_cast} Roles cast" });
@@ -48,7 +50,13 @@ namespace CarmenUI.ViewModels
                     }
                 }
             }
-            //TODO consecutive items check (eg. 1 Applicant is in two consecutive items)
+            var cast_per_item = items.Select(i => i.Roles.SelectMany(r => r.Cast).ToHashSet()).ToList(); //LATER parallelise
+            for (var i = 1; i < items.Count; i++)
+            {
+                var cast_in_consecutive_items = cast_per_item[i].Intersect(cast_per_item[i-1]).Count();
+                if (cast_in_consecutive_items != 0)
+                    Rows.Add(new Row { Fail = $"{cast_in_consecutive_items.Plural("Applicant is", "Applicants are")} in {items[i-1].Name} and {items[i].Name}" });
+            }
             FinishLoad(roles_blank == 0);
         }
     }

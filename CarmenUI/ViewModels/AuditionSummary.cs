@@ -9,7 +9,7 @@ namespace CarmenUI.ViewModels
 {
     public class AuditionSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext context)//TODO this re-uses a lot of info & processing done by ApplicantsSummary
+        public override async Task LoadAsync(ShowContext context)//TODO 2) this re-uses a lot of info & processing done by ApplicantsSummary
         {
             /*
                 <StackPanel x:Name="AuditionApplicantsSummary" Visibility="Collapsed">
