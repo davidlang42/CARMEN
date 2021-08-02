@@ -32,7 +32,7 @@ namespace CarmenUI.Pages
             ?? throw new ApplicationException("Tried to use context after it was disposed.");
 
         public ShowSummary ShowSummary { get; init; } = new();
-        public ApplicantsSummary ApplicantsSummary { get; init; } = new();
+        public RegistrationSummary RegistrationSummary { get; init; } = new();
         public AuditionSummary AuditionSummary { get; init; } = new();
         public CastSummary CastSummary { get; init; } = new();
         public ItemsSummary ItemsSummary { get; init; } = new();
@@ -90,7 +90,7 @@ namespace CarmenUI.Pages
             => SummaryPanel.DataContext = ShowSummary;
 
         private void RegisterApplicants_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.DataContext = ApplicantsSummary;
+            => SummaryPanel.DataContext = RegistrationSummary;
 
         private void AuditionApplicants_MouseEnter(object sender, MouseEventArgs e)
             => SummaryPanel.DataContext = AuditionSummary;
@@ -113,7 +113,7 @@ namespace CarmenUI.Pages
             //     the summaries themselves to multi-thread calculations, improving performance.
             //     benchmark before and after to confirm performance improvement
             await ShowSummary.LoadAsync(context);
-            await ApplicantsSummary.LoadAsync(context);
+            await RegistrationSummary.LoadAsync(context);
             await AuditionSummary.LoadAsync(context);
             await CastSummary.LoadAsync(context);
             await ItemsSummary.LoadAsync(context);

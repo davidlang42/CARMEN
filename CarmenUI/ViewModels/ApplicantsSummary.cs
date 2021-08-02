@@ -12,7 +12,9 @@ namespace CarmenUI.ViewModels
     {
         public override async Task LoadAsync(ShowContext context)
         {
-            StartLoad();
+            var concrete_class = GetType() == typeof(ApplicantsSummary); // don't update status if this is a subclass
+            if (concrete_class)
+                StartLoad();
             var applicants = (await context.ColdLoadAsync(c => c.Applicants)).ToList();
             Rows.Add(new Row { Success = $"{applicants.Count} Applicants Registered" });
             var cast_groups = (await context.ColdLoadAsync(c => c.CastGroups)).ToList();
@@ -24,11 +26,8 @@ namespace CarmenUI.ViewModels
                     row.Fail = $"({cast_group.RequiredCount} required)";
                 Rows.Add(row);
             }
-            var all_criterias = (await context.ColdLoadAsync(c => c.Criterias)).ToList();
-            var incomplete = await applicants.CountAsync(a => IsApplicantComplete.Check(a, all_criterias));//LATER paralleise
-            if (incomplete > 0)
-                Rows.Add(new Row { Fail = $"{incomplete} Applicants are Incomplete" });
-            FinishLoad(true);
+            if (concrete_class)
+                FinishLoad(true);
         }
     }
 }

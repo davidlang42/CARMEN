@@ -184,6 +184,14 @@ namespace ShowModel.Applicants
         public int OverallAbility //LATER notify OverallAbility changed if any criteria weights/maxmarks change
             => Convert.ToInt32(Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); //LATER handle overflow
 
+        public bool HasAuditioned(IEnumerable<Criteria> all_criterias)
+        {
+            foreach (var required_criteria in all_criterias.Where(c => c.Primary))
+                if (!Abilities.Any(ab => ab.Criteria == required_criteria))
+                    return false;
+            return true;
+        }
+
         public Applicant()
         {
             abilities.CollectionChanged += Abilities_CollectionChanged;

@@ -32,6 +32,8 @@ namespace CarmenUI.Converters
             return Check(applicant, list.OfType<Criteria>());
         }
 
+        //TODO move the concept of complete into applicant, ie. Applicant.IsRegistered, Applicant.HasAuditioned()
+        //     this will also involve updating the status in the UI to be Incomplete, Registered/Not Auditioned, or Auditioned (Overall)
         public static bool Check(Applicant applicant, IEnumerable<Criteria> all_criterias)
         {
             if (string.IsNullOrEmpty(applicant.FirstName))
