@@ -1,6 +1,4 @@
 ﻿using ShowModel;
-using ShowModel.Applicants;
-using ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,12 +9,14 @@ namespace CarmenUI.ViewModels
 {
     public class AuditionSummary : Summary
     {
-        public async Task LoadAsync(IReadOnlyCollection<Applicant> applicants, IReadOnlyCollection<CastGroup> cast_groups,
-            IReadOnlyCollection<Criteria> criterias)
+        public override async Task LoadAsync(ShowContext context)
         {
             StartLoad();
-            var auditioned = applicants.Where(a => a.HasAuditioned(criterias)).ToList(); //LATER async/parallelise
+            var applicants = (await context.ColdLoadAsync(c => c.Applicants)).ToList();
+            var all_criterias = (await context.ColdLoadAsync(c => c.Criterias)).ToList();
+            var auditioned = applicants.Where(a => a.HasAuditioned(all_criterias)).ToList();
             Rows.Add(new Row { Success = $"{auditioned.Count} Applicants Auditioned" });
+            var cast_groups = (await context.ColdLoadAsync(c => c.CastGroups)).ToList();
             foreach (var cast_group in cast_groups)
             {
                 var applicant_count = await auditioned.CountAsync(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)));//LATER paralleise

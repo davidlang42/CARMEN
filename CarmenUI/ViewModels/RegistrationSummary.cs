@@ -1,7 +1,5 @@
 ﻿using CarmenUI.Converters;
 using ShowModel;
-using ShowModel.Applicants;
-using ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,11 +10,12 @@ namespace CarmenUI.ViewModels
 {
     public class RegistrationSummary : Summary
     {
-        public async Task LoadAsync(IReadOnlyCollection<Applicant> applicants, IReadOnlyCollection<CastGroup> cast_groups,
-            IReadOnlyCollection<Criteria> criterias)
+        public override async Task LoadAsync(ShowContext context)
         {
             StartLoad();
+            var applicants = (await context.ColdLoadAsync(c => c.Applicants)).ToList();
             Rows.Add(new Row { Success = $"{applicants.Count} Applicants Registered" });
+            var cast_groups = (await context.ColdLoadAsync(c => c.CastGroups)).ToList();
             foreach (var cast_group in cast_groups)
             {
                 var applicant_count = await applicants.CountAsync(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)));//LATER paralleise
@@ -25,8 +24,8 @@ namespace CarmenUI.ViewModels
                     row.Fail = $"({cast_group.RequiredCount} required)";
                 Rows.Add(row);
             }
-            //TODO don't use criterias here
-            var incomplete = await applicants.CountAsync(a => IsApplicantComplete.Check(a, criterias));//LATER paralleise
+            var all_criterias = (await context.ColdLoadAsync(c => c.Criterias)).ToList();
+            var incomplete = await applicants.CountAsync(a => IsApplicantComplete.Check(a, all_criterias));//LATER paralleise
             if (incomplete > 0)
                 Rows.Add(new Row { Fail = $"{incomplete} Applicants are Incomplete" });
             FinishLoad(true);
