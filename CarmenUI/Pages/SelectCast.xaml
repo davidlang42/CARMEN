@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CarmenUI.Pages"
     xmlns:cv="clr-namespace:CarmenUI.Converters"
+    xmlns:modelApplicants="clr-namespace:ShowModel.Applicants;assembly=ShowModel"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Select Cast" Loaded="Page_Loaded">
@@ -32,57 +33,31 @@
                         <TextBlock Text="Cast Groups"/>
                     </ListBoxItem>
                     <CollectionContainer Collection="{Binding Source={StaticResource castGroupsViewSource}}" />
-                    <Separator/>
-                    <ListBoxItem IsEnabled="False">
-                        <TextBlock Text="Cast Groups"/>
+                    <ListBoxItem IsEnabled="False" Margin="0 20 0 0">
+                        <TextBlock Text="Tags"/>
                     </ListBoxItem>
-                    <CollectionContainer Collection="{Binding Source={StaticResource castGroupsViewSource}}" />
-                    <Separator/>
+                    <CollectionContainer Collection="{Binding Source={StaticResource tagsViewSource}}" />
+                    <ListBoxItem Content="Cast Numbers" Margin="0 20 0 0"/>
                 </CompositeCollection>
             </ItemsControl.ItemsSource>
-            <ListBox.ItemTemplate>
-                <DataTemplate>
+            <ListBox.Resources>
+                <DataTemplate DataType="{x:Type modelApplicants:CastGroup}">
                     <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
                         <TextBlock Text="{Binding Name}"/>
                         <TextBlock Text="{Binding RequiredCount, StringFormat=' (\{0\})'}"/>
                         <TextBlock Visibility="{Binding AlternateCasts, Converter={StaticResource booleanToVisibility}}" Text="{Binding Source={StaticResource alternativeCastsViewSource}, Path=Count, StringFormat='x\{0\}'}"/>
                     </StackPanel>
                 </DataTemplate>
+                <DataTemplate DataType="{x:Type modelApplicants:Tag}">
+                    <TextBlock Text="{Binding Name}" Margin="20 0 0 0"/>
+                </DataTemplate>
+            </ListBox.Resources>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <ContentControl Content="{Binding}"/>
+                </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <!--<ListBox FontSize="22" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-            <ListBoxItem IsEnabled="False">
-                <TextBlock Text="Cast Groups"/>
-            </ListBoxItem>
-            
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="Junior Boys (18)x2"/>
-            </ListBoxItem>
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="Junior Girls (18)x2"/>
-            </ListBoxItem>
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="Senior Boys (36)"/>
-            </ListBoxItem>
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="Senior Girls (36)"/>
-            </ListBoxItem>
-            <ListBoxItem IsEnabled="False" Margin="0 20 0 0">
-                <TextBlock Text="Tags"/>
-            </ListBoxItem>
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="Dance Team"/>
-            </ListBoxItem>
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="Microphones"/>
-            </ListBoxItem>
-            <ListBoxItem Margin="20 0 0 0">
-                <TextBlock Text="Production Team"/>
-            </ListBoxItem>
-            <ListBoxItem IsEnabled="True" Margin="0 20 0 0">
-                <TextBlock Text="Cast Numbers"/>
-            </ListBoxItem>
-        </ListBox>-->
         <DockPanel Grid.Column="1">
             <Grid DockPanel.Dock="Top" Margin="7 0">
                 <Grid.ColumnDefinitions>
