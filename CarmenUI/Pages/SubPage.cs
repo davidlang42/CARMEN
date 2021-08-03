@@ -45,7 +45,7 @@ namespace CarmenUI.Pages
         }
 
         //LATER this will crash if still running when the page is cancelled, maybe I need to wrap this in a LoadingOverlay afterall
-        protected Task<IList> TaskToLoad<T>(Func<ShowContext, DbSet<T>> db_set_getter) where T : class
+        protected Task<IList> TaskToLoad<T>(Func<ShowContext, DbSet<T>> db_set_getter) where T : class//TODO dont use this
             => new Task<IList>(() =>
             {
                 var db_set = db_set_getter(context);

@@ -46,7 +46,7 @@ namespace CarmenUI.Pages
             showAuditionedApplicants.IsChecked = show_auditioned_applicants;
         }
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)//LATER perform this loading before showing page, using a loadingoverlay
+        private async void Page_Loaded(object sender, RoutedEventArgs e)//TODO perform this loading before showing page, using a loadingoverlay
         {
             // initialise with "Loading..."
             applicantsViewSource.Source = new[] { "Loading..." };

@@ -22,6 +22,10 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class SelectCast : SubPage
     {
+        private CollectionViewSource castGroupsViewSource;
+        private CollectionViewSource tagsViewSource;
+        private CollectionViewSource alternativeCastsViewSource;
+
         public CastNumberModel[] CastNumbers { get; set; }
         public SelectCast(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -53,7 +57,26 @@ namespace CarmenUI.Pages
                 }
             };
             InitializeComponent();
+            castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
+            tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
+            alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
             DataContext = this;
+        }
+
+        private async void Page_Loaded(object sender, RoutedEventArgs e)//TODO perform this loading before showing page, using a loadingoverlay
+        {
+            // initialise with "Loading..."
+            castGroupsViewSource.Source = new[] { "Loading..." };
+            tagsViewSource.Source = new[] { "Loading..." };
+            alternativeCastsViewSource.Source = new[] { "Loading..." };
+            // populate source asynchronously
+            await context.CastGroups.LoadAsync();
+            castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
+            await context.Tags.LoadAsync();
+            tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
+            await context.AlternativeCasts.LoadAsync();
+            alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
+            //TODO ? applicantsList.SelectedItem = null;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
