@@ -79,7 +79,7 @@ namespace CarmenUI.Pages
             castStatusCombo.SelectedIndex = 0; // must be here because it triggers event below
         }
 
-        private async void Page_Loaded(object sender, RoutedEventArgs e)//TODO perform this loading before showing page, using a loadingoverlay
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             // initialise with "Loading..."
             castGroupsViewSource.Source = new[] { "Loading..." };
@@ -174,14 +174,31 @@ namespace CarmenUI.Pages
 
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            selectedApplicantsViewSource.Source = selectionList.SelectedItem switch
+            if (selectionList.SelectedItem is CastGroup cast_group)
             {
-                CastGroup cast_group => cast_group.Members,
-                Tag tag => tag.Members,
-                _ => null
-            };
-            //TODO show/hide cast numbers/selection UIs
-            ConfigureFiltering();
+                numbersPanel.Visibility = Visibility.Collapsed;
+                selectedApplicantsViewSource.Source = cast_group.Members;
+                selectionPanel.Visibility = Visibility.Visible;
+                ConfigureFiltering();
+            }
+            else if (selectionList.SelectedItem is Tag tag)
+            {
+                numbersPanel.Visibility = Visibility.Collapsed;
+                selectedApplicantsViewSource.Source = tag.Members;
+                selectionPanel.Visibility = Visibility.Visible;
+                ConfigureFiltering();
+            }
+            else if (selectionList.SelectedItem != null) // Cast Numbers
+            {
+                selectionPanel.Visibility = Visibility.Collapsed;
+                //TODO populate view model
+                numbersPanel.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                selectionPanel.Visibility = Visibility.Collapsed;
+                numbersPanel.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void ConfigureFiltering()

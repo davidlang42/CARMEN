@@ -66,8 +66,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
-        <!-- Cast Numbers
-        <DockPanel Grid.Column="1">
+        <DockPanel x:Name="numbersPanel" Grid.Column="1" Margin="5" Visibility="Collapsed">
             <Grid DockPanel.Dock="Top" Margin="7 0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50"/>
@@ -105,8 +104,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        -->
-        <Grid Grid.Column="1" Margin="5">
+        <Grid x:Name="selectionPanel" Grid.Column="1" Margin="5" Visibility="Collapsed">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
                 <ColumnDefinition Width="50"/>
