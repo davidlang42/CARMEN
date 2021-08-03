@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace CarmenUI.Pages
 {
@@ -33,38 +34,12 @@ namespace CarmenUI.Pages
         private CollectionViewSource castGroupsViewSource;
         private CollectionViewSource tagsViewSource;
         private CollectionViewSource alternativeCastsViewSource;
+        private CollectionViewSource castNumbersViewSource;
 
-        public CastNumberModel[] CastNumbers { get; set; }//TODO remove
         public SelectCast(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
-            CastNumbers = new CastNumberModel[]
-            {
-                new AlternateCastMembers
-                {
-                     CastNumber = 1,
-                     TotalCasts = 2,
-                     Names = new[] {"Name 1a", "Name 1b"}
-                },
-                new AlternateCastMembers
-                {
-                     CastNumber = 2,
-                     TotalCasts = 2,
-                     Names = new[] {"Name 2a", "Name 2b"}
-                },
-                new SingleCastMember
-                {
-                     CastNumber = 3,
-                     TotalCasts = 2,
-                     Name ="Both cast 1"
-                },
-                new SingleCastMember
-                {
-                     CastNumber = 4,
-                     TotalCasts = 2,
-                     Name ="Both cast 2"
-                }
-            };
             InitializeComponent();
+            castNumbersViewSource = (CollectionViewSource)FindResource(nameof(castNumbersViewSource));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
@@ -75,7 +50,6 @@ namespace CarmenUI.Pages
                 allApplicantsViewSource.SortDescriptions.Add(sd);
                 selectedApplicantsViewSource.SortDescriptions.Add(sd);
             }
-            DataContext = this;//TODO remove
             castStatusCombo.SelectedIndex = 0; // must be here because it triggers event below
         }
 
@@ -85,6 +59,8 @@ namespace CarmenUI.Pages
             castGroupsViewSource.Source = new[] { "Loading..." };
             tagsViewSource.Source = new[] { "Loading..." };
             alternativeCastsViewSource.Source = new[] { "Loading..." };
+            allApplicantsViewSource.Source = new[] { "Loading..." };
+            castNumbersViewSource.Source = new[] { "Loading..." };
             // populate source asynchronously
             await context.AlternativeCasts.LoadAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
@@ -93,7 +69,11 @@ namespace CarmenUI.Pages
             await context.Tags.Include(cg => cg.Members).LoadAsync();
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
             await context.Applicants.LoadAsync();
-            allApplicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
+            castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
+            allApplicantsViewSource.Source = castNumbersViewSource.Source = context.Applicants.Local.ToObservableCollection();
+            castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
+            //TODO order properly castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
+            castNumbersViewSource.View.Filter = a => ((Applicant)a).CastNumber != null;
             await context.Requirements.LoadAsync();
         }
 
@@ -111,6 +91,25 @@ namespace CarmenUI.Pages
         private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
             //TODO auto select cast
+            int num = 1;
+            foreach (var cast_group in context.CastGroups.Local)
+            {
+                AlternativeCast?[] alternative_casts = new AlternativeCast?[] { null };
+                if (cast_group.AlternateCasts)
+                    alternative_casts = context.AlternativeCasts.Local.ToArray();
+                int ac = 0;
+                foreach (var applicant in cast_group.Members)
+                {
+                    applicant.CastNumber = num;
+                    applicant.AlternativeCast = alternative_casts[ac++];
+                    if (ac >= alternative_casts.Length)
+                    {
+                        ac = 0;
+                        num++;
+                    }
+                }
+            }
+            MessageBox.Show("Cast numbers allocated randomly.");
         }
 
         private void addButton_Click(object sender, RoutedEventArgs e)
@@ -123,7 +122,7 @@ namespace CarmenUI.Pages
                     if (selectionList.SelectedItem is CastGroup cast_group)
                         ((Applicant)item).CastGroup = cast_group;
                 }
-            ConfigureFiltering();
+            ConfigureAllApplicantsFiltering();
         }
 
         private void addAllButton_Click(object sender, RoutedEventArgs e)
@@ -136,7 +135,7 @@ namespace CarmenUI.Pages
                     if (selectionList.SelectedItem is CastGroup cast_group)
                         ((Applicant)item).CastGroup = cast_group;
                 }
-            ConfigureFiltering();
+            ConfigureAllApplicantsFiltering();
         }
 
         private void removeButton_Click(object sender, RoutedEventArgs e)
@@ -148,7 +147,7 @@ namespace CarmenUI.Pages
                     if (selectionList.SelectedItem is CastGroup)
                         ((Applicant)item).CastGroup = null;
                 }
-            ConfigureFiltering();
+            ConfigureAllApplicantsFiltering();
         }
 
         private void removeAllButton_Click(object sender, RoutedEventArgs e)
@@ -160,7 +159,7 @@ namespace CarmenUI.Pages
                     if (selectionList.SelectedItem is CastGroup)
                         ((Applicant)item).CastGroup = null;
                 }
-            ConfigureFiltering();
+            ConfigureAllApplicantsFiltering();
         }
 
         private void availableList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -170,7 +169,7 @@ namespace CarmenUI.Pages
             => removeButton_Click(sender, e);
 
         private void castStatusCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-            => ConfigureFiltering();
+            => ConfigureAllApplicantsFiltering();
 
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -179,19 +178,18 @@ namespace CarmenUI.Pages
                 numbersPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = cast_group.Members;
                 selectionPanel.Visibility = Visibility.Visible;
-                ConfigureFiltering();
+                ConfigureAllApplicantsFiltering();
             }
             else if (selectionList.SelectedItem is Tag tag)
             {
                 numbersPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = tag.Members;
                 selectionPanel.Visibility = Visibility.Visible;
-                ConfigureFiltering();
+                ConfigureAllApplicantsFiltering();
             }
             else if (selectionList.SelectedItem != null) // Cast Numbers
             {
                 selectionPanel.Visibility = Visibility.Collapsed;
-                //TODO populate view model
                 numbersPanel.Visibility = Visibility.Visible;
             }
             else
@@ -201,7 +199,7 @@ namespace CarmenUI.Pages
             }
         }
 
-        private void ConfigureFiltering()
+        private void ConfigureAllApplicantsFiltering()
         {
             if (allApplicantsViewSource.View is CollectionView view
                 && selectedApplicantsViewSource.Source is ObservableCollection<Applicant> selected_applicants)
@@ -222,29 +220,5 @@ namespace CarmenUI.Pages
     {
         Available,
         Eligible
-    }
-
-    public abstract class CastNumberModel
-    {
-        public int CastNumber { get; set; }
-        public int TotalCasts { get; set; }
-        public abstract string[] GetNames { get; }
-        public int CountNames => GetNames.Length;
-        public IEnumerable<TextBlock> TextBlocks
-            => GetNames.Select(n => new TextBlock { Text = n });
-    }
-
-    public class SingleCastMember : CastNumberModel
-    {
-        public string Name { get; set; } = "";
-        public override string[] GetNames => new[] { Name };
-
-    }
-
-    public class AlternateCastMembers : CastNumberModel
-    {
-        public string[] Names { get; set; } = new string[0];
-
-        public override string[] GetNames => Names;
     }
 }

@@ -13,6 +13,7 @@
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Select Cast" Loaded="Page_Loaded">
     <Page.Resources>
+        <CollectionViewSource x:Key="castNumbersViewSource"/>
         <CollectionViewSource x:Key="selectedApplicantsViewSource"/>
         <CollectionViewSource x:Key="allApplicantsViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
@@ -73,12 +74,20 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="#" FontSize="22"/>
-                <UniformGrid Grid.Column="1" Rows="1">
-                    <TextBlock Text="Gilbert" HorizontalAlignment="Center" FontSize="22"/>
-                    <TextBlock Text="Sullivan" HorizontalAlignment="Center" FontSize="22"/>
-                </UniformGrid>
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding Source={StaticResource alternativeCastsViewSource}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" FontSize="22"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
             </Grid>
-            <ListBox ItemsSource="{Binding CastNumbers}" HorizontalContentAlignment="Stretch">
+            <ListBox ItemsSource="{Binding Source={StaticResource castNumbersViewSource}, Path=Groups}" HorizontalContentAlignment="Stretch">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -86,8 +95,8 @@
                                 <ColumnDefinition Width="50"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding CastNumber}" VerticalAlignment="Center"/>
-                            <ItemsControl Grid.Column="1" ItemsSource="{Binding GetNames}">
+                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Items}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Rows="1"/>
@@ -126,7 +135,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Selected applicants" FontSize="18" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource selectedApplicantsViewSource}, Path=Source.Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource selectedApplicantsViewSource}, Path=Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
             </Grid>
             <ListBox x:Name="selectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="7" SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick" ItemsSource="{Binding Source={StaticResource selectedApplicantsViewSource}}"/>
             <Button Grid.Column="1" Grid.Row="1" Click="addButton_Click" Margin="5 0">
@@ -150,7 +159,7 @@
                 <ComboBox x:Name="castStatusCombo" FontSize="18" ItemsSource="{Binding Source={StaticResource castStatusEnumValues}}"
                           SelectionChanged="castStatusCombo_SelectionChanged"/>
                 <TextBlock Grid.Column="1" Text=" applicants" FontSize="18" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="{Binding Source={StaticResource allApplicantsViewSource}, Path=Source.Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding Source={StaticResource allApplicantsViewSource}, Path=Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
             </Grid>
             <ListBox x:Name="availableList" Grid.Column="2" Grid.Row="1" Grid.RowSpan="7" SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick" ItemsSource="{Binding Source={StaticResource allApplicantsViewSource}}"/>
         </Grid>
