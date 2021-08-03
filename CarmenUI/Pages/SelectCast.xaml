@@ -7,15 +7,23 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="clr-namespace:CarmenUI.Pages"
     xmlns:cv="clr-namespace:CarmenUI.Converters"
+    xmlns:vm="clr-namespace:CarmenUI.ViewModels"
     xmlns:modelApplicants="clr-namespace:ShowModel.Applicants;assembly=ShowModel"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Select Cast" Loaded="Page_Loaded">
     <Page.Resources>
+        <CollectionViewSource x:Key="selectedApplicantsViewSource"/>
+        <CollectionViewSource x:Key="allApplicantsViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
         <CollectionViewSource x:Key="alternativeCastsViewSource"/>
         <CollectionViewSource x:Key="tagsViewSource"/>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
+        <ObjectDataProvider x:Key="castStatusEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:CastStatus"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -26,7 +34,7 @@
             <ColumnDefinition Width="Auto" MaxWidth="400"/>
             <ColumnDefinition Width="2*"/>
         </Grid.ColumnDefinitions>
-        <ListBox FontSize="22" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+        <ListBox x:Name="selectionList" FontSize="22" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="selectionList_SelectionChanged">
             <ItemsControl.ItemsSource>
                 <CompositeCollection>
                     <ListBoxItem IsEnabled="False">
@@ -58,6 +66,7 @@
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>
+        <!-- Cast Numbers
         <DockPanel Grid.Column="1">
             <Grid DockPanel.Dock="Top" Margin="7 0">
                 <Grid.ColumnDefinitions>
@@ -96,7 +105,7 @@
                 </ListBox.ItemTemplate>
             </ListBox>
         </DockPanel>
-        <!-- Cast Groups / Tags (Cast Numbers above)
+        -->
         <Grid Grid.Column="1" Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="1*" />
@@ -119,21 +128,19 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Selected applicants" FontSize="18" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="18" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource selectedApplicantsViewSource}, Path=Source.Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
             </Grid>
-            <ListBox x:Name="SelectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="7"
-                 SelectionMode="Extended" MouseDoubleClick="SelectedList_MouseDoubleClick">
-            </ListBox>
-            <Button x:Name="AddButton" Grid.Column="1" Grid.Row="1" Click="AddButton_Click" Margin="5 0">
+            <ListBox x:Name="selectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="7" SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick" ItemsSource="{Binding Source={StaticResource selectedApplicantsViewSource}}"/>
+            <Button Grid.Column="1" Grid.Row="1" Click="addButton_Click" Margin="5 0">
                 <TextBlock>&lt;</TextBlock>
             </Button>
-            <Button x:Name="addAllButton" Grid.Column="1" Grid.Row="3" Click="addAllButton_Click" Margin="5 0">
+            <Button Grid.Column="1" Grid.Row="3" Click="addAllButton_Click" Margin="5 0">
                 <TextBlock>&lt;&lt;</TextBlock>
             </Button>
-            <Button x:Name="RemoveButton" Grid.Column="1" Grid.Row="5" Click="RemoveButton_Click" Margin="5 0">
+            <Button Grid.Column="1" Grid.Row="5" Click="removeButton_Click" Margin="5 0">
                 <TextBlock>&gt;</TextBlock>
             </Button>
-            <Button x:Name="RemoveAllButton" Grid.Column="1" Grid.Row="7" Click="RemoveAllButton_Click" Margin="5 0">
+            <Button Grid.Column="1" Grid.Row="7" Click="removeAllButton_Click" Margin="5 0">
                 <TextBlock>&gt;&gt;</TextBlock>
             </Button>
             <Grid Grid.Column="2">
@@ -142,19 +149,14 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <ComboBox FontSize="18" SelectedIndex="0">
-                    <ComboBoxItem Content="Available"/>
-                    <ComboBoxItem Content="Eligible"/>
-                </ComboBox>
+                <ComboBox x:Name="castStatusCombo" FontSize="18" ItemsSource="{Binding Source={StaticResource castStatusEnumValues}}"
+                          SelectionChanged="castStatusCombo_SelectionChanged"/>
                 <TextBlock Grid.Column="1" Text=" applicants" FontSize="18" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="2" Text="18" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding Source={StaticResource allApplicantsViewSource}, Path=Source.Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
             </Grid>
-            <ListBox x:Name="AvailableList" Grid.Column="2" Grid.Row="1" Grid.RowSpan="7"
-                 SelectionMode="Extended" MouseDoubleClick="AvailableList_MouseDoubleClick">
-            </ListBox>
+            <ListBox x:Name="availableList" Grid.Column="2" Grid.Row="1" Grid.RowSpan="7" SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick" ItemsSource="{Binding Source={StaticResource allApplicantsViewSource}}"/>
         </Grid>
-        -->
-        <Button Grid.Row="1" x:Name="SelectCastButton" Width="200" Height="35" Margin="5" HorizontalAlignment="Left" Click="SelectCastButton_Click">
+        <Button Grid.Row="1" Width="200" Height="35" Margin="5" HorizontalAlignment="Left" Click="selectCastButton_Click">
             <TextBlock Text="Auto-Select Cast" FontSize="16"/>
         </Button>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">

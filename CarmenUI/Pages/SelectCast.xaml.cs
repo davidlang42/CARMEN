@@ -1,7 +1,13 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CarmenUI.Converters;
+using CarmenUI.ViewModels;
+using Microsoft.EntityFrameworkCore;
 using ShowModel;
+using ShowModel.Applicants;
+using A = ShowModel.Applicants;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,11 +28,13 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class SelectCast : SubPage
     {
+        private CollectionViewSource selectedApplicantsViewSource;
+        private CollectionViewSource allApplicantsViewSource;
         private CollectionViewSource castGroupsViewSource;
         private CollectionViewSource tagsViewSource;
         private CollectionViewSource alternativeCastsViewSource;
 
-        public CastNumberModel[] CastNumbers { get; set; }
+        public CastNumberModel[] CastNumbers { get; set; }//TODO remove
         public SelectCast(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             CastNumbers = new CastNumberModel[]
@@ -60,7 +68,15 @@ namespace CarmenUI.Pages
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
-            DataContext = this;
+            selectedApplicantsViewSource = (CollectionViewSource)FindResource(nameof(selectedApplicantsViewSource));
+            allApplicantsViewSource = (CollectionViewSource)FindResource(nameof(allApplicantsViewSource));
+            foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
+            {
+                allApplicantsViewSource.SortDescriptions.Add(sd);
+                selectedApplicantsViewSource.SortDescriptions.Add(sd);
+            }
+            DataContext = this;//TODO remove
+            castStatusCombo.SelectedIndex = 0; // must be here because it triggers event below
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)//TODO perform this loading before showing page, using a loadingoverlay
@@ -70,13 +86,15 @@ namespace CarmenUI.Pages
             tagsViewSource.Source = new[] { "Loading..." };
             alternativeCastsViewSource.Source = new[] { "Loading..." };
             // populate source asynchronously
-            await context.CastGroups.LoadAsync();
-            castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
-            await context.Tags.LoadAsync();
-            tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
             await context.AlternativeCasts.LoadAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
-            //TODO ? applicantsList.SelectedItem = null;
+            await context.CastGroups.Include(cg => cg.Members).LoadAsync();
+            castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
+            await context.Tags.Include(cg => cg.Members).LoadAsync();
+            tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
+            await context.Applicants.LoadAsync();
+            allApplicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
+            await context.Requirements.LoadAsync();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -90,40 +108,103 @@ namespace CarmenUI.Pages
                 OnReturn(DataObjects.Nodes);
         }
 
-        private void SelectCastButton_Click(object sender, RoutedEventArgs e)
+        private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO auto select cast
         }
 
-        private void AvailableList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void addButton_Click(object sender, RoutedEventArgs e)
         {
-
-        }
-
-        private void SelectedList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void RemoveAllButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
-
-        private void RemoveButton_Click(object sender, RoutedEventArgs e)
-        {
-
+            if (selectedApplicantsViewSource.Source is IList list)
+                foreach (var item in availableList.SelectedItems)
+                {
+                    if (!list.Contains(item))
+                        list.Add(item);
+                    if (selectionList.SelectedItem is CastGroup cast_group)
+                        ((Applicant)item).CastGroup = cast_group;
+                }
+            ConfigureFiltering();
         }
 
         private void addAllButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (selectedApplicantsViewSource.Source is IList list)
+                foreach (var item in availableList.Items)
+                {
+                    if (!list.Contains(item))
+                        list.Add(item);
+                    if (selectionList.SelectedItem is CastGroup cast_group)
+                        ((Applicant)item).CastGroup = cast_group;
+                }
+            ConfigureFiltering();
         }
 
-        private void AddButton_Click(object sender, RoutedEventArgs e)
+        private void removeButton_Click(object sender, RoutedEventArgs e)
         {
-
+            if (selectedApplicantsViewSource.Source is IList list)
+                foreach (var item in selectedList.SelectedItems.OfType<object>().ToList())
+                {
+                    list.Remove(item);
+                    if (selectionList.SelectedItem is CastGroup)
+                        ((Applicant)item).CastGroup = null;
+                }
+            ConfigureFiltering();
         }
+
+        private void removeAllButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (selectedApplicantsViewSource.Source is IList list)
+                foreach (var item in selectedList.Items.OfType<object>().ToList())
+                {
+                    list.Remove(item);
+                    if (selectionList.SelectedItem is CastGroup)
+                        ((Applicant)item).CastGroup = null;
+                }
+            ConfigureFiltering();
+        }
+
+        private void availableList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => addButton_Click(sender, e);
+
+        private void selectedList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => removeButton_Click(sender, e);
+
+        private void castStatusCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+            => ConfigureFiltering();
+
+        private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selectedApplicantsViewSource.Source = selectionList.SelectedItem switch
+            {
+                CastGroup cast_group => cast_group.Members,
+                Tag tag => tag.Members,
+                _ => null
+            };
+            //TODO show/hide cast numbers/selection UIs
+            ConfigureFiltering();
+        }
+
+        private void ConfigureFiltering()
+        {
+            if (allApplicantsViewSource.View is CollectionView view
+                && selectedApplicantsViewSource.Source is ObservableCollection<Applicant> selected_applicants)
+            {
+                view.Filter = (selectionList.SelectedItem, castStatusCombo.SelectedItem) switch
+                {
+                    (CastGroup, CastStatus.Available) => o => o is Applicant a && !selected_applicants.Contains(a) && a.CastGroup == null,
+                    (A.Tag, CastStatus.Available) => o => o is Applicant a && !selected_applicants.Contains(a),
+                    (CastGroup cg, CastStatus.Eligible) => o => o is Applicant a && !selected_applicants.Contains(a) && cg.Requirements.All(r => r.IsSatisfiedBy(a)),
+                    (Tag t, CastStatus.Eligible) => o => o is Applicant a && !selected_applicants.Contains(a) && t.Requirements.All(r => r.IsSatisfiedBy(a)),
+                    _ => null
+                };
+            }
+        }
+    }
+
+    public enum CastStatus
+    {
+        Available,
+        Eligible
     }
 
     public abstract class CastNumberModel
