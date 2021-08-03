@@ -55,7 +55,7 @@ namespace CarmenUI.Pages
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             loading.Progress = 90;
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
-            rootNodesViewSource.View.SortDescriptions.Add(StandardSort.IOrdered); // sorts top level only, other levels sorted by SortIOrdered converter
+            rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
             loading.Progress = 100;
         }
 

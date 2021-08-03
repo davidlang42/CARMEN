@@ -10,9 +10,11 @@ namespace ShowModel
     /// <summary>
     /// An object which can be ordered when in a collection
     /// </summary>
-    public interface IOrdered
+    public interface IOrdered : IComparable
     {
         int Order { get; set; }
+
+        int IComparable.CompareTo(object? obj) => Order.CompareTo(((IOrdered?)obj)?.Order);
     }
 
     public static class IOrderedExtensions

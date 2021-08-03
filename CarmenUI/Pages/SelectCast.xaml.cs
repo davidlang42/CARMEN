@@ -64,7 +64,7 @@ namespace CarmenUI.Pages
             // populate source asynchronously
             await context.AlternativeCasts.LoadAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
-            alternativeCastsViewSource.SortDescriptions.Add(new(nameof(AlternativeCast.Initial), ListSortDirection.Ascending));
+            alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
             await context.CastGroups.Include(cg => cg.Members).LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
             await context.Tags.Include(cg => cg.Members).LoadAsync();
@@ -91,7 +91,7 @@ namespace CarmenUI.Pages
 
         private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO auto select cast
+            //LATER auto select cast (to be done by future task)
             int num = 1;
             foreach (var cast_group in context.CastGroups.Local)
             {

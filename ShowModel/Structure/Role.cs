@@ -7,7 +7,7 @@ using ShowModel.Requirements;
 
 namespace ShowModel.Structure
 {
-    public class Role : ICounted, INamed //LATER implement INotifyPropertyChanged for completeness
+    public class Role : ICounted, INameOrdered //LATER implement INotifyPropertyChanged for completeness
     {
         public enum RoleStatus
         {

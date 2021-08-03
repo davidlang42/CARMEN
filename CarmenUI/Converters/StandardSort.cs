@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShowModel;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -12,7 +13,20 @@ namespace CarmenUI.Converters
     /// </summary>
     public static class StandardSort
     {
-        public static readonly SortDescription IOrdered = new(nameof(ShowModel.IOrdered.Order), ListSortDirection.Ascending);
-        public static readonly SortDescription INamed = new(nameof(ShowModel.INamed.Name), ListSortDirection.Ascending);
+        private static readonly SortDescription IOrdered = new(nameof(ShowModel.IOrdered.Order), ListSortDirection.Ascending);
+        private static readonly SortDescription INameOrdered = new(nameof(ShowModel.INameOrdered.Name), ListSortDirection.Ascending);
+
+        public static SortDescription For<T>(T? _ = null) where T : class => For(typeof(T));
+        public static SortDescription For<T>(IEnumerable<T> _) where T : class => For(typeof(T));
+
+        private static SortDescription For(Type type)
+        {
+            if (type.IsAssignableTo(typeof(IOrdered)))
+                return IOrdered;
+            else if (type.IsAssignableTo(typeof(INameOrdered)))
+                return INameOrdered;
+            else
+                throw new ArgumentException($"No standard sort found for {type.Name}.");
+        }
     }
 }

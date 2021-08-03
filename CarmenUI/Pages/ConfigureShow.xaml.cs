@@ -35,8 +35,8 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource castGroupsViewSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource alternativeCastsViewSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource tagsViewSource; // xaml resource loaded in constructor
-        private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { StandardSort.INamed } };
-        private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { StandardSort.IOrdered } };
+        private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { StandardSort.For<SectionType>() } };
+        private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { StandardSort.For<Requirement>() } };
         private readonly CollectionViewSource requirementsSelectionSource; // xaml resource loaded in constructor
 
         private CollectionViewSource? currentViewSource;
@@ -45,15 +45,15 @@ namespace CarmenUI.Pages
         {
             InitializeComponent();
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
-            alternativeCastsViewSource.SortDescriptions.Add(StandardSort.INamed);
+            alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
-            criteriasViewSource.SortDescriptions.Add(StandardSort.IOrdered);
+            criteriasViewSource.SortDescriptions.Add(StandardSort.For<Criteria>());
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
-            castGroupsViewSource.SortDescriptions.Add(StandardSort.IOrdered);
+            castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
-            tagsViewSource.SortDescriptions.Add(StandardSort.INamed);
+            tagsViewSource.SortDescriptions.Add(StandardSort.For<Tag>());
             requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));
-            requirementsSelectionSource.SortDescriptions.Add(StandardSort.IOrdered);
+            requirementsSelectionSource.SortDescriptions.Add(StandardSort.For<Requirement>());
             configList.SelectedIndex = 0; // must be set after InitializeComponent() because it triggers Selected event below
         }
 

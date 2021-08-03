@@ -14,7 +14,7 @@ namespace ShowModel.Applicants
     /// A group of people which an applicant can be selected into.
     /// An applicant can have many Tags.
     /// </summary>
-    public class Tag : INamed //LATER implement INotifyPropertyChanged for completeness
+    public class Tag : INameOrdered //LATER implement INotifyPropertyChanged for completeness
     {
         #region Database fields
         [Key]

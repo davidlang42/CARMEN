@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShowModel;
+using System;
 using System.Collections;
 using System.ComponentModel;
 using System.Globalization;
@@ -11,7 +12,7 @@ namespace CarmenUI.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is IList list)
-                return new ListCollectionView(list) { SortDescriptions = { StandardSort.IOrdered } };
+                return new ListCollectionView(list) { SortDescriptions = { StandardSort.For<IOrdered>() } };
             return value;
         }
 

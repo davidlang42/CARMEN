@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace ShowModel.Structure
 {
-    public class SectionType : INamed //LATER implement INotifyPropertyChanged for completeness
+    public class SectionType : INameOrdered //LATER implement INotifyPropertyChanged for completeness
     {
         [Key]
         public int SectionTypeId { get; private set; }

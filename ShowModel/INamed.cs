@@ -13,4 +13,9 @@ namespace ShowModel
     {
         string Name { get; }
     }
+
+    public interface INameOrdered : INamed, IComparable
+    {
+        int IComparable.CompareTo(object? obj) => Name.CompareTo(((INamed?)obj)?.Name);
+    }
 }
