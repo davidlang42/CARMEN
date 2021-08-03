@@ -68,7 +68,7 @@
             </ListViewItem>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
                 <Image Height="20" Margin="2 0"/>
-                <TextBlock Text="IT'S SHOWTIME" HorizontalAlignment="Left" FontStyle="Italic" FontSize="20"/>
+                <TextBlock x:Name="CastingComplete" Visibility="Hidden" Text="IT'S SHOWTIME" HorizontalAlignment="Left" FontStyle="Italic" FontSize="20"/>
             </StackPanel>
         </StackPanel>
         <Image Grid.Row="0" Grid.Column="1" Source="/Icons/CloudDatabase.png"/>

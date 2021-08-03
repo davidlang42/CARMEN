@@ -38,6 +38,8 @@ namespace CarmenUI.Pages
         public ItemsSummary ItemsSummary { get; init; } = new();
         public RolesSummary RolesSummary { get; init; } = new();
 
+        private Summary[] allSummaries => new Summary[] { ShowSummary, RegistrationSummary, AuditionSummary, CastSummary, ItemsSummary, RolesSummary };
+
         public MainMenu(DbContextOptions<ShowContext> context_options)
         {
             _context = new ShowContext(context_options);
@@ -131,11 +133,16 @@ namespace CarmenUI.Pages
                 || changes.HasFlag(DataObjects.SectionTypes))
                 summaries.AddRange(new Summary[] { ItemsSummary, RolesSummary });
             // Mark them as 'Loading'
+            if (summaries.Any())
+                CastingComplete.Visibility = Visibility.Hidden;
             foreach (var summary in summaries)
                 summary.Status = ProcessStatus.Loading;
             // Update them sequentially
             foreach (var summary in summaries)
                 await summary.LoadAsync(context);
+            // Update complete text
+            if (allSummaries.All(s => s.Status == ProcessStatus.Complete))
+                CastingComplete.Visibility = Visibility.Visible;
         }
     }
 }
