@@ -14,7 +14,7 @@ namespace ShowModel.Applicants
     /// <summary>
     /// An alternating cast within a cast group for which casting should be duplicated.
     /// </summary>
-    public class AlternativeCast : INamed, INotifyPropertyChanged
+    public class AlternativeCast : INamed, INotifyPropertyChanged, IComparable //LATER implement IComparable for other entities
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -64,5 +64,7 @@ namespace ShowModel.Applicants
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
+        public int CompareTo(object? obj) => Initial.CompareTo(((AlternativeCast?)obj)?.Initial);
     }
 }

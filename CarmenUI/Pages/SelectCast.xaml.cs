@@ -64,6 +64,7 @@ namespace CarmenUI.Pages
             // populate source asynchronously
             await context.AlternativeCasts.LoadAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
+            alternativeCastsViewSource.SortDescriptions.Add(new(nameof(AlternativeCast.Initial), ListSortDirection.Ascending));
             await context.CastGroups.Include(cg => cg.Members).LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
             await context.Tags.Include(cg => cg.Members).LoadAsync();
@@ -72,7 +73,7 @@ namespace CarmenUI.Pages
             castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
             allApplicantsViewSource.Source = castNumbersViewSource.Source = context.Applicants.Local.ToObservableCollection();
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
-            //TODO order properly castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
+            castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
             castNumbersViewSource.View.Filter = a => ((Applicant)a).CastNumber != null;
             await context.Requirements.LoadAsync();
         }
