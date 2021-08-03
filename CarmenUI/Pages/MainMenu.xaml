@@ -5,6 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:CarmenUI.Pages"
       xmlns:cv="clr-namespace:CarmenUI.Converters"
+      xmlns:vm="clr-namespace:CarmenUI.ViewModels"
       mc:Ignorable="d" 
       d:DesignHeight="768" d:DesignWidth="1024"
       Title="Main Menu"
@@ -73,24 +74,30 @@
         </StackPanel>
         <Image Grid.Row="0" Grid.Column="1" Source="/Icons/CloudDatabase.png"/>
         <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="20">
-            <StackPanel x:Name="SummaryPanel" VerticalAlignment="Center" DataContext="">
-                <ItemsControl ItemsSource="{Binding Rows}">
-                    <ItemsControl.ItemsPanel>
-                        <ItemsPanelTemplate>
-                            <StackPanel/>
-                        </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="{Binding Success}" HorizontalAlignment="Left" FontSize="20" TextWrapping="Wrap" Margin="0 0 5 0"/>
-                                <TextBlock Text="{Binding Fail}" HorizontalAlignment="Left" FontSize="20" TextWrapping="Wrap" FontStyle="Italic" Foreground="Red"/>
-                            </StackPanel>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
-                <TextBlock Text="Loading..." FontSize="20" Visibility="{Binding Status, Converter={StaticResource showIfStatusValue}, ConverterParameter='Loading'}"/>
-            </StackPanel>
+            <ContentControl x:Name="SummaryPanel" VerticalAlignment="Center">
+                <ContentControl.Resources>
+                    <DataTemplate DataType="{x:Type vm:Summary}">
+                        <StackPanel>
+                            <ItemsControl ItemsSource="{Binding Rows}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="{Binding Success}" HorizontalAlignment="Left" FontSize="20" TextWrapping="Wrap" Margin="0 0 5 0"/>
+                                            <TextBlock Text="{Binding Fail}" HorizontalAlignment="Left" FontSize="20" TextWrapping="Wrap" FontStyle="Italic" Foreground="Red"/>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="Loading..." FontSize="20" Visibility="{Binding Status, Converter={StaticResource showIfStatusValue}, ConverterParameter='Loading'}"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ContentControl.Resources>
+            </ContentControl>
         </ScrollViewer>
     </Grid>
 </Page>

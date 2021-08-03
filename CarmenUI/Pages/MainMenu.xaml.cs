@@ -89,22 +89,22 @@ namespace CarmenUI.Pages
             => NavigateToSubPage(new EditApplicants(contextOptions, true, true, true));
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.DataContext = ShowSummary;
+            => SummaryPanel.Content = ShowSummary;
 
         private void RegisterApplicants_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.DataContext = RegistrationSummary;
+            => SummaryPanel.Content = RegistrationSummary;
 
         private void AuditionApplicants_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.DataContext = AuditionSummary;
+            => SummaryPanel.Content = AuditionSummary;
 
         private void SelectCast_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.DataContext = CastSummary;
+            => SummaryPanel.Content = CastSummary;
 
         private void ConfigureItems_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.DataContext = ItemsSummary;
+            => SummaryPanel.Content = ItemsSummary;
 
         private void AllocateRoles_MouseEnter(object sender, MouseEventArgs e)
-            => SummaryPanel.DataContext = RolesSummary;
+            => SummaryPanel.Content = RolesSummary;
 
         private void Page_Initialized(object sender, EventArgs e)
             => LoadSummariesAsync(DataObjects.All);
