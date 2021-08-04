@@ -78,7 +78,7 @@ namespace CarmenUI.Pages
             sectionTypesViewSource.Source = context.Criterias.Local.ToObservableCollection();
             loading.Progress = 77;
             await context.Requirements.LoadAsync();
-            requirementsViewSource.Source = requirementsSelectionSource.Source = context.Criterias.Local.ToObservableCollection();
+            requirementsViewSource.Source = requirementsSelectionSource.Source = context.Requirements.Local.ToObservableCollection();
             loading.Progress = 100;
         }
 
