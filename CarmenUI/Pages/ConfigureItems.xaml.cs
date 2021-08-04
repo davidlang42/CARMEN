@@ -56,7 +56,7 @@ namespace CarmenUI.Pages
 
             await context.Nodes.LoadAsync();
             loading.Progress = 40;
-            await context.Nodes.OfType<Item>().Include(i => i.Roles).LoadAsync();
+            await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
             loading.Progress = 90;
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
