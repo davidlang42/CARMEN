@@ -21,6 +21,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using CarmenUI.Windows;
 
 namespace CarmenUI.Pages
 {
@@ -55,27 +56,27 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // initialise with "Loading..."
-            castGroupsViewSource.Source = new[] { "Loading..." };
-            tagsViewSource.Source = new[] { "Loading..." };
-            alternativeCastsViewSource.Source = new[] { "Loading..." };
-            allApplicantsViewSource.Source = new[] { "Loading..." };
-            castNumbersViewSource.Source = new[] { "Loading..." };
-            // populate source asynchronously
+            using var loading = new LoadingOverlay(this);
+            loading.Progress = 0;
             await context.AlternativeCasts.LoadAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
+            loading.Progress = 20;
             await context.CastGroups.Include(cg => cg.Members).LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
+            loading.Progress = 40;
             await context.Tags.Include(cg => cg.Members).LoadAsync();
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
+            loading.Progress = 60;
             await context.Applicants.LoadAsync();
             castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
             allApplicantsViewSource.Source = castNumbersViewSource.Source = context.Applicants.Local.ToObservableCollection();
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
             castNumbersViewSource.View.Filter = a => ((Applicant)a).CastNumber != null;
+            loading.Progress = 80;
             await context.Requirements.LoadAsync();
+            loading.Progress = 100;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
