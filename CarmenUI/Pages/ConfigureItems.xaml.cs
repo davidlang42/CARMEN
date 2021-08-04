@@ -154,17 +154,11 @@ namespace CarmenUI.Pages
                 },
                 IsReadOnly = true
             });
-            //TODO requirements not tested because requirements list in ConfigureShow is incorrectly showing criterias, so I can't set any as primary
-            foreach (var requirement in context.Requirements.Local.Where(r => r.Primary))
-                columns.Add(new DataGridCheckBoxColumn
-                {
-                    Header = requirement.Name,
-                    Binding = new Binding(nameof(Role.Requirements))
-                    {
-                        Converter = new CollectionContains(requirement),
-                        ConverterParameter = new Binding(nameof(Role.Requirements))
-                    }
-                });
+            columns.Add(new DataGridComboBoxColumn
+            {
+                Header="Requirements",
+                 
+            });
         }
     }
 }
