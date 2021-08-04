@@ -62,23 +62,23 @@ namespace CarmenUI.Pages
         {
             using var loading = new LoadingOverlay(this);
             loading.Progress = 0;
-            await context.Criterias.LoadAsync();
-            criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
-            loading.Progress = 17;
-            await context.CastGroups.LoadAsync();
-            castGroupsViewSource.Source = context.Criterias.Local.ToObservableCollection();
-            loading.Progress = 34;
-            await context.AlternativeCasts.LoadAsync();
-            alternativeCastsViewSource.Source = context.Criterias.Local.ToObservableCollection();
-            loading.Progress = 51;
-            await context.Tags.LoadAsync();
-            tagsViewSource.Source = context.Criterias.Local.ToObservableCollection();
-            loading.Progress = 68;
-            await context.SectionTypes.LoadAsync();
-            sectionTypesViewSource.Source = context.Criterias.Local.ToObservableCollection();
-            loading.Progress = 77;
             await context.Requirements.LoadAsync();
             requirementsViewSource.Source = requirementsSelectionSource.Source = context.Requirements.Local.ToObservableCollection();
+            loading.Progress = 17;
+            await context.Criterias.LoadAsync();
+            criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
+            loading.Progress = 34;
+            await context.CastGroups.Include(cg => cg.Requirements).LoadAsync();
+            castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
+            loading.Progress = 51;
+            await context.AlternativeCasts.LoadAsync();
+            alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
+            loading.Progress = 68;
+            await context.Tags.Include(t => t.Requirements).LoadAsync();
+            tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
+            loading.Progress = 77;
+            await context.SectionTypes.LoadAsync();
+            sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
             loading.Progress = 100;
         }
 
