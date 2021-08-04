@@ -25,6 +25,7 @@
         </cv:MultiConverter>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
+        <cv:NameLister x:Key="nameLister"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -91,18 +92,28 @@
                                 <DataGridTemplateColumn x:Name="HeaderOther" Header="Other" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="Baritone, Adult, blah, etc."/>
+                                            <TextBlock Text="{Binding Requirements, Converter={StaticResource nameLister}}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
                                         <DataTemplate>
-                                            <!--<uc:MultiSelectCombo ItemsSource="{Binding Source={StaticResource requirementsViewSource}"/>-->
                                             <ComboBox x:Name="requirementsCombo" SelectedIndex="0" ItemsSource="{Binding Requirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsViewSource}}">
                                                 <ComboBox.ItemTemplateSelector>
                                                     <cv:ComboBoxFaceTemplateSelector>
                                                         <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                                                             <DataTemplate>
-                                                                <TextBlock Text="{Binding ElementName=requirementsCombo, Path=DataContext.Requirements.Count}"/>
+                                                                <ItemsControl ItemsSource="{Binding ElementName=requirementsCombo, Path=DataContext.Requirements}">
+                                                                    <ItemsControl.ItemsPanel>
+                                                                        <ItemsPanelTemplate>
+                                                                            <StackPanel Orientation="Horizontal"/>
+                                                                        </ItemsPanelTemplate>
+                                                                    </ItemsControl.ItemsPanel>
+                                                                    <ItemsControl.ItemTemplate>
+                                                                        <DataTemplate>
+                                                                            <TextBlock Text="{Binding Name, StringFormat='\{0\}, '}"/>
+                                                                        </DataTemplate>
+                                                                    </ItemsControl.ItemTemplate>
+                                                                </ItemsControl>
                                                             </DataTemplate>
                                                         </cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                                                         <cv:ComboBoxFaceTemplateSelector.ItemTemplate>

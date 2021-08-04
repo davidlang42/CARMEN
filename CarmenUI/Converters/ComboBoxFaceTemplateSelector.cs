@@ -17,9 +17,9 @@ namespace CarmenUI.Converters
         {
             if (container is FrameworkElement element
                 && element.TemplatedParent is ComboBox)
-                return FaceTemplate;
+                return FaceTemplate ?? throw new ApplicationException("FaceTemplate not set.");
             else
-                return ItemTemplate;
+                return ItemTemplate ?? throw new ApplicationException("ItemTemplate not set.");
         }
     }
 }
