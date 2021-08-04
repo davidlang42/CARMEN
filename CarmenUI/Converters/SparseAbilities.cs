@@ -26,7 +26,7 @@ namespace CarmenUI.Converters
             if (parameter is not CollectionViewSource view_source)
                 throw new ApplicationException("ConverterParameter must be a CollectionViewSource representing the Criterias.");
             if (value is ObservableCollection<Ability> collection && view_source.Source is IList list)
-                return list.OfType<Criteria>().Select(g => new NullableAbility(collection, g)).ToList();
+                return list.OfType<Criteria>().Select(c => new NullableAbility(collection, c)).ToList();
             return value;
         }
 

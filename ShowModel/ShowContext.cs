@@ -129,6 +129,7 @@ namespace ShowModel
             modelBuilder.Entity<Tag>().Navigation(t => t.CountByGroups).AutoInclude();
             modelBuilder.Entity<Node>().Navigation(n => n.CountByGroups).AutoInclude();
             modelBuilder.Entity<Role>().Navigation(r => r.CountByGroups).AutoInclude();
+            modelBuilder.Entity<Section>().Navigation(s => s.SectionType).AutoInclude();
         }
 
 #if SLOW_DATABASE
