@@ -159,7 +159,7 @@ namespace CarmenUI.Pages
                 columns.Add(new DataGridCheckBoxColumn
                 {
                     Header = requirement.Name,
-                    Binding = new Binding
+                    Binding = new Binding(nameof(Role.Requirements))
                     {
                         Converter = new CollectionContains(requirement),
                         ConverterParameter = new Binding(nameof(Role.Requirements))

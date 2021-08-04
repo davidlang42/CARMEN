@@ -12,7 +12,7 @@ namespace CarmenUI.Converters
 {
     /// <summary>
     /// A converter which checks if a set value exists within the collection provided as the ConverterParameter, returning boolean.
-    /// In reverse, if a boolean is provided, then the set value will be added/removed from the ConverterParameter collection.
+    /// In reverse, if a boolean is provided, then the set value will be added/removed from the ConverterParameter collection, returning the collection.
     /// </summary>
     public class CollectionContains : IValueConverter
     {
@@ -43,7 +43,7 @@ namespace CarmenUI.Converters
                     if (list.Contains(parameter))
                         list.Remove(parameter);
                 }
-            return DependencyProperty.UnsetValue;
+            return parameter;
         }
     }
 }
