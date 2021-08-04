@@ -1,8 +1,10 @@
 ﻿using CarmenUI.Converters;
+using CarmenUI.ViewModels;
 using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Applicants;
+using ShowModel.Requirements;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -132,39 +134,79 @@ namespace CarmenUI.Pages
             //        </DataGridTemplateColumn.CellEditingTemplate>
             //    </DataGridTemplateColumn>
             //</DataGrid.Columns>
-            //var columns = ((DataGrid)sender).Columns;
-            //columns.Add(new DataGridTextColumn
-            //{
-            //    Binding = new Binding(nameof(Role.Name)),
-            //    Header = "Name",
-            //    Width = new(1, DataGridLengthUnitType.Star)
-            //});
-            //foreach (var cast_group in context.CastGroups.Local)
-            //    columns.Add(new DataGridTextColumn
-            //    {
-            //        Header = cast_group.Abbreviation,
-            //        Binding = new Binding(nameof(Role.CountByGroups))
-            //        {
-            //            Converter = new CountByGroupSelector(cast_group)
-            //        }
-            //    });
-            //columns.Add(new DataGridTextColumn
-            //{
-            //    Header = "Total",
-            //    Binding = new Binding(nameof(Role.CountByGroups))
-            //    {
-            //        Converter = new CountByGroupsTotal()
-            //    },
-            //    IsReadOnly = true
-            //});
-            //columns.Add(new DataGridTemplateColumn
-            //{
-            //    Header="Requirements",
-            //    CellTemplate= new DataTemplate
-            //    {
-            //        n
-            //    }
-            //});
+            var columns = ((DataGrid)sender).Columns;
+            columns.Add(new DataGridTextColumn
+            {
+                Binding = new Binding(nameof(Role.Name)),
+                Header = "Name",
+                Width = new(1, DataGridLengthUnitType.Star)
+            });
+            foreach (var cast_group in context.CastGroups.Local)
+                columns.Add(new DataGridTextColumn
+                {
+                    Header = cast_group.Abbreviation,
+                    Binding = new Binding(nameof(Role.CountByGroups))
+                    {
+                        Converter = new CountByGroupSelector(cast_group)
+                    }
+                });
+            columns.Add(new DataGridTextColumn
+            {
+                Header = "Total",
+                Binding = new Binding(nameof(Role.CountByGroups))
+                {
+                    Converter = new CountByGroupsTotal()
+                },
+                IsReadOnly = true
+            });
+            const string comboName = "requirementsCombo";
+            var faceTemplateFactory = new FrameworkElementFactory(typeof(ItemsControl));
+            faceTemplateFactory.SetBinding(ItemsControl.ItemsSourceProperty, new Binding
+            {
+                ElementName = comboName,
+                Path = new PropertyPath($"{nameof(ComboBox.DataContext)}.{nameof(Role.Requirements)}")
+            });
+            var faceTemplatePanelFactory = new FrameworkElementFactory(typeof(StackPanel));
+            faceTemplatePanelFactory.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
+            faceTemplateFactory.SetValue(ItemsControl.ItemsPanelProperty, new ItemsPanelTemplate(faceTemplatePanelFactory));
+            var faceTemplateItemFactory = new FrameworkElementFactory(typeof(TextBlock));
+            faceTemplateItemFactory.SetBinding(TextBlock.TextProperty, new Binding(nameof(Requirement.Name))
+            {
+                StringFormat = "{0}, "
+            });
+            faceTemplateFactory.SetValue(ItemsControl.ItemTemplateProperty, new DataTemplate { VisualTree = faceTemplateItemFactory });
+            var itemTemplateFactory = new FrameworkElementFactory(typeof(CheckBox));
+            itemTemplateFactory.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(SelectableObject<Requirement>.IsSelected)));
+            itemTemplateFactory.SetBinding(CheckBox.WidthProperty, new Binding
+            {
+                ElementName = comboName,
+                Path = new PropertyPath(nameof(ComboBox.ActualWidth))
+            });
+            itemTemplateFactory.SetBinding(ContentControl.ContentProperty, new Binding(nameof(SelectableObject<Requirement>.ObjectValue)));
+            var cellEditingTemplateFactory = new FrameworkElementFactory(typeof(ComboBox), comboName);
+            cellEditingTemplateFactory.SetValue(ComboBox.SelectedIndexProperty, 0);
+            cellEditingTemplateFactory.SetBinding(ComboBox.ItemsSourceProperty, new Binding(nameof(Role.Requirements))
+            {
+                Converter = new SelectableRequirementsList(),
+                ConverterParameter = requirementsViewSource
+            });
+            cellEditingTemplateFactory.SetValue(ComboBox.ItemTemplateSelectorProperty, new ComboBoxFaceTemplateSelector
+            {
+                FaceTemplate = new DataTemplate { VisualTree = faceTemplateFactory },
+                ItemTemplate = new DataTemplate { VisualTree = itemTemplateFactory }
+            });
+            var cellTemplateFactory = new FrameworkElementFactory(typeof(TextBlock));
+            cellTemplateFactory.SetBinding(TextBlock.TextProperty, new Binding(nameof(Role.Requirements))
+            {
+                Converter = new NameLister()
+            });
+            columns.Add(new DataGridTemplateColumn
+            {
+                Header = "Requirements",
+                Width = new(1, DataGridLengthUnitType.Star),
+                CellTemplate = new DataTemplate { VisualTree = cellTemplateFactory },
+                CellEditingTemplate = new DataTemplate { VisualTree = cellEditingTemplateFactory }
+            });
         }
     }
 }
