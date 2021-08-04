@@ -16,7 +16,7 @@ namespace CarmenUI.Converters
     /// This converter passes through an ObservableCollection&lt;CountByGroup&gt;, adding adds any missing CastGroups to the collection.
     /// ConverterParameter must be a CollectionViewSource representing the CastGroups.
     /// </summary>
-    public class FullyEnumeratedCountByGroups : IValueConverter //LATER remove if not used
+    public class FullyEnumeratedCountByGroups : IValueConverter //TODO remove if not used
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

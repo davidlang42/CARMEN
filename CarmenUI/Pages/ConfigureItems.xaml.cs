@@ -121,6 +121,10 @@ namespace CarmenUI.Pages
             //        CellEditingTemplate = WrapWithNullableCountByGroupContext(cast_group, editFactory)
             //    });
             //}
+
+            //TODO rename code here to populate columns,but bind to indicies like POC xaml code (and remove POC xaml code)
+            //TODO handle property changed events to get TotalCount to update as soon as you change any count
+
         }
 
         private DataTemplate WrapWithNullableCountByGroupContext(CastGroup cast_group, FrameworkElementFactory child_element)

@@ -3,6 +3,7 @@ using ShowModel.Requirements;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -11,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace CarmenUI.ViewModels
 {
-    public class RoleView : INotifyPropertyChanged
+    public class RoleView : INotifyPropertyChanged//TODO do we really need this? Could I just use a converter? prob not
     {
         private Role role;
         private CastGroup[] castGroups;
@@ -30,35 +31,21 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public uint?[] Count
+        public CountByGroup[] CountByGroups//TODO really this should be made on construction, then we know exactly which 4 CBG objects we need to monitor for changes
         {
-            get => castGroups.Select(cg => role.CountByGroups.Where(cbg => cbg.CastGroup == cg).SingleOrDefault()?.Count).ToArray();
-            set
+            get
             {
-                if (value.Length != castGroups.Length)
-                    throw new ArgumentException("New array length did not match existing.");
-                bool changes = false;
-                for (var i = 0; i < castGroups.Length; i++)
+                var count_by_groups = new CountByGroup[castGroups.Length];
+                for (var i=0; i< castGroups.Length; i++)
                 {
-                    var cbg = role.CountByGroups.Where(cbg => cbg.CastGroup == castGroups[i]).SingleOrDefault();
-                    if (value[i] != cbg?.Count) {
-                        if (cbg == null)
-                        {
-                            cbg = new CountByGroup { CastGroup = castGroups[i], Count = value[i]!.Value };
-                            role.CountByGroups.Add(cbg);
-                        }
-                        else if (value[i] == null)
-                            role.CountByGroups.Remove(cbg);
-                        else
-                            cbg.Count = value[i]!.Value;
-                        changes = true;
+                    if (role.CountByGroups.SingleOrDefault(cbg => cbg.CastGroup == castGroups[i]) is not CountByGroup cbg)
+                    {
+                        cbg = new CountByGroup { CastGroup = castGroups[i], Count = 0 };
+                        role.CountByGroups.Add(cbg);
                     }
+                    count_by_groups[i] = cbg;
                 }
-                if (changes)
-                {
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(TotalCount));
-                }
+                return count_by_groups;
             }
         }
 

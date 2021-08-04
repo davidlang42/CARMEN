@@ -19,7 +19,7 @@ namespace CarmenUI.Converters
     /// for a specified CastGroup, allowing a non-set CountByGroup to be modelled as null.
     /// ConverterParameter must be the CastGroup for which this is wrapping.
     /// </summary>
-    public class CountByGroupSelector : IValueConverter
+    public class CountByGroupSelector : IValueConverter//TODO remove if not required
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
