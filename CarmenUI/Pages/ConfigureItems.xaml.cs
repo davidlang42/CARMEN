@@ -103,24 +103,24 @@ namespace CarmenUI.Pages
         {
             // Insert columns for CountByGroups (which can't be done in XAML
             // because they are dynamic and DataGridColumns is not a panel)
-            var columns = ((DataGrid)sender).Columns;
-            int index = 1;
-            foreach (var cast_group in context.CastGroups.Local)
-            {
-                // build view template
-                var viewFactory = new FrameworkElementFactory(typeof(TextBlock));
-                viewFactory.SetBinding(TextBlock.TextProperty, new Binding(nameof(NullableCountByGroup.Count)));
-                // build edit template
-                var editFactory = new FrameworkElementFactory(typeof(TextBox));
-                editFactory.SetBinding(TextBox.TextProperty, new Binding(nameof(NullableCountByGroup.Count)));
-                // add the column
-                columns.Insert(index++, new DataGridTemplateColumn
-                {
-                    Header = cast_group.Abbreviation,
-                    CellTemplate = WrapWithNullableCountByGroupContext(cast_group, viewFactory),
-                    CellEditingTemplate = WrapWithNullableCountByGroupContext(cast_group, editFactory)
-                });
-            }
+            //var columns = ((DataGrid)sender).Columns;
+            //int index = 1;
+            //foreach (var cast_group in context.CastGroups.Local)
+            //{
+            //    // build view template
+            //    var viewFactory = new FrameworkElementFactory(typeof(TextBlock));
+            //    viewFactory.SetBinding(TextBlock.TextProperty, new Binding(nameof(NullableCountByGroup.Count)));
+            //    // build edit template
+            //    var editFactory = new FrameworkElementFactory(typeof(TextBox));
+            //    editFactory.SetBinding(TextBox.TextProperty, new Binding(nameof(NullableCountByGroup.Count)));
+            //    // add the column
+            //    columns.Insert(index++, new DataGridTemplateColumn
+            //    {
+            //        Header = cast_group.Abbreviation,
+            //        CellTemplate = WrapWithNullableCountByGroupContext(cast_group, viewFactory),
+            //        CellEditingTemplate = WrapWithNullableCountByGroupContext(cast_group, editFactory)
+            //    });
+            //}
         }
 
         private DataTemplate WrapWithNullableCountByGroupContext(CastGroup cast_group, FrameworkElementFactory child_element)

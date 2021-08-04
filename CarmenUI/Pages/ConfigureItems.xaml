@@ -27,6 +27,7 @@
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
         <cv:NameLister x:Key="nameLister"/>
         <cv:CountByGroupsTotal x:Key="countByGroupsTotal"/>
+        <cv:WrapRoles x:Key="wrapRoles"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -79,10 +80,14 @@
                         <TextBlock Text="{Binding Name, StringFormat='Roles in \{0\}:'}" FontSize="22"/>
                         <DataGrid Grid.Row="1" AutoGenerateColumns="False"
                                   CanUserSortColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
-                                  ItemsSource="{Binding Roles}" Loaded="RolesDataGrid_Loaded">
+                                  ItemsSource="{Binding Roles, Converter={StaticResource wrapRoles}, ConverterParameter={StaticResource castGroupsViewSource}}" Loaded="RolesDataGrid_Loaded">
                             <DataGrid.Columns>
                                 <DataGridTextColumn x:Name="HeaderName" Header="Name" Width="*" Binding="{Binding Name}"/>
-                                <DataGridTextColumn x:Name="HeaderTotal" Header="Total" Binding="{Binding CountByGroups, Converter={StaticResource countByGroupsTotal}}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="0" Binding="{Binding Count[0], Mode=TwoWay}"/>
+                                <DataGridTextColumn Header="1" Binding="{Binding Count[1], Mode=TwoWay}"/>
+                                <DataGridTextColumn Header="2" Binding="{Binding Count[2], Mode=TwoWay}"/>
+                                <DataGridTextColumn Header="3" Binding="{Binding Count[3], Mode=TwoWay}"/>
+                                <DataGridTextColumn x:Name="HeaderTotal" Header="Total" Binding="{Binding TotalCount}" IsReadOnly="True"/>
                                 <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Requirements" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
