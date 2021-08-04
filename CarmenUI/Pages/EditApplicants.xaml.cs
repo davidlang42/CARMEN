@@ -1,5 +1,6 @@
 ﻿using CarmenUI.Converters;
 using CarmenUI.ViewModels;
+using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Applicants;
@@ -48,17 +49,17 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // initialise with "Loading..."
-            applicantsViewSource.Source = new[] { "Loading..." };
-            // populate source asynchronously
-            var applicants = TaskToLoad(c => c.Applicants);
-            applicants.Start();
-            applicantsViewSource.Source = await applicants;
+            using var loading = new LoadingOverlay(this);
+            loading.Progress = 0;
+            await context.Applicants.LoadAsync();
+            loading.Progress = 80;
+            applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             ConfigureGroupingAndSorting(groupCombo.SelectedItem);
             applicantsList.SelectedItem = null;
-            var criterias = TaskToLoad(c => c.Criterias);
-            criterias.Start();
-            criteriasViewSource.Source = await criterias;
+            loading.Progress = 90;
+            await context.Criterias.LoadAsync();
+            criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
+            loading.Progress = 100;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
