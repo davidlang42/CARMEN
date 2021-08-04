@@ -26,6 +26,7 @@
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
         <cv:NameLister x:Key="nameLister"/>
+        <cv:CountByGroupsTotal x:Key="countByGroupsTotal"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -79,17 +80,10 @@
                         <DataGrid Grid.Row="1" AutoGenerateColumns="False"
                                   CanUserSortColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
                                   ItemsSource="{Binding Roles}" Loaded="RolesDataGrid_Loaded">
-                            <!--<DataGrid.Columns>
+                            <DataGrid.Columns>
                                 <DataGridTextColumn x:Name="HeaderName" Header="Name" Width="*" Binding="{Binding Name}"/>
-                                <DataGridTextColumn x:Name="HeaderJB" Header="JB"/>
-                                <DataGridTextColumn x:Name="HeaderJG" Header="JG"/>
-                                <DataGridTextColumn x:Name="HeaderSB" Header="SB"/>
-                                <DataGridTextColumn x:Name="HeaderSG" Header="SG"/>
-                                <DataGridTextColumn x:Name="HeaderTotal" Header="Total"/>
-                                <DataGridCheckBoxColumn x:Name="HeaderSinger" Header="Singer"/>
-                                <DataGridCheckBoxColumn x:Name="HeaderActor" Header="Actor"/>
-                                <DataGridCheckBoxColumn x:Name="HeaderDancer" Header="Dancer"/>
-                                <DataGridTemplateColumn x:Name="HeaderOther" Header="Other" Width="*">
+                                <DataGridTextColumn x:Name="HeaderTotal" Header="Total" Binding="{Binding CountByGroups, Converter={StaticResource countByGroupsTotal}}" IsReadOnly="True"/>
+                                <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Requirements" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
                                             <TextBlock Text="{Binding Requirements, Converter={StaticResource nameLister}}"/>
@@ -129,7 +123,7 @@
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
-                            </DataGrid.Columns>-->
+                            </DataGrid.Columns>
                         </DataGrid>
                         <Grid Grid.Row="2" >
                             <Grid.ColumnDefinitions>

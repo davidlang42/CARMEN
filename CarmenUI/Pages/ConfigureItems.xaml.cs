@@ -111,38 +111,12 @@ namespace CarmenUI.Pages
 
         private void RolesDataGrid_Loaded(object sender, RoutedEventArgs e)
         {
-            //<DataGrid.Columns>
-            //    <DataGridTextColumn x:Name="HeaderName" Header="Name" Width="*" Binding="{Binding Name}"/>
-            //    <DataGridTextColumn x:Name="HeaderJB" Header="JB"/>
-            //    <DataGridTextColumn x:Name="HeaderJG" Header="JG"/>
-            //    <DataGridTextColumn x:Name="HeaderSB" Header="SB"/>
-            //    <DataGridTextColumn x:Name="HeaderSG" Header="SG"/>
-            //    <DataGridTextColumn x:Name="HeaderTotal" Header="Total"/>
-            //    <DataGridCheckBoxColumn x:Name="HeaderSinger" Header="Singer"/>
-            //    <DataGridCheckBoxColumn x:Name="HeaderActor" Header="Actor"/>
-            //    <DataGridCheckBoxColumn x:Name="HeaderDancer" Header="Dancer"/>
-            //    <DataGridTemplateColumn x:Name="HeaderOther" Header="Other" Width="*">
-            //        <DataGridTemplateColumn.CellTemplate>
-            //            <DataTemplate>
-            //                <TextBlock Text="Baritone, Adult, blah, etc."/>
-            //            </DataTemplate>
-            //        </DataGridTemplateColumn.CellTemplate>
-            //        <DataGridTemplateColumn.CellEditingTemplate>
-            //            <DataTemplate>
-            //                <ComboBox />
-            //            </DataTemplate>
-            //        </DataGridTemplateColumn.CellEditingTemplate>
-            //    </DataGridTemplateColumn>
-            //</DataGrid.Columns>
+            // Insert columns for CountByGroups (which can't be done in XAML
+            // because they are dynamic and DataGridColumns is not a panel)
             var columns = ((DataGrid)sender).Columns;
-            columns.Add(new DataGridTextColumn
-            {
-                Binding = new Binding(nameof(Role.Name)),
-                Header = "Name",
-                Width = new(1, DataGridLengthUnitType.Star)
-            });
+            int index = 1;
             foreach (var cast_group in context.CastGroups.Local)
-                columns.Add(new DataGridTextColumn
+                columns.Insert(index++, new DataGridTextColumn
                 {
                     Header = cast_group.Abbreviation,
                     Binding = new Binding(nameof(Role.CountByGroups))
@@ -150,63 +124,6 @@ namespace CarmenUI.Pages
                         Converter = new CountByGroupSelector(cast_group)
                     }
                 });
-            columns.Add(new DataGridTextColumn
-            {
-                Header = "Total",
-                Binding = new Binding(nameof(Role.CountByGroups))
-                {
-                    Converter = new CountByGroupsTotal()
-                },
-                IsReadOnly = true
-            });
-            const string comboName = "requirementsCombo";
-            var faceTemplateFactory = new FrameworkElementFactory(typeof(ItemsControl));
-            faceTemplateFactory.SetBinding(ItemsControl.ItemsSourceProperty, new Binding
-            {
-                ElementName = comboName,
-                Path = new PropertyPath($"{nameof(ComboBox.DataContext)}.{nameof(Role.Requirements)}")
-            });
-            var faceTemplatePanelFactory = new FrameworkElementFactory(typeof(StackPanel));
-            faceTemplatePanelFactory.SetValue(StackPanel.OrientationProperty, Orientation.Horizontal);
-            faceTemplateFactory.SetValue(ItemsControl.ItemsPanelProperty, new ItemsPanelTemplate(faceTemplatePanelFactory));
-            var faceTemplateItemFactory = new FrameworkElementFactory(typeof(TextBlock));
-            faceTemplateItemFactory.SetBinding(TextBlock.TextProperty, new Binding(nameof(Requirement.Name))
-            {
-                StringFormat = "{0}, "
-            });
-            faceTemplateFactory.SetValue(ItemsControl.ItemTemplateProperty, new DataTemplate { VisualTree = faceTemplateItemFactory });
-            var itemTemplateFactory = new FrameworkElementFactory(typeof(CheckBox));
-            itemTemplateFactory.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(SelectableObject<Requirement>.IsSelected)));
-            itemTemplateFactory.SetBinding(CheckBox.WidthProperty, new Binding
-            {
-                ElementName = comboName,
-                Path = new PropertyPath(nameof(ComboBox.ActualWidth))
-            });
-            itemTemplateFactory.SetBinding(ContentControl.ContentProperty, new Binding(nameof(SelectableObject<Requirement>.ObjectValue)));
-            var cellEditingTemplateFactory = new FrameworkElementFactory(typeof(ComboBox), comboName);
-            cellEditingTemplateFactory.SetValue(ComboBox.SelectedIndexProperty, 0);
-            cellEditingTemplateFactory.SetBinding(ComboBox.ItemsSourceProperty, new Binding(nameof(Role.Requirements))
-            {
-                Converter = new SelectableRequirementsList(),
-                ConverterParameter = requirementsViewSource
-            });
-            cellEditingTemplateFactory.SetValue(ComboBox.ItemTemplateSelectorProperty, new ComboBoxFaceTemplateSelector
-            {
-                FaceTemplate = new DataTemplate { VisualTree = faceTemplateFactory },
-                ItemTemplate = new DataTemplate { VisualTree = itemTemplateFactory }
-            });
-            var cellTemplateFactory = new FrameworkElementFactory(typeof(TextBlock));
-            cellTemplateFactory.SetBinding(TextBlock.TextProperty, new Binding(nameof(Role.Requirements))
-            {
-                Converter = new NameLister()
-            });
-            columns.Add(new DataGridTemplateColumn
-            {
-                Header = "Requirements",
-                Width = new(1, DataGridLengthUnitType.Star),
-                CellTemplate = new DataTemplate { VisualTree = cellTemplateFactory },
-                CellEditingTemplate = new DataTemplate { VisualTree = cellEditingTemplateFactory }
-            });
         }
     }
 }
