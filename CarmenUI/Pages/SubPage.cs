@@ -44,15 +44,6 @@ namespace CarmenUI.Pages
             return MessageBox.Show("Are you sure you want to cancel?\nAny unsaved changes will be lost.", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
         }
 
-        //LATER this will crash if still running when the page is cancelled, maybe I need to wrap this in a LoadingOverlay afterall
-        protected Task<IList> TaskToLoad<T>(Func<ShowContext, DbSet<T>> db_set_getter) where T : class
-            => new Task<IList>(() =>
-            {
-                var db_set = db_set_getter(context);
-                db_set.Load();
-                return db_set.Local.ToObservableCollection();
-            });
-
         public void Dispose()
         {
             if (_context != null)

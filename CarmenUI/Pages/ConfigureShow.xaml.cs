@@ -1,5 +1,6 @@
 ﻿using CarmenUI.Converters;
 using CarmenUI.ViewModels;
+using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Applicants;
@@ -59,40 +60,26 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            // make tasks to load each collection view source
-            var tasks = new Dictionary<CollectionViewSource, Task<IList>>()
-            {
-                { criteriasViewSource, TaskToLoad(c => c.Criterias) },
-                { castGroupsViewSource, TaskToLoad(c => c.CastGroups) },
-                { alternativeCastsViewSource, TaskToLoad(c => c.AlternativeCasts) },
-                { tagsViewSource, TaskToLoad(c => c.Tags) },
-                { sectionTypesViewSource, TaskToLoad(c => c.SectionTypes) },
-                { requirementsViewSource, TaskToLoad(c => c.Requirements) },
-                { requirementsSelectionSource, new Task<IList>(() => null!) } // see special case below
-            };
-            // initialise all sources with "Loading..."
-            var loading = new[] { "Loading..." };
-            foreach (var view_source in tasks.Keys)
-                view_source.Source = loading;
-            // load one at a time because DbContext is not thread safe
-            CollectionViewSource next_source;
-            Task<IList> next_task;
-            while (tasks.Count != 0)
-            {
-                // prioritise loading whatever is in view
-                if (currentViewSource != null && tasks.ContainsKey(currentViewSource))
-                    next_source = currentViewSource;
-                else
-                    next_source = tasks.Keys.First();
-                // extract task & remove from list
-                next_task = tasks[next_source];
-                tasks.Remove(next_source);
-                // populate source asynchronously
-                next_task.Start();
-                next_source.Source = await next_task;
-            }
-            // special case
-            requirementsSelectionSource.Source = requirementsViewSource.Source;
+            using var loading = new LoadingOverlay(this);
+            loading.Progress = 0;
+            await context.Criterias.LoadAsync();
+            criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
+            loading.Progress = 17;
+            await context.CastGroups.LoadAsync();
+            castGroupsViewSource.Source = context.Criterias.Local.ToObservableCollection();
+            loading.Progress = 34;
+            await context.AlternativeCasts.LoadAsync();
+            alternativeCastsViewSource.Source = context.Criterias.Local.ToObservableCollection();
+            loading.Progress = 51;
+            await context.Tags.LoadAsync();
+            tagsViewSource.Source = context.Criterias.Local.ToObservableCollection();
+            loading.Progress = 68;
+            await context.SectionTypes.LoadAsync();
+            sectionTypesViewSource.Source = context.Criterias.Local.ToObservableCollection();
+            loading.Progress = 77;
+            await context.Requirements.LoadAsync();
+            requirementsViewSource.Source = requirementsSelectionSource.Source = context.Criterias.Local.ToObservableCollection();
+            loading.Progress = 100;
         }
 
         private void BindObjectList(string header, string tool_tip, CollectionViewSource view_source, AddableObject[][] add_buttons)
