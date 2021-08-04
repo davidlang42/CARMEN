@@ -18,6 +18,9 @@ namespace CarmenUI
         {
             yield return obj;
         }
+
+        public static uint Sum(this IEnumerable<uint> list)
+            => (uint)list.Select(u => (int)u).Sum();
     }
 
     internal static class WpfExtensions

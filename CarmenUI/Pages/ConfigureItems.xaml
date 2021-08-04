@@ -75,6 +75,9 @@
                         <DataGrid Grid.Row="1" AutoGenerateColumns="False"
                                   CanUserSortColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
                                   ItemsSource="{Binding Roles}" Loaded="RolesDataGrid_Loaded">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="*"/>
+                            </DataGrid.Columns>
                         </DataGrid>
                         <Grid Grid.Row="2" >
                             <Grid.ColumnDefinitions>

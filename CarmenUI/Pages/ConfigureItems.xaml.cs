@@ -2,6 +2,7 @@
 using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
+using ShowModel.Applicants;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -128,25 +129,42 @@ namespace CarmenUI.Pages
             //        </DataGridTemplateColumn.CellEditingTemplate>
             //    </DataGridTemplateColumn>
             //</DataGrid.Columns>
-            //var columns = ((DataGrid)sender).Columns;
-            //columns.Add(new DataGridTextColumn
-            //{
-            //    Binding = new Binding(nameof(Role.Name)),
-            //    Header = "Name",
-            //});
-            //foreach (var cast_group in context.CastGroups.Local)
-            //{
-            //    var selector = new CountByGroupSelector(cast_group);
-            //    columns.Add(new DataGridTextColumn
-            //    {
-            //        Binding = new Binding(nameof(Role.CountByGroups))
-            //        {
-            //            Converter = selector
-            //        },
-            //        Header = cast_group.Abbreviation,
-            //    });
-            //}
-                
+            var columns = ((DataGrid)sender).Columns;
+            columns.Add(new DataGridTextColumn
+            {
+                Binding = new Binding(nameof(Role.Name)),
+                Header = "Name",
+                Width = new(1, DataGridLengthUnitType.Star)
+            });
+            foreach (var cast_group in context.CastGroups.Local)
+                columns.Add(new DataGridTextColumn
+                {
+                    Header = cast_group.Abbreviation,
+                    Binding = new Binding(nameof(Role.CountByGroups))
+                    {
+                        Converter = new CountByGroupSelector(cast_group)
+                    }
+                });
+            columns.Add(new DataGridTextColumn
+            {
+                Header = "Total",
+                Binding = new Binding(nameof(Role.CountByGroups))
+                {
+                    Converter = new CountByGroupsTotal()
+                },
+                IsReadOnly = true
+            });
+            //TODO requirements not tested because requirements list in ConfigureShow is incorrectly showing criterias, so I can't set any as primary
+            foreach (var requirement in context.Requirements.Local.Where(r => r.Primary))
+                columns.Add(new DataGridCheckBoxColumn
+                {
+                    Header = requirement.Name,
+                    Binding = new Binding
+                    {
+                        Converter = new CollectionContains(requirement),
+                        ConverterParameter = new Binding(nameof(Role.Requirements))
+                    }
+                });
         }
     }
 }

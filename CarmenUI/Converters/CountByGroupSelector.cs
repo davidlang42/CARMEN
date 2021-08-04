@@ -26,11 +26,11 @@ namespace CarmenUI.Converters
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is not IList list)
-                throw new ArgumentException("Value must be an IList containing Abilities.");
+                throw new ArgumentException("Value must be an IList containing CountByGroups.");
             return list.OfType<CountByGroup>().Where(cbg => cbg.CastGroup == CastGroup).SingleOrDefault()?.Count;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            => throw new NotImplementedException();
+            => throw new NotImplementedException();//TODO implement two-way
     }
 }

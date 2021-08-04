@@ -14,7 +14,7 @@ namespace ShowModel
         }
 
         public static uint Sum(this IEnumerable<uint> list)
-            => (uint)list.Cast<int>().Sum();
+            => (uint)list.Select(u => (int)u).Sum();
 
         public static double Product(this IEnumerable<double> list)
         {
