@@ -31,12 +31,14 @@ namespace CarmenUI.Pages
     {
         private readonly CollectionViewSource rootNodesViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
+        private readonly CollectionViewSource requirementsViewSource;
 
         public ConfigureItems(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
+            requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -48,6 +50,7 @@ namespace CarmenUI.Pages
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
 
             await context.Requirements.LoadAsync();
+            requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
 
             await context.Nodes.LoadAsync();
             loading.Progress = 40;
@@ -129,36 +132,39 @@ namespace CarmenUI.Pages
             //        </DataGridTemplateColumn.CellEditingTemplate>
             //    </DataGridTemplateColumn>
             //</DataGrid.Columns>
-            var columns = ((DataGrid)sender).Columns;
-            columns.Add(new DataGridTextColumn
-            {
-                Binding = new Binding(nameof(Role.Name)),
-                Header = "Name",
-                Width = new(1, DataGridLengthUnitType.Star)
-            });
-            foreach (var cast_group in context.CastGroups.Local)
-                columns.Add(new DataGridTextColumn
-                {
-                    Header = cast_group.Abbreviation,
-                    Binding = new Binding(nameof(Role.CountByGroups))
-                    {
-                        Converter = new CountByGroupSelector(cast_group)
-                    }
-                });
-            columns.Add(new DataGridTextColumn
-            {
-                Header = "Total",
-                Binding = new Binding(nameof(Role.CountByGroups))
-                {
-                    Converter = new CountByGroupsTotal()
-                },
-                IsReadOnly = true
-            });
-            columns.Add(new DataGridComboBoxColumn
-            {
-                Header="Requirements",
-                 
-            });
+            //var columns = ((DataGrid)sender).Columns;
+            //columns.Add(new DataGridTextColumn
+            //{
+            //    Binding = new Binding(nameof(Role.Name)),
+            //    Header = "Name",
+            //    Width = new(1, DataGridLengthUnitType.Star)
+            //});
+            //foreach (var cast_group in context.CastGroups.Local)
+            //    columns.Add(new DataGridTextColumn
+            //    {
+            //        Header = cast_group.Abbreviation,
+            //        Binding = new Binding(nameof(Role.CountByGroups))
+            //        {
+            //            Converter = new CountByGroupSelector(cast_group)
+            //        }
+            //    });
+            //columns.Add(new DataGridTextColumn
+            //{
+            //    Header = "Total",
+            //    Binding = new Binding(nameof(Role.CountByGroups))
+            //    {
+            //        Converter = new CountByGroupsTotal()
+            //    },
+            //    IsReadOnly = true
+            //});
+            //columns.Add(new DataGridTemplateColumn
+            //{
+            //    Header="Requirements",
+            //    CellTemplate= new DataTemplate
+            //    {
+            //        n
+            //    }
+            //});
         }
     }
 }
