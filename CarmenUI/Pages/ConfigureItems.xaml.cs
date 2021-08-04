@@ -45,25 +45,20 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            using var loading = new LoadingOverlay(this);//TODO fix percentages
+            using var loading = new LoadingOverlay(this);
             loading.Progress = 0;
-
             await context.CastGroups.LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
-
+            loading.Progress = 25;
             await context.Requirements.LoadAsync();
             requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
-
+            loading.Progress = 50;
             await context.Nodes.LoadAsync();
-            loading.Progress = 40;
+            loading.Progress = 75;
             await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-            loading.Progress = 90;
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
-
-
-            ConfigureDataGridColumns();
             loading.Progress = 100;
         }
 
@@ -104,11 +99,6 @@ namespace CarmenUI.Pages
 
         }
 
-        private void ConfigureDataGridColumns()
-        {
-            
-        }
-
         private void RolesDataGrid_Loaded(object sender, RoutedEventArgs e)
         {
             // Insert columns for CountByGroups (which can't be done in XAML
@@ -116,14 +106,34 @@ namespace CarmenUI.Pages
             var columns = ((DataGrid)sender).Columns;
             int index = 1;
             foreach (var cast_group in context.CastGroups.Local)
-                columns.Insert(index++, new DataGridTextColumn
+            {
+                // build view template
+                var viewFactory = new FrameworkElementFactory(typeof(TextBlock));
+                viewFactory.SetBinding(TextBlock.TextProperty, new Binding(nameof(NullableCountByGroup.Count)));
+                // build edit template
+                var editFactory = new FrameworkElementFactory(typeof(TextBox));
+                editFactory.SetBinding(TextBox.TextProperty, new Binding(nameof(NullableCountByGroup.Count)));
+                // add the column
+                columns.Insert(index++, new DataGridTemplateColumn
                 {
                     Header = cast_group.Abbreviation,
-                    Binding = new Binding(nameof(Role.CountByGroups))
-                    {
-                        Converter = new CountByGroupSelector(cast_group)
-                    }
+                    CellTemplate = WrapWithNullableCountByGroupContext(cast_group, viewFactory),
+                    CellEditingTemplate = WrapWithNullableCountByGroupContext(cast_group, editFactory)
                 });
+            }
         }
+
+        private DataTemplate WrapWithNullableCountByGroupContext(CastGroup cast_group, FrameworkElementFactory child_element)
+        {
+            var stackPanelFactory = new FrameworkElementFactory(typeof(StackPanel));
+            stackPanelFactory.SetValue(StackPanel.DataContextProperty, new Binding(nameof(Role.CountByGroups))
+            {
+                Converter = new CountByGroupSelector(),
+                ConverterParameter = cast_group
+            });
+            stackPanelFactory.AppendChild(child_element);
+            return new DataTemplate { VisualTree = stackPanelFactory };
+        }
+
     }
 }

@@ -1,36 +1,36 @@
-﻿using ShowModel.Applicants;
+﻿using CarmenUI.ViewModels;
+using ShowModel.Applicants;
 using ShowModel.Structure;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace CarmenUI.Converters
 {
     /// <summary>
-    /// Selects a count from a list of CountByGroups, for the set CastGroup.
+    /// This converter wraps an ObservableCollection&lt;CountByGroup&gt; as a single NullableCountByGroup,
+    /// for a specified CastGroup, allowing a non-set CountByGroup to be modelled as null.
+    /// ConverterParameter must be the CastGroup for which this is wrapping.
     /// </summary>
     public class CountByGroupSelector : IValueConverter
     {
-        public CastGroup CastGroup { get; set; }
-
-        public CountByGroupSelector(CastGroup cast_group)
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            CastGroup = cast_group;
-        }
-
-        public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
-        {
-            if (value is not IList list)
-                throw new ArgumentException("Value must be an IList containing CountByGroups.");
-            return list.OfType<CountByGroup>().Where(cbg => cbg.CastGroup == CastGroup).SingleOrDefault()?.Count;
+            if (parameter is not CastGroup cast_group)
+                throw new ApplicationException("ConverterParameter must be a CastGroup.");
+            if (value is ObservableCollection<CountByGroup> collection)
+                return new NullableCountByGroup(collection, cast_group);
+            return DependencyProperty.UnsetValue;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            => throw new NotImplementedException();//TODO implement two-way
+            => throw new NotImplementedException();
     }
 }
