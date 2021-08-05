@@ -23,6 +23,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Section = ShowModel.Structure.Section;
 
 namespace CarmenUI.Pages
 {
@@ -115,6 +116,16 @@ namespace CarmenUI.Pages
                 });
             }
             //TODO Bind footer column widths to match DataGrid column widths
+        }
+
+        private void itemsTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            rolesPanel.Content = itemsTreeView.SelectedItem switch
+            {
+                Item item => new ItemView(item, context.CastGroups.Local.ToArray()),
+                Section section => section,
+                _ => null
+            };
         }
     }
 }

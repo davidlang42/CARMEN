@@ -37,6 +37,8 @@ namespace CarmenUI.ViewModels
 
         public ICollection<Requirement> Requirements => role.Requirements;
 
+        //TODO implement RequirementsSummary here rather than use nameLister
+
         public RoleView(Role role, CastGroup[] cast_groups)
         {
             this.role = role;

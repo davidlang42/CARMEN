@@ -14,7 +14,7 @@ namespace CarmenUI.Converters
     /// <summary>
     /// Takes multiple objects of type INamed, and returns a concatenated string list of Names.
     /// </summary>
-    public class NameLister : IValueConverter
+    public class NameLister : IValueConverter//TODO remove if not needed
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
