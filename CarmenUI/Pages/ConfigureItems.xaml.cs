@@ -136,7 +136,10 @@ namespace CarmenUI.Pages
                 footer.Children.Add(top_text);
                 // add bottom text
                 var bottom_text = new TextBox();
-                bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ItemView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}"));
+                bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ItemView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}")
+                {
+                    TargetNullValue = ""
+                });
                 Grid.SetColumn(bottom_text, column_index);
                 Grid.SetRow(bottom_text, 1);
                 footer.Children.Add(bottom_text);
