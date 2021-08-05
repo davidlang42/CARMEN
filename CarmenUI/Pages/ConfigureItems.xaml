@@ -82,7 +82,8 @@
                                   ItemsSource="{Binding Roles, Converter={StaticResource wrapRoles}, ConverterParameter={StaticResource castGroupsViewSource}}" Loaded="RolesDataGrid_Loaded">
                             <DataGrid.Columns>
                                 <DataGridTextColumn x:Name="HeaderName" Header="Name" Width="*" Binding="{Binding Name}"/>
-                                <DataGridTextColumn x:Name="HeaderTotal" Header="Total" Binding="{Binding TotalCount}" IsReadOnly="True"/>
+                                <!-- CountByGroup columns are added here dynamically -->
+                                <DataGridTextColumn x:Name="HeaderTotal" Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True"/>
                                 <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Requirements" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
