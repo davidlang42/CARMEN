@@ -153,12 +153,18 @@ namespace CarmenUI.Pages
             footer.ColumnDefinitions.Add(total_column);
             // add top total
             var top_total = new TextBlock();
-            top_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.SumOfRolesTotal)));
+            top_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.SumOfRolesTotal))
+            {
+                StringFormat = "={0}"
+            });
             Grid.SetColumn(top_total, column_index);
             footer.Children.Add(top_total);
             // add bottom total
             var bottom_total = new TextBlock();
-            bottom_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.TotalCount)));
+            bottom_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.TotalCount))
+            {
+                StringFormat = "={0}"
+            });
             Grid.SetColumn(bottom_total, column_index);
             Grid.SetRow(bottom_total, 1);
             footer.Children.Add(bottom_total);
