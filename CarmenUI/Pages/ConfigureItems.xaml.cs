@@ -35,6 +35,7 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource rootNodesViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
         private readonly CollectionViewSource requirementsViewSource;
+        private readonly CollectionViewSource sectionTypesViewSource;
 
         public ConfigureItems(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -42,6 +43,7 @@ namespace CarmenUI.Pages
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
+            sectionTypesViewSource = (CollectionViewSource)FindResource(nameof(sectionTypesViewSource));
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -50,16 +52,19 @@ namespace CarmenUI.Pages
             loading.Progress = 0;
             await context.CastGroups.LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
-            loading.Progress = 25;
+            loading.Progress = 20;
             await context.Requirements.LoadAsync();
             requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
-            loading.Progress = 50;
+            loading.Progress = 40;
             await context.Nodes.LoadAsync();
-            loading.Progress = 75;
+            loading.Progress = 60;
             await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
+            loading.Progress = 80;
+            await context.SectionTypes.LoadAsync();
+            sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
             loading.Progress = 100;
         }
 
@@ -195,6 +200,31 @@ namespace CarmenUI.Pages
             var role_view = item_view.AddRole();
             data_grid.SelectedItem = role_view;
             data_grid.CurrentCell = new DataGridCellInfo(role_view, data_grid.Columns.First());
+        }
+
+        private void AddNode(object sender, ExecutedRoutedEventArgs e)
+        {
+            (var parent, var after) = itemsTreeView.SelectedItem switch
+            {
+                Item item => (item.Parent ?? throw new Exception("Item did not have a parent."), item),
+                Section section => (section, null),
+                ShowRoot show => (show, null),
+                _ => (context.ShowRoot, null)
+            };
+            Node new_node = e.Parameter switch
+            {
+                SectionType section_type => new Section
+                {
+                    Name = $"New {section_type.Name}",
+                    SectionType = section_type
+                },
+                _ => new Item
+                {
+                    Name = "New Item"
+                }
+            };
+            new_node.Parent = parent;
+            parent.Children.InsertInOrder(new_node, after);
         }
     }
 }

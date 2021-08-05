@@ -26,7 +26,12 @@
         </cv:MultiConverter>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
+        <RoutedUICommand x:Key="addNodeCommand"/>
+        <CollectionViewSource x:Key="sectionTypesViewSource"/>
     </Page.Resources>
+    <Page.CommandBindings>
+        <CommandBinding Command="{StaticResource addNodeCommand}" Executed="AddNode"/>
+    </Page.CommandBindings>
     <Grid Margin="5">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -64,6 +69,27 @@
                         <TextBlock Text="{Binding Name}"/>
                     </HierarchicalDataTemplate>
                 </TreeView.Resources>
+                <TreeView.ContextMenu>
+                    <ContextMenu>
+                        <ContextMenu.ItemsSource>
+                            <CompositeCollection>
+                                <MenuItem Header="Add Item" Command="{Binding Source={StaticResource addNodeCommand}}"/>
+                                <CollectionContainer Collection="{Binding Source={StaticResource sectionTypesViewSource}}"/>
+                            </CompositeCollection>
+                        </ContextMenu.ItemsSource>
+                        <ContextMenu.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name, StringFormat='Add \{0\}'}"/>
+                            </DataTemplate>
+                        </ContextMenu.ItemTemplate>
+                        <ContextMenu.ItemContainerStyle>
+                            <Style TargetType="{x:Type MenuItem}">
+                                <Setter Property="Command" Value="{Binding Source={StaticResource addNodeCommand}}"/>
+                                <Setter Property="CommandParameter" Value="{Binding}"/>
+                            </Style>
+                        </ContextMenu.ItemContainerStyle>
+                    </ContextMenu>
+                </TreeView.ContextMenu>
             </TreeView>
         </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5"/>
