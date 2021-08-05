@@ -26,7 +26,6 @@
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
         <cv:NameLister x:Key="nameLister"/>
-        <cv:CountByGroupsTotal x:Key="countByGroupsTotal"/>
         <cv:WrapRoles x:Key="wrapRoles"/>
     </Page.Resources>
     <Grid Margin="5">
