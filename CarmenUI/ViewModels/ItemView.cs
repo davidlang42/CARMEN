@@ -22,6 +22,13 @@ namespace CarmenUI.ViewModels
 
         public Item Item { get; init; }
 
+        public string ParentType => Item.Parent switch
+        {
+            ShowRoot => "Show",
+            Section section => section.SectionType.Name,
+            _ => ""
+        };
+
         public ObservableCollection<RoleView> Roles { get; init; }
 
         public uint[] SumOfRolesCount

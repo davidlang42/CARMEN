@@ -77,14 +77,28 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="{Binding Item.Name, StringFormat='Roles in \{0\}:'}" FontSize="22"/>
-                        <DataGrid Grid.Row="1" AutoGenerateColumns="False"
+                        <Grid Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="5"/>
+                                <ColumnDefinition Width="{Binding ElementName=RolesDataGrid, Path=Columns[0].ActualWidth}"/>
+                                <!-- CountByGroup footer columns are added here dynamically -->
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition/>
+                                <RowDefinition/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Column="1" Text="Total Role Counts"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ParentType, StringFormat='Required in \{0\}'}"/>
+                            <!-- CountByGroup footer cells are added here dynamically -->
+                        </Grid>
+                        <DataGrid Grid.Row="1" x:Name="RolesDataGrid"  AutoGenerateColumns="False"
                                   CanUserSortColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
                                   ItemsSource="{Binding Roles}"
-                                  Initialized="RolesDataGrid_Initialized">
+                                  Initialized="RolesDataGrid_Initialized"> <!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->
                             <DataGrid.Columns>
-                                <DataGridTextColumn x:Name="HeaderName" Header="Name" Width="*" Binding="{Binding Role.Name}"/>
+                                <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Role.Name}"/>
                                 <!-- CountByGroup columns are added here dynamically -->
-                                <DataGridTextColumn x:Name="HeaderTotal" Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True"/>
                                 <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Requirements" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
@@ -116,39 +130,6 @@
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
                         </DataGrid>
-                        <Grid Grid.Row="2">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="5"/>
-                                <!--<ColumnDefinition Width="{Binding ElementName=HeaderName, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderJB, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderJG, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderSB, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderSG, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderTotal, Path=ActualWidth}"/>-->
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition/>
-                                <RowDefinition/>
-                            </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="1" Text="Total Required Counts"/>
-                            <TextBlock Grid.Column="2" Text="{Binding SumOfRolesCount[0]}" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="{Binding SumOfRolesCount[1]}" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="{Binding SumOfRolesCount[2]}" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="5" Text="{Binding SumOfRolesCount[3]}" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="6" Text="{Binding SumOfRolesTotal}" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Required in Bracket"/>
-                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding CountByGroups[0].Count}" HorizontalAlignment="Center" Width="40"/>
-                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding CountByGroups[1].Count}" HorizontalAlignment="Center" Width="40"/>
-                            <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding CountByGroups[2].Count}" HorizontalAlignment="Center" Width="40"/>
-                            <TextBox Grid.Row="1" Grid.Column="5" Text="{Binding CountByGroups[3].Count}" HorizontalAlignment="Center" Width="40"/>
-                            <TextBlock Grid.Row="1" Grid.Column="6" Text="{Binding TotalCount}" HorizontalAlignment="Center"/>
-                        </Grid>
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type modelStructure:Section}">
