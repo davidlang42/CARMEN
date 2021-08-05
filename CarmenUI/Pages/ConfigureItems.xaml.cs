@@ -117,9 +117,6 @@ namespace CarmenUI.Pages
             }
             // Populate all footer cells (because doing any in XAML would require
             // knowing how many CountByGroup columns there are in the DataGrid)
-            //TODO HorizontalAlignment="Center"
-            //TODO TextBox for bottom text except total
-
             var footer = ((Grid)datagrid.Parent).Children.OfType<Grid>().Single();
             column_index = 2;
             for (var i = 0; i < context.CastGroups.Local.Count; i++)
@@ -138,8 +135,8 @@ namespace CarmenUI.Pages
                 Grid.SetColumn(top_text, column_index);
                 footer.Children.Add(top_text);
                 // add bottom text
-                var bottom_text = new TextBlock();
-                bottom_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ItemView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}"));
+                var bottom_text = new TextBox();
+                bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ItemView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}"));
                 Grid.SetColumn(bottom_text, column_index);
                 Grid.SetRow(bottom_text, 1);
                 footer.Children.Add(bottom_text);
