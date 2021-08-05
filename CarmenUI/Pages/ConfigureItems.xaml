@@ -83,13 +83,13 @@
                                   ItemsSource="{Binding Roles}"
                                   Initialized="RolesDataGrid_Initialized">
                             <DataGrid.Columns>
-                                <DataGridTextColumn x:Name="HeaderName" Header="Name" Width="*" Binding="{Binding Name}"/>
+                                <DataGridTextColumn x:Name="HeaderName" Header="Name" Width="*" Binding="{Binding Role.Name}"/>
                                 <!-- CountByGroup columns are added here dynamically -->
                                 <DataGridTextColumn x:Name="HeaderTotal" Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True"/>
                                 <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Requirements" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Requirements, Converter={StaticResource nameLister}}"/>
+                                            <TextBlock Text="{Binding CommaSeparatedRequirements}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>

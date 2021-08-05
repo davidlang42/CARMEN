@@ -4,6 +4,7 @@ using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -14,35 +15,25 @@ namespace CarmenUI.ViewModels
 {
     public class RoleView : IDisposable, INotifyPropertyChanged
     {
-        private Role role;
-        private CountByGroup[]? countByGroups;
+        //LATER audit the use of all converters, because I suspect some of them can be implemented more cleanly elsewhere
+        bool disposed = false;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public string Name
-        {
-            get => role.Name;
-            set
-            {
-                if (role.Name == value)
-                    return;
-                role.Name = value;
-                OnPropertyChanged();
-            }
-        }
-
-        public CountByGroup[] CountByGroups => countByGroups ?? throw new ApplicationException("Tried to use RoleView after it was disposed.");
+        public Role Role { get; init; }
+        
+        public CountByGroup[] CountByGroups { get; init; }
 
         public uint TotalCount => CountByGroups.Select(cbg => cbg.Count).Sum();
 
-        public ICollection<Requirement> Requirements => role.Requirements;
+        public ICollection<Requirement> Requirements => Role.Requirements;//TODO should this be a list of SelectableRequirements?
 
-        //TODO implement RequirementsSummary here rather than use nameLister
+        public string CommaSeparatedRequirements => string.Join(", ", Role.Requirements.Select(r => r.Name));
 
         public RoleView(Role role, CastGroup[] cast_groups)
         {
-            this.role = role;
-            this.countByGroups = new CountByGroup[cast_groups.Length];
+            Role = role;
+            CountByGroups = new CountByGroup[cast_groups.Length];
             for (var i = 0; i < cast_groups.Length; i++)
             {
                 if (role.CountByGroups.SingleOrDefault(cbg => cbg.CastGroup == cast_groups[i]) is not CountByGroup cbg)
@@ -50,10 +41,15 @@ namespace CarmenUI.ViewModels
                     cbg = new CountByGroup { CastGroup = cast_groups[i], Count = 0 };
                     role.CountByGroups.Add(cbg);
                 }
-                countByGroups[i] = cbg;
+                CountByGroups[i] = cbg;
                 cbg.PropertyChanged += CountByGroup_PropertyChanged;
             }
+            if (role.Requirements is ObservableCollection<Requirement> requirements)
+                requirements.CollectionChanged += Requirements_CollectionChanged;
         }
+
+        private void Requirements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => OnPropertyChanged(nameof(CommaSeparatedRequirements));
 
         private void CountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
             => OnPropertyChanged(nameof(TotalCount));
@@ -65,11 +61,13 @@ namespace CarmenUI.ViewModels
 
         public void Dispose()
         {
-            if (countByGroups != null)
+            if (!disposed)
             {
-                foreach (var cbg in countByGroups)
+                foreach (var cbg in CountByGroups)
                     cbg.PropertyChanged -= CountByGroup_PropertyChanged;
-                countByGroups = null;
+                if (Role.Requirements is ObservableCollection<Requirement> requirements)
+                    requirements.CollectionChanged -= Requirements_CollectionChanged;
+                disposed = true;
             }
         }
     }
