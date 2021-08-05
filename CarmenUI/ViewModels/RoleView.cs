@@ -26,7 +26,7 @@ namespace CarmenUI.ViewModels
 
         public uint TotalCount => CountByGroups.Select(cbg => cbg.Count).Sum();
 
-        public ICollection<Requirement> Requirements => Role.Requirements;//TODO should this be a list of SelectableRequirements?
+        public ICollection<Requirement> Requirements => Role.Requirements;
 
         public string CommaSeparatedRequirements => string.Join(", ", Role.Requirements.Select(r => r.Name));
 

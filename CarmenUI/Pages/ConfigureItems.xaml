@@ -26,7 +26,6 @@
         </cv:MultiConverter>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
-        <cv:NameLister x:Key="nameLister"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -99,18 +98,7 @@
                                                     <cv:ComboBoxFaceTemplateSelector>
                                                         <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                                                             <DataTemplate>
-                                                                <ItemsControl ItemsSource="{Binding ElementName=requirementsCombo, Path=DataContext.Requirements}">
-                                                                    <ItemsControl.ItemsPanel>
-                                                                        <ItemsPanelTemplate>
-                                                                            <StackPanel Orientation="Horizontal"/>
-                                                                        </ItemsPanelTemplate>
-                                                                    </ItemsControl.ItemsPanel>
-                                                                    <ItemsControl.ItemTemplate>
-                                                                        <DataTemplate>
-                                                                            <TextBlock Text="{Binding Name, StringFormat='\{0\}, '}"/>
-                                                                        </DataTemplate>
-                                                                    </ItemsControl.ItemTemplate>
-                                                                </ItemsControl>
+                                                                <TextBlock Text="{Binding ElementName=requirementsCombo, Path=DataContext.CommaSeparatedRequirements}"/>
                                                             </DataTemplate>
                                                         </cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                                                         <cv:ComboBoxFaceTemplateSelector.ItemTemplate>
