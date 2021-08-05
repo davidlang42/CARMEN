@@ -113,6 +113,9 @@ namespace CarmenUI.Pages
                 {
                     Header = cast_group.Abbreviation,
                     Binding = new Binding($"{nameof(RoleView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
+                    {
+                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                    }
                 });
             }
             // Populate all footer cells (because doing any in XAML would require
@@ -138,7 +141,8 @@ namespace CarmenUI.Pages
                 var bottom_text = new TextBox();
                 bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ItemView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}")
                 {
-                    TargetNullValue = ""
+                    TargetNullValue = "",
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 });
                 Grid.SetColumn(bottom_text, column_index);
                 Grid.SetRow(bottom_text, 1);
