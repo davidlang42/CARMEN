@@ -80,30 +80,58 @@ namespace CarmenUI.Pages
                 OnReturn(DataObjects.Nodes);
         }
 
-        private void itemsTreeView_KeyDown(object sender, KeyEventArgs e)
-        {
+        #region Drag & drop in itemsTreeView
 
+        private Point lastMouseDown;
+        private Node? draggedItem;
+        private Node? draggedTarget;
+
+        private void itemsTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                lastMouseDown = e.GetPosition(itemsTreeView);
         }
 
         private void itemsTreeView_MouseMove(object sender, MouseEventArgs e)
         {
-
-        }
-
-        private void itemsTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if ((e.GetPosition(itemsTreeView) - lastMouseDown).Length > 10)
+                {
+                    draggedItem = (Node?)itemsTreeView.SelectedItem;
+                    if (draggedItem != null)
+                    {
+                        var drop_effect = DragDrop.DoDragDrop(itemsTreeView, itemsTreeView.SelectedValue, DragDropEffects.Move);
+                        if (drop_effect == DragDropEffects.Move && draggedTarget != null && draggedItem != draggedTarget)
+                        {
+                            MoveNode(draggedItem, draggedTarget);
+                            draggedTarget = null;
+                            draggedItem = null;
+                        }
+                    }
+                }
+            }
         }
 
         private void itemsTreeView_DragOver(object sender, DragEventArgs e)
         {
-
+            if ((e.GetPosition(itemsTreeView) - lastMouseDown).Length > 10)
+                ProcessDragDrop(e, out _);
+            e.Handled = true;
         }
 
         private void itemsTreeView_Drop(object sender, DragEventArgs e)
         {
-
+            ProcessDragDrop(e, out draggedTarget);
+            e.Handled = true;
         }
+
+        private void ProcessDragDrop(DragEventArgs e, out Node? target_item)
+        {
+            target_item = (e.OriginalSource as TextBlock)?.DataContext as Node;
+            e.Effects = target_item != null && draggedItem != null && target_item != draggedItem ? DragDropEffects.Move : DragDropEffects.None;
+        }
+        #endregion
 
         private void RolesDataGrid_Initialized(object sender, EventArgs e)
         {
@@ -182,6 +210,17 @@ namespace CarmenUI.Pages
             footer.Children.Add(bottom_total);
         }
 
+        private void itemsTreeView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete && itemsTreeView.SelectedItem is Node node && node is not ShowRoot)
+            {
+                var parent = node.Parent ?? throw new ApplicationException("Non-ShowRoot must have a parent.");
+                parent.Children.Remove(node);
+                var collection = (ObservableCollection<Node>)rootNodesViewSource.Source;
+                collection.Remove(node);
+            }
+        }
+
         private void itemsTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             rolesPanel.Content = itemsTreeView.SelectedItem switch
@@ -225,6 +264,41 @@ namespace CarmenUI.Pages
             };
             new_node.Parent = parent;
             parent.Children.InsertInOrder(new_node, after);
+        }
+
+        private void MoveNode(Node dragged, Node target)
+        {
+            if (dragged is ShowRoot)
+                return;
+            if (dragged.Parent == null)
+                throw new ApplicationException("Non-ShowRoot node must have a parent.");
+            if (dragged.Parent == target.Parent) // move within parent
+            {
+                dragged.Parent.Children.MoveInOrder(dragged, target);
+                var parent = dragged.Parent;
+                parent.Children.Remove(dragged);
+                parent.Children.Add(dragged);
+            }
+            else if (dragged.Parent == target) // move to start of parent
+            {
+                dragged.Parent.Children.MoveInOrder(dragged, dragged.Parent.Children.FirstOrder());
+                var parent = dragged.Parent;
+                parent.Children.Remove(dragged);
+                parent.Children.Add(dragged);
+            }
+            else if (target is InnerNode inner_node) // move into the targeted section/show (at the end of existing children)
+            {
+                dragged.Parent.Children.Remove(dragged);
+                dragged.Parent = inner_node;
+                inner_node.Children.InsertInOrder(dragged);
+            }
+            else // move into a new parent (after the targeted item)
+            {
+                var new_parent = target.Parent ?? throw new ApplicationException("Non-InnerNode node must have a parent.");
+                dragged.Parent.Children.Remove(dragged);
+                dragged.Parent = new_parent;
+                new_parent.Children.InsertInOrder(dragged, target);
+            }
         }
     }
 }
