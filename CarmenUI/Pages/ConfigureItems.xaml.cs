@@ -103,41 +103,18 @@ namespace CarmenUI.Pages
         {
             // Insert columns for CountByGroups (which can't be done in XAML
             // because they are dynamic and DataGridColumns is not a panel)
-            //var columns = ((DataGrid)sender).Columns;
-            //int index = 1;
-            //foreach (var cast_group in context.CastGroups.Local)
-            //{
-            //    // build view template
-            //    var viewFactory = new FrameworkElementFactory(typeof(TextBlock));
-            //    viewFactory.SetBinding(TextBlock.TextProperty, new Binding(nameof(NullableCountByGroup.Count)));
-            //    // build edit template
-            //    var editFactory = new FrameworkElementFactory(typeof(TextBox));
-            //    editFactory.SetBinding(TextBox.TextProperty, new Binding(nameof(NullableCountByGroup.Count)));
-            //    // add the column
-            //    columns.Insert(index++, new DataGridTemplateColumn
-            //    {
-            //        Header = cast_group.Abbreviation,
-            //        CellTemplate = WrapWithNullableCountByGroupContext(cast_group, viewFactory),
-            //        CellEditingTemplate = WrapWithNullableCountByGroupContext(cast_group, editFactory)
-            //    });
-            //}
-
-            //TODO rename code here to populate columns,but bind to indicies like POC xaml code (and remove POC xaml code)
-            //TODO handle property changed events to get TotalCount to update as soon as you change any count
-
-        }
-
-        private DataTemplate WrapWithNullableCountByGroupContext(CastGroup cast_group, FrameworkElementFactory child_element)
-        {
-            var stackPanelFactory = new FrameworkElementFactory(typeof(StackPanel));
-            stackPanelFactory.SetValue(StackPanel.DataContextProperty, new Binding(nameof(Role.CountByGroups))
+            var columns = ((DataGrid)sender).Columns;
+            int column_index = 1;
+            int array_index = 0;
+            foreach (var cast_group in context.CastGroups.Local)
             {
-                Converter = new CountByGroupSelector(),
-                ConverterParameter = cast_group
-            });
-            stackPanelFactory.AppendChild(child_element);
-            return new DataTemplate { VisualTree = stackPanelFactory };
+                columns.Insert(column_index++, new DataGridTextColumn
+                {
+                    Header = cast_group.Abbreviation,
+                    Binding = new Binding($"{nameof(RoleView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
+                });
+            }
+            //TODO handle property changed events to get TotalCount to update as soon as you change any count
         }
-
     }
 }
