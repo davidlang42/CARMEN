@@ -12,10 +12,10 @@ using System.Threading.Tasks;
 
 namespace CarmenUI.ViewModels
 {
-    public class RoleView : INotifyPropertyChanged//TODO do we really need this? Could I just use a converter? prob not
+    public class RoleView : IDisposable, INotifyPropertyChanged
     {
         private Role role;
-        private CastGroup[] castGroups;
+        private CountByGroup[]? countByGroups;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -31,37 +31,44 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public CountByGroup[] CountByGroups//TODO really this should be made on construction, then we know exactly which 4 CBG objects we need to monitor for changes
-        {
-            get
-            {
-                var count_by_groups = new CountByGroup[castGroups.Length];
-                for (var i=0; i< castGroups.Length; i++)
-                {
-                    if (role.CountByGroups.SingleOrDefault(cbg => cbg.CastGroup == castGroups[i]) is not CountByGroup cbg)
-                    {
-                        cbg = new CountByGroup { CastGroup = castGroups[i], Count = 0 };
-                        role.CountByGroups.Add(cbg);
-                    }
-                    count_by_groups[i] = cbg;
-                }
-                return count_by_groups;
-            }
-        }
+        public CountByGroup[] CountByGroups => countByGroups ?? throw new ApplicationException("Tried to use RoleView after it was disposed.");
 
-        public uint TotalCount => role.CountByGroups.Select(cbg => cbg.Count).Sum();
+        public uint TotalCount => CountByGroups.Select(cbg => cbg.Count).Sum();
 
         public ICollection<Requirement> Requirements => role.Requirements;
 
         public RoleView(Role role, CastGroup[] cast_groups)
         {
             this.role = role;
-            this.castGroups = cast_groups;
+            this.countByGroups = new CountByGroup[cast_groups.Length];
+            for (var i = 0; i < cast_groups.Length; i++)
+            {
+                if (role.CountByGroups.SingleOrDefault(cbg => cbg.CastGroup == cast_groups[i]) is not CountByGroup cbg)
+                {
+                    cbg = new CountByGroup { CastGroup = cast_groups[i], Count = 0 };
+                    role.CountByGroups.Add(cbg);
+                }
+                countByGroups[i] = cbg;
+                cbg.PropertyChanged += CountByGroup_PropertyChanged;
+            }
         }
+
+        private void CountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+            => OnPropertyChanged(nameof(TotalCount));
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public void Dispose()
+        {
+            if (countByGroups != null)
+            {
+                foreach (var cbg in countByGroups)
+                    cbg.PropertyChanged -= CountByGroup_PropertyChanged;
+                countByGroups = null;
+            }
         }
     }
 }

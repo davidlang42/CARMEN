@@ -114,7 +114,6 @@ namespace CarmenUI.Pages
                     Binding = new Binding($"{nameof(RoleView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
                 });
             }
-            //TODO handle property changed events to get TotalCount to update as soon as you change any count
         }
     }
 }
