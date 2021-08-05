@@ -5,16 +5,19 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CarmenUI.ViewModels
 {
-    public class NullableCountByGroup
+    public class NullableCountByGroup : INotifyPropertyChanged
     {
         ICollection<CountByGroup> collection;
         CountByGroup countByGroup;
         bool attached;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public CastGroup CastGroup => countByGroup.CastGroup;
 
@@ -36,6 +39,7 @@ namespace CarmenUI.ViewModels
                         collection.Add(countByGroup);
                     attached = true;
                 }
+                OnPropertyChanged();
             }
         }
 
@@ -52,6 +56,11 @@ namespace CarmenUI.ViewModels
                 countByGroup = new CountByGroup { CastGroup = cast_group };
                 attached = false;
             }
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

@@ -52,7 +52,10 @@ namespace CarmenUI.ViewModels
             => OnPropertyChanged(nameof(CommaSeparatedRequirements));
 
         private void CountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-            => OnPropertyChanged(nameof(TotalCount));//TODO CountByGroups as well?
+        {
+            OnPropertyChanged(nameof(CountByGroups));
+            OnPropertyChanged(nameof(TotalCount));
+        }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
