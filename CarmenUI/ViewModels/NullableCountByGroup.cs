@@ -12,7 +12,7 @@ namespace CarmenUI.ViewModels
 {
     public class NullableCountByGroup
     {
-        ObservableCollection<CountByGroup> collection;
+        ICollection<CountByGroup> collection;
         CountByGroup countByGroup;
         bool attached;
 
@@ -39,7 +39,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public NullableCountByGroup(ObservableCollection<CountByGroup> collection, CastGroup cast_group)
+        public NullableCountByGroup(ICollection<CountByGroup> collection, CastGroup cast_group)
         {
             this.collection = collection;
             if (collection.Where(cbg => cbg.CastGroup == cast_group).FirstOrDefault() is CountByGroup existing)

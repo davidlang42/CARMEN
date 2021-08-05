@@ -119,29 +119,35 @@
                         <Grid Grid.Row="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="5"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderName, Path=ActualWidth}"/>
+                                <!--<ColumnDefinition Width="{Binding ElementName=HeaderName, Path=ActualWidth}"/>
                                 <ColumnDefinition Width="{Binding ElementName=HeaderJB, Path=ActualWidth}"/>
                                 <ColumnDefinition Width="{Binding ElementName=HeaderJG, Path=ActualWidth}"/>
                                 <ColumnDefinition Width="{Binding ElementName=HeaderSB, Path=ActualWidth}"/>
                                 <ColumnDefinition Width="{Binding ElementName=HeaderSG, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderTotal, Path=ActualWidth}"/>
+                                <ColumnDefinition Width="{Binding ElementName=HeaderTotal, Path=ActualWidth}"/>-->
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Column="1" Text="Total Required Counts"/>
-                            <TextBlock Grid.Column="2" Text="{Binding }" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="3" Text="18" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="4" Text="36" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="5" Text="36" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="6" Text="144" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="2" Text="{Binding SumOfRolesCount[0]}" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="3" Text="{Binding SumOfRolesCount[1]}" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="4" Text="{Binding SumOfRolesCount[2]}" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="5" Text="{Binding SumOfRolesCount[3]}" HorizontalAlignment="Center"/>
+                            <TextBlock Grid.Column="6" Text="{Binding SumOfRolesTotal}" HorizontalAlignment="Center"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="Required in Bracket"/>
-                            <TextBlock Grid.Row="1" Grid.Column="2" Text="18" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Row="1" Grid.Column="3" Text="18" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Row="1" Grid.Column="4" Text="36" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Row="1" Grid.Column="5" Text="37" HorizontalAlignment="Center" Background="Red"/>
-                            <TextBlock Grid.Row="1" Grid.Column="6" Text="144" HorizontalAlignment="Center"/>
+                            <TextBox Grid.Row="1" Grid.Column="2" Text="{Binding CountByGroups[0].Count}" HorizontalAlignment="Center" Width="40"/>
+                            <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding CountByGroups[1].Count}" HorizontalAlignment="Center" Width="40"/>
+                            <TextBox Grid.Row="1" Grid.Column="4" Text="{Binding CountByGroups[2].Count}" HorizontalAlignment="Center" Width="40"/>
+                            <TextBox Grid.Row="1" Grid.Column="5" Text="{Binding CountByGroups[3].Count}" HorizontalAlignment="Center" Width="40"/>
+                            <TextBlock Grid.Row="1" Grid.Column="6" Text="{Binding TotalCount}" HorizontalAlignment="Center"/>
                         </Grid>
                     </Grid>
                 </DataTemplate>
