@@ -22,13 +22,6 @@ namespace CarmenUI.ViewModels
 
         public Item Item { get; init; }
 
-        public string ParentType => Item.Parent switch
-        {
-            ShowRoot => "Show",
-            Section section => section.SectionType.Name,
-            _ => ""
-        };
-
         public ObservableCollection<RoleView> Roles { get; init; }
 
         public uint[] SumOfRolesCount
@@ -45,6 +38,8 @@ namespace CarmenUI.ViewModels
 
         public uint SumOfRolesTotal => SumOfRolesCount.Sum();
 
+        //TODO confirm that changing role count updates role total, role sum counts and role sum total
+        //TODO confirm that changing item count updates item total, and that its only set if all 4 are set (including to 0)
         public NullableCountByGroup[] CountByGroups { get; init; }//TODO on change, trigger change of TotalCount
 
         /// <summary>The sum of CountByGroups.Count, if they are all set, otherwise null</summary>

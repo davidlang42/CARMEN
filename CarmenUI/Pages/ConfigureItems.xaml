@@ -88,7 +88,7 @@
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Column="1" Text="Total Role Counts"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding ParentType, StringFormat='Required in \{0\}'}"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Required in Item"/>
                             <!-- CountByGroup footer cells are added here dynamically -->
                         </Grid>
                         <DataGrid Grid.Row="1" x:Name="RolesDataGrid"  AutoGenerateColumns="False"
