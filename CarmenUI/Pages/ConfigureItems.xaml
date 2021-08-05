@@ -79,7 +79,8 @@
                         <TextBlock Text="{Binding Name, StringFormat='Roles in \{0\}:'}" FontSize="22"/>
                         <DataGrid Grid.Row="1" AutoGenerateColumns="False"
                                   CanUserSortColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
-                                  ItemsSource="{Binding Roles, Converter={StaticResource wrapRoles}, ConverterParameter={StaticResource castGroupsViewSource}}" Loaded="RolesDataGrid_Loaded">
+                                  ItemsSource="{Binding Roles, Converter={StaticResource wrapRoles}, ConverterParameter={StaticResource castGroupsViewSource}}"
+                                  Initialized="RolesDataGrid_Initialized">
                             <DataGrid.Columns>
                                 <DataGridTextColumn x:Name="HeaderName" Header="Name" Width="*" Binding="{Binding Name}"/>
                                 <!-- CountByGroup columns are added here dynamically -->
@@ -135,10 +136,6 @@
                                 <ColumnDefinition Width="{Binding ElementName=HeaderSB, Path=ActualWidth}"/>
                                 <ColumnDefinition Width="{Binding ElementName=HeaderSG, Path=ActualWidth}"/>
                                 <ColumnDefinition Width="{Binding ElementName=HeaderTotal, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderSinger, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderActor, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderDancer, Path=ActualWidth}"/>
-                                <ColumnDefinition Width="{Binding ElementName=HeaderOther, Path=ActualWidth}"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -150,9 +147,6 @@
                             <TextBlock Grid.Column="4" Text="36" HorizontalAlignment="Center"/>
                             <TextBlock Grid.Column="5" Text="36" HorizontalAlignment="Center"/>
                             <TextBlock Grid.Column="6" Text="144" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="7" Text="1" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="8" Text="24" HorizontalAlignment="Center"/>
-                            <TextBlock Grid.Column="9" Text="12" HorizontalAlignment="Center"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="Required in Bracket"/>
                             <TextBlock Grid.Row="1" Grid.Column="2" Text="18" HorizontalAlignment="Center"/>
                             <TextBlock Grid.Row="1" Grid.Column="3" Text="18" HorizontalAlignment="Center"/>

@@ -99,7 +99,7 @@ namespace CarmenUI.Pages
 
         }
 
-        private void RolesDataGrid_Loaded(object sender, RoutedEventArgs e)
+        private void RolesDataGrid_Initialized(object sender, EventArgs e)
         {
             // Insert columns for CountByGroups (which can't be done in XAML
             // because they are dynamic and DataGridColumns is not a panel)
@@ -114,6 +114,7 @@ namespace CarmenUI.Pages
                     Binding = new Binding($"{nameof(RoleView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
                 });
             }
+            //TODO Bind footer column widths to match DataGrid column widths
         }
     }
 }
