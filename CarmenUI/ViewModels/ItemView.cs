@@ -16,11 +16,11 @@ namespace CarmenUI.ViewModels
     {
         bool disposed = false;
 
-        int castGroupCount;
+        private CastGroup[] castGroups;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public Item Item { get; init; }
+        public Item Item { get; init; } //LATER this should be private
 
         public ObservableCollection<RoleView> Roles { get; init; }
 
@@ -28,9 +28,9 @@ namespace CarmenUI.ViewModels
         {
             get
             {
-                var sum = new uint[castGroupCount];
+                var sum = new uint[castGroups.Length];
                 foreach (var role in Roles)
-                    for (var i = 0; i < castGroupCount; i++)
+                    for (var i = 0; i < sum.Length; i++)
                         sum[i] += role.CountByGroups[i].Count;
                 return sum;
             }
@@ -61,23 +61,49 @@ namespace CarmenUI.ViewModels
         {
             Item = item;
             Roles = new ObservableCollection<RoleView>(item.Roles.Select(r => new RoleView(r, cast_groups)));
-            Roles.CollectionChanged += RoleViews_CollectionChanged;
+            Roles.CollectionChanged += Roles_CollectionChanged;
             CountByGroups = cast_groups.Select(cg => new NullableCountByGroup(item.CountByGroups, cg)).ToArray();
-            if (Item.Roles is ObservableCollection<Role> roles)
-                roles.CollectionChanged += ItemRoles_CollectionChanged;
-            castGroupCount = cast_groups.Length;
+            this.castGroups = cast_groups;
         }
 
-        private void RoleViews_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        private void Roles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                case NotifyCollectionChangedAction.Remove:
+                case NotifyCollectionChangedAction.Replace:
+                    if (e.OldItems != null)
+                        foreach (RoleView rv in e.OldItems)
+                            Item.Roles.Remove(rv.Role);
+                    if (e.NewItems != null)
+                        foreach (RoleView rv in e.NewItems)
+                            Item.Roles.Add(rv.Role);
+                    break;
+                case NotifyCollectionChangedAction.Reset:
+                    Item.Roles.Clear();
+                    foreach (var rv in Roles)
+                        Item.Roles.Add(rv.Role);
+                    break;
+                case NotifyCollectionChangedAction.Move:
+                    // do nothing
+                    break;
+                default:
+                    throw new NotImplementedException($"Action not handled: {e.Action}");
+            }
+
+
             //TODO add/remove property changed handlers to each RoleView (also on initialise)
             //TODO on change of RoleView.CountByGroups trigger change of SumOfRolesCount, SumOfRolesTotal
         }
 
-        private void ItemRoles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        public RoleView AddRole()
         {
-            //TODO propogate changes to RoleView collection
+            var role_view = new RoleView(new Role(), castGroups);
+            Roles.Add(role_view);
+            return role_view;
         }
+
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -87,8 +113,7 @@ namespace CarmenUI.ViewModels
         {
             if (!disposed)
             {
-                if (Item.Roles is ObservableCollection<Role> roles)
-                    roles.CollectionChanged -= ItemRoles_CollectionChanged;
+                Roles.CollectionChanged -= Roles_CollectionChanged;
                 disposed = true;
             }
         }

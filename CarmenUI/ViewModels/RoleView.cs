@@ -20,7 +20,7 @@ namespace CarmenUI.ViewModels
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public Role Role { get; init; }
+        public Role Role { get; init; } //LATER this should be private
         
         public CountByGroup[] CountByGroups { get; init; }
 

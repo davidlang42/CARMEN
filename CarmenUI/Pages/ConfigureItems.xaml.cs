@@ -179,5 +179,15 @@ namespace CarmenUI.Pages
                 _ => null
             };
         }
+
+        private void AddRoleButton_Click(object sender, RoutedEventArgs e)
+        {
+            var item_view = (ItemView)rolesPanel.Content;
+            var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
+            data_grid.Focus();
+            var role_view = item_view.AddRole();
+            data_grid.SelectedItem = role_view;
+            data_grid.CurrentCell = new DataGridCellInfo(role_view, data_grid.Columns.First());
+        }
     }
 }
