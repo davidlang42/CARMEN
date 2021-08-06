@@ -1,4 +1,5 @@
 ﻿using CarmenUI.Converters;
+using CarmenUI.ViewModels;
 using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
@@ -44,19 +45,15 @@ namespace CarmenUI.Pages
         private async void PopulateViews()
         {
             using var loading = new LoadingOverlay(this);
-            loading.Progress = 0;
-            loading.SubText = "Waiting for sleep";
-            await Task.Run(() => Thread.Sleep(1000));
-            loading.Progress = 30;
-            loading.SubText = "Loading nodes";
-            await Task.Run(() => context.Nodes.Load());
-            loading.Progress = 60;
-            loading.SubText = "Observing collection";
+            await context.Criterias.LoadAsync();
+            await context.CastGroups.LoadAsync();
+            await context.Nodes.LoadAsync();
+            await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
-            loading.Progress = 90;
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
-            loading.Progress = 100;
+            await context.Applicants.LoadAsync();
+            loading.Progress = 100;//TODO update percentages
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -71,52 +68,52 @@ namespace CarmenUI.Pages
                 OnReturn(DataObjects.Applicants | DataObjects.Nodes);
         }
 
-        private void ItemsTreeView_KeyDown(object sender, KeyEventArgs e)
+        private void itemsTreeView_KeyDown(object sender, KeyEventArgs e)
         {
 
         }
 
-        private void ItemsTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void itemsTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
 
         }
 
-        private void ItemsTreeView_MouseMove(object sender, MouseEventArgs e)
+        private void itemsTreeView_MouseMove(object sender, MouseEventArgs e)
         {
 
         }
 
-        private void ItemsTreeView_DragOver(object sender, DragEventArgs e)
+        private void itemsTreeView_DragOver(object sender, DragEventArgs e)
         {
 
         }
 
-        private void ItemsTreeView_Drop(object sender, DragEventArgs e)
+        private void itemsTreeView_Drop(object sender, DragEventArgs e)
         {
 
         }
 
-        private void RolesTreeView_KeyDown(object sender, KeyEventArgs e)
+        private void rolesTreeView_KeyDown(object sender, KeyEventArgs e)
         {
 
         }
 
-        private void RolesTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void rolesTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
 
         }
 
-        private void RolesTreeView_MouseMove(object sender, MouseEventArgs e)
+        private void rolesTreeView_MouseMove(object sender, MouseEventArgs e)
         {
 
         }
 
-        private void RolesTreeView_DragOver(object sender, DragEventArgs e)
+        private void rolesTreeView_DragOver(object sender, DragEventArgs e)
         {
 
         }
 
-        private void RolesTreeView_Drop(object sender, DragEventArgs e)
+        private void rolesTreeView_Drop(object sender, DragEventArgs e)
         {
 
         }
@@ -124,6 +121,28 @@ namespace CarmenUI.Pages
         private void AutoCastButton_Click(object sender, RoutedEventArgs e)
         {
 
+        }
+
+        private void ListView_Initialized(object sender, EventArgs e)
+        {
+            //TODO
+            //<GridViewColumn Header="Singing"/>
+            //<GridViewColumn Header="Roles"/>
+            //<GridViewColumn Header="Acting"/>
+            //<GridViewColumn Header="Roles"/>
+            //<GridViewColumn Header="Dancing"/>
+            //<GridViewColumn Header="Roles"/>
+            int column_index = 4;
+        }
+
+        private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            //TODO if any changes have been made, prompt for lose changes like cancel click
+            applicantsPanel.DataContext = rolesTreeView.SelectedItem switch
+            {
+                Role role => new RoleWithApplicantsView(role, context.CastGroups.Local.ToArray(), context.Criterias.Local.ToArray(), context.Applicants.Local.ToObservableCollection()),
+                _ => null
+            };
         }
     }
 }

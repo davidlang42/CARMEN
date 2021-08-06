@@ -15,6 +15,7 @@
     <Page.Resources>
         <CollectionViewSource x:Key="rootNodesViewSource"/>
         <cv:SortIOrdered x:Key="sortIOrdered" />
+        <cv:FullName x:Key="fullName"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -30,13 +31,14 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="Roles:" FontSize="22"/>
-            <TreeView Grid.Row="1" x:Name="RolesTreeView" KeyDown="RolesTreeView_KeyDown"
+            <TreeView Grid.Row="1" x:Name="rolesTreeView" KeyDown="rolesTreeView_KeyDown"
                             ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}"
                             AllowDrop="True"
-                            PreviewMouseLeftButtonDown="RolesTreeView_PreviewMouseLeftButtonDown"
-                            MouseMove="RolesTreeView_MouseMove" 
-                            DragOver="RolesTreeView_DragOver" 
-                            Drop="RolesTreeView_Drop">
+                            PreviewMouseLeftButtonDown="rolesTreeView_PreviewMouseLeftButtonDown"
+                            MouseMove="rolesTreeView_MouseMove" 
+                            DragOver="rolesTreeView_DragOver" 
+                            Drop="rolesTreeView_Drop"
+                       SelectedItemChanged="rolesTreeView_SelectedItemChanged">
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
                         <StackPanel Orientation="Horizontal">
@@ -71,7 +73,7 @@
             </Grid>
         </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5"/>
-        <Grid Grid.Column="2" Margin="5 0">
+        <Grid Grid.Column="2" Margin="5 0" x:Name="applicantsPanel">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -83,8 +85,8 @@
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Role 1" FontSize="22"/>
-                <TextBlock Grid.Column="1" Text="  requires Singer, Actor" FontSize="14" VerticalAlignment="Bottom"/>
+                <TextBlock Text="{Binding Role.Name}" FontSize="22"/>
+                <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, StringFormat='  requires \{0\}'}" FontSize="14" VerticalAlignment="Bottom"/>
                 <Button Grid.Column="2" Content="Edit Roles" Width="100"/>
             </Grid>
             <Grid Grid.Row="1">
@@ -99,29 +101,47 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="80"/>
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock Grid.Row="1" Text="Required"/>
                     <TextBlock Grid.Row="2" Text="Selected"/>
-                    <UniformGrid Grid.Column="1" Rows="1" Width="150" HorizontalAlignment="Left">
-                        <TextBlock Text="JB" HorizontalAlignment="Center"/>
-                        <TextBlock Text="JG" HorizontalAlignment="Center"/>
-                        <TextBlock Text="SB" HorizontalAlignment="Center"/>
-                        <TextBlock Text="SG" HorizontalAlignment="Center"/>
-                    </UniformGrid>
-                    <UniformGrid Grid.Row="1" Grid.Column="1" Rows="1" Width="150" HorizontalAlignment="Left">
-                        <TextBlock Text="1" HorizontalAlignment="Center"/>
-                        <TextBlock Text="2" HorizontalAlignment="Center"/>
-                        <TextBlock Text="3" HorizontalAlignment="Center"/>
-                        <TextBlock Text="4" HorizontalAlignment="Center"/>
-                    </UniformGrid>
-                    <UniformGrid Grid.Row="2" Grid.Column="1" Rows="1" Width="150" HorizontalAlignment="Left">
-                        <TextBlock Text="1" HorizontalAlignment="Center"/>
-                        <TextBlock Text="1" HorizontalAlignment="Center"/>
-                        <TextBlock Text="1" HorizontalAlignment="Center"/>
-                        <TextBlock Text="1" HorizontalAlignment="Center"/>
-                    </UniformGrid>
+                    <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroups}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Abbreviation}" Width="50"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding CountByGroups}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Count}" Width="50"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SelectedCast}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal"/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding}" Width="50"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Grid>
                 <UniformGrid Grid.Column="1" Columns="1" VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal">
@@ -131,7 +151,7 @@
                             <ComboBoxItem Content="etc"/>
                         </ComboBox>
                     </StackPanel>
-                    <CheckBox Content="Show unavailable applicants"/>
+                    <CheckBox x:Name="showUnavailableApplicants" Content="Show unavailable applicants"/>
                 </UniformGrid>
             </Grid>
             <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5">
@@ -144,37 +164,32 @@
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <ListView Grid.ColumnSpan="2">
+                    <ListView Grid.ColumnSpan="2" Initialized="ListView_Initialized" ItemsSource="{Binding Applicants}">
                         <ListView.View>
                             <GridView AllowsColumnReorder="False">
                                 <GridViewColumn>
                                     <GridViewColumn.CellTemplate>
                                         <DataTemplate>
-                                            <CheckBox/>
+                                            <CheckBox IsChecked="{Binding IsSelected}"/>
                                         </DataTemplate>
                                     </GridViewColumn.CellTemplate>
                                 </GridViewColumn>
-                                <GridViewColumn Header="Suitability"/>
-                                <GridViewColumn Header="Cast Number"/>
-                                <GridViewColumn Header="Name"/>
-                                <GridViewColumn Header="Singing"/>
-                                <GridViewColumn Header="Roles"/>
-                                <GridViewColumn Header="Acting"/>
-                                <GridViewColumn Header="Roles"/>
-                                <GridViewColumn Header="Dancing"/>
-                                <GridViewColumn Header="Roles"/>
-                                <GridViewColumn Header="Overall"/>
-                                <GridViewColumn Header="Brac"/>
-                                <GridViewColumn Header="Same"/>
-                                <GridViewColumn Header="Prev"/>
-                                <GridViewColumn Header="Next"/>
+                                <GridViewColumn Header="Suitability" DisplayMemberBinding="{Binding Suitability}"/>
+                                <GridViewColumn Header="Cast Number" DisplayMemberBinding="{Binding CastNumberAndCast}"/>
+                                <GridViewColumn Header="Name">
+                                    <GridViewColumn.DisplayMemberBinding>
+                                        <MultiBinding Converter="{StaticResource fullName}">
+                                            <MultiBinding.Bindings>
+                                                <Binding Path="FirstName"/>
+                                                <Binding Path="LastName"/>
+                                            </MultiBinding.Bindings>
+                                        </MultiBinding>
+                                    </GridViewColumn.DisplayMemberBinding>
+                                </GridViewColumn>
+                                <!-- Criteria columns are added here dynamically -->
+                                <GridViewColumn Header="Overall" DisplayMemberBinding="{Binding OverallAbility}"/>
                             </GridView>
                         </ListView.View>
-                        <TextBlock/>
-                        <TextBlock/>
-                        <TextBlock/>
-                        <TextBlock/>
-                        <TextBlock/>
                     </ListView>
                     <Button Grid.Row="1" x:Name="AutoCastButton" Width="200" Height="35" Margin="5" Click="AutoCastButton_Click" HorizontalAlignment="Left">
                         <TextBlock Text="Allocate most suitable cast"/>

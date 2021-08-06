@@ -97,7 +97,7 @@ namespace CarmenUI.ViewModels
                             rv.PropertyChanged += RoleView_PropertyChanged;
                         }
                     break;
-                case NotifyCollectionChangedAction.Reset:
+                case NotifyCollectionChangedAction.Reset://LATER is this implementation correct? it probably isn't used
                     foreach (var rv in Roles)
                         rv.PropertyChanged -= RoleView_PropertyChanged;
                     Item.Roles.Clear();
@@ -113,7 +113,6 @@ namespace CarmenUI.ViewModels
                 default:
                     throw new NotImplementedException($"Action not handled: {e.Action}");
             }
-            
         }
 
         private void RoleView_PropertyChanged(object? sender, PropertyChangedEventArgs e)
