@@ -92,7 +92,7 @@ namespace CarmenUI.Pages
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
             if (CancelChanges())
-                OnReturn(null);
+                ViewCast_Handler(sender, e);
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
@@ -105,7 +105,7 @@ namespace CarmenUI.Pages
             //- also we need a button somewhere on the page to return to main menu
             //- also need to implement "Edit Roles" button, maybe only from view page though
             if (SaveChanges())
-                OnReturn(DataObjects.Applicants | DataObjects.Nodes);
+                ViewCast_Handler(sender, e);
         }
 
         private void AutoCastButton_Click(object sender, RoutedEventArgs e)
@@ -141,9 +141,10 @@ namespace CarmenUI.Pages
             }
         }
 
-        private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        private void ViewCast_Handler(object sender, RoutedEventArgs e)
         {
-            //TODO (LAST) if any changes have been made, prompt for lose changes like cancel click
+            if (!CancelChanges())
+                return;//TODO if not changing, need to change selected node in treeview back
             if (applicantsPanel.Content is IDisposable existing_view)
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
@@ -156,7 +157,8 @@ namespace CarmenUI.Pages
         private void EditCast_Handler(object sender, RoutedEventArgs e)
         {
             //LATER loadingoverlay while this is created (if needed) -- due to computational time rather than db time
-            //TODO (LAST) if any changes have been made, prompt for lose changes like cancel click
+            if (!CancelChanges())
+                return;
             if (applicantsPanel.Content is IDisposable existing_view)
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
@@ -188,7 +190,8 @@ namespace CarmenUI.Pages
 
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO (LAST) handle main menu
+            if (CancelChanges())
+                OnReturn(DataObjects.Applicants | DataObjects.Nodes);
         }
 
         private void showUnavailableApplicants_Checked(object sender, RoutedEventArgs e)

@@ -39,7 +39,7 @@
             <TextBlock Text="Roles:" FontSize="22"/>
             <Button Grid.Column="1" Content="Next" Width="60" Margin="0 0 0 5" Click="NextButton_Click"/>
             <TreeView Grid.Row="1" Grid.ColumnSpan="2" x:Name="rolesTreeView"
-                       SelectedItemChanged="rolesTreeView_SelectedItemChanged"
+                       SelectedItemChanged="ViewCast_Handler"
                       MouseDoubleClick="EditCast_Handler">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding ChildrenInOrder}">
