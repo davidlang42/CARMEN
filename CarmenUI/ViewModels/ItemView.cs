@@ -60,7 +60,7 @@ namespace CarmenUI.ViewModels
             Item = item;
             Roles = new ObservableCollection<RoleOnlyView>(item.Roles.Select(r =>
             {
-                var rv = new RoleOnlyView(r, cast_groups);//TODO this needs disposing
+                var rv = new RoleOnlyView(r, cast_groups);
                 rv.PropertyChanged += RoleView_PropertyChanged;
                 return rv;
             }));
@@ -89,6 +89,7 @@ namespace CarmenUI.ViewModels
                         {
                             rv.PropertyChanged -= RoleView_PropertyChanged;
                             Item.Roles.Remove(rv.Role);
+                            rv.Dispose();
                         }
                     if (e.NewItems != null)
                         foreach (RoleOnlyView rv in e.NewItems)
@@ -99,7 +100,10 @@ namespace CarmenUI.ViewModels
                     break;
                 case NotifyCollectionChangedAction.Reset://LATER is this implementation correct? it probably isn't used
                     foreach (var rv in Roles)
+                    {
                         rv.PropertyChanged -= RoleView_PropertyChanged;
+                        rv.Dispose();
+                    }
                     Item.Roles.Clear();
                     foreach (var rv in Roles)
                     {
@@ -142,7 +146,10 @@ namespace CarmenUI.ViewModels
             {
                 Roles.CollectionChanged -= Roles_CollectionChanged;
                 foreach (var rv in Roles)
+                {
                     rv.PropertyChanged -= RoleView_PropertyChanged;
+                    rv.Dispose();
+                }
                 foreach (var ncbg in CountByGroups)
                     ncbg.PropertyChanged -= NullableCountByGroup_PropertyChanged;
                 disposed = true;
