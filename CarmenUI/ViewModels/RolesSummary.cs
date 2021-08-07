@@ -40,13 +40,13 @@ namespace CarmenUI.ViewModels
                 foreach (var section in section_type.Sections)
                 {
                     var roles_in_section = section.ItemsInOrder().SelectMany(i => i.Roles).ToHashSet(); //LATER does this need await?
-                    if (section_type.AllowNoRoles == false)
+                    if (!section_type.AllowNoRoles)
                     {
                         var no_roles = total_cast - roles_in_section.SelectMany(r => r.Cast).Distinct().Count(); //LATER does this need await?
                         if (no_roles > 0)
                             Rows.Add(new Row { Fail = $"{no_roles.Plural("Applicant has", "Applicants have")} no role in {section.Name}" });
                     }
-                    if (section_type.AllowMultipleRoles == false)
+                    if (!section_type.AllowMultipleRoles)
                     {
                         var multi_roles = roles_in_section.SelectMany(r => r.Cast).GroupBy(a => a).Where(g => g.Count() > 1).Count(); //LATER does this need await?
                         if (multi_roles > 0)

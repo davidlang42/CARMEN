@@ -36,9 +36,8 @@ namespace CarmenUI.ViewModels
         public virtual async Task UpdateAsync()//TODO maybe this default implementation is stupid because checks need to happen at each level, though I guess node countbygroup checks could happen here
         {
             StartUpdate();
-            await Task.Run(() => Thread.Sleep(500)); //TODO remove
             var (progress, any_errors) = await UpdateChildren();
-            await Task.Run(() => Thread.Sleep(500)); //TODO remove
+            //TODO do we need to check Node.CountMatchesSumOfRoles()?
             FinishUpdate(progress, any_errors);
         }
 
@@ -73,11 +72,11 @@ namespace CarmenUI.ViewModels
             Progress = progress;
         }
 
-        public static NodeView CreateView(Node node)
+        public static NodeView CreateView(Node node, int total_cast)
             => node switch
             {
-                ShowRoot show_root => new ShowRootNodeView(show_root),
-                Section section => new SectionNodeView(section),
+                ShowRoot show_root => new ShowRootNodeView(show_root, total_cast),
+                Section section => new SectionNodeView(section, total_cast),
                 Item item => new ItemNodeView(item),
                 _ => throw new NotImplementedException($"Node type not handled: {typeof(Node)}")
             };

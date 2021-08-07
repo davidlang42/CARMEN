@@ -84,7 +84,7 @@ namespace CarmenUI.Pages
                 await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
                 loading.Progress = 95;
                 await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-                _rootNodeView = new ShowRootNodeView(context.ShowRoot);
+                _rootNodeView = new ShowRootNodeView(context.ShowRoot, applicantsInCast.Length);
                 rolesTreeView.ItemsSource = rootNodeView.Yield();
                 castingProgress.DataContext = rootNodeView;
                 loading.Progress = 100;

@@ -20,9 +20,11 @@ namespace CarmenUI.ViewModels
         public override async Task UpdateAsync()
         {
             StartUpdate();
-            await Task.Run(() => Thread.Sleep(2000));
-            //TODO update role
-            FinishUpdate(1, false);
+            // check role status
+            var status = await Task.Run(() => role.Status);
+            var is_complete = status == Role.RoleStatus.FullyCast;
+            var has_errors = status == Role.RoleStatus.UnderCast || status == Role.RoleStatus.OverCast;
+            FinishUpdate(is_complete ? 1 : 0, has_errors);
         }
 
         public RoleNodeView(Role role)
