@@ -143,18 +143,30 @@ namespace CarmenUI.Pages
 
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            //TODO (LAST) if any changes have been made, prompt for lose changes like cancel click
+            if (applicantsPanel.Content is IDisposable existing_view)
+                existing_view.Dispose();
+            applicantsPanel.Content = rolesTreeView.SelectedItem switch
+            {
+                RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
+                _ => null
+            };
+        }
+
+        private void EditCast_Handler(object sender, RoutedEventArgs e)
+        {
             //LATER loadingoverlay while this is created (if needed) -- due to computational time rather than db time
             //TODO (LAST) if any changes have been made, prompt for lose changes like cancel click
             if (applicantsPanel.Content is IDisposable existing_view)
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
-                //TODO RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
                 RoleNodeView role_node_view => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast),
                 _ => null
             };
             if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
                 check_box.IsChecked = false; //LATER it would be much better if this was a property of the view itself, but for some reason I couldn't get the binding to work properly
+
         }
 
         protected override void DisposeInternal()
