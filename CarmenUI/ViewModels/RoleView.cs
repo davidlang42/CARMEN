@@ -13,38 +13,22 @@ using System.Threading.Tasks;
 
 namespace CarmenUI.ViewModels
 {
-    public class RoleView : IDisposable, INotifyPropertyChanged
+    public abstract class RoleView : IDisposable, INotifyPropertyChanged
     {
         //LATER audit the use of all converters, because I suspect some of them can be implemented more cleanly elsewhere
-        bool disposed = false;
+        bool disposed;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public Role Role { get; init; } //LATER this should be protected
-        
-        /// <summary>Indicies match CastGroup[] provided in constructor</summary>
-        public CountByGroup[] CountByGroups { get; init; }
-
-        public uint TotalCount => CountByGroups.Select(cbg => cbg.Count).Sum();
 
         public ICollection<Requirement> Requirements => Role.Requirements;
 
         public string CommaSeparatedRequirements => string.Join(", ", Role.Requirements.Select(r => r.Name));
 
-        public RoleView(Role role, CastGroup[] cast_groups)
+        public RoleView(Role role)
         {
             Role = role;
-            CountByGroups = new CountByGroup[cast_groups.Length];
-            for (var i = 0; i < cast_groups.Length; i++)
-            {
-                if (role.CountByGroups.SingleOrDefault(cbg => cbg.CastGroup == cast_groups[i]) is not CountByGroup cbg)
-                {
-                    cbg = new CountByGroup { CastGroup = cast_groups[i], Count = 0 };
-                    role.CountByGroups.Add(cbg);
-                }
-                CountByGroups[i] = cbg;
-                cbg.PropertyChanged += CountByGroup_PropertyChanged;
-            }
             if (role.Requirements is ObservableCollection<Requirement> requirements)
                 requirements.CollectionChanged += Requirements_CollectionChanged;
         }
@@ -52,25 +36,24 @@ namespace CarmenUI.ViewModels
         private void Requirements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(CommaSeparatedRequirements));
 
-        private void CountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            OnPropertyChanged(nameof(CountByGroups));
-            OnPropertyChanged(nameof(TotalCount));
-        }
-
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        /// <summary>Actually dispose change handlers, etc.
+        /// This will only be called once.</summary>
+        protected virtual void DisposeInternal()
+        {
+            if (Role.Requirements is ObservableCollection<Requirement> requirements)
+                requirements.CollectionChanged -= Requirements_CollectionChanged;
         }
 
         public void Dispose()
         {
             if (!disposed)
             {
-                foreach (var cbg in CountByGroups)
-                    cbg.PropertyChanged -= CountByGroup_PropertyChanged;
-                if (Role.Requirements is ObservableCollection<Requirement> requirements)
-                    requirements.CollectionChanged -= Requirements_CollectionChanged;
+                DisposeInternal();
                 disposed = true;
             }
         }

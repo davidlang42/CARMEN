@@ -35,10 +35,10 @@ namespace CarmenUI.ViewModels
 
         public ObservableCollection<ApplicantForRole> Applicants { get; init; } = new();
 
-        public RoleWithApplicantsView(Role role, CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Criteria[] criterias, ICollection<Applicant> applicants)
-            : base (role, cast_groups)
+        public RoleWithApplicantsView(Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] criterias, ICollection<Applicant> applicants)
+            : base(role)
         {
-            CastGroupsByCast = CastGroupAndCast.Enumerate(cast_groups, alternative_casts).ToArray();
+            CastGroupsByCast = cast_groups_by_cast;
             RequiredCast = new uint[CastGroupsByCast.Length];
             for (var i = 0; i < CastGroupsByCast.Length; i++)
                 RequiredCast[i] = role.CountFor(CastGroupsByCast[i].CastGroup);
@@ -93,38 +93,6 @@ namespace CarmenUI.ViewModels
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "TODO") //TODO
             {
                 
-            }
-        }
-    }
-
-    public struct CastGroupAndCast
-    {
-        public CastGroup CastGroup { get; set; }
-        public AlternativeCast? Cast { get; set; }
-
-        public string Name => Cast == null ? CastGroup.Name : $"{CastGroup.Name} ({Cast.Name})";
-        public string Abbreviation => Cast == null ? CastGroup.Abbreviation : $"{CastGroup.Abbreviation}-{Cast.Initial}";
-
-        public CastGroupAndCast(CastGroup cast_group, AlternativeCast? alternative_cast = null)
-        {
-            CastGroup = cast_group;
-            Cast = alternative_cast;
-        }
-
-        public CastGroupAndCast(Applicant applicant)
-            : this(applicant.CastGroup ?? throw new ApplicationException("Applicant does not have a CastGroup."),
-                  applicant.AlternativeCast)
-        { }
-
-        public static IEnumerable<CastGroupAndCast> Enumerate(CastGroup[] cast_groups, AlternativeCast[] alternative_casts)
-        {
-            foreach (var cast_group in cast_groups)
-            {
-                if (cast_group.AlternateCasts)
-                    foreach (var alternative_cast in alternative_casts)
-                        yield return new CastGroupAndCast(cast_group, alternative_cast);
-                else
-                    yield return new CastGroupAndCast(cast_group);
             }
         }
     }

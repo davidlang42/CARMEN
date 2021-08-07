@@ -145,7 +145,7 @@ namespace CarmenUI.Pages
                 datagrid.Columns.Insert(column_index++, new DataGridTextColumn
                 {
                     Header = cast_group.Abbreviation,
-                    Binding = new Binding($"{nameof(RoleView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
+                    Binding = new Binding($"{nameof(RoleOnlyView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
                     {
                         UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                     }

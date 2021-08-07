@@ -22,7 +22,7 @@ namespace CarmenUI.ViewModels
 
         public Item Item { get; init; } //LATER this should be private
 
-        public ObservableCollection<RoleView> Roles { get; init; }
+        public ObservableCollection<RoleOnlyView> Roles { get; init; }
 
         public uint[] SumOfRolesCount
         {
@@ -58,9 +58,9 @@ namespace CarmenUI.ViewModels
         public ItemView(Item item, CastGroup[] cast_groups)
         {
             Item = item;
-            Roles = new ObservableCollection<RoleView>(item.Roles.Select(r =>
+            Roles = new ObservableCollection<RoleOnlyView>(item.Roles.Select(r =>
             {
-                var rv = new RoleView(r, cast_groups);
+                var rv = new RoleOnlyView(r, cast_groups);
                 rv.PropertyChanged += RoleView_PropertyChanged;
                 return rv;
             }));
@@ -85,13 +85,13 @@ namespace CarmenUI.ViewModels
                 case NotifyCollectionChangedAction.Remove:
                 case NotifyCollectionChangedAction.Replace:
                     if (e.OldItems != null)
-                        foreach (RoleView rv in e.OldItems)
+                        foreach (RoleOnlyView rv in e.OldItems)
                         {
                             rv.PropertyChanged -= RoleView_PropertyChanged;
                             Item.Roles.Remove(rv.Role);
                         }
                     if (e.NewItems != null)
-                        foreach (RoleView rv in e.NewItems)
+                        foreach (RoleOnlyView rv in e.NewItems)
                         {
                             Item.Roles.Add(rv.Role);
                             rv.PropertyChanged += RoleView_PropertyChanged;
@@ -117,16 +117,16 @@ namespace CarmenUI.ViewModels
 
         private void RoleView_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(RoleView.CountByGroups))
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(RoleOnlyView.CountByGroups))
             {
                 OnPropertyChanged(nameof(SumOfRolesCount));
                 OnPropertyChanged(nameof(SumOfRolesTotal));
             }
         }
 
-        public RoleView AddRole()
+        public RoleOnlyView AddRole()
         {
-            var role_view = new RoleView(new Role(), castGroups);
+            var role_view = new RoleOnlyView(new Role(), castGroups);
             Roles.Add(role_view);
             return role_view;
         }

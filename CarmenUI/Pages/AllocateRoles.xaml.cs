@@ -30,6 +30,10 @@ namespace CarmenUI.Pages
     public partial class AllocateRoles : SubPage
     {
         private readonly CollectionViewSource rootNodesViewSource;
+        private CastGroupAndCast[]? _castGroupsByCast;
+
+        private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
+            ?? throw new ApplicationException($"Tried to used {nameof(castGroupsByCast)} before it was loaded.");
 
         public AllocateRoles(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -43,6 +47,7 @@ namespace CarmenUI.Pages
             await context.Criterias.LoadAsync();//LATER have a user setting which enables/disables preloading on page open for all pages, because if the connection is fast (or local) it might actually be a nicer UX to not do this all up front.
             await context.CastGroups.LoadAsync();
             await context.AlternativeCasts.LoadAsync();
+            _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, context.AlternativeCasts.Local).ToArray();
             await context.Nodes.LoadAsync();
             await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
@@ -128,7 +133,23 @@ namespace CarmenUI.Pages
             //<GridViewColumn Header="Roles"/>
             //<GridViewColumn Header="Dancing"/>
             //<GridViewColumn Header="Roles"/>
+            
+            // Insert columns for primary Criteria (which can't be done in XAML
+            // because they are dynamic and GridView is not a panel)
+            var listview = (ListView)sender;
             int column_index = 4;
+            int array_index = 0;
+            //foreach (var cast_group in context.CastGroups.Local)
+            //{
+            //    datagrid.Columns.Insert(column_index++, new DataGridTextColumn
+            //    {
+            //        Header = cast_group.Abbreviation,
+            //        Binding = new Binding($"{nameof(RoleOnlyView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
+            //        {
+            //            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+            //        }
+            //    });
+            //}
         }
 
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
@@ -137,8 +158,7 @@ namespace CarmenUI.Pages
             applicantsPanel.DataContext = rolesTreeView.SelectedItem switch
             {
                 Role role => new RoleWithApplicantsView(role,
-                    context.CastGroups.Local.ToArray(),
-                    context.AlternativeCasts.Local.ToArray(),
+                    castGroupsByCast,
                     context.Criterias.Local.ToArray(),
                     context.Applicants.Local.ToObservableCollection()),//TODO loadingoverlay while this is created (if needed)
                 _ => null//TODO make this not show the UI when null, probably needs to be a content control
