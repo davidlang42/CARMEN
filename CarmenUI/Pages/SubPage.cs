@@ -18,12 +18,14 @@ namespace CarmenUI.Pages
     {
         bool disposed = false;
         private ShowContext? _context;
+        private DbContextOptions<ShowContext> context_options;
 
         protected ShowContext context => _context
             ?? throw new ApplicationException("Tried to use context after it was disposed.");
 
         public SubPage(DbContextOptions<ShowContext> context_options)
         {
+            this.context_options = context_options;
             _context = new ShowContext(context_options);
         }
 
@@ -43,6 +45,15 @@ namespace CarmenUI.Pages
             if (!context.ChangeTracker.HasChanges())
                 return true; // no changes, always okay to cancel
             return MessageBox.Show("Are you sure you want to cancel?\nAny unsaved changes will be lost.", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+        }
+
+        protected bool RevertChanges()
+        {
+            if (!context.ChangeTracker.HasChanges())
+                return false; // no changes to revert
+            _context?.Dispose();
+            _context = new ShowContext(context_options);
+            return true;
         }
 
         /// <summary>Actually dispose change handlers, etc.

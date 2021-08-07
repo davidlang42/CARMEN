@@ -90,10 +90,7 @@ namespace CarmenUI.Pages
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (CancelChanges())
-                ViewCast_Handler(sender, e);
-        }
+            => ChangeToViewMode();
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
@@ -105,7 +102,7 @@ namespace CarmenUI.Pages
             //- also we need a button somewhere on the page to return to main menu
             //- also need to implement "Edit Roles" button, maybe only from view page though
             if (SaveChanges())
-                ViewCast_Handler(sender, e);
+                ChangeToViewMode();
         }
 
         private void AutoCastButton_Click(object sender, RoutedEventArgs e)
@@ -141,10 +138,12 @@ namespace CarmenUI.Pages
             }
         }
 
-        private void ViewCast_Handler(object sender, RoutedEventArgs e)
+        private bool ChangeToViewMode()
         {
             if (!CancelChanges())
-                return;//TODO if not changing, need to change selected node in treeview back
+                return false;
+            if (RevertChanges())
+                Page_Loaded(this, new RoutedEventArgs());
             if (applicantsPanel.Content is IDisposable existing_view)
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
@@ -152,13 +151,16 @@ namespace CarmenUI.Pages
                 RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
                 _ => null
             };
+            return true;
         }
 
-        private void EditCast_Handler(object sender, RoutedEventArgs e)
+        private bool ChangeToEditMode()
         {
             //LATER loadingoverlay while this is created (if needed) -- due to computational time rather than db time
             if (!CancelChanges())
-                return;
+                return false;
+            if (RevertChanges())
+                Page_Loaded(this, new RoutedEventArgs());
             if (applicantsPanel.Content is IDisposable existing_view)
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
@@ -168,7 +170,7 @@ namespace CarmenUI.Pages
             };
             if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
                 check_box.IsChecked = false; //LATER it would be much better if this was a property of the view itself, but for some reason I couldn't get the binding to work properly
-
+            return true;
         }
 
         protected override void DisposeInternal()
@@ -191,7 +193,7 @@ namespace CarmenUI.Pages
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
         {
             if (CancelChanges())
-                OnReturn(DataObjects.Applicants | DataObjects.Nodes);
+                OnReturn(DataObjects.Applicants | DataObjects.Nodes);//LATER only trigger changes if something was actually changed
         }
 
         private void showUnavailableApplicants_Checked(object sender, RoutedEventArgs e)
@@ -211,5 +213,20 @@ namespace CarmenUI.Pages
             if (applicantsPanel.Content is EditableRoleWithApplicantsView current_view)
                 current_view.ClearSelectedApplicants();
         }
+
+        private void EditCastButton_Click(object sender, RoutedEventArgs e)
+            => ChangeToEditMode();
+
+        private void ViewOnlyApplicantsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => ChangeToEditMode();
+
+        private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
+        {
+            if (!ChangeToViewMode())
+                rolesTreeView.SetSelectedItem(e.OldValue);
+        }
+
+        private void rolesTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => ChangeToEditMode();
     }
 }
