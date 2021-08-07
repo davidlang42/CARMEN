@@ -39,8 +39,7 @@
                     <HierarchicalDataTemplate ItemsSource="{Binding ChildrenInOrder}">
                         <StackPanel Orientation="Horizontal">
                             <Image Source="{Binding Status, Converter={StaticResource processStatusIcon}}" Width="16"/>
-                            <TextBlock Text="{Binding Path=Name}"/>
-                            <TextBlock Text="{Binding Path=Progress, StringFormat=' ({0})', Converter={StaticResource doubleToPercentage}}"/>
+                            <TextBlock Text="{Binding Name}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
                 </TreeView.ItemTemplate>

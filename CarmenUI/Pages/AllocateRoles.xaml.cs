@@ -36,7 +36,6 @@ namespace CarmenUI.Pages
         //TODO add next role button
         //TODO group by cast group in list view
         //TODO hide/remove "edit roles" button and comments(TODO/LATER) relating to it, put all the info into a task for future
-        //TODO hide percentages from node views if 0 or 100%
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
