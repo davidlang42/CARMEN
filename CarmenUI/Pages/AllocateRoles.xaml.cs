@@ -49,18 +49,23 @@ namespace CarmenUI.Pages
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             using var loading = new LoadingOverlay(this);
+            loading.Progress = 0;
             await context.Criterias.LoadAsync();//LATER have a user setting which enables/disables preloading on page open for all pages, because if the connection is fast (or local) it might actually be a nicer UX to not do this all up front.
+            loading.Progress = 10;
             await context.CastGroups.LoadAsync();
+            loading.Progress = 20;
             await context.AlternativeCasts.LoadAsync();
             _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, context.AlternativeCasts.Local).ToArray();
+            loading.Progress = 30;
             _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).ToArrayAsync();
+            loading.Progress = 60;
             await context.Nodes.LoadAsync();
+            loading.Progress = 80;
             await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
-            await context.Applicants.LoadAsync();
-            loading.Progress = 100;//TODO update percentages
+            loading.Progress = 100;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
