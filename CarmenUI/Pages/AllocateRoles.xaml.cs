@@ -4,6 +4,7 @@ using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Applicants;
+using ShowModel.Criterias;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -33,12 +34,16 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource rootNodesViewSource;
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
+        private Criteria[]? _primaryCriterias;
 
         private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
             ?? throw new ApplicationException($"Tried to used {nameof(castGroupsByCast)} before it was loaded.");
 
         private Applicant[] applicantsInCast => _applicantsInCast
             ?? throw new ApplicationException($"Tried to used {nameof(applicantsInCast)} before it was loaded.");
+
+        private Criteria[] primaryCriterias => _primaryCriterias
+            ?? throw new ApplicationException($"Tried to used {nameof(primaryCriterias)} before it was loaded.");
 
         public AllocateRoles(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -48,9 +53,10 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            //LATER have a user setting which enables/disables preloading on page open for all pages, because if the connection is fast (or local) it might actually be a nicer UX to not do this all up front.
             using var loading = new LoadingOverlay(this);
             loading.Progress = 0;
-            await context.Criterias.LoadAsync();//LATER have a user setting which enables/disables preloading on page open for all pages, because if the connection is fast (or local) it might actually be a nicer UX to not do this all up front.
+            _primaryCriterias = await context.Criterias.Where(c => c.Primary).ToArrayAsync();
             loading.Progress = 10;
             await context.CastGroups.LoadAsync();
             loading.Progress = 20;
@@ -137,37 +143,33 @@ namespace CarmenUI.Pages
 
         private void ListView_Initialized(object sender, EventArgs e)
         {
-            //TODO
-            //<GridViewColumn Header="Singing"/>
-            //<GridViewColumn Header="Roles"/>
-            //<GridViewColumn Header="Acting"/>
-            //<GridViewColumn Header="Roles"/>
-            //<GridViewColumn Header="Dancing"/>
-            //<GridViewColumn Header="Roles"/>
-            
             // Insert columns for primary Criteria (which can't be done in XAML
             // because they are dynamic and GridView is not a panel)
             var listview = (ListView)sender;
+            var gridview = (GridView)listview.View;
             int column_index = 4;
             int array_index = 0;
-            //foreach (var cast_group in context.CastGroups.Local)
-            //{
-            //    datagrid.Columns.Insert(column_index++, new DataGridTextColumn
-            //    {
-            //        Header = cast_group.Abbreviation,
-            //        Binding = new Binding($"{nameof(RoleOnlyView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
-            //        {
-            //            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            //        }
-            //    });
-            //}
+            foreach (var criteria in primaryCriterias)
+            {
+                gridview.Columns.Insert(column_index++, new GridViewColumn
+                {
+                    Header = criteria.Name,
+                    DisplayMemberBinding = new Binding($"{nameof(ApplicantForRole.Marks)}[{array_index}]")
+                });
+                gridview.Columns.Insert(column_index++, new GridViewColumn
+                {
+                    Header = "Roles",
+                    DisplayMemberBinding = new Binding($"{nameof(ApplicantForRole.ExistingRoles)}[{array_index}]")
+                });
+                array_index++;
+            }
         }
 
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             //TODO this probably needs to be constructed higher up, in a NodeView VM, so that each node can know its progress/icon etc
             //TODO if any changes have been made, prompt for lose changes like cancel click
-            applicantsPanel.DataContext = rolesTreeView.SelectedItem switch
+            applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
                 Role role => new RoleWithApplicantsView(role,//TODO this needs disposing
                     castGroupsByCast,

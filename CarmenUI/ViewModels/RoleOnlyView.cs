@@ -28,7 +28,7 @@ namespace CarmenUI.ViewModels
                 if (role.CountByGroups.SingleOrDefault(cbg => cbg.CastGroup == cast_groups[i]) is not CountByGroup cbg)
                 {
                     cbg = new CountByGroup { CastGroup = cast_groups[i], Count = 0 };
-                    role.CountByGroups.Add(cbg);//TODO (maybe) instead of creating missing CountByGroups, they could be wrapped as NullableCountByGroups, which might give a better UX, as long as it doesn't break anything else
+                    role.CountByGroups.Add(cbg);//LATER (maybe) instead of creating missing CountByGroups, they could be wrapped as NullableCountByGroups, which might give a better UX, as long as it doesn't break anything else
                 }
                 CountByGroups[i] = cbg;
                 cbg.PropertyChanged += CountByGroup_PropertyChanged;

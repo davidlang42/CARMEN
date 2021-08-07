@@ -48,15 +48,16 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public double Suitability { get; }//TODO
+        public double Suitability => new Random().NextDouble(); //TODO
         public string FirstName => Applicant.FirstName;
         public string LastName => Applicant.LastName;
 
         public string CastNumberAndCast => $"{Applicant.CastNumber}{Applicant.AlternativeCast?.Initial}";
 
-        public Ability[] Abilities { get; }//TODO
+        public uint[] Marks => new uint[] { 10, 20, 30 };//TODO
 
-        public double[] ExistingRoles { get; }//TODO
+        /// <summary>Not including this role, even if already cast in it</summary>
+        public double[] ExistingRoles => new double[] { 1, 2, 3 };//TODO
 
         public int OverallAbility => Applicant.OverallAbility;
 
