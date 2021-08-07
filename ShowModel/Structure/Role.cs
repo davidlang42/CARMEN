@@ -41,6 +41,7 @@ namespace ShowModel.Structure
                 {
                     if (cast_by_group.Key is not CastGroup cast_group)
                         return RoleStatus.OverCast;
+                    //TODO handle alternate casts here, probably by bringing CastGroupAndCast into ShowModel
                     var required_count = CountFor(cast_group);
                     var actual_count = cast_by_group.Count();
                     if (required_count > actual_count)

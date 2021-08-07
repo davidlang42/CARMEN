@@ -47,12 +47,14 @@ namespace CarmenUI.Pages
             return MessageBox.Show("Are you sure you want to cancel?\nAny unsaved changes will be lost.", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
         }
 
+        /// <summary>Reverts changes by refreshing the context.
+        /// Returns true if a full context refresh is required.</summary>
         protected bool RevertChanges()
         {
             if (!context.ChangeTracker.HasChanges())
                 return false; // no changes to revert
             _context?.Dispose();
-            _context = new ShowContext(context_options);
+            _context = new ShowContext(context_options); //LATER there has to be a better way than this
             return true;
         }
 

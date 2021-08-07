@@ -33,6 +33,8 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class AllocateRoles : SubPage
     {
+        //TODO make sure that ViewOnlyApplicantsList scrolls if too long
+        //TODO handle double click on ViewOnlyApplicantsList even when no applicants
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
@@ -94,15 +96,12 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO (LAST) modify (and rename) save/cancel buttons to be only for the currently selected Role --
-            //- what should happen to selection in tree when save/cancel is clicked?
-            //- maybe selecting it only shows the current selected applicants by default, then you click edit to load this view?
-            //- if no one selected, it could go to edit by default
-            //- then when you click save/cancel it goes back to view
-            //- also we need a button somewhere on the page to return to main menu
-            //- also need to implement "Edit Roles" button, maybe only from view page though
             if (SaveChanges())
+            {
+                if (applicantsPanel.Content is EditableRoleWithApplicantsView editable_view)
+                    rootNodeView.FindRoleView(editable_view.Role)?.UpdateAsync();
                 ChangeToViewMode();
+            }
         }
 
         private void AutoCastButton_Click(object sender, RoutedEventArgs e)
