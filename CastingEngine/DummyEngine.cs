@@ -34,5 +34,27 @@ namespace CastingEngine
         /// <summary>Dummy value enumerates roles in item order, then by name, removing duplicates</summary>
         public IEnumerable<Role> CastingOrder(IEnumerable<Item> items_in_order)
             => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();
+
+        /// <summary>
+        /// Dummy selection picks the number of required applicants of each type from the list of applicants, ignoring availability
+        /// </summary>
+        public IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts)
+        {
+            var casts = alternative_casts.ToArray();
+            foreach (var cbg in role.CountByGroups)
+            {
+                if (cbg.CastGroup.AlternateCasts)
+                {
+                    foreach(var cast in casts)
+                        foreach (var applicant in applicants.Where(a => a.CastGroup == cbg.CastGroup && a.AlternativeCast == cast).Take((int)cbg.Count))
+                            yield return applicant;
+                }
+                else
+                {
+                    foreach (var applicant in applicants.Where(a => a.CastGroup == cbg.CastGroup).Take((int)cbg.Count))
+                        yield return applicant;
+                }
+            }
+        }
     }
 }

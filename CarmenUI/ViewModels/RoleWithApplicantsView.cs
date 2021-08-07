@@ -17,7 +17,7 @@ namespace CarmenUI.ViewModels
 {
     public class RoleWithApplicantsView : RoleView
     {
-        public CastGroupAndCast[] CastGroupsByCast { get; init; }
+        public CastGroupAndCast[] CastGroupsByCast { get; init; } //LATER consider moving CastGroupAndCast into ShowModal so it can be used in CastingEngine, or maybe just instanciate CastingEngine with cast groups and alternative casts
 
         /// <summary>Indicies match CastGroupsByCast</summary>
         public uint[] RequiredCast { get; init; }
@@ -72,6 +72,20 @@ namespace CarmenUI.ViewModels
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.CastGroup)}.{nameof(CastGroup.Order)}", ListSortDirection.Ascending));
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Cast)}.{nameof(AlternativeCast.Initial)}", ListSortDirection.Ascending));
             view.SortDescriptions.Add(new(nameof(ApplicantForRole.Suitability), ListSortDirection.Descending));
+        }
+
+        public void ClearSelectedApplicants()
+        {
+            foreach (var av in Applicants)
+                av.IsSelected = false;
+        }
+
+        public void SelectApplicants(IEnumerable<Applicant> applicants)
+        {
+            var applicant_set = applicants.ToHashSet();
+            foreach (var av in Applicants)
+                if (applicant_set.Contains(av.Applicant))
+                    av.IsSelected = true;
         }
 
         private void ApplicantForRole_PropertyChanged(object? sender, PropertyChangedEventArgs e)

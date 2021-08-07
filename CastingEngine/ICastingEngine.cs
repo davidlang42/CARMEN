@@ -62,7 +62,7 @@ namespace CastingEngine
         Availability AvailabilityOf(Applicant applicant, Role role);
 
         /// <summary>Pick the cast for a role</summary>
-        //LATER IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
+        IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
 
         /// <summary>Pick the cast for one or more roles, balancing talent between them</summary>
         //LATER Dictionary<Role, IEnumerable<Applicant>> PickCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);

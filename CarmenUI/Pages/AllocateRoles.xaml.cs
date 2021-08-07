@@ -110,7 +110,11 @@ namespace CarmenUI.Pages
 
         private void AutoCastButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO handle auto cast button click
+            if (applicantsPanel.Content is not RoleWithApplicantsView current_view)
+                return;
+            current_view.ClearSelectedApplicants();
+            var new_applicants = engine.PickCast(applicantsInCast, current_view.Role, context.AlternativeCasts.Local);
+            current_view.SelectApplicants(new_applicants);
         }
 
         private void ListView_Initialized(object sender, EventArgs e)
