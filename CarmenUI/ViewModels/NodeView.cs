@@ -11,6 +11,15 @@ namespace CarmenUI.ViewModels
 {
     public abstract class NodeView : DependencyObject
     {
+        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
+            nameof(IsSelected), typeof(bool), typeof(NodeView), new PropertyMetadata(false));
+
+        public bool IsSelected
+        {
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
+        }
+
         public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(
             nameof(Status), typeof(ProcessStatus), typeof(NodeView), new PropertyMetadata(ProcessStatus.Loading));
 
@@ -38,6 +47,18 @@ namespace CarmenUI.ViewModels
         public abstract ICollection<NodeView> ChildrenInOrder { get; }
 
         public abstract string Name { get; }
+
+        /// <summary>Searches recursively for the RoleNodeView for the given Role.
+        /// This will throw an exception if the Role is not found.</summary>
+        public RoleNodeView? FindRoleView(Role role)
+        {
+            if (this is RoleNodeView rv && rv.Role == role)
+                return rv;
+            foreach (var child in ChildrenInOrder)
+                if (child.FindRoleView(role) is RoleNodeView child_result)
+                    return child_result;
+            return null;
+        }
 
         protected void StartUpdate()
         {

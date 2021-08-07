@@ -38,7 +38,18 @@ namespace CastingEngine
 
         #region Role allocation
         /// <summary>Determine the recommended order in which the roles should be cast</summary>
-        //LATER IEnumerable<Role> CastingOrder(IEnumerable<Item> items_in_order, IEnumerable<Role> roles);
+        IEnumerable<Role> CastingOrder(IEnumerable<Item> items_in_order);
+
+        Role? NextRoleToCast(IEnumerable<Item> items_in_order, Role? excluding_role = null)
+        {
+            var e = CastingOrder(items_in_order).GetEnumerator();
+            if (!e.MoveNext())
+                return null;
+            if (e.Current == excluding_role)
+                if (!e.MoveNext())
+                    return null;
+            return e.Current;
+        }
 
         /// <summary>Calculate the suitability of an applicant for a role</summary>
         double SuitabilityOf(Applicant applicant, Role role);

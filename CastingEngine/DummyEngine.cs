@@ -30,5 +30,9 @@ namespace CastingEngine
             .Where(r => r != role)
             .Any(r => r.Cast.Contains(applicant))
             ? Availability.AlreadyInItem : Availability.Available;
+
+        /// <summary>Dummy value enumerates roles in item order, then by name, removing duplicates</summary>
+        public IEnumerable<Role> CastingOrder(IEnumerable<Item> items_in_order)
+            => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();
     }
 }

@@ -159,7 +159,12 @@ namespace CarmenUI.Pages
 
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO handle next role button
+            var current_role = (rolesTreeView.SelectedItem as RoleNodeView)?.Role;
+            var next_role = engine.NextRoleToCast(context.ShowRoot.ItemsInOrder(), current_role);
+            if (next_role == null)
+                rolesTreeView.ClearSelectedItem();
+            else if (rootNodeView.FindRoleView(next_role) is RoleNodeView next_role_view)
+                rolesTreeView.SetSelectedItem(next_role_view);
         }
 
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
