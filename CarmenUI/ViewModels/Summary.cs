@@ -46,12 +46,4 @@ namespace CarmenUI.ViewModels
                 Status = ProcessStatus.None;
         }
     }
-
-    public enum ProcessStatus
-    {
-        None,
-        Loading,
-        Error,
-        Complete
-    }
 }

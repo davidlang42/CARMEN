@@ -14,10 +14,10 @@
     Title="Allocate Roles"
     Loaded="Page_Loaded">
     <Page.Resources>
-        <CollectionViewSource x:Key="rootNodesViewSource"/>
-        <cv:SortIOrdered x:Key="sortIOrdered" />
         <cv:FullName x:Key="fullName"/>
         <cv:DoubleToPercentage x:Key="doubleToPercentage"/>
+        <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
+        <cv:TrueIfNull x:Key="trueIfNull"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -34,44 +34,21 @@
             </Grid.RowDefinitions>
             <TextBlock Text="Roles:" FontSize="22"/>
             <TreeView Grid.Row="1" x:Name="rolesTreeView" KeyDown="rolesTreeView_KeyDown"
-                            ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}"
-                            AllowDrop="True"
-                            PreviewMouseLeftButtonDown="rolesTreeView_PreviewMouseLeftButtonDown"
-                            MouseMove="rolesTreeView_MouseMove" 
-                            DragOver="rolesTreeView_DragOver" 
-                            Drop="rolesTreeView_Drop"
                        SelectedItemChanged="rolesTreeView_SelectedItemChanged">
-                <TreeView.Resources>
-                    <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding ChildrenInOrder}">
                         <StackPanel Orientation="Horizontal">
-                            <Image Source="/Icons/Checkmark.png" Width="16"/>
-                            <TextBlock Text="{Binding Path=Name, StringFormat='Show: {0}'}"/>
+                            <Image Source="{Binding Status, Converter={StaticResource processStatusIcon}}" Width="16"/>
+                            <TextBlock Text="{Binding Path=Name}"/>
+                            <TextBlock Text="{Binding Path=Progress, StringFormat=' ({0})', Converter={StaticResource doubleToPercentage}}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type modelStructure:Section}" ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="/Icons/Ellipsis_bold.png" Width="16"/>
-                            <TextBlock Text="{Binding Path=Name, StringFormat='Section: {0}'}"/>
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type modelStructure:Item}" ItemsSource="{Binding Roles, Converter={StaticResource sortIOrdered}}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="/Icons/Cancel.png" Width="16"/>
-                            <TextBlock Text="{Binding Path=Name, StringFormat='Item: {0}'}"/>
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                    <HierarchicalDataTemplate DataType="{x:Type modelStructure:Role}">
-                        <StackPanel Orientation="Horizontal">
-                            <Image Source="/Icons/Ellipsis_bold.png" Width="16"/>
-                            <TextBlock Text="{Binding Path=Name, StringFormat='Role: {0}'}"/>
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                </TreeView.Resources>
+                </TreeView.ItemTemplate>
             </TreeView>
             <CheckBox Grid.Row="2" IsChecked="True" Content="Show completed" Margin="0 5"/>
-            <Grid Grid.Row="3" Margin="0 0 0 5">
-                <ProgressBar x:Name="CastingProgress" Value="50" Height="20"/>
-                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding ElementName=CastingProgress, Path=Value, StringFormat='\{0\}%'}"/>
+            <Grid Grid.Row="3" x:Name="castingProgress" Margin="0 0 0 5">
+                <ProgressBar Maximum="1" Height="20" Value="{Binding Progress}" IsIndeterminate="{Binding Progress, Converter={StaticResource trueIfNull}}"/>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Progress, Converter={StaticResource doubleToPercentage}}"/>
             </Grid>
         </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5"/>

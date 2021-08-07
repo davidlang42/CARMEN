@@ -33,10 +33,10 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class AllocateRoles : SubPage
     {
-        private readonly CollectionViewSource rootNodesViewSource;
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
+        private NodeView? _rootNodeView;
         private ICastingEngine engine;
 
         private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
@@ -47,42 +47,46 @@ namespace CarmenUI.Pages
 
         private Criteria[] primaryCriterias => _primaryCriterias
             ?? throw new ApplicationException($"Tried to used {nameof(primaryCriterias)} before it was loaded.");
+        
+        private NodeView rootNodeView => _rootNodeView
+            ?? throw new ApplicationException($"Tried to used {nameof(rootNodeView)} before it was loaded.");
 
         public AllocateRoles(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
-            rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
             engine = new DummyEngine(); //LATER use real engine, maybe have it supplied by constructor
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             //LATER have a user setting which enables/disables preloading on page open for all pages, because if the connection is fast (or local) it might actually be a nicer UX to not do this all up front.
-            using var loading = new LoadingOverlay(this);
-            loading.Progress = 0;
-            _primaryCriterias = await context.Criterias.Where(c => c.Primary).ToArrayAsync();
-            loading.Progress = 10;
-            await context.CastGroups.LoadAsync();
-            loading.Progress = 20;
-            await context.AlternativeCasts.LoadAsync();
-            _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, context.AlternativeCasts.Local).ToArray();
-            loading.Progress = 30;
-            _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ToArrayAsync();
-            loading.Progress = 60;
-            await context.Nodes.LoadAsync();
-            loading.Progress = 80;
-            await context.Requirements.OfType<AbilityExactRequirement>().Include(cr => cr.Criteria).LoadAsync();
-            loading.Progress = 85;
-            await context.Requirements.OfType<AbilityRangeRequirement>().Include(cr => cr.Criteria).LoadAsync();
-            loading.Progress = 90;
-            await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
-            loading.Progress = 95;
-            await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-            //TODO (3) populate itemsTreeView with viewmodels (NodeView) which provide: Children, Name, Status(ie. icon)
-            rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
-            rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
-            rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
-            loading.Progress = 100;
+            using (var loading = new LoadingOverlay(this))
+            {
+                loading.Progress = 0;
+                _primaryCriterias = await context.Criterias.Where(c => c.Primary).ToArrayAsync();
+                loading.Progress = 10;
+                await context.CastGroups.LoadAsync();
+                loading.Progress = 20;
+                await context.AlternativeCasts.LoadAsync();
+                _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, context.AlternativeCasts.Local).ToArray();
+                loading.Progress = 30;
+                _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ToArrayAsync();
+                loading.Progress = 60;
+                await context.Nodes.LoadAsync();
+                loading.Progress = 80;
+                await context.Requirements.OfType<AbilityExactRequirement>().Include(cr => cr.Criteria).LoadAsync();
+                loading.Progress = 85;
+                await context.Requirements.OfType<AbilityRangeRequirement>().Include(cr => cr.Criteria).LoadAsync();
+                loading.Progress = 90;
+                await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
+                loading.Progress = 95;
+                await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
+                _rootNodeView = new ShowRootNodeView(context.ShowRoot);
+                rolesTreeView.ItemsSource = rootNodeView.Yield();
+                castingProgress.DataContext = rootNodeView;
+                loading.Progress = 100;
+            }
+            await rootNodeView.UpdateAsync();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -93,7 +97,7 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO (4) modify (and rename) save/cancel buttons to be only for the currently selected Role --
+            //TODO (LAST) modify (and rename) save/cancel buttons to be only for the currently selected Role --
             //- what should happen to selection in tree when save/cancel is clicked?
             //- maybe selecting it only shows the current selected applicants by default, then you click edit to load this view?
             //- if no one selected, it could go to edit by default
@@ -104,52 +108,7 @@ namespace CarmenUI.Pages
                 OnReturn(DataObjects.Applicants | DataObjects.Nodes);
         }
 
-        private void itemsTreeView_KeyDown(object sender, KeyEventArgs e)
-        {
-
-        }
-
-        private void itemsTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void itemsTreeView_MouseMove(object sender, MouseEventArgs e)
-        {
-
-        }
-
-        private void itemsTreeView_DragOver(object sender, DragEventArgs e)
-        {
-
-        }
-
-        private void itemsTreeView_Drop(object sender, DragEventArgs e)
-        {
-
-        }
-
         private void rolesTreeView_KeyDown(object sender, KeyEventArgs e)
-        {
-
-        }
-
-        private void rolesTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
-        private void rolesTreeView_MouseMove(object sender, MouseEventArgs e)
-        {
-
-        }
-
-        private void rolesTreeView_DragOver(object sender, DragEventArgs e)
-        {
-
-        }
-
-        private void rolesTreeView_Drop(object sender, DragEventArgs e)
         {
 
         }
@@ -186,7 +145,7 @@ namespace CarmenUI.Pages
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             //LATER loadingoverlay while this is created (if needed) -- due to computational time rather than db time
-            //TODO (4) if any changes have been made, prompt for lose changes like cancel click
+            //TODO (LAST) if any changes have been made, prompt for lose changes like cancel click
             if (applicantsPanel.Content is RoleWithApplicantsView existing_view)
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
