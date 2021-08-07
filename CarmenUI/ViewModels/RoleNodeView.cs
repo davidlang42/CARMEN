@@ -10,18 +10,18 @@ namespace CarmenUI.ViewModels
 {
     public class RoleNodeView : NodeView
     {
-        private Role role;
+        public Role Role;
         private NodeView[] childrenInOrder;
 
         public override ICollection<NodeView> ChildrenInOrder => childrenInOrder;
 
-        public override string Name => role.Name;
+        public override string Name => Role.Name;
 
         public override async Task UpdateAsync()
         {
             StartUpdate();
             // check role status
-            var status = await Task.Run(() => role.Status);
+            var status = await Task.Run(() => Role.Status);
             var is_complete = status == Role.RoleStatus.FullyCast;
             var has_errors = status == Role.RoleStatus.UnderCast || status == Role.RoleStatus.OverCast;
             FinishUpdate(is_complete ? 1 : 0, has_errors);
@@ -29,7 +29,7 @@ namespace CarmenUI.ViewModels
 
         public RoleNodeView(Role role)
         {
-            this.role = role;
+            this.Role = role;
             childrenInOrder = new NodeView[0];
         }
     }

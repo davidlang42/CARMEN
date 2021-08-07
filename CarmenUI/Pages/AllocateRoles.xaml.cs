@@ -154,7 +154,7 @@ namespace CarmenUI.Pages
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
-                Role role => new RoleWithApplicantsView(engine, role, castGroupsByCast, primaryCriterias, applicantsInCast),
+                RoleNodeView role_node_view => new RoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast),
                 _ => null
             };
         }

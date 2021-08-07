@@ -35,7 +35,7 @@ namespace ShowModel.Structure
         public bool VerifyConsecutiveItems()
             => VerifyConsecutiveItems(out _, true);
 
-        private bool VerifyConsecutiveItems(out List<ConsecutiveItemResult> failures, bool shortcut_result)//TODO abstract out of RolesSummary.cs, make async
+        private bool VerifyConsecutiveItems(out List<ConsecutiveItemResult> failures, bool shortcut_result)
         {
             failures = new();
             var items = ItemsInOrder().ToList();

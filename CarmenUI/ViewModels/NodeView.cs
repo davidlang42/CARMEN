@@ -11,7 +11,6 @@ namespace CarmenUI.ViewModels
 {
     public abstract class NodeView : DependencyObject
     {
-        //TODO implement a similar thing to NodeView but for ConfigureItems UI, matching logic of ItemsSummary
         public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(
             nameof(Status), typeof(ProcessStatus), typeof(NodeView), new PropertyMetadata(ProcessStatus.Loading));
 
