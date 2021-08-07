@@ -59,6 +59,9 @@
         <ContentControl x:Name="applicantsPanel" Grid.Column="2" Margin="5 0">
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:RoleWithApplicantsView}">
+                    <TextBlock Text="TODO"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:EditableRoleWithApplicantsView}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>

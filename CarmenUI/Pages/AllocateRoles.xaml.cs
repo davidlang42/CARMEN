@@ -110,7 +110,7 @@ namespace CarmenUI.Pages
 
         private void AutoCastButton_Click(object sender, RoutedEventArgs e)
         {
-            if (applicantsPanel.Content is not RoleWithApplicantsView current_view)
+            if (applicantsPanel.Content is not EditableRoleWithApplicantsView current_view)
                 return;
             current_view.ClearSelectedApplicants();
             var new_applicants = engine.PickCast(applicantsInCast, current_view.Role, context.AlternativeCasts.Local);
@@ -145,11 +145,12 @@ namespace CarmenUI.Pages
         {
             //LATER loadingoverlay while this is created (if needed) -- due to computational time rather than db time
             //TODO (LAST) if any changes have been made, prompt for lose changes like cancel click
-            if (applicantsPanel.Content is RoleWithApplicantsView existing_view)
+            if (applicantsPanel.Content is IDisposable existing_view)
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
-                RoleNodeView role_node_view => new RoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast),
+                //TODO RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
+                RoleNodeView role_node_view => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast),
                 _ => null
             };
             if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
@@ -158,7 +159,7 @@ namespace CarmenUI.Pages
 
         protected override void DisposeInternal()
         {
-            if (applicantsPanel.Content is RoleWithApplicantsView existing_view)
+            if (applicantsPanel.Content is IDisposable existing_view)
                 existing_view.Dispose();
             base.DisposeInternal();
         }
@@ -180,19 +181,19 @@ namespace CarmenUI.Pages
 
         private void showUnavailableApplicants_Checked(object sender, RoutedEventArgs e)
         {
-            if (applicantsPanel.Content is RoleWithApplicantsView current_view)
+            if (applicantsPanel.Content is EditableRoleWithApplicantsView current_view)
                 current_view.ConfigureFiltering(true);
         }
 
         private void showUnavailableApplicants_Unchecked(object sender, RoutedEventArgs e)
         {
-            if (applicantsPanel.Content is RoleWithApplicantsView current_view)
+            if (applicantsPanel.Content is EditableRoleWithApplicantsView current_view)
                 current_view.ConfigureFiltering(false);
         }
 
         private void ClearCastButton_Click(object sender, RoutedEventArgs e)
         {
-            if (applicantsPanel.Content is RoleWithApplicantsView current_view)
+            if (applicantsPanel.Content is EditableRoleWithApplicantsView current_view)
                 current_view.ClearSelectedApplicants();
         }
     }

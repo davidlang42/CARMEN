@@ -14,7 +14,7 @@ namespace CarmenUI.ViewModels
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(NodeView), new PropertyMetadata(false));
 
-        public bool IsSelected
+        public bool IsSelected //LATER try to use isseleted/isexpanded here rather than hacky visual tree stuff to change selection
         {
             get => (bool)GetValue(IsSelectedProperty);
             set => SetValue(IsSelectedProperty, value);
