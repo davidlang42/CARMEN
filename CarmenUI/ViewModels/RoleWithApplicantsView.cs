@@ -46,7 +46,8 @@ namespace CarmenUI.ViewModels
             RequiredCast = new uint[CastGroupsByCast.Length];
             for (var i = 0; i < CastGroupsByCast.Length; i++)
                 RequiredCast[i] = role.CountFor(CastGroupsByCast[i].CastGroup);
-            Applicants = applicants.Select(a =>
+            var required_cast_groups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
+            Applicants = applicants.Where(a => required_cast_groups.Contains(a.CastGroup!)).Select(a =>
             {
                 var av = new ApplicantForRole(engine, a, role, criterias);
                 av.PropertyChanged += ApplicantForRole_PropertyChanged;
