@@ -11,7 +11,9 @@ namespace CarmenUI.ViewModels
 {
     public class RoleOnlyView : RoleView
     {
-        /// <summary>Indicies match CastGroup[] provided in constructor</summary>
+        public CastGroup[] CastGroups { get; init; }
+
+        /// <summary>Indicies match CastGroups</summary>
         public CountByGroup[] CountByGroups { get; init; }
 
         public uint TotalCount => CountByGroups.Select(cbg => cbg.Count).Sum();
@@ -19,13 +21,14 @@ namespace CarmenUI.ViewModels
         public RoleOnlyView(Role role, CastGroup[] cast_groups)
             : base(role)
         {
+            CastGroups = cast_groups;
             CountByGroups = new CountByGroup[cast_groups.Length];
             for (var i = 0; i < cast_groups.Length; i++)
             {
                 if (role.CountByGroups.SingleOrDefault(cbg => cbg.CastGroup == cast_groups[i]) is not CountByGroup cbg)
                 {
                     cbg = new CountByGroup { CastGroup = cast_groups[i], Count = 0 };
-                    role.CountByGroups.Add(cbg);
+                    role.CountByGroups.Add(cbg);//TODO (maybe) instead of creating missing CountByGroups, they could be wrapped as NullableCountByGroups, which might give a better UX, as long as it doesn't break anything else
                 }
                 CountByGroups[i] = cbg;
                 cbg.PropertyChanged += CountByGroup_PropertyChanged;

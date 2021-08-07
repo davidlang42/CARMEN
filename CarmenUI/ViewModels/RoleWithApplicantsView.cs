@@ -33,67 +33,35 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public ObservableCollection<ApplicantForRole> Applicants { get; init; } = new();
+        public ApplicantForRole[] Applicants { get; init; }
 
-        public RoleWithApplicantsView(Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] criterias, ICollection<Applicant> applicants)
+        /// <summary>Array arguments are not expected not to change over the lifetime of this View.
+        /// Elements of the array may be monitored for changes, but the collection itself is not.</summary>
+        public RoleWithApplicantsView(Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] criterias, Applicant[] applicants)
             : base(role)
         {
             CastGroupsByCast = cast_groups_by_cast;
             RequiredCast = new uint[CastGroupsByCast.Length];
             for (var i = 0; i < CastGroupsByCast.Length; i++)
                 RequiredCast[i] = role.CountFor(CastGroupsByCast[i].CastGroup);
-            Applicants = new ObservableCollection<ApplicantForRole>(applicants.Select(a =>
+            Applicants = applicants.Select(a =>
             {
                 var av = new ApplicantForRole(a, role, criterias);
-                av.PropertyChanged += ApplicantForRole_PropertyChanged;//TODO is this really needed? i dont think we care
+                av.PropertyChanged += ApplicantForRole_PropertyChanged;
                 return av;
-            }));
-            Applicants.CollectionChanged += Applicants_CollectionChanged;
+            }).ToArray();
         }
 
-        private void Applicants_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            switch (e.Action)
-            {
-                case NotifyCollectionChangedAction.Add:
-                case NotifyCollectionChangedAction.Remove:
-                case NotifyCollectionChangedAction.Replace:
-                    if (e.OldItems != null)
-                        foreach (ApplicantForRole av in e.OldItems)
-                        {
-                            av.PropertyChanged -= ApplicantForRole_PropertyChanged;
-                            Role.Cast.Remove(av.Applicant);
-                        }
-                    if (e.NewItems != null)
-                        foreach (ApplicantForRole av in e.NewItems)
-                        {
-                            Role.Cast.Add(av.Applicant);
-                            av.PropertyChanged += ApplicantForRole_PropertyChanged;//TODO dispose handlers
-                        }
-                    break;
-                case NotifyCollectionChangedAction.Reset://LATER is this implementation correct? probably isn't used
-                    foreach (var av in Applicants)
-                        av.PropertyChanged -= ApplicantForRole_PropertyChanged;
-                    Role.Cast.Clear();
-                    foreach (var av in Applicants)
-                    {
-                        Role.Cast.Add(av.Applicant);
-                        av.PropertyChanged += ApplicantForRole_PropertyChanged;
-                    }
-                    break;
-                case NotifyCollectionChangedAction.Move:
-                    // do nothing
-                    break;
-                default:
-                    throw new NotImplementedException($"Action not handled: {e.Action}");
-            }
-        }
         private void ApplicantForRole_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "TODO") //TODO
-            {
-                
-            }
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ApplicantForRole.IsSelected))
+                OnPropertyChanged(nameof(SelectedCast));
+        }
+
+        protected override void DisposeInternal()
+        {
+            foreach (var applicant in Applicants)
+                applicant.PropertyChanged -= ApplicantForRole_PropertyChanged;
         }
     }
 }

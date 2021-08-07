@@ -44,12 +44,13 @@ namespace CarmenUI.ViewModels
                     if (role.Cast.Contains(Applicant))
                         role.Cast.Remove(Applicant);
                 }
+                OnPropertyChanged();
             }
         }
 
         public double Suitability { get; }//TODO
         public string FirstName => Applicant.FirstName;
-        public string LastName => Applicant.LastName;//TODO should I format these into name here? or with converter?
+        public string LastName => Applicant.LastName;
 
         public string CastNumberAndCast => $"{Applicant.CastNumber}{Applicant.AlternativeCast?.Initial}";
 
@@ -59,7 +60,7 @@ namespace CarmenUI.ViewModels
 
         public int OverallAbility => Applicant.OverallAbility;
 
-        public CastGroupAndCast CastGroupAndCast => new CastGroupAndCast(Applicant);
+        public CastGroupAndCast CastGroupAndCast { get; init; }
 
         public Availability Availability { get; }//TODO
         public bool IsAvailable => Availability == Availability.Available;
@@ -85,6 +86,7 @@ namespace CarmenUI.ViewModels
         public ApplicantForRole(Applicant applicant, Role role, Criteria[] criterias)
         {
             this.Applicant = applicant;
+            CastGroupAndCast = new CastGroupAndCast(Applicant);
             this.role = role;
             this.criterias = criterias;
         }

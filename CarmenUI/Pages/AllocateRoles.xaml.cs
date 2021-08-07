@@ -3,6 +3,7 @@ using CarmenUI.ViewModels;
 using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
+using ShowModel.Applicants;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -31,9 +32,13 @@ namespace CarmenUI.Pages
     {
         private readonly CollectionViewSource rootNodesViewSource;
         private CastGroupAndCast[]? _castGroupsByCast;
+        private Applicant[]? _applicantsInCast;
 
         private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
             ?? throw new ApplicationException($"Tried to used {nameof(castGroupsByCast)} before it was loaded.");
+
+        private Applicant[] applicantsInCast => _applicantsInCast
+            ?? throw new ApplicationException($"Tried to used {nameof(applicantsInCast)} before it was loaded.");
 
         public AllocateRoles(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -48,6 +53,7 @@ namespace CarmenUI.Pages
             await context.CastGroups.LoadAsync();
             await context.AlternativeCasts.LoadAsync();
             _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, context.AlternativeCasts.Local).ToArray();
+            _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).ToArrayAsync();
             await context.Nodes.LoadAsync();
             await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
@@ -154,13 +160,14 @@ namespace CarmenUI.Pages
 
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
+            //TODO this probably needs to be constructed higher up, in a NodeView VM, so that each node can know its progress/icon etc
             //TODO if any changes have been made, prompt for lose changes like cancel click
             applicantsPanel.DataContext = rolesTreeView.SelectedItem switch
             {
-                Role role => new RoleWithApplicantsView(role,
+                Role role => new RoleWithApplicantsView(role,//TODO this needs disposing
                     castGroupsByCast,
                     context.Criterias.Local.ToArray(),
-                    context.Applicants.Local.ToObservableCollection()),//TODO loadingoverlay while this is created (if needed)
+                    applicantsInCast),//TODO loadingoverlay while this is created (if needed)
                 _ => null//TODO make this not show the UI when null, probably needs to be a content control
             };
         }

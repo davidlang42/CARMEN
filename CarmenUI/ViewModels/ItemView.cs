@@ -60,7 +60,7 @@ namespace CarmenUI.ViewModels
             Item = item;
             Roles = new ObservableCollection<RoleOnlyView>(item.Roles.Select(r =>
             {
-                var rv = new RoleOnlyView(r, cast_groups);
+                var rv = new RoleOnlyView(r, cast_groups);//TODO this needs disposing
                 rv.PropertyChanged += RoleView_PropertyChanged;
                 return rv;
             }));

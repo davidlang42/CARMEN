@@ -66,6 +66,6 @@ namespace CarmenUI
             => Task.Run(() => collection.Count(predicate));
 
         public static Task<List<T>> ToListAsync<T>(this IEnumerable<T> collection)
-            => Task.Run(() => collection.ToList());
+            => Task.Run(() => collection.ToList());//LATER remove these if they aren't actually useful, or maybe should be delegated to casting engine async functions
     }
 }
