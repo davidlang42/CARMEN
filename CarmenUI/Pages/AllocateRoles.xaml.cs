@@ -148,6 +148,8 @@ namespace CarmenUI.Pages
                 RoleNodeView role_node_view => new RoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast),
                 _ => null
             };
+            if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
+                check_box.IsChecked = false;
         }
 
         protected override void DisposeInternal()
@@ -172,9 +174,16 @@ namespace CarmenUI.Pages
             //TODO (LAST) handle main menu
         }
 
-        private void showUnavailableApplicants_Changed(object sender, RoutedEventArgs e)
+        private void showUnavailableApplicants_Checked(object sender, RoutedEventArgs e)
         {
-            //TODO handle unavailable applicants filter
+            if (applicantsPanel.Content is RoleWithApplicantsView current_view)
+                current_view.ConfigureFiltering(true);
+        }
+
+        private void showUnavailableApplicants_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (applicantsPanel.Content is RoleWithApplicantsView current_view)
+                current_view.ConfigureFiltering(false);
         }
     }
 }

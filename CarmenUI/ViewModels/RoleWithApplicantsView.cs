@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Data;
 
 namespace CarmenUI.ViewModels
@@ -55,6 +56,19 @@ namespace CarmenUI.ViewModels
             }).ToArray();
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
+            ConfigureFiltering(false);
+            ConfigureSorting();
+        }
+
+        public void ConfigureFiltering(bool show_unavailable)
+        {
+            var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
+            view.Filter = show_unavailable ? null : av => ((ApplicantForRole)av).IsAvailable;
+        }
+
+        public void ConfigureSorting()
+        {
+            var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.CastGroup)}.{nameof(CastGroup.Order)}", ListSortDirection.Ascending));
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Cast)}.{nameof(AlternativeCast.Initial)}", ListSortDirection.Ascending));
             view.SortDescriptions.Add(new(nameof(ApplicantForRole.Suitability), ListSortDirection.Descending));

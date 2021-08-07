@@ -131,7 +131,8 @@
                             </Grid>
                             <UniformGrid Grid.Column="1" Columns="1" VerticalAlignment="Center">
                                 <CheckBox x:Name="showUnavailableApplicants" Content="Show unavailable applicants"
-                                          Checked="showUnavailableApplicants_Changed" Unchecked="showUnavailableApplicants_Changed"/>
+                                          Checked="showUnavailableApplicants_Checked"
+                                          Unchecked="showUnavailableApplicants_Unchecked"/>
                             </UniformGrid>
                         </Grid>
                         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5">
