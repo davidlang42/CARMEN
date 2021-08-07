@@ -11,6 +11,7 @@ namespace CarmenUI.ViewModels
 {
     public abstract class NodeView : DependencyObject
     {
+        //TODO implement a similar thing to NodeView but for ConfigureItems UI, matching logic of ItemsSummary
         public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(
             nameof(Status), typeof(ProcessStatus), typeof(NodeView), new PropertyMetadata(ProcessStatus.Loading));
 
@@ -33,13 +34,7 @@ namespace CarmenUI.ViewModels
 
         /// <summary>Update the Status and Progress of this node.
         /// Status/Progress should be Loading/null respectively while it is updating.</summary>
-        public virtual async Task UpdateAsync()//TODO maybe this default implementation is stupid because checks need to happen at each level, though I guess node countbygroup checks could happen here
-        {
-            StartUpdate();
-            var (progress, any_errors) = await UpdateChildren();
-            //TODO do we need to check Node.CountMatchesSumOfRoles()?
-            FinishUpdate(progress, any_errors);
-        }
+        public abstract Task UpdateAsync();
 
         public abstract ICollection<NodeView> ChildrenInOrder { get; }
 

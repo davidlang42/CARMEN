@@ -17,6 +17,13 @@ namespace CarmenUI.ViewModels
 
         public override string Name => item.Name;
 
+        public override async Task UpdateAsync()
+        {
+            StartUpdate();
+            var (progress, any_errors) = await UpdateChildren();
+            FinishUpdate(progress, any_errors);
+        }
+
         public ItemNodeView(Item item)
         {
             this.item = item;
