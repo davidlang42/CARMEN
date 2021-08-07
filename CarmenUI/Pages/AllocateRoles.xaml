@@ -204,9 +204,12 @@
                                         </GroupStyle>
                                     </ListView.GroupStyle>
                                 </ListView>
-                                <Button Grid.Row="1" x:Name="AutoCastButton" Width="200" Height="35" Margin="5" Click="AutoCastButton_Click" HorizontalAlignment="Left">
-                                    <TextBlock Text="Allocate most suitable cast"/>
-                                </Button>
+                                <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                    <Button x:Name="AutoCastButton" Width="200" Height="35" Margin="5" Click="AutoCastButton_Click"
+                                        HorizontalAlignment="Left" Content="Allocate most suitable cast"/>
+                                    <Button x:Name="ClearCastButton" Width="100" Height="35" Margin="5" Click="ClearCastButton_Click"
+                                        HorizontalAlignment="Left" Content="Clear cast"/>
+                                </StackPanel>
                                 <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                                     <Button x:Name="CancelButton" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
                                         <StackPanel Orientation="Horizontal">

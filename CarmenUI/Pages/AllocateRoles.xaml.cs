@@ -153,7 +153,7 @@ namespace CarmenUI.Pages
                 _ => null
             };
             if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
-                check_box.IsChecked = false;
+                check_box.IsChecked = false; //LATER it would be much better if this was a property of the view itself, but for some reason I couldn't get the binding to work properly
         }
 
         protected override void DisposeInternal()
@@ -188,6 +188,12 @@ namespace CarmenUI.Pages
         {
             if (applicantsPanel.Content is RoleWithApplicantsView current_view)
                 current_view.ConfigureFiltering(false);
+        }
+
+        private void ClearCastButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (applicantsPanel.Content is RoleWithApplicantsView current_view)
+                current_view.ClearSelectedApplicants();
         }
     }
 }
