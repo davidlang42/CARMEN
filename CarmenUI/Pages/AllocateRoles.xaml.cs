@@ -1,10 +1,12 @@
 ﻿using CarmenUI.Converters;
 using CarmenUI.ViewModels;
 using CarmenUI.Windows;
+using CastingEngine;
 using Microsoft.EntityFrameworkCore;
 using ShowModel;
 using ShowModel.Applicants;
 using ShowModel.Criterias;
+using ShowModel.Requirements;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -35,6 +37,7 @@ namespace CarmenUI.Pages
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
+        private ICastingEngine engine;
 
         private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
             ?? throw new ApplicationException($"Tried to used {nameof(castGroupsByCast)} before it was loaded.");
@@ -49,6 +52,7 @@ namespace CarmenUI.Pages
         {
             InitializeComponent();
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
+            engine = new DummyEngine(); //LATER use real engine, maybe have it supplied by constructor
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -63,11 +67,17 @@ namespace CarmenUI.Pages
             await context.AlternativeCasts.LoadAsync();
             _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, context.AlternativeCasts.Local).ToArray();
             loading.Progress = 30;
-            _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).ToArrayAsync();
+            _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ToArrayAsync();
             loading.Progress = 60;
             await context.Nodes.LoadAsync();
             loading.Progress = 80;
+            await context.Requirements.OfType<AbilityExactRequirement>().Include(cr => cr.Criteria).LoadAsync();
+            loading.Progress = 85;
+            await context.Requirements.OfType<AbilityRangeRequirement>().Include(cr => cr.Criteria).LoadAsync();
+            loading.Progress = 90;
             await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
+            loading.Progress = 95;
+            await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
             //TODO (3) populate itemsTreeView with viewmodels (NodeView) which provide: Children, Name, Status(ie. icon)
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
@@ -181,7 +191,7 @@ namespace CarmenUI.Pages
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
-                Role role => new RoleWithApplicantsView(role, castGroupsByCast, primaryCriterias, applicantsInCast),
+                Role role => new RoleWithApplicantsView(engine, role, castGroupsByCast, primaryCriterias, applicantsInCast),
                 _ => null
             };
         }

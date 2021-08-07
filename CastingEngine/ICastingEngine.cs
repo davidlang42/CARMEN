@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ShowModel;
 using ShowModel.Applicants;
+using ShowModel.Criterias;
 using ShowModel.Structure;
 
 namespace CastingEngine
@@ -13,20 +14,20 @@ namespace CastingEngine
     {
         #region Applicant abilities
         /// <summary>Calculate the overall ability of an applicant</summary>
-        int OverallAbility(Applicant applicant);
+        //LATER int OverallAbility(Applicant applicant);
 
-        // analyse distribution of sets of marks
+        //LATER analyse distribution of sets of marks
         #endregion
 
         #region Cast selection
         /// <summary>Select applicants into a cast group</summary>
-        IEnumerable<Applicant> SelectCastGroup(IEnumerable<Applicant> applicants, CastGroup cast_group);
-        
-        // apply tags to cast
-        
-        // set cast numbers/identifiers
+        //LATER IEnumerable<Applicant> SelectCastGroup(IEnumerable<Applicant> applicants, CastGroup cast_group);
 
-        // handle alternative casts
+        //LATER apply tags to cast
+
+        //LATER set cast numbers/identifiers
+
+        //LATER handle alternative casts
         //- need to have buddies
         //- need to match casting between buddies(by default but with exceptions?)
         //- need to be able to "swap" buddies between casts
@@ -37,20 +38,23 @@ namespace CastingEngine
 
         #region Role allocation
         /// <summary>Determine the recommended order in which the roles should be cast</summary>
-        IEnumerable<Role> CastingOrder(IEnumerable<Item> items_in_order, IEnumerable<Role> roles);
+        //LATER IEnumerable<Role> CastingOrder(IEnumerable<Item> items_in_order, IEnumerable<Role> roles);
 
         /// <summary>Calculate the suitability of an applicant for a role</summary>
         double SuitabilityOf(Applicant applicant, Role role);
 
+        /// <summary>Count the number of roles an applicant has which require a certain criteria, optionally excluding one role</summary>
+        double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role);
+
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
-        bool AvailabilityOf(Applicant applicant, Role role);
+        Availability AvailabilityOf(Applicant applicant, Role role);
 
         /// <summary>Pick the cast for a role</summary>
-        IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
+        //LATER IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
 
         /// <summary>Pick the cast for one or more roles, balancing talent between them</summary>
-        Dictionary<Role, IEnumerable<Applicant>> PickCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
+        //LATER Dictionary<Role, IEnumerable<Applicant>> PickCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
         #endregion
     }
 }

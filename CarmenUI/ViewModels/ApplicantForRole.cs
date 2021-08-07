@@ -1,4 +1,5 @@
-﻿using ShowModel.Applicants;
+﻿using CastingEngine;
+using ShowModel.Applicants;
 using ShowModel.Criterias;
 using ShowModel.Structure;
 using System;
@@ -16,7 +17,7 @@ namespace CarmenUI.ViewModels
     {
         public Applicant Applicant;//LATER should really be private
         private Role role;
-        private Criteria[] criterias;
+        public Criteria[] Criterias { get; init; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -39,22 +40,24 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public double Suitability => new Random().NextDouble(); //TODO (2) populate suitability
+        public double Suitability { get; init; }
         public string FirstName => Applicant.FirstName;
         public string LastName => Applicant.LastName;
 
         public string CastNumberAndCast => $"{Applicant.CastNumber}{Applicant.AlternativeCast?.Initial}";
 
-        public uint[] Marks => new uint[] { 10, 20, 30 };//TODO (2) populate marks
+        /// <summary>Indicies match Criterias</summary>
+        public uint[] Marks { get; init; }
 
         /// <summary>Not including this role, even if already cast in it</summary>
-        public double[] ExistingRoles => new double[] { 1, 2, 3 };//TODO (2) populate existing roles
+        public double[] ExistingRoles { get; init; }
 
         public int OverallAbility => Applicant.OverallAbility;
 
         public CastGroupAndCast CastGroupAndCast { get; init; }
 
-        public Availability Availability { get; }//TODO (2) populate availability
+        public Availability Availability { get; init; }
+        
         public bool IsAvailable => Availability == Availability.Available;
 
         public IEnumerable<string> UnavailabilityReasons
@@ -75,27 +78,25 @@ namespace CarmenUI.ViewModels
 
         public string CommaSeparatedUnavailabilityReason => string.Join(", ", UnavailabilityReasons);
 
-        public ApplicantForRole(Applicant applicant, Role role, Criteria[] criterias)
+        public ApplicantForRole(ICastingEngine engine, Applicant applicant, Role role, Criteria[] criterias)
         {
             this.Applicant = applicant;
             CastGroupAndCast = new CastGroupAndCast(Applicant);
             this.role = role;
-            this.criterias = criterias;
+            Criterias = criterias;
+            Suitability = engine.SuitabilityOf(applicant, role);
+            Marks = new uint[Criterias.Length];
+            for (var i = 0; i < Marks.Length; i++)
+                Marks[i] = applicant.MarkFor(Criterias[i]);
+            ExistingRoles = new double[Criterias.Length];
+            for (var i = 0; i < ExistingRoles.Length; i++)
+                ExistingRoles[i] = engine.CountRoles(applicant, Criterias[i], role);
+            Availability = engine.AvailabilityOf(applicant, role);
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
-    }
-
-    [Flags]
-    public enum Availability
-    {
-        Available = 0,
-        AlreadyInItem = 1,
-        AlreadyInNonMultiSection = 2,
-        InPreviousItem = 4,
-        InNextItem = 8
     }
 }

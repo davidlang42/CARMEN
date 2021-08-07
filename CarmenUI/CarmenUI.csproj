@@ -14,6 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\CastingEngine\CastingEngine.csproj" />
     <ProjectReference Include="..\ShowModel\ShowModel.csproj" />
   </ItemGroup>
 

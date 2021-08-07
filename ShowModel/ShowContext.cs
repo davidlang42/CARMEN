@@ -132,6 +132,7 @@ namespace ShowModel
             modelBuilder.Entity<Tag>().Navigation(t => t.CountByGroups).AutoInclude();
             modelBuilder.Entity<Node>().Navigation(n => n.CountByGroups).AutoInclude();
             modelBuilder.Entity<Role>().Navigation(r => r.CountByGroups).AutoInclude();
+            modelBuilder.Entity<Role>().Navigation(r => r.Requirements).AutoInclude();
             modelBuilder.Entity<Section>().Navigation(s => s.SectionType).AutoInclude();
         }
 
@@ -147,6 +148,9 @@ namespace ShowModel
 
             public override InterceptionResult<DbDataReader> ReaderExecuting(DbCommand command, CommandEventData eventData, InterceptionResult<DbDataReader> result)
             {
+                //LATER to avoid/detect unnessesary lazy loading, I could throw an exception when ReaderExecuting syncrhonously,
+                // because I always (or should always) use Async when I mean to load from the database. This may be helpful as a diagnostic tool
+                // to be enabled whenever building for debug.
                 Thread.Sleep(delay);
                 return result;
             }

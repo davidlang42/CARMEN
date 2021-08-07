@@ -1,4 +1,5 @@
-﻿using ShowModel.Applicants;
+﻿using CastingEngine;
+using ShowModel.Applicants;
 using ShowModel.Criterias;
 using ShowModel.Structure;
 using System;
@@ -37,7 +38,7 @@ namespace CarmenUI.ViewModels
 
         /// <summary>Array arguments are not expected not to change over the lifetime of this View.
         /// Elements of the array may be monitored for changes, but the collection itself is not.</summary>
-        public RoleWithApplicantsView(Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] criterias, Applicant[] applicants)
+        public RoleWithApplicantsView(ICastingEngine engine, Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] criterias, Applicant[] applicants)
             : base(role)
         {
             CastGroupsByCast = cast_groups_by_cast;
@@ -46,7 +47,7 @@ namespace CarmenUI.ViewModels
                 RequiredCast[i] = role.CountFor(CastGroupsByCast[i].CastGroup);
             Applicants = applicants.Select(a =>
             {
-                var av = new ApplicantForRole(a, role, criterias);
+                var av = new ApplicantForRole(engine, a, role, criterias);
                 av.PropertyChanged += ApplicantForRole_PropertyChanged;
                 return av;
             }).ToArray();

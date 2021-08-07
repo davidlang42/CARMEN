@@ -170,6 +170,16 @@
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <ListView Grid.ColumnSpan="2" Initialized="ListView_Initialized" ItemsSource="{Binding Applicants}">
+                                    <ListView.Resources>
+                                        <Style TargetType="{x:Type ListViewItem}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                    <Setter Property="Background" Value="LightGray" />
+                                                    <Setter Property="ToolTip" Value="{Binding CommaSeparatedUnavailabilityReason}"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </ListView.Resources>
                                     <ListView.View>
                                         <GridView AllowsColumnReorder="False">
                                             <GridView.Columns>
