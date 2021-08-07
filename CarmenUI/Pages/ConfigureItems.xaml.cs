@@ -224,7 +224,7 @@ namespace CarmenUI.Pages
         private void itemsTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (rolesPanel.Content is ItemView existing_view)
-                existing_view.Dispose(); //TODO (1) also dispose on page dispose
+                existing_view.Dispose();
             rolesPanel.Content = itemsTreeView.SelectedItem switch
             {
                 Item item => new ItemView(item, context.CastGroups.Local.ToArray()),
@@ -301,6 +301,13 @@ namespace CarmenUI.Pages
                 dragged.Parent = new_parent;
                 new_parent.Children.InsertInOrder(dragged, target);
             }
+        }
+
+        protected override void DisposeInternal()
+        {
+            if (rolesPanel.Content is ItemView existing_view)
+                existing_view.Dispose();
+            base.DisposeInternal();
         }
     }
 }

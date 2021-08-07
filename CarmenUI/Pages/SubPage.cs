@@ -16,6 +16,7 @@ namespace CarmenUI.Pages
     /// </summary>
     public class SubPage : PageFunction<DataObjects>, IDisposable
     {
+        bool disposed = false;
         private ShowContext? _context;
 
         protected ShowContext context => _context
@@ -44,12 +45,19 @@ namespace CarmenUI.Pages
             return MessageBox.Show("Are you sure you want to cancel?\nAny unsaved changes will be lost.", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
         }
 
+        /// <summary>Actually dispose change handlers, etc.
+        /// This will only be called once.</summary>
+        protected virtual void DisposeInternal()
+        {
+            context.Dispose();
+        }
+
         public void Dispose()
         {
-            if (_context != null)
+            if (!disposed)
             {
-                _context.Dispose();
-                _context = null;
+                DisposeInternal();
+                disposed = true;
             }
         }
     }

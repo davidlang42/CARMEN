@@ -178,12 +178,19 @@ namespace CarmenUI.Pages
             //LATER loadingoverlay while this is created (if needed) -- due to computational time rather than db time
             //TODO (4) if any changes have been made, prompt for lose changes like cancel click
             if (applicantsPanel.Content is RoleWithApplicantsView existing_view)
-                existing_view.Dispose(); //TODO (1) also dispose on page dispose
+                existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
                 Role role => new RoleWithApplicantsView(role, castGroupsByCast, primaryCriterias, applicantsInCast),
                 _ => null
             };
+        }
+
+        protected override void DisposeInternal()
+        {
+            if (applicantsPanel.Content is RoleWithApplicantsView existing_view)
+                existing_view.Dispose();
+            base.DisposeInternal();
         }
     }
 }
