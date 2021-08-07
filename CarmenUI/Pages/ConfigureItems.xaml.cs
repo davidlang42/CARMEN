@@ -224,10 +224,10 @@ namespace CarmenUI.Pages
         private void itemsTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (rolesPanel.Content is ItemView existing_view)
-                existing_view.Dispose();
+                existing_view.Dispose(); //TODO (1) also dispose on page dispose
             rolesPanel.Content = itemsTreeView.SelectedItem switch
             {
-                Item item => new ItemView(item, context.CastGroups.Local.ToArray()),//LATER maybe reuse rather than create/dispose
+                Item item => new ItemView(item, context.CastGroups.Local.ToArray()),
                 Section section => section,
                 _ => null
             };

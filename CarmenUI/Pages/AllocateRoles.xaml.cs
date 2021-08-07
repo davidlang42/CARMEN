@@ -68,6 +68,7 @@ namespace CarmenUI.Pages
             await context.Nodes.LoadAsync();
             loading.Progress = 80;
             await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
+            //TODO (3) populate itemsTreeView with viewmodels (NodeView) which provide: Children, Name, Status(ie. icon)
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
@@ -82,6 +83,13 @@ namespace CarmenUI.Pages
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
+            //TODO (4) modify (and rename) save/cancel buttons to be only for the currently selected Role --
+            //- what should happen to selection in tree when save/cancel is clicked?
+            //- maybe selecting it only shows the current selected applicants by default, then you click edit to load this view?
+            //- if no one selected, it could go to edit by default
+            //- then when you click save/cancel it goes back to view
+            //- also we need a button somewhere on the page to return to main menu
+            //- also need to implement "Edit Roles" button, maybe only from view page though
             if (SaveChanges())
                 OnReturn(DataObjects.Applicants | DataObjects.Nodes);
         }
@@ -167,15 +175,14 @@ namespace CarmenUI.Pages
 
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            //TODO this probably needs to be constructed higher up, in a NodeView VM, so that each node can know its progress/icon etc
-            //TODO if any changes have been made, prompt for lose changes like cancel click
+            //LATER loadingoverlay while this is created (if needed) -- due to computational time rather than db time
+            //TODO (4) if any changes have been made, prompt for lose changes like cancel click
+            if (applicantsPanel.Content is RoleWithApplicantsView existing_view)
+                existing_view.Dispose(); //TODO (1) also dispose on page dispose
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
-                Role role => new RoleWithApplicantsView(role,//TODO this needs disposing
-                    castGroupsByCast,
-                    context.Criterias.Local.ToArray(),
-                    applicantsInCast),//TODO loadingoverlay while this is created (if needed)
-                _ => null//TODO make this not show the UI when null, probably needs to be a content control
+                Role role => new RoleWithApplicantsView(role, castGroupsByCast, primaryCriterias, applicantsInCast),
+                _ => null
             };
         }
     }

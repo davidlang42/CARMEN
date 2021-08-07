@@ -12,22 +12,13 @@ using System.Windows;
 
 namespace CarmenUI.ViewModels
 {
-    public class ApplicantForRole : INotifyPropertyChanged //TODO
+    public class ApplicantForRole : INotifyPropertyChanged
     {
         public Applicant Applicant;//LATER should really be private
         private Role role;
         private Criteria[] criterias;
 
         public event PropertyChangedEventHandler? PropertyChanged;
-
-        //public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
-        //    nameof(IsSelected), typeof(bool), typeof(ApplicantForRole), new PropertyMetadata(null));
-
-        //public bool IsSelected
-        //{
-        //    get => (bool)GetValue(IsSelectedProperty);
-        //    set => SetValue(IsSelectedProperty, value);
-        //}
 
         public bool IsSelected
         {
@@ -48,22 +39,22 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public double Suitability => new Random().NextDouble(); //TODO
+        public double Suitability => new Random().NextDouble(); //TODO (2) populate suitability
         public string FirstName => Applicant.FirstName;
         public string LastName => Applicant.LastName;
 
         public string CastNumberAndCast => $"{Applicant.CastNumber}{Applicant.AlternativeCast?.Initial}";
 
-        public uint[] Marks => new uint[] { 10, 20, 30 };//TODO
+        public uint[] Marks => new uint[] { 10, 20, 30 };//TODO (2) populate marks
 
         /// <summary>Not including this role, even if already cast in it</summary>
-        public double[] ExistingRoles => new double[] { 1, 2, 3 };//TODO
+        public double[] ExistingRoles => new double[] { 1, 2, 3 };//TODO (2) populate existing roles
 
         public int OverallAbility => Applicant.OverallAbility;
 
         public CastGroupAndCast CastGroupAndCast { get; init; }
 
-        public Availability Availability { get; }//TODO
+        public Availability Availability { get; }//TODO (2) populate availability
         public bool IsAvailable => Availability == Availability.Available;
 
         public IEnumerable<string> UnavailabilityReasons
