@@ -33,9 +33,7 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class AllocateRoles : SubPage
     {
-        //TODO add next role button
         //TODO group by cast group in list view
-        //TODO hide/remove "edit roles" button and comments(TODO/LATER) relating to it, put all the info into a task for future
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
@@ -111,14 +109,9 @@ namespace CarmenUI.Pages
                 OnReturn(DataObjects.Applicants | DataObjects.Nodes);
         }
 
-        private void rolesTreeView_KeyDown(object sender, KeyEventArgs e)
-        {
-
-        }
-
         private void AutoCastButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO handle auto cast button click
         }
 
         private void ListView_Initialized(object sender, EventArgs e)
@@ -163,6 +156,21 @@ namespace CarmenUI.Pages
             if (applicantsPanel.Content is RoleWithApplicantsView existing_view)
                 existing_view.Dispose();
             base.DisposeInternal();
+        }
+
+        private void NextButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO handle next role button
+        }
+
+        private void MainMenuButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO handle main menu
+        }
+
+        private void showUnavailableApplicants_Changed(object sender, RoutedEventArgs e)
+        {
+            //TODO handle unavailable applicants filter
         }
     }
 }
