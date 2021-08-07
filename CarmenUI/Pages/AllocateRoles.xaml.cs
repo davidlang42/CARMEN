@@ -33,6 +33,9 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class AllocateRoles : SubPage
     {
+        //TODO add next role button
+        //TODO group by cast group in list view
+        //TODO hide/remove "edit roles" button and comments(TODO/LATER) relating to it, put all the info into a task for future
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;

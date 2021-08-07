@@ -18,14 +18,6 @@ namespace CarmenUI.ViewModels
 
         public override string Name => showRoot.Name;
 
-        public override async Task UpdateAsync()
-        {
-            StartUpdate();
-            //TODO update show root
-            await Task.Run(() => Thread.Sleep(1000));
-            FinishUpdate(0.75, false);
-        }
-
         public ShowRootNodeView(ShowRoot show_root)
         {
             showRoot = show_root;

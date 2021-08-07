@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -32,7 +33,14 @@ namespace CarmenUI.ViewModels
 
         /// <summary>Update the Status and Progress of this node.
         /// Status/Progress should be Loading/null respectively while it is updating.</summary>
-        public abstract Task UpdateAsync();
+        public virtual async Task UpdateAsync()//TODO maybe this default implementation is stupid because checks need to happen at each level, though I guess node countbygroup checks could happen here
+        {
+            StartUpdate();
+            await Task.Run(() => Thread.Sleep(500)); //TODO remove
+            var (progress, any_errors) = await UpdateChildren();
+            await Task.Run(() => Thread.Sleep(500)); //TODO remove
+            FinishUpdate(progress, any_errors);
+        }
 
         public abstract ICollection<NodeView> ChildrenInOrder { get; }
 
@@ -42,6 +50,16 @@ namespace CarmenUI.ViewModels
         {
             Status = ProcessStatus.Loading;
             Progress = null;
+        }
+
+        protected async Task<(double, bool)> UpdateChildren()
+        {
+            if (!ChildrenInOrder.Any())
+                return (1, false);
+            await Task.WhenAll(ChildrenInOrder.Select(c => c.UpdateAsync()));
+            var average_progress = ChildrenInOrder.Average(c => c.Progress!.Value);
+            var any_errors = ChildrenInOrder.Any(c => c.Status == ProcessStatus.Error);
+            return (average_progress, any_errors);
         }
 
         protected void FinishUpdate(double progress, bool has_errors)

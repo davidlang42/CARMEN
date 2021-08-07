@@ -20,8 +20,8 @@ namespace CarmenUI.ViewModels
         public override async Task UpdateAsync()
         {
             StartUpdate();
+            await Task.Run(() => Thread.Sleep(2000));
             //TODO update role
-            await Task.Run(() => Thread.Sleep(5000));
             FinishUpdate(1, false);
         }
 

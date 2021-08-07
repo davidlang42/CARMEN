@@ -18,14 +18,6 @@ namespace CarmenUI.ViewModels
 
         public override string Name => section.Name;
 
-        public override async Task UpdateAsync()
-        {
-            StartUpdate();
-            //TODO update section
-            await Task.Run(() => Thread.Sleep(2000));
-            FinishUpdate(0.5, true);
-        }
-
         public SectionNodeView(Section section)
         {
             this.section = section;
