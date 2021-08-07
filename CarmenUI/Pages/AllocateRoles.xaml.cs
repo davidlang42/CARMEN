@@ -33,7 +33,6 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class AllocateRoles : SubPage
     {
-        //TODO group by cast group in list view
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;

@@ -182,6 +182,26 @@
                                             </GridView.Columns>
                                         </GridView>
                                     </ListView.View>
+                                    <ListView.GroupStyle>
+                                        <GroupStyle>
+                                            <GroupStyle.ContainerStyle>
+                                                <Style TargetType="{x:Type GroupItem}">
+                                                    <Setter Property="Template">
+                                                        <Setter.Value>
+                                                            <ControlTemplate>
+                                                                <Expander IsExpanded="True">
+                                                                    <Expander.Header>
+                                                                        <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                                                                    </Expander.Header>
+                                                                    <ItemsPresenter/>
+                                                                </Expander>
+                                                            </ControlTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                </Style>
+                                            </GroupStyle.ContainerStyle>
+                                        </GroupStyle>
+                                    </ListView.GroupStyle>
                                 </ListView>
                                 <Button Grid.Row="1" x:Name="AutoCastButton" Width="200" Height="35" Margin="5" Click="AutoCastButton_Click" HorizontalAlignment="Left">
                                     <TextBlock Text="Allocate most suitable cast"/>

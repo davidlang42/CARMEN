@@ -10,6 +10,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Data;
 
 namespace CarmenUI.ViewModels
 {
@@ -51,6 +52,10 @@ namespace CarmenUI.ViewModels
                 av.PropertyChanged += ApplicantForRole_PropertyChanged;
                 return av;
             }).ToArray();
+            var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
+            view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
+            view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.CastGroup)}.{nameof(CastGroup.Order)}", ListSortDirection.Ascending));
+            view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Cast)}.{nameof(AlternativeCast.Initial)}", ListSortDirection.Ascending));
         }
 
         private void ApplicantForRole_PropertyChanged(object? sender, PropertyChangedEventArgs e)
