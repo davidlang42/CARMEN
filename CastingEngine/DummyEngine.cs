@@ -16,7 +16,7 @@ namespace CastingEngine
     public class DummyEngine : ICastingEngine
     {
         /// <summary>Dummy value is just the applicant's Overall ability, irrelavant to the role</summary>
-        public double SuitabilityOf(Applicant applicant, Role role) => applicant.OverallAbility;
+        public double SuitabilityOf(Applicant applicant, Role role) => applicant.OverallAbility / 100.0;
 
         /// <summary>Dummy value counts top level AbilityExact/AbilityRange requirements only</summary>
         public double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)

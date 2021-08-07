@@ -164,7 +164,7 @@ namespace CarmenUI.Pages
 
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO handle main menu
+            //TODO (LAST) handle main menu
         }
 
         private void showUnavailableApplicants_Changed(object sender, RoutedEventArgs e)

@@ -57,6 +57,7 @@ namespace CarmenUI.ViewModels
             view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.CastGroup)}.{nameof(CastGroup.Order)}", ListSortDirection.Ascending));
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Cast)}.{nameof(AlternativeCast.Initial)}", ListSortDirection.Ascending));
+            view.SortDescriptions.Add(new(nameof(ApplicantForRole.Suitability), ListSortDirection.Descending));
         }
 
         private void ApplicantForRole_PropertyChanged(object? sender, PropertyChangedEventArgs e)
