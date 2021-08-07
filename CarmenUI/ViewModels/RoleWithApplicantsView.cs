@@ -14,20 +14,38 @@ namespace CarmenUI.ViewModels
 {
     public class RoleWithApplicantsView : RoleView
     {
-        public CastGroup[] CastGroups { get; init; }
+        public CastGroupAndCast[] CastGroupsByCast { get; init; }
 
-        public uint[] SelectedCast { get; }//TODO
+        /// <summary>Indicies match CastGroupsByCast</summary>
+        public uint[] RequiredCast { get; init; }
+
+        /// <summary>Indicies match CastGroupsByCast</summary>
+        public uint[] SelectedCast //LATER check if re-calculating this each time is too slow, maybe cache and update on each applicant change
+        {
+            get
+            {
+                var dictionary = Applicants.Where(a => a.IsSelected).GroupBy(a => a.CastGroupAndCast).ToDictionary(g => g.Key, g => (uint)g.Count());
+                var result = new uint[CastGroupsByCast.Length];
+                for (var i = 0; i < CastGroupsByCast.Length; i++)
+                    if (dictionary.TryGetValue(CastGroupsByCast[i], out var count))
+                        result[i] = count;
+                return result;
+            }
+        }
 
         public ObservableCollection<ApplicantForRole> Applicants { get; init; } = new();
 
-        public RoleWithApplicantsView(Role role, CastGroup[] cast_groups, Criteria[] criterias, ICollection<Applicant> applicants)
+        public RoleWithApplicantsView(Role role, CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Criteria[] criterias, ICollection<Applicant> applicants)
             : base (role, cast_groups)
         {
-            CastGroups = cast_groups;
+            CastGroupsByCast = CastGroupAndCast.Enumerate(cast_groups, alternative_casts).ToArray();
+            RequiredCast = new uint[CastGroupsByCast.Length];
+            for (var i = 0; i < CastGroupsByCast.Length; i++)
+                RequiredCast[i] = role.CountFor(CastGroupsByCast[i].CastGroup);
             Applicants = new ObservableCollection<ApplicantForRole>(applicants.Select(a =>
             {
                 var av = new ApplicantForRole(a, role, criterias);
-                av.PropertyChanged += ApplicantForRole_PropertyChanged;//TODO is this really needed?
+                av.PropertyChanged += ApplicantForRole_PropertyChanged;//TODO is this really needed? i dont think we care
                 return av;
             }));
             Applicants.CollectionChanged += Applicants_CollectionChanged;
@@ -75,6 +93,38 @@ namespace CarmenUI.ViewModels
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == "TODO") //TODO
             {
                 
+            }
+        }
+    }
+
+    public struct CastGroupAndCast
+    {
+        public CastGroup CastGroup { get; set; }
+        public AlternativeCast? Cast { get; set; }
+
+        public string Name => Cast == null ? CastGroup.Name : $"{CastGroup.Name} ({Cast.Name})";
+        public string Abbreviation => Cast == null ? CastGroup.Abbreviation : $"{CastGroup.Abbreviation}-{Cast.Initial}";
+
+        public CastGroupAndCast(CastGroup cast_group, AlternativeCast? alternative_cast = null)
+        {
+            CastGroup = cast_group;
+            Cast = alternative_cast;
+        }
+
+        public CastGroupAndCast(Applicant applicant)
+            : this(applicant.CastGroup ?? throw new ApplicationException("Applicant does not have a CastGroup."),
+                  applicant.AlternativeCast)
+        { }
+
+        public static IEnumerable<CastGroupAndCast> Enumerate(CastGroup[] cast_groups, AlternativeCast[] alternative_casts)
+        {
+            foreach (var cast_group in cast_groups)
+            {
+                if (cast_group.AlternateCasts)
+                    foreach (var alternative_cast in alternative_casts)
+                        yield return new CastGroupAndCast(cast_group, alternative_cast);
+                else
+                    yield return new CastGroupAndCast(cast_group);
             }
         }
     }

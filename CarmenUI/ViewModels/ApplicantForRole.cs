@@ -59,6 +59,8 @@ namespace CarmenUI.ViewModels
 
         public int OverallAbility => Applicant.OverallAbility;
 
+        public CastGroupAndCast CastGroupAndCast => new CastGroupAndCast(Applicant);
+
         public Availability Availability { get; }//TODO
         public bool IsAvailable => Availability == Availability.Available;
 

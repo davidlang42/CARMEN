@@ -22,6 +22,7 @@ namespace CarmenUI.ViewModels
 
         public Role Role { get; init; } //LATER this should be protected
         
+        /// <summary>Indicies match CastGroup[] provided in constructor</summary>
         public CountByGroup[] CountByGroups { get; init; }
 
         public uint TotalCount => CountByGroups.Select(cbg => cbg.Count).Sum();

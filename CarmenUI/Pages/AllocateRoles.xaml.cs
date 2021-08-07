@@ -37,16 +37,12 @@ namespace CarmenUI.Pages
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
         }
 
-        private void Page_Loaded(object sender, RoutedEventArgs e)
-        {
-            PopulateViews();
-        }
-
-        private async void PopulateViews()
+        private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             using var loading = new LoadingOverlay(this);
-            await context.Criterias.LoadAsync();
+            await context.Criterias.LoadAsync();//LATER have a user setting which enables/disables preloading on page open for all pages, because if the connection is fast (or local) it might actually be a nicer UX to not do this all up front.
             await context.CastGroups.LoadAsync();
+            await context.AlternativeCasts.LoadAsync();
             await context.Nodes.LoadAsync();
             await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
             rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
@@ -140,8 +136,12 @@ namespace CarmenUI.Pages
             //TODO if any changes have been made, prompt for lose changes like cancel click
             applicantsPanel.DataContext = rolesTreeView.SelectedItem switch
             {
-                Role role => new RoleWithApplicantsView(role, context.CastGroups.Local.ToArray(), context.Criterias.Local.ToArray(), context.Applicants.Local.ToObservableCollection()),
-                _ => null
+                Role role => new RoleWithApplicantsView(role,
+                    context.CastGroups.Local.ToArray(),
+                    context.AlternativeCasts.Local.ToArray(),
+                    context.Criterias.Local.ToArray(),
+                    context.Applicants.Local.ToObservableCollection()),//TODO loadingoverlay while this is created (if needed)
+                _ => null//TODO make this not show the UI when null, probably needs to be a content control
             };
         }
     }
