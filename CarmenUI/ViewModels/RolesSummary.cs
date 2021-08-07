@@ -19,9 +19,11 @@ namespace CarmenUI.ViewModels
             await c.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
             await c.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
             await c.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
+            await c.AlternativeCasts.LoadAsync();
             // check role statuses
             var roles = c.ShowRoot.ItemsInOrder().SelectMany(i => i.Roles).Distinct();
-            var counts = roles.GroupBy(r => r.Status).ToDictionary(g => g.Key, g => g.Count()); //LATER does this need await?
+            var counts = roles.GroupBy(r => r.CheckStatus(c.AlternativeCasts.Local.ToArray()))
+                .ToDictionary(g => g.Key, g => g.Count()); //LATER does this need await?
             if (counts.TryGetValue(RoleStatus.FullyCast, out var roles_cast))
                 Rows.Add(new Row { Success = $"{roles_cast} Roles cast" });
             if (counts.TryGetValue(RoleStatus.NotCast, out var roles_blank))

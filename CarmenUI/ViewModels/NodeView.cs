@@ -1,4 +1,5 @@
-﻿using ShowModel.Structure;
+﻿using ShowModel.Applicants;
+using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -87,12 +88,12 @@ namespace CarmenUI.ViewModels
             Progress = progress;
         }
 
-        public static NodeView CreateView(Node node, int total_cast)
+        public static NodeView CreateView(Node node, int total_cast, AlternativeCast[] alternative_casts)
             => node switch
             {
-                ShowRoot show_root => new ShowRootNodeView(show_root, total_cast),
-                Section section => new SectionNodeView(section, total_cast),
-                Item item => new ItemNodeView(item),
+                ShowRoot show_root => new ShowRootNodeView(show_root, total_cast, alternative_casts),
+                Section section => new SectionNodeView(section, total_cast, alternative_casts),
+                Item item => new ItemNodeView(item, alternative_casts),
                 _ => throw new NotImplementedException($"Node type not handled: {typeof(Node)}")
             };
     }

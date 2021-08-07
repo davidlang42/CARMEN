@@ -28,31 +28,42 @@ namespace ShowModel.Structure
         public uint CountFor(CastGroup group)
             => CountByGroups.Where(c => c.CastGroup == group).Select(c => c.Count).SingleOrDefault(); // defaults to 0
 
-        public RoleStatus Status
+        public RoleStatus CheckStatus(AlternativeCast[] alternative_casts)
         {
-            get
+            if (CountByGroups.Count == 0 || CountByGroups.All(cbg => cbg.Count == 0))
+                return Cast.Count > 0 ? RoleStatus.OverCast : RoleStatus.FullyCast;
+            if (Cast.Count == 0)
+                return RoleStatus.NotCast;
+            bool under_cast = false;
+            foreach (var cast_by_group in Cast.GroupBy(a => a.CastGroup))
             {
-                if (CountByGroups.Count == 0 || CountByGroups.All(cbg => cbg.Count == 0))
-                    return Cast.Count > 0 ? RoleStatus.OverCast : RoleStatus.FullyCast;
-                if (Cast.Count == 0)
-                    return RoleStatus.NotCast;
-                bool under_cast = false;
-                foreach (var cast_by_group in Cast.GroupBy(a => a.CastGroup))
+                if (cast_by_group.Key is not CastGroup cast_group)
+                    return RoleStatus.OverCast;
+                //LATER handle alternate casts here properly (probably by bringing CastGroupAndCast into ShowModel)
+                var required_count = CountFor(cast_group);
+                if (cast_group.AlternateCasts)
                 {
-                    if (cast_by_group.Key is not CastGroup cast_group)
-                        return RoleStatus.OverCast;
-                    //TODO handle alternate casts here, probably by bringing CastGroupAndCast into ShowModel
-                    var required_count = CountFor(cast_group);
+                    foreach(var alternative_cast in alternative_casts)
+                    {
+                        var actual_count = cast_by_group.Where(a => a.AlternativeCast == alternative_cast).Count();
+                        if (required_count > actual_count)
+                            return RoleStatus.OverCast;
+                        if (required_count < actual_count)
+                            under_cast = true; // don't return yet, because if any count is over cast, we want to return that first
+                    }
+                }
+                else
+                {
                     var actual_count = cast_by_group.Count();
                     if (required_count > actual_count)
                         return RoleStatus.OverCast;
                     if (required_count < actual_count)
                         under_cast = true; // don't return yet, because if any count is over cast, we want to return that first
                 }
-                if (under_cast)
-                    return RoleStatus.UnderCast;
-                return RoleStatus.FullyCast;
             }
+            if (under_cast)
+                return RoleStatus.UnderCast;
+            return RoleStatus.FullyCast;
         }
     }
 }

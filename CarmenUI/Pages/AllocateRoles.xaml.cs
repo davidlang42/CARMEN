@@ -33,8 +33,8 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class AllocateRoles : SubPage
     {
-        //TODO make sure that ViewOnlyApplicantsList scrolls if too long
-        //TODO handle double click on ViewOnlyApplicantsList even when no applicants
+        //LATER make sure that ViewOnlyApplicantsList scrolls if too long
+        //LATER handle double click on ViewOnlyApplicantsList even when no applicants
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
@@ -83,7 +83,7 @@ namespace CarmenUI.Pages
                 await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
                 loading.Progress = 95;
                 await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-                _rootNodeView = new ShowRootNodeView(context.ShowRoot, applicantsInCast.Length);
+                _rootNodeView = new ShowRootNodeView(context.ShowRoot, applicantsInCast.Length, context.AlternativeCasts.ToArray());
                 rolesTreeView.ItemsSource = rootNodeView.Yield();
                 castingProgress.DataContext = rootNodeView;
                 loading.Progress = 100;
@@ -99,7 +99,7 @@ namespace CarmenUI.Pages
             if (SaveChanges())
             {
                 if (applicantsPanel.Content is EditableRoleWithApplicantsView editable_view)
-                    rootNodeView.FindRoleView(editable_view.Role)?.UpdateAsync();
+                    rootNodeView.FindRoleView(editable_view.Role)?.UpdateAsync(); //LATER this should propogate upwards, but it will need a rewrite because it currently propogates downwards
                 ChangeToViewMode();
             }
         }

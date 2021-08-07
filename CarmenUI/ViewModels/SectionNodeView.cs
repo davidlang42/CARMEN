@@ -1,4 +1,5 @@
 ﻿using ShowModel;
+using ShowModel.Applicants;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -29,11 +30,11 @@ namespace CarmenUI.ViewModels
             FinishUpdate(progress, any_errors);
         }
 
-        public SectionNodeView(Section section, int total_cast)
+        public SectionNodeView(Section section, int total_cast, AlternativeCast[] alternative_casts)
         {
             this.section = section;
             this.totalCast = total_cast;
-            childrenInOrder = section.Children.InOrder().Select(n => CreateView(n, total_cast)).ToArray();
+            childrenInOrder = section.Children.InOrder().Select(n => CreateView(n, total_cast, alternative_casts)).ToArray();
         }
     }
 }

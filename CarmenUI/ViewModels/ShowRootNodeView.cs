@@ -1,4 +1,5 @@
 ﻿using ShowModel;
+using ShowModel.Applicants;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -26,10 +27,10 @@ namespace CarmenUI.ViewModels
             FinishUpdate(progress, any_errors);
         }
 
-        public ShowRootNodeView(ShowRoot show_root, int total_cast)
+        public ShowRootNodeView(ShowRoot show_root, int total_cast, AlternativeCast[] alternative_casts)
         {
             showRoot = show_root;
-            childrenInOrder = show_root.Children.InOrder().Select(n => CreateView(n, total_cast)).ToArray();
+            childrenInOrder = show_root.Children.InOrder().Select(n => CreateView(n, total_cast, alternative_casts)).ToArray();
         }
     }
 }
