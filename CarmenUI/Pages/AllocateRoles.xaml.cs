@@ -39,7 +39,7 @@ namespace CarmenUI.Pages
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
         private NodeView? _rootNodeView;
-        private ICastingEngine engine;
+        private IAllocationEngine engine;
 
         private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
             ?? throw new ApplicationException($"Tried to used {nameof(castGroupsByCast)} before it was loaded.");

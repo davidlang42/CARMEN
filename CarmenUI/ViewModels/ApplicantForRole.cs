@@ -78,7 +78,7 @@ namespace CarmenUI.ViewModels
 
         public string CommaSeparatedUnavailabilityReason => string.Join(", ", UnavailabilityReasons);
 
-        public ApplicantForRole(ICastingEngine engine, Applicant applicant, Role role, Criteria[] criterias)
+        public ApplicantForRole(IAllocationEngine engine, Applicant applicant, Role role, Criteria[] criterias)
         {
             this.Applicant = applicant;
             CastGroupAndCast = new CastGroupAndCast(Applicant);

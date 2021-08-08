@@ -4,6 +4,7 @@ using ShowModel.Requirements;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -78,7 +79,7 @@ namespace CastingEngine
         //TODO implement dummy engine
         public void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups) => throw new NotImplementedException();
         public void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<AlternativeCast> alternative_casts, IEnumerable<SameCastSet> same_cast_sets) => throw new NotImplementedException();
-        public void AllocateCastNumbers(IEnumerable<Applicant> applicants, Criteria order_by) => throw new NotImplementedException();
+        public void AllocateCastNumbers(IEnumerable<Applicant> applicants, Criteria order_by, ListSortDirection sort_direction = ListSortDirection.Ascending) => throw new NotImplementedException();
         public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags) => throw new NotImplementedException();
     }
 }
