@@ -56,5 +56,29 @@ namespace CastingEngine
                 }
             }
         }
+
+        //TODO this should be in AllocateCastNumbers
+        //int num = 1;
+        //foreach (var cast_group in cast_groups)
+        //{
+        //    var group_casts = cast_group.AlternateCasts ? alternative_casts : new AlternativeCast?[] { null };
+        //    int ac = 0;
+        //    foreach (var applicant in cast_group.Members)
+        //    {
+        //        applicant.CastNumber = num;
+        //        applicant.AlternativeCast = group_casts[ac++];
+        //        if (ac >= group_casts.Length)
+        //        {
+        //            ac = 0;
+        //            num++;
+        //        }
+        //    }
+        //}
+
+        //TODO implement dummy engine
+        public void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups) => throw new NotImplementedException();
+        public void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<AlternativeCast> alternative_casts, IEnumerable<SameCastSet> same_cast_sets) => throw new NotImplementedException();
+        public void AllocateCastNumbers(IEnumerable<Applicant> applicants, Criteria order_by) => throw new NotImplementedException();
+        public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags) => throw new NotImplementedException();
     }
 }

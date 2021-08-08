@@ -93,25 +93,7 @@ namespace CarmenUI.Pages
 
         private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO move this into dummy implementation
-            int num = 1;
-            foreach (var cast_group in context.CastGroups.Local)
-            {
-                AlternativeCast?[] alternative_casts = new AlternativeCast?[] { null };
-                if (cast_group.AlternateCasts)
-                    alternative_casts = context.AlternativeCasts.Local.ToArray();
-                int ac = 0;
-                foreach (var applicant in cast_group.Members)
-                {
-                    applicant.CastNumber = num;
-                    applicant.AlternativeCast = alternative_casts[ac++];
-                    if (ac >= alternative_casts.Length)
-                    {
-                        ac = 0;
-                        num++;
-                    }
-                }
-            }
+            //TODO moved this into dummy implementation, need to call from here
             MessageBox.Show("Cast numbers allocated randomly.");
         }
 

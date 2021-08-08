@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using ShowModel;
 using ShowModel.Applicants;
 using ShowModel.Criterias;
@@ -14,28 +15,29 @@ namespace CastingEngine
     {
         #region Applicant abilities
         /// <summary>Calculate the overall ability of an applicant</summary>
-        //LATER int OverallAbility(Applicant applicant);
-
-        //TODO analyse distribution of sets of marks
+        //TODO int OverallAbility(Applicant applicant);
         #endregion
 
         #region Cast selection
-        /// <summary>Select applicants into a cast group</summary>
-        //TODO IEnumerable<Applicant> SelectCastGroup(IEnumerable<Applicant> applicants, CastGroup cast_group);//TODO
+        /// <summary>Select applicants into cast groups, respecting those already placed
+        /// NOTE: CastGroup requirements may not depend on CastGroups or Tags</summary>
+        void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups);//TODO CALL
 
-        //TODO apply tags to cast
+        /// <summary>Balance applicants between alternative casts, respecting those already set
+        /// NOTE: All applicants must have a CastGroup set</summary>
+        void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<AlternativeCast> alternative_casts, IEnumerable<SameCastSet> same_cast_sets);//TODO CALL
 
-        //TODO set cast numbers/identifiers
+        /// <summary>Allocate cast numbers, respecting those already set
+        /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set</summary>
+        void AllocateCastNumbers(IEnumerable<Applicant> applicants, Criteria order_by);//TODO CALL
 
-        //TODO handle alternative casts
-        //- need to have buddies
-        //- need to match casting between buddies(by default but with exceptions?)
-        //- need to be able to "swap" buddies between casts
-        //- need to lock sets of applicants to be in the same cast(across cast groups, eg.junior boy, junior girl)
-        //- need to be able to balance talent between casts
-        //- need to have counts by group same for both casts
+        /// <summary>Apply tags to applicants, respecting those already applied
+        /// NOTE: Tag requirements may depend on other Tags, as long as there is no circular
+        /// dependency and that tag is also being applied as part of this call</summary>
+        void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags);//TODO CALL
         #endregion
 
+        //TODO revise role allocation section
         #region Role allocation
         /// <summary>Determine the recommended order in which the roles should be cast</summary>
         IEnumerable<Role> CastingOrder(IEnumerable<Item> items_in_order);
