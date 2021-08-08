@@ -16,18 +16,18 @@ namespace CastingEngine
         /// <summary>Calculate the overall ability of an applicant</summary>
         //LATER int OverallAbility(Applicant applicant);
 
-        //LATER analyse distribution of sets of marks
+        //TODO analyse distribution of sets of marks
         #endregion
 
         #region Cast selection
         /// <summary>Select applicants into a cast group</summary>
-        //LATER IEnumerable<Applicant> SelectCastGroup(IEnumerable<Applicant> applicants, CastGroup cast_group);
+        //TODO IEnumerable<Applicant> SelectCastGroup(IEnumerable<Applicant> applicants, CastGroup cast_group);//TODO
 
-        //LATER apply tags to cast
+        //TODO apply tags to cast
 
-        //LATER set cast numbers/identifiers
+        //TODO set cast numbers/identifiers
 
-        //LATER handle alternative casts
+        //TODO handle alternative casts
         //- need to have buddies
         //- need to match casting between buddies(by default but with exceptions?)
         //- need to be able to "swap" buddies between casts
@@ -65,7 +65,7 @@ namespace CastingEngine
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
 
         /// <summary>Pick the cast for one or more roles, balancing talent between them</summary>
-        //LATER Dictionary<Role, IEnumerable<Applicant>> PickCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
+        //TODO Dictionary<Role, IEnumerable<Applicant>> PickCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
         #endregion
     }
 }

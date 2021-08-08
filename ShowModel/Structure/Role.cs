@@ -18,7 +18,7 @@ namespace ShowModel.Structure
         }
 
         [Key]
-        public int RoleId { get; private set; } //LATER make all IDs internal rather than public (this would require patching DatabaseExplorer to not show/use IDs)
+        public int RoleId { get; private set; }
         public string Name { get; set; } = "";
         public virtual ICollection<Item> Items { get; private set; } = new ObservableCollection<Item>();
         public virtual ICollection<Requirement> Requirements { get; set; } = new ObservableCollection<Requirement>();
@@ -39,7 +39,7 @@ namespace ShowModel.Structure
             {
                 if (cast_by_group.Key is not CastGroup cast_group)
                     return RoleStatus.OverCast;
-                //LATER handle alternate casts here properly (probably by bringing CastGroupAndCast into ShowModel)
+                //TODO handle alternate casts here properly (probably by bringing CastGroupAndCast into ShowModel)
                 var required_count = CountFor(cast_group);
                 if (cast_group.AlternateCasts)
                 {

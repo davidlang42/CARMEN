@@ -195,7 +195,7 @@ namespace ShowModel.Applicants
         {
             abilities.CollectionChanged += Abilities_CollectionChanged;
             tags.CollectionChanged += Tags_CollectionChanged;
-            roles.CollectionChanged += Roles_CollectionChanged;
+            roles.CollectionChanged += Roles_CollectionChanged;//LATER check any show model INotifyPropertyChanged objects for handlers that should be disposed
         }
 
         private void Abilities_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

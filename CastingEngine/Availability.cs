@@ -14,7 +14,7 @@ namespace CastingEngine
         AlreadyInNonMultiSection = 2,
         InPreviousItem = 4,
         InNextItem = 8,
-        //LATER there will need to be more types of unavailablity due to roles being in multiple items, eg.
+        //TODO there will need to be more types of unavailablity due to roles being in multiple items, eg.
         //- already cast in a role which is in THIS item, vs already cast in a role which is in ANOTHER item which this role is in
         //- in next item after THIS item, vs in next item after ANOTHER item which this role is in
         //- " for previous item

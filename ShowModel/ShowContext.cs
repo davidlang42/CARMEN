@@ -17,7 +17,7 @@ namespace ShowModel
     {
         //LATER add comments to DbSet properties reminding the caller what to Include()
         //LATER also audit navigation properties, and change to internal where not required (to avoid the accidental usage from UI causing bad lazy loading)
-        //lATER consider making all IDs internal as well
+        //LATER consider making all IDs internal as well (this would require removing them from DatabaseExplorer)
         #region Database collections
         public DbSet<Applicant> Applicants => Set<Applicant>();
         public DbSet<AlternativeCast> AlternativeCasts => Set<AlternativeCast>();

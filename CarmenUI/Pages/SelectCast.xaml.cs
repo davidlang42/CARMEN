@@ -93,7 +93,7 @@ namespace CarmenUI.Pages
 
         private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-            //LATER auto select cast (to be done by future task)
+            //TODO move this into dummy implementation
             int num = 1;
             foreach (var cast_group in context.CastGroups.Local)
             {
