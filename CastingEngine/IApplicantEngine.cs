@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ShowModel.Applicants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,6 +13,6 @@ namespace CastingEngine
     public interface IApplicantEngine
     {
         /// <summary>Calculate the overall ability of an applicant</summary>
-        //TODO int OverallAbility(Applicant applicant);
+        int OverallAbility(Applicant applicant); //TODO remove OverallAbility from Applicant and CALL this
     }
 }

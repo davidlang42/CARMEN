@@ -27,8 +27,9 @@ namespace CastingEngine
         void AllocateCastNumbers(IEnumerable<Applicant> applicants, Criteria order_by, ListSortDirection sort_direction = ListSortDirection.Ascending);//TODO CALL
 
         /// <summary>Apply tags to applicants, respecting those already applied
-        /// NOTE: Tag requirements may depend on other Tags, as long as there is no circular
-        /// dependency and that tag is also being applied as part of this call</summary>
+        /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set,
+        /// Tag requirements may depend on other Tags as long as there is no circular dependency and the dependee
+        /// tag is also being applied as part of this call</summary>
         void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags);//TODO CALL
     }
 }
