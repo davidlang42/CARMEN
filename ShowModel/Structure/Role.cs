@@ -28,7 +28,7 @@ namespace ShowModel.Structure
         public uint CountFor(CastGroup group)
             => CountByGroups.Where(c => c.CastGroup == group).Select(c => c.Count).SingleOrDefault(); // defaults to 0
 
-        public RoleStatus CheckStatus(AlternativeCast[] alternative_casts)
+        public RoleStatus CheckStatus(AlternativeCast[] alternative_casts) //TODO rename Role.CheckStatus() to something better (look at item/section check names)
         {
             if (CountByGroups.Count == 0 || CountByGroups.All(cbg => cbg.Count == 0))
                 return Cast.Count > 0 ? RoleStatus.OverCast : RoleStatus.FullyCast;
