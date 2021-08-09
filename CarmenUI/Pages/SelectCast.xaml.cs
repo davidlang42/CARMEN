@@ -107,7 +107,7 @@ namespace CarmenUI.Pages
             await Task.Run(() => engine.BalanceAlternativeCasts(context.Applicants.Local, alternative_casts, Enumerable.Empty<SameCastSet>()));
             processing.Progress = 50;
             processing.SubText = "Allocating cast numbers";
-            await Task.Run(() => engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.Criterias.First(), ListSortDirection.Ascending));//TODO add show setting for which criteria should be used to allocate cast numbers
+            await Task.Run(() => engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection));
             processing.Progress = 75;
             processing.SubText = "Applying tags";
             await Task.Run(() => engine.ApplyTags(context.Applicants.Local, context.Tags.Local));

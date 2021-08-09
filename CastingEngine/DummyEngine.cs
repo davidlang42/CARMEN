@@ -126,7 +126,7 @@ namespace CastingEngine
         }
 
         /// <summary>Dummy implementation allocates cast numbers for each cast group in order, in a random order, ignoring order_by</summary>
-        public void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria order_by, ListSortDirection sort_direction)
+        public void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? order_by, ListSortDirection sort_direction)
         {
             int num = 1;
             var cast_groups = applicants.Select(a => a.CastGroup).OfType<CastGroup>().ToHashSet();

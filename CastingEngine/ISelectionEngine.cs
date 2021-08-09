@@ -24,7 +24,7 @@ namespace CastingEngine
 
         /// <summary>Allocate cast numbers, respecting those already set
         /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set</summary>
-        void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria order_by, ListSortDirection sort_direction);
+        void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? order_by, ListSortDirection sort_direction);
         //LATER might be good to be able to order by age, name, external data
 
         /// <summary>Apply tags to applicants, respecting those already applied
