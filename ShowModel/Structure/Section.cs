@@ -29,7 +29,10 @@ namespace ShowModel.Structure
             var sum_of_roles = cast_members.ToDictionary(cm => cm.Key, cm => 0u);
             foreach (var role in ItemsInOrder().SelectMany(i => i.Roles).Distinct())
                 foreach (var role_cbg in role.CountByGroups)
-                    sum_of_roles[role_cbg.CastGroup] += role_cbg.Count; //TODO what if a role has a countbygroup for a cast group with no cast members in it?
+                    if (sum_of_roles.TryGetValue(role_cbg.CastGroup, out var existing_count))
+                        sum_of_roles[role_cbg.CastGroup] = existing_count + role_cbg.Count;
+                    else
+                        return RolesMatchResult.TooManyRoles; // CountByGroup exists for a CastGroup with no cast members in it
             if (SectionType.AllowNoRoles == false && sum_of_roles.Any(kvp => cast_members[kvp.Key] > kvp.Value))
                 return RolesMatchResult.TooFewRoles;
             if (SectionType.AllowMultipleRoles == false && sum_of_roles.Any(kvp => cast_members[kvp.Key] < kvp.Value))
