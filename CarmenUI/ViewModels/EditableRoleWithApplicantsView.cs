@@ -40,7 +40,7 @@ namespace CarmenUI.ViewModels
         public void ConfigureFiltering(bool show_unavailable)
         {
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
-            view.Filter = show_unavailable ? null : av => ((ApplicantForRole)av).IsAvailable;
+            view.Filter = show_unavailable ? null : av => ((ApplicantForRole)av).Availability.IsAvailable;
         }
 
         public void ConfigureSorting()

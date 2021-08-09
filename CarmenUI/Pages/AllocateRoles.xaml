@@ -243,7 +243,7 @@
                                     <ListView.Resources>
                                         <Style TargetType="{x:Type ListViewItem}">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsAvailable}" Value="False">
+                                                <DataTrigger Binding="{Binding Availability.IsAvailable}" Value="False">
                                                     <Setter Property="Background" Value="LightGray" />
                                                     <Setter Property="ToolTip" Value="{Binding CommaSeparatedUnavailabilityReason}"/>
                                                 </DataTrigger>

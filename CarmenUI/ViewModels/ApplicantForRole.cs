@@ -57,22 +57,21 @@ namespace CarmenUI.ViewModels
         public CastGroupAndCast CastGroupAndCast { get; init; }
 
         public Availability Availability { get; init; }
-        
-        public bool IsAvailable => Availability == Availability.Available;
 
         public IEnumerable<string> UnavailabilityReasons
         {
             get
             {
                 var av = Availability;
-                if (av.HasFlag(Availability.AlreadyInItem))
-                    yield return "Already cast in ITEM";
-                if (av.HasFlag(Availability.AlreadyInNonMultiSection))
-                    yield return "Already cast in SECTION";
-                if (av.HasFlag(Availability.InPreviousItem))
-                    yield return "Cast in NEXT item";
-                if (av.HasFlag(Availability.InNextItem))
-                    yield return "Cast in PREVIOUS item";
+                if (av.IsAlreadyInItem)
+                    foreach (var item in av.AlreadyInItems!)
+                        yield return $"Already cast in {item.Name}";
+                if (av.IsAlreadyInNonMultiSection)
+                    foreach (var nms in av.AlreadyInNonMultiSections!)
+                        yield return $"Already cast in {nms.NonMultiSection.Name}";
+                if (av.IsInAdjacentItem)
+                    foreach (var adj in av.InAdjacentItems!)
+                        yield return $"Cast in {adj.Adjacency.ToString().ToLower()} item ({adj.AlreadyInItem.Name})";
             }
         }
 

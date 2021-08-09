@@ -51,7 +51,7 @@ namespace CastingEngine
 
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
-        Availability AvailabilityOf(Applicant applicant, Role role);//TODO signature needs to change, see comment in Availability.cs
+        Availability AvailabilityOf(Applicant applicant, Role role);
 
         /// <summary>Pick the cast for a role</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
