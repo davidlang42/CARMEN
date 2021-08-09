@@ -93,7 +93,8 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled"/>
+            <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                     KeyUp="objectList_KeyUp"/>
         </DockPanel>
         <DockPanel Grid.Column="2" Margin="5" DataContext="{Binding ElementName=objectList,Path=SelectedItem}">
             <TextBlock DockPanel.Dock="Top" Text="{Binding Name, StringFormat='Editing: \{0\}'}" FontSize="22"/>
