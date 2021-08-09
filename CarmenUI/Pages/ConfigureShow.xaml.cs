@@ -216,7 +216,7 @@ namespace CarmenUI.Pages
                     case CastGroup cast_group:
                         if (context.CastGroups.Local.Count == 1)
                         {
-                            MessageBox.Show("You must have at least one Cast Group.");
+                            MessageBox.Show("You must have at least one Cast Group.", WindowTitle);
                             return;
                         }
                         if (!cast_group.Members.Any() || ConfirmDelete($"Are you sure you want to delete the '{cast_group.Name}' cast group?\nThis will remove the {cast_group.Members.Count.Plural($"currently selected {cast_group.Name}")} from the cast."))
@@ -255,7 +255,7 @@ namespace CarmenUI.Pages
                     case SectionType section_type:
                         if (context.SectionTypes.Local.Count == 1)
                         {
-                            MessageBox.Show("You must have at least one Section Type.");
+                            MessageBox.Show("You must have at least one Section Type.", WindowTitle);
                             return;
                         }
                         if (!section_type.Sections.Any() || ConfirmDelete($"Are you sure you want to delete the '{section_type.Name}' section type?\nThis will remove the {section_type.Sections.Count.Plural(section_type.Name)} and any sections, items and roles within them."))
