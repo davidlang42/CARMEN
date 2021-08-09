@@ -11,6 +11,28 @@ namespace UnitTests.Database
 {
     public class ContextTests
     {
+        readonly DbContextOptions<ShowContext> contextOptions = new DbContextOptionsBuilder<ShowContext>()
+            .UseSqlite($"Filename={nameof(ContextTests)}.db").Options;
+
+        [OneTimeSetUp]
+        public void CreateDatabase()
+        {
+            using var context = new ShowContext(contextOptions);
+            context.Database.EnsureDeleted();
+            context.Database.EnsureCreated();
+        }
+
+        [Test]
+        public void ShowRootAccessorCreatesOnlyOneNode()
+        {
+            using var context = new ShowContext(contextOptions);
+            context.Nodes.Count().Should().Be(0);
+            var show_root = context.ShowRoot;
+            context.ShowRoot.Should().Be(show_root);
+            context.SaveChanges();
+            context.Nodes.Count().Should().Be(1);
+        }
+
         [Test]
         public void DataObjectsEnum_MatchesDbSets()
         {

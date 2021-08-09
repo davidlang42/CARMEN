@@ -30,8 +30,9 @@ namespace ShowModel
         public DbSet<Image> Images => Set<Image>();
         #endregion
 
+        private ShowRoot? showRoot;
         /// <summary>The root node of the show structure</summary>
-        public ShowRoot ShowRoot => Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;
+        public ShowRoot ShowRoot => showRoot ??= Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;
 
         public ShowContext(DbContextOptions<ShowContext> context_options) : base(context_options)
         { }
