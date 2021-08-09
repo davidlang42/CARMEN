@@ -121,9 +121,9 @@
                             <!-- CountByGroup footer cells are added here dynamically -->
                         </Grid>
                         <DataGrid Grid.Row="1" x:Name="RolesDataGrid"  AutoGenerateColumns="False"
-                                  CanUserSortColumns="False" CanUserAddRows="True" CanUserDeleteRows="True"
+                                  CanUserSortColumns="True" CanUserDeleteRows="True"
                                   ItemsSource="{Binding Roles}"
-                                  Initialized="RolesDataGrid_Initialized"> <!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->
+                                  Initialized="RolesDataGrid_Initialized"><!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Role.Name}"/>
                                 <!-- CountByGroup columns are added here dynamically -->

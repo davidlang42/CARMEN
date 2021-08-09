@@ -18,4 +18,11 @@ namespace Carmen.ShowModel
     {
         int IComparable.CompareTo(object? obj) => Name.CompareTo(((INamed?)obj)?.Name);
     }
+
+    public static class INameOrderedExtensions
+    {
+        /// <summary>Enumerates this collection ordered by Name value.</summary>
+        public static IOrderedEnumerable<T> InOrder<T>(this IEnumerable<T> objects) where T : INameOrdered
+            => objects.OrderBy(o => o.Name);
+    }
 }

@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -58,7 +59,7 @@ namespace CarmenUI.ViewModels
         public ItemView(Item item, CastGroup[] cast_groups)
         {
             Item = item;
-            Roles = new ObservableCollection<RoleOnlyView>(item.Roles.Select(r =>
+            Roles = new ObservableCollection<RoleOnlyView>(item.Roles.InOrder().Select(r =>
             {
                 var rv = new RoleOnlyView(r, cast_groups);
                 rv.PropertyChanged += RoleView_PropertyChanged;
