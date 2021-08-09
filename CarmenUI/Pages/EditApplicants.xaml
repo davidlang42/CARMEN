@@ -141,7 +141,7 @@
                         <TextBlock Grid.Row="1" Text="Incomplete"
                                    Visibility="{Binding IsRegistered, Converter={StaticResource hideIfTrue}}"
                                    Foreground="Red" FontStyle="Italic" FontSize="16"/>
-                        <TextBlock Grid.Row="1" Text="{Binding OverallAbility}" Foreground="Green" FontWeight="Bold" FontSize="16">
+                        <TextBlock Grid.Row="1" Text="Auditioned" Foreground="Green" FontSize="16">
                             <TextBlock.Visibility>
                                 <MultiBinding Converter="{StaticResource showIfApplicantRegisteredAndAuditioned}" ConverterParameter="{StaticResource criteriasViewSource}">
                                     <MultiBinding.Bindings>

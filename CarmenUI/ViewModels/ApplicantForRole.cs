@@ -52,7 +52,7 @@ namespace CarmenUI.ViewModels
         /// <summary>Not including this role, even if already cast in it</summary>
         public double[] ExistingRoles { get; init; }
 
-        public int OverallAbility => Applicant.OverallAbility;
+        public int OverallAbility { get; init; }
 
         public CastGroupAndCast CastGroupAndCast { get; init; }
 
@@ -77,13 +77,14 @@ namespace CarmenUI.ViewModels
 
         public string CommaSeparatedUnavailabilityReason => string.Join(", ", UnavailabilityReasons);
 
-        public ApplicantForRole(IAllocationEngine engine, Applicant applicant, Role role, Criteria[] criterias)
+        public ApplicantForRole(ICastingEngine engine, Applicant applicant, Role role, Criteria[] criterias)
         {
             this.Applicant = applicant;
             CastGroupAndCast = new CastGroupAndCast(Applicant);
             this.role = role;
             Criterias = criterias;
             Suitability = engine.SuitabilityOf(applicant, role);
+            OverallAbility = engine.OverallAbility(applicant);
             Marks = new uint[Criterias.Length];
             for (var i = 0; i < Marks.Length; i++)
                 Marks[i] = applicant.MarkFor(Criterias[i]);

@@ -185,11 +185,24 @@ namespace ShowModel.Applicants
             }
         }
 
-        public int OverallAbility //LATER notify OverallAbility changed if any criteria weights/maxmarks change
-            => Convert.ToInt32(Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); //LATER handle overflow
-
         public bool IsRegistered
             => !string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName) && Gender.HasValue && DateOfBirth.HasValue;
+
+        public bool HasAuditioned(IEnumerable<Criteria> all_criterias)
+            => HasAuditioned(IsRegistered, Abilities, all_criterias);
+
+        public static bool HasAuditioned(bool is_registered, IEnumerable<Ability> applicant_abilities, IEnumerable<Criteria> all_criterias)
+        {
+            if (!is_registered)
+                return false;
+            foreach (var ability in applicant_abilities)
+                if (ability.Mark > ability.Criteria.MaxMark)
+                    return false;
+            foreach (var required_criteria in all_criterias.Where(c => c.Primary))
+                if (!applicant_abilities.Any(ab => ab.Criteria == required_criteria))
+                    return false;
+            return true;
+        }
 
         public Applicant()
         {
@@ -213,7 +226,7 @@ namespace ShowModel.Applicants
         }
 
         private void Ability_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-            => OnPropertyChanged(nameof(OverallAbility));
+            => OnPropertyChanged(nameof(Abilities));
 
         private void Tags_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(Tags));

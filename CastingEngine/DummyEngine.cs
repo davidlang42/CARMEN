@@ -153,7 +153,8 @@ namespace CastingEngine
             }
         }
 
-        /// <summary></summary>
-        public int OverallAbility(Applicant applicant) => throw new NotImplementedException();//TODO (OVERALL) implement
+        /// <summary>Dummy value is the weighted average of abilities, not checking for any missing values</summary>
+        public int OverallAbility(Applicant applicant)
+            => Convert.ToInt32(applicant.Abilities.Sum(a => (double) a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)); //LATER handle overflow
     }
 }

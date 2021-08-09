@@ -37,20 +37,7 @@ namespace CarmenUI.Converters
         {
             if (criterias.Source is not IList list)
                 return false;
-            return Check(is_registered, applicant_abilities, list.OfType<Criteria>());
-        }
-
-        public static bool Check(bool is_registered, IEnumerable<Ability> applicant_abilities, IEnumerable<Criteria> all_criterias)
-        {
-            if (!is_registered)
-                return false;
-            foreach (var ability in applicant_abilities)
-                if (ability.Mark > ability.Criteria.MaxMark)
-                    return false;
-            foreach (var required_criteria in all_criterias.Where(c => c.Primary))
-                if (!applicant_abilities.Any(ab => ab.Criteria == required_criteria))
-                    return false;
-            return true;
+            return Applicant.HasAuditioned(is_registered, applicant_abilities, list.OfType<Criteria>());
         }
 
         public object[] ConvertBack(object value, Type[] targetType, object parameter, CultureInfo culture)

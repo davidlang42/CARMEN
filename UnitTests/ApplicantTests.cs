@@ -132,21 +132,22 @@ namespace UnitTests
         }
 
         [Test]
-        public void PropertyChanged_AbilityToOverallAbility()
+        public void PropertyChanged_AbilityToAbilities()
         {
             var applicant = new Applicant();
             var ability = AbilityTests.TestAbility();
-            using var mon = applicant.Monitor();
             applicant.Abilities.Add(ability);
-            mon.Should().NotRaisePropertyChangeFor(a => a.OverallAbility);
+            using var mon = applicant.Monitor();
             ability.Mark = 100;
-            mon.Should().RaisePropertyChangeFor(a => a.OverallAbility);
+            mon.Should().RaisePropertyChangeFor(a => a.Abilities);
             mon.Clear();
             ability.Mark = 100;
-            mon.Should().NotRaisePropertyChangeFor(a => a.OverallAbility);
+            mon.Should().NotRaisePropertyChangeFor(a => a.Abilities);
             applicant.Abilities.Remove(ability);
+            mon.Should().RaisePropertyChangeFor(a => a.Abilities);
+            mon.Clear();
             ability.Mark = 50;
-            mon.Should().NotRaisePropertyChangeFor(a => a.OverallAbility);
+            mon.Should().NotRaisePropertyChangeFor(a => a.Abilities);
         }
     }
 }
