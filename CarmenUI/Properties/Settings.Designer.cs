@@ -124,5 +124,29 @@ namespace CarmenUI.Properties {
                 this["SaveOnApplicantChange"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowUnavailableApplicants {
+            get {
+                return ((bool)(this["ShowUnavailableApplicants"]));
+            }
+            set {
+                this["ShowUnavailableApplicants"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowIneligibleApplicants {
+            get {
+                return ((bool)(this["ShowIneligibleApplicants"]));
+            }
+            set {
+                this["ShowIneligibleApplicants"] = value;
+            }
+        }
     }
 }

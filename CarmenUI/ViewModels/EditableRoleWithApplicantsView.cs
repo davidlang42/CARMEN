@@ -21,7 +21,7 @@ namespace CarmenUI.ViewModels
 
         /// <summary>Array arguments are not expected not to change over the lifetime of this View.
         /// Elements of the array may be monitored for changes, but the collection itself is not.</summary>
-        public EditableRoleWithApplicantsView(ICastingEngine engine, Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] criterias, Applicant[] applicants)
+        public EditableRoleWithApplicantsView(ICastingEngine engine, Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] criterias, Applicant[] applicants, bool show_unavailable, bool show_ineligible)
             : base(role, cast_groups_by_cast)
         {
             var required_cast_groups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
@@ -33,14 +33,20 @@ namespace CarmenUI.ViewModels
             }).ToArray();
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
-            ConfigureFiltering(false);
+            ConfigureFiltering(show_unavailable, show_ineligible);
             ConfigureSorting();
         }
 
-        public void ConfigureFiltering(bool show_unavailable)//TODO do we need to be able to filter out ineligible candidates?
+        public void ConfigureFiltering(bool show_unavailable, bool show_ineligible)
         {
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
-            view.Filter = show_unavailable ? null : av => ((ApplicantForRole)av).Availability.IsAvailable;
+            view.Filter = (show_unavailable, show_ineligible) switch
+            {
+                (false, false) => av => ((ApplicantForRole)av).Availability.IsAvailable && ((ApplicantForRole)av).Eligibility.IsEligible,//
+                (false, true) => av => ((ApplicantForRole)av).Availability.IsAvailable,
+                (true, false) => av => ((ApplicantForRole)av).Eligibility.IsEligible,
+                _ => null // (true, true)
+            };
         }
 
         public void ConfigureSorting()

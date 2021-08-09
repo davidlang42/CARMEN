@@ -9,6 +9,7 @@
     xmlns:modelStructure="clr-namespace:ShowModel.Structure;assembly=ShowModel"
     xmlns:cv="clr-namespace:CarmenUI.Converters"
     xmlns:vm="clr-namespace:CarmenUI.ViewModels"
+    xmlns:bd="clr-namespace:CarmenUI.Bindings"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Allocate Roles"
@@ -224,9 +225,14 @@
                                 </ItemsControl>
                             </Grid>
                             <UniformGrid Grid.Column="1" Columns="1" VerticalAlignment="Center">
-                                <CheckBox x:Name="showUnavailableApplicants" Content="Show unavailable applicants"
-                                          Checked="showUnavailableApplicants_Checked"
-                                          Unchecked="showUnavailableApplicants_Unchecked"/>
+                                <CheckBox Content="Show unavailable applicants"
+                                          IsChecked="{bd:SettingBinding ShowUnavailableApplicants}"
+                                          Checked="showApplicants_Changed"
+                                          Unchecked="showApplicants_Changed"/>
+                                <CheckBox Content="Show ineligible applicants"
+                                          IsChecked="{bd:SettingBinding ShowIneligibleApplicants}"
+                                          Checked="showApplicants_Changed"
+                                          Unchecked="showApplicants_Changed"/>
                             </UniformGrid>
                         </Grid>
                         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5">
@@ -243,13 +249,13 @@
                                     <ListView.Resources>
                                         <Style TargetType="{x:Type ListViewItem}">
                                             <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Availability.IsAvailable}" Value="False">
-                                                    <Setter Property="Background" Value="LightGray" />
-                                                    <Setter Property="ToolTip" Value="{Binding CommaSeparatedUnavailabilityReason}"/>
-                                                </DataTrigger>
                                                 <DataTrigger Binding="{Binding Eligibility.IsEligible}" Value="False">
                                                     <Setter Property="Background" Value="LightCoral" />
                                                     <Setter Property="ToolTip" Value="{Binding CommaSeparatedIneligibilityReason}"/>
+                                                </DataTrigger>
+                                                <DataTrigger Binding="{Binding Availability.IsAvailable}" Value="False"><!-- Unavailable listed last to give precedence -->
+                                                    <Setter Property="Background" Value="LightGray" />
+                                                    <Setter Property="ToolTip" Value="{Binding CommaSeparatedUnavailabilityReason}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
