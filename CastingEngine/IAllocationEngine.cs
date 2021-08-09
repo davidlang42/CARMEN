@@ -64,11 +64,5 @@ namespace CastingEngine
 
         /// <summary>Pick the cast for a role</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
-        //TODO (PICK) revise PickCast signature, and CALL
-
-        /// <summary>Pick the cast for one or more roles, balancing talent between them</summary>
-        //TODO (PICK) Dictionary<Role, IEnumerable<Applicant>> PickCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
-        //TODO (PICK) if the method to cast multiple roles at once is enabled, the return type of IdealCastingOrder()
-        //     may need to be modified to allow returning sets of roles to be cast together
     }
 }
