@@ -247,6 +247,10 @@
                                                     <Setter Property="Background" Value="LightGray" />
                                                     <Setter Property="ToolTip" Value="{Binding CommaSeparatedUnavailabilityReason}"/>
                                                 </DataTrigger>
+                                                <DataTrigger Binding="{Binding Eligibility.IsEligible}" Value="False">
+                                                    <Setter Property="Background" Value="LightCoral" />
+                                                    <Setter Property="ToolTip" Value="{Binding CommaSeparatedIneligibilityReason}"/>
+                                                </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
                                     </ListView.Resources>

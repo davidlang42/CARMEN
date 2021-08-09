@@ -41,14 +41,15 @@ namespace CastingEngine
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>
-        bool EligibilityOf(Applicant applicant, Role role, out HashSet<Requirement> requirements_not_met)//TODO implement similar to availability but as light red highlight
+        Eligibility EligibilityOf(Applicant applicant, Role role)
         {
-            requirements_not_met = new();
-            var result = true;
+            var requirements_not_met = new HashSet<Requirement>();
             foreach (var req in role.Requirements)
-                if (!req.IsSatisfiedBy(applicant, requirements_not_met))
-                    result = false;
-            return result;
+                _ = req.IsSatisfiedBy(applicant, requirements_not_met);
+            return new Eligibility
+            {
+                RequirementsNotMet = requirements_not_met.ToArray()
+            };
         }
 
         /// <summary>Count the number of roles an applicant has which require a certain criteria,

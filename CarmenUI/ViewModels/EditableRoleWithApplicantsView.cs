@@ -37,7 +37,7 @@ namespace CarmenUI.ViewModels
             ConfigureSorting();
         }
 
-        public void ConfigureFiltering(bool show_unavailable)
+        public void ConfigureFiltering(bool show_unavailable)//TODO do we need to be able to filter out ineligible candidates?
         {
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             view.Filter = show_unavailable ? null : av => ((ApplicantForRole)av).Availability.IsAvailable;

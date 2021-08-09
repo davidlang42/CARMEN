@@ -58,6 +58,8 @@ namespace CarmenUI.ViewModels
 
         public Availability Availability { get; init; }
 
+        public Eligibility Eligibility { get; init; }
+
         public IEnumerable<string> UnavailabilityReasons
         {
             get
@@ -75,7 +77,11 @@ namespace CarmenUI.ViewModels
             }
         }
 
+        public IEnumerable<string> IneligibilityReasons => Eligibility.RequirementsNotMet.Select(r => r.Reason ?? $"{r.Name} requirement not met");
+
         public string CommaSeparatedUnavailabilityReason => string.Join(", ", UnavailabilityReasons);
+
+        public string CommaSeparatedIneligibilityReason => string.Join(", ", IneligibilityReasons);
 
         public ApplicantForRole(ICastingEngine engine, Applicant applicant, Role role, Criteria[] criterias)
         {
@@ -92,6 +98,7 @@ namespace CarmenUI.ViewModels
             for (var i = 0; i < ExistingRoles.Length; i++)
                 ExistingRoles[i] = engine.CountRoles(applicant, Criterias[i], role);
             Availability = engine.AvailabilityOf(applicant, role);
+            Eligibility = engine.EligibilityOf(applicant, role);
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
