@@ -109,15 +109,19 @@ namespace CastingEngine
         }
 
         /// <summary>Dummy implementation allocates alternative casts randomly, overwriting every applicants existing alternative cast, ignoring same_cast_sets</summary>
-        public void BalanceAlternativeCasts(CastGroup cast_group, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets)
+        public void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets)
         {
-            var group_casts = cast_group.AlternateCasts ? alternative_casts : new AlternativeCast?[] { null };
-            int ac = 0;
-            foreach (var applicant in cast_group.Members)
+            var cast_groups = applicants.Select(a => a.CastGroup).OfType<CastGroup>().ToHashSet();
+            foreach (var cast_group in cast_groups)
             {
-                applicant.AlternativeCast = group_casts[ac++];
-                if (ac >= group_casts.Length)
-                    ac = 0;
+                var group_casts = cast_group.AlternateCasts ? alternative_casts : new AlternativeCast?[] { null };
+                int ac = 0;
+                foreach (var applicant in cast_group.Members)
+                {
+                    applicant.AlternativeCast = group_casts[ac++];
+                    if (ac >= group_casts.Length)
+                        ac = 0;
+                }
             }
         }
 

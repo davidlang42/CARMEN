@@ -41,7 +41,7 @@ namespace CastingEngine
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>
-        bool EligibilityOf(Applicant applicant, Role role, out HashSet<Requirement> requirements_not_met)//TODO (CALL)
+        bool EligibilityOf(Applicant applicant, Role role, out HashSet<Requirement> requirements_not_met)//TODO implement similar to availability but as light red highlight
         {
             requirements_not_met = new();
             var result = true;

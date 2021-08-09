@@ -22,6 +22,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using CarmenUI.Windows;
+using CastingEngine;
 
 namespace CarmenUI.Pages
 {
@@ -36,6 +37,7 @@ namespace CarmenUI.Pages
         private CollectionViewSource tagsViewSource;
         private CollectionViewSource alternativeCastsViewSource;
         private CollectionViewSource castNumbersViewSource;
+        private ICastingEngine engine;
 
         public SelectCast(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -52,6 +54,7 @@ namespace CarmenUI.Pages
                 selectedApplicantsViewSource.SortDescriptions.Add(sd);
             }
             castStatusCombo.SelectedIndex = 0; // must be here because it triggers event below
+            engine = new DummyEngine(); //LATER use real engine
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -91,10 +94,24 @@ namespace CarmenUI.Pages
                 OnReturn(DataObjects.Nodes);
         }
 
-        private void selectCastButton_Click(object sender, RoutedEventArgs e)
+        private async void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO (CALL) moved this into dummy implementation, need to call from here
-            MessageBox.Show("Cast numbers allocated randomly.");
+            using var processing = new LoadingOverlay(this);
+            processing.MainText = "Processing...";
+            processing.Progress = 0;
+            processing.SubText = "Selecting applicants";
+            var alternative_casts = context.AlternativeCasts.Local.ToArray();
+            await Task.Run(() => engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local, (uint)alternative_casts.Length));
+            processing.Progress = 25;
+            processing.SubText = "Balancing alternating casts";
+            await Task.Run(() => engine.BalanceAlternativeCasts(context.Applicants.Local, alternative_casts, Enumerable.Empty<SameCastSet>()));
+            processing.Progress = 50;
+            processing.SubText = "Allocating cast numbers";
+            await Task.Run(() => engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.Criterias.First(), ListSortDirection.Ascending));//TODO add show setting for which criteria should be used to allocate cast numbers
+            processing.Progress = 75;
+            processing.SubText = "Applying tags";
+            await Task.Run(() => engine.ApplyTags(context.Applicants.Local, context.Tags.Local));
+            processing.Progress = 100;
         }
 
         private void addButton_Click(object sender, RoutedEventArgs e)
