@@ -81,5 +81,7 @@ namespace CastingEngine
         public void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<AlternativeCast> alternative_casts, IEnumerable<SameCastSet> same_cast_sets) => throw new NotImplementedException();
         public void AllocateCastNumbers(IEnumerable<Applicant> applicants, Criteria order_by, ListSortDirection sort_direction = ListSortDirection.Ascending) => throw new NotImplementedException();
         public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags) => throw new NotImplementedException();
+        public int OverallAbility(Applicant applicant) => throw new NotImplementedException();
+        public IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order) => throw new NotImplementedException();
     }
 }

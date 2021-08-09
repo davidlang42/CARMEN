@@ -21,7 +21,7 @@ namespace CastingEngine
 
         /// <summary>Finds the next Role in IdealCastingOrder() which has not yet been fully cast,
         /// optionally exlcuding a specified role.</summary>
-        Role? NextUncastRole(IEnumerable<Item> items_in_order, AlternativeCast[] alternative_casts, Role? excluding_role = null)//TODO CALL
+        Role? NextUncastRole(IEnumerable<Item> items_in_order, AlternativeCast[] alternative_casts, Role? excluding_role = null)
         {
             var e = IdealCastingOrder(items_in_order)
                 .Where(r => r.CheckStatus(alternative_casts) != Role.RoleStatus.FullyCast)

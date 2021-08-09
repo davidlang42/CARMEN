@@ -182,7 +182,7 @@ namespace CarmenUI.Pages
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
             var current_role = (rolesTreeView.SelectedItem as RoleNodeView)?.Role;
-            var next_role = engine.NextRoleToCast(context.ShowRoot.ItemsInOrder(), current_role);
+            var next_role = engine.NextUncastRole(context.ShowRoot.ItemsInOrder(), context.AlternativeCasts.Local.ToArray(), current_role);
             if (next_role == null)
                 rolesTreeView.ClearSelectedItem();
             else if (rootNodeView.FindRoleView(next_role) is RoleNodeView next_role_view)
