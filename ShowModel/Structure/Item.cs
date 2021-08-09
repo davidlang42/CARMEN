@@ -12,7 +12,6 @@ namespace ShowModel.Structure
     public class Item : Node //LATER implement INotifyPropertyChanged for completeness
     {
         #region Database fields
-        public override string Name { get; set; } = "Item"; //TODO move this back into Node, and set the default value in constructor (if still required)
         public virtual ICollection<Role> Roles { get; private set; } = new ObservableCollection<Role>();
         #endregion
 

@@ -16,7 +16,6 @@ namespace ShowModel.Structure
             TooManyRoles
         }
 
-        public override string Name { get; set; } = "Section"; //TODO move back into Node
         public virtual SectionType SectionType { get; set; } = null!;
 
         /// <summary>Check if the Roles in this Section sum meet the conditions of this SectionType.

@@ -14,7 +14,7 @@ namespace ShowModel.Structure
         #region Database fields
         [Key]
         public int NodeId { get; private set; }
-        public abstract string Name { get; set; }
+        public string Name { get; set; } = "";
         public int Order { get; set; }
         public virtual InnerNode? Parent { get; set; }
         public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();

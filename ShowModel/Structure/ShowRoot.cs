@@ -16,7 +16,6 @@ namespace ShowModel.Structure
             public Item Item2;
             public int CastCount;
         }
-        public override string Name { get; set; } = "Show";
         public DateTime? ShowDate { get; set; }
         public virtual Image? Logo { get; set; }
         public override InnerNode? Parent
