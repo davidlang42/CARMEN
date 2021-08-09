@@ -77,7 +77,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public IEnumerable<string> IneligibilityReasons => Eligibility.RequirementsNotMet.Select(r => r.Reason ?? $"{r.Name} requirement not met");
+        public IEnumerable<string> IneligibilityReasons => Eligibility.RequirementsNotMet.Select(r => r.Reason ?? $"'{r.Name}' requirement not met");
 
         public string CommaSeparatedUnavailabilityReason => string.Join(", ", UnavailabilityReasons);
 
