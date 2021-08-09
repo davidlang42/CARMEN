@@ -23,7 +23,7 @@ namespace CarmenUI.ViewModels
         {
             StartUpdate();
             // check role status
-            var status = await Task.Run(() => Role.CheckStatus(alternativeCasts));
+            var status = await Task.Run(() => Role.CastingStatus(alternativeCasts));
             var is_complete = status == Role.RoleStatus.FullyCast;
             var has_errors = status == Role.RoleStatus.UnderCast || status == Role.RoleStatus.OverCast;
             FinishUpdate(is_complete ? 1 : 0, has_errors);

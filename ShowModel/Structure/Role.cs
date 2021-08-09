@@ -28,7 +28,7 @@ namespace ShowModel.Structure
         public uint CountFor(CastGroup group)
             => CountByGroups.Where(c => c.CastGroup == group).Select(c => c.Count).SingleOrDefault(); // defaults to 0
 
-        public RoleStatus CheckStatus(AlternativeCast[] alternative_casts) //TODO rename Role.CheckStatus() to something better (look at item/section check names)
+        public RoleStatus CastingStatus(AlternativeCast[] alternative_casts)
         {
             if (CountByGroups.Count == 0 || CountByGroups.All(cbg => cbg.Count == 0))
                 return Cast.Count > 0 ? RoleStatus.OverCast : RoleStatus.FullyCast;
@@ -39,22 +39,11 @@ namespace ShowModel.Structure
             {
                 if (cast_by_group.Key is not CastGroup cast_group)
                     return RoleStatus.OverCast;
-                //TODO handle alternate casts here properly (probably by bringing CastGroupAndCast into ShowModel)
+                var group_casts = cast_group.AlternateCasts ? alternative_casts : new AlternativeCast?[] { null };
                 var required_count = CountFor(cast_group);
-                if (cast_group.AlternateCasts)
+                foreach (var alternative_cast in group_casts)
                 {
-                    foreach(var alternative_cast in alternative_casts)
-                    {
-                        var actual_count = cast_by_group.Where(a => a.AlternativeCast == alternative_cast).Count();
-                        if (required_count > actual_count)
-                            return RoleStatus.OverCast;
-                        if (required_count < actual_count)
-                            under_cast = true; // don't return yet, because if any count is over cast, we want to return that first
-                    }
-                }
-                else
-                {
-                    var actual_count = cast_by_group.Count();
+                    var actual_count = cast_by_group.Where(a => a.AlternativeCast == alternative_cast).Count();//LATER check there are no cast in this CastGroup which have null AlternativeCast when CastGroup.AlternateCasts and vice versa
                     if (required_count > actual_count)
                         return RoleStatus.OverCast;
                     if (required_count < actual_count)

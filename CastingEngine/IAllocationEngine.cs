@@ -25,7 +25,7 @@ namespace CastingEngine
         Role? NextUncastRole(IEnumerable<Item> items_in_order, AlternativeCast[] alternative_casts, Role? excluding_role = null)
         {
             var e = IdealCastingOrder(items_in_order)
-                .Where(r => r.CheckStatus(alternative_casts) != Role.RoleStatus.FullyCast)
+                .Where(r => r.CastingStatus(alternative_casts) != Role.RoleStatus.FullyCast)
                 .GetEnumerator();
             if (!e.MoveNext())
                 return null;
