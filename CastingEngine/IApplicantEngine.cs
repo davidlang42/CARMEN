@@ -13,6 +13,6 @@ namespace CastingEngine
     public interface IApplicantEngine
     {
         /// <summary>Calculate the overall ability of an applicant</summary>
-        int OverallAbility(Applicant applicant); //TODO remove OverallAbility from Applicant and CALL this
+        int OverallAbility(Applicant applicant); //TODO (OVERALL) remove OverallAbility from Applicant and CALL this
     }
 }

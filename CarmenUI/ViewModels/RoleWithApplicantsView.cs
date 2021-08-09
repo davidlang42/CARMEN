@@ -9,7 +9,7 @@ namespace CarmenUI.ViewModels
 {
     public class RoleWithApplicantsView : RoleView
     {
-        public CastGroupAndCast[] CastGroupsByCast { get; init; } //TODO consider moving CastGroupAndCast into ShowModal so it can be used in CastingEngine, or maybe just instanciate CastingEngine with cast groups and alternative casts
+        public CastGroupAndCast[] CastGroupsByCast { get; init; }
 
         /// <summary>Indicies match CastGroupsByCast</summary>
         public uint[] RequiredCast { get; init; }

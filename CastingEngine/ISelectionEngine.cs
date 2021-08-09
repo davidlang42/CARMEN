@@ -16,20 +16,21 @@ namespace CastingEngine
     {
         /// <summary>Select applicants into cast groups, respecting those already placed
         /// NOTE: CastGroup requirements may not depend on CastGroups or Tags</summary>
-        void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups);//TODO CALL
+        void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts);//TODO (CALL)
 
         /// <summary>Balance applicants between alternative casts, respecting those already set
-        /// NOTE: All applicants must have a CastGroup set</summary>
-        void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<AlternativeCast> alternative_casts, IEnumerable<SameCastSet> same_cast_sets);//TODO CALL
+        /// NOTE: same_cast_sets must only contain applicants in this cast_group</summary>
+        void BalanceAlternativeCasts(CastGroup cast_group, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets);//TODO (CALL)
 
         /// <summary>Allocate cast numbers, respecting those already set
         /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set</summary>
-        void AllocateCastNumbers(IEnumerable<Applicant> applicants, Criteria order_by, ListSortDirection sort_direction = ListSortDirection.Ascending);//TODO CALL
+        void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria order_by, ListSortDirection sort_direction);//TODO (CALL)
+        //LATER might be good to be able to order by age, name, external data
 
         /// <summary>Apply tags to applicants, respecting those already applied
         /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set,
         /// Tag requirements may depend on other Tags as long as there is no circular dependency and the dependee
         /// tag is also being applied as part of this call</summary>
-        void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags);//TODO CALL
+        void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags);//TODO (CALL)
     }
 }

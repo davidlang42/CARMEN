@@ -93,7 +93,7 @@ namespace CarmenUI.Pages
 
         private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO moved this into dummy implementation, need to call from here
+            //TODO (CALL) moved this into dummy implementation, need to call from here
             MessageBox.Show("Cast numbers allocated randomly.");
         }
 

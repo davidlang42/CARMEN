@@ -64,13 +64,11 @@ namespace CastingEngine
                     ).ToArray()
             };
 
-         /// <summary>Dummy value enumerates roles in item order, then by name, removing duplicates</summary>
-        public IEnumerable<Role> CastingOrder(IEnumerable<Item> items_in_order)
+        /// <summary>Dummy value enumerates roles in item order, then by name, removing duplicates</summary>
+        public IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order)
             => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();
 
-        /// <summary>
-        /// Dummy selection picks the number of required applicants of each type from the list of applicants, ignoring availability
-        /// </summary>
+        /// <summary>Dummy selection picks the number of required applicants of each type from the list of applicants, ignoring availability and eligibility</summary>
         public IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts)
         {
             var casts = alternative_casts.ToArray();
@@ -90,30 +88,72 @@ namespace CastingEngine
             }
         }
 
-        //TODO this should be in AllocateCastNumbers
-        //int num = 1;
-        //foreach (var cast_group in cast_groups)
-        //{
-        //    var group_casts = cast_group.AlternateCasts ? alternative_casts : new AlternativeCast?[] { null };
-        //    int ac = 0;
-        //    foreach (var applicant in cast_group.Members)
-        //    {
-        //        applicant.CastNumber = num;
-        //        applicant.AlternativeCast = group_casts[ac++];
-        //        if (ac >= group_casts.Length)
-        //        {
-        //            ac = 0;
-        //            num++;
-        //        }
-        //    }
-        //}
+        /// <summary>Dummy implementation selects the required number of cast in each group, in random order, overwriting every applicants existing cast group</summary>
+        public void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts)
+        {
+            var e = applicants.GetEnumerator();
+            foreach (var cast_group in cast_groups)
+            {
+                var required = cast_group.RequiredCount;
+                if (cast_group.AlternateCasts)
+                    required *= number_of_alternative_casts;
+                for (var i=0; i<required; i++)
+                {
+                    if (!e.MoveNext())
+                        return;
+                    e.Current.CastGroup = cast_group;
+                }
+            }
+            while (e.MoveNext())
+                e.Current.CastGroup = null;
+        }
 
-        //TODO implement dummy engine
-        public void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups) => throw new NotImplementedException();
-        public void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<AlternativeCast> alternative_casts, IEnumerable<SameCastSet> same_cast_sets) => throw new NotImplementedException();
-        public void AllocateCastNumbers(IEnumerable<Applicant> applicants, Criteria order_by, ListSortDirection sort_direction = ListSortDirection.Ascending) => throw new NotImplementedException();
-        public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags) => throw new NotImplementedException();
-        public int OverallAbility(Applicant applicant) => throw new NotImplementedException();
-        public IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order) => throw new NotImplementedException();
+        /// <summary>Dummy implementation allocates alternative casts randomly, overwriting every applicants existing alternative cast, ignoring same_cast_sets</summary>
+        public void BalanceAlternativeCasts(CastGroup cast_group, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets)
+        {
+            var group_casts = cast_group.AlternateCasts ? alternative_casts : new AlternativeCast?[] { null };
+            int ac = 0;
+            foreach (var applicant in cast_group.Members)
+            {
+                applicant.AlternativeCast = group_casts[ac++];
+                if (ac >= group_casts.Length)
+                    ac = 0;
+            }
+        }
+
+        /// <summary>Dummy implementation allocates cast numbers for each cast group in order, in a random order, ignoring order_by</summary>
+        public void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria order_by, ListSortDirection sort_direction)
+        {
+            int num = 1;
+            var cast_groups = applicants.Select(a => a.CastGroup).OfType<CastGroup>().ToHashSet();
+            foreach (var cast_group in cast_groups)
+            {
+                var applicants_by_cast = cast_group.Members.GroupBy(a => a.AlternativeCast).Select(g => g.ToArray()).ToList();
+                var common_length = applicants_by_cast.First().Length;
+                if (!applicants_by_cast.All(arr => arr.Length == common_length))
+                    throw new ArgumentException($"Alternative casts of {cast_group.Name} do not contain the same number of applicants.");
+                for (var i = 0; i < common_length; i++)
+                {
+                    foreach (var arr in applicants_by_cast)
+                        arr[i].CastNumber = num;
+                    num++;
+                }
+            }
+        }
+
+        /// <summary>Dummy implementation applies tags to cast randomly, overwriting any tags previously applied to an applicant, ignoring requriements</summary>
+        public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)
+        {
+            foreach (var tag in tags)
+            {
+                tag.Members.Clear();
+                foreach (var cbg in tag.CountByGroups)
+                    foreach (var applicant in applicants.Where(a => a.CastGroup == cbg.CastGroup).Take((int)cbg.Count))
+                        tag.Members.Add(applicant);
+            }
+        }
+
+        /// <summary></summary>
+        public int OverallAbility(Applicant applicant) => throw new NotImplementedException();//TODO (OVERALL) implement
     }
 }
