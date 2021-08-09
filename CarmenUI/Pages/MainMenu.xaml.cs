@@ -1,7 +1,7 @@
 ﻿using CarmenUI.ViewModels;
 using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
-using ShowModel;
+using Carmen.ShowModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

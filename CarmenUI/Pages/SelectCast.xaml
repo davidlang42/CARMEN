@@ -8,7 +8,7 @@
     xmlns:local="clr-namespace:CarmenUI.Pages"
     xmlns:cv="clr-namespace:CarmenUI.Converters"
     xmlns:vm="clr-namespace:CarmenUI.ViewModels"
-    xmlns:modelApplicants="clr-namespace:ShowModel.Applicants;assembly=ShowModel"
+    xmlns:modelApplicants="clr-namespace:Carmen.ShowModel.Applicants;assembly=Carmen.ShowModel"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Select Cast" Loaded="Page_Loaded">

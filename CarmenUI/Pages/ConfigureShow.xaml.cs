@@ -2,11 +2,11 @@
 using CarmenUI.ViewModels;
 using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
-using ShowModel;
-using ShowModel.Applicants;
-using ShowModel.Criterias;
-using ShowModel.Requirements;
-using ShowModel.Structure;
+using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Requirements;
+using Carmen.ShowModel.Structure;
 using System;
 using System.Collections;
 using System.Collections.Generic;

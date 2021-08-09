@@ -1,11 +1,11 @@
-﻿using ShowModel.Applicants;
-using ShowModel.Structure;
+﻿using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Structure;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace ShowModel.Requirements
+namespace Carmen.ShowModel.Requirements
 {
     /// <summary>
     /// A requirement which can be satisfied by an Applicant

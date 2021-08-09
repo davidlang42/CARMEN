@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 
-namespace ShowModel
+namespace Carmen.ShowModel
 {
     /// <summary>
     /// An object which can be ordered when in a collection

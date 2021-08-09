@@ -1,9 +1,9 @@
 ﻿using CarmenUI.Converters;
 using CarmenUI.ViewModels;
 using Microsoft.EntityFrameworkCore;
-using ShowModel;
-using ShowModel.Applicants;
-using A = ShowModel.Applicants;
+using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
+using A = Carmen.ShowModel.Applicants;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,7 +22,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using CarmenUI.Windows;
-using CastingEngine;
+using Carmen.CastingEngine;
 
 namespace CarmenUI.Pages
 {

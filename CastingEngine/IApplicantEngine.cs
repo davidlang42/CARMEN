@@ -1,11 +1,11 @@
-﻿using ShowModel.Applicants;
+﻿using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CastingEngine
+namespace Carmen.CastingEngine
 {
     /// <summary>
     /// Interface for CastingEngine functions relating to Applicant abilities

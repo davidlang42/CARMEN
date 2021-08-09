@@ -2,10 +2,10 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using ShowModel.Applicants;
-using ShowModel.Requirements;
+using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Requirements;
 
-namespace ShowModel.Structure
+namespace Carmen.ShowModel.Structure
 {
     public class Role : ICounted, INameOrdered //LATER implement INotifyPropertyChanged for completeness
     {

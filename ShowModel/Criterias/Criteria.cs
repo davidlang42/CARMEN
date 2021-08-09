@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using ShowModel.Applicants;
+using Carmen.ShowModel.Applicants;
 
-namespace ShowModel.Criterias
+namespace Carmen.ShowModel.Criterias
 {
     /// <summary>
     /// A criteria on which applicants are assessed, and assigned a mark.

@@ -1,6 +1,6 @@
-﻿using ShowModel.Applicants;
-using ShowModel.Criterias;
-using ShowModel.Structure;
+﻿using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

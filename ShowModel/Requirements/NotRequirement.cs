@@ -1,7 +1,7 @@
-﻿using ShowModel.Applicants;
+﻿using Carmen.ShowModel.Applicants;
 using System.Collections.Generic;
 
-namespace ShowModel.Requirements
+namespace Carmen.ShowModel.Requirements
 {
     public class NotRequirement : Requirement //LATER implement INotifyPropertyChanged for completeness
     {

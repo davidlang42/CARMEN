@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShowModel.Requirements
+namespace Carmen.ShowModel.Requirements
 {
     public abstract class ExactRequirement : Requirement //LATER implement INotifyPropertyChanged for completeness
     {

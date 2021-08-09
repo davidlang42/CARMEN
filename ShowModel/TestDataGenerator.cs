@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
-using ShowModel.Applicants;
-using ShowModel.Criterias;
-using ShowModel.Requirements;
-using ShowModel.Structure;
+using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Requirements;
+using Carmen.ShowModel.Structure;
 
-namespace ShowModel
+namespace Carmen.ShowModel
 {
     /// <summary>
     /// A generator of test data for the ShowContext data model.

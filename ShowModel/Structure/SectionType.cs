@@ -2,7 +2,7 @@
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace ShowModel.Structure
+namespace Carmen.ShowModel.Structure
 {
     public class SectionType : INameOrdered //LATER implement INotifyPropertyChanged for completeness
     {

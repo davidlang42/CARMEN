@@ -9,7 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShowModel.Applicants
+namespace Carmen.ShowModel.Applicants
 {
     /// <summary>
     /// An alternating cast within a cast group for which casting should be duplicated.

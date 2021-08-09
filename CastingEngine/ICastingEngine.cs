@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ShowModel;
-using ShowModel.Applicants;
-using ShowModel.Criterias;
-using ShowModel.Structure;
+using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Structure;
 
-namespace CastingEngine
+namespace Carmen.CastingEngine
 {
     /// <summary>
     /// Interface for all CastingEngine functions

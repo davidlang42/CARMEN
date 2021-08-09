@@ -1,9 +1,9 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
-using ShowModel;
-using ShowModel.Structure;
-using ShowModel.Criterias;
+using Carmen.ShowModel;
+using Carmen.ShowModel.Structure;
+using Carmen.ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using ShowModel.Requirements;
+using Carmen.ShowModel.Requirements;
 using System.IO;
 using System.Windows.Media.Imaging;
 
@@ -353,7 +353,7 @@ namespace DatabaseExplorer
             };
             if (dialog.ShowDialog() == true)
             {
-                var image = new ShowModel.Image
+                var image = new Carmen.ShowModel.Image
                 {
                     Name = Path.GetFileName(dialog.FileName),
                     ImageData = File.ReadAllBytes(dialog.FileName)
@@ -370,7 +370,7 @@ namespace DatabaseExplorer
                 encoder.Frames.Add(BitmapFrame.Create(source));
                 using var stream = new MemoryStream();
                 encoder.Save(stream);
-                var image = new ShowModel.Image
+                var image = new Carmen.ShowModel.Image
                 {
                     Name = $"Pasted at {DateTime.Now:yyyy-MM-dd HH:mm}",
                     ImageData = stream.ToArray()

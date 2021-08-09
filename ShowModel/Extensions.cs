@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore;
 
-namespace ShowModel
+namespace Carmen.ShowModel
 {
     internal static class IEnumerableExtensions
     {

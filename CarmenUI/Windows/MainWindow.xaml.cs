@@ -1,7 +1,7 @@
 ﻿using CarmenUI.Pages;
 using Microsoft.EntityFrameworkCore;
-using ShowModel;
-using ShowModel.Structure;
+using Carmen.ShowModel;
+using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

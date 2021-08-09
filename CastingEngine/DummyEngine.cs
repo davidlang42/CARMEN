@@ -1,7 +1,7 @@
-﻿using ShowModel.Applicants;
-using ShowModel.Criterias;
-using ShowModel.Requirements;
-using ShowModel.Structure;
+﻿using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Requirements;
+using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CastingEngine
+namespace Carmen.CastingEngine
 {
     /// <summary>
     /// For testing only, does not nessesarily produce valid casting, only valid at a data model/type level.

@@ -2,7 +2,7 @@
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
-using ShowModel;
+using Carmen.ShowModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,7 +1,7 @@
-﻿using ShowModel.Applicants;
+﻿using Carmen.ShowModel.Applicants;
 using System.Collections.Generic;
 
-namespace ShowModel.Structure
+namespace Carmen.ShowModel.Structure
 {
     public interface ICounted
     {

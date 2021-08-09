@@ -1,10 +1,10 @@
-﻿using ShowModel.Applicants;
+﻿using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace ShowModel.Structure
+namespace Carmen.ShowModel.Structure
 {
     /// <summary>
     /// An item within the show.

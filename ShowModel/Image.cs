@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace ShowModel
+namespace Carmen.ShowModel
 {
     /// <summary>
     /// A stored image containing binary data.

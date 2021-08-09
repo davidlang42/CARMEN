@@ -1,6 +1,6 @@
 ﻿using CarmenUI.Converters;
 using Microsoft.EntityFrameworkCore;
-using ShowModel;
+using Carmen.ShowModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

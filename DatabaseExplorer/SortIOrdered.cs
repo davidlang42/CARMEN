@@ -8,7 +8,7 @@ namespace DatabaseExplorer
 {
     public class SortIOrdered : IValueConverter
     {
-        public static SortDescription SortDescription = new(nameof(ShowModel.IOrdered.Order), ListSortDirection.Ascending);
+        public static SortDescription SortDescription = new(nameof(Carmen.ShowModel.IOrdered.Order), ListSortDirection.Ascending);
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

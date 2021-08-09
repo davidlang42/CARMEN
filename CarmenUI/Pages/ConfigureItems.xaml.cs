@@ -2,10 +2,10 @@
 using CarmenUI.ViewModels;
 using CarmenUI.Windows;
 using Microsoft.EntityFrameworkCore;
-using ShowModel;
-using ShowModel.Applicants;
-using ShowModel.Requirements;
-using ShowModel.Structure;
+using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Requirements;
+using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,7 +23,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using Section = ShowModel.Structure.Section;
+using Section = Carmen.ShowModel.Structure.Section;
 
 namespace CarmenUI.Pages
 {

@@ -1,5 +1,5 @@
 ﻿using CarmenUI.ViewModels;
-using ShowModel.Requirements;
+using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections;
 using System.Collections.Generic;

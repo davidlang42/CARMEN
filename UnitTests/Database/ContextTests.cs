@@ -1,8 +1,8 @@
 ﻿using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using ShowModel;
-using ShowModel.Requirements;
-using ShowModel.Structure;
+using Carmen.ShowModel;
+using Carmen.ShowModel.Requirements;
+using Carmen.ShowModel.Structure;
 using NUnit.Framework;
 using System.Linq;
 using System;

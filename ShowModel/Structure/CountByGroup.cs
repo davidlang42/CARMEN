@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ShowModel.Applicants;
+using Carmen.ShowModel.Applicants;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
-namespace ShowModel.Structure
+namespace Carmen.ShowModel.Structure
 {
     /// <summary>
     /// The count of applicants required for a role from a certain group.

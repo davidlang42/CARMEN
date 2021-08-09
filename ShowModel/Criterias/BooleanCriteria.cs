@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShowModel.Criterias
+namespace Carmen.ShowModel.Criterias
 {
     /// <summary>
     /// A criteria which is marked as True or False.

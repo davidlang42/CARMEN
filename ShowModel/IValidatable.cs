@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShowModel
+namespace Carmen.ShowModel
 {
     /// <summary>
     /// A simplier version of System.ComponentModel.DataAnnotations.IValidateableObject

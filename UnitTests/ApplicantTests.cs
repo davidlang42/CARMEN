@@ -1,7 +1,7 @@
 using FluentAssertions;
 using Microsoft.EntityFrameworkCore;
-using ShowModel;
-using ShowModel.Applicants;
+using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;

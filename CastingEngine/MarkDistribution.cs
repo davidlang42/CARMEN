@@ -1,12 +1,12 @@
-﻿using ShowModel.Applicants;
-using ShowModel.Criterias;
+﻿using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CastingEngine
+namespace Carmen.CastingEngine
 {
     public struct MarkDistribution
     {

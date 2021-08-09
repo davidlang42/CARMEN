@@ -5,9 +5,9 @@ using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using ShowModel.Requirements;
+using Carmen.ShowModel.Requirements;
 
-namespace ShowModel.Applicants
+namespace Carmen.ShowModel.Applicants
 {
     /// <summary>
     /// A group of people which an applicant can be selected into.

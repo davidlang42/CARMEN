@@ -1,5 +1,5 @@
-﻿using ShowModel.Requirements;
-using ShowModel.Structure;
+﻿using Carmen.ShowModel.Requirements;
+using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShowModel.Applicants
+namespace Carmen.ShowModel.Applicants
 {
     /// <summary>
     /// A group of people which an applicant can be selected into.

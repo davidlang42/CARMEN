@@ -1,8 +1,8 @@
-﻿using ShowModel.Applicants;
+﻿using Carmen.ShowModel.Applicants;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace ShowModel.Structure
+namespace Carmen.ShowModel.Structure
 {
     /// <summary>
     /// A section of the show, containing items or other sections.

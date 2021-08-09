@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ShowModel
+namespace Carmen.ShowModel
 {
     /// <summary>
     /// An object which has a name

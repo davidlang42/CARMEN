@@ -1,6 +1,6 @@
-﻿using ShowModel.Applicants;
+﻿using Carmen.ShowModel.Applicants;
 
-namespace ShowModel.Requirements
+namespace Carmen.ShowModel.Requirements
 {
     public class AgeRequirement : RangeRequirement
     {

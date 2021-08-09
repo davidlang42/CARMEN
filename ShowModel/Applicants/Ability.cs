@@ -1,9 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using ShowModel.Criterias;
+using Carmen.ShowModel.Criterias;
 
-namespace ShowModel.Applicants
+namespace Carmen.ShowModel.Applicants
 {
     /// <summary>
     /// The assessed ability of an applicant in a certain criteria.

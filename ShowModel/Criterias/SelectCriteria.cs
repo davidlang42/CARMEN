@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ShowModel.Criterias
+namespace Carmen.ShowModel.Criterias
 {
     /// <summary>
     /// A criteria which is marked as one of a set of discreet options.

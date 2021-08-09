@@ -1,9 +1,9 @@
-﻿using ShowModel.Applicants;
+﻿using Carmen.ShowModel.Applicants;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace ShowModel.Requirements
+namespace Carmen.ShowModel.Requirements
 {
     public abstract class CombinedRequirement : Requirement //LATER implement INotifyPropertyChanged for completeness
     {

@@ -1,5 +1,5 @@
-﻿using ShowModel.Criterias;
-using ShowModel.Structure;
+﻿using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
-namespace ShowModel.Applicants
+namespace Carmen.ShowModel.Applicants
 {
     /// <summary>
     /// A person who has auditioned to be in a show.

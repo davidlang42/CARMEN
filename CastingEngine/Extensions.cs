@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CastingEngine
+namespace Carmen.CastingEngine
 {
     internal static class Extensions
     {

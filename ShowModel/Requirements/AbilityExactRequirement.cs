@@ -1,7 +1,7 @@
-﻿using ShowModel.Applicants;
-using ShowModel.Criterias;
+﻿using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
 
-namespace ShowModel.Requirements
+namespace Carmen.ShowModel.Requirements
 {
     public class AbilityExactRequirement : ExactRequirement, ICriteriaRequirement //LATER implement INotifyPropertyChanged for completeness
     {

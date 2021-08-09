@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using ShowModel;
-using ShowModel.Applicants;
+using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.Linq;

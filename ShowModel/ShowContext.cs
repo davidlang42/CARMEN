@@ -2,16 +2,16 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Linq;
 using System.Text.Json;
-using ShowModel.Applicants;
-using ShowModel.Criterias;
-using ShowModel.Requirements;
-using ShowModel.Structure;
+using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Requirements;
+using Carmen.ShowModel.Structure;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ShowModel
+namespace Carmen.ShowModel
 {
     public class ShowContext : DbContext
     {

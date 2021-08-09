@@ -1,11 +1,11 @@
-﻿using ShowModel.Requirements;
+﻿using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CastingEngine
+namespace Carmen.CastingEngine
 {
     public struct Eligibility
     {
