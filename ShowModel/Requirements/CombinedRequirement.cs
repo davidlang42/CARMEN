@@ -33,6 +33,17 @@ namespace ShowModel.Requirements
 
         public override bool IsSatisfiedBy(Applicant applicant)
             => SubRequirements.All(r => r.IsSatisfiedBy(applicant));
+
+        public override bool IsSatisfiedBy(Applicant applicant, ICollection<Requirement> accumulate_failed_requirements)
+        {
+            var result = true;
+            foreach (var req in SubRequirements)
+            {
+                if (!req.IsSatisfiedBy(applicant, accumulate_failed_requirements))
+                    result = false;
+            }
+            return result;
+        }
     }
 
     public class OrRequirement : CombinedRequirement //LATER implement INotifyPropertyChanged for completeness

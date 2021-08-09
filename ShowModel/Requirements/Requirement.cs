@@ -28,6 +28,14 @@ namespace ShowModel.Requirements
         /// <summary>Checks if an Applicant satisfies this requirement.</summary>
         public abstract bool IsSatisfiedBy(Applicant applicant);
 
+        public virtual bool IsSatisfiedBy(Applicant applicant, ICollection<Requirement> accumulate_failed_requirements)
+        {
+            var result = IsSatisfiedBy(applicant);
+            if (!result)
+                accumulate_failed_requirements.Add(this);
+            return result;
+        }
+
         internal virtual bool HasCircularReference(HashSet<Requirement> visited) => false;
 
         /// <summary>Checks if this requirement has a circular reference.</summary>

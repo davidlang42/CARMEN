@@ -1,5 +1,6 @@
 ﻿using ShowModel.Applicants;
 using ShowModel.Criterias;
+using ShowModel.Requirements;
 using ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -40,8 +41,15 @@ namespace CastingEngine
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>
-        bool EligibilityOf(Applicant applicant, Role role)//TODO CALL
-            => role.Requirements.All(req => req.IsSatisfiedBy(applicant));//TODO ideally this would return a list of requirements which it fails
+        bool EligibilityOf(Applicant applicant, Role role, out HashSet<Requirement> requirements_not_met)//TODO CALL
+        {
+            requirements_not_met = new();
+            var result = true;
+            foreach (var req in role.Requirements)
+                if (!req.IsSatisfiedBy(applicant, requirements_not_met))
+                    result = false;
+            return result;
+        }
 
         /// <summary>Count the number of roles an applicant has which require a certain criteria,
         /// optionally excluding a specified role. Depending on implementation, this may return a
