@@ -32,7 +32,7 @@ namespace UnitTests.Database
             test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
             context.SaveChanges();
             test_data.AddRoles(5); // after applicants, items, cast groups, requirements committed
-            test_data.AddImages(); // after applicants, cast groups, tags committed
+            test_data.AddImages(); // after applicants, tags committed
             context.SaveChanges();
         }
 
@@ -96,18 +96,6 @@ namespace UnitTests.Database
             var tag = applicant.Tags.First();
             tag.TagId.Should().NotBe(0);
             tag.Members.Should().Contain(applicant);
-        }
-
-        [Test]
-        public void CastGroup_Image_ManyToOne()
-        {
-            using var context = new ShowContext(contextOptions);
-            var group = context.CastGroups.Where(g => g.Icon != null).First();
-            group.CastGroupId.Should().NotBe(0);
-            var image = group.Icon;
-            image.Should().NotBeNull();
-            image!.ImageId.Should().NotBe(0);
-            // Reverse navigation not defined
         }
 
         [Test]

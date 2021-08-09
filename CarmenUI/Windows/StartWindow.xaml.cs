@@ -65,7 +65,7 @@ namespace CarmenUI.Windows
                             test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
                             context.SaveChanges();
                             test_data.AddRoles(5); // after applicants, items, cast groups, requirements committed
-                            test_data.AddImages(); // after applicants, cast groups, tags committed
+                            test_data.AddImages(); // after applicants, tags committed
                             context.SaveChanges();
                         }
                         else

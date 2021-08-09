@@ -240,7 +240,6 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 During the cast selection process, Applicants will be selected into a Cast Group.
@@ -252,10 +251,8 @@
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Abbreviation" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Abbreviation}" FontSize="14"/>
-                            <TextBlock Grid.Row="3" Text="Icon" FontSize="14"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="TODO" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Required Count" FontSize="14"/>
-                            <Grid Grid.Row="4" Grid.Column="1">
+                            <TextBlock Grid.Row="3" Text="Required Count" FontSize="14"/>
+                            <Grid Grid.Row="3" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
@@ -265,10 +262,10 @@
                                            Visibility="{Binding AlternateCasts, Converter={StaticResource booleanToVisibility}}"
                                            FontSize="14"/>
                             </Grid>
-                            <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding AlternateCasts}" FontSize="14" Content="Alternate Casts" VerticalContentAlignment="Center"
+                            <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding AlternateCasts}" FontSize="14" Content="Alternate Casts" VerticalContentAlignment="Center"
                                       IsEnabled="{Binding Source={StaticResource alternativeCastsViewSource}, Path=Count, Converter={StaticResource minimumIntValue}, ConverterParameter=2}"/>
-                            <TextBlock Grid.Row="6" Text="Requirements" FontSize="14"/>
-                            <TextBlock Grid.Row="6" Grid.Column="1" Text="TODO" FontSize="14"/>
+                            <TextBlock Grid.Row="5" Text="Requirements" FontSize="14"/>
+                            <TextBlock Grid.Row="5" Grid.Column="1" Text="TODO" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelApplicants:AlternativeCast}">
@@ -321,7 +318,6 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 A tag can be applied to a successful Applicant to indicate that form part of a special team, or have an external attribute, such as wearing a microphone. An Applicant can have many tags.
@@ -330,12 +326,10 @@
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
                             <TextBlock Grid.Row="2" Text="Description" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" FontSize="14"/>
-                            <TextBlock Grid.Row="3" Text="Icon" FontSize="14"/>
+                            <TextBlock Grid.Row="3" Text="Requirements" FontSize="14"/>
                             <TextBlock Grid.Row="3" Grid.Column="1" Text="TODO" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Requirements" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="TODO" FontSize="14"/>
-                            <TextBlock Grid.Row="5" Grid.ColumnSpan="2" Text="Required Counts:" FontSize="14"/>
-                            <ItemsControl Grid.Row="6" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource sparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
+                            <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Text="Required Counts:" FontSize="14"/>
+                            <ItemsControl Grid.Row="5" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource sparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Columns="1"/>
@@ -378,7 +372,6 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This defines a type of Section which can be used to add structure to the items in your show.
@@ -387,10 +380,8 @@
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
-                            <TextBlock Grid.Row="2" Text="Icon" FontSize="14"/>
-                            <TextBlock Grid.Row="2" Grid.Column="1" Text="TODO" FontSize="14"/>
-                            <CheckBox Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding AllowNoRoles, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Everyone must have a role" VerticalContentAlignment="Center"/>
-                            <CheckBox Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding AllowMultipleRoles}" FontSize="14" Content="A person can have multiple roles" VerticalContentAlignment="Center"/>
+                            <CheckBox Grid.Row="2" Grid.ColumnSpan="2" IsChecked="{Binding AllowNoRoles, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Everyone must have a role" VerticalContentAlignment="Center"/>
+                            <CheckBox Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding AllowMultipleRoles}" FontSize="14" Content="A person can have multiple roles" VerticalContentAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">

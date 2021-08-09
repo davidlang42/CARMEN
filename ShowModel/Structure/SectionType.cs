@@ -9,7 +9,6 @@ namespace Carmen.ShowModel.Structure
         [Key]
         public int SectionTypeId { get; private set; }
         public string Name { get; set; } = "Section";
-        public virtual Image? Icon { get; set; }
         public bool AllowMultipleRoles { get; set; } = false;
         public bool AllowNoRoles { get; set; } = false;
         public virtual ICollection<Section> Sections { get; private set; } = new ObservableCollection<Section>(); //LATER add this to RelationshipTests.cs

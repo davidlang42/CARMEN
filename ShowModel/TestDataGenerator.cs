@@ -368,8 +368,8 @@ namespace Carmen.ShowModel
             => name == "" ? "" : name.Substring(0, 1).ToUpper() + name.Substring(1).ToLower();
 
         /// <summary>Adds images, optionally assigning to various objects.
-        /// NOTE: Must be called after Applicants and Cast Groups have been committed.</summary>
-        public void AddImages(uint count = 5, bool assign_to_show = true, bool assign_to_applicant = true, bool assign_to_cast_group = true, bool assign_to_tag = true)
+        /// NOTE: Must be called after Applicants and Tags have been committed.</summary>
+        public void AddImages(uint count = 5, bool assign_to_show = true, bool assign_to_applicant = true, bool assign_to_tag = true)
         {
             var images = Enumerable.Range(0, (int)count).Select(i => new Image { Name = $"Image {i + 1}" }).ToArray();
             Context.Images.AddRange(images);
@@ -377,8 +377,6 @@ namespace Carmen.ShowModel
                 Context.ShowRoot.Logo = random.NextOf(images);
             if (assign_to_applicant)
                 random.NextOf(Context.Applicants.ToArray()).Photo = random.NextOf(images);
-            if (assign_to_cast_group)
-                random.NextOf(Context.CastGroups.ToArray()).Icon = random.NextOf(images);
             if (assign_to_tag)
                 random.NextOf(Context.Tags.ToArray()).Icon = random.NextOf(images);
         }

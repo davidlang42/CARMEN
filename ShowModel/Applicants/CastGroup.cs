@@ -61,19 +61,6 @@ namespace Carmen.ShowModel.Applicants
             }
         }
 
-        private Image? icon;
-        public virtual Image? Icon
-        {
-            get => icon;
-            set
-            {
-                if (icon == value)
-                    return;
-                icon = value;
-                OnPropertyChanged();
-            }
-        }
-
         private ObservableCollection<Applicant> members = new();
         public virtual ICollection<Applicant> Members => members;
 
