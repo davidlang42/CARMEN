@@ -11,9 +11,6 @@ namespace ShowModel.Requirements
         public override bool IsSatisfiedBy(Applicant applicant)
             => !SubRequirement.IsSatisfiedBy(applicant);
 
-        public override double SuitabilityOf(Applicant applicant)
-            => 1 - SubRequirement.SuitabilityOf(applicant);
-
         internal override bool HasCircularReference(HashSet<Requirement> visited)
         {
             if (!visited.Add(this))

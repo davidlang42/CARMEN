@@ -25,11 +25,6 @@ namespace ShowModel.Requirements
         public virtual ICollection<Tag> UsedByTags { get; private set; } = new ObservableCollection<Tag>();
         #endregion
 
-        /// <summary>Calculates the suitability of an Applicant.
-        /// Value returned will be between 0 and 1 (inclusive).</summary>
-        public virtual double SuitabilityOf(Applicant applicant)
-            => IsSatisfiedBy(applicant) ? 1 : 0;
-
         /// <summary>Checks if an Applicant satisfies this requirement.</summary>
         public abstract bool IsSatisfiedBy(Applicant applicant);
 

@@ -36,7 +36,7 @@ namespace CastingEngine
 
         /// <summary>Calculate the suitability of an applicant for a role, irrelevant to availability.
         /// Value returned will be between 0 and 1 (inclusive).</summary>
-        double SuitabilityOf(Applicant applicant, Role role);//TODO move Suitability calculation from Requirements to here
+        double SuitabilityOf(Applicant applicant, Role role);
 
         /// <summary>Count the number of roles an applicant has which require a certain criteria,
         /// optionally excluding a specified role. Depending on implementation, this may return a

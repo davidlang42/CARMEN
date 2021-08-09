@@ -11,16 +11,5 @@ namespace ShowModel.Requirements
 
         public override bool IsSatisfiedBy(Applicant applicant)
             => IsInRange(applicant.MarkFor(Criteria));
-
-        public override double SuitabilityOf(Applicant applicant)
-        {
-            var mark = applicant.MarkFor(Criteria);
-            if (!IsInRange(mark))
-                return 0;
-            else if (ScaleSuitability)
-                return mark / Criteria.MaxMark;
-            else
-                return 1;
-        }
     }
 }

@@ -34,4 +34,31 @@ namespace CastingEngine
             return (double)total / list.Count;
         }
     }
+
+    internal static class IEnumerableExtensions
+    {
+        public static double Product(this IEnumerable<double> list)
+        {
+            var e = list.GetEnumerator();
+            if (!e.MoveNext())
+                throw new ArgumentException("Cannot calculate product of an empty sequence.");
+            var result = e.Current;
+            while (e.MoveNext())
+                result *= e.Current;
+            return result;
+        }
+
+        /// <summary>Similar to SingleOrDefault(), except if the sequence contains more than 1 element,
+        /// the default is returned rather than throwing an exception.</summary>
+        public static T? SingleOrDefaultSafe<T>(this IEnumerable<T> list)
+        {
+            var e = list.GetEnumerator();
+            if (!e.MoveNext())
+                return default;
+            var first = e.Current;
+            if (e.MoveNext())
+                return default;
+            return first;
+        }
+    }
 }

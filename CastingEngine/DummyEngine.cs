@@ -16,8 +16,36 @@ namespace CastingEngine
     /// </summary>
     public class DummyEngine : ICastingEngine
     {
-        /// <summary>Dummy value is just the applicant's Overall ability, irrelavant to the role</summary>
-        public double SuitabilityOf(Applicant applicant, Role role) => applicant.OverallAbility / 100.0;
+        /// <summary>Dummy value is the basic implementation of recursive requirements.
+        /// This assumes there are no circular references.</summary>
+        public double SuitabilityOf(Applicant applicant, Role role)
+        {
+            var sub_suitabilities = role.Requirements.Select(req => SuitabilityOf(applicant, req));
+            return sub_suitabilities.Average();
+        }
+
+        private double SuitabilityOf(Applicant applicant, Requirement requirement)
+            => requirement switch
+            {
+                AbilityRangeRequirement arr => ScaledSuitability(arr.IsSatisfiedBy(applicant), arr.ScaleSuitability, applicant.MarkFor(arr.Criteria), arr.Criteria.MaxMark),
+                NotRequirement nr => 1 - SuitabilityOf(applicant, nr.SubRequirement),
+                AndRequirement ar => ar.AverageSuitability ? ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
+                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(),
+                OrRequirement or => or.AverageSuitability ? or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
+                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(),
+                XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? SuitabilityOf(applicant, req) : 0,
+                Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
+            };
+
+        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark)
+        {
+            if (!in_range)
+                return 0;
+            else if (scale_suitability)
+                return mark / max_mark;
+            else
+                return 1;
+        }
 
         /// <summary>Dummy value counts top level AbilityExact/AbilityRange requirements only</summary>
         public double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)
