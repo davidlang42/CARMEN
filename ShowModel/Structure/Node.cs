@@ -58,14 +58,4 @@ namespace Carmen.ShowModel.Structure
             return true;
         }
     }
-
-    /// <summary>
-    /// An internal node of the item tree, which can have children.
-    /// </summary>
-    public abstract class InnerNode : Node //LATER implement INotifyPropertyChanged for completeness
-    {
-        public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
-
-        public override IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
-    }
 }

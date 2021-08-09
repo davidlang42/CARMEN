@@ -52,7 +52,7 @@ namespace CarmenUI.ViewModels
                 }
             }
             // verify consecutive items
-            if (!c.ShowRoot.VerifyConsecutiveItems(out var failures))
+            if (!c.ShowRoot.VerifyConsecutiveItems(out var failures))//TODO call this for showroot, and also for section when section type !AllowConsecutiveItems
                 foreach (var failure in failures)
                     Rows.Add(new Row { Fail = $"{failure.CastCount.Plural("Applicant is", "Applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}" });
             FinishLoad(roles_blank == 0);

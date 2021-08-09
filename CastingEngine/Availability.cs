@@ -11,7 +11,7 @@ namespace Carmen.CastingEngine
     {
         public Item[]? AlreadyInItems { get; init; }
         public (Section NonMultiSection, Item AlreadyInItem)[]? AlreadyInNonMultiSections { get; init; }
-        public (Item AlreadyInItem, Adjacency Adjacency, Item AdjacentTo)[]? InAdjacentItems { get; init; }
+        public (Item AlreadyInItem, Adjacency Adjacency, Item AdjacentTo, InnerNode NonConsecutiveSection)[]? InAdjacentItems { get; init; }
 
         public bool IsAvailable => !IsAlreadyInItem && !IsAlreadyInNonMultiSection && !IsInAdjacentItem;
         public bool IsAlreadyInItem => AlreadyInItems?.Length > 0;

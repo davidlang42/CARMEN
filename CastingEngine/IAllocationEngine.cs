@@ -60,7 +60,14 @@ namespace Carmen.CastingEngine
 
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
-        Availability AvailabilityOf(Applicant applicant, Role role);
+        Availability AvailabilityOf(Applicant applicant, Role role) //TODO properly implement this for all cases
+            => new Availability
+            {
+                AlreadyInItems = role.Items.Where(i => i.Roles
+                    .Where(r => r != role)
+                    .Any(r => r.Cast.Contains(applicant))
+                    ).ToArray()
+            };
 
         /// <summary>Pick the cast for a role</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);

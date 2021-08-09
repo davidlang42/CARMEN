@@ -18,6 +18,8 @@ namespace Carmen.ShowModel.Structure
 
         public virtual SectionType SectionType { get; set; } = null!;
 
+        protected override bool GetAllowConsecutiveItems() => SectionType.AllowConsecutiveItems;
+
         /// <summary>Check if the Roles in this Section sum meet the conditions of this SectionType.
         /// If SectionType.AllowNoRoles == false and sum of roles &lt; cast members for any CastGroup, this will return TooFewRoles.
         /// If SectionType.AllowMultipleRoles == false and sum of roles &gt; cast members for any CastGroup, this will return TooManyRoles.
@@ -44,17 +46,17 @@ namespace Carmen.ShowModel.Structure
         /// The out parameters of cast counts are calculated only if they may break the SectionType rules.</summary>
         public bool CastingMeetsSectionTypeRules(int total_cast_members, out int cast_with_no_roles, out int cast_with_multiple_roles)
         {
+            cast_with_no_roles = 0;
+            cast_with_multiple_roles = 0;
+            if (SectionType.AllowNoRoles && SectionType.AllowMultipleRoles)
+                return true; // nothing to check
             var roles_per_cast = ItemsInOrder()
                 .SelectMany(i => i.Roles).Distinct()
                 .SelectMany(r => r.Cast).GroupBy(a => a)
                 .ToDictionary(g => g.Key, g => g.Count()); //LATER does this need await?
-            if (SectionType.AllowNoRoles)
-                cast_with_no_roles = 0;
-            else 
+            if (!SectionType.AllowNoRoles)
                 cast_with_no_roles = total_cast_members - roles_per_cast.Count;
-            if (SectionType.AllowMultipleRoles)
-                cast_with_multiple_roles = 0;
-            else
+            if (!SectionType.AllowMultipleRoles)
                 cast_with_multiple_roles = roles_per_cast.Values.Count(v => v > 1);
             return cast_with_no_roles == 0 && cast_with_multiple_roles == 0;
         }

@@ -372,6 +372,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This defines a type of Section which can be used to add structure to the items in your show.
@@ -382,6 +383,7 @@
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
                             <CheckBox Grid.Row="2" Grid.ColumnSpan="2" IsChecked="{Binding AllowNoRoles, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Everyone must have a role" VerticalContentAlignment="Center"/>
                             <CheckBox Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding AllowMultipleRoles}" FontSize="14" Content="A person can have multiple roles" VerticalContentAlignment="Center"/>
+                            <CheckBox Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items" VerticalContentAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">

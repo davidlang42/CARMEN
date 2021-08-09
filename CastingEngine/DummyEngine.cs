@@ -54,16 +54,6 @@ namespace Carmen.CastingEngine
             .Where(r => r.Requirements.Any(req => req is ICriteriaRequirement cr && cr.Criteria == criteria))
             .Count();
 
-        /// <summary>Dummy value is always available unless they are already cast in a role in any of the items this role is in, except this role</summary>
-        public Availability AvailabilityOf(Applicant applicant, Role role) //LATER implement this properly within IAllocationEngine, because its implementation is not a choice
-            => new Availability
-            {
-                AlreadyInItems = role.Items.Where(i => i.Roles
-                    .Where(r => r != role)
-                    .Any(r => r.Cast.Contains(applicant))
-                    ).ToArray()
-            };
-
         /// <summary>Dummy value enumerates roles in item order, then by name, removing duplicates</summary>
         public IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order)
             => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();

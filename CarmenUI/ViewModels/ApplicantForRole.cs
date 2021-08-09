@@ -73,7 +73,12 @@ namespace CarmenUI.ViewModels
                         yield return $"Already cast in {nms.NonMultiSection.Name}";
                 if (av.IsInAdjacentItem)
                     foreach (var adj in av.InAdjacentItems!)
-                        yield return $"Cast in {adj.Adjacency.ToString().ToLower()} item ({adj.AlreadyInItem.Name})";
+                    {
+                        var msg = $"Cast in {adj.Adjacency.ToString().ToLower()} item ({adj.AlreadyInItem.Name})";
+                        if (adj.NonConsecutiveSection is not ShowRoot)
+                            msg += $" within {adj.NonConsecutiveSection.Name}";
+                        yield return msg;
+                    }
             }
         }
 
