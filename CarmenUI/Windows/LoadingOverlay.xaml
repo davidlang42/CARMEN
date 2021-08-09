@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarmenUI.Windows"
         mc:Ignorable="d"
-        Title="Loading..." Height="100" Width="200" ShowInTaskbar="False" Topmost="True" WindowStartupLocation="CenterOwner" WindowStyle="None" BorderThickness="1,1,1,1">
+        Title="Loading..." Height="100" Width="200" ShowInTaskbar="False" Topmost="True" WindowStartupLocation="CenterOwner" WindowStyle="None">
     <UniformGrid Columns="1">
         <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="24" Text="{Binding MainText}"/>
         <TextBlock x:Name="SubTextElement" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="12" TextWrapping="Wrap" Text="{Binding SubText}"/>
