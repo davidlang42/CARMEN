@@ -1,6 +1,8 @@
 ﻿using ShowModel.Applicants;
+using ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace ShowModel.Structure
@@ -18,6 +20,9 @@ namespace ShowModel.Structure
         }
         public DateTime? ShowDate { get; set; }
         public virtual Image? Logo { get; set; }
+        /// <summary>The criteria which will be used to determine the order for Cast Numbers (if not set, OverallAbility will be used)</summary>
+        public virtual Criteria? CastNumberOrderBy { get; set; }
+        public ListSortDirection CastNumberOrderDirection { get; set; }
         public override InnerNode? Parent
         {
             get => null;
