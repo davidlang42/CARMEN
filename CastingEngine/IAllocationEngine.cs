@@ -34,9 +34,14 @@ namespace CastingEngine
             return e.Current;
         }
 
-        /// <summary>Calculate the suitability of an applicant for a role, irrelevant to availability.
+        /// <summary>Calculate the suitability of an applicant for a role, regardless of availability and eligibility.
         /// Value returned will be between 0 and 1 (inclusive).</summary>
         double SuitabilityOf(Applicant applicant, Role role);
+
+        /// <summary>Determine if an applicant is eligible to be cast in a role
+        /// (ie. whether all minimum requirements of the role are met)</summary>
+        bool EligibilityOf(Applicant applicant, Role role)//TODO CALL
+            => role.Requirements.All(req => req.IsSatisfiedBy(applicant));//TODO ideally this would return a list of requirements which it fails
 
         /// <summary>Count the number of roles an applicant has which require a certain criteria,
         /// optionally excluding a specified role. Depending on implementation, this may return a
