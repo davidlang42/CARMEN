@@ -49,6 +49,26 @@ namespace CarmenUI.Windows
                         //LATER handle io errors
                         context.Database.EnsureDeleted();
                         context.Database.EnsureCreated();
+#if DEBUG
+                        if (MessageBox.Show("Do you want to add test data?","DEBUG",MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        {
+                            using var test_data = new TestDataGenerator(context, 0);
+                            test_data.AddAlternativeCasts();
+                            test_data.AddCastGroups(4);
+                            context.SaveChanges();
+                            test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false); // after cast groups committed
+                            context.SaveChanges();
+                            test_data.AddCriteriaAndRequirements(); // after cast groups committed
+                            context.SaveChanges();
+                            test_data.AddTags(1); // after requirements committed
+                            context.SaveChanges();
+                            test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
+                            context.SaveChanges();
+                            test_data.AddRoles(5); // after applicants, items, cast groups, requirements committed
+                            test_data.AddImages(); // after applicants, cast groups, tags committed
+                            context.SaveChanges();
+                        }
+#endif
                         context.ShowRoot.Name = System.IO.Path.GetFileNameWithoutExtension(dialog.FileName);
                         context.SaveChanges();
                     }
