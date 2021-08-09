@@ -37,6 +37,19 @@ namespace Carmen.ShowModel
         public ShowContext(DbContextOptions<ShowContext> context_options) : base(context_options)
         { }
 
+        /// <summary>Configures the default AlternativeCasts, CastGroups, Tags, Criterias, Requirements and SectionTypes</summary>
+        public void SetDefaultShowSettings()
+        {
+            AlternativeCasts.Local.Clear();
+            CastGroups.Local.Clear();
+            CastGroups.Add(new CastGroup { Name = "Cast" });
+            Tags.Local.Clear();
+            Criterias.Local.Clear();
+            Requirements.Local.Clear();
+            SectionTypes.Local.Clear();
+            SectionTypes.Add(new SectionType { Name = "Section" });
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseLazyLoadingProxies(); //LATER this has a huge performance risk, if I forget to include the right objects in my queries, however the alternative is I get incorrect values (eg. nulls and empty collections), which seems worse

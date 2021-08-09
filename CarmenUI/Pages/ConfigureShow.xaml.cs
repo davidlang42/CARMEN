@@ -272,5 +272,8 @@ namespace CarmenUI.Pages
 
         private bool ConfirmDelete(string msg)
             => MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+
+        private void ResetToDefaults_Click(object sender, RoutedEventArgs e)
+            => context.SetDefaultShowSettings();
     }
 }

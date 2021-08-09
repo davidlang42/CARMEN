@@ -50,7 +50,7 @@ namespace CarmenUI.Windows
                         context.Database.EnsureDeleted();
                         context.Database.EnsureCreated();
 #if DEBUG
-                        if (MessageBox.Show("Do you want to add test data?","DEBUG",MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        if (MessageBox.Show("Do you want to add test data?", "DEBUG", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         {
                             using var test_data = new TestDataGenerator(context, 0);
                             test_data.AddAlternativeCasts();
@@ -68,6 +68,12 @@ namespace CarmenUI.Windows
                             test_data.AddImages(); // after applicants, cast groups, tags committed
                             context.SaveChanges();
                         }
+                        else
+                        {
+                            context.SetDefaultShowSettings();
+                        }
+#else
+                        context.SetDefaultShowSettings();
 #endif
                         context.ShowRoot.Name = System.IO.Path.GetFileNameWithoutExtension(dialog.FileName);
                         context.SaveChanges();

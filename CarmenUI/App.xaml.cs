@@ -24,10 +24,10 @@ namespace CarmenUI
         private void Application_Startup(object sender, StartupEventArgs e)
         {
             if (CarmenUI.Properties.Settings.Default.FirstRun)
-                SetDefaultSettings();
+                SetDefaultUserSettings();
         }
 
-        public void SetDefaultSettings()
+        public void SetDefaultUserSettings()
         {
             var settings = CarmenUI.Properties.Settings.Default;
             settings.FirstRun = false;
