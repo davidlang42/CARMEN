@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Navigation;
+using CarmenUI.Windows;
 
 namespace CarmenUI.Pages
 {
@@ -35,7 +36,9 @@ namespace CarmenUI.Pages
         /// <summary>Save changes to the database and return true if succeeded</summary>
         protected bool SaveChanges()
         {
-            context.SaveChanges(); //LATER handle db errors
+            using var saving = new LoadingOverlay(this);
+            saving.MainText = "Saving...";
+            context.SaveChanges(); //LATER handle db errors, could this be async?
             return true;
         }
 
@@ -53,6 +56,8 @@ namespace CarmenUI.Pages
         {
             if (!context.ChangeTracker.HasChanges())
                 return false; // no changes to revert
+            using var reverting = new LoadingOverlay(this);
+            reverting.MainText = "Reverting...";
             _context?.Dispose();
             _context = new ShowContext(context_options); //LATER there has to be a better way than this
             return true;
