@@ -41,7 +41,7 @@ namespace CarmenUI.ViewModels
             var incorrect_sum = 0;
             foreach (var item in items) //LATER paralleise
             {
-                if (item.Roles.Count == 0)
+                if (item.Roles.Count == 0)//TODO should a Role with CBG=0 be considered "without roles"? highlighting currently implemented on ConfigureItems UI does, so either change this or change that to match
                     without_roles += 1;
                 else if (!item.CountMatchesSumOfRoles()) //LATER does this need await?
                     incorrect_sum += 1;
@@ -64,13 +64,13 @@ namespace CarmenUI.ViewModels
             var too_many_roles = 0;
             var incorrect_sum = 0;
             foreach (var section in section_type.Sections) //LATER parallelise
-            {
+            {//TODO highlight on ConfigureItems UI if roles in non-multi/non-zero section dont match cast members
                 var role_match = section.RolesMatchCastMembers(cast_members); //LATER does this need await?
                 if (role_match == Section.RolesMatchResult.TooFewRoles)
                     missing_roles += 1;
                 else if (role_match == Section.RolesMatchResult.TooManyRoles)
                     too_many_roles += 1;
-                else if (!section.CountMatchesSumOfRoles())
+                else if (!section.CountMatchesSumOfRoles())//TODO highlight on ConfigureItems UI if section/showroot CBGs dont match sum of roles, also check showroot here?
                     incorrect_sum += 1;
                 section_count += 1;
             }
