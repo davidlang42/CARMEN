@@ -8,7 +8,7 @@ namespace Carmen.ShowModel.Structure
     {
         [Key]
         public int SectionTypeId { get; private set; }
-        public string Name { get; set; } = "Section";
+        public string Name { get; set; } = "";
         public bool AllowMultipleRoles { get; set; } = false;
         public bool AllowNoRoles { get; set; } = false;
         /// <summary>AllowConsecutiveItems defaults to true in SectionType, but false in ShowRoot,
