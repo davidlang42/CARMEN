@@ -173,6 +173,26 @@ namespace CarmenUI.ViewModels
             return null;
         }
 
+        /// <summary>Recursively expands all NodeViews</summary>
+        public void ExpandAll()
+        {
+            IsExpanded = true;
+            foreach (var child in ChildrenInOrder)
+                child.ExpandAll();
+        }
+
+        /// <summary>Recursively collapses all NodeViews except the path to the current selection.
+        /// Returns whether or not a selected item was found.</summary>
+        public bool CollapseAll()
+        {
+            var containing_selection = false;
+            foreach (var child in ChildrenInOrder)
+                if (child.CollapseAll())
+                    containing_selection = true;
+            IsExpanded = containing_selection;
+            return containing_selection || IsSelected;
+        }
+
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

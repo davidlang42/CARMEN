@@ -222,5 +222,11 @@ namespace CarmenUI.Pages
 
         private void rolesTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
             => ChangeToEditMode();
+
+        private void ExpandAll_Click(object sender, RoutedEventArgs e)
+            => rootNodeView.ExpandAll();
+
+        private void CollapseAll_Click(object sender, RoutedEventArgs e)
+            => rootNodeView.CollapseAll();
     }
 }
