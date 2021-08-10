@@ -184,10 +184,10 @@ namespace CarmenUI.Pages
         {
             var current_role = (rolesTreeView.SelectedItem as RoleNodeView)?.Role;
             var next_role = engine.NextUncastRole(context.ShowRoot.ItemsInOrder(), context.AlternativeCasts.Local.ToArray(), current_role);
-            if (next_role == null)
-                rolesTreeView.ClearSelectedItem();
-            else if (rootNodeView.FindRoleView(next_role) is RoleNodeView next_role_view)
-                rolesTreeView.SetSelectedItem(next_role_view);
+            if (next_role != null)
+                rootNodeView.SelectRole(next_role);
+            else
+                rootNodeView.ClearSelection();
         }
 
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
@@ -217,7 +217,7 @@ namespace CarmenUI.Pages
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!ChangeToViewMode())
-                rolesTreeView.SetSelectedItem(e.OldValue);
+            { } //LATER ideally change the selection back, but this causes the event to get called again and infinitely loop asking if you want to cancel, until you do
         }
 
         private void rolesTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)

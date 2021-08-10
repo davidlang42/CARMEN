@@ -21,7 +21,7 @@ namespace CarmenUI.ViewModels
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(NodeView), new PropertyMetadata(false));
 
-        public bool IsSelected //LATER try to use isseleted/isexpanded here rather than hacky visual tree stuff to change selection
+        public bool IsSelected
         {
             get => (bool)GetValue(IsSelectedProperty);
             set
@@ -137,8 +137,32 @@ namespace CarmenUI.ViewModels
                     await child.UpdateAllAsync();
         }
 
+        /// <summary>Searches recursively for the RoleNodeView representing the given Role, and marks it as selected.
+        /// Any nodes on the path to it will be expanded once found. Returns whether or not it was found.</summary>
+        public bool SelectRole(Role role)
+        {
+            if (this is RoleNodeView rv && rv.Role == role)
+                return IsSelected = true;
+            foreach (var child in ChildrenInOrder)
+                if (child.SelectRole(role))
+                    return IsExpanded = true;
+            return false;
+        }
+
+        /// <summary>Searches recursively for the NodeView which is selected, and marks it as not selected.
+        /// Returns whether or not it was found.</summary>
+        public bool ClearSelection()
+        {
+            if (IsSelected)
+                return !(IsSelected = false);
+            foreach (var child in ChildrenInOrder)
+                if (child.ClearSelection())
+                    return true;
+            return false;
+        }
+
         /// <summary>Searches recursively for the RoleNodeView for the given Role.
-        /// This will throw an exception if the Role is not found.</summary>
+        /// This will return null if the Role is not found.</summary>
         public RoleNodeView? FindRoleView(Role role)
         {
             if (this is RoleNodeView rv && rv.Role == role)
