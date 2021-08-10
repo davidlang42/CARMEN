@@ -70,23 +70,21 @@ namespace CarmenUI.Pages
             this.NavigationService.Navigate(sub_page);
         }
 
-        private void ConfigureShow_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateToSubPage(new ConfigureShow(contextOptions));
-
-        private void AllocateRoles_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateToSubPage(new AllocateRoles(contextOptions));
-
-        private void ConfigureItems_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateToSubPage(new ConfigureItems(contextOptions));
-
-        private void SelectCast_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateToSubPage(new SelectCast(contextOptions));
-
-        private void AuditionApplicants_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateToSubPage(new EditApplicants(contextOptions, false, true, false));
-
-        private void RegisterApplicants_MouseUp(object sender, MouseButtonEventArgs e)
-            => NavigateToSubPage(new EditApplicants(contextOptions, true, true, true));
+        private void menuList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (menuList.SelectedItem == ConfigureShow)
+                NavigateToSubPage(new ConfigureShow(contextOptions));
+            else if (menuList.SelectedItem == AllocateRoles)
+                NavigateToSubPage(new AllocateRoles(contextOptions));
+            else if (menuList.SelectedItem == ConfigureItems)
+                NavigateToSubPage(new ConfigureItems(contextOptions));
+            else if (menuList.SelectedItem == SelectCast)
+                NavigateToSubPage(new SelectCast(contextOptions));
+            else if (menuList.SelectedItem == AuditionApplicants)
+                NavigateToSubPage(new EditApplicants(contextOptions, false, true, false));
+            else if (menuList.SelectedItem == RegisterApplicants)
+                NavigateToSubPage(new EditApplicants(contextOptions, true, true, true));
+        }
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
             => SummaryPanel.Content = ShowSummary;
