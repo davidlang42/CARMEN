@@ -31,6 +31,19 @@ namespace CarmenUI.ViewModels
             }
         }
 
+        public static readonly DependencyProperty IsExpandedProperty = DependencyProperty.Register(
+            nameof(IsExpanded), typeof(bool), typeof(NodeView), new PropertyMetadata(true));
+
+        public bool IsExpanded
+        {
+            get => (bool)GetValue(IsExpandedProperty);
+            set
+            {
+                SetValue(IsExpandedProperty, value);
+                OnPropertyChanged();
+            }
+        }
+
         public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(
             nameof(Status), typeof(ProcessStatus), typeof(NodeView), new PropertyMetadata(ProcessStatus.Loading));
 
