@@ -64,12 +64,14 @@ namespace CarmenUI.ViewModels
                 for (var i = 0; i < colors.Length; i++)
                     if (CountByGroups[i].Count is uint required_count
                         && SumOfRolesCount[i] != required_count)
-                        colors[i] = "LightCoral";
+                        colors[i] = "LightCoral";//LATER use constants, also convert to brush
                     else
-                        colors[i] = "White";
+                        colors[i] = "White";//LATER use constants, also convert to brush
                 return colors;
             }
         }
+
+        public string NoRolesErrorBackgroundColor => SumOfRolesTotal == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
 
         public ItemView(Item item, CastGroup[] cast_groups)
         {
@@ -116,6 +118,7 @@ namespace CarmenUI.ViewModels
                             Item.Roles.Add(rv.Role);
                             rv.PropertyChanged += RoleView_PropertyChanged;
                         }
+                    RoleView_PropertyChanged(this, new PropertyChangedEventArgs(""));
                     break;
                 case NotifyCollectionChangedAction.Reset://LATER is this implementation correct? it probably isn't used
                     foreach (var rv in Roles)
@@ -129,6 +132,7 @@ namespace CarmenUI.ViewModels
                         Item.Roles.Add(rv.Role);
                         rv.PropertyChanged += RoleView_PropertyChanged;
                     }
+                    RoleView_PropertyChanged(this, new PropertyChangedEventArgs(""));
                     break;
                 case NotifyCollectionChangedAction.Move:
                     // do nothing
@@ -145,6 +149,7 @@ namespace CarmenUI.ViewModels
                 OnPropertyChanged(nameof(SumOfRolesCount));
                 OnPropertyChanged(nameof(SumOfRolesTotal));
                 OnPropertyChanged(nameof(CountErrorBackgroundColors));
+                OnPropertyChanged(nameof(NoRolesErrorBackgroundColor));
             }
         }
 
