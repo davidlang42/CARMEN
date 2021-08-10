@@ -27,6 +27,8 @@ namespace CarmenUI.ViewModels
             var (progress, any_errors) = await UpdateChildren();
             // check section type rules
             any_errors |= !await Task.Run(() => section.CastingMeetsSectionTypeRules(totalCast, out _, out _));
+            // check consecutive items
+            any_errors |= !await Task.Run(() => section.VerifyConsecutiveItems());
             FinishUpdate(progress, any_errors);
         }
 

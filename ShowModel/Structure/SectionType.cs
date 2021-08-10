@@ -11,7 +11,9 @@ namespace Carmen.ShowModel.Structure
         public string Name { get; set; } = "Section";
         public bool AllowMultipleRoles { get; set; } = false;
         public bool AllowNoRoles { get; set; } = false;
-        public bool AllowConsecutiveItems { get; set; } = false;
+        /// <summary>AllowConsecutiveItems defaults to true in SectionType, but false in ShowRoot,
+        /// so that the consecutive item check does not run multiple times by default</summary>
+        public bool AllowConsecutiveItems { get; set; } = true;
         public virtual ICollection<Section> Sections { get; private set; } = new ObservableCollection<Section>(); //LATER add this to RelationshipTests.cs
     }
 }

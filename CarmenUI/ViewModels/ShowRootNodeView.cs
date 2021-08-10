@@ -23,7 +23,7 @@ namespace CarmenUI.ViewModels
         {
             StartUpdate();
             var (progress, any_errors) = await UpdateChildren();
-            any_errors |= !await Task.Run(() => showRoot.VerifyConsecutiveItems());//TODO also verify consecutive items in SectionNodeView
+            any_errors |= !await Task.Run(() => showRoot.VerifyConsecutiveItems());
             FinishUpdate(progress, any_errors);
         }
 

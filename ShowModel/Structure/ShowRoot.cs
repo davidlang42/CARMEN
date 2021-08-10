@@ -17,7 +17,9 @@ namespace Carmen.ShowModel.Structure
         /// <summary>The criteria which will be used to determine the order for Cast Numbers (if not set, OverallAbility will be used)</summary>
         public virtual Criteria? CastNumberOrderBy { get; set; }
         public ListSortDirection CastNumberOrderDirection { get; set; }
-        public bool AllowConsecutiveItems { get; set; }
+        /// <summary>AllowConsecutiveItems defaults to true in SectionType, but false in ShowRoot,
+        /// so that the consecutive item check does not run multiple times by default</summary>
+        public bool AllowConsecutiveItems { get; set; } = false;
         public override InnerNode? Parent
         {
             get => null;
