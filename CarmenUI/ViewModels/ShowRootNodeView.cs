@@ -13,24 +13,19 @@ namespace CarmenUI.ViewModels
     public class ShowRootNodeView : NodeView
     {
         private ShowRoot showRoot;
-        private NodeView[] childrenInOrder;
-
-        public override ICollection<NodeView> ChildrenInOrder => childrenInOrder;
 
         public override string Name => showRoot.Name;
 
-        public override async Task UpdateAsync()
+        protected override async Task<(double progress, bool has_errors)> CalculateAsync(double child_progress, bool child_errors)
         {
-            StartUpdate();
-            var (progress, any_errors) = await UpdateChildren();
-            any_errors |= !await Task.Run(() => showRoot.VerifyConsecutiveItems());
-            FinishUpdate(progress, any_errors);
+            child_errors |= !await Task.Run(() => showRoot.VerifyConsecutiveItems());
+            return (child_progress, child_errors);
         }
 
         public ShowRootNodeView(ShowRoot show_root, int total_cast, AlternativeCast[] alternative_casts)
+            : base(show_root.Children.InOrder().Select(n => CreateView(n, total_cast, alternative_casts)))
         {
             showRoot = show_root;
-            childrenInOrder = show_root.Children.InOrder().Select(n => CreateView(n, total_cast, alternative_casts)).ToArray();
         }
     }
 }

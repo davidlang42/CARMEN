@@ -2,7 +2,9 @@
 using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -10,15 +12,23 @@ using System.Windows;
 
 namespace CarmenUI.ViewModels
 {
-    public abstract class NodeView : DependencyObject
+    public abstract class NodeView : DependencyObject, INotifyPropertyChanged, IDisposable
     {
+        bool disposed = false;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(NodeView), new PropertyMetadata(false));
 
         public bool IsSelected //LATER try to use isseleted/isexpanded here rather than hacky visual tree stuff to change selection
         {
             get => (bool)GetValue(IsSelectedProperty);
-            set => SetValue(IsSelectedProperty, value);
+            set
+            {
+                SetValue(IsSelectedProperty, value);
+                OnPropertyChanged();
+            }
         }
 
         public static readonly DependencyProperty StatusProperty = DependencyProperty.Register(
@@ -27,7 +37,11 @@ namespace CarmenUI.ViewModels
         public ProcessStatus Status
         {
             get => (ProcessStatus)GetValue(StatusProperty);
-            set => SetValue(StatusProperty, value);
+            private set
+            {
+                SetValue(StatusProperty, value);
+                OnPropertyChanged();
+            }
         }
 
         public static readonly DependencyProperty ProgressProperty = DependencyProperty.Register(
@@ -38,16 +52,75 @@ namespace CarmenUI.ViewModels
         public double? Progress
         {
             get => (double?)GetValue(ProgressProperty);
-            set => SetValue(ProgressProperty, value);
+            private set
+            {
+                SetValue(ProgressProperty, value);
+                OnPropertyChanged();
+            }
         }
 
-        /// <summary>Update the Status and Progress of this node.
-        /// Status/Progress should be Loading/null respectively while it is updating.</summary>
-        public abstract Task UpdateAsync();
+        /// <summary>Calculate the result of this node, returning the progress (between 0 and 1)
+        /// and whether there are errors.</summary>
+        protected abstract Task<(double progress, bool has_errors)> CalculateAsync(double child_progress, bool child_errors);
 
-        public abstract ICollection<NodeView> ChildrenInOrder { get; }
+        public NodeView[] ChildrenInOrder { get; init; }
 
         public abstract string Name { get; }
+
+        public NodeView(IEnumerable<NodeView> children_in_order)
+            : this(children_in_order.ToArray())
+        { }
+
+        public NodeView(NodeView[] children_in_order)
+        {
+            ChildrenInOrder = children_in_order;
+            foreach (var child in ChildrenInOrder)
+                child.PropertyChanged += Child_PropertyChanged;
+        }
+
+        private async void Child_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Status))
+                await UpdateAsync();
+        }
+
+        /// <summary>Update the Status and Progress of this node.</summary>
+        public async Task UpdateAsync()
+        {
+            StartUpdate();
+            if (ChildrenInOrder.Any(c => c.Status == ProcessStatus.Loading))
+                return; // leave status as loading until child statuses update
+            var child_progress = ChildrenInOrder.Average(c => c.Progress) ?? 1;
+            var child_errors = ChildrenInOrder.Any(c => c.Status == ProcessStatus.Error);
+            var (progress, has_errors) = await CalculateAsync(child_progress, child_errors);
+            FinishUpdate(progress, has_errors);
+        }
+
+        private void StartUpdate()
+        {
+            Progress = null;
+            Status = ProcessStatus.Loading;
+        }
+
+        private void FinishUpdate(double progress, bool has_errors)
+        {
+            Progress = progress;
+            Status = (has_errors, progress) switch
+            {
+                (true, _) => ProcessStatus.Error,
+                (false, 1) => ProcessStatus.Complete,
+                _ => ProcessStatus.None
+            };
+        }
+
+        public async Task UpdateAllAsync()
+        {
+            if (ChildrenInOrder.Length == 0)
+                await UpdateAsync();
+            else
+                foreach (var child in ChildrenInOrder)
+                    await child.UpdateAllAsync();
+        }
 
         /// <summary>Searches recursively for the RoleNodeView for the given Role.
         /// This will throw an exception if the Role is not found.</summary>
@@ -61,31 +134,22 @@ namespace CarmenUI.ViewModels
             return null;
         }
 
-        protected void StartUpdate()
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
-            Status = ProcessStatus.Loading;
-            Progress = null;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        protected async Task<(double, bool)> UpdateChildren()
+        public void Dispose()
         {
-            if (!ChildrenInOrder.Any())
-                return (1, false);
-            await Task.WhenAll(ChildrenInOrder.Select(c => c.UpdateAsync()));
-            var average_progress = ChildrenInOrder.Average(c => c.Progress!.Value);
-            var any_errors = ChildrenInOrder.Any(c => c.Status == ProcessStatus.Error);
-            return (average_progress, any_errors);
-        }
-
-        protected void FinishUpdate(double progress, bool has_errors)
-        {
-            Status = (has_errors, progress) switch
+            if (!disposed)
             {
-                (true, _) => ProcessStatus.Error,
-                (false, 1) => ProcessStatus.Complete,
-                _ => ProcessStatus.None
-            };
-            Progress = progress;
+                foreach (var child in ChildrenInOrder)
+                {
+                    child.PropertyChanged -= Child_PropertyChanged;
+                    child.Dispose();
+                }
+                disposed = true;
+            }
         }
 
         public static NodeView CreateView(Node node, int total_cast, AlternativeCast[] alternative_casts)

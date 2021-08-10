@@ -88,7 +88,7 @@ namespace CarmenUI.Pages
                 castingProgress.DataContext = rootNodeView;
                 loading.Progress = 100;
             }
-            await rootNodeView.UpdateAsync();
+            await rootNodeView.UpdateAllAsync();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -99,7 +99,7 @@ namespace CarmenUI.Pages
             if (SaveChanges())
             {
                 if (applicantsPanel.Content is EditableRoleWithApplicantsView editable_view)
-                    rootNodeView.FindRoleView(editable_view.Role)?.UpdateAsync(); //LATER this should propogate upwards, but it will need a rewrite because it currently propogates downwards
+                    rootNodeView.FindRoleView(editable_view.Role)?.UpdateAsync();
                 ChangeToViewMode();
             }
         }

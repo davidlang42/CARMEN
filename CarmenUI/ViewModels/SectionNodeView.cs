@@ -14,29 +14,21 @@ namespace CarmenUI.ViewModels
     {
         private Section section;
         private int totalCast;
-        private NodeView[] childrenInOrder;
-
-        public override ICollection<NodeView> ChildrenInOrder => childrenInOrder;
 
         public override string Name => section.Name;
 
-        public override async Task UpdateAsync()
+        protected override async Task<(double progress, bool has_errors)> CalculateAsync(double child_progress, bool child_errors)
         {
-            StartUpdate();
-            // check child statuses
-            var (progress, any_errors) = await UpdateChildren();
-            // check section type rules
-            any_errors |= !await Task.Run(() => section.CastingMeetsSectionTypeRules(totalCast, out _, out _));
-            // check consecutive items
-            any_errors |= !await Task.Run(() => section.VerifyConsecutiveItems());
-            FinishUpdate(progress, any_errors);
+            child_errors |= !await Task.Run(() => section.CastingMeetsSectionTypeRules(totalCast, out _, out _));
+            child_errors |= !await Task.Run(() => section.VerifyConsecutiveItems());
+            return (child_progress, child_errors);
         }
 
         public SectionNodeView(Section section, int total_cast, AlternativeCast[] alternative_casts)
+            : base(section.Children.InOrder().Select(n => CreateView(n, total_cast, alternative_casts)))
         {
             this.section = section;
             this.totalCast = total_cast;
-            childrenInOrder = section.Children.InOrder().Select(n => CreateView(n, total_cast, alternative_casts)).ToArray();
         }
     }
 }
