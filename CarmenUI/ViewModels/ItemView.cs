@@ -56,6 +56,21 @@ namespace CarmenUI.ViewModels
             }
         }
 
+        public string[] CountErrorBackgroundColors
+        {
+            get
+            {
+                var colors = new string[castGroups.Length];
+                for (var i = 0; i < colors.Length; i++)
+                    if (CountByGroups[i].Count is uint required_count
+                        && SumOfRolesCount[i] != required_count)
+                        colors[i] = "LightCoral";
+                    else
+                        colors[i] = "White";
+                return colors;
+            }
+        }
+
         public ItemView(Item item, CastGroup[] cast_groups)
         {
             Item = item;
@@ -76,7 +91,10 @@ namespace CarmenUI.ViewModels
         }
 
         private void NullableCountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-            => OnPropertyChanged(nameof(TotalCount));
+        {
+            OnPropertyChanged(nameof(TotalCount));
+            OnPropertyChanged(nameof(CountErrorBackgroundColors));
+        }
 
         private void Roles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
@@ -126,6 +144,7 @@ namespace CarmenUI.ViewModels
             {
                 OnPropertyChanged(nameof(SumOfRolesCount));
                 OnPropertyChanged(nameof(SumOfRolesTotal));
+                OnPropertyChanged(nameof(CountErrorBackgroundColors));
             }
         }
 

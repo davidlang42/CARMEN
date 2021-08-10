@@ -177,6 +177,7 @@ namespace CarmenUI.Pages
                     TargetNullValue = "",
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 });
+                bottom_text.SetBinding(TextBox.BackgroundProperty, new Binding($"{nameof(ItemView.CountErrorBackgroundColors)}[{i}]"));
                 Grid.SetColumn(bottom_text, column_index);
                 Grid.SetRow(bottom_text, 1);
                 footer.Children.Add(bottom_text);
