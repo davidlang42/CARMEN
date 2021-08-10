@@ -72,7 +72,7 @@ namespace CarmenUI.Pages
                 await context.AlternativeCasts.LoadAsync();
                 _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, context.AlternativeCasts.Local).ToArray();
                 loading.Progress = 30;
-                _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ToArrayAsync();
+                _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
                 loading.Progress = 60;
                 await context.Nodes.LoadAsync();
                 loading.Progress = 80;

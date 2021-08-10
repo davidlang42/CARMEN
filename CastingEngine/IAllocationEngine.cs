@@ -60,14 +60,68 @@ namespace Carmen.CastingEngine
 
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
-        Availability AvailabilityOf(Applicant applicant, Role role) //TODO properly implement this for all cases
-            => new Availability
+        Availability AvailabilityOf(Applicant applicant, Role role)//LATER thoroughly unit test
+        {
+            var applicant_items = applicant.Roles.Where(r => r != role).SelectMany(r => r.Items).ToHashSet();
+            var role_items = role.Items.ToHashSet();
+            return new Availability
             {
-                AlreadyInItems = role.Items.Where(i => i.Roles
-                    .Where(r => r != role)
-                    .Any(r => r.Cast.Contains(applicant))
-                    ).ToArray()
+                AlreadyInItems = applicant_items.Intersect(role_items).ToArray(),
+                AlreadyInNonMultiSections = FindCommonNonMultiSections(applicant_items, role_items).ToArray(),
+                InAdjacentItems = FindAdjacentItems(applicant_items, role_items).ToArray()
             };
+        }
+
+        private IEnumerable<NonMultiSectionItem> FindCommonNonMultiSections(HashSet<Item> applicant_items, HashSet<Item> role_items)
+        {
+            var role_non_multi_sections = role_items.SelectMany(i => NonMultiSections(i)).ToHashSet();
+            foreach (var applicant_item in applicant_items)
+                foreach (var applicant_non_multi_section in NonMultiSections(applicant_item))
+                    if (role_non_multi_sections.Contains(applicant_non_multi_section))
+                        yield return new NonMultiSectionItem {
+                             AlreadyInItem = applicant_item,
+                             NonMultiSection = applicant_non_multi_section
+                        };
+        }
+
+        private IEnumerable<Section> NonMultiSections(Item item)
+            => item.Parents().OfType<Section>().Where(s => !s.SectionType.AllowMultipleRoles);
+
+        private IEnumerable<AdjacentItem> FindAdjacentItems(HashSet<Item> applicant_items, HashSet<Item> role_items)
+        {
+            var applicant_non_consecutive_nodes = applicant_items.Select(i => HighestNonConsecutiveNode(i));
+            var role_non_consecutive_nodes = role_items.Select(i => HighestNonConsecutiveNode(i));
+            var non_consecutive_nodes_to_check = applicant_non_consecutive_nodes.Intersect(role_non_consecutive_nodes);
+            foreach (var non_consecutive_node in non_consecutive_nodes_to_check)
+            {
+                var e = non_consecutive_node.ItemsInOrder().GetEnumerator();
+                if (!e.MoveNext())
+                    yield break;
+                var previous = e.Current;
+                while (e.MoveNext())
+                {
+                    if (applicant_items.Contains(previous) && role_items.Contains(e.Current))
+                        yield return new AdjacentItem
+                        {
+                            AlreadyInItem = previous,
+                            Adjacency = Adjacency.Previous,
+                            AdjacentTo = e.Current,
+                            NonConsecutiveSection = non_consecutive_node
+                        };
+                    else if (role_items.Contains(previous) && applicant_items.Contains(e.Current))
+                        yield return new AdjacentItem
+                        {
+                            AlreadyInItem = e.Current,
+                            Adjacency = Adjacency.Next,
+                            AdjacentTo = previous,
+                            NonConsecutiveSection = non_consecutive_node
+                        };
+                }
+            }
+        }
+
+        private InnerNode HighestNonConsecutiveNode(Item item)
+            => item.Parents().Where(n => !n.GetAllowConsecutiveItems()).Last();
 
         /// <summary>Pick the cast for a role</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);

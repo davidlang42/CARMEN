@@ -28,6 +28,17 @@ namespace Carmen.ShowModel.Structure
 
         public Node RootParent() => Parent?.RootParent() ?? this;
 
+        /// <summary>Recursively enumerate all parents</summary>
+        public IEnumerable<InnerNode> Parents()
+        {
+            var parent = Parent;
+            while (parent != null)
+            {
+                yield return parent;
+                parent = parent.Parent;
+            }
+        }
+
         /// <summary>Checks if this node's required counts equals the sum of the roles within it.</summary>
         public virtual IEnumerable<string> Validate()
         {

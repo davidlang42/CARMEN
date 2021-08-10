@@ -30,6 +30,6 @@ namespace Carmen.ShowModel.Structure
             }
         }
 
-        protected override bool GetAllowConsecutiveItems() => AllowConsecutiveItems;
+        public override bool GetAllowConsecutiveItems() => AllowConsecutiveItems;
     }
 }

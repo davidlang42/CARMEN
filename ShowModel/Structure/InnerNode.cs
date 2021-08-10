@@ -16,7 +16,7 @@ namespace Carmen.ShowModel.Structure
 
         public override IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
 
-        protected abstract bool GetAllowConsecutiveItems();
+        public abstract bool GetAllowConsecutiveItems();
 
         public bool VerifyConsecutiveItems(out List<ConsecutiveItemSummary> failures)
             => VerifyConsecutiveItems(out failures, false);

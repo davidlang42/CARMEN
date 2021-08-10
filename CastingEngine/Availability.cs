@@ -9,14 +9,28 @@ namespace Carmen.CastingEngine
 {
     public struct Availability
     {
-        public Item[]? AlreadyInItems { get; init; }
-        public (Section NonMultiSection, Item AlreadyInItem)[]? AlreadyInNonMultiSections { get; init; }
-        public (Item AlreadyInItem, Adjacency Adjacency, Item AdjacentTo, InnerNode NonConsecutiveSection)[]? InAdjacentItems { get; init; }
+        public Item[] AlreadyInItems { get; init; }
+        public NonMultiSectionItem[] AlreadyInNonMultiSections { get; init; }
+        public AdjacentItem[] InAdjacentItems { get; init; }
 
         public bool IsAvailable => !IsAlreadyInItem && !IsAlreadyInNonMultiSection && !IsInAdjacentItem;
         public bool IsAlreadyInItem => AlreadyInItems?.Length > 0;
         public bool IsAlreadyInNonMultiSection => AlreadyInNonMultiSections?.Length > 0;
         public bool IsInAdjacentItem => InAdjacentItems?.Length > 0;
+    }
+
+    public struct NonMultiSectionItem
+    {
+        public Section NonMultiSection { get; init; }
+        public Item AlreadyInItem { get; init; }
+    }
+
+    public struct AdjacentItem
+    {
+        public Item AlreadyInItem { get; init; }
+        public Adjacency Adjacency { get; init; }
+        public Item AdjacentTo { get; init; }
+        public InnerNode NonConsecutiveSection { get; init; }
     }
 
     public enum Adjacency
