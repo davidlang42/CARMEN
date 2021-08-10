@@ -39,6 +39,8 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { StandardSort.For<SectionType>() } };
         private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { StandardSort.For<Requirement>() } };
         private readonly CollectionViewSource requirementsSelectionSource; // xaml resource loaded in constructor
+        private readonly CollectionViewSource listSortDirectionEnumSource; // xaml resource loaded in constructor
+        private readonly CollectionViewSource showRootSource = new();
 
         private CollectionViewSource? currentViewSource;
 
@@ -55,6 +57,8 @@ namespace CarmenUI.Pages
             tagsViewSource.SortDescriptions.Add(StandardSort.For<Tag>());
             requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));
             requirementsSelectionSource.SortDescriptions.Add(StandardSort.For<Requirement>());
+            listSortDirectionEnumSource = (CollectionViewSource)FindResource(nameof(listSortDirectionEnumSource));
+            listSortDirectionEnumSource.Source = Enum.GetValues<ListSortDirection>();
             configList.SelectedIndex = 0; // must be set after InitializeComponent() because it triggers Selected event below
         }
 
@@ -79,10 +83,11 @@ namespace CarmenUI.Pages
             loading.Progress = 77;
             await context.SectionTypes.LoadAsync();
             sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
+            showRootSource.Source = context.ShowRoot.Yield();
             loading.Progress = 100;
         }
 
-        private void BindObjectList(string header, string tool_tip, CollectionViewSource view_source, AddableObject[][] add_buttons)
+        private void BindObjectList(string header, string? tool_tip, CollectionViewSource view_source, AddableObject[][] add_buttons)
         {
             objectHeading.Text = header;
             objectList.ToolTip = tool_tip;
@@ -90,6 +95,9 @@ namespace CarmenUI.Pages
             currentViewSource = view_source;
             objectAddButtons.ItemsSource = add_buttons;
         }
+
+        private void ShowRoot_Selected(object sender, RoutedEventArgs e)
+            => BindObjectList("Show Details", null, showRootSource, new AddableObject[0][]);
 
         readonly AddableObject[][] criteriasButtons = new[]
         {
@@ -181,7 +189,7 @@ namespace CarmenUI.Pages
         {
             if (SaveChanges())
                 //LATER only flag changes on objects which actually changed, rather than all possible changes on this form
-                OnReturn(DataObjects.AlternativeCasts | DataObjects.CastGroups | DataObjects.Criterias | DataObjects.Images | DataObjects.Requirements | DataObjects.SectionTypes | DataObjects.Tags);
+                OnReturn(DataObjects.AlternativeCasts | DataObjects.CastGroups | DataObjects.Criterias | DataObjects.Images | DataObjects.Requirements | DataObjects.SectionTypes | DataObjects.Tags | DataObjects.Nodes);
         }
 
         private void AddObjectButton_Click(object sender, RoutedEventArgs e)

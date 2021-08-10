@@ -29,6 +29,7 @@
                 <x:Type TypeName="modelApplicants:Gender"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+        <CollectionViewSource x:Key="listSortDirectionEnumSource"/>
         <cv:MinimumIntValue x:Key="minimumIntValue"/>
     </Page.Resources>
     <Grid Margin="5">
@@ -44,6 +45,9 @@
         <DockPanel Margin="5">
             <TextBlock DockPanel.Dock="Top" Text="Configuration" FontSize="22"/>
             <ListBox x:Name="configList" FontSize="16" BorderThickness="0">
+                <ListBoxItem Selected="ShowRoot_Selected">
+                    <TextBlock Text="Show details..."/>
+                </ListBoxItem>
                 <ListBoxItem Selected="Criteria_Selected">
                     <TextBlock Text="Audition cast based on..."/>
                 </ListBoxItem>
@@ -95,7 +99,13 @@
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
             <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     KeyUp="objectList_KeyUp"/>
+                     KeyUp="objectList_KeyUp">
+                <ListBox.Resources>
+                    <DataTemplate DataType="{x:Type modelStructure:ShowRoot}">
+                        <TextBlock Text="Details for the current show"/>
+                    </DataTemplate>
+                </ListBox.Resources>
+            </ListBox>
         </DockPanel>
         <DockPanel Grid.Column="2" Margin="5" DataContext="{Binding ElementName=objectList,Path=SelectedItem}">
             <TextBlock DockPanel.Dock="Top" Text="{Binding Name, StringFormat='Editing: \{0\}'}" FontSize="22"/>
@@ -384,6 +394,68 @@
                             <CheckBox Grid.Row="2" Grid.ColumnSpan="2" IsChecked="{Binding AllowNoRoles, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Everyone must have a role" VerticalContentAlignment="Center"/>
                             <CheckBox Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding AllowMultipleRoles}" FontSize="14" Content="A person can have multiple roles" VerticalContentAlignment="Center"/>
                             <CheckBox Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items" VerticalContentAlignment="Center"/>
+                        </Grid>
+                    </DataTemplate>
+                    <DataTemplate DataType="{x:Type modelStructure:ShowRoot}">
+                        <Grid Margin="0 5">
+                            <Grid.Resources>
+                                <Style TargetType="TextBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Margin" Value="0 0 0 5"/>
+                                </Style>
+                                <Style TargetType="CheckBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="ComboBox">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                                <Style TargetType="DatePicker">
+                                    <Setter Property="Margin" Value="5 0 0 5"/>
+                                </Style>
+                            </Grid.Resources>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
+                                This is the root block of show settings, which define your show.
+                                The show date will be used to calculate the age of applicants.
+                                The cast number order option allows you to pick which Audition Criteria is used to determine the automatic cast numbering order. If no Audition Criteria has been set, cast numbers will be allocated based on each applicant's overall ability level.
+                            </TextBlock>
+                            <TextBlock Grid.Row="1" Text="Show Name" FontSize="14"/>
+                            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Show Date" FontSize="14" VerticalAlignment="Center"/>
+                            <DatePicker Grid.Row="2" Grid.Column="1" SelectedDate="{Binding ShowDate}" FontSize="14"/>
+                            <TextBlock Grid.Row="3" Text="Cast Number Order" FontSize="14" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Row="3" Grid.Column="1" FontSize="14" SelectedItem="{Binding CastNumberOrderBy, TargetNullValue='Overall ability'}" DisplayMemberPath="Name">
+                                <ComboBox.Resources>
+                                    <DataTemplate DataType="{x:Type modelCriterias:Criteria}">
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                    </DataTemplate>
+                                </ComboBox.Resources>
+                                <ComboBox.ItemsSource>
+                                    <CompositeCollection >
+                                        <sys:String>Overall ability</sys:String>
+                                        <CollectionContainer Collection="{Binding Source={StaticResource criteriasViewSource}}"/>
+                                    </CompositeCollection>
+                                </ComboBox.ItemsSource>
+                            </ComboBox>
+                            <TextBlock Grid.Row="4" Text="Cast Number Direction" FontSize="14" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding CastNumberOrderDirection}" ItemsSource="{Binding Source={StaticResource listSortDirectionEnumSource}}" FontSize="14"/>
+                            <CheckBox Grid.Row="5" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items" VerticalContentAlignment="Center"/>
+                            <TextBlock Grid.Row="6" Text="Logo" FontSize="14"/>
+                            <TextBlock Grid.Row="6" Grid.Column="1" Text="TODO" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">
