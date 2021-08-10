@@ -16,8 +16,9 @@
             <cv:MatchStatusValue/>
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
+        <cv:BytesToImage x:Key="bytesToImage"/>
     </Page.Resources>
-    <Grid>
+    <Grid x:Name="mainGrid">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="400"/>
             <ColumnDefinition Width="*"/>
@@ -28,8 +29,8 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <StackPanel Grid.Row="0" Grid.Column="0">
-            <TextBlock Text="Show Name" HorizontalAlignment="Center" FontSize="48"/>
-            <TextBlock Text="opening 1st July 2021" HorizontalAlignment="Center" FontSize="20" FontStyle="Italic"/>
+            <TextBlock Text="{Binding Name, FallbackValue='Loading...'}" HorizontalAlignment="Center" FontSize="48" TextWrapping="Wrap"/>
+            <TextBlock Text="{Binding ShowDate, FallbackValue='Loading...', StringFormat='openin\\g dd MMMM yyyy'}" HorizontalAlignment="Center" FontSize="20" FontStyle="Italic"/>
         </StackPanel>
         <ListView Grid.Row="1" Grid.Column="0" x:Name="menuList" Margin="20" BorderThickness="0" VerticalAlignment="Bottom" SelectionChanged="menuList_SelectionChanged">
             <ListViewItem x:Name="ConfigureShow" MouseEnter="ConfigureShow_MouseEnter">
@@ -73,7 +74,7 @@
             <Image Height="20" Margin="2 0"/>
             <TextBlock x:Name="CastingComplete" Visibility="Hidden" Text="IT'S SHOWTIME" HorizontalAlignment="Left" FontStyle="Italic" FontSize="20"/>
         </StackPanel>
-        <Image Grid.Row="0" Grid.Column="1" Source="/Icons/CloudDatabase.png"/>
+        <Image Grid.Row="0" Grid.Column="1" Source="{Binding Logo.ImageData, Converter={StaticResource bytesToImage}}"/>
         <ScrollViewer Grid.Row="1" Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="20">
             <ContentControl x:Name="SummaryPanel" VerticalAlignment="Bottom">
                 <ContentControl.Resources>

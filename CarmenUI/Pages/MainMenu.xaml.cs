@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Carmen.ShowModel.Structure;
 
 namespace CarmenUI.Pages
 {
@@ -132,11 +133,14 @@ namespace CarmenUI.Pages
                 || changes.HasFlag(DataObjects.SectionTypes))
                 summaries.AddRange(new Summary[] { ItemsSummary, RolesSummary });
             // Mark them as 'Loading'
+            mainGrid.DataContext = null;
             if (summaries.Any())
                 CastingComplete.Visibility = Visibility.Hidden;
             foreach (var summary in summaries)
                 summary.Status = ProcessStatus.Loading;
-            // Update them sequentially
+            // Update headings & logo
+            mainGrid.DataContext = await context.Nodes.OfType<ShowRoot>().Include(n => n.Logo).FirstOrDefaultAsync();
+            // Update summaries sequentially
             foreach (var summary in summaries)
                 await summary.LoadAsync(context);
             // Update complete text
