@@ -148,7 +148,7 @@
                             <Button Grid.Column="1" Height="30" Width="100" VerticalAlignment="Bottom" Content="Edit Casting" Click="EditCastButton_Click"/>
                         </Grid>
                         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5">
-                            <ItemsControl ItemsSource="{Binding Role.Cast}" Margin="5" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick">
+                            <ItemsControl ItemsSource="{Binding Role.Cast}" Margin="5" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick" Background="White">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock>
