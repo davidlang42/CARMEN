@@ -84,6 +84,7 @@ namespace CarmenUI.Pages
                 loading.Progress = 95;
                 await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
                 _rootNodeView = new ShowRootNodeView(context.ShowRoot, applicantsInCast.Length, context.AlternativeCasts.ToArray());
+                showCompleted.IsChecked = true; // must be set after creating ShowRootNodeView because it triggers Checked event
                 rolesTreeView.ItemsSource = rootNodeView.ChildrenInOrder;
                 castingProgress.DataContext = rootNodeView;
                 loading.Progress = 100;
@@ -228,5 +229,11 @@ namespace CarmenUI.Pages
 
         private void CollapseAll_Click(object sender, RoutedEventArgs e)
             => rootNodeView.CollapseAll();
+
+        private void showCompleted_Checked(object sender, RoutedEventArgs e)
+            => rootNodeView.SetShowCompleted(true);
+
+        private void showCompleted_Unchecked(object sender, RoutedEventArgs e)
+            => rootNodeView.SetShowCompleted(false);
     }
 }

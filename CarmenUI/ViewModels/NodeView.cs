@@ -54,6 +54,7 @@ namespace CarmenUI.ViewModels
             {
                 SetValue(StatusProperty, value);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsVisible));
             }
         }
 
@@ -77,6 +78,21 @@ namespace CarmenUI.ViewModels
         protected abstract Task<(double progress, bool has_errors)> CalculateAsync(double child_progress, bool child_errors);
 
         public NodeView[] ChildrenInOrder { get; init; }
+
+        public bool IsVisible => ShowCompleted || Status != ProcessStatus.Complete;
+
+        private bool showCompleted = true;
+        public bool ShowCompleted
+        {
+            get => showCompleted;
+            set
+            {
+                if (showCompleted == value)
+                    return;
+                showCompleted = value;
+                OnPropertyChanged(nameof(IsVisible));
+            }
+        }
 
         public abstract string Name { get; }
 
@@ -135,6 +151,14 @@ namespace CarmenUI.ViewModels
             else
                 foreach (var child in ChildrenInOrder)
                     await child.UpdateAllAsync();
+        }
+
+        /// <summary>Recursively set ShowCompleted to the given value</summary>
+        public void SetShowCompleted(bool value)
+        {
+            foreach (var child in ChildrenInOrder)
+                child.SetShowCompleted(value);
+            ShowCompleted = value;
         }
 
         /// <summary>Searches recursively for the RoleNodeView representing the given Role, and marks it as selected.
