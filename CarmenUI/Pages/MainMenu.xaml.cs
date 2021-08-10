@@ -84,6 +84,7 @@ namespace CarmenUI.Pages
                 NavigateToSubPage(new EditApplicants(contextOptions, false, true, false));
             else if (menuList.SelectedItem == RegisterApplicants)
                 NavigateToSubPage(new EditApplicants(contextOptions, true, true, true));
+            menuList.SelectedItem = null;
         }
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
