@@ -25,7 +25,7 @@ namespace CarmenUI.ViewModels
             : base(role, cast_groups_by_cast)
         {
             var required_cast_groups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
-            Applicants = applicants.Where(a => required_cast_groups.Contains(a.CastGroup!)).Select(a =>
+            Applicants = applicants.Where(a => required_cast_groups.Contains(a.CastGroup!) || role.Cast.Contains(a)).Select(a =>
             {
                 var av = new ApplicantForRole(engine, a, role, criterias);
                 av.PropertyChanged += ApplicantForRole_PropertyChanged;
@@ -42,9 +42,9 @@ namespace CarmenUI.ViewModels
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             view.Filter = (show_unavailable, show_ineligible) switch
             {
-                (false, false) => av => ((ApplicantForRole)av).Availability.IsAvailable && ((ApplicantForRole)av).Eligibility.IsEligible,//
-                (false, true) => av => ((ApplicantForRole)av).Availability.IsAvailable,
-                (true, false) => av => ((ApplicantForRole)av).Eligibility.IsEligible,
+                (false, false) => av => ((ApplicantForRole)av).IsSelected || (((ApplicantForRole)av).Availability.IsAvailable && ((ApplicantForRole)av).Eligibility.IsEligible),
+                (false, true) => av => ((ApplicantForRole)av).IsSelected || ((ApplicantForRole)av).Availability.IsAvailable,
+                (true, false) => av => ((ApplicantForRole)av).IsSelected || ((ApplicantForRole)av).Eligibility.IsEligible,
                 _ => null // (true, true)
             };
         }
