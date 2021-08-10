@@ -16,7 +16,9 @@ namespace Carmen.ShowModel.Structure
 
         public override IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
 
-        public abstract bool GetAllowConsecutiveItems();
+        protected abstract bool _allowConsecutiveItems { get; }
+
+        public bool AllowConsecutiveItems => _allowConsecutiveItems;
 
         public bool VerifyConsecutiveItems(out List<ConsecutiveItemSummary> failures)
             => VerifyConsecutiveItems(out failures, false);
@@ -27,7 +29,7 @@ namespace Carmen.ShowModel.Structure
         private bool VerifyConsecutiveItems(out List<ConsecutiveItemSummary> failures, bool shortcut_result)
         {
             failures = new();
-            if (GetAllowConsecutiveItems())
+            if (AllowConsecutiveItems)
                 return true; // nothing to check
             var items = ItemsInOrder().ToList();
             var cast_per_item = items.Select(i => i.Roles.SelectMany(r => r.Cast).ToHashSet()).ToList(); //LATER does this need await? also parallelise

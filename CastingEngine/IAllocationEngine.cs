@@ -121,7 +121,7 @@ namespace Carmen.CastingEngine
         }
 
         private InnerNode HighestNonConsecutiveNode(Item item)
-            => item.Parents().Where(n => !n.GetAllowConsecutiveItems()).Last();
+            => item.Parents().Where(n => !n.AllowConsecutiveItems).Last();
 
         /// <summary>Pick the cast for a role</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);

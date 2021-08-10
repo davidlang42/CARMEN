@@ -18,7 +18,7 @@ namespace Carmen.ShowModel.Structure
 
         public virtual SectionType SectionType { get; set; } = null!;
 
-        public override bool GetAllowConsecutiveItems() => SectionType.AllowConsecutiveItems;
+        protected override bool _allowConsecutiveItems => SectionType.AllowConsecutiveItems;
 
         /// <summary>Check if the Roles in this Section sum meet the conditions of this SectionType.
         /// If SectionType.AllowNoRoles == false and sum of roles &lt; cast members for any CastGroup, this will return TooFewRoles.

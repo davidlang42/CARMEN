@@ -19,7 +19,8 @@ namespace Carmen.ShowModel.Structure
         public ListSortDirection CastNumberOrderDirection { get; set; }
         /// <summary>AllowConsecutiveItems defaults to true in SectionType, but false in ShowRoot,
         /// so that the consecutive item check does not run multiple times by default</summary>
-        public bool AllowConsecutiveItems { get; set; } = false;
+        public new bool AllowConsecutiveItems { get; set; } = false;
+        protected override bool _allowConsecutiveItems => AllowConsecutiveItems;
         public override InnerNode? Parent
         {
             get => null;
@@ -29,7 +30,5 @@ namespace Carmen.ShowModel.Structure
                     throw new InvalidOperationException("Parent of ShowRoot must be null.");
             }
         }
-
-        public override bool GetAllowConsecutiveItems() => AllowConsecutiveItems;
     }
 }
