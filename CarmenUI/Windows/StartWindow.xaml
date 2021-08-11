@@ -46,9 +46,15 @@
                 </StackPanel>
             </Button>
         </Grid>
-        <ListBox x:Name="RecentList" Grid.Row="3" ItemsSource="{bd:SettingBinding RecentShows}" Margin="20" BorderThickness="0" SelectionChanged="RecentList_SelectionChanged">
+        <ListBox x:Name="RecentList" Grid.Row="3" ItemsSource="{bd:SettingBinding RecentShows}" Margin="20" BorderThickness="0" SelectionChanged="RecentList_SelectionChanged"
+                 KeyboardNavigation.IsTabStop="False">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                </Style>
+            </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
-                <DataTemplate DataType="{x:Type vm:RecentShow}">
+                <DataTemplate DataType="{x:Type vm:RecentShow}" >
                     <Grid ToolTip="{Binding ConnectionString}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="24"/>
