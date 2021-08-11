@@ -218,7 +218,7 @@ namespace CarmenUI.Pages
                 var parent = node.Parent ?? throw new ApplicationException("Non-ShowRoot must have a parent.");
                 parent.Children.Remove(node);
                 var collection = (ObservableCollection<Node>)rootNodesViewSource.Source;
-                collection.Remove(node);//LATER cascade delete sectons/items/roles under this node
+                collection.Remove(node);
             }
         }
 

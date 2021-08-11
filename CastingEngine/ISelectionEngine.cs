@@ -22,10 +22,9 @@ namespace Carmen.CastingEngine
         /// NOTE: All applicants must have a CastGroup set</summary>
         void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets);
 
-        /// <summary>Allocate cast numbers, respecting those already set
+        /// <summary>Allocate cast numbers, respecting those already set, ordered by a criteria, otherwise overall ability
         /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set</summary>
         void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? order_by, ListSortDirection sort_direction);
-        //LATER might be good to be able to order by age, name, external data
 
         /// <summary>Apply tags to applicants, respecting those already applied
         /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set,

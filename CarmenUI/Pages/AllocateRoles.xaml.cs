@@ -33,8 +33,6 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class AllocateRoles : SubPage
     {
-        //LATER make sure that ViewOnlyApplicantsList scrolls if too long
-        //LATER handle double click on ViewOnlyApplicantsList even when no applicants
         private CastGroupAndCast[]? _castGroupsByCast;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
@@ -56,12 +54,11 @@ namespace CarmenUI.Pages
         public AllocateRoles(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
-            engine = new DummyEngine(); //LATER use real engine, maybe have it supplied by constructor
+            engine = new DummyEngine(); //LATER use real engine, maybe have it supplied by constructor, and type determined by a user setting
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            //LATER have a user setting which enables/disables preloading on page open for all pages, because if the connection is fast (or local) it might actually be a nicer UX to not do this all up front.
             using (var loading = new LoadingOverlay(this))
             {
                 loading.Progress = 0;
@@ -218,7 +215,7 @@ namespace CarmenUI.Pages
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!ChangeToViewMode())
-            { } //LATER ideally change the selection back, but this causes the event to get called again and infinitely loop asking if you want to cancel, until you do
+            { } //LATER ideally change the selection back, but this causes the event to get called again and infinitely loop asking if you want to cancel, until you do -- a better way to handle this might be to disable the items tree when in edit mode
         }
 
         private void rolesTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)

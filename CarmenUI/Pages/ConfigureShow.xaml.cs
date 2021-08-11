@@ -219,7 +219,7 @@ namespace CarmenUI.Pages
                 switch (objectList.SelectedItem) {
                     case Criteria criteria:
                         if (!criteria.Abilities.Any() || ConfirmDelete($"Are you sure you want to delete the '{criteria.Name}' criteria?\nThis will delete the {criteria.Name} mark of {criteria.Abilities.Count.Plural("applicant")}."))
-                            list.Remove(criteria); //LATER confirm cascade delete of Abilities
+                            list.Remove(criteria);
                         break;
                     case CastGroup cast_group:
                         if (context.CastGroups.Local.Count == 1)
@@ -253,7 +253,7 @@ namespace CarmenUI.Pages
                                         other_cast_member.AlternativeCast = null;
                                     cast_group.AlternateCasts = false;
                                 }
-                            list.Remove(alternative_cast);//LATER thoroughly test all cases
+                            list.Remove(alternative_cast);
                         }
                         break;
                     case Tag tag:
@@ -267,12 +267,12 @@ namespace CarmenUI.Pages
                             return;
                         }
                         if (!section_type.Sections.Any() || ConfirmDelete($"Are you sure you want to delete the '{section_type.Name}' section type?\nThis will remove the {section_type.Sections.Count.Plural(section_type.Name)} and any sections, items and roles within them."))
-                            list.Remove(section_type); //LATER confirm cascade delete of sections/items/roles
+                            list.Remove(section_type);
                         break;
                     case Requirement requirement:
                         var used_count = requirement.UsedByCastGroups.Count + requirement.UsedByCombinedRequirements.Count + requirement.UsedByRoles.Count + requirement.UsedByTags.Count;//LATER is this missing NotRequirements?
                         if (used_count == 0 || ConfirmDelete($"Are you sure you want to delete the '{requirement.Name}' reqirement?\nThis requirement is currently in used {used_count.Plural("time")}."))
-                            list.Remove(requirement);//LATER confirm cascade delete of NotRequirements
+                            list.Remove(requirement);
                         break;
                 }
             }

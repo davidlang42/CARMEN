@@ -76,7 +76,7 @@ namespace CarmenUI.Pages
 
         private void AddApplicant_Click(object sender, RoutedEventArgs e)//LATER fix names
         {
-            if (applicantsViewSource.Source is IList list)//LATER change ilist/not null view checks into hard casts (once loading is done before showing page)
+            if (applicantsViewSource.Source is IList list)//LATER change ilist/not null view checks into hard casts (now that loading is done before showing page)
             {
                 filterText.Text = "";
                 var applicant = new Applicant();

@@ -52,9 +52,14 @@ namespace Carmen.ShowModel
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseLazyLoadingProxies(); //LATER this has a huge performance risk, if I forget to include the right objects in my queries, however the alternative is I get incorrect values (eg. nulls and empty collections), which seems worse
+            // Using LazyLoadingProxies will have a huge performance hit if I forget to include
+            // the right objects in my queries, however the alternative is that if I forget to
+            // include something then I get incorrect values (eg. nulls and empty collections)
+            optionsBuilder.UseLazyLoadingProxies();
 #if SLOW_DATABASE
-            // NOTE: Using a delay of 200 seems to block unit tests
+            // Due to risks of LazyLoadingProxies above, it is best to always debug with SLOW_DATABASE
+            // so that there is a noticeable delay if I forget to include the right objects, however
+            // its worth noting that a delay of 200ms blocks unit tests from completing.
             optionsBuilder.AddInterceptors(new DelayInterceptor(200)); // simulates a 3g connection
 #endif
             base.OnConfiguring(optionsBuilder);
