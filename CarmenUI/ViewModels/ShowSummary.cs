@@ -6,14 +6,47 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace CarmenUI.ViewModels
 {
     public class ShowSummary : Summary
     {
+        public static readonly DependencyProperty HeadingProperty = DependencyProperty.Register(
+            nameof(Heading), typeof(string), typeof(ShowSummary), new PropertyMetadata(""));
+
+        public string Heading
+        {
+            get => (string)GetValue(HeadingProperty);
+            set => SetValue(HeadingProperty, value);
+        }
+
+        public static readonly DependencyProperty SubHeadingProperty = DependencyProperty.Register(
+            nameof(SubHeading), typeof(string), typeof(ShowSummary), new PropertyMetadata(""));
+
+        public string SubHeading
+        {
+            get => (string)GetValue(SubHeadingProperty);
+            set => SetValue(SubHeadingProperty, value);
+        }
+
+        public static readonly DependencyProperty LogoImageProperty = DependencyProperty.Register(
+            nameof(LogoImage), typeof(byte[]), typeof(ShowSummary), new PropertyMetadata(null));
+
+        public byte[]? LogoImage
+        {
+            get => (byte[]?)GetValue(LogoImageProperty);
+            set => SetValue(LogoImageProperty, value);
+        }
+
         public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
+            await c.Entry(c.ShowRoot).ReloadAsync();//LATER do I need to force reload entities on invalidate to ensure new values get checked?
+            var show_root = c.ShowRoot;
+            Heading = show_root.Name;
+            SubHeading = show_root.ShowDate.HasValue ? $"opening {show_root.ShowDate.Value:dd MMMM yyyy}" : "";//LATER opening 12th July 2021
+            LogoImage = show_root.Logo?.ImageData;
             await c.Criterias.LoadAsync();
             Rows.Add(new Row { Success = $"{c.Criterias.Local.Count} Audition Criteria" });
             await c.CastGroups.LoadAsync();

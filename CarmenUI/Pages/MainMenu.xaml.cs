@@ -143,8 +143,6 @@ namespace CarmenUI.Pages
             }
             // Trigger update (does nothing if already running)
             UpdateSummariesAsync();
-            //TODO mainGrid.DataContext = null;
-            //TODO mainGrid.DataContext = await context.Nodes.OfType<ShowRoot>().Include(n => n.Logo).FirstOrDefaultAsync();
         }
 
         bool updating_summaries = false;
@@ -161,7 +159,7 @@ namespace CarmenUI.Pages
                 if (next_to_update.NeedsUpdate) // may have been set while LoadAsync() was running, eg. if we went to another page and came back
                     next_to_update.Status = ProcessStatus.Loading;
             }  
-            // Update complete text
+            // Show complete text if required
             if (allSummaries.All(s => s.Status == ProcessStatus.Complete))
                 CastingComplete.Visibility = Visibility.Visible;
             updating_summaries = false;
