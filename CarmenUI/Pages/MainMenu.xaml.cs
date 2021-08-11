@@ -186,7 +186,7 @@ namespace CarmenUI.Pages
             }
         }
 
-        Window window;
+        Window? window;
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
             window = Window.GetWindow(this);
@@ -195,7 +195,8 @@ namespace CarmenUI.Pages
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
-            window.KeyDown -= Window_KeyDown;
+            if (window != null)
+                window.KeyDown -= Window_KeyDown;
         }
     }
 }
