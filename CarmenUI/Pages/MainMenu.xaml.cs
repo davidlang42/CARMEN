@@ -73,19 +73,21 @@ namespace CarmenUI.Pages
 
         private void menuList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (menuList.SelectedItem == ConfigureShow)
-                NavigateToSubPage(new ConfigureShow(contextOptions));
-            else if (menuList.SelectedItem == AllocateRoles)
-                NavigateToSubPage(new AllocateRoles(contextOptions));
-            else if (menuList.SelectedItem == ConfigureItems)
-                NavigateToSubPage(new ConfigureItems(contextOptions));
-            else if (menuList.SelectedItem == SelectCast)
-                NavigateToSubPage(new SelectCast(contextOptions));
-            else if (menuList.SelectedItem == AuditionApplicants)
-                NavigateToSubPage(new EditApplicants(contextOptions, false, true, false));
-            else if (menuList.SelectedItem == RegisterApplicants)
-                NavigateToSubPage(new EditApplicants(contextOptions, true, true, true));
-            menuList.SelectedItem = null;
+            if (e.AddedItems.Count > 0 && e.AddedItems[0] is ListViewItem selected) {
+                if (selected == ConfigureShow)
+                    NavigateToSubPage(new ConfigureShow(contextOptions));
+                else if (selected == AllocateRoles)
+                    NavigateToSubPage(new AllocateRoles(contextOptions));
+                else if (selected == ConfigureItems)
+                    NavigateToSubPage(new ConfigureItems(contextOptions));
+                else if (selected == SelectCast)
+                    NavigateToSubPage(new SelectCast(contextOptions));
+                else if (selected == AuditionApplicants)
+                    NavigateToSubPage(new EditApplicants(contextOptions, false, true, false));
+                else if (selected == RegisterApplicants)
+                    NavigateToSubPage(new EditApplicants(contextOptions, true, true, true));
+                menuList.SelectedItem = null;
+            }
         }
 
         private void ConfigureShow_MouseEnter(object sender, MouseEventArgs e)
@@ -163,6 +165,37 @@ namespace CarmenUI.Pages
             if (allSummaries.All(s => s.Status == ProcessStatus.Complete))
                 CastingComplete.Visibility = Visibility.Visible;
             updating_summaries = false;
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            var list_item = e.Key switch
+            {
+                Key.S => ConfigureShow,
+                Key.P => RegisterApplicants,
+                Key.A => AuditionApplicants,
+                Key.C => SelectCast,
+                Key.I => ConfigureItems,
+                Key.R => AllocateRoles,
+                _ => null
+            };
+            if (list_item != null)
+            {
+                e.Handled = true;
+                menuList_SelectionChanged(sender, new(e.RoutedEvent, Array.Empty<object>(), new[] { list_item }));
+            }
+        }
+
+        Window window;
+        private void Page_Loaded(object sender, RoutedEventArgs e)
+        {
+            window = Window.GetWindow(this);
+            window.KeyDown += Window_KeyDown;
+        }
+
+        private void Page_Unloaded(object sender, RoutedEventArgs e)
+        {
+            window.KeyDown -= Window_KeyDown;
         }
     }
 }

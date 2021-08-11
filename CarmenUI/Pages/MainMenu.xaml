@@ -9,7 +9,8 @@
       mc:Ignorable="d" 
       d:DesignHeight="768" d:DesignWidth="1024"
       Title="Main Menu"
-      x:Name="PageRoot" Initialized="Page_Initialized">
+      x:Name="PageRoot" Initialized="Page_Initialized"
+      Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Page.Resources>
         <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
         <cv:MultiConverter x:Key="showIfStatusValue">
@@ -18,7 +19,7 @@
         </cv:MultiConverter>
         <cv:BytesToImage x:Key="bytesToImage"/>
     </Page.Resources>
-    <Grid x:Name="mainGrid">
+    <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="400"/>
             <ColumnDefinition Width="*"/>
