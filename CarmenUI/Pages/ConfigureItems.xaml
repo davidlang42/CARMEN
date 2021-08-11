@@ -184,13 +184,16 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <TextBlock Text="{Binding InnerNode.Name, StringFormat='Items/Sections in \{0\}:'}" FontSize="22"/>
                         <TextBlock Grid.Row="1" Text="{Binding SectionDescription}"
                                    Visibility="{Binding SectionDescription, Converter={StaticResource collapseIfNull}}"/>
-                        <Grid Grid.Row="3">
+                        <TextBlock Grid.Row="2" Text="{Binding SectionError}" Foreground="Red"
+                                   Visibility="{Binding SectionError, Converter={StaticResource collapseIfNull}}"/>
+                        <Grid Grid.Row="4">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="5"/>
                                 <ColumnDefinition Width="{Binding ElementName=ChildrenDataGrid, Path=Columns[0].ActualWidth}"/>
@@ -200,11 +203,11 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="1" Text="Total Roles Counts"/>
+                            <TextBlock Grid.Column="1" Text="Total Role Counts"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SectionTypeName, StringFormat='Required in \{0\}'}"/>
                             <!-- CountByGroup footer cells are added here dynamically -->
                         </Grid>
-                        <DataGrid Grid.Row="2" x:Name="ChildrenDataGrid" AutoGenerateColumns="False"
+                        <DataGrid Grid.Row="3" x:Name="ChildrenDataGrid" AutoGenerateColumns="False"
                                   CanUserDeleteRows="True"
                                   ItemsSource="{Binding Children}"
                                   Background="{Binding NoChildrenErrorBackgroundColor}"

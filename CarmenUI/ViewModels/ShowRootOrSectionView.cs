@@ -10,6 +10,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using static Carmen.ShowModel.Structure.Section;
 
 namespace CarmenUI.ViewModels
 {
@@ -18,6 +19,7 @@ namespace CarmenUI.ViewModels
         bool disposed = false;
 
         private CastGroup[] castGroups;
+        private Dictionary<CastGroup, uint> castMemberCounts;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -40,6 +42,23 @@ namespace CarmenUI.ViewModels
                     + (section.SectionType.AllowMultipleRoles ?
                     "Cast members can have more than one role in this " : "Cast members cannot have more than one role in this ")
                     + section.SectionType.Name + ".";
+            }
+        }
+
+        public string? SectionError
+        {
+            get
+            {
+                if (InnerNode is not Section section)
+                    return null;
+                var result = section.RolesMatchCastMembers(castMemberCounts);
+                return result switch
+                {
+                    RolesMatchResult.RolesMatch => null,
+                    RolesMatchResult.TooManyRoles => $"There are currently too many roles in this {SectionTypeName} to meet those requirements.",
+                    RolesMatchResult.TooFewRoles => $"There are currently too few roles in this {SectionTypeName} to meet those requirements.",
+                    _ => throw new NotImplementedException($"RolesMatchResult not handled: {result}")
+                };
             }
         }
 
@@ -112,6 +131,7 @@ namespace CarmenUI.ViewModels
                 return ncbg;
             }).ToArray();
             this.castGroups = cast_groups;
+            this.castMemberCounts = castGroups.ToDictionary(cg => cg, cg => (uint)cg.Members.Count);
         }
 
         private void NullableCountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
