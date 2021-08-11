@@ -6,15 +6,19 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ApplicationIcon>Icons\CarmenC.ico</ApplicationIcon>
-    <Authors>David Lang</Authors>
-    <Product>CARMEN</Product>
-    <Description>Casting And Role Management Equality Network</Description>
-    <Copyright>David Lang</Copyright>
     <PackageIcon>CarmenC.png</PackageIcon>
     <PackageIconUrl />
     <PackageProjectUrl>https://github.com/davidlang42/CARMEN</PackageProjectUrl>
     <RepositoryUrl>https://github.com/davidlang42/CARMEN</RepositoryUrl>
+    <Deterministic>false</Deterministic>
+    <AssemblyName>CarmenUI</AssemblyName>
+    <RootNamespace>CarmenUI</RootNamespace>
+    <Authors>David Lang</Authors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.8" />

@@ -4,16 +4,19 @@
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;Slow DB</Configurations>
+    <Deterministic>false</Deterministic>
     <AssemblyName>Carmen.ShowModel</AssemblyName>
     <RootNamespace>Carmen.ShowModel</RootNamespace>
     <Authors>David Lang</Authors>
-    <Company>David Lang</Company>
-    <Copyright>David Lang</Copyright>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Slow DB|AnyCPU'">
     <DefineConstants>DEBUG;TRACE;SLOW_DATABASE</DefineConstants>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.7" />

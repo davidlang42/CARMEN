@@ -4,11 +4,15 @@
     <TargetFramework>net5.0</TargetFramework>
 	  <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
+    <Deterministic>false</Deterministic>
     <AssemblyName>UnitTests</AssemblyName>
     <RootNamespace>UnitTests</RootNamespace>
     <Authors>David Lang</Authors>
-    <Copyright>David Lang</Copyright>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="5.10.3" />

@@ -6,12 +6,18 @@
 	  <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>DatabaseApplication.ico</ApplicationIcon>
+    <Deterministic>false</Deterministic>
+    <AssemblyName>DatabaseExplorer</AssemblyName>
+    <RootNamespace>DatabaseExplorer</RootNamespace>
     <Authors>David Lang</Authors>
-    <Copyright>David Lang</Copyright>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="DatabaseApplication.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
   </ItemGroup>
 
   <ItemGroup>

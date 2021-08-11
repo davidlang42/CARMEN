@@ -3,11 +3,15 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <Authors>David Lang</Authors>
+    <Deterministic>false</Deterministic>
     <AssemblyName>Carmen.CastingEngine</AssemblyName>
     <RootNamespace>Carmen.CastingEngine</RootNamespace>
-    <Copyright>David Lang</Copyright>
+    <Authors>David Lang</Authors>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ShowModel\ShowModel.csproj" />
