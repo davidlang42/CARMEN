@@ -207,10 +207,10 @@
                                 <TextBlock Text="Date of Birth: " VerticalAlignment="Center"/>
                                 <DatePicker Grid.Column="1" SelectedDate="{Binding DateOfBirth}"/>
                             </Grid>
-                            <ItemsControl ItemsSource="{Binding Abilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}">
+                            <ItemsControl ItemsSource="{Binding Abilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}" KeyboardNavigation.IsTabStop="False">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
-                                        <UniformGrid Columns="1"/>
+                                        <UniformGrid Columns="1" KeyboardNavigation.IsTabStop="False"/>
                                     </ItemsPanelTemplate>
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>

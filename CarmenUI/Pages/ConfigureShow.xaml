@@ -73,18 +73,18 @@
         </DockPanel>
         <DockPanel Grid.Column="1" Margin="5">
             <TextBlock DockPanel.Dock="Top" x:Name="objectHeading" FontSize="22"/>
-            <ItemsControl DockPanel.Dock="Bottom" x:Name="objectAddButtons">
+            <ItemsControl DockPanel.Dock="Bottom" x:Name="objectAddButtons" KeyboardNavigation.IsTabStop="False">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <StackPanel/>
+                        <StackPanel KeyboardNavigation.IsTabStop="False"/>
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
-                        <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding}">
+                        <ItemsControl DockPanel.Dock="Bottom" ItemsSource="{Binding}" KeyboardNavigation.IsTabStop="False">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
-                                    <UniformGrid Rows="1"/>
+                                    <UniformGrid Rows="1" KeyboardNavigation.IsTabStop="False"/>
                                 </ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
@@ -109,7 +109,7 @@
         </DockPanel>
         <DockPanel Grid.Column="2" Margin="5" DataContext="{Binding ElementName=objectList,Path=SelectedItem}">
             <TextBlock DockPanel.Dock="Top" Text="{Binding Name, StringFormat='Editing: \{0\}'}" FontSize="22"/>
-            <ContentControl Content="{Binding}">
+            <ContentControl Content="{Binding}" KeyboardNavigation.IsTabStop="False">
                 <ContentControl.Resources>
                     <Style TargetType="TextBlock">
                         <Setter Property="Margin" Value="0 0 0 5"/>

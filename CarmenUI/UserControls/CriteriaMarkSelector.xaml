@@ -11,7 +11,7 @@
     <UserControl.Resources>
         <cv:MatchUIntValue x:Key="matchUIntValue"/>
     </UserControl.Resources>
-    <ContentControl Content="{Binding ElementName=ControlRoot, Path=Criteria}">
+    <ContentControl Content="{Binding ElementName=ControlRoot, Path=Criteria}" KeyboardNavigation.IsTabStop="False">
         <ContentControl.Resources>
             <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">
                 <CheckBox IsChecked="{Binding ElementName=ControlRoot, Path=Mark, Converter={StaticResource matchUIntValue}, ConverterParameter=1}"/>

@@ -71,8 +71,8 @@
                 <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Progress, Converter={StaticResource doubleToPercentage}}"/>
             </Grid>
         </Grid>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5"/>
-        <ContentControl x:Name="applicantsPanel" Grid.Column="2" Margin="5 0">
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5" KeyboardNavigation.IsTabStop="False"/>
+        <ContentControl x:Name="applicantsPanel" Grid.Column="2" Margin="5 0" KeyboardNavigation.IsTabStop="False">
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:RoleWithApplicantsView}">
                     <Grid>
@@ -108,7 +108,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Row="1" Text="Required"/>
                                 <TextBlock Grid.Row="2" Text="Selected"/>
-                                <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}">
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>
@@ -120,7 +120,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RequiredCast}">
+                                <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RequiredCast}" KeyboardNavigation.IsTabStop="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>
@@ -132,7 +132,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SelectedCast}">
+                                <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SelectedCast}" KeyboardNavigation.IsTabStop="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>
@@ -201,7 +201,7 @@
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Grid.Row="1" Text="Required"/>
                                 <TextBlock Grid.Row="2" Text="Selected"/>
-                                <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}">
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>
@@ -213,7 +213,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RequiredCast}">
+                                <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RequiredCast}" KeyboardNavigation.IsTabStop="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>
@@ -225,7 +225,7 @@
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SelectedCast}">
+                                <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SelectedCast}" KeyboardNavigation.IsTabStop="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <StackPanel Orientation="Horizontal"/>

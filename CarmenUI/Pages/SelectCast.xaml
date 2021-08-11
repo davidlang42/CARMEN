@@ -63,7 +63,7 @@
             </ListBox.Resources>
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <ContentControl Content="{Binding}"/>
+                    <ContentControl Content="{Binding}" KeyboardNavigation.IsTabStop="False"/>
                 </DataTemplate>
             </ListBox.ItemTemplate>
         </ListBox>

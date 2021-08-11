@@ -97,8 +97,8 @@
                 </TreeView.ContextMenu>
             </TreeView>
         </Grid>
-        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5"/>
-        <ContentControl Grid.Column="2" Margin="5 0" x:Name="rolesPanel">
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5" KeyboardNavigation.IsTabStop="False"/>
+        <ContentControl Grid.Column="2" Margin="5 0" x:Name="rolesPanel" KeyboardNavigation.IsTabStop="False">
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:ItemView}">
                     <Grid>
