@@ -161,6 +161,11 @@ namespace CarmenUI.ViewModels
             return role_view;
         }
 
+        public void DeleteRole(RoleOnlyView role_view)
+        {
+            Roles.Remove(role_view);
+        }
+
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

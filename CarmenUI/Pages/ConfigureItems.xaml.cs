@@ -235,7 +235,7 @@ namespace CarmenUI.Pages
             };
         }
 
-        private void AddRoleButton_Click(object sender, RoutedEventArgs e)
+        private void AddRole_Click(object sender, RoutedEventArgs e)
         {
             var item_view = (ItemView)rolesPanel.Content;
             var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
@@ -243,6 +243,14 @@ namespace CarmenUI.Pages
             var role_view = item_view.AddRole();
             data_grid.SelectedItem = role_view;
             data_grid.CurrentCell = new DataGridCellInfo(role_view, data_grid.Columns.First());
+        }
+
+        private void DeleteRole_Click(object sender, RoutedEventArgs e)
+        {
+            var item_view = (ItemView)rolesPanel.Content;
+            var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
+            if (data_grid.SelectedItem is RoleOnlyView rv)
+                item_view.DeleteRole(rv);
         }
 
         private void AddNode(object sender, ExecutedRoutedEventArgs e)

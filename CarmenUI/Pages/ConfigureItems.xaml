@@ -108,7 +108,8 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <DockPanel>
-                            <Button DockPanel.Dock="Right" Content="Add Role" x:Name="AddRoleButton" Click="AddRoleButton_Click" Width="100"/>
+                            <Button DockPanel.Dock="Right" Content="Add Role" Click="AddRole_Click" Width="100" Margin="0 0 0 5"/>
+                            <Button DockPanel.Dock="Right" Content="Delete Role" Click="DeleteRole_Click" Width="100" Margin="0 0 5 5"/>
                             <TextBlock Text="{Binding Item.Name, StringFormat='Roles in \{0\}:'}" FontSize="22"/>
                         </DockPanel>
                         <Grid Grid.Row="2">
@@ -164,6 +165,12 @@
                                     </DataGridTemplateColumn.CellEditingTemplate>
                                 </DataGridTemplateColumn>
                             </DataGrid.Columns>
+                            <DataGrid.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Add Role" Click="AddRole_Click"/>
+                                    <MenuItem Header="Delete Role" Click="DeleteRole_Click"/>
+                                </ContextMenu>
+                            </DataGrid.ContextMenu>
                         </DataGrid>
                     </Grid>
                 </DataTemplate>
