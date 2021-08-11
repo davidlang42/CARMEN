@@ -30,19 +30,19 @@
             <Button x:Name="NewButton" Grid.Column="0" Width="100" Height="100" Click="NewButton_Click">
                 <StackPanel>
                     <Image Source="/Icons/NewFile.png" Width="32"/>
-                    <TextBlock HorizontalAlignment="Center"><Underline>N</Underline>ew</TextBlock>
+                    <TextBlock HorizontalAlignment="Center">New</TextBlock>
                 </StackPanel>
             </Button>
             <Button x:Name="OpenButton" Grid.Column="1" Width="100" Height="100" Click="OpenButton_Click">
                 <StackPanel>
                     <Image Source="/Icons/OpenFile.png" Width="32"/>
-                    <TextBlock HorizontalAlignment="Center"><Underline>O</Underline>pen</TextBlock>
+                    <TextBlock HorizontalAlignment="Center">Open</TextBlock>
                 </StackPanel>
             </Button>
             <Button x:Name="ConnectButton" Grid.Column="2" Width="100" Height="100" IsEnabled="False" Click="ConnectButton_Click">
                 <StackPanel>
                     <Image Source="/Icons/CloudDatabase.png" Width="32"/>
-                    <TextBlock HorizontalAlignment="Center"><Underline>C</Underline>onnect</TextBlock>
+                    <TextBlock HorizontalAlignment="Center">Connect</TextBlock>
                 </StackPanel>
             </Button>
         </Grid>
