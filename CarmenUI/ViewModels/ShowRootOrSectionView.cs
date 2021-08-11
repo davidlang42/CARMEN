@@ -43,7 +43,18 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public uint?[] SumOfChildrenCount
+        //TODO (SUM GAP) there IS a way that section cbgs can be wrong which isn't detected. Imagine for one cast group:
+        //Show: requires 100
+        //- Section A: requires 50
+        //- - Item 1: requires*
+        //- - - Role X: requires 26
+        //- - Item 2: requires 25
+        //- Section B: requires*
+        //- - Item 3: requires*
+        //- - Item 4: requires 51
+        //Show sum: 50+*=* (but wrong because Section B must be at least 51)
+        //Section A sum: *+25=50 (but wrong because Item 1 must be 26)
+        public uint?[] SumOfChildrenCount//TODO (SUM GAP) can't be null, must be actually counted from distinct descendent roles
         {
             get
             {
@@ -61,7 +72,7 @@ namespace CarmenUI.ViewModels
         }
 
         /// <summary>The sum of SumOfChildrenCount, if they are all set, otherwise null</summary>
-        public uint? SumOfChildrenTotal
+        public uint? SumOfChildrenTotal//TODO (SUM GAP) can't be null, must be actually counted from distinct descendent roles
         {
             get
             {
