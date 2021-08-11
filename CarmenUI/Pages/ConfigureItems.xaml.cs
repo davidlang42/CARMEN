@@ -248,10 +248,7 @@ namespace CarmenUI.Pages
                 footer.ColumnDefinitions.Add(column_definition);
                 // add top text
                 var top_text = new TextBlock();
-                top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ShowRootOrSectionView.SumOfChildrenCount)}[{i}]")
-                {
-                    TargetNullValue = "*"
-                });
+                top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ShowRootOrSectionView.SumOfRolesCount)}[{i}]"));
                 Grid.SetColumn(top_text, column_index);
                 footer.Children.Add(top_text);
                 // add bottom text
@@ -278,9 +275,8 @@ namespace CarmenUI.Pages
             footer.ColumnDefinitions.Add(total_column);
             // add top total
             var top_total = new TextBlock();
-            top_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ShowRootOrSectionView.SumOfChildrenTotal))
+            top_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ShowRootOrSectionView.SumOfRolesTotal))
             {
-                TargetNullValue = "=*",
                 StringFormat = "={0}"
             });
             Grid.SetColumn(top_total, column_index);

@@ -200,7 +200,7 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="1" Text="Total Item/Section Counts"/>
+                            <TextBlock Grid.Column="1" Text="Total Roles Counts"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SectionTypeName, StringFormat='Required in \{0\}'}"/>
                             <!-- CountByGroup footer cells are added here dynamically -->
                         </Grid>

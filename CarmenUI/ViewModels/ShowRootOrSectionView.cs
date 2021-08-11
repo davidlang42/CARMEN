@@ -43,48 +43,23 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        //TODO (SUM GAP) there IS a way that section cbgs can be wrong which isn't detected. Imagine for one cast group:
-        //Show: requires 100
-        //- Section A: requires 50
-        //- - Item 1: requires*
-        //- - - Role X: requires 26
-        //- - Item 2: requires 25
-        //- Section B: requires*
-        //- - Item 3: requires*
-        //- - Item 4: requires 51
-        //Show sum: 50+*=* (but wrong because Section B must be at least 51)
-        //Section A sum: *+25=50 (but wrong because Item 1 must be 26)
-        public uint?[] SumOfChildrenCount//TODO (SUM GAP) can't be null, must be actually counted from distinct descendent roles
+        public uint[] SumOfRolesCount
         {
             get
             {
-                var sum = new uint?[castGroups.Length];
-                for (var i = 0; i < sum.Length; i++)
-                    sum[i] = 0;
-                foreach (var child in Children)
+                var sum = new uint[castGroups.Length];
+                var descendent_roles = InnerNode.Children
+                    .SelectMany(n => n.ItemsInOrder())
+                    .SelectMany(i => i.Roles)
+                    .Distinct();
+                foreach (var role in descendent_roles)
                     for (var i = 0; i < sum.Length; i++)
-                        if (child.CountByGroups[i].Count is uint count && sum[i] != null)
-                            sum[i] += count;
-                        else
-                            sum[i] = null;
+                        sum[i] += role.CountFor(castGroups[i]);
                 return sum;
             }
         }
 
-        /// <summary>The sum of SumOfChildrenCount, if they are all set, otherwise null</summary>
-        public uint? SumOfChildrenTotal//TODO (SUM GAP) can't be null, must be actually counted from distinct descendent roles
-        {
-            get
-            {
-                uint sum = 0;
-                foreach (uint? value in SumOfChildrenCount)
-                    if (value == null)
-                        return null;
-                    else
-                        sum += value.Value;
-                return sum;
-            }
-        }
+        public uint SumOfRolesTotal => SumOfRolesCount.Sum();
 
         public NullableCountByGroup[] CountByGroups { get; init; }
 
@@ -110,8 +85,7 @@ namespace CarmenUI.ViewModels
                 var colors = new string[castGroups.Length];
                 for (var i = 0; i < colors.Length; i++)
                     if (CountByGroups[i].Count is uint required_count
-                        && SumOfChildrenCount[i] is uint sum_count
-                        && sum_count != required_count)
+                        && SumOfRolesCount[i] != required_count)
                         colors[i] = "LightCoral";//LATER use constants, also convert to brush
                     else
                         colors[i] = "White";//LATER use constants, also convert to brush
@@ -194,8 +168,8 @@ namespace CarmenUI.ViewModels
         {
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ChildView.CountByGroups))
             {
-                OnPropertyChanged(nameof(SumOfChildrenCount));
-                OnPropertyChanged(nameof(SumOfChildrenTotal));
+                OnPropertyChanged(nameof(SumOfRolesCount));
+                OnPropertyChanged(nameof(SumOfRolesTotal));
                 OnPropertyChanged(nameof(CountErrorBackgroundColors));
                 OnPropertyChanged(nameof(NoChildrenErrorBackgroundColor));
             }
