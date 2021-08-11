@@ -94,23 +94,23 @@ namespace CarmenUI.Pages
                 OnReturn(DataObjects.Nodes);
         }
 
-        private async void selectCastButton_Click(object sender, RoutedEventArgs e)
+        private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
             using var processing = new LoadingOverlay(this);
             processing.MainText = "Processing...";
             processing.Progress = 0;
             processing.SubText = "Selecting applicants";
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
-            await Task.Run(() => engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local, (uint)alternative_casts.Length));
+            engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local, (uint)alternative_casts.Length);
             processing.Progress = 25;
             processing.SubText = "Balancing alternating casts";
-            await Task.Run(() => engine.BalanceAlternativeCasts(context.Applicants.Local, alternative_casts, Enumerable.Empty<SameCastSet>()));
+            engine.BalanceAlternativeCasts(context.Applicants.Local, alternative_casts, Enumerable.Empty<SameCastSet>());
             processing.Progress = 50;
             processing.SubText = "Allocating cast numbers";
-            await Task.Run(() => engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection));
+            engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection);
             processing.Progress = 75;
             processing.SubText = "Applying tags";
-            await Task.Run(() => engine.ApplyTags(context.Applicants.Local, context.Tags.Local));
+            engine.ApplyTags(context.Applicants.Local, context.Tags.Local);
             processing.Progress = 100;
         }
 
