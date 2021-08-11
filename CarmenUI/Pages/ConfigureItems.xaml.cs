@@ -32,13 +32,11 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureItems : SubPage
     {
-        //TODO highlight the nodes in the itemsTree if any errors shown on the view
-        //TODO may need to implement a similar thing to NodeView but for ConfigureItems UI,
-        //     matching logic of ItemsSummary however it would be best if I didn't have to
         private readonly CollectionViewSource rootNodesViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
         private readonly CollectionViewSource requirementsViewSource;
         private readonly CollectionViewSource sectionTypesViewSource;
+        private readonly CollectionViewSource castMembersDictionarySource;
 
         public ConfigureItems(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -47,6 +45,7 @@ namespace CarmenUI.Pages
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
             sectionTypesViewSource = (CollectionViewSource)FindResource(nameof(sectionTypesViewSource));
+            castMembersDictionarySource = (CollectionViewSource)FindResource(nameof(castMembersDictionarySource));
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -55,6 +54,9 @@ namespace CarmenUI.Pages
             loading.Progress = 0;
             await context.AlternativeCasts.LoadAsync();
             await context.CastGroups.LoadAsync();
+            var alternative_casts_count = context.AlternativeCasts.Local.Count;
+            var cast_groups = context.CastGroups.Local.ToArray();
+            castMembersDictionarySource.Source = cast_groups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
             loading.Progress = 20;
             await context.Requirements.LoadAsync();

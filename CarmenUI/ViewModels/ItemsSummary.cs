@@ -63,13 +63,16 @@ namespace CarmenUI.ViewModels
         private static Row CreateSectionTypeRow(SectionType section_type, Dictionary<CastGroup, uint> cast_members)
         {
             var section_count = 0;
+            var without_children = 0;
             var missing_roles = 0;
             var too_many_roles = 0;
             var incorrect_sum = 0;
             foreach (var section in section_type.Sections) //LATER parallelise
             {
                 var role_match = section.RolesMatchCastMembers(cast_members); //LATER does this need await?
-                if (role_match == Section.RolesMatchResult.TooFewRoles)
+                if (section.Children.Count == 0)
+                    without_children += 1;
+                else if (role_match == Section.RolesMatchResult.TooFewRoles)
                     missing_roles += 1;
                 else if (role_match == Section.RolesMatchResult.TooManyRoles)
                     too_many_roles += 1;
@@ -79,6 +82,8 @@ namespace CarmenUI.ViewModels
             }
             var row = new Row { Success = $"{section_count} {section_type.Name}s" };
             var fails = new List<string>();
+            if (without_children != 0)
+                fails.Add($"{without_children} without items");
             if (missing_roles != 0)
                 fails.Add($"{missing_roles} missing roles");
             if (too_many_roles != 0)
