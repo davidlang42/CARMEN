@@ -81,7 +81,7 @@
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type vm:Summary}">
                         <StackPanel>
-                            <ItemsControl ItemsSource="{Binding Rows}">
+                            <ItemsControl ItemsSource="{Binding Rows}" KeyboardNavigation.IsTabStop="False">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <StackPanel KeyboardNavigation.IsTabStop="False"/>
@@ -89,7 +89,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <StackPanel Orientation="Horizontal">
+                                        <StackPanel Orientation="Horizontal" KeyboardNavigation.IsTabStop="False">
                                             <TextBlock Text="{Binding Success}" HorizontalAlignment="Left" FontSize="20" TextWrapping="Wrap" Margin="0 0 5 0"/>
                                             <TextBlock Text="{Binding Fail}" HorizontalAlignment="Left" FontSize="20" TextWrapping="Wrap" FontStyle="Italic" Foreground="Red"/>
                                         </StackPanel>
