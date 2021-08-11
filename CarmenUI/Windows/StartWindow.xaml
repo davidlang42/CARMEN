@@ -6,7 +6,8 @@
         xmlns:bd="clr-namespace:CarmenUI.Bindings"
         xmlns:vm="clr-namespace:CarmenUI.ViewModels"
         mc:Ignorable="d"
-        Title="CARMEN: Show Selection" Height="440" Width="500" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Icon="/Icons/CarmenC.png">
+        Title="CARMEN: Show Selection" Height="440" Width="500" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Icon="/Icons/CarmenC.png"
+        KeyDown="Window_KeyDown">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -29,19 +30,19 @@
             <Button x:Name="NewButton" Grid.Column="0" Width="100" Height="100" Click="NewButton_Click">
                 <StackPanel>
                     <Image Source="/Icons/NewFile.png" Width="32"/>
-                    <TextBlock HorizontalAlignment="Center">New</TextBlock>
+                    <TextBlock HorizontalAlignment="Center"><Underline>N</Underline>ew</TextBlock>
                 </StackPanel>
             </Button>
             <Button x:Name="OpenButton" Grid.Column="1" Width="100" Height="100" Click="OpenButton_Click">
                 <StackPanel>
                     <Image Source="/Icons/OpenFile.png" Width="32"/>
-                    <TextBlock HorizontalAlignment="Center">Open</TextBlock>
+                    <TextBlock HorizontalAlignment="Center"><Underline>O</Underline>pen</TextBlock>
                 </StackPanel>
             </Button>
-            <Button x:Name="ConnectButton" Grid.Column="2" Width="100" Height="100" IsEnabled="False">
+            <Button x:Name="ConnectButton" Grid.Column="2" Width="100" Height="100" IsEnabled="False" Click="ConnectButton_Click">
                 <StackPanel>
                     <Image Source="/Icons/CloudDatabase.png" Width="32"/>
-                    <TextBlock HorizontalAlignment="Center">Connect</TextBlock>
+                    <TextBlock HorizontalAlignment="Center"><Underline>C</Underline>onnect</TextBlock>
                 </StackPanel>
             </Button>
         </Grid>
