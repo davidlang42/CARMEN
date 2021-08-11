@@ -18,9 +18,9 @@
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <CollectionViewSource x:Key="alternativeCastsViewSource"/>
-        <CollectionViewSource x:Key="criteriasViewSource"/>
+        <CollectionViewSource x:Key="criteriasSelectionSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
-        <CollectionViewSource x:Key="tagsViewSource"/>
+        <CollectionViewSource x:Key="tagsSelectionSource"/>
         <CollectionViewSource x:Key="requirementsSelectionSource"/>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:InvertBoolean x:Key="inverseBoolean"/>
@@ -447,7 +447,7 @@
                                 <ComboBox.ItemsSource>
                                     <CompositeCollection >
                                         <sys:String>Overall ability</sys:String>
-                                        <CollectionContainer Collection="{Binding Source={StaticResource criteriasViewSource}}"/>
+                                        <CollectionContainer Collection="{Binding Source={StaticResource criteriasSelectionSource}}"/>
                                     </CompositeCollection>
                                 </ComboBox.ItemsSource>
                             </ComboBox>
@@ -497,7 +497,7 @@
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
                             <TextBlock Grid.Row="4" Text="Criteria" FontSize="14"/>
-                            <ComboBox Grid.Row="4" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasViewSource}}" DisplayMemberPath="Name" />
+                            <ComboBox Grid.Row="4" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name" />
                             <TextBlock Grid.Row="5" Text="Required Value" FontSize="14"/>
                             <uc:CriteriaMarkSelector Grid.Row="5" Grid.Column="1" Mark="{Binding RequiredValue, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
                         </Grid>
@@ -544,7 +544,7 @@
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
                             <TextBlock Grid.Row="4" Text="Criteria" FontSize="14"/>
-                            <ComboBox Grid.Row="4" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasViewSource}}" DisplayMemberPath="Name"/>
+                            <ComboBox Grid.Row="4" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name"/>
                             <TextBlock Grid.Row="5" Text="Minimum" FontSize="14"/>
                             <uc:CriteriaMarkSelector Grid.Row="5" Grid.Column="1" Mark="{Binding Minimum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
                             <TextBlock Grid.Row="6" Text="Maximum" FontSize="14"/>
@@ -668,7 +668,7 @@
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
                             <TextBlock Grid.Row="4" Text="Tag" FontSize="14"/>
-                            <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding RequiredTag}" ItemsSource="{Binding Source={StaticResource tagsViewSource}}" DisplayMemberPath="Name"/>
+                            <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding RequiredTag}" ItemsSource="{Binding Source={StaticResource tagsSelectionSource}}" DisplayMemberPath="Name"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:NotRequirement}">

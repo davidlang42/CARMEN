@@ -32,10 +32,12 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureShow : SubPage
     {
-        private readonly CollectionViewSource criteriasViewSource; // xaml resource loaded in constructor
+        private readonly CollectionViewSource criteriasViewSource = new() { SortDescriptions = { StandardSort.For<Criteria>() } };
+        private readonly CollectionViewSource criteriasSelectionSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource castGroupsViewSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource alternativeCastsViewSource; // xaml resource loaded in constructor
-        private readonly CollectionViewSource tagsViewSource; // xaml resource loaded in constructor
+        private readonly CollectionViewSource tagsViewSource = new() { SortDescriptions = { StandardSort.For<Tag>() } };
+        private readonly CollectionViewSource tagsSelectionSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { StandardSort.For<SectionType>() } };
         private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { StandardSort.For<Requirement>() } };
         private readonly CollectionViewSource requirementsSelectionSource; // xaml resource loaded in constructor
@@ -49,12 +51,12 @@ namespace CarmenUI.Pages
             InitializeComponent();
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
-            criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
-            criteriasViewSource.SortDescriptions.Add(StandardSort.For<Criteria>());
+            criteriasSelectionSource = (CollectionViewSource)FindResource(nameof(criteriasSelectionSource));
+            criteriasSelectionSource.SortDescriptions.Add(StandardSort.For<Criteria>());
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
-            tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
-            tagsViewSource.SortDescriptions.Add(StandardSort.For<Tag>());
+            tagsSelectionSource = (CollectionViewSource)FindResource(nameof(tagsSelectionSource));
+            tagsSelectionSource.SortDescriptions.Add(StandardSort.For<Tag>());
             requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));
             requirementsSelectionSource.SortDescriptions.Add(StandardSort.For<Requirement>());
             listSortDirectionEnumSource = (CollectionViewSource)FindResource(nameof(listSortDirectionEnumSource));
@@ -70,7 +72,7 @@ namespace CarmenUI.Pages
             requirementsViewSource.Source = requirementsSelectionSource.Source = context.Requirements.Local.ToObservableCollection();
             loading.Progress = 17;
             await context.Criterias.LoadAsync();
-            criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
+            criteriasViewSource.Source = criteriasSelectionSource.Source = context.Criterias.Local.ToObservableCollection();
             loading.Progress = 34;
             await context.CastGroups.Include(cg => cg.Requirements).LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
@@ -79,7 +81,7 @@ namespace CarmenUI.Pages
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
             loading.Progress = 68;
             await context.Tags.Include(t => t.Requirements).LoadAsync();
-            tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
+            tagsViewSource.Source = tagsSelectionSource.Source = context.Tags.Local.ToObservableCollection();
             loading.Progress = 77;
             await context.SectionTypes.LoadAsync();
             sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
