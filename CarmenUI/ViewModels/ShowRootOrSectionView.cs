@@ -43,20 +43,37 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public uint[] SumOfChildrenCount
+        public uint?[] SumOfChildrenCount
         {
             get
             {
-                var sum = new uint[castGroups.Length];
+                var sum = new uint?[castGroups.Length];
+                for (var i = 0; i < sum.Length; i++)
+                    sum[i] = 0;
                 foreach (var child in Children)
                     for (var i = 0; i < sum.Length; i++)
-                        if (child.CountByGroups[i].Count is uint count)
+                        if (child.CountByGroups[i].Count is uint count && sum[i] != null)
                             sum[i] += count;
+                        else
+                            sum[i] = null;
                 return sum;
             }
         }
 
-        public uint SumOfChildrenTotal => SumOfChildrenCount.Sum();
+        /// <summary>The sum of SumOfChildrenCount, if they are all set, otherwise null</summary>
+        public uint? SumOfChildrenTotal
+        {
+            get
+            {
+                uint sum = 0;
+                foreach (uint? value in SumOfChildrenCount)
+                    if (value == null)
+                        return null;
+                    else
+                        sum += value.Value;
+                return sum;
+            }
+        }
 
         public NullableCountByGroup[] CountByGroups { get; init; }
 
@@ -75,14 +92,15 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public string[] CountErrorBackgroundColors
+        public string[] CountErrorBackgroundColors//LATER when these arrays change, _get is called once for each castGroup, therefore re-calcing it ~4 times instead of 1. this should probably be a stored value, which is updated once when the current propertychanged is called, similar for all other arrays like this in ShowRootOrSectionView/ChildView / ItemView/RoleOnlyView/RoleView
         {
             get
             {
                 var colors = new string[castGroups.Length];
                 for (var i = 0; i < colors.Length; i++)
                     if (CountByGroups[i].Count is uint required_count
-                        && SumOfChildrenCount[i] != required_count)
+                        && SumOfChildrenCount[i] is uint sum_count
+                        && sum_count != required_count)
                         colors[i] = "LightCoral";//LATER use constants, also convert to brush
                     else
                         colors[i] = "White";//LATER use constants, also convert to brush

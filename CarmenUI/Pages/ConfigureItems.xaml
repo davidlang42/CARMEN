@@ -198,7 +198,7 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="1" Text="Total Role Counts"/>
+                            <TextBlock Grid.Column="1" Text="Total Item/Section Counts"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SectionTypeName, StringFormat='Required in \{0\}'}"/>
                             <!-- CountByGroup footer cells are added here dynamically -->
                         </Grid>
@@ -210,7 +210,7 @@
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Node.Name}"/>
                                 <!-- CountByGroup columns are added here dynamically -->
-                                <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}', TargetNullValue='=*'}" IsReadOnly="True"/>
                             </DataGrid.Columns>
                             <!--<DataGrid.ContextMenu>
                                 <ContextMenu>

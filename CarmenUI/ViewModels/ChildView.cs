@@ -24,7 +24,20 @@ namespace CarmenUI.ViewModels
         /// <summary>Indicies match CastGroups</summary>
         public NullableCountByGroup[] CountByGroups { get; init; }
 
-        public uint TotalCount => CountByGroups.Select(cbg => cbg.Count ?? 0).Sum();
+        /// <summary>The sum of CountByGroups.Count, if they are all set, otherwise null</summary>
+        public uint? TotalCount
+        {
+            get
+            {
+                uint sum = 0;
+                foreach (var cbg in CountByGroups)
+                    if (cbg.Count == null)
+                        return null;
+                    else
+                        sum += cbg.Count.Value;
+                return sum;
+            }
+        }
 
         public ChildView(Node node, CastGroup[] cast_groups)
         {

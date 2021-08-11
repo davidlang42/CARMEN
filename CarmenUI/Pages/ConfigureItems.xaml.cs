@@ -175,7 +175,7 @@ namespace CarmenUI.Pages
                 var bottom_text = new TextBox();
                 bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ItemView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}")
                 {
-                    TargetNullValue = "",
+                    TargetNullValue = "*",
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 });
                 bottom_text.SetBinding(TextBox.BackgroundProperty, new Binding($"{nameof(ItemView.CountErrorBackgroundColors)}[{i}]"));
@@ -205,6 +205,7 @@ namespace CarmenUI.Pages
             var bottom_total = new TextBlock();
             bottom_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.TotalCount))
             {
+                TargetNullValue="=*",
                 StringFormat = "={0}"
             });
             Grid.SetColumn(bottom_total, column_index);
@@ -226,7 +227,7 @@ namespace CarmenUI.Pages
                     Header = cast_group.Abbreviation,
                     Binding = new Binding($"{nameof(ChildView.CountByGroups)}[{array_index++}].{nameof(NullableCountByGroup.Count)}")
                     {
-                        TargetNullValue = "",
+                        TargetNullValue = "*",
                         UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                     }
                 });
@@ -247,14 +248,17 @@ namespace CarmenUI.Pages
                 footer.ColumnDefinitions.Add(column_definition);
                 // add top text
                 var top_text = new TextBlock();
-                top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ShowRootOrSectionView.SumOfChildrenCount)}[{i}]"));
+                top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ShowRootOrSectionView.SumOfChildrenCount)}[{i}]")
+                {
+                    TargetNullValue = "*"
+                });
                 Grid.SetColumn(top_text, column_index);
                 footer.Children.Add(top_text);
                 // add bottom text
                 var bottom_text = new TextBox();
                 bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ShowRootOrSectionView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}")
                 {
-                    TargetNullValue = "",
+                    TargetNullValue = "*",
                     UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                 });
                 bottom_text.SetBinding(TextBox.BackgroundProperty, new Binding($"{nameof(ShowRootOrSectionView.CountErrorBackgroundColors)}[{i}]"));
@@ -276,6 +280,7 @@ namespace CarmenUI.Pages
             var top_total = new TextBlock();
             top_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ShowRootOrSectionView.SumOfChildrenTotal))
             {
+                TargetNullValue = "=*",
                 StringFormat = "={0}"
             });
             Grid.SetColumn(top_total, column_index);
@@ -284,6 +289,7 @@ namespace CarmenUI.Pages
             var bottom_total = new TextBlock();
             bottom_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ShowRootOrSectionView.TotalCount))
             {
+                TargetNullValue = "=*",
                 StringFormat = "={0}"
             });
             Grid.SetColumn(bottom_total, column_index);
