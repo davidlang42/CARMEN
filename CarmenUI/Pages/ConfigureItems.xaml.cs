@@ -147,6 +147,7 @@ namespace CarmenUI.Pages
                     Header = cast_group.Abbreviation,
                     Binding = new Binding($"{nameof(RoleOnlyView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
                     {
+                        TargetNullValue = "",
                         UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
                     }
                 });

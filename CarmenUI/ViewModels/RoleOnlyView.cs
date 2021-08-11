@@ -14,24 +14,19 @@ namespace CarmenUI.ViewModels
         public CastGroup[] CastGroups { get; init; }
 
         /// <summary>Indicies match CastGroups</summary>
-        public CountByGroup[] CountByGroups { get; init; }
+        public NullableCountByGroup[] CountByGroups { get; init; }
 
-        public uint TotalCount => CountByGroups.Select(cbg => cbg.Count).Sum();
+        public uint TotalCount => CountByGroups.Select(cbg => cbg.Count ?? 0).Sum();
 
         public RoleOnlyView(Role role, CastGroup[] cast_groups)
             : base(role)
         {
             CastGroups = cast_groups;
-            CountByGroups = new CountByGroup[cast_groups.Length];
+            CountByGroups = new NullableCountByGroup[cast_groups.Length];
             for (var i = 0; i < cast_groups.Length; i++)
             {
-                if (role.CountByGroups.SingleOrDefault(cbg => cbg.CastGroup == cast_groups[i]) is not CountByGroup cbg)
-                {
-                    cbg = new CountByGroup { CastGroup = cast_groups[i], Count = 0 };
-                    role.CountByGroups.Add(cbg);
-                }
-                CountByGroups[i] = cbg;
-                cbg.PropertyChanged += CountByGroup_PropertyChanged;
+                CountByGroups[i] = new NullableCountByGroup(role.CountByGroups, cast_groups[i]);
+                CountByGroups[i].PropertyChanged += CountByGroup_PropertyChanged;
             }
         }
 

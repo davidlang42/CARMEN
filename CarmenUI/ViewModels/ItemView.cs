@@ -32,7 +32,8 @@ namespace CarmenUI.ViewModels
                 var sum = new uint[castGroups.Length];
                 foreach (var role in Roles)
                     for (var i = 0; i < sum.Length; i++)
-                        sum[i] += role.CountByGroups[i].Count;
+                        if (role.CountByGroups[i].Count is uint count)
+                            sum[i] += count;
                 return sum;
             }
         }
