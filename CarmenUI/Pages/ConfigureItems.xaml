@@ -55,7 +55,7 @@
                     MouseMove="itemsTreeView_MouseMove" 
                     DragOver="itemsTreeView_DragOver" 
                     Drop="itemsTreeView_Drop"
-                    SelectedItemChanged="itemsTreeView_SelectedItemChanged">
+                    SelectedItemChanged="itemsTreeView_SelectedItemChanged" ToolTip="Drag to re-order">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsExpanded" Value="True"/>
