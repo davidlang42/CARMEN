@@ -25,6 +25,25 @@ namespace CarmenUI.ViewModels
 
         public ObservableCollection<ChildView> Children { get; init; }
 
+        public string SectionTypeName => (InnerNode as Section)?.SectionType.Name ?? "Show";
+
+        public string SectionDescription
+        {
+            get
+            {
+                if (InnerNode is not Section section)
+                    return "";
+                return (section.SectionType.AllowNoRoles ?
+                    "Some cast members may not have a role in this " : "Every cast member must have a role within this ")
+                    + section.SectionType.Name + "."
+                    + "\n"
+                    + (section.SectionType.AllowMultipleRoles ?
+                    "Cast members can have more than one role in this " : "Cast members cannot have more than one role in this ")
+                    + section.SectionType.Name + ".";
+            }
+        }
+
+        //TODO
         public uint[] SumOfRolesCount
         {
             get
@@ -38,6 +57,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
+        //TODO
         public uint SumOfRolesTotal => SumOfRolesCount.Sum();
 
         public NullableCountByGroup[] CountByGroups { get; init; }
@@ -57,6 +77,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
+        //TODO
         public string[] CountErrorBackgroundColors
         {
             get
@@ -72,6 +93,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
+        //TODO
         public string NoRolesErrorBackgroundColor => InnerNode.Children.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
 
         public ShowRootOrSectionView(InnerNode inner_node, CastGroup[] cast_groups)

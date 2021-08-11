@@ -185,25 +185,9 @@
                         <DockPanel>
                             <!--<Button DockPanel.Dock="Right" Content="Add Role" Click="AddRole_Click" Width="100" Margin="0 0 0 5"/>
                             <Button DockPanel.Dock="Right" Content="Delete Role" Click="DeleteRole_Click" Width="100" Margin="0 0 5 5"/>-->
-                            <TextBlock Text="{Binding Item.Name, StringFormat='Items/Sections in \{0\}:'}" FontSize="22"/>
+                            <TextBlock Text="{Binding InnerNode.Name, StringFormat='Items/Sections in \{0\}:'}" FontSize="22"/>
                         </DockPanel>
                         <TextBlock Grid.Row="1" Text="{Binding SectionDescription}"/>
-                        <!--<StackPanel Grid.Row="1">
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Every cast member must have a role within this"
-                                           Visibility="{Binding SectionType.AllowNoRoles, Converter={StaticResource showIfFalse}}"/>
-                                <TextBlock Text="Some cast members may not have a role in this"
-                                           Visibility="{Binding SectionType.AllowNoRoles, Converter={StaticResource showIfTrue}}"/>
-                                <TextBlock Text="{Binding SectionType.Name, StringFormat=' \{0\}.'}"/>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Cast members cannot have more than one role in this"
-                                           Visibility="{Binding SectionType.AllowMultipleRoles, Converter={StaticResource showIfFalse}}"/>
-                                <TextBlock Text="Cast members can have more than one role in this"
-                                           Visibility="{Binding SectionType.AllowMultipleRoles, Converter={StaticResource showIfTrue}}"/>
-                                <TextBlock Text="{Binding SectionType.Name, StringFormat=' \{0\}.'}"/>
-                            </StackPanel>
-                        </StackPanel>-->
                         <Grid Grid.Row="3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="5"/>
@@ -222,10 +206,9 @@
                                   CanUserDeleteRows="True"
                                   ItemsSource="{Binding Children}"
                                   Background="{Binding NoRolesErrorBackgroundColor}"
-                                  Initialized="ChildrenDataGrid_Initialized">
-                            <!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->
+                                  Initialized="ChildrenDataGrid_Initialized"><!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Role.Name}"/>
+                                <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Node.Name}"/>
                                 <!-- CountByGroup columns are added here dynamically -->
                                 <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True"/>
                             </DataGrid.Columns>
