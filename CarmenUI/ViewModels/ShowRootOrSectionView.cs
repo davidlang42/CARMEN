@@ -27,12 +27,12 @@ namespace CarmenUI.ViewModels
 
         public string SectionTypeName => (InnerNode as Section)?.SectionType.Name ?? "Show";
 
-        public string SectionDescription
+        public string? SectionDescription
         {
             get
             {
                 if (InnerNode is not Section section)
-                    return "";
+                    return null;
                 return (section.SectionType.AllowNoRoles ?
                     "Some cast members may not have a role in this " : "Every cast member must have a role within this ")
                     + section.SectionType.Name + "."
@@ -200,19 +200,6 @@ namespace CarmenUI.ViewModels
                 OnPropertyChanged(nameof(NoChildrenErrorBackgroundColor));
             }
         }
-
-        //TODO
-        //public RoleOnlyView AddRole()
-        //{
-        //    var role_view = new RoleOnlyView(new Role(), castGroups);
-        //    Children.Add(role_view);
-        //    return role_view;
-        //}
-
-        //public void DeleteRole(RoleOnlyView role_view)
-        //{
-        //    Children.Remove(role_view);
-        //}
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {

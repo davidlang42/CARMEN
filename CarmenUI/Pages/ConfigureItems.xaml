@@ -24,6 +24,11 @@
             <cv:InvertBoolean/>
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
+        <cv:MultiConverter x:Key="collapseIfNull">
+            <cv:TrueIfNull />
+            <cv:InvertBoolean/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
         <RoutedUICommand x:Key="addNodeCommand"/>
@@ -182,12 +187,9 @@
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <DockPanel>
-                            <!--<Button DockPanel.Dock="Right" Content="Add Role" Click="AddRole_Click" Width="100" Margin="0 0 0 5"/>
-                            <Button DockPanel.Dock="Right" Content="Delete Role" Click="DeleteRole_Click" Width="100" Margin="0 0 5 5"/>-->
-                            <TextBlock Text="{Binding InnerNode.Name, StringFormat='Items/Sections in \{0\}:'}" FontSize="22"/>
-                        </DockPanel>
-                        <TextBlock Grid.Row="1" Text="{Binding SectionDescription}"/>
+                        <TextBlock Text="{Binding InnerNode.Name, StringFormat='Items/Sections in \{0\}:'}" FontSize="22"/>
+                        <TextBlock Grid.Row="1" Text="{Binding SectionDescription}"
+                                   Visibility="{Binding SectionDescription, Converter={StaticResource collapseIfNull}}"/>
                         <Grid Grid.Row="3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="5"/>
@@ -212,12 +214,27 @@
                                 <!-- CountByGroup columns are added here dynamically -->
                                 <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}', TargetNullValue='=*'}" IsReadOnly="True"/>
                             </DataGrid.Columns>
-                            <!--<DataGrid.ContextMenu>
+                            <DataGrid.ContextMenu>
                                 <ContextMenu>
-                                    <MenuItem Header="Add Role" Click="AddRole_Click"/>
-                                    <MenuItem Header="Delete Role" Click="DeleteRole_Click"/>
+                                    <ContextMenu.ItemsSource>
+                                        <CompositeCollection>
+                                            <MenuItem Header="Add Item" Command="{Binding Source={StaticResource addNodeCommand}}"/>
+                                            <CollectionContainer Collection="{Binding Source={StaticResource sectionTypesViewSource}}"/>
+                                        </CompositeCollection>
+                                    </ContextMenu.ItemsSource>
+                                    <ContextMenu.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Name, StringFormat='Add \{0\}'}"/>
+                                        </DataTemplate>
+                                    </ContextMenu.ItemTemplate>
+                                    <ContextMenu.ItemContainerStyle>
+                                        <Style TargetType="{x:Type MenuItem}">
+                                            <Setter Property="Command" Value="{Binding Source={StaticResource addNodeCommand}}"/>
+                                            <Setter Property="CommandParameter" Value="{Binding}"/>
+                                        </Style>
+                                    </ContextMenu.ItemContainerStyle>
                                 </ContextMenu>
-                            </DataGrid.ContextMenu>-->
+                            </DataGrid.ContextMenu>
                         </DataGrid>
                     </Grid>
                 </DataTemplate>
