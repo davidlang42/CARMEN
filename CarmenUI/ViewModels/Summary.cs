@@ -11,6 +11,8 @@ namespace CarmenUI.ViewModels
 {
     public abstract class Summary : DependencyObject
     {
+        public bool NeedsUpdate { get; set; } = true;
+
         public struct Row
         {
             public string? Success { get; set; }

@@ -62,7 +62,7 @@ namespace CarmenUI.Pages
         private void HandleChangesOnReturn(object sender, ReturnEventArgs<DataObjects> e)
         {
             if (e?.Result is DataObjects changes)
-                LoadSummariesAsync(changes);
+                InvalidateSummaries(changes);
         }
 
         private void NavigateToSubPage(SubPage sub_page)
@@ -107,9 +107,9 @@ namespace CarmenUI.Pages
             => SummaryPanel.Content = RolesSummary;
 
         private void Page_Initialized(object sender, EventArgs e)
-            => LoadSummariesAsync(DataObjects.All);
+            => InvalidateSummaries(DataObjects.All);
 
-        private async void LoadSummariesAsync(DataObjects changes)
+        private void InvalidateSummaries(DataObjects changes)
         {
             // Determine which summaries need updating
             List<Summary> summaries = new();
@@ -133,19 +133,38 @@ namespace CarmenUI.Pages
                 || changes.HasFlag(DataObjects.SectionTypes))
                 summaries.AddRange(new Summary[] { ItemsSummary, RolesSummary });
             // Mark them as 'Loading'
-            mainGrid.DataContext = null;
-            if (summaries.Any())
-                CastingComplete.Visibility = Visibility.Hidden;
+            if (summaries.Count == 0)
+                return; // nothing to do
+            CastingComplete.Visibility = Visibility.Hidden;
             foreach (var summary in summaries)
+            {
+                summary.NeedsUpdate = true;
                 summary.Status = ProcessStatus.Loading;
-            // Update headings & logo
-            mainGrid.DataContext = await context.Nodes.OfType<ShowRoot>().Include(n => n.Logo).FirstOrDefaultAsync();
+            }
+            // Trigger update (does nothing if already running)
+            UpdateSummariesAsync();
+            //TODO mainGrid.DataContext = null;
+            //TODO mainGrid.DataContext = await context.Nodes.OfType<ShowRoot>().Include(n => n.Logo).FirstOrDefaultAsync();
+        }
+
+        bool updating_summaries = false;
+        private async void UpdateSummariesAsync()
+        {
+            if (updating_summaries)
+                return; // already running
+            updating_summaries = true;
             // Update summaries sequentially
-            foreach (var summary in summaries)
-                await summary.LoadAsync(context);
+            while (allSummaries.FirstOrDefault(s => s.NeedsUpdate) is Summary next_to_update)
+            {
+                next_to_update.NeedsUpdate = false;
+                await next_to_update.LoadAsync(context);
+                if (next_to_update.NeedsUpdate) // may have been set while LoadAsync() was running, eg. if we went to another page and came back
+                    next_to_update.Status = ProcessStatus.Loading;
+            }  
             // Update complete text
             if (allSummaries.All(s => s.Status == ProcessStatus.Complete))
                 CastingComplete.Visibility = Visibility.Visible;
+            updating_summaries = false;
         }
     }
 }
