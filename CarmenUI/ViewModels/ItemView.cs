@@ -71,7 +71,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public string NoRolesErrorBackgroundColor => SumOfRolesTotal == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
+        public string NoRolesErrorBackgroundColor => Item.Roles.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
 
         public ItemView(Item item, CastGroup[] cast_groups)
         {
