@@ -9,22 +9,28 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="5"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="5"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="5"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="5"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Label Content="{Binding Title}" Grid.ColumnSpan="3"/>
-        <ListBox x:Name="optionsList" ItemsSource="{Binding ItemsSource}" Grid.ColumnSpan="2" Grid.RowSpan="3" Grid.Row="1" MouseDoubleClick="optionsList_MouseDoubleClick" KeyDown="optionsList_KeyDown" />
-        <Button x:Name="optionsMoveUp" Grid.Row="1" Grid.Column="2" Content="Move Up" Click="optionsMoveUp_Click"/>
-        <Button x:Name="optionsDelete" Grid.Row="2" Grid.Column="2" Content="Delete" Click="optionsDelete_Click"/>
-        <Button x:Name="optionsMoveDown" Grid.Row="3" Grid.Column="2" Content="Move Down" Click="optionsMoveDown_Click"/>
-        <Label Content="New option:" Grid.Row="4"/>
-        <TextBox x:Name="optionsNewItem" Grid.Row="4" Grid.Column="1" KeyDown="optionsNewItem_KeyDown"/>
-        <Button x:Name="optionsAdd" Grid.Row="4" Grid.Column="2" Content="Add" Click="optionsAdd_Click"/>
+        <TextBlock Text="{Binding Title}" Grid.ColumnSpan="3"/>
+        <ListBox x:Name="optionsList" ItemsSource="{Binding ItemsSource}" Grid.ColumnSpan="2" Grid.RowSpan="5" Grid.Row="1" MouseDoubleClick="optionsList_MouseDoubleClick" KeyDown="optionsList_KeyDown" />
+        <Button x:Name="optionsMoveUp" Grid.Row="1" Grid.Column="3" Content="Move Up" Click="optionsMoveUp_Click"/>
+        <Button x:Name="optionsDelete" Grid.Row="3" Grid.Column="3" Content="Delete" Click="optionsDelete_Click"/>
+        <Button x:Name="optionsMoveDown" Grid.Row="5" Grid.Column="3" Click="optionsMoveDown_Click">
+            <TextBlock Text="Move Down" Margin="5 0"/>
+        </Button>
+        <TextBlock Text="New option:" Grid.Row="7" Margin="0 0 5 0" VerticalAlignment="Center"/>
+        <TextBox x:Name="optionsNewItem" Grid.Row="7" Grid.Column="1" KeyDown="optionsNewItem_KeyDown" Margin="0"/>
+        <Button x:Name="optionsAdd" Grid.Row="7" Grid.Column="3" Content="Add" Click="optionsAdd_Click"/>
     </Grid>
 </UserControl>

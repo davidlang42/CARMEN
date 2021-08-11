@@ -191,7 +191,7 @@
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
                             <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
                             <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
-                            <uc:EditableList Grid.Row="5" Grid.ColumnSpan="2" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
+                            <uc:EditableList Grid.Row="5" Grid.ColumnSpan="2" FontSize="14" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">
