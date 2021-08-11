@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace Carmen.ShowModel
 {
@@ -48,6 +49,10 @@ namespace Carmen.ShowModel
             Requirements.Local.Clear();
             SectionTypes.Local.Clear();
             SectionTypes.Add(new SectionType { Name = "Section" });
+            ShowRoot.AllowConsecutiveItems = false;
+            ShowRoot.CastNumberOrderBy = null;
+            ShowRoot.CastNumberOrderDirection = ListSortDirection.Ascending;
+            ShowRoot.Logo = null;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

@@ -10,7 +10,7 @@ namespace Carmen.ShowModel.Structure
     /// <summary>
     /// An internal node of the item tree, which can have children.
     /// </summary>
-    public abstract class InnerNode : Node //LATER implement INotifyPropertyChanged for completeness
+    public abstract class InnerNode : Node //LATER implement INotifyPropertyChanged for completeness (ShowRoot already does)
     {
         public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
 

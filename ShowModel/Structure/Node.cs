@@ -9,7 +9,7 @@ namespace Carmen.ShowModel.Structure
     /// <summary>
     /// A node in the item tree, which may or may not be able to have children.
     /// </summary>
-    public abstract class Node : IOrdered, ICounted, IValidatable, INamed //LATER implement INotifyPropertyChanged for completeness
+    public abstract class Node : IOrdered, ICounted, IValidatable, INamed //LATER implement INotifyPropertyChanged for completeness (ShowRoot already does)
     {
         #region Database fields
         [Key]
