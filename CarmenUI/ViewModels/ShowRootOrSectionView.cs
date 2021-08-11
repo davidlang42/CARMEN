@@ -43,8 +43,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        //TODO
-        public uint[] SumOfRolesCount
+        public uint[] SumOfChildrenCount
         {
             get
             {
@@ -57,8 +56,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        //TODO
-        public uint SumOfRolesTotal => SumOfRolesCount.Sum();
+        public uint SumOfChildrenTotal => SumOfChildrenCount.Sum();
 
         public NullableCountByGroup[] CountByGroups { get; init; }
 
@@ -77,7 +75,6 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        //TODO
         public string[] CountErrorBackgroundColors
         {
             get
@@ -85,7 +82,7 @@ namespace CarmenUI.ViewModels
                 var colors = new string[castGroups.Length];
                 for (var i = 0; i < colors.Length; i++)
                     if (CountByGroups[i].Count is uint required_count
-                        && SumOfRolesCount[i] != required_count)
+                        && SumOfChildrenCount[i] != required_count)
                         colors[i] = "LightCoral";//LATER use constants, also convert to brush
                     else
                         colors[i] = "White";//LATER use constants, also convert to brush
@@ -93,8 +90,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        //TODO
-        public string NoRolesErrorBackgroundColor => InnerNode.Children.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
+        public string NoChildrenErrorBackgroundColor => InnerNode.Children.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
 
         public ShowRootOrSectionView(InnerNode inner_node, CastGroup[] cast_groups)
         {
@@ -169,10 +165,10 @@ namespace CarmenUI.ViewModels
         {
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ChildView.CountByGroups))
             {
-                OnPropertyChanged(nameof(SumOfRolesCount));
-                OnPropertyChanged(nameof(SumOfRolesTotal));
+                OnPropertyChanged(nameof(SumOfChildrenCount));
+                OnPropertyChanged(nameof(SumOfChildrenTotal));
                 OnPropertyChanged(nameof(CountErrorBackgroundColors));
-                OnPropertyChanged(nameof(NoRolesErrorBackgroundColor));
+                OnPropertyChanged(nameof(NoChildrenErrorBackgroundColor));
             }
         }
 

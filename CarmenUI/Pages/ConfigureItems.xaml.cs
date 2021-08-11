@@ -145,7 +145,7 @@ namespace CarmenUI.Pages
                 datagrid.Columns.Insert(column_index++, new DataGridTextColumn
                 {
                     Header = cast_group.Abbreviation,
-                    Binding = new Binding($"{nameof(RoleOnlyView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
+                    Binding = new Binding($"{nameof(RoleOnlyView.CountByGroups)}[{array_index++}].{nameof(NullableCountByGroup.Count)}")
                     {
                         TargetNullValue = "",
                         UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
@@ -212,84 +212,83 @@ namespace CarmenUI.Pages
             footer.Children.Add(bottom_total);
         }
 
-        private void ChildrenDataGrid_Initialized(object sender, EventArgs e)
+        private void ChildrenDataGrid_Initialized(object sender, EventArgs e)//LATER mostly copied from RolesDataGrid_Initialized, abstract somehow
         {
-            //TODO
-            //// Insert columns for CountByGroups (which can't be done in XAML
-            //// because they are dynamic and DataGridColumns is not a panel)
-            //var datagrid = (DataGrid)sender;
-            //int column_index = 1;
-            //int array_index = 0;
-            //foreach (var cast_group in context.CastGroups.Local)
-            //{
-            //    datagrid.Columns.Insert(column_index++, new DataGridTextColumn
-            //    {
-            //        Header = cast_group.Abbreviation,
-            //        Binding = new Binding($"{nameof(RoleOnlyView.CountByGroups)}[{array_index++}].{nameof(CountByGroup.Count)}")
-            //        {
-            //            TargetNullValue = "",
-            //            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            //        }
-            //    });
-            //}
-            //// Populate all footer cells (because doing any in XAML would require
-            //// knowing how many CountByGroup columns there are in the DataGrid)
-            //var footer = ((Grid)datagrid.Parent).Children.OfType<Grid>().Single();
-            //column_index = 2;
-            //for (var i = 0; i < context.CastGroups.Local.Count; i++)
-            //{
-            //    // define column
-            //    var column_definition = new ColumnDefinition();
-            //    column_definition.SetBinding(ColumnDefinition.WidthProperty, new Binding
-            //    {
-            //        ElementName = datagrid.Name,
-            //        Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - 1}].{nameof(DataGridColumn.ActualWidth)}")
-            //    });
-            //    footer.ColumnDefinitions.Add(column_definition);
-            //    // add top text
-            //    var top_text = new TextBlock();
-            //    top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ItemView.SumOfRolesCount)}[{i}]"));
-            //    Grid.SetColumn(top_text, column_index);
-            //    footer.Children.Add(top_text);
-            //    // add bottom text
-            //    var bottom_text = new TextBox();
-            //    bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ItemView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}")
-            //    {
-            //        TargetNullValue = "",
-            //        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
-            //    });
-            //    bottom_text.SetBinding(TextBox.BackgroundProperty, new Binding($"{nameof(ItemView.CountErrorBackgroundColors)}[{i}]"));
-            //    Grid.SetColumn(bottom_text, column_index);
-            //    Grid.SetRow(bottom_text, 1);
-            //    footer.Children.Add(bottom_text);
-            //    // increment column
-            //    column_index++;
-            //}
-            //// define totals column
-            //var total_column = new ColumnDefinition();
-            //total_column.SetBinding(ColumnDefinition.WidthProperty, new Binding
-            //{
-            //    ElementName = datagrid.Name,
-            //    Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - 1}].{nameof(DataGridColumn.ActualWidth)}")
-            //});
-            //footer.ColumnDefinitions.Add(total_column);
-            //// add top total
-            //var top_total = new TextBlock();
-            //top_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.SumOfRolesTotal))
-            //{
-            //    StringFormat = "={0}"
-            //});
-            //Grid.SetColumn(top_total, column_index);
-            //footer.Children.Add(top_total);
-            //// add bottom total
-            //var bottom_total = new TextBlock();
-            //bottom_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.TotalCount))
-            //{
-            //    StringFormat = "={0}"
-            //});
-            //Grid.SetColumn(bottom_total, column_index);
-            //Grid.SetRow(bottom_total, 1);
-            //footer.Children.Add(bottom_total);
+            // Insert columns for CountByGroups (which can't be done in XAML
+            // because they are dynamic and DataGridColumns is not a panel)
+            var datagrid = (DataGrid)sender;
+            int column_index = 1;
+            int array_index = 0;
+            foreach (var cast_group in context.CastGroups.Local)
+            {
+                datagrid.Columns.Insert(column_index++, new DataGridTextColumn
+                {
+                    Header = cast_group.Abbreviation,
+                    Binding = new Binding($"{nameof(ChildView.CountByGroups)}[{array_index++}].{nameof(NullableCountByGroup.Count)}")
+                    {
+                        TargetNullValue = "",
+                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                    }
+                });
+            }
+            // Populate all footer cells (because doing any in XAML would require
+            // knowing how many CountByGroup columns there are in the DataGrid)
+            var footer = ((Grid)datagrid.Parent).Children.OfType<Grid>().Single();
+            column_index = 2;
+            for (var i = 0; i < context.CastGroups.Local.Count; i++)
+            {
+                // define column
+                var column_definition = new ColumnDefinition();
+                column_definition.SetBinding(ColumnDefinition.WidthProperty, new Binding
+                {
+                    ElementName = datagrid.Name,
+                    Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - 1}].{nameof(DataGridColumn.ActualWidth)}")
+                });
+                footer.ColumnDefinitions.Add(column_definition);
+                // add top text
+                var top_text = new TextBlock();
+                top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ShowRootOrSectionView.SumOfChildrenCount)}[{i}]"));
+                Grid.SetColumn(top_text, column_index);
+                footer.Children.Add(top_text);
+                // add bottom text
+                var bottom_text = new TextBox();
+                bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ShowRootOrSectionView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}")
+                {
+                    TargetNullValue = "",
+                    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                });
+                bottom_text.SetBinding(TextBox.BackgroundProperty, new Binding($"{nameof(ShowRootOrSectionView.CountErrorBackgroundColors)}[{i}]"));
+                Grid.SetColumn(bottom_text, column_index);
+                Grid.SetRow(bottom_text, 1);
+                footer.Children.Add(bottom_text);
+                // increment column
+                column_index++;
+            }
+            // define totals column
+            var total_column = new ColumnDefinition();
+            total_column.SetBinding(ColumnDefinition.WidthProperty, new Binding
+            {
+                ElementName = datagrid.Name,
+                Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - 1}].{nameof(DataGridColumn.ActualWidth)}")
+            });
+            footer.ColumnDefinitions.Add(total_column);
+            // add top total
+            var top_total = new TextBlock();
+            top_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ShowRootOrSectionView.SumOfChildrenTotal))
+            {
+                StringFormat = "={0}"
+            });
+            Grid.SetColumn(top_total, column_index);
+            footer.Children.Add(top_total);
+            // add bottom total
+            var bottom_total = new TextBlock();
+            bottom_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ShowRootOrSectionView.TotalCount))
+            {
+                StringFormat = "={0}"
+            });
+            Grid.SetColumn(bottom_total, column_index);
+            Grid.SetRow(bottom_total, 1);
+            footer.Children.Add(bottom_total);
         }
 
         private void itemsTreeView_KeyDown(object sender, KeyEventArgs e)
