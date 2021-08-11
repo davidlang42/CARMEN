@@ -32,6 +32,11 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureItems : SubPage
     {
+        //TODO highlight the nodes in the itemsTree if any errors shown on the view
+        //TODO may need to implement a similar thing to NodeView but for ConfigureItems UI,
+        //     matching logic of ItemsSummary however it would be best if I didn't have to
+        //TODO highlight on ConfigureItems UI if roles in non-multi/non-zero section dont match cast members
+        //     using: section.RolesMatchCastMembers(cast_members) != RolesMatch
         private readonly CollectionViewSource rootNodesViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
         private readonly CollectionViewSource requirementsViewSource;
