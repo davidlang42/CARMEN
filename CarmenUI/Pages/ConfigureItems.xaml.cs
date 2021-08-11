@@ -35,8 +35,6 @@ namespace CarmenUI.Pages
         //TODO highlight the nodes in the itemsTree if any errors shown on the view
         //TODO may need to implement a similar thing to NodeView but for ConfigureItems UI,
         //     matching logic of ItemsSummary however it would be best if I didn't have to
-        //TODO highlight on ConfigureItems UI if roles in non-multi/non-zero section dont match cast members
-        //     using: section.RolesMatchCastMembers(cast_members) != RolesMatch
         private readonly CollectionViewSource rootNodesViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
         private readonly CollectionViewSource requirementsViewSource;
@@ -55,6 +53,7 @@ namespace CarmenUI.Pages
         {
             using var loading = new LoadingOverlay(this);
             loading.Progress = 0;
+            await context.AlternativeCasts.LoadAsync();
             await context.CastGroups.LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
             loading.Progress = 20;
@@ -316,8 +315,8 @@ namespace CarmenUI.Pages
             rolesPanel.Content = itemsTreeView.SelectedItem switch
             {
                 Item item => new ItemView(item, context.CastGroups.Local.ToArray()),
-                Section section => new ShowRootOrSectionView(section, context.CastGroups.Local.ToArray()),
-                ShowRoot show_root => new ShowRootOrSectionView(show_root, context.CastGroups.Local.ToArray()),
+                Section section => new ShowRootOrSectionView(section, context.CastGroups.Local.ToArray(), context.AlternativeCasts.Local.Count),
+                ShowRoot show_root => new ShowRootOrSectionView(show_root, context.CastGroups.Local.ToArray(), context.AlternativeCasts.Local.Count),
                 _ => null
             };
         }

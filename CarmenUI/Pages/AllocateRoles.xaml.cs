@@ -80,7 +80,8 @@ namespace CarmenUI.Pages
                 await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
                 loading.Progress = 95;
                 await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-                _rootNodeView = new ShowRootNodeView(context.ShowRoot, applicantsInCast.Length, context.AlternativeCasts.ToArray());
+                var total_cast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
+                _rootNodeView = new ShowRootNodeView(context.ShowRoot, total_cast, context.AlternativeCasts.ToArray());
                 showCompleted.IsChecked = true; // must be set after creating ShowRootNodeView because it triggers Checked event
                 rolesTreeView.ItemsSource = rootNodeView.ChildrenInOrder;
                 castingProgress.DataContext = rootNodeView;

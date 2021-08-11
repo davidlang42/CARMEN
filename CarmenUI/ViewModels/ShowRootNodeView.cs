@@ -22,7 +22,7 @@ namespace CarmenUI.ViewModels
             return (child_progress, child_errors);
         }
 
-        public ShowRootNodeView(ShowRoot show_root, int total_cast, AlternativeCast[] alternative_casts)
+        public ShowRootNodeView(ShowRoot show_root, uint total_cast, AlternativeCast[] alternative_casts)
             : base(show_root.Children.InOrder().Select(n => CreateView(n, total_cast, alternative_casts)))
         {
             showRoot = show_root;

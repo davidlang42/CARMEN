@@ -21,7 +21,8 @@ namespace CarmenUI.ViewModels
             var items_in_order = c.ShowRoot.ItemsInOrder().ToList();
             Rows.Add(CreateItemsRow(items_in_order, out int item_count));
             await c.CastGroups.Include(cg => cg.Members).LoadAsync();
-            var cast_members = c.CastGroups.Local.ToDictionary(cg => cg, cg => (uint)cg.Members.Count);
+            var alternative_casts_count = await c.AlternativeCasts.CountAsync();
+            var cast_members = c.CastGroups.Local.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
             await c.SectionTypes.Include(st => st.Sections).ThenInclude(s => s.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
             if (!c.ShowRoot.CountMatchesSumOfRoles())
                 Rows.Add(new Row { Fail = "Show has incorrect sum of roles" });

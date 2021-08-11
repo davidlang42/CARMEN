@@ -235,7 +235,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public static NodeView CreateView(Node node, int total_cast, AlternativeCast[] alternative_casts)
+        public static NodeView CreateView(Node node, uint total_cast, AlternativeCast[] alternative_casts)
             => node switch
             {
                 ShowRoot show_root => new ShowRootNodeView(show_root, total_cast, alternative_casts),

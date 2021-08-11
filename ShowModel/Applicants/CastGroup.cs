@@ -100,6 +100,10 @@ namespace Carmen.ShowModel.Applicants
             requirements.CollectionChanged += Requirements_CollectionChanged;
         }
 
+        /// <summary>Gets the number of FTE members of this cast group, taking AlternateCasts into account</summary>
+        public uint FullTimeEquivalentMembers(int alternative_cast_count)
+            => (uint)(AlternateCasts ? Members.Count / alternative_cast_count : Members.Count);
+
         private void Members_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(Members));
 

@@ -13,7 +13,7 @@ namespace CarmenUI.ViewModels
     public class SectionNodeView : NodeView
     {
         private Section section;
-        private int totalCast;
+        private uint totalCast;
 
         public override string Name => section.Name;
 
@@ -24,7 +24,7 @@ namespace CarmenUI.ViewModels
             return (child_progress, child_errors);
         }
 
-        public SectionNodeView(Section section, int total_cast, AlternativeCast[] alternative_casts)
+        public SectionNodeView(Section section, uint total_cast, AlternativeCast[] alternative_casts)
             : base(section.Children.InOrder().Select(n => CreateView(n, total_cast, alternative_casts)))
         {
             this.section = section;

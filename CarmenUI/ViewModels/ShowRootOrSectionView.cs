@@ -114,7 +114,7 @@ namespace CarmenUI.ViewModels
 
         public string NoChildrenErrorBackgroundColor => InnerNode.Children.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
 
-        public ShowRootOrSectionView(InnerNode inner_node, CastGroup[] cast_groups)
+        public ShowRootOrSectionView(InnerNode inner_node, CastGroup[] cast_groups, int alternative_casts_count)
         {
             InnerNode = inner_node;
             Children = new ObservableCollection<ChildView>(inner_node.Children.InOrder().Select(c =>
@@ -131,7 +131,7 @@ namespace CarmenUI.ViewModels
                 return ncbg;
             }).ToArray();
             this.castGroups = cast_groups;
-            this.castMemberCounts = castGroups.ToDictionary(cg => cg, cg => (uint)cg.Members.Count);
+            this.castMemberCounts = castGroups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
         }
 
         private void NullableCountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
