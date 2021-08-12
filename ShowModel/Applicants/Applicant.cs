@@ -137,6 +137,11 @@ namespace Carmen.ShowModel.Applicants
                     return;
                 castGroup = value;
                 OnPropertyChanged();
+                if (castGroup == null)
+                {
+                    CastNumber = null;
+                    AlternativeCast = null;
+                }    
             }
         }
 

@@ -74,13 +74,13 @@ namespace CarmenUI.Pages
             await context.Applicants.LoadAsync();
             castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
             allApplicantsViewSource.Source = castNumbersViewSource.Source = context.Applicants.Local.ToObservableCollection();
-            ConfigureCastNumbersSource();
+            TriggerCastNumbersRefresh();
             loading.Progress = 80;
             await context.Requirements.LoadAsync();
             loading.Progress = 100;
         }
 
-        private void ConfigureCastNumbersSource()
+        private void TriggerCastNumbersRefresh()
         {
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
@@ -116,7 +116,7 @@ namespace CarmenUI.Pages
             processing.Progress = 75;
             processing.SubText = "Applying tags";
             engine.ApplyTags(context.Applicants.Local, context.Tags.Local);
-            ConfigureCastNumbersSource();
+            TriggerCastNumbersRefresh();
             processing.Progress = 100;
         }
 
@@ -197,6 +197,7 @@ namespace CarmenUI.Pages
             }
             else if (selectionList.SelectedItem != null) // Cast Numbers
             {
+                TriggerCastNumbersRefresh();
                 selectionPanel.Visibility = Visibility.Collapsed;
                 numbersPanel.Visibility = Visibility.Visible;
             }
