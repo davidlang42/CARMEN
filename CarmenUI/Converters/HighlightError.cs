@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace CarmenUI.Converters
 {
@@ -13,8 +14,10 @@ namespace CarmenUI.Converters
     /// </summary>
     public class HighlightError : IValueConverter
     {
+        BrushConverter brushConverter = new();
+
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            => (value is bool b && b) ? "LightCoral" : "Transparent"; //LATER put these constants somewhere
+            => brushConverter.ConvertFromString((value is bool b && b) ? "LightCoral" : "Transparent"); //LATER put these constants somewhere
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();

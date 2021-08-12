@@ -19,10 +19,10 @@
         <CollectionViewSource x:Key="castGroupsViewSource"/>
         <CollectionViewSource x:Key="requirementsViewSource"/>
         <CollectionViewSource x:Key="castMembersDictionarySource"/>
-        <cv:MultiConverter x:Key="nodeErrorBackground">
+        <cv:FakeItTilYouUpdateIt x:Key="nodeErrorBackground">
             <cv:AnyNodeErrors/>
             <cv:HighlightError/>
-        </cv:MultiConverter>
+        </cv:FakeItTilYouUpdateIt>
         <cv:SortIOrdered x:Key="sortIOrdered" />
         <BooleanToVisibilityConverter x:Key="showIfTrue"/>
         <cv:MultiConverter x:Key="showIfFalse">
@@ -74,17 +74,44 @@
                 <TreeView.Resources>
                     <HierarchicalDataTemplate DataType="{x:Type modelStructure:ShowRoot}"
                                               ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
-                        <TextBlock Text="{Binding Name}"
-                            Background="{Binding Converter={StaticResource nodeErrorBackground}, ConverterParameter={StaticResource castMembersDictionarySource}}"/>
+                        <TextBlock Text="{Binding Name}">
+                            <TextBlock.Background>
+                                <MultiBinding Converter="{StaticResource nodeErrorBackground}" ConverterParameter="{StaticResource castMembersDictionarySource}">
+                                    <MultiBinding.Bindings>
+                                        <Binding/>
+                                        <Binding Path="CountByGroups"/>
+                                        <Binding Path="Children"/>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </TextBlock.Background>
+                        </TextBlock>
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type modelStructure:Section}"
                                               ItemsSource="{Binding Children, Converter={StaticResource sortIOrdered}}">
-                        <TextBlock Text="{Binding Name}"
-                            Background="{Binding Converter={StaticResource nodeErrorBackground}, ConverterParameter={StaticResource castMembersDictionarySource}}"/>
+                        <TextBlock Text="{Binding Name}">
+                            <TextBlock.Background>
+                                <MultiBinding Converter="{StaticResource nodeErrorBackground}" ConverterParameter="{StaticResource castMembersDictionarySource}">
+                                    <MultiBinding.Bindings>
+                                        <Binding/>
+                                        <Binding Path="CountByGroups"/>
+                                        <Binding Path="Children"/>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </TextBlock.Background>
+                        </TextBlock>
                     </HierarchicalDataTemplate>
                     <HierarchicalDataTemplate DataType="{x:Type modelStructure:Item}">
-                        <TextBlock Text="{Binding Name}"
-                            Background="{Binding Converter={StaticResource nodeErrorBackground}, ConverterParameter={StaticResource castMembersDictionarySource}}"/>
+                        <TextBlock Text="{Binding Name}">
+                            <TextBlock.Background>
+                                <MultiBinding Converter="{StaticResource nodeErrorBackground}" ConverterParameter="{StaticResource castMembersDictionarySource}">
+                                    <MultiBinding.Bindings>
+                                        <Binding/>
+                                        <Binding Path="CountByGroups"/>
+                                        <Binding Path="Roles"/>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </TextBlock.Background>
+                        </TextBlock>
                     </HierarchicalDataTemplate>
                 </TreeView.Resources>
                 <TreeView.ContextMenu>
