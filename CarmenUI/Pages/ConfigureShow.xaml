@@ -250,7 +250,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 During the cast selection process, Applicants will be selected into a Cast Group.
@@ -345,7 +345,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 A tag can be applied to a successful Applicant to indicate that form part of a special team, or have an external attribute, such as wearing a microphone. An Applicant can have many tags.
@@ -354,27 +354,8 @@
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
                             <TextBlock Grid.Row="2" Text="Description" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" FontSize="14"/>
-                            <TextBlock Grid.Row="3" Text="Requirements" FontSize="14"/>
-                            <ListView Grid.Row="3" Grid.Column="1" FontSize="14"
-                                      x:Name="requirementsList"
-                                      Margin="5 0 0 5"
-                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                      ItemsSource="{Binding Requirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsSelectionSource}}">
-                                <ListView.ItemContainerStyle>
-                                    <Style TargetType="{x:Type ListViewItem}">
-                                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-                                <ListView.ItemTemplate>
-                                    <DataTemplate>
-                                        <CheckBox IsChecked="{Binding IsSelected}"
-                                                  Width="{Binding ElementName=requirementsList, Path=ActualWidth}"
-                                                  Content="{Binding ObjectValue.Name}" VerticalAlignment="Center"/>
-                                    </DataTemplate>
-                                </ListView.ItemTemplate>
-                            </ListView>
-                            <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Text="Required Counts:" FontSize="14"/>
-                            <ItemsControl Grid.Row="5" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource sparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
+                            <TextBlock Grid.Row="3" Grid.ColumnSpan="2" Text="Required Counts:" FontSize="14"/>
+                            <ItemsControl Grid.Row="4" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource sparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Columns="1"/>
@@ -393,6 +374,25 @@
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
+                            <TextBlock Grid.Row="5" Text="Requirements" FontSize="14"/>
+                            <ListView Grid.Row="5" Grid.Column="1" FontSize="14"
+                                      x:Name="requirementsList"
+                                      Margin="5 0 0 5"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      ItemsSource="{Binding Requirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsSelectionSource}}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  Width="{Binding ElementName=requirementsList, Path=ActualWidth}"
+                                                  Content="{Binding ObjectValue.Name}" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelStructure:SectionType}">
@@ -765,7 +765,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an AND requirement, which means that an Applicant must meet ALL of the specified sub-requirements.
@@ -818,7 +818,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an OR requirement, which means that an Applicant must meet ANY of the specified sub-requirements.
@@ -871,7 +871,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an XOR requirement, which means that an Applicant must meet EXACTLY ONE of the specified sub-requirements.
