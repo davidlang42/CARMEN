@@ -337,12 +337,12 @@ namespace CarmenUI.Pages
             data_grid.CurrentCell = new DataGridCellInfo(role_view, data_grid.Columns.First());
         }
 
-        private void DeleteRole_Click(object sender, RoutedEventArgs e)
+        private void RemoveRole_Click(object sender, RoutedEventArgs e)
         {
             var item_view = (ItemView)rolesPanel.Content;
             var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
             if (data_grid.SelectedItem is RoleOnlyView rv)
-                item_view.DeleteRole(rv);
+                item_view.RemoveRole(rv);
         }
 
         private void AddNode(object sender, ExecutedRoutedEventArgs e)

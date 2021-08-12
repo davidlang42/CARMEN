@@ -161,7 +161,7 @@ namespace CarmenUI.ViewModels
             return role_view;
         }
 
-        public void DeleteRole(RoleOnlyView role_view)
+        public void RemoveRole(RoleOnlyView role_view)
         {
             Roles.Remove(role_view);
         }
