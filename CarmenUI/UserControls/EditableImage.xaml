@@ -25,6 +25,7 @@
             <ContextMenu>
                 <MenuItem Header="Upload Image" Click="UploadImage_Click"/>
                 <MenuItem Header="Paste Image" Click="PasteImage_Click"/>
+                <MenuItem Header="Clear Image" Click="ClearImage_Click"/>
             </ContextMenu>
         </Grid.ContextMenu>
     </Grid>

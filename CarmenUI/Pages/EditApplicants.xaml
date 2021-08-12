@@ -240,7 +240,7 @@
                         <RowDefinition Height="*" MinHeight="200"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <Image Source="/Icons/CloudDatabase.png"/>
+                    <uc:EditableImage ImageObject="{Binding Photo, Mode=TwoWay}"/>
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>

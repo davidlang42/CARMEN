@@ -81,5 +81,10 @@ namespace CarmenUI.UserControls
                 };
             }
         }
+
+        private void ClearImage_Click(object sender, RoutedEventArgs e)
+        {
+            ImageObject = null;
+        }
     }
 }
