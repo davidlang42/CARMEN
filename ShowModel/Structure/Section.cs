@@ -7,7 +7,7 @@ namespace Carmen.ShowModel.Structure
     /// <summary>
     /// A section of the show, containing items or other sections.
     /// </summary>
-    public class Section : InnerNode //LATER implement INotifyPropertyChanged for completeness
+    public class Section : InnerNode
     {
         public enum RolesMatchResult
         {
@@ -16,7 +16,19 @@ namespace Carmen.ShowModel.Structure
             TooManyRoles
         }
 
-        public virtual SectionType SectionType { get; set; } = null!;
+        private SectionType sectionType = null!;
+        public virtual SectionType SectionType
+        {
+            get => sectionType;
+            set
+            {
+                if (sectionType == value)
+                    return;
+                sectionType = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(AllowConsecutiveItems)); //LATER this will miss the case when the SectionType is not changed, but SectionType.AllowConsecutiveItems is changed
+            }
+        }
 
         protected override bool _allowConsecutiveItems => SectionType.AllowConsecutiveItems;
 

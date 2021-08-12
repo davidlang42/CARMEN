@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,15 +12,42 @@ namespace Carmen.ShowModel.Structure
     /// <summary>
     /// An internal node of the item tree, which can have children.
     /// </summary>
-    public abstract class InnerNode : Node //LATER implement INotifyPropertyChanged for completeness (ShowRoot already does)
+    public abstract class InnerNode : Node
     {
-        public virtual ICollection<Node> Children { get; private set; } = new ObservableCollection<Node>();
+        private readonly ObservableCollection<Node> children = new();
+        public virtual ICollection<Node> Children => children;
 
         public override IEnumerable<Item> ItemsInOrder() => Children.InOrder().SelectMany(n => n.ItemsInOrder());
 
         protected abstract bool _allowConsecutiveItems { get; }
 
         public bool AllowConsecutiveItems => _allowConsecutiveItems;
+
+        public InnerNode()
+        {
+            children.CollectionChanged += Children_CollectionChanged;
+        }
+
+        private void Children_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(Children));
+            if (e.Action != NotifyCollectionChangedAction.Move)
+            {
+                var new_items = e.NewItems?.Cast<Node>().ToHashSet() ?? new HashSet<Node>();
+                var old_items = e.OldItems?.Cast<Node>().ToHashSet() ?? new HashSet<Node>();
+                foreach (var added in new_items.Where(n => !old_items.Contains(n)))
+                    added.PropertyChanged += Child_PropertyChanged;
+                foreach (var removed in old_items.Where(o => !new_items.Contains(o)))
+                    removed.PropertyChanged -= Child_PropertyChanged;
+            }
+        }
+
+        private void Child_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            // Only propogate changes to counts
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(CountByGroups))
+                OnPropertyChanged(nameof(CountByGroups));
+        }
 
         public bool VerifyConsecutiveItems(out List<ConsecutiveItemSummary> failures)
             => VerifyConsecutiveItems(out failures, false);

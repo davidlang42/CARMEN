@@ -1,13 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 
 namespace Carmen.ShowModel.Structure
 {
-    public class Role : ICounted, INameOrdered //LATER implement INotifyPropertyChanged for completeness
+    public class Role : ICounted, INameOrdered, INotifyPropertyChanged
     {
         public enum RoleStatus
         {
@@ -17,13 +20,52 @@ namespace Carmen.ShowModel.Structure
             UnderCast,
         }
 
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         [Key]
         public int RoleId { get; private set; }
-        public string Name { get; set; } = "";
-        public virtual ICollection<Item> Items { get; private set; } = new ObservableCollection<Item>();
-        public virtual ICollection<Requirement> Requirements { get; set; } = new ObservableCollection<Requirement>();
-        public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
-        public virtual ICollection<Applicant> Cast { get; private set; } = new ObservableCollection<Applicant>();
+
+        private string name = "";
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if (name == value)
+                    return;
+                name = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private readonly ObservableCollection<CountByGroup> countByGroups = new();
+        public virtual ICollection<CountByGroup> CountByGroups => countByGroups;
+
+        public virtual ICollection<Item> Items { get; private set; } = new ObservableCollection<Item>();//TODO INotifyPropertyChanged
+        public virtual ICollection<Requirement> Requirements { get; set; } = new ObservableCollection<Requirement>();//TODO INotifyPropertyChanged
+        public virtual ICollection<Applicant> Cast { get; private set; } = new ObservableCollection<Applicant>();//TODO INotifyPropertyChanged
+
+        public Role()
+        {
+            countByGroups.CollectionChanged += CountByGroups_CollectionChanged;
+        }
+
+        private void CountByGroups_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(CountByGroups));
+            if (e.Action != NotifyCollectionChangedAction.Move)
+            {
+                var new_items = e.NewItems?.Cast<CountByGroup>().ToHashSet() ?? new HashSet<CountByGroup>();
+                var old_items = e.OldItems?.Cast<CountByGroup>().ToHashSet() ?? new HashSet<CountByGroup>();
+                foreach (var added in new_items.Where(n => !old_items.Contains(n)))
+                    added.PropertyChanged += CountByGroup_PropertyChanged;
+                foreach (var removed in old_items.Where(o => !new_items.Contains(o)))
+                    removed.PropertyChanged -= CountByGroup_PropertyChanged;
+            }
+        }
+
+        private void CountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+            => OnPropertyChanged(nameof(CountByGroups));
 
         public uint CountFor(CastGroup group)
             => CountByGroups.Where(c => c.CastGroup == group).Select(c => c.Count).SingleOrDefault(); // defaults to 0
@@ -53,6 +95,11 @@ namespace Carmen.ShowModel.Structure
             if (under_cast)
                 return RoleStatus.UnderCast;
             return RoleStatus.FullyCast;
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

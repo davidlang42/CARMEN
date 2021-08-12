@@ -11,10 +11,8 @@ namespace Carmen.ShowModel.Structure
     /// <summary>
     /// The (singular) root node of the item tree, including various details about the show
     /// </summary>
-    public class ShowRoot : InnerNode, INotifyPropertyChanged
+    public class ShowRoot : InnerNode
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         private DateTime? showDate;
         public DateTime? ShowDate
         {
@@ -92,11 +90,6 @@ namespace Carmen.ShowModel.Structure
                 if (value != null)
                     throw new InvalidOperationException("Parent of ShowRoot must be null.");
             }
-        }
-
-        protected void OnPropertyChanged([CallerMemberName] string? name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }
