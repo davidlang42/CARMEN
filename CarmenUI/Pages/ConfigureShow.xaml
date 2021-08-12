@@ -456,7 +456,7 @@
                             <CheckBox Grid.Row="5" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items" VerticalContentAlignment="Center"/>
                             <TextBlock Grid.Row="6" Text="Logo" FontSize="14"/>
                             <uc:EditableImage Grid.Row="6" Grid.Column="1" Width="100" Height="100" HorizontalAlignment="Left"
-                                              ImageBytes="{Binding Logo.ImageData}"/>
+                                              ImageObject="{Binding Logo, Mode=TwoWay}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">

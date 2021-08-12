@@ -12,12 +12,14 @@
     <Control.Resources>
         <cv:BytesToImage x:Key="bytesToImage"/>
     </Control.Resources>
-    <Grid MouseEnter="Grid_MouseEnter"
-              MouseLeave="Grid_MouseLeave"
-              MouseDown="Grid_MouseDown" Background="White">
-        <Image Source="{Binding ElementName=ControlRoot, Path=ImageBytes, Converter={StaticResource bytesToImage}}"/>
-        <Grid x:Name="editPencil" Background="#AAFFFFFF" Visibility="Hidden" HorizontalAlignment="Right" VerticalAlignment="Bottom">
-            <Image Source="/Icons/EditPencil.png" Width="30" Margin="3"/>
+    <Grid MouseEnter="Grid_MouseEnter" MouseLeave="Grid_MouseLeave" MouseDown="Grid_MouseDown" Background="White">
+        <Image Source="{Binding ElementName=ControlRoot, Path=ImageObject.ImageData, Converter={StaticResource bytesToImage}}"/>
+        <Grid x:Name="overlay" Visibility="Hidden">
+            <Grid Background="#AAFFFFFF" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                <Image Source="/Icons/EditPencil.png" Width="30" Margin="3"/>
+            </Grid>
+            <TextBlock Background="#AAFFFFFF" Text="{Binding ElementName=ControlRoot, Path=ImageObject.Name}"
+                       HorizontalAlignment="Left" VerticalAlignment="Top"/>
         </Grid>
         <Grid.ContextMenu>
             <ContextMenu>
