@@ -32,14 +32,22 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureShow : SubPage
     {
-        private readonly CollectionViewSource criteriasViewSource = new() { SortDescriptions = { StandardSort.For<Criteria>() } };
+        private readonly CollectionViewSource criteriasViewSource = new()
+        {
+            IsLiveSortingRequested = true,
+            SortDescriptions = { StandardSort.For<Criteria>() }
+        };
         private readonly CollectionViewSource criteriasSelectionSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource castGroupsViewSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource alternativeCastsViewSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource tagsViewSource = new() { SortDescriptions = { StandardSort.For<Tag>() } };
         private readonly CollectionViewSource tagsSelectionSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource sectionTypesViewSource = new() { SortDescriptions = { StandardSort.For<SectionType>() } };
-        private readonly CollectionViewSource requirementsViewSource = new() { SortDescriptions = { StandardSort.For<Requirement>() } };
+        private readonly CollectionViewSource requirementsViewSource = new()
+        {
+            IsLiveSortingRequested = true,
+            SortDescriptions = { StandardSort.For<Requirement>() }
+        };
         private readonly CollectionViewSource requirementsSelectionSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource listSortDirectionEnumSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource showRootSource = new();
@@ -285,5 +293,67 @@ namespace CarmenUI.Pages
 
         private void ResetToDefaults_Click(object sender, RoutedEventArgs e)
             => context.SetDefaultShowSettings();
+
+        #region Drag & drop in objectList
+
+        private Point lastMouseDown;
+        private IOrdered? draggedItem;
+        private IOrdered? draggedTarget;
+
+        private void objectList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+                lastMouseDown = e.GetPosition(objectList);
+        }
+
+        private void objectList_MouseMove(object sender, MouseEventArgs e)
+        {
+            if (e.LeftButton == MouseButtonState.Pressed)
+            {
+                if ((e.GetPosition(objectList) - lastMouseDown).Length > 1)
+                {
+                    draggedItem = objectList.SelectedItem as IOrdered;
+                    if (draggedItem != null)
+                    {
+                        var drop_effect = DragDrop.DoDragDrop(objectList, objectList.SelectedValue, DragDropEffects.Move);
+                        if (drop_effect == DragDropEffects.Move && draggedTarget != null && draggedItem != draggedTarget)
+                        {
+                            MoveObject(draggedItem, draggedTarget);
+                            draggedTarget = null;
+                            draggedItem = null;
+                        }
+                    }
+                }
+            }
+        }
+
+        private void objectList_DragOver(object sender, DragEventArgs e)
+        {
+            if ((e.GetPosition(objectList) - lastMouseDown).Length > 1)
+                ProcessDragDrop(e, out _);
+            e.Handled = true;
+        }
+
+        private void objectList_Drop(object sender, DragEventArgs e)
+        {
+            ProcessDragDrop(e, out draggedTarget);
+            e.Handled = true;
+        }
+
+        private void ProcessDragDrop(DragEventArgs e, out IOrdered? target_item)
+        {
+            target_item = (e.OriginalSource as TextBlock)?.DataContext as IOrdered;
+            e.Effects = target_item != null && draggedItem != null && target_item != draggedItem ? DragDropEffects.Move : DragDropEffects.None;
+        }
+        #endregion
+
+        private void MoveObject(IOrdered dragged, IOrdered target)
+        {
+            if (currentViewSource?.Source is IList list)
+            {
+                var typed_list = list.OfType<IOrdered>().ToList();
+                typed_list.MoveInOrder(dragged, target);
+            }
+        }
     }
 }

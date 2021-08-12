@@ -19,7 +19,7 @@
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <CollectionViewSource x:Key="alternativeCastsViewSource"/>
         <CollectionViewSource x:Key="criteriasSelectionSource"/>
-        <CollectionViewSource x:Key="castGroupsViewSource"/>
+        <CollectionViewSource x:Key="castGroupsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="tagsSelectionSource"/>
         <CollectionViewSource x:Key="requirementsSelectionSource"/>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
@@ -98,8 +98,8 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     KeyUp="objectList_KeyUp">
+            <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled" KeyUp="objectList_KeyUp"
+                     AllowDrop="True" PreviewMouseLeftButtonDown="objectList_PreviewMouseLeftButtonDown" MouseMove="objectList_MouseMove" DragOver="objectList_DragOver" Drop="objectList_Drop">
                 <ListBox.Resources>
                     <DataTemplate DataType="{x:Type modelStructure:ShowRoot}">
                         <TextBlock Text="Details for the current show"/>
