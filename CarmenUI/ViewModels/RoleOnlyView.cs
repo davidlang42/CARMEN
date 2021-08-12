@@ -2,6 +2,8 @@
 using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -11,6 +13,8 @@ namespace CarmenUI.ViewModels
 {
     public class RoleOnlyView : RoleView
     {
+        private Item currentItem;
+
         public CastGroup[] CastGroups { get; init; }
 
         /// <summary>Indicies match CastGroups</summary>
@@ -18,9 +22,16 @@ namespace CarmenUI.ViewModels
 
         public uint TotalCount => CountByGroups.Select(cbg => cbg.Count ?? 0).Sum();
 
-        public RoleOnlyView(Role role, CastGroup[] cast_groups)
+        public ICollection<Item> Items => Role.Items;
+
+        public string CommaSeparatedItems => string.Join(", ", Role.Items.Select(r => r.Name));
+
+        public string? CommaSeparatedOtherItems => Role.Items.Count < 2 ? null : string.Join(", ", Role.Items.Where(i => i != currentItem).Select(r => r.Name));
+
+        public RoleOnlyView(Role role, CastGroup[] cast_groups, Item current_item)
             : base(role)
         {
+            currentItem = current_item;
             CastGroups = cast_groups;
             CountByGroups = new NullableCountByGroup[cast_groups.Length];
             for (var i = 0; i < cast_groups.Length; i++)
@@ -28,6 +39,14 @@ namespace CarmenUI.ViewModels
                 CountByGroups[i] = new NullableCountByGroup(role.CountByGroups, cast_groups[i]);
                 CountByGroups[i].PropertyChanged += CountByGroup_PropertyChanged;
             }
+            if (role.Items is ObservableCollection<Item> items)
+                items.CollectionChanged += Items_CollectionChanged;
+        }
+
+        private void Items_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(CommaSeparatedItems));
+            OnPropertyChanged(nameof(CommaSeparatedOtherItems));
         }
 
         private void CountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -40,6 +59,8 @@ namespace CarmenUI.ViewModels
         {
             foreach (var cbg in CountByGroups)
                 cbg.PropertyChanged -= CountByGroup_PropertyChanged;
+            if (Role.Items is ObservableCollection<Item> items)
+                items.CollectionChanged -= Items_CollectionChanged;
             base.DisposeInternal();
         }
     }

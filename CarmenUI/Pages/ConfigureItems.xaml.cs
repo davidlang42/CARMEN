@@ -35,6 +35,7 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource rootNodesViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
         private readonly CollectionViewSource requirementsViewSource;
+        private readonly CollectionViewSource itemsViewSource;
         private readonly CollectionViewSource sectionTypesViewSource;
         private readonly CollectionViewSource castMembersDictionarySource;
 
@@ -44,6 +45,7 @@ namespace CarmenUI.Pages
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
+            itemsViewSource = (CollectionViewSource)FindResource(nameof(itemsViewSource));
             sectionTypesViewSource = (CollectionViewSource)FindResource(nameof(sectionTypesViewSource));
             castMembersDictionarySource = (CollectionViewSource)FindResource(nameof(castMembersDictionarySource));
         }
@@ -65,9 +67,11 @@ namespace CarmenUI.Pages
             await context.Nodes.LoadAsync();
             loading.Progress = 60;
             await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-            rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
+            rootNodesViewSource.Source = itemsViewSource.Source = context.Nodes.Local.ToObservableCollection();
             rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
             rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
+            itemsViewSource.View.Filter = n => n is Item;
+            itemsViewSource.View.SortDescriptions.Add(new(nameof(Item.Name), ListSortDirection.Ascending)); // sorting by order isn't possible in a flat structure, so just use name instead
             loading.Progress = 80;
             await context.SectionTypes.LoadAsync();
             sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();

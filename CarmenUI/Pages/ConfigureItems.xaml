@@ -18,6 +18,7 @@
         <CollectionViewSource x:Key="rootNodesViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
         <CollectionViewSource x:Key="requirementsViewSource"/>
+        <CollectionViewSource x:Key="itemsViewSource"/>
         <CollectionViewSource x:Key="castMembersDictionarySource"/>
         <cv:FakeItTilYouUpdateIt x:Key="nodeErrorBackground">
             <cv:AnyNodeErrors/>
@@ -36,6 +37,7 @@
         </cv:MultiConverter>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
+        <cv:SelectableItemsList x:Key="selectableItemsList"/>
         <RoutedUICommand x:Key="addNodeCommand"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
     </Page.Resources>
@@ -196,6 +198,35 @@
                                                                 <CheckBox IsChecked="{Binding IsSelected}"
                                                                   Width="{Binding ElementName=requirementsCombo, Path=ActualWidth}"
                                                                   Content="{Binding ObjectValue}"/>
+                                                            </DataTemplate>
+                                                        </cv:ComboBoxFaceTemplateSelector.ItemTemplate>
+                                                    </cv:ComboBoxFaceTemplateSelector>
+                                                </ComboBox.ItemTemplateSelector>
+                                            </ComboBox>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn x:Name="HeaderItems" Header="Other Items" Width="*">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding CommaSeparatedOtherItems, TargetNullValue=''}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <ComboBox x:Name="itemsCombo" SelectedIndex="0" ItemsSource="{Binding Items, Converter={StaticResource selectableItemsList}, ConverterParameter={StaticResource itemsViewSource}}">
+                                                <ComboBox.ItemTemplateSelector>
+                                                    <cv:ComboBoxFaceTemplateSelector>
+                                                        <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
+                                                            <DataTemplate>
+                                                                <TextBlock Text="{Binding ElementName=itemsCombo, Path=DataContext.CommaSeparatedItems}"/>
+                                                            </DataTemplate>
+                                                        </cv:ComboBoxFaceTemplateSelector.FaceTemplate>
+                                                        <cv:ComboBoxFaceTemplateSelector.ItemTemplate>
+                                                            <DataTemplate>
+                                                                <CheckBox IsChecked="{Binding IsSelected}"
+                                                                  Width="{Binding ElementName=itemsCombo, Path=ActualWidth}"
+                                                                  Content="{Binding ObjectValue.Name}"/>
                                                             </DataTemplate>
                                                         </cv:ComboBoxFaceTemplateSelector.ItemTemplate>
                                                     </cv:ComboBoxFaceTemplateSelector>

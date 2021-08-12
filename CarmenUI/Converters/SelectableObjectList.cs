@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using Carmen.ShowModel.Structure;
 
 namespace CarmenUI.Converters
 {
@@ -32,5 +33,8 @@ namespace CarmenUI.Converters
     }
 
     public class SelectableRequirementsList : SelectableObjectList<Requirement>
+    { }
+
+    public class SelectableItemsList : SelectableObjectList<Item>
     { }
 }
