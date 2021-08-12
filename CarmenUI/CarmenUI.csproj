@@ -40,6 +40,7 @@
     <Resource Include="Icons\Checkmark_blue.png" />
     <Resource Include="Icons\Ellipsis_bold.png" />
     <Resource Include="Icons\CarmenC.png" />
+    <Resource Include="Icons\EditPencil.png" />
   </ItemGroup>
 
   <ItemGroup>
