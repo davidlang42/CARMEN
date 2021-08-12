@@ -41,9 +41,14 @@ namespace Carmen.ShowModel.Structure
         private readonly ObservableCollection<CountByGroup> countByGroups = new();
         public virtual ICollection<CountByGroup> CountByGroups => countByGroups;
 
-        public virtual ICollection<Item> Items { get; private set; } = new ObservableCollection<Item>();//TODO INotifyPropertyChanged
-        public virtual ICollection<Requirement> Requirements { get; set; } = new ObservableCollection<Requirement>();//TODO INotifyPropertyChanged
-        public virtual ICollection<Applicant> Cast { get; private set; } = new ObservableCollection<Applicant>();//TODO INotifyPropertyChanged
+        private readonly ObservableCollection<Item> items = new();
+        public virtual ICollection<Item> Items => items;
+
+        private readonly ObservableCollection<Requirement> requirements = new();
+        public virtual ICollection<Requirement> Requirements => requirements;
+
+        private readonly ObservableCollection<Applicant> cast = new();
+        public virtual ICollection<Applicant> Cast => cast;
 
         public Role()
         {

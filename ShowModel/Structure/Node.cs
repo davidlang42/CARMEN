@@ -18,9 +18,45 @@ namespace Carmen.ShowModel.Structure
 
         [Key]
         public int NodeId { get; private set; }
-        public string Name { get; set; } = "";//TODO INotifyPropertyChanged
-        public int Order { get; set; }//TODO INotifyPropertyChanged
-        public virtual InnerNode? Parent { get; set; }//TODO INotifyPropertyChanged
+
+        private string name = "";
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if (name == value)
+                    return;
+                name = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int order;
+        public int Order
+        {
+            get => order;
+            set
+            {
+                if (order == value)
+                    return;
+                order = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private InnerNode? parent;
+        public virtual InnerNode? Parent
+        {
+            get => parent;
+            set
+            {
+                if (parent == value)
+                    return;
+                parent = value;
+                OnPropertyChanged();
+            }
+        }
 
         private readonly ObservableCollection<CountByGroup> countByGroups = new();
         public virtual ICollection<CountByGroup> CountByGroups => countByGroups;
