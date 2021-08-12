@@ -44,7 +44,7 @@ namespace CarmenUI.ViewModels
         public string FirstName => Applicant.FirstName;
         public string LastName => Applicant.LastName;
 
-        public string CastNumberAndCast => Applicant.CastNumberAndCast;
+        public string? CastNumberAndCast => Applicant.CastNumberAndCast;
 
         /// <summary>Indicies match Criterias</summary>
         public uint[] Marks { get; init; }
