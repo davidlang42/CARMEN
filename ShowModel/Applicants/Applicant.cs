@@ -158,6 +158,8 @@ namespace Carmen.ShowModel.Applicants
             }
         }
 
+        public string? CastNumberAndCast => CastNumber == null ? null : $"{CastNumber}{AlternativeCast?.Initial}";
+
         private AlternativeCast? alternativeCast;
         public virtual AlternativeCast? AlternativeCast
         {

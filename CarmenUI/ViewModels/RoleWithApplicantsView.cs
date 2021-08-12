@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Structure;
+﻿using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,16 +15,18 @@ namespace CarmenUI.ViewModels
         /// <summary>Indicies match CastGroupsByCast</summary>
         public uint[] RequiredCast { get; init; }
 
-        /// <summary>Indicies match CastGroupsByCast</summary>
-        public uint[] SelectedCast //LATER check if re-calculating this each time is too slow, maybe cache and update on each applicant change
+        /// <summary>First-order indicies match CastGroupsByCast</summary>
+        public Applicant[][] SelectedCast //LATER check if re-calculating this each time is too slow, maybe cache and update on each applicant change
         {
             get
             {
-                var dictionary = Role.Cast.GroupBy(a => new CastGroupAndCast(a)).ToDictionary(g => g.Key, g => (uint)g.Count());
-                var result = new uint[CastGroupsByCast.Length];
+                var dictionary = Role.Cast.OrderBy(a => a.CastNumber).GroupBy(a => new CastGroupAndCast(a)).ToDictionary(g => g.Key, g => g.ToArray());
+                var result = new Applicant[CastGroupsByCast.Length][];
                 for (var i = 0; i < CastGroupsByCast.Length; i++)
-                    if (dictionary.TryGetValue(CastGroupsByCast[i], out var count))
-                        result[i] = count;
+                    if (dictionary.TryGetValue(CastGroupsByCast[i], out var group_cast))
+                        result[i] = group_cast;
+                    else
+                        result[i] = Array.Empty<Applicant>();
                 return result;
             }
         }

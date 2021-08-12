@@ -147,13 +147,60 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding}" Width="50"/>
+                                        <TextBlock Text="{Binding Length}" Width="50"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </Grid>
                         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5">
-                            <ItemsControl ItemsSource="{Binding Role.Cast}" Margin="5" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick" Background="White">
+                            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                <DockPanel Margin="5">
+                                    <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="1"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}" TextDecorations="Underline" Margin="0 0 0 5"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <ItemsControl ItemsSource="{Binding SelectedCast}" KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick" Background="White">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="1"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <ItemsControl ItemsSource="{Binding}" KeyboardNavigation.IsTabStop="False">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="{Binding CastNumberAndCast, StringFormat='#\{0\} '}"/>
+                                                                <TextBlock>
+                                                                    <TextBlock.Text>
+                                                                        <MultiBinding Converter="{StaticResource fullName}">
+                                                                            <MultiBinding.Bindings>
+                                                                                <Binding Path="FirstName"/>
+                                                                                <Binding Path="LastName"/>
+                                                                            </MultiBinding.Bindings>
+                                                                        </MultiBinding>
+                                                                    </TextBlock.Text>
+                                                                </TextBlock>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DockPanel>
+                            </ScrollViewer>
+
+                            <!--<ItemsControl ItemsSource="{Binding Role.Cast}" Margin="5" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick" Background="White">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock>
@@ -168,7 +215,7 @@
                                         </TextBlock>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                            </ItemsControl>-->
                         </Border>
                         <Grid Grid.Row="3">
                             <Grid.ColumnDefinitions>
@@ -250,7 +297,7 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding}" Width="50"/>
+                                            <TextBlock Text="{Binding Length}" Width="50"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>

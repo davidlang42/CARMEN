@@ -20,7 +20,7 @@ namespace Carmen.CastingEngine
         /// This assumes there are no circular references.</summary>
         public double SuitabilityOf(Applicant applicant, Role role)
         {
-            var sub_suitabilities = role.Requirements.Select(req => SuitabilityOf(applicant, req));
+            var sub_suitabilities = role.Requirements.Select(req => SuitabilityOf(applicant, req)).DefaultIfEmpty();
             return sub_suitabilities.Average();//LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
         }
 
