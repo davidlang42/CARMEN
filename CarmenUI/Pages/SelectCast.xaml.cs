@@ -74,12 +74,17 @@ namespace CarmenUI.Pages
             await context.Applicants.LoadAsync();
             castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
             allApplicantsViewSource.Source = castNumbersViewSource.Source = context.Applicants.Local.ToObservableCollection();
-            castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
-            castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
-            castNumbersViewSource.View.Filter = a => ((Applicant)a).CastNumber != null;
+            ConfigureCastNumbersSource();
             loading.Progress = 80;
             await context.Requirements.LoadAsync();
             loading.Progress = 100;
+        }
+
+        private void ConfigureCastNumbersSource()
+        {
+            castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
+            castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
+            castNumbersViewSource.View.Filter = a => ((Applicant)a).CastNumber != null;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -111,6 +116,7 @@ namespace CarmenUI.Pages
             processing.Progress = 75;
             processing.SubText = "Applying tags";
             engine.ApplyTags(context.Applicants.Local, context.Tags.Local);
+            ConfigureCastNumbersSource();
             processing.Progress = 100;
         }
 
