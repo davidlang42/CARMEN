@@ -39,6 +39,8 @@ namespace CarmenUI.Pages
         private NodeView? _rootNodeView;
         private ICastingEngine engine;
 
+        private object defaultPanelContent;
+
         private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
             ?? throw new ApplicationException($"Tried to used {nameof(castGroupsByCast)} before it was loaded.");
 
@@ -54,6 +56,7 @@ namespace CarmenUI.Pages
         public AllocateRoles(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
+            defaultPanelContent = applicantsPanel.Content;
             engine = new DummyEngine(); //LATER use real engine, maybe have it supplied by constructor, and type determined by a user setting
         }
 
@@ -147,7 +150,7 @@ namespace CarmenUI.Pages
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
                 RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
-                _ => null
+                _ => defaultPanelContent
             };
             return true;
         }
@@ -165,7 +168,7 @@ namespace CarmenUI.Pages
             {
                 RoleNodeView role_node_view => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,
                     Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants),
-                _ => null
+                _ => defaultPanelContent
             };
             if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
                 check_box.IsChecked = false; //LATER it would be much better if this was a property of the view itself, but for some reason I couldn't get the binding to work properly

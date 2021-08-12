@@ -73,6 +73,19 @@
         </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5" KeyboardNavigation.IsTabStop="False"/>
         <ContentControl x:Name="applicantsPanel" Grid.Column="2" Margin="5 0" KeyboardNavigation.IsTabStop="False">
+            <ContentControl.Content><!-- Default content for when nothing relevant is selected -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Text="Select a Role to cast" FontSize="20"/>
+                    <Button Grid.Row="1" HorizontalAlignment="Right" Width="160" Height="35" Margin="0 5"
+                            IsCancel="True" Content="Return to Main Menu"
+                            Click="MainMenuButton_Click" />
+                </Grid>
+            </ContentControl.Content>
             <ContentControl.Resources>
                 <DataTemplate DataType="{x:Type vm:RoleWithApplicantsView}">
                     <Grid>
