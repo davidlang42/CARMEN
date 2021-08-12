@@ -278,6 +278,7 @@
                             <TextBlock Grid.Row="5" Text="Requirements" FontSize="14"/>
                             <ListView Grid.Row="5" Grid.Column="1" FontSize="14"
                                       x:Name="requirementsList"
+                                      Margin="5 0 0 5"
                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                       ItemsSource="{Binding Requirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsSelectionSource}}">
                                 <ListView.ItemContainerStyle>
@@ -354,7 +355,24 @@
                             <TextBlock Grid.Row="2" Text="Description" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" FontSize="14"/>
                             <TextBlock Grid.Row="3" Text="Requirements" FontSize="14"/>
-                            <TextBlock Grid.Row="3" Grid.Column="1" Text="TODO" FontSize="14"/>
+                            <ListView Grid.Row="3" Grid.Column="1" FontSize="14"
+                                      x:Name="requirementsList"
+                                      Margin="5 0 0 5"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      ItemsSource="{Binding Requirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsSelectionSource}}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  Width="{Binding ElementName=requirementsList, Path=ActualWidth}"
+                                                  Content="{Binding ObjectValue.Name}" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                             <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Text="Required Counts:" FontSize="14"/>
                             <ItemsControl Grid.Row="5" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource sparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
                                 <ItemsControl.ItemsPanel>
@@ -758,7 +776,24 @@
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
                             <TextBlock Grid.Row="4" Text="ALL of" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="TODO" FontSize="14"/>
+                            <ListView Grid.Row="4" Grid.Column="1" FontSize="14"
+                                      x:Name="requirementsList"
+                                      Margin="5 0 0 5"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      ItemsSource="{Binding SubRequirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsSelectionSource}}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  Width="{Binding ElementName=requirementsList, Path=ActualWidth}"
+                                                  Content="{Binding ObjectValue.Name}" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:OrRequirement}">
@@ -794,7 +829,24 @@
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
                             <TextBlock Grid.Row="4" Text="ANY of" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="TODO" FontSize="14"/>
+                            <ListView Grid.Row="4" Grid.Column="1" FontSize="14"
+                                      x:Name="requirementsList"
+                                      Margin="5 0 0 5"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      ItemsSource="{Binding SubRequirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsSelectionSource}}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  Width="{Binding ElementName=requirementsList, Path=ActualWidth}"
+                                                  Content="{Binding ObjectValue.Name}" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:XorRequirement}">
@@ -830,7 +882,24 @@
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
                             <TextBlock Grid.Row="4" Text="ONE of" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Grid.Column="1" Text="TODO" FontSize="14"/>
+                            <ListView Grid.Row="4" Grid.Column="1" FontSize="14"
+                                      x:Name="requirementsList"
+                                      Margin="5 0 0 5"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      ItemsSource="{Binding SubRequirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsSelectionSource}}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  Width="{Binding ElementName=requirementsList, Path=ActualWidth}"
+                                                  Content="{Binding ObjectValue.Name}" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                         </Grid>
                     </DataTemplate>
                 </ContentControl.Resources>
