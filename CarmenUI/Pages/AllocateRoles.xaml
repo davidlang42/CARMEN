@@ -101,7 +101,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Role.Name}" FontSize="22"/>
-                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, TargetNullValue='', StringFormat='  requires \{0\}'}" FontSize="14" VerticalAlignment="Bottom"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, TargetNullValue='', StringFormat='  requires \{0\}'}" FontSize="16" VerticalAlignment="Bottom"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.RowDefinitions>
@@ -110,11 +110,11 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="85"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Grid.Row="1" Text="Required"/>
-                            <TextBlock Grid.Row="2" Text="Selected"/>
+                            <TextBlock Grid.Row="1" Text="Required" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Selected" FontSize="14"/>
                             <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
@@ -123,7 +123,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Abbreviation}" Width="50"/>
+                                        <TextBlock Text="{Binding Abbreviation}" Width="60" FontSize="14"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -135,7 +135,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding}" Width="50"/>
+                                        <TextBlock Text="{Binding}" Width="60" FontSize="14"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -147,7 +147,7 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <TextBlock Text="{Binding Length}" Width="50"/>
+                                        <TextBlock Text="{Binding Length}" Width="60" FontSize="14"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -199,23 +199,6 @@
                                     </ItemsControl>
                                 </DockPanel>
                             </ScrollViewer>
-
-                            <!--<ItemsControl ItemsSource="{Binding Role.Cast}" Margin="5" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick" Background="White">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <TextBlock>
-                                            <TextBlock.Text>
-                                                <MultiBinding Converter="{StaticResource fullName}">
-                                                    <MultiBinding.Bindings>
-                                                        <Binding Path="FirstName"/>
-                                                        <Binding Path="LastName"/>
-                                                    </MultiBinding.Bindings>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>-->
                         </Border>
                         <Grid Grid.Row="3">
                             <Grid.ColumnDefinitions>
@@ -242,11 +225,9 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Role.Name}" FontSize="22"/>
-                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, TargetNullValue='', StringFormat='  requires \{0\}'}" FontSize="14" VerticalAlignment="Bottom"/>
-                            <Button Grid.Column="2" Content="Main Menu" Width="100" Click="MainMenuButton_Click"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, TargetNullValue='', StringFormat='  requires \{0\}'}" FontSize="16" VerticalAlignment="Bottom"/>
                         </Grid>
                         <Grid Grid.Row="1">
                             <Grid.ColumnDefinitions>
@@ -260,11 +241,11 @@
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="85"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Row="1" Text="Required"/>
-                                <TextBlock Grid.Row="2" Text="Selected"/>
+                                <TextBlock Grid.Row="1" Text="Required" FontSize="14"/>
+                                <TextBlock Grid.Row="2" Text="Selected" FontSize="14"/>
                                 <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
@@ -273,7 +254,7 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Abbreviation}" Width="50"/>
+                                            <TextBlock Text="{Binding Abbreviation}" Width="60" FontSize="14"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
@@ -285,7 +266,7 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding}" Width="50"/>
+                                            <TextBlock Text="{Binding}" Width="60" FontSize="14"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
@@ -297,17 +278,17 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Length}" Width="50"/>
+                                            <TextBlock Text="{Binding Length}" Width="60" FontSize="14"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
                             </Grid>
-                            <UniformGrid Grid.Column="1" Columns="1" VerticalAlignment="Center">
-                                <CheckBox Content="Show unavailable applicants"
+                            <UniformGrid Grid.Column="1" Columns="1">
+                                <CheckBox Content="Show unavailable applicants" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"
                                           IsChecked="{bd:SettingBinding ShowUnavailableApplicants}"
                                           Checked="showApplicants_Changed"
                                           Unchecked="showApplicants_Changed"/>
-                                <CheckBox Content="Show ineligible applicants"
+                                <CheckBox Content="Show ineligible applicants" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"
                                           IsChecked="{bd:SettingBinding ShowIneligibleApplicants}"
                                           Checked="showApplicants_Changed"
                                           Unchecked="showApplicants_Changed"/>
