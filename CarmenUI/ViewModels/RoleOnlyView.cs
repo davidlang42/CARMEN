@@ -1,6 +1,7 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -13,7 +14,7 @@ namespace CarmenUI.ViewModels
 {
     public class RoleOnlyView : RoleView
     {
-        private Item currentItem;
+        private ItemView itemView;
 
         public CastGroup[] CastGroups { get; init; }
 
@@ -26,12 +27,12 @@ namespace CarmenUI.ViewModels
 
         public string CommaSeparatedItems => string.Join(", ", Role.Items.Select(r => r.Name));
 
-        public string? CommaSeparatedOtherItems => Role.Items.Count < 2 ? null : string.Join(", ", Role.Items.Where(i => i != currentItem).Select(r => r.Name));
+        public string? CommaSeparatedOtherItems => Role.Items.Count < 2 ? null : string.Join(", ", Role.Items.Where(i => i != itemView.Item).Select(r => r.Name));
 
-        public RoleOnlyView(Role role, CastGroup[] cast_groups, Item current_item)
+        public RoleOnlyView(Role role, CastGroup[] cast_groups, ItemView item_view)
             : base(role)
         {
-            currentItem = current_item;
+            itemView = item_view;
             CastGroups = cast_groups;
             CountByGroups = new NullableCountByGroup[cast_groups.Length];
             for (var i = 0; i < cast_groups.Length; i++)
@@ -47,6 +48,10 @@ namespace CarmenUI.ViewModels
         {
             OnPropertyChanged(nameof(CommaSeparatedItems));
             OnPropertyChanged(nameof(CommaSeparatedOtherItems));
+            if (e.Action != NotifyCollectionChangedAction.Move
+                && e.OldItems is IList removed_items
+                && removed_items.Contains(itemView.Item))
+                itemView.RemoveRole(this);
         }
 
         private void CountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
