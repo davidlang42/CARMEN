@@ -304,7 +304,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <ListView Grid.ColumnSpan="2" Initialized="ListView_Initialized" ItemsSource="{Binding Applicants}">
+                                <ListView Grid.ColumnSpan="2" Initialized="ListView_Initialized" ItemsSource="{Binding Applicants}"
+                                          MouseDoubleClick="ListView_MouseDoubleClick" KeyDown="ListView_KeyDown" PreviewKeyDown="ListView_PreviewKeyDown">
                                     <ListView.Resources>
                                         <Style TargetType="{x:Type ListViewItem}">
                                             <Style.Triggers>

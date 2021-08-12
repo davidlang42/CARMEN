@@ -236,5 +236,48 @@ namespace CarmenUI.Pages
 
         private void showCompleted_Unchecked(object sender, RoutedEventArgs e)
             => rootNodeView.SetShowCompleted(false);
+
+        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var list_view = (ListView)sender;
+            if (list_view.SelectedItem is ApplicantForRole afr && list_view.SelectedItems.Count == 1)
+                afr.IsSelected = !afr.IsSelected;
+        }
+
+        private void ListView_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.T) // Toggle
+            {
+                e.Handled = true;
+                PickSelectedApplicants((ListView)sender, null);
+            }
+            else if (e.Key == Key.S) // Select
+            {
+                e.Handled = true;
+                PickSelectedApplicants((ListView)sender, true);
+            }
+            else if (e.Key == Key.U) // Unselect
+            {
+                e.Handled = true;
+                PickSelectedApplicants((ListView)sender, false);
+            }
+        }
+
+        private void ListView_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Space) // Space can only be handed in PreviewKeyDown, not KeyDown
+            {
+                e.Handled = true;
+                PickSelectedApplicants((ListView)sender, null);
+            }
+        }
+
+        private void PickSelectedApplicants(ListView list_view, bool? value_or_toggle)
+        {
+            var selected_items = list_view.SelectedItems.OfType<ApplicantForRole>().ToArray();
+            var value = value_or_toggle ?? !(selected_items.Where(afr => afr.IsSelected).Count() > selected_items.Length / 2);
+            foreach (var afr in selected_items)
+                afr.IsSelected = value;
+        }
     }
 }
