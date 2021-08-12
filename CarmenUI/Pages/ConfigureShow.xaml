@@ -31,6 +31,7 @@
         </ObjectDataProvider>
         <CollectionViewSource x:Key="listSortDirectionEnumSource"/>
         <cv:MinimumIntValue x:Key="minimumIntValue"/>
+        <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -275,7 +276,23 @@
                             <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding AlternateCasts}" FontSize="14" Content="Alternate Casts" VerticalContentAlignment="Center"
                                       IsEnabled="{Binding Source={StaticResource alternativeCastsViewSource}, Path=Count, Converter={StaticResource minimumIntValue}, ConverterParameter=2}"/>
                             <TextBlock Grid.Row="5" Text="Requirements" FontSize="14"/>
-                            <TextBlock Grid.Row="5" Grid.Column="1" Text="TODO" FontSize="14"/>
+                            <ListView Grid.Row="5" Grid.Column="1" FontSize="14"
+                                      x:Name="requirementsList"
+                                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                      ItemsSource="{Binding Requirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsSelectionSource}}">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.ItemTemplate>
+                                    <DataTemplate>
+                                        <CheckBox IsChecked="{Binding IsSelected}"
+                                                  Width="{Binding ElementName=requirementsList, Path=ActualWidth}"
+                                                  Content="{Binding ObjectValue.Name}" VerticalAlignment="Center"/>
+                                    </DataTemplate>
+                                </ListView.ItemTemplate>
+                            </ListView>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelApplicants:AlternativeCast}">
