@@ -178,7 +178,7 @@
                                 <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Requirements" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding CommaSeparatedRequirements}"/>
+                                            <TextBlock Text="{Binding CommaSeparatedRequirements, TargetNullValue=''}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
@@ -188,7 +188,7 @@
                                                     <cv:ComboBoxFaceTemplateSelector>
                                                         <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                                                             <DataTemplate>
-                                                                <TextBlock Text="{Binding ElementName=requirementsCombo, Path=DataContext.CommaSeparatedRequirements}"/>
+                                                                <TextBlock Text="{Binding ElementName=requirementsCombo, Path=DataContext.CommaSeparatedRequirements, TargetNullValue=''}"/>
                                                             </DataTemplate>
                                                         </cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                                                         <cv:ComboBoxFaceTemplateSelector.ItemTemplate>

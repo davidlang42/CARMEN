@@ -93,72 +93,64 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Role.Name}" FontSize="22"/>
-                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, StringFormat='  requires \{0\}'}" FontSize="14" VerticalAlignment="Bottom"/>
-                            <Button Grid.Column="2" Content="Main Menu" Width="100" Click="MainMenuButton_Click"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, TargetNullValue='', StringFormat='  requires \{0\}'}" FontSize="14" VerticalAlignment="Bottom"/>
                         </Grid>
                         <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80"/>
                                 <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Row="1" Text="Required"/>
-                                <TextBlock Grid.Row="2" Text="Selected"/>
-                                <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding Abbreviation}" Width="50"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RequiredCast}" KeyboardNavigation.IsTabStop="False">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding}" Width="50"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                                <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SelectedCast}" KeyboardNavigation.IsTabStop="False">
-                                    <ItemsControl.ItemsPanel>
-                                        <ItemsPanelTemplate>
-                                            <StackPanel Orientation="Horizontal"/>
-                                        </ItemsPanelTemplate>
-                                    </ItemsControl.ItemsPanel>
-                                    <ItemsControl.ItemTemplate>
-                                        <DataTemplate>
-                                            <TextBlock Text="{Binding}" Width="50"/>
-                                        </DataTemplate>
-                                    </ItemsControl.ItemTemplate>
-                                </ItemsControl>
-                            </Grid>
-                            <Button Grid.Column="1" Height="30" Width="100" VerticalAlignment="Bottom" Content="Edit Casting" Click="EditCastButton_Click"/>
+                            <TextBlock Grid.Row="1" Text="Required"/>
+                            <TextBlock Grid.Row="2" Text="Selected"/>
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Abbreviation}" Width="50"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RequiredCast}" KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Width="50"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SelectedCast}" KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Width="50"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
                         </Grid>
                         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5">
                             <ItemsControl ItemsSource="{Binding Role.Cast}" Margin="5" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick" Background="White">
@@ -178,6 +170,18 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </Border>
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button HorizontalAlignment="Left" Width="110" Height="35" Margin="0 0 0 5"
+                                Content="Edit Casting"
+                                Click="EditCastButton_Click" />
+                            <Button Grid.Column="1" Width="160" Height="35" Margin="0 0 0 5"
+                                IsCancel="True" Content="Return to Main Menu"
+                                Click="MainMenuButton_Click" />
+                        </Grid>
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:EditableRoleWithApplicantsView}">
@@ -194,7 +198,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Role.Name}" FontSize="22"/>
-                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, StringFormat='  requires \{0\}'}" FontSize="14" VerticalAlignment="Bottom"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, TargetNullValue='', StringFormat='  requires \{0\}'}" FontSize="14" VerticalAlignment="Bottom"/>
                             <Button Grid.Column="2" Content="Main Menu" Width="100" Click="MainMenuButton_Click"/>
                         </Grid>
                         <Grid Grid.Row="1">

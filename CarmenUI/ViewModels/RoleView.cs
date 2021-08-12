@@ -24,7 +24,7 @@ namespace CarmenUI.ViewModels
 
         public ICollection<Requirement> Requirements => Role.Requirements;
 
-        public string CommaSeparatedRequirements => string.Join(", ", Role.Requirements.Select(r => r.Name));
+        public string? CommaSeparatedRequirements => Role.Requirements.Count == 0 ? null : string.Join(", ", Role.Requirements.Select(r => r.Name));
 
         public RoleView(Role role)
         {
