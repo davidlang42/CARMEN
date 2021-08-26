@@ -116,27 +116,6 @@
                         </TextBlock>
                     </HierarchicalDataTemplate>
                 </TreeView.Resources>
-                <TreeView.ContextMenu>
-                    <ContextMenu>
-                        <ContextMenu.ItemsSource>
-                            <CompositeCollection>
-                                <MenuItem Header="Add Item" Command="{Binding Source={StaticResource addNodeCommand}}"/>
-                                <CollectionContainer Collection="{Binding Source={StaticResource sectionTypesViewSource}}"/>
-                            </CompositeCollection>
-                        </ContextMenu.ItemsSource>
-                        <ContextMenu.ItemTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding Name, StringFormat='Add \{0\}'}"/>
-                            </DataTemplate>
-                        </ContextMenu.ItemTemplate>
-                        <ContextMenu.ItemContainerStyle>
-                            <Style TargetType="{x:Type MenuItem}">
-                                <Setter Property="Command" Value="{Binding Source={StaticResource addNodeCommand}}"/>
-                                <Setter Property="CommandParameter" Value="{Binding}"/>
-                            </Style>
-                        </ContextMenu.ItemContainerStyle>
-                    </ContextMenu>
-                </TreeView.ContextMenu>
             </TreeView>
         </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5" KeyboardNavigation.IsTabStop="False"/>
@@ -151,7 +130,6 @@
                         </Grid.RowDefinitions>
                         <DockPanel>
                             <Button DockPanel.Dock="Right" Content="Add Role" Click="AddRole_Click" Width="100" Margin="0 0 0 5"/>
-                            <Button DockPanel.Dock="Right" Content="Remove Role" Click="RemoveRole_Click" Width="100" Margin="0 0 5 5"/>
                             <TextBlock Text="{Binding Item.Name, StringFormat='Roles in \{0\}:'}" FontSize="22"/>
                         </DockPanel>
                         <Grid Grid.Row="2">
@@ -239,7 +217,6 @@
                             <DataGrid.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Add Role" Click="AddRole_Click"/>
-                                    <MenuItem Header="Remove Role" Click="RemoveRole_Click"/>
                                 </ContextMenu>
                             </DataGrid.ContextMenu>
                         </DataGrid>
@@ -249,17 +226,46 @@
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Text="{Binding InnerNode.Name, StringFormat='Items/Sections in \{0\}:'}" FontSize="22"/>
-                        <TextBlock Grid.Row="1" Text="{Binding SectionDescription}"
-                                   Visibility="{Binding SectionDescription, Converter={StaticResource collapseIfNull}}"/>
-                        <TextBlock Grid.Row="2" Text="{Binding SectionError}" Foreground="Red"
-                                   Visibility="{Binding SectionError, Converter={StaticResource collapseIfNull}}"/>
-                        <Grid Grid.Row="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel>
+                            <TextBlock Text="{Binding InnerNode.Name, StringFormat='Items/Sections in \{0\}:'}" FontSize="22"/>
+                            <TextBlock Grid.Row="1" Text="{Binding SectionDescription}"
+                                       Visibility="{Binding SectionDescription, Converter={StaticResource collapseIfNull}}"/>
+                            <TextBlock Grid.Row="2" Text="{Binding SectionError}" Foreground="Red"
+                                       Visibility="{Binding SectionError, Converter={StaticResource collapseIfNull}}"/>
+                        </StackPanel>
+                        <ItemsControl Grid.Column="1">
+                            <ItemsControl.ItemsSource>
+                                <CompositeCollection>
+                                    <Button HorizontalAlignment="Right" Height="25" Margin="0 0 5 5"
+                                            Command="{Binding Source={StaticResource addNodeCommand}}">
+                                        <TextBlock Text="Add Item" Margin="10 0"/>
+                                    </Button>
+                                    <CollectionContainer Collection="{Binding Source={StaticResource sectionTypesViewSource}}"/>
+                                </CompositeCollection>
+                            </ItemsControl.ItemsSource>
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel HorizontalAlignment="Right" FlowDirection="RightToLeft"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Button HorizontalAlignment="Right" Height="25" Margin="0 0 5 5"
+                                            Command="{Binding Source={StaticResource addNodeCommand}}"
+                                            CommandParameter="{Binding}">
+                                        <TextBlock Text="{Binding Name, StringFormat='Add \{0\}'}" Margin="10 0"/>
+                                    </Button>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <Grid Grid.Row="2" Grid.ColumnSpan="2">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="5"/>
                                 <ColumnDefinition Width="{Binding ElementName=ChildrenDataGrid, Path=Columns[0].ActualWidth}"/>
@@ -273,7 +279,7 @@
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SectionTypeName, StringFormat='Required in \{0\}'}"/>
                             <!-- CountByGroup footer cells are added here dynamically -->
                         </Grid>
-                        <DataGrid Grid.Row="3" x:Name="ChildrenDataGrid" AutoGenerateColumns="False"
+                        <DataGrid Grid.Row="1" Grid.ColumnSpan="2" x:Name="ChildrenDataGrid" AutoGenerateColumns="False"
                                   CanUserDeleteRows="True"
                                   ItemsSource="{Binding Children}"
                                   Background="{Binding NoChildrenErrorBackgroundColor}"

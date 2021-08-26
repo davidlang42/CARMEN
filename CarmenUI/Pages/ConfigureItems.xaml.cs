@@ -331,23 +331,11 @@ namespace CarmenUI.Pages
             data_grid.CurrentCell = new DataGridCellInfo(role_view, data_grid.Columns.First());
         }
 
-        private void RemoveRole_Click(object sender, RoutedEventArgs e)
-        {
-            var item_view = (ItemView)rolesPanel.Content;
-            var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
-            if (data_grid.SelectedItem is RoleOnlyView rv)
-                item_view.RemoveRole(rv);
-        }
-
         private void AddNode(object sender, ExecutedRoutedEventArgs e)
         {
-            (var parent, var after) = itemsTreeView.SelectedItem switch
-            {
-                Item item => (item.Parent ?? throw new Exception("Item did not have a parent."), item),
-                Section section => (section, null),
-                ShowRoot show => (show, null),
-                _ => (context.ShowRoot, null)
-            };
+            var section_view = (ShowRootOrSectionView)rolesPanel.Content;
+            var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
+            data_grid.Focus();
             Node new_node = e.Parameter switch
             {
                 SectionType section_type => new Section
@@ -360,8 +348,44 @@ namespace CarmenUI.Pages
                     Name = "New Item"
                 }
             };
-            new_node.Parent = parent;
-            parent.Children.InsertInOrder(new_node, after);
+            var child_view = section_view.AddChild(new_node);
+            data_grid.SelectedItem = child_view;
+            data_grid.CurrentCell = new DataGridCellInfo(child_view, data_grid.Columns.First());
+
+
+
+
+            (var parent, var after) = itemsTreeView.SelectedItem switch
+            {
+                Item item => (item.Parent ?? throw new Exception("Item did not have a parent."), item),
+                Section section => (section, null),
+                ShowRoot show => (show, null),
+                _ => (context.ShowRoot, null)
+            };
+
+
+
+            //(var parent, var after) = itemsTreeView.SelectedItem switch
+            //{
+            //    Item item => (item.Parent ?? throw new Exception("Item did not have a parent."), item),
+            //    Section section => (section, null),
+            //    ShowRoot show => (show, null),
+            //    _ => (context.ShowRoot, null)
+            //};
+            //Node new_node = e.Parameter switch
+            //{
+            //    SectionType section_type => new Section
+            //    {
+            //        Name = $"New {section_type.Name}",
+            //        SectionType = section_type
+            //    },
+            //    _ => new Item
+            //    {
+            //        Name = "New Item"
+            //    }
+            //};
+            //new_node.Parent = parent;
+            //parent.Children.InsertInOrder(new_node, after);
         }
 
         private void MoveNode(Node dragged, Node target)
