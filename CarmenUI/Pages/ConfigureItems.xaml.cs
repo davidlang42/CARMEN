@@ -326,7 +326,7 @@ namespace CarmenUI.Pages
             var item_view = (ItemView)rolesPanel.Content;
             var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
             data_grid.Focus();
-            var role_view = item_view.AddRole();
+            var role_view = item_view.AddRole(data_grid.SelectedItems.OfType<RoleOnlyView>().SingleOrDefaultSafe());
             data_grid.SelectedItem = role_view;
             data_grid.CurrentCell = new DataGridCellInfo(role_view, data_grid.Columns.First());
         }
@@ -348,44 +348,9 @@ namespace CarmenUI.Pages
                     Name = "New Item"
                 }
             };
-            var child_view = section_view.AddChild(new_node);
+            var child_view = section_view.AddChild(new_node, data_grid.SelectedItems.OfType<ChildView>().SingleOrDefaultSafe());
             data_grid.SelectedItem = child_view;
             data_grid.CurrentCell = new DataGridCellInfo(child_view, data_grid.Columns.First());
-
-
-
-
-            (var parent, var after) = itemsTreeView.SelectedItem switch
-            {
-                Item item => (item.Parent ?? throw new Exception("Item did not have a parent."), item),
-                Section section => (section, null),
-                ShowRoot show => (show, null),
-                _ => (context.ShowRoot, null)
-            };
-
-
-
-            //(var parent, var after) = itemsTreeView.SelectedItem switch
-            //{
-            //    Item item => (item.Parent ?? throw new Exception("Item did not have a parent."), item),
-            //    Section section => (section, null),
-            //    ShowRoot show => (show, null),
-            //    _ => (context.ShowRoot, null)
-            //};
-            //Node new_node = e.Parameter switch
-            //{
-            //    SectionType section_type => new Section
-            //    {
-            //        Name = $"New {section_type.Name}",
-            //        SectionType = section_type
-            //    },
-            //    _ => new Item
-            //    {
-            //        Name = "New Item"
-            //    }
-            //};
-            //new_node.Parent = parent;
-            //parent.Children.InsertInOrder(new_node, after);
         }
 
         private void MoveNode(Node dragged, Node target)

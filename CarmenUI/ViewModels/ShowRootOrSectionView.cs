@@ -200,9 +200,16 @@ namespace CarmenUI.ViewModels
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
-        public ChildView AddChild(Node new_child)
+        public ChildView AddChild(Node new_child, ChildView? insert_after = null)
         {
             var child_view = new ChildView(new_child, castGroups);
+            if (insert_after != null)
+                for (var i = 0; i < Children.Count; i++)
+                    if (Children[i] == insert_after)
+                    {
+                        Children.Insert(i + 1, child_view);
+                        return child_view;
+                    }
             Children.Add(child_view);
             return child_view;
         }

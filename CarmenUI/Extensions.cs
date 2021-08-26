@@ -22,6 +22,18 @@ namespace CarmenUI
 
         public static uint Sum(this IEnumerable<uint> list)
             => (uint)list.Select(u => (int)u).Sum();
+
+        /// <summary>Like SingleOrDefault() except returns null if more than one element rather than throwing an exception</summary>
+        public static T? SingleOrDefaultSafe<T>(this IEnumerable<T> list) where T : class
+        {
+            var e = list.GetEnumerator();
+            if (!e.MoveNext())
+                return null;
+            var first = e.Current;
+            if (e.MoveNext())
+                return null;
+            return first;
+        }
     }
 
     internal static class AsyncExtensions
