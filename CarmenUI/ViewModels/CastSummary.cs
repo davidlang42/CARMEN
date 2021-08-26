@@ -15,12 +15,14 @@ namespace CarmenUI.ViewModels
         {
             StartLoad();
             await c.CastGroups.Include(cg => cg.Members).LoadAsync();
+            var alternative_cast_count = await c.AlternativeCasts.CountAsync();
             var sum = 0;
             foreach (var cast_group in c.CastGroups.Local)
             {
                 var count = cast_group.Members.Count;
                 var row = new Row { Success = $"{count} in {cast_group.Name}" };
-                var extra = count - cast_group.RequiredCount;
+                var alternative_casts_for_group = cast_group.AlternateCasts ? alternative_cast_count : 1;
+                var extra = count - cast_group.RequiredCount * alternative_casts_for_group;
                 if (extra > 0)
                     row.Fail = $"({extra} too many)";
                 else if (extra < 0)
