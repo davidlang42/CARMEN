@@ -1,7 +1,17 @@
 ﻿using System.Reflection;
 
-[assembly: AssemblyInformationalVersion("0.1")] // Application.ProductVersion
-[assembly: AssemblyVersion("0.1.*")]
+// AssemblyInformationalVersion is used for Application.ProductVersion
+[assembly: AssemblyInformationalVersion("0.1"
+#if DEBUG
+    + "-debug"
+#endif
+    )]
+// AssemblyVersion must be deterministic in debug mode so that user settings persist
+[assembly: AssemblyVersion("0.1"
+#if !DEBUG
+    + ".*"
+#endif
+    )]
 [assembly: AssemblyProduct("CARMEN")]
 [assembly: AssemblyDescription("Casting And Role Management Equality Network")]
 [assembly: AssemblyCompany("David Lang")]
