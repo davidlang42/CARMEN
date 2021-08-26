@@ -97,8 +97,9 @@ namespace CarmenUI.Pages
             loading.Progress = 100;
         }
 
-        private void BindObjectList(string header, string? tool_tip, CollectionViewSource view_source, AddableObject[][] add_buttons)
+        private void BindObjectList(string header, string? tool_tip, CollectionViewSource view_source, AddableObject[][] add_buttons, bool hide_panel = false)
         {
+            objectPanelColumn.Width = hide_panel ? new(0) : new(1, GridUnitType.Star);
             objectHeading.Text = header;
             objectList.ToolTip = tool_tip;
             objectList.SetBinding(ItemsControl.ItemsSourceProperty, new Binding { Source = view_source });
@@ -107,7 +108,7 @@ namespace CarmenUI.Pages
         }
 
         private void ShowRoot_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Show Details", null, showRootSource, new AddableObject[0][]);
+            => BindObjectList("", null, showRootSource, new AddableObject[0][], true);
 
         readonly AddableObject[][] criteriasButtons = new[]
         {

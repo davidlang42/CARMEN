@@ -36,7 +36,7 @@
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="250"/>
-            <ColumnDefinition Width="*" MinWidth="275"/>
+            <ColumnDefinition x:Name="objectPanelColumn" Width="*"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -466,7 +466,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is the root block of show settings, which define your show.
@@ -495,8 +495,9 @@
                             <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding CastNumberOrderDirection}" ItemsSource="{Binding Source={StaticResource listSortDirectionEnumSource}}" FontSize="14"/>
                             <CheckBox Grid.Row="5" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items" VerticalContentAlignment="Center"/>
                             <TextBlock Grid.Row="6" Text="Company Logo" FontSize="14"/>
-                            <uc:EditableImage Grid.Row="6" Grid.Column="1" Width="100" Height="100" HorizontalAlignment="Left"
-                                              ImageObject="{Binding Logo, Mode=TwoWay}"/>
+                            <uc:EditableImage Grid.Row="6" Grid.Column="1" Margin="5 0 0 0" HorizontalAlignment="Left"
+                                              ImageObject="{Binding Logo, Mode=TwoWay}"
+                                              x:Name="LogoImage" MinWidth="{Binding ElementName=LogoImage, Path=ActualHeight}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">
