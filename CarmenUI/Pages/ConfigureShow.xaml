@@ -265,7 +265,7 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Text="{Binding RequiredCount}" FontSize="14"/>
+                                <TextBox Text="{Binding RequiredCount, TargetNullValue=''}" FontSize="14"/>
                                 <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource alternativeCastsViewSource}, Path=Count, StringFormat=' x {0}'}"
                                            Visibility="{Binding AlternateCasts, Converter={StaticResource booleanToVisibility}}"
                                            FontSize="14"/>
