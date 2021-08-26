@@ -50,7 +50,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="400"/>
+            <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="450"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -67,7 +67,8 @@
                     MouseMove="itemsTreeView_MouseMove" 
                     DragOver="itemsTreeView_DragOver" 
                     Drop="itemsTreeView_Drop"
-                    SelectedItemChanged="itemsTreeView_SelectedItemChanged" ToolTip="Drag to re-order">
+                    SelectedItemChanged="itemsTreeView_SelectedItemChanged" ToolTip="Drag to re-order"
+                    FontSize="14">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
                         <Setter Property="IsExpanded" Value="True"/>
@@ -142,11 +143,11 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="1" Text="Total Role Counts"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Required in Item"/>
+                            <TextBlock Grid.Column="1" Text="Total Role Counts" FontSize="14"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="Required in Item" FontSize="14"/>
                             <!-- CountByGroup footer cells are added here dynamically -->
                         </Grid>
-                        <DataGrid Grid.Row="1" x:Name="RolesDataGrid"  AutoGenerateColumns="False"
+                        <DataGrid Grid.Row="1" x:Name="RolesDataGrid" FontSize="14" AutoGenerateColumns="False"
                                   CanUserSortColumns="True" CanUserDeleteRows="True"
                                   ItemsSource="{Binding Roles}"
                                   Background="{Binding NoRolesErrorBackgroundColor}"
@@ -275,12 +276,12 @@
                                 <RowDefinition/>
                                 <RowDefinition/>
                             </Grid.RowDefinitions>
-                            <TextBlock Grid.Column="1" Text="Total Role Counts"/>
-                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SectionTypeName, StringFormat='Required in \{0\}'}"/>
+                            <TextBlock Grid.Column="1" Text="Total Role Counts" FontSize="14"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" FontSize="14" Text="{Binding SectionTypeName, StringFormat='Required in \{0\}'}"/>
                             <!-- CountByGroup footer cells are added here dynamically -->
                         </Grid>
                         <DataGrid Grid.Row="1" Grid.ColumnSpan="2" x:Name="ChildrenDataGrid" AutoGenerateColumns="False"
-                                  CanUserDeleteRows="True"
+                                  CanUserDeleteRows="True" FontSize="14"
                                   ItemsSource="{Binding Children}"
                                   Background="{Binding NoChildrenErrorBackgroundColor}"
                                   Initialized="ChildrenDataGrid_Initialized"><!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->

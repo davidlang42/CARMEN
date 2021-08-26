@@ -52,30 +52,34 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            using var loading = new LoadingOverlay(this);
-            loading.Progress = 0;
-            await context.AlternativeCasts.LoadAsync();
-            await context.CastGroups.LoadAsync();
-            var alternative_casts_count = context.AlternativeCasts.Local.Count;
-            var cast_groups = context.CastGroups.Local.ToArray();
-            castMembersDictionarySource.Source = cast_groups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
-            castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
-            loading.Progress = 20;
-            await context.Requirements.LoadAsync();
-            requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
-            loading.Progress = 40;
-            await context.Nodes.LoadAsync();
-            loading.Progress = 60;
-            await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-            rootNodesViewSource.Source = itemsViewSource.Source = context.Nodes.Local.ToObservableCollection();
-            rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
-            rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
-            itemsViewSource.View.Filter = n => n is Item;
-            itemsViewSource.View.SortDescriptions.Add(new(nameof(Item.Name), ListSortDirection.Ascending)); // sorting by order isn't possible in a flat structure, so just use name instead
-            loading.Progress = 80;
-            await context.SectionTypes.LoadAsync();
-            sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
-            loading.Progress = 100;
+            using (var loading = new LoadingOverlay(this))
+            {
+                loading.Progress = 0;
+                await context.AlternativeCasts.LoadAsync();
+                await context.CastGroups.LoadAsync();
+                var alternative_casts_count = context.AlternativeCasts.Local.Count;
+                var cast_groups = context.CastGroups.Local.ToArray();
+                castMembersDictionarySource.Source = cast_groups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
+                castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
+                loading.Progress = 20;
+                await context.Requirements.LoadAsync();
+                requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
+                loading.Progress = 40;
+                await context.Nodes.LoadAsync();
+                loading.Progress = 60;
+                await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
+                rootNodesViewSource.Source = itemsViewSource.Source = context.Nodes.Local.ToObservableCollection();
+                rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
+                rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
+                itemsViewSource.View.Filter = n => n is Item;
+                itemsViewSource.View.SortDescriptions.Add(new(nameof(Item.Name), ListSortDirection.Ascending)); // sorting by order isn't possible in a flat structure, so just use name instead
+                loading.Progress = 80;
+                await context.SectionTypes.LoadAsync();
+                sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
+                loading.Progress = 100;
+            }
+            if (itemsTreeView.VisualDescendants<TreeViewItem>().FirstOrDefault() is TreeViewItem show_root_tvi)
+                show_root_tvi.IsSelected = true;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -171,12 +175,12 @@ namespace CarmenUI.Pages
                 });
                 footer.ColumnDefinitions.Add(column_definition);
                 // add top text
-                var top_text = new TextBlock();
+                var top_text = new TextBlock() { FontSize = datagrid.FontSize };
                 top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ItemView.SumOfRolesCount)}[{i}]"));
                 Grid.SetColumn(top_text, column_index);
                 footer.Children.Add(top_text);
                 // add bottom text
-                var bottom_text = new TextBox();
+                var bottom_text = new TextBox() { FontSize = datagrid.FontSize };
                 bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ItemView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}")
                 {
                     TargetNullValue = "*",
@@ -198,7 +202,7 @@ namespace CarmenUI.Pages
             });
             footer.ColumnDefinitions.Add(total_column);
             // add top total
-            var top_total = new TextBlock();
+            var top_total = new TextBlock() { FontSize = datagrid.FontSize };
             top_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.SumOfRolesTotal))
             {
                 StringFormat = "={0}"
@@ -206,7 +210,7 @@ namespace CarmenUI.Pages
             Grid.SetColumn(top_total, column_index);
             footer.Children.Add(top_total);
             // add bottom total
-            var bottom_total = new TextBlock();
+            var bottom_total = new TextBlock() { FontSize = datagrid.FontSize };
             bottom_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.TotalCount))
             {
                 TargetNullValue="=*",
@@ -251,12 +255,12 @@ namespace CarmenUI.Pages
                 });
                 footer.ColumnDefinitions.Add(column_definition);
                 // add top text
-                var top_text = new TextBlock();
+                var top_text = new TextBlock() { FontSize = datagrid.FontSize };
                 top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ShowRootOrSectionView.SumOfRolesCount)}[{i}]"));
                 Grid.SetColumn(top_text, column_index);
                 footer.Children.Add(top_text);
                 // add bottom text
-                var bottom_text = new TextBox();
+                var bottom_text = new TextBox() { FontSize = datagrid.FontSize };
                 bottom_text.SetBinding(TextBox.TextProperty, new Binding($"{nameof(ShowRootOrSectionView.CountByGroups)}[{i}].{nameof(NullableCountByGroup.Count)}")
                 {
                     TargetNullValue = "*",
@@ -278,7 +282,7 @@ namespace CarmenUI.Pages
             });
             footer.ColumnDefinitions.Add(total_column);
             // add top total
-            var top_total = new TextBlock();
+            var top_total = new TextBlock() { FontSize = datagrid.FontSize };
             top_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ShowRootOrSectionView.SumOfRolesTotal))
             {
                 StringFormat = "={0}"
@@ -286,7 +290,7 @@ namespace CarmenUI.Pages
             Grid.SetColumn(top_total, column_index);
             footer.Children.Add(top_total);
             // add bottom total
-            var bottom_total = new TextBlock();
+            var bottom_total = new TextBlock() { FontSize = datagrid.FontSize };
             bottom_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ShowRootOrSectionView.TotalCount))
             {
                 TargetNullValue = "=*",
