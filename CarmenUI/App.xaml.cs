@@ -21,6 +21,7 @@ namespace CarmenUI
         private void Application_Exit(object sender, ExitEventArgs e)
         {
             CarmenUI.Properties.Settings.Default.Save();
+            CarmenUI.Properties.Timings.Default.Save();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
