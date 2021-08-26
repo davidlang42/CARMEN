@@ -176,78 +176,77 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="First Name: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" x:Name="firstNameText"  Text="{Binding FirstName}"/>
-                            </Grid>
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Last Name: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Text="{Binding LastName}"/>
-                            </Grid>
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Gender: " VerticalAlignment="Center"/>
-                                <RadioButton Grid.Column="1" IsChecked="{Binding Gender, Converter={StaticResource matchGenderValue}, ConverterParameter='Male'}">
-                                    <RadioButton.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="Clear Gender" Click="ClearGender_Click"/>
-                                        </ContextMenu>
-                                    </RadioButton.ContextMenu>
-                                    <RadioButton.Content>
-                                        Male
-                                    </RadioButton.Content>
-                                </RadioButton>
-                                <RadioButton Grid.Column="2" IsChecked="{Binding Gender, Converter={StaticResource matchGenderValue}, ConverterParameter='Female'}">
-                                    <RadioButton.ContextMenu>
-                                        <ContextMenu>
-                                            <MenuItem Header="Clear gender" Click="ClearGender_Click"/>
-                                        </ContextMenu>
-                                    </RadioButton.ContextMenu>
-                                    <RadioButton.Content>
-                                        Female
-                                    </RadioButton.Content>
-                                </RadioButton>
-                            </Grid>
-                            <Grid Margin="0 0 0 10">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Text="Date of Birth: " VerticalAlignment="Center"/>
-                                <DatePicker Grid.Column="1" SelectedDate="{Binding DateOfBirth}"/>
-                            </Grid>
-                            <ItemsControl ItemsSource="{Binding Abilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}" KeyboardNavigation.IsTabStop="False">
-                                <ItemsControl.ItemsPanel>
-                                    <ItemsPanelTemplate>
-                                        <UniformGrid Columns="1" KeyboardNavigation.IsTabStop="False"/>
-                                    </ItemsPanelTemplate>
-                                </ItemsControl.ItemsPanel>
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="0 0 0 10">
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding Criteria.Name, StringFormat='\{0\}: '}" VerticalAlignment="Center"/>
-                                            <uc:CriteriaMarkSelector Grid.Column="1" Mark="{Binding Mark, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                    <RowDefinition/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Text="First Name: " VerticalAlignment="Center" Margin="0 0 0 10"/>
+                                <TextBox Grid.Column="1" x:Name="firstNameText"  Text="{Binding FirstName}" Margin="0 0 0 10"/>
+                                <TextBlock Grid.Row="1" Text="Last Name: " VerticalAlignment="Center" Margin="0 0 0 10"/>
+                                <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding LastName}" Margin="0 0 0 10"/>
+                                <TextBlock Grid.Row="2" Text="Gender: " VerticalAlignment="Center" Margin="0 0 0 10"/>
+                                <Grid Grid.Row="2" Grid.Column="1" Margin="0 0 0 10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition/>
+                                        <ColumnDefinition/>
+                                    </Grid.ColumnDefinitions>
+                                    <RadioButton Grid.Column="0" IsChecked="{Binding Gender, Converter={StaticResource matchGenderValue}, ConverterParameter='Male'}">
+                                        <RadioButton.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Clear Gender" Click="ClearGender_Click"/>
+                                            </ContextMenu>
+                                        </RadioButton.ContextMenu>
+                                        <RadioButton.Content>
+                                            Male
+                                        </RadioButton.Content>
+                                    </RadioButton>
+                                    <RadioButton Grid.Column="1" IsChecked="{Binding Gender, Converter={StaticResource matchGenderValue}, ConverterParameter='Female'}">
+                                        <RadioButton.ContextMenu>
+                                            <ContextMenu>
+                                                <MenuItem Header="Clear gender" Click="ClearGender_Click"/>
+                                            </ContextMenu>
+                                        </RadioButton.ContextMenu>
+                                        <RadioButton.Content>
+                                            Female
+                                        </RadioButton.Content>
+                                    </RadioButton>
+                                </Grid>
+                                <TextBlock Grid.Row="3" Text="Date of Birth: " VerticalAlignment="Center" Margin="0 0 0 10"/>
+                                <DatePicker Grid.Row="3" Grid.Column="1" SelectedDate="{Binding DateOfBirth}" Margin="0 0 0 10"/>
+                                <ItemsControl Grid.Row="4" ItemsSource="{Binding Abilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}" KeyboardNavigation.IsTabStop="False">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="1" KeyboardNavigation.IsTabStop="False"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Criteria.Name, StringFormat='\{0\}: '}" VerticalAlignment="Center" Margin="0 0 0 10"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <ItemsControl Grid.Row="4" Grid.Column="1" ItemsSource="{Binding Abilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}" KeyboardNavigation.IsTabStop="False">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <UniformGrid Columns="1" KeyboardNavigation.IsTabStop="False"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <uc:CriteriaMarkSelector Mark="{Binding Mark, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center" Margin="0 0 0 10">
                                                 <Control.ContextMenu>
                                                     <ContextMenu>
                                                         <MenuItem Header="Clear value" Click="ClearValue_Click"/>
                                                     </ContextMenu>
                                                 </Control.ContextMenu>
                                             </uc:CriteriaMarkSelector>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
                         </StackPanel>
                     </ScrollViewer>
                 </Grid>
