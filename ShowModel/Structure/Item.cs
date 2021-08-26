@@ -43,29 +43,5 @@ namespace Carmen.ShowModel.Structure
         }
 
         public override IEnumerable<Item> ItemsInOrder() => this.Yield();
-
-        public Item? NextItem()
-        {
-            var e = RootParent().ItemsInOrder().GetEnumerator();
-            while (e.MoveNext())
-            {
-                if (e.Current == this)
-                    return e.MoveNext() ? e.Current : null;
-            }
-            throw new ApplicationException("Item not found in root parent's items.");
-        }
-
-        public Item? PreviousItem()
-        {
-            var e = RootParent().ItemsInOrder().GetEnumerator();
-            Item? last_item = null;
-            while (e.MoveNext())
-            {
-                if (e.Current == this)
-                    return last_item;
-                last_item = e.Current;
-            }
-            throw new ApplicationException("Item not found in root parent's items.");
-        }
     }
 }
