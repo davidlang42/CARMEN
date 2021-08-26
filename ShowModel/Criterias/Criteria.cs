@@ -16,6 +16,7 @@ namespace Carmen.ShowModel.Criterias
         public int CriteriaId { get; private set; }
         public string Name { get; set; } = "";
         public string Description { get; set; } = "";
+        public bool Required { get; set; }
         public bool Primary { get; set; }
         public int Order { get; set; }
         public double Weight { get; set; }

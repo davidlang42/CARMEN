@@ -145,19 +145,22 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a numeric criteria, for which an Applicant can be given a whole number mark between 0 and a maximum value, inclusive.
-                                If set to primary, this criteria will be shown on the role allocation screen and must be entered for every applicant.
+                                If set to required, this criteria must be entered for every applicant.
+                                If set to primary, this criteria will be shown on the role allocation screen.
                                 The weight specifies the importantance of this criteria in calculating applicants overall ability.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
-                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
-                            <TextBlock Grid.Row="3" Text="Weight" FontSize="14"/>
-                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Maximum" FontSize="14"/>
-                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding MaxMark}" FontSize="14"/>
+                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Required}" FontSize="14" Content="Required" VerticalContentAlignment="Center"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
+                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
+                            <TextBlock Grid.Row="5" Text="Maximum" FontSize="14"/>
+                            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding MaxMark}" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
@@ -172,13 +175,15 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14" Margin="0 0 0 5">
                                 This is a list criteria, for which an Applicant can be marked as having a value selected from a list.
                                 The 'mark' an Applicant receives for a list criteria is a number representing the position of the selected value within the list, where the 1st option is 0.
                                 The maximum this 'mark' will be is N-1, where N is the number of options.
-                                If set to primary, this criteria will be shown on the role allocation screen and must be entered for every applicant.
+                                If set to required, this criteria must be entered for every applicant.
+                                If set to primary, this criteria will be shown on the role allocation screen.
                                 The weight specifies the importantance of this criteria in calculating applicants overall ability.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Grid.ColumnSpan="2" TextWrapping="Wrap" FontStyle="Italic" FontSize="12"  Margin="0 0 0 10">
@@ -186,10 +191,11 @@
                             </TextBlock>
                             <TextBlock Grid.Row="2" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Name}" Margin="5 0 0 5" FontSize="14"/>
-                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
-                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
-                            <uc:EditableList Grid.Row="5" Grid.ColumnSpan="2" FontSize="14" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Required}" FontSize="14" Content="Required" VerticalContentAlignment="Center"/>
+                            <CheckBox Grid.Row="4" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
+                            <TextBlock Grid.Row="5" Text="Weight" FontSize="14"/>
+                            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
+                            <uc:EditableList Grid.Row="6" Grid.ColumnSpan="2" FontSize="14" Title="List of options:" MinimumCount="2" ItemsSource="{Binding ElementName=objectList, Path=SelectedItem.Options, Mode=TwoWay}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">
@@ -211,17 +217,20 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a tick criteria, like a Yes/No question, for which an Applicant can either be marked Yes or No.
-                                If set to primary, this criteria will be shown on the role allocation screen and must be entered for every applicant.
+                                If set to required, this criteria must be entered for every applicant.
+                                If set to primary, this criteria will be shown on the role allocation screen.
                                 The weight specifies the importantance of this criteria in calculating applicants overall ability.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
-                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
-                            <TextBlock Grid.Row="3" Text="Weight" FontSize="14"/>
-                            <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
+                            <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Required}" FontSize="14" Content="Required" VerticalContentAlignment="Center"/>
+                            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
+                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelApplicants:CastGroup}">
@@ -532,7 +541,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Exact Ability requirement, which means that an Applicant must have a specific Mark in the specified Criteria.
-                                If set to Primary, this requirement will be shown on the Role Allocation screen.
+                                If set to primary, this requirement will be shown on the role allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -580,7 +589,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Ability Range requirement, which means that an Applicant must have a Mark within a range for the specified Criteria.
-                                If set to Primary, this requirement will be shown on the Role Allocation screen.
+                                If set to primary, this requirement will be shown on the role allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -630,7 +639,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Age requirement, which means that an Applicant must have an age within the specified range.
-                                If set to Primary, this requirement will be shown on the Role Allocation screen.
+                                If set to primary, this requirement will be shown on the role allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -670,7 +679,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a Gender requirement, which means that an Applicant must be the specified gender.
-                                If set to Primary, this requirement will be shown on the Role Allocation screen.
+                                If set to primary, this requirement will be shown on the role allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -707,7 +716,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a Tag requirement, which means that an Applicant must be assigned the specified tag.
-                                If set to Primary, this requirement will be shown on the Role Allocation screen.
+                                If set to primary, this requirement will be shown on the role allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -744,7 +753,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a NOT requirement, which means that an Applicant must not meet the specified requirement.
-                                If set to Primary, this requirement will be shown on the Role Allocation screen.
+                                If set to primary, this requirement will be shown on the role allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -781,7 +790,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an AND requirement, which means that an Applicant must meet ALL of the specified sub-requirements.
-                                If set to Primary, this requirement will be shown on the Role Allocation screen.
+                                If set to primary, this requirement will be shown on the role allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -835,7 +844,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an OR requirement, which means that an Applicant must meet ANY of the specified sub-requirements.
-                                If set to Primary, this requirement will be shown on the Role Allocation screen.
+                                If set to primary, this requirement will be shown on the role allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -889,7 +898,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an XOR requirement, which means that an Applicant must meet EXACTLY ONE of the specified sub-requirements.
-                                If set to Primary, this requirement will be shown on the Role Allocation screen.
+                                If set to primary, this requirement will be shown on the role allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
