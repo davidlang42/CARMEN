@@ -31,6 +31,8 @@ namespace CarmenUI.ViewModels
             }
         }
 
+        public bool AnyCastSelected => Role.Cast.Any();
+
         /// <summary>Array arguments are not expected not to change over the lifetime of this View.
         /// Elements of the array may be monitored for changes, but the collection itself is not.</summary>
         public RoleWithApplicantsView(Role role, CastGroupAndCast[] cast_groups_by_cast)

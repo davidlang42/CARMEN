@@ -20,6 +20,10 @@
         <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
         <cv:TrueIfNull x:Key="trueIfNull"/>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
+        <cv:MultiConverter x:Key="inverseBooleanToVisibility">
+            <cv:InvertBoolean/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -152,7 +156,13 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                         </Grid>
-                        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5">
+                        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5"
+                                Visibility="{Binding AnyCastSelected, Converter={StaticResource inverseBooleanToVisibility}}">
+                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Text="No cast selected" FontSize="20"/>
+                        </Border>
+                        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5"
+                                Visibility="{Binding AnyCastSelected, Converter={StaticResource booleanToVisibility}}">
                             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                 <DockPanel Margin="5">
                                     <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick">
