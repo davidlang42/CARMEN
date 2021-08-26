@@ -171,7 +171,7 @@ namespace CarmenUI.Pages
             if (applicantsViewSource.View is ICollectionView view)
             {
                 var previous_counts = GetGroupCounts(view);
-                view.Filter = o => o is not Applicant a || FilterPredicate(a); // always show "Loading..." text
+                view.Filter = o => o is not Applicant a || FilterPredicate(a);
                 var new_counts = GetGroupCounts(view);
                 foreach (var (key, new_count) in new_counts)
                 {
@@ -188,7 +188,7 @@ namespace CarmenUI.Pages
 
         private bool FilterPredicate(Applicant applicant)
         {
-            if (!FullName.Format(applicant).Contains(filterText.Text, StringComparison.OrdinalIgnoreCase))
+            if (!AnyFormatOfNameContains(applicant, filterText.Text))
                 return false;
             if (!applicant.IsRegistered)
                 return showIncompleteApplicants.IsChecked == true;
@@ -196,6 +196,9 @@ namespace CarmenUI.Pages
                 return showAuditionedApplicants.IsChecked == true;
             return showRegisteredApplicants.IsChecked == true;
         }
+
+        private bool AnyFormatOfNameContains(Applicant applicant, string filter_text)
+            => Enum.GetValues<FullNameFormat>().Any(f => FullName.Format(applicant, f).Contains(filter_text, StringComparison.OrdinalIgnoreCase));
 
         private void applicantsList_KeyUp(object sender, KeyEventArgs e)
         {
