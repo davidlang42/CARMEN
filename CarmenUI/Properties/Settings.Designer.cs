@@ -148,5 +148,29 @@ namespace CarmenUI.Properties {
                 this["ShowIneligibleApplicants"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SaveOnCtrlS {
+            get {
+                return ((bool)(this["SaveOnCtrlS"]));
+            }
+            set {
+                this["SaveOnCtrlS"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SaveAndExitOnCtrlEnter {
+            get {
+                return ((bool)(this["SaveAndExitOnCtrlEnter"]));
+            }
+            set {
+                this["SaveAndExitOnCtrlEnter"] = value;
+            }
+        }
     }
 }

@@ -193,10 +193,7 @@ namespace CarmenUI.Pages
         }
 
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (CancelChanges())
-                OnReturn(DataObjects.Applicants | DataObjects.Nodes);//LATER only trigger changes if something was actually changed
-        }
+            => CancelChangesAndReturn();
 
         private void showApplicants_Changed(object sender, RoutedEventArgs e)
         {

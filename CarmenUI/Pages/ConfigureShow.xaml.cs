@@ -190,17 +190,10 @@ namespace CarmenUI.Pages
             => BindObjectList("Role Requirements", "Drag to re-order", requirementsViewSource, requirementsButtons);
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (CancelChanges())
-                OnReturn(null);
-        }
+            => CancelChangesAndReturn();
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (SaveChanges())
-                //LATER only flag changes on objects which actually changed, rather than all possible changes on this form
-                OnReturn(DataObjects.AlternativeCasts | DataObjects.CastGroups | DataObjects.Criterias | DataObjects.Images | DataObjects.Requirements | DataObjects.SectionTypes | DataObjects.Tags | DataObjects.Nodes);
-        }
+            => SaveChangesAndReturn();
 
         private void AddObjectButton_Click(object sender, RoutedEventArgs e)
         {

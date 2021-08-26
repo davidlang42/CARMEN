@@ -63,16 +63,10 @@ namespace CarmenUI.Pages
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (CancelChanges())
-                OnReturn(null);
-        }
+            => CancelChangesAndReturn();
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            if (SaveChanges())
-                OnReturn(DataObjects.Applicants);
-        }
+            => SaveChangesAndReturn();
 
         private void AddApplicant_Click(object sender, RoutedEventArgs e)//LATER fix names
         {

@@ -310,13 +310,13 @@
             </ContentControl.Resources>
         </ContentControl>
         <StackPanel Grid.Row="1" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button x:Name="CancelButton" IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
+            <Button IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/Cancel_grey.png" Width="16" Margin="2 0"/>
                     <TextBlock Text="Cancel" Margin="2 0"/>
                 </StackPanel>
             </Button>
-            <Button x:Name="SaveButton" IsDefault="True" Width="100" Height="35" Margin="5" Click="SaveButton_Click">
+            <Button IsDefault="False" Width="100" Height="35" Margin="5" Click="SaveButton_Click">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="/Icons/Checkmark_blue.png" Width="16" Margin="2 0"/>
                     <TextBlock Text="Save" Margin="2 0"/>
