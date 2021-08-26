@@ -79,6 +79,7 @@ namespace CarmenUI.Pages
                 applicantsList.ScrollIntoView(applicant);
                 if (applicantsViewSource.View.Groups?.FirstOrDefault(g => ((CollectionViewGroup)g).Items.Contains(applicant)) is CollectionViewGroup group)
                     applicantsList.VisualDescendants<Expander>().First(ex => ex.DataContext == group).IsExpanded = true; // ensure new applicant group is expanded
+                firstNameText.Focus();
             }
         }
 

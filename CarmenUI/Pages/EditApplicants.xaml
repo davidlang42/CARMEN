@@ -161,7 +161,7 @@
                                     <ColumnDefinition Width="*"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBlock Text="First Name: " VerticalAlignment="Center"/>
-                                <TextBox Grid.Column="1" Text="{Binding FirstName}"/>
+                                <TextBox Grid.Column="1" x:Name="firstNameText"  Text="{Binding FirstName}"/>
                             </Grid>
                             <Grid Margin="0 0 0 10">
                                 <Grid.ColumnDefinitions>
