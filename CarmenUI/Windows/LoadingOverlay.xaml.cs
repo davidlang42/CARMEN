@@ -122,6 +122,7 @@ namespace CarmenUI.Windows
         LoadingSegment? currentSubSegment;
         int previousSubSegmentsPercentage = 0;
         int currentSubSegmentPercentage;
+        DateTime? lastSubSegmentFinished;
 
         public LoadingSegment(UpdateSegmentDelegate update_segment, UpdateSubTextDelegate update_sub_text, string segment_key)
         {
@@ -140,6 +141,14 @@ namespace CarmenUI.Windows
             if (!subSegments.Add(sub_segment_key))
                 throw new ArgumentException($"Sub-segment '{sub_segment_key}' has already run in this '{segmentKey}' segment.");
             currentSubSegmentPercentage = (100 - previousSubSegmentsPercentage) / 2; //TODO use previous sub-segments to calc this
+#if DEBUG
+            if (lastSubSegmentFinished.HasValue)
+            {
+                var time_between_segments = (DateTime.Now - lastSubSegmentFinished.Value).TotalMilliseconds;
+                if (time_between_segments > 50)
+                    MessageBox.Show($"Within {segmentKey}, there was {time_between_segments}ms between the last sub-segment and {sub_segment_key}.");
+            }
+#endif
             return currentSubSegment = new LoadingSegment(SetSubProgress, updateSubText, sub_segment_key);
         }
 
@@ -152,6 +161,7 @@ namespace CarmenUI.Windows
                 currentSubSegment = null;
                 previousSubSegmentsPercentage = Math.Min(previousSubSegmentsPercentage + currentSubSegmentPercentage, 99);
                 updateSegment(previousSubSegmentsPercentage, false);
+                lastSubSegmentFinished = DateTime.Now;
             }
             else
             {
@@ -162,8 +172,8 @@ namespace CarmenUI.Windows
         private void Finish()
         {
             var duration = DateTime.Now - startTime;
-            updateSegment(100, true);
             SaveResult(segmentKey, (int)duration.TotalMilliseconds, subSegments);
+            updateSegment(100, true);
         }
 
         public void Dispose()
@@ -177,6 +187,19 @@ namespace CarmenUI.Windows
 
         private static void SaveResult(string segment_key, int total_milliseconds, IEnumerable<string> sub_segment_keys)
         {
+#if DEBUG
+            if (Properties.Timings.Default.SubSegments.TryGetValue(segment_key, out var previous_subs))
+            {
+                var previous_in_order = previous_subs.OrderBy(k => k).ToArray();
+                var current_in_order = sub_segment_keys.OrderBy(k => k).ToArray();
+                if (!previous_in_order.SequenceEqual(current_in_order)
+                    && MessageBox.Show($"{segment_key} previously contained sub-segments: {string.Join(", ", previous_in_order)}\n but this time contained: {string.Join(", ", current_in_order)}\nWould you like to clear the timings cache?", "DEBUG", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    Properties.Timings.Default.TotalTime.Clear();
+                    Properties.Timings.Default.SubSegments.Clear();
+                }
+            }
+#endif
             Properties.Timings.Default.TotalTime[segment_key] = total_milliseconds;
             Properties.Timings.Default.SubSegments[segment_key] = sub_segment_keys.ToArray();
         }
