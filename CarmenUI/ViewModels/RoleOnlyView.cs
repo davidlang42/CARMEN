@@ -25,9 +25,9 @@ namespace CarmenUI.ViewModels
 
         public ICollection<Item> Items => Role.Items;
 
-        public string CommaSeparatedItems => string.Join(", ", Role.Items.Select(r => r.Name));
+        public string CommaSeparatedItems => string.Join(", ", Role.Items.Select(i => i.Name).OrderBy(n => n));
 
-        public string? CommaSeparatedOtherItems => Role.Items.Count < 2 ? null : string.Join(", ", Role.Items.Where(i => i != itemView.Item).Select(r => r.Name));
+        public string? CommaSeparatedOtherItems => Role.Items.Count < 2 ? null : string.Join(", ", Role.Items.Where(i => i != itemView.Item).Select(i => i.Name).OrderBy(n => n));
 
         public RoleOnlyView(Role role, CastGroup[] cast_groups, ItemView item_view)
             : base(role)

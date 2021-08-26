@@ -64,6 +64,7 @@ namespace CarmenUI.Pages
                 loading.Progress = 20;
                 await context.Requirements.LoadAsync();
                 requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
+                requirementsViewSource.SortDescriptions.Add(StandardSort.For<Requirement>());
                 loading.Progress = 40;
                 await context.Nodes.LoadAsync();
                 loading.Progress = 60;
@@ -72,7 +73,7 @@ namespace CarmenUI.Pages
                 rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
                 rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
                 itemsViewSource.View.Filter = n => n is Item;
-                itemsViewSource.View.SortDescriptions.Add(new(nameof(Item.Name), ListSortDirection.Ascending)); // sorting by order isn't possible in a flat structure, so just use name instead
+                itemsViewSource.SortDescriptions.Add(new(nameof(Item.Name), ListSortDirection.Ascending)); // sorting by order isn't possible in a flat structure, so use name instead
                 loading.Progress = 80;
                 await context.SectionTypes.LoadAsync();
                 sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();

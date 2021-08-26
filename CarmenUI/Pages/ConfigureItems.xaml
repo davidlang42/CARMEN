@@ -17,8 +17,8 @@
     <Page.Resources>
         <CollectionViewSource x:Key="rootNodesViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
-        <CollectionViewSource x:Key="requirementsViewSource"/>
-        <CollectionViewSource x:Key="itemsViewSource"/>
+        <CollectionViewSource x:Key="requirementsViewSource" IsLiveSortingRequested="True"/>
+        <CollectionViewSource x:Key="itemsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="castMembersDictionarySource"/>
         <cv:FakeItTilYouUpdateIt x:Key="nodeErrorBackground">
             <cv:AnyNodeErrors/>
