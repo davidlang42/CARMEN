@@ -33,13 +33,15 @@
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="1*" MinWidth="200" MaxWidth="350"/>
-            <ColumnDefinition Width="3*"/>
+            <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="450"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
+        <GridSplitter Grid.Column="1" Grid.RowSpan="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5" KeyboardNavigation.IsTabStop="False"/>
         <DockPanel>
             <Grid DockPanel.Dock="Top" Margin="5">
                 <Grid.ColumnDefinitions>
@@ -114,13 +116,13 @@
                 </ListBox.ContextMenu>
             </ListBox>
         </DockPanel>
-        <Grid Grid.Column="1"
+        <Grid Grid.Column="2"
               Visibility="{Binding ElementName=applicantsList, Path=SelectedItem, Converter={StaticResource showIfNull}, ConverterParameter={x:Type modelApplicants:Applicant}}">
             <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20">
                 No applicant selected.
             </TextBlock>
         </Grid>
-        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5"
+        <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="5"
                 DataContext="{Binding ElementName=applicantsList, Path=SelectedItem}"
                 Visibility="{Binding Converter={StaticResource hideIfNull}, ConverterParameter={x:Type modelApplicants:Applicant}}">
             <Grid>
@@ -267,7 +269,7 @@
             </Grid>
         </Border>
         <Button Grid.Row="1" Content="Import applicants" Margin="5" IsEnabled="False" Height="35"/>
-        <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
+        <Grid Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
