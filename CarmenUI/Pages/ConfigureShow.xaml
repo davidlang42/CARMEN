@@ -315,6 +315,7 @@
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 If any Cast Groups are set to "Alternate Casts" then these Alternative Casts are the casts which they alternate between.
                                 There must be at least two Alternative Casts in order to enable "Alternate Casts" on a Cast Group.
+                                The Initial will be appended to the applicant's cast number to indicate which alternate cast they are in.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
@@ -352,7 +353,8 @@
                             <TextBlock Grid.Row="2" Text="Description" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Description}" FontSize="14"/>
                             <TextBlock Grid.Row="3" Grid.ColumnSpan="2" Text="Required Counts:" FontSize="14"/>
-                            <ItemsControl Grid.Row="4" Grid.ColumnSpan="2" ItemsSource="{Binding CountByGroups, Converter={StaticResource sparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}">
+                            <ItemsControl Grid.Row="4" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}"
+                                          KeyboardNavigation.IsTabStop="False">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Columns="1"/>
@@ -360,14 +362,20 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid>
-                                            <Grid.ColumnDefinitions>
-                                                <ColumnDefinition Width="Auto"/>
-                                                <ColumnDefinition Width="*"/>
-                                            </Grid.ColumnDefinitions>
-                                            <TextBlock Text="{Binding CastGroup.Name}" FontSize="14"/>
-                                            <TextBox Grid.Column="1" Text="{Binding Count, TargetNullValue=''}" FontSize="14"/>
-                                        </Grid>
+                                        <TextBlock Text="{Binding Name}" FontSize="14"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl Grid.Row="4" Grid.Column="1" ItemsSource="{Binding CountByGroups, Converter={StaticResource sparseCountByGroups}, ConverterParameter={StaticResource castGroupsViewSource}}"
+                                          KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Columns="1"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBox Grid.Column="1" Text="{Binding Count, TargetNullValue=''}" FontSize="14"/>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
@@ -486,7 +494,7 @@
                             <TextBlock Grid.Row="4" Text="Cast Number Direction" FontSize="14" VerticalAlignment="Center"/>
                             <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding CastNumberOrderDirection}" ItemsSource="{Binding Source={StaticResource listSortDirectionEnumSource}}" FontSize="14"/>
                             <CheckBox Grid.Row="5" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items" VerticalContentAlignment="Center"/>
-                            <TextBlock Grid.Row="6" Text="Logo" FontSize="14"/>
+                            <TextBlock Grid.Row="6" Text="Company Logo" FontSize="14"/>
                             <uc:EditableImage Grid.Row="6" Grid.Column="1" Width="100" Height="100" HorizontalAlignment="Left"
                                               ImageObject="{Binding Logo, Mode=TwoWay}"/>
                         </Grid>
@@ -628,9 +636,9 @@
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Minimum" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Minimum Age" FontSize="14"/>
                             <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Minimum, TargetNullValue=''}" FontSize="14"/>
-                            <TextBlock Grid.Row="5" Text="Maximum" FontSize="14"/>
+                            <TextBlock Grid.Row="5" Text="Maximum Age" FontSize="14"/>
                             <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Maximum, TargetNullValue=''}" FontSize="14"/>
                             <CheckBox Grid.Row="6" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
                         </Grid>
@@ -705,7 +713,7 @@
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Tag" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Required Tag" FontSize="14"/>
                             <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding RequiredTag}" ItemsSource="{Binding Source={StaticResource tagsSelectionSource}}" DisplayMemberPath="Name"/>
                         </Grid>
                     </DataTemplate>

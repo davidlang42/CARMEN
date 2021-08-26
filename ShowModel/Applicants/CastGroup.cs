@@ -44,7 +44,7 @@ namespace Carmen.ShowModel.Applicants
                 name = value;
                 OnPropertyChanged();
                 if (name != "")
-                    Abbreviation = name.Abbreviate();
+                    Abbreviation = name.Abbreviate(2, 4);
             }
         }
 
