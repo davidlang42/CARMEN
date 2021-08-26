@@ -27,7 +27,7 @@
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" MinWidth="200" MaxWidth="400"/>
+            <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="450"/>
             <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
@@ -158,14 +158,16 @@
                         </Grid>
                         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5"
                                 Visibility="{Binding AnyCastSelected, Converter={StaticResource inverseBooleanToVisibility}}">
-                            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-                               Text="No cast selected" FontSize="20"/>
+                            <ItemsControl KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick"
+                                          Background="White" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                <TextBlock Text="No cast selected" FontSize="16" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </ItemsControl>
                         </Border>
                         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5"
                                 Visibility="{Binding AnyCastSelected, Converter={StaticResource booleanToVisibility}}">
                             <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
                                 <DockPanel Margin="5">
-                                    <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick">
+                                    <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick" Background="White">
                                         <ItemsControl.ItemsPanel>
                                             <ItemsPanelTemplate>
                                                 <UniformGrid Rows="1"/>
@@ -216,7 +218,7 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Button HorizontalAlignment="Left" Width="110" Height="35" Margin="0 0 0 5"
-                                Content="Edit Casting"
+                                Content="Edit casting"
                                 Click="EditCastButton_Click" />
                             <Button Grid.Column="1" Width="160" Height="35" Margin="0 0 0 5"
                                 IsCancel="True" Content="Return to Main Menu"
@@ -304,102 +306,101 @@
                                           Unchecked="showApplicants_Changed"/>
                             </UniformGrid>
                         </Grid>
-                        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5">
-                            <Grid>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="*"/>
-                                    <RowDefinition Height="Auto"/>
-                                </Grid.RowDefinitions>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
-                                </Grid.ColumnDefinitions>
-                                <ListView Grid.ColumnSpan="2" Initialized="ListView_Initialized" ItemsSource="{Binding Applicants}"
-                                          MouseDoubleClick="ListView_MouseDoubleClick" KeyDown="ListView_KeyDown" PreviewKeyDown="ListView_PreviewKeyDown">
-                                    <ListView.Resources>
-                                        <Style TargetType="{x:Type ListViewItem}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding Eligibility.IsEligible}" Value="False">
-                                                    <Setter Property="Background" Value="LightCoral" />
-                                                    <Setter Property="ToolTip" Value="{Binding CommaSeparatedIneligibilityReason}"/>
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding Availability.IsAvailable}" Value="False"><!-- Unavailable listed last to give precedence -->
-                                                    <Setter Property="Background" Value="LightGray" />
-                                                    <Setter Property="ToolTip" Value="{Binding CommaSeparatedUnavailabilityReason}"/>
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ListView.Resources>
-                                    <ListView.View>
-                                        <GridView AllowsColumnReorder="False">
-                                            <GridView.Columns>
-                                                <GridViewColumn>
-                                                    <GridViewColumn.CellTemplate>
-                                                        <DataTemplate>
-                                                            <CheckBox IsChecked="{Binding IsSelected}"/>
-                                                        </DataTemplate>
-                                                    </GridViewColumn.CellTemplate>
-                                                </GridViewColumn>
-                                                <GridViewColumn Header="Suitability" DisplayMemberBinding="{Binding Suitability, Converter={StaticResource doubleToPercentage}}"/>
-                                                <GridViewColumn Header="Cast Number" DisplayMemberBinding="{Binding CastNumberAndCast}"/>
-                                                <GridViewColumn Header="Name">
-                                                    <GridViewColumn.DisplayMemberBinding>
-                                                        <MultiBinding Converter="{StaticResource fullName}">
-                                                            <MultiBinding.Bindings>
-                                                                <Binding Path="FirstName"/>
-                                                                <Binding Path="LastName"/>
-                                                            </MultiBinding.Bindings>
-                                                        </MultiBinding>
-                                                    </GridViewColumn.DisplayMemberBinding>
-                                                </GridViewColumn>
-                                                <!-- Criteria columns are added here dynamically -->
-                                                <GridViewColumn Header="Overall" DisplayMemberBinding="{Binding OverallAbility}"/>
-                                            </GridView.Columns>
-                                        </GridView>
-                                    </ListView.View>
-                                    <ListView.GroupStyle>
-                                        <GroupStyle>
-                                            <GroupStyle.ContainerStyle>
-                                                <Style TargetType="{x:Type GroupItem}">
-                                                    <Setter Property="Template">
-                                                        <Setter.Value>
-                                                            <ControlTemplate>
-                                                                <Expander IsExpanded="True">
-                                                                    <Expander.Header>
-                                                                        <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
-                                                                    </Expander.Header>
-                                                                    <ItemsPresenter/>
-                                                                </Expander>
-                                                            </ControlTemplate>
-                                                        </Setter.Value>
-                                                    </Setter>
-                                                </Style>
-                                            </GroupStyle.ContainerStyle>
-                                        </GroupStyle>
-                                    </ListView.GroupStyle>
-                                </ListView>
-                                <StackPanel Grid.Row="1" Orientation="Horizontal">
-                                    <Button x:Name="AutoCastButton" Width="200" Height="35" Margin="5" Click="AutoCastButton_Click"
-                                        HorizontalAlignment="Left" Content="Allocate most suitable cast"/>
-                                    <Button x:Name="ClearCastButton" Width="100" Height="35" Margin="5" Click="ClearCastButton_Click"
-                                        HorizontalAlignment="Left" Content="Clear cast"/>
-                                </StackPanel>
-                                <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Button IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Icons/Cancel_grey.png" Width="16" Margin="2 0"/>
-                                            <TextBlock Text="Cancel" Margin="2 0"/>
-                                        </StackPanel>
-                                    </Button>
-                                    <Button IsDefault="False" Width="100" Height="35" Margin="5" Click="SaveButton_Click">
-                                        <StackPanel Orientation="Horizontal">
-                                            <Image Source="/Icons/Checkmark_blue.png" Width="16" Margin="2 0"/>
-                                            <TextBlock Text="Save" Margin="2 0"/>
-                                        </StackPanel>
-                                    </Button>
-                                </StackPanel>
-                            </Grid>
-                        </Border>
+                        <Grid Grid.Row="2" Margin="0 5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ListView Grid.ColumnSpan="2" Initialized="ListView_Initialized" ItemsSource="{Binding Applicants}"
+                                        MouseDoubleClick="ListView_MouseDoubleClick" KeyDown="ListView_KeyDown" PreviewKeyDown="ListView_PreviewKeyDown">
+                                <ListView.Resources>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Eligibility.IsEligible}" Value="False">
+                                                <Setter Property="Background" Value="LightCoral" />
+                                                <Setter Property="ToolTip" Value="{Binding CommaSeparatedIneligibilityReason}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Availability.IsAvailable}" Value="False">
+                                                <!-- Unavailable listed last to give precedence -->
+                                                <Setter Property="Background" Value="LightGray" />
+                                                <Setter Property="ToolTip" Value="{Binding CommaSeparatedUnavailabilityReason}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListView.Resources>
+                                <ListView.View>
+                                    <GridView AllowsColumnReorder="False">
+                                        <GridView.Columns>
+                                            <GridViewColumn>
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding IsSelected}"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="Suitability" DisplayMemberBinding="{Binding Suitability, Converter={StaticResource doubleToPercentage}}"/>
+                                            <GridViewColumn Header="Cast Number" DisplayMemberBinding="{Binding CastNumberAndCast}"/>
+                                            <GridViewColumn Header="Name">
+                                                <GridViewColumn.DisplayMemberBinding>
+                                                    <MultiBinding Converter="{StaticResource fullName}">
+                                                        <MultiBinding.Bindings>
+                                                            <Binding Path="FirstName"/>
+                                                            <Binding Path="LastName"/>
+                                                        </MultiBinding.Bindings>
+                                                    </MultiBinding>
+                                                </GridViewColumn.DisplayMemberBinding>
+                                            </GridViewColumn>
+                                            <!-- Criteria columns are added here dynamically -->
+                                            <GridViewColumn Header="Overall" DisplayMemberBinding="{Binding OverallAbility}"/>
+                                        </GridView.Columns>
+                                    </GridView>
+                                </ListView.View>
+                                <ListView.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.ContainerStyle>
+                                            <Style TargetType="{x:Type GroupItem}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate>
+                                                            <Expander IsExpanded="True">
+                                                                <Expander.Header>
+                                                                    <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                                                                </Expander.Header>
+                                                                <ItemsPresenter/>
+                                                            </Expander>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </GroupStyle.ContainerStyle>
+                                    </GroupStyle>
+                                </ListView.GroupStyle>
+                            </ListView>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                <Button x:Name="AutoCastButton" Width="200" Height="35" Margin="0 5 5 0" Click="AutoCastButton_Click"
+                                    HorizontalAlignment="Left" Content="Allocate most suitable cast"/>
+                                <Button x:Name="ClearCastButton" Width="100" Height="35" Margin="5 5 5 0" Click="ClearCastButton_Click"
+                                    HorizontalAlignment="Left" Content="Clear cast"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button IsCancel="True" Width="100" Height="35" Margin="5 5 5 0" Click="CancelButton_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/Icons/Cancel_grey.png" Width="16" Margin="2 0"/>
+                                        <TextBlock Text="Cancel" Margin="2 0"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button IsDefault="False" Width="100" Height="35" Margin="5 5 0 0" Click="SaveButton_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Image Source="/Icons/Checkmark_blue.png" Width="16" Margin="2 0"/>
+                                        <TextBlock Text="Save" Margin="2 0"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
                     </Grid>
                 </DataTemplate>
             </ContentControl.Resources>
