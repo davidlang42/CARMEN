@@ -93,7 +93,7 @@ namespace Carmen.ShowModel
 
             // Set up section type
             if (section_type == null)
-                section_type = Context.SectionTypes.FirstOrDefault() ?? Context.Add(new SectionType()).Entity;
+                section_type = Context.SectionTypes.FirstOrDefault() ?? Context.Add(new SectionType() { Name = "Section" }).Entity;
 
             // Calculate sections
             uint extra_sections_in_root;
