@@ -62,33 +62,34 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            using (var loading = new LoadingOverlay(this))
+            using (var loading = new LoadingOverlay(this).AsSegment(nameof(AllocateRoles)))
             {
-                loading.Progress = 0;
-                _primaryCriterias = await context.Criterias.Where(c => c.Primary).ToArrayAsync();
-                loading.Progress = 10;
-                await context.CastGroups.LoadAsync();
-                loading.Progress = 20;
-                await context.AlternativeCasts.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Criterias) + nameof(Criteria.Primary), "Criteria"))
+                    _primaryCriterias = await context.Criterias.Where(c => c.Primary).ToArrayAsync();
+                using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
+                    await context.CastGroups.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
+                    await context.AlternativeCasts.LoadAsync();
                 _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, context.AlternativeCasts.Local).ToArray();
-                loading.Progress = 30;
-                _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
-                loading.Progress = 60;
-                await context.Nodes.LoadAsync();
-                loading.Progress = 80;
-                await context.Requirements.OfType<AbilityExactRequirement>().Include(cr => cr.Criteria).LoadAsync();
-                loading.Progress = 85;
-                await context.Requirements.OfType<AbilityRangeRequirement>().Include(cr => cr.Criteria).LoadAsync();
-                loading.Progress = 90;
-                await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
-                loading.Progress = 95;
-                await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-                var total_cast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
-                _rootNodeView = new ShowRootNodeView(context.ShowRoot, total_cast, context.AlternativeCasts.ToArray());
+                using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles) + nameof(Role.Items), "Applicants"))
+                    _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
+                using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
+                    await context.Nodes.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Requirements) + nameof(AbilityExactRequirement) + nameof(AbilityExactRequirement.Criteria), "Requirements"))
+                    await context.Requirements.OfType<AbilityExactRequirement>().Include(cr => cr.Criteria).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Requirements) + nameof(AbilityRangeRequirement) + nameof(AbilityRangeRequirement.Criteria), "Requirements"))
+                    await context.Requirements.OfType<AbilityRangeRequirement>().Include(cr => cr.Criteria).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Cast), "Items"))
+                    await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Requirements), "Items"))
+                    await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
+                uint total_cast;
+                using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
+                    total_cast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
+                _rootNodeView = new ShowRootNodeView(context.ShowRoot, total_cast, context.AlternativeCasts.Local.ToArray());
                 showCompleted.IsChecked = true; // must be set after creating ShowRootNodeView because it triggers Checked event
                 rolesTreeView.ItemsSource = rootNodeView.ChildrenInOrder;
                 castingProgress.DataContext = rootNodeView;
-                loading.Progress = 100;
             }
             await rootNodeView.UpdateAllAsync();
         }

@@ -52,32 +52,36 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            using (var loading = new LoadingOverlay(this))
+            using (var loading = new LoadingOverlay(this).AsSegment(nameof(ConfigureItems)))
             {
-                loading.Progress = 0;
-                await context.AlternativeCasts.LoadAsync();
-                await context.CastGroups.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
+                    await context.AlternativeCasts.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
+                    await context.CastGroups.LoadAsync();
                 var alternative_casts_count = context.AlternativeCasts.Local.Count;
                 var cast_groups = context.CastGroups.Local.ToArray();
-                castMembersDictionarySource.Source = cast_groups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
+                using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
+                    castMembersDictionarySource.Source = cast_groups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
                 castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
-                loading.Progress = 20;
-                await context.Requirements.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
+                    await context.Requirements.LoadAsync();
                 requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
                 requirementsViewSource.SortDescriptions.Add(StandardSort.For<Requirement>());
-                loading.Progress = 40;
-                await context.Nodes.LoadAsync();
-                loading.Progress = 60;
-                await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-                rootNodesViewSource.Source = itemsViewSource.Source = context.Nodes.Local.ToObservableCollection();
-                rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
-                rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
-                itemsViewSource.View.Filter = n => n is Item;
-                itemsViewSource.SortDescriptions.Add(new(nameof(Item.Name), ListSortDirection.Ascending)); // sorting by order isn't possible in a flat structure, so use name instead
-                loading.Progress = 80;
-                await context.SectionTypes.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
+                    await context.Nodes.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Requirements), "Items"))
+                    await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
+                using (loading.Segment(nameof(ConfigureItems) + nameof(rootNodesViewSource) + nameof(itemsViewSource), "Sorting"))
+                {
+                    rootNodesViewSource.Source = itemsViewSource.Source = context.Nodes.Local.ToObservableCollection();
+                    rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
+                    rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
+                    itemsViewSource.View.Filter = n => n is Item;
+                    itemsViewSource.SortDescriptions.Add(new(nameof(Item.Name), ListSortDirection.Ascending)); // sorting by order isn't possible in a flat structure, so use name instead
+                }
+                using (loading.Segment(nameof(ShowContext.SectionTypes), "Section types"))
+                    await context.SectionTypes.LoadAsync();
                 sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
-                loading.Progress = 100;
             }
             if (itemsTreeView.VisualDescendants<TreeViewItem>().FirstOrDefault() is TreeViewItem show_root_tvi)
                 show_root_tvi.IsSelected = true;

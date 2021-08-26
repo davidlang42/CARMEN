@@ -49,18 +49,17 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            using (var loading = new LoadingOverlay(this))
+            using (var loading = new LoadingOverlay(this).AsSegment(nameof(EditApplicants)))
             {
-                loading.Progress = 0;
-                await context.Applicants.LoadAsync();
-                loading.Progress = 80;
+                using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
+                    await context.Applicants.LoadAsync();
                 applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
-                ConfigureGroupingAndSorting(groupCombo.SelectedItem);
+                using (loading.Segment(nameof(EditApplicants) + nameof(ConfigureGroupingAndSorting), "Sorting"))
+                    ConfigureGroupingAndSorting(groupCombo.SelectedItem);
                 applicantsList.SelectedItem = null;
-                loading.Progress = 90;
-                await context.Criterias.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
+                    await context.Criterias.LoadAsync();
                 criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
-                loading.Progress = 100;
             }
             filterText.Focus();
         }

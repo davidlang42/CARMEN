@@ -59,25 +59,24 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            using var loading = new LoadingOverlay(this);
-            loading.Progress = 0;
-            await context.AlternativeCasts.LoadAsync();
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(SelectCast));
+            using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
+                await context.AlternativeCasts.LoadAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
-            loading.Progress = 20;
-            await context.CastGroups.Include(cg => cg.Members).LoadAsync();
+            using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
+                await context.CastGroups.Include(cg => cg.Members).LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
-            loading.Progress = 40;
-            await context.Tags.Include(cg => cg.Members).LoadAsync();
+            using (loading.Segment(nameof(ShowContext.Tags) + nameof(A.Tag.Members), "Tags"))
+                await context.Tags.Include(cg => cg.Members).LoadAsync();
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
-            loading.Progress = 60;
-            await context.Applicants.LoadAsync();
+            using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
+                await context.Applicants.LoadAsync();
             castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
             allApplicantsViewSource.Source = castNumbersViewSource.Source = context.Applicants.Local.ToObservableCollection();
             TriggerCastNumbersRefresh();
-            loading.Progress = 80;
-            await context.Requirements.LoadAsync();
-            loading.Progress = 100;
+            using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
+                await context.Requirements.LoadAsync();
         }
 
         private void TriggerCastNumbersRefresh()
@@ -95,23 +94,17 @@ namespace CarmenUI.Pages
 
         private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-            using var processing = new LoadingOverlay(this);
-            processing.MainText = "Processing...";
-            processing.Progress = 0;
-            processing.SubText = "Selecting applicants";
+            using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click),"Processing...");
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
-            engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local, (uint)alternative_casts.Length);
-            processing.Progress = 25;
-            processing.SubText = "Balancing alternating casts";
-            engine.BalanceAlternativeCasts(context.Applicants.Local, alternative_casts, Enumerable.Empty<SameCastSet>());
-            processing.Progress = 50;
-            processing.SubText = "Allocating cast numbers";
-            engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection);
-            processing.Progress = 75;
-            processing.SubText = "Applying tags";
-            engine.ApplyTags(context.Applicants.Local, context.Tags.Local);
+            using (processing.Segment(nameof(ICastingEngine.SelectCastGroups), "Selecting applicants"))
+                engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local, (uint)alternative_casts.Length);
+            using (processing.Segment(nameof(ICastingEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
+                engine.BalanceAlternativeCasts(context.Applicants.Local, alternative_casts, Enumerable.Empty<SameCastSet>());
+            using (processing.Segment(nameof(ICastingEngine.AllocateCastNumbers), "Allocating cast numbers"))
+                engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection);
+            using (processing.Segment(nameof(ICastingEngine.ApplyTags), "Applying tags"))
+                engine.ApplyTags(context.Applicants.Local, context.Tags.Local);
             TriggerCastNumbersRefresh();
-            processing.Progress = 100;
         }
 
         private void addButton_Click(object sender, RoutedEventArgs e)

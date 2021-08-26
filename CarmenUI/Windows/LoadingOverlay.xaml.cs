@@ -150,14 +150,13 @@ namespace CarmenUI.Windows
             }
         }
 
-        public LoadingSegment Segment(string sub_segment_key, string? sub_text = null)
+        public LoadingSegment Segment(string sub_segment_key, string sub_text)
         {
             if (currentSubSegment != null)
                 throw new ArgumentException("LoadingSegment already has a sub-segment running.");
-            if (sub_text != null)
-                updateSubText(sub_text);
             if (!subSegments.Add(sub_segment_key))
                 throw new ArgumentException($"Sub-segment '{sub_segment_key}' has already run in this '{segmentKey}' segment.");
+            updateSubText(sub_text);
             currentSubSegmentPercentage = FindSubSegmentPercentage(segmentKey, sub_segment_key)
                 ?? (100 - previousSubSegmentsPercentage) / 2; // fallback for the first time this is run
 #if DEBUG
@@ -180,6 +179,7 @@ namespace CarmenUI.Windows
                 currentSubSegment = null;
                 previousSubSegmentsPercentage = Math.Min(previousSubSegmentsPercentage + currentSubSegmentPercentage, 99);
                 updateSegment(previousSubSegmentsPercentage, false);
+                updateSubText("");
                 lastSubSegmentFinished = DateTime.Now;
             }
             else

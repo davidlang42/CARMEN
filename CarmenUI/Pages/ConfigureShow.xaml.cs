@@ -24,6 +24,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using A = Carmen.ShowModel.Applicants;
 
 namespace CarmenUI.Pages
 {
@@ -75,22 +76,22 @@ namespace CarmenUI.Pages
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             using var loading = new LoadingOverlay(this).AsSegment(nameof(ConfigureShow));
-            using (loading.Segment(nameof(ShowContext.Requirements), "Requirements..."))
+            using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 await context.Requirements.LoadAsync();
             requirementsViewSource.Source = requirementsSelectionSource.Source = context.Requirements.Local.ToObservableCollection();
-            using (loading.Segment(nameof(ShowContext.Criterias), "Criteria..."))
+            using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
                 await context.Criterias.LoadAsync();
             criteriasViewSource.Source = criteriasSelectionSource.Source = context.Criterias.Local.ToObservableCollection();
-            using (loading.Segment(nameof(ShowContext.CastGroups) + nameof(ShowContext.Requirements), "Cast groups..."))
+            using (loading.Segment(nameof(ShowContext.CastGroups) + nameof(CastGroup.Requirements), "Cast groups"))
                 await context.CastGroups.Include(cg => cg.Requirements).LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
-            using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts..."))
+            using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
                 await context.AlternativeCasts.LoadAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
-            using (loading.Segment(nameof(ShowContext.Tags) + nameof(ShowContext.Requirements), "Tags..."))
+            using (loading.Segment(nameof(ShowContext.Tags) + nameof(A.Tag.Requirements), "Tags"))
                 await context.Tags.Include(t => t.Requirements).LoadAsync();
             tagsViewSource.Source = tagsSelectionSource.Source = context.Tags.Local.ToObservableCollection();
-            using (loading.Segment(nameof(ShowContext.SectionTypes), "Section types..."))
+            using (loading.Segment(nameof(ShowContext.SectionTypes), "Section types"))
                 await context.SectionTypes.LoadAsync();
             sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
             showRootSource.Source = context.ShowRoot.Yield();
