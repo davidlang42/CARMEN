@@ -130,6 +130,24 @@ namespace CarmenUI.Windows
             this.updateSubText = update_sub_text;
             this.segmentKey = segment_key;
             this.startTime = DateTime.Now;
+            SmoothProgressAsync();
+        }
+
+        private async void SmoothProgressAsync()
+        {
+            const int UPDATE_DELAY = 50;
+            if (FindSegmentTime(segmentKey) is not int segment_time)
+                return;
+            while (true)
+            {
+                await Task.Delay(UPDATE_DELAY);
+                if (disposed || currentSubSegment != null)
+                    break;
+                var estimated_percentage = (int)((DateTime.Now - startTime).TotalMilliseconds * 100 / segment_time);
+                updateSegment(estimated_percentage, false);
+                if (estimated_percentage >= 100)
+                    break;
+            }
         }
 
         public LoadingSegment Segment(string sub_segment_key, string? sub_text = null)
@@ -140,7 +158,8 @@ namespace CarmenUI.Windows
                 updateSubText(sub_text);
             if (!subSegments.Add(sub_segment_key))
                 throw new ArgumentException($"Sub-segment '{sub_segment_key}' has already run in this '{segmentKey}' segment.");
-            currentSubSegmentPercentage = (100 - previousSubSegmentsPercentage) / 2; //TODO use previous sub-segments to calc this
+            currentSubSegmentPercentage = FindSubSegmentPercentage(segmentKey, sub_segment_key)
+                ?? (100 - previousSubSegmentsPercentage) / 2; // fallback for the first time this is run
 #if DEBUG
             if (lastSubSegmentFinished.HasValue)
             {
@@ -203,5 +222,26 @@ namespace CarmenUI.Windows
             Properties.Timings.Default.TotalTime[segment_key] = total_milliseconds;
             Properties.Timings.Default.SubSegments[segment_key] = sub_segment_keys.ToArray();
         }
+
+        private static int? FindSubSegmentPercentage(string segment_key, string this_sub_segment_key)
+        {
+            if (!Properties.Timings.Default.SubSegments.TryGetValue(segment_key, out var sub_segment_keys))
+                return null;
+            if (!Properties.Timings.Default.TotalTime.TryGetValue(this_sub_segment_key, out var this_sub_segment_time))
+                return null;
+            int sub_segments_total = 0;
+            foreach (var sub_segment_key in sub_segment_keys)
+            {
+                if (!Properties.Timings.Default.TotalTime.TryGetValue(sub_segment_key, out var sub_segment_time))
+                    return null;
+                sub_segments_total += sub_segment_time;
+            }
+            if (sub_segments_total == 0 || this_sub_segment_time > sub_segments_total)
+                return null;
+            return this_sub_segment_time * 100 / sub_segments_total;
+        }
+
+        private static int? FindSegmentTime(string segment_key)
+            => Properties.Timings.Default.TotalTime.TryGetValue(segment_key, out var segment_time) ? segment_time : null;
     }
 }
