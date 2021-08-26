@@ -523,6 +523,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Exact Ability requirement, which means that an Applicant must have a specific Mark in the specified Criteria.
+                                If set to Primary, this requirement will be shown on the Role Allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -570,6 +571,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Ability Range requirement, which means that an Applicant must have a Mark within a range for the specified Criteria.
+                                If set to Primary, this requirement will be shown on the Role Allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -619,6 +621,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Age requirement, which means that an Applicant must have an age within the specified range.
+                                If set to Primary, this requirement will be shown on the Role Allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -658,6 +661,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a Gender requirement, which means that an Applicant must be the specified gender.
+                                If set to Primary, this requirement will be shown on the Role Allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -694,6 +698,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a Tag requirement, which means that an Applicant must be assigned the specified tag.
+                                If set to Primary, this requirement will be shown on the Role Allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -730,6 +735,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a NOT requirement, which means that an Applicant must not meet the specified requirement.
+                                If set to Primary, this requirement will be shown on the Role Allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -766,6 +772,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an AND requirement, which means that an Applicant must meet ALL of the specified sub-requirements.
+                                If set to Primary, this requirement will be shown on the Role Allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -819,6 +826,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an OR requirement, which means that an Applicant must meet ANY of the specified sub-requirements.
+                                If set to Primary, this requirement will be shown on the Role Allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -872,6 +880,7 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an XOR requirement, which means that an Applicant must meet EXACTLY ONE of the specified sub-requirements.
+                                If set to Primary, this requirement will be shown on the Role Allocation screen.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
