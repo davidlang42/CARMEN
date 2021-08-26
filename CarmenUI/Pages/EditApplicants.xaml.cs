@@ -29,7 +29,7 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class EditApplicants : SubPage
     {
-        const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10;
+        const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10; //LATER why not make this a user setting?
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;
@@ -49,17 +49,20 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
-            using var loading = new LoadingOverlay(this);
-            loading.Progress = 0;
-            await context.Applicants.LoadAsync();
-            loading.Progress = 80;
-            applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
-            ConfigureGroupingAndSorting(groupCombo.SelectedItem);
-            applicantsList.SelectedItem = null;
-            loading.Progress = 90;
-            await context.Criterias.LoadAsync();
-            criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
-            loading.Progress = 100;
+            using (var loading = new LoadingOverlay(this))
+            {
+                loading.Progress = 0;
+                await context.Applicants.LoadAsync();
+                loading.Progress = 80;
+                applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
+                ConfigureGroupingAndSorting(groupCombo.SelectedItem);
+                applicantsList.SelectedItem = null;
+                loading.Progress = 90;
+                await context.Criterias.LoadAsync();
+                criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
+                loading.Progress = 100;
+            }
+            filterText.Focus();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -69,11 +72,25 @@ namespace CarmenUI.Pages
             => SaveChangesAndReturn();
 
         private void AddApplicant_Click(object sender, RoutedEventArgs e)//LATER fix names
-        {
+        {//LATER this is really slow, maybe add a loading dialog? but hang on, why the hell is it slow?
             if (applicantsViewSource.Source is IList list)//LATER change ilist/not null view checks into hard casts (now that loading is done before showing page)
             {
-                filterText.Text = "";
                 var applicant = new Applicant();
+                if (filterText.Text.Contains(","))
+                {
+                    var names = filterText.Text.Split(",");
+                    applicant.FirstName = names[1].Trim().ToProperCase();
+                    applicant.LastName = names[0].Trim().ToProperCase();
+                }
+                else
+                {
+                    var names = filterText.Text.Split(" ", 2);
+                    applicant.FirstName = names[0].Trim().ToProperCase();
+                    if (names.Length > 1)
+                        applicant.LastName = names[1].Trim().ToProperCase();
+                }
+                filterText.Text = "";
+                EnsureApplicantIsShown(applicant);
                 list.Add(applicant);
                 applicantsList.SelectedItem = applicant;
                 applicantsList.ScrollIntoView(applicant);
@@ -198,6 +215,18 @@ namespace CarmenUI.Pages
             return showRegisteredApplicants.IsChecked == true;
         }
 
+        /// <summary>This modifies at most one of the show*Applicants checkboxes to ensure the given applicant is shown,
+        /// assuming that filterText is blank. This duplicates logic in FilterPredicate()</summary>
+        private void EnsureApplicantIsShown(Applicant applicant)
+        {
+            if (!applicant.IsRegistered)
+                showIncompleteApplicants.IsChecked = true;
+            else if (ShowIfApplicantRegisteredAndAuditioned.Check(applicant.IsRegistered, applicant.Abilities, criteriasViewSource))
+                showAuditionedApplicants.IsChecked = true;
+            else
+                showRegisteredApplicants.IsChecked = true;
+        }
+
         private bool AnyFormatOfNameContains(Applicant applicant, string filter_text)
             => Enum.GetValues<FullNameFormat>().Any(f => FullName.Format(applicant, f).Contains(filter_text, StringComparison.OrdinalIgnoreCase));
 
@@ -253,8 +282,35 @@ namespace CarmenUI.Pages
                 AddApplicant_Click(sender, e);
                 e.Handled = true;
             }
+            else if (e.Key == Key.Escape && applicantsList.SelectedItem != null)
+            {
+                filterText.Focus();
+                applicantsList.SelectedItem = null;
+                e.Handled = true;
+            }
             else
                 base.Window_KeyDown(sender, e);
+        }
+
+        private void filterText_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape && filterText.Text != "")
+            {
+                filterText.Text = "";
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Enter)
+            {
+                if (applicantsList.Items.Count == 0)
+                    AddApplicant_Click(sender, e);
+                else
+                {
+                    if (applicantsList.SelectedItem == null)
+                        applicantsList.SelectedIndex = 0;
+                    firstNameText.Focus();
+                }    
+                e.Handled = true;
+            }
         }
     }
 }

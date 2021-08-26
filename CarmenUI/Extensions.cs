@@ -110,4 +110,23 @@ namespace CarmenUI
             return digit != null;
         }
     }
+
+    public static class StringExtenions
+    {
+        public static string ToProperCase(this string words)
+        {
+            if (string.IsNullOrEmpty(words))
+                return "";
+            words = string.Join(" ", words.Split(" ").Select(w => w.Capitalise()));
+            words = string.Join("-", words.Split("-").Select(w => w.Capitalise()));
+            return words;
+        }
+
+        public static string Capitalise(this string word)
+        {
+            if (string.IsNullOrEmpty(word))
+                return "";
+            return word.Substring(0, 1).ToUpper() + word.Substring(1);
+        }
+    }
 }

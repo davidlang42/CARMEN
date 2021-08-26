@@ -21,6 +21,10 @@
         <cv:BooleanLookupDictionary x:Key="groupExpansionLookup"/>
         <cv:SparseAbilities x:Key="sparseAbilities"/>
         <cv:HideIfNull x:Key="hideIfNull"/>
+        <cv:MultiConverter x:Key="showIfNull">
+            <cv:TrueIfNull/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
         <cv:ShowIfApplicantRegisteredAndAuditioned x:Key="showIfApplicantRegisteredAndAuditioned"/>
         <cv:MultiConverter x:Key="hideIfTrue">
             <cv:InvertBoolean/>
@@ -43,7 +47,9 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Filter: " FontSize="14" VerticalAlignment="Center"/>
-                <TextBox x:Name="filterText" Grid.Column="1" TextChanged="filterText_TextChanged" FontSize="14" GotFocus="filterText_GotFocus"/>
+                <TextBox x:Name="filterText" Grid.Column="1" TextChanged="filterText_TextChanged"
+                         FontSize="14" GotFocus="filterText_GotFocus"
+                         KeyDown="filterText_KeyDown"/>
             </Grid>
             <Grid DockPanel.Dock="Top">
                 <Grid.ColumnDefinitions>
@@ -74,7 +80,7 @@
                     </ComboBox.ItemsSource>
                 </ComboBox>
             </Grid>
-            <Button DockPanel.Dock="Bottom" Content="Add New Applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
+            <Button DockPanel.Dock="Bottom" Content="Add new applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
             <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5" KeyUp="applicantsList_KeyUp" SelectionChanged="applicantsList_SelectionChanged">
                 <ListBox.GroupStyle>
                     <GroupStyle>
@@ -108,8 +114,16 @@
                 </ListBox.ContextMenu>
             </ListBox>
         </DockPanel>
-        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5">
-            <Grid DataContext="{Binding ElementName=applicantsList, Path=SelectedItem}" Visibility="{Binding Converter={StaticResource hideIfNull}, ConverterParameter={x:Type modelApplicants:Applicant}}">
+        <Grid Grid.Column="1"
+              Visibility="{Binding ElementName=applicantsList, Path=SelectedItem, Converter={StaticResource showIfNull}, ConverterParameter={x:Type modelApplicants:Applicant}}">
+            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20">
+                No applicant selected.
+            </TextBlock>
+        </Grid>
+        <Border Grid.Column="1" BorderBrush="Black" BorderThickness="1" Margin="5"
+                DataContext="{Binding ElementName=applicantsList, Path=SelectedItem}"
+                Visibility="{Binding Converter={StaticResource hideIfNull}, ConverterParameter={x:Type modelApplicants:Applicant}}">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -252,7 +266,7 @@
                 </Grid>
             </Grid>
         </Border>
-        <Button Grid.Row="1" Content="Import Applicants" Margin="5" IsEnabled="False" Height="35"/>
+        <Button Grid.Row="1" Content="Import applicants" Margin="5" IsEnabled="False" Height="35"/>
         <Grid Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
