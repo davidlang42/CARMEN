@@ -240,5 +240,17 @@ namespace CarmenUI.Pages
 
         private void filterText_GotFocus(object sender, RoutedEventArgs e)
             => ConfigureFiltering();
+
+        protected override void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (Properties.Settings.Default.NewOnCtrlN
+                && e.Key == Key.N && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                AddApplicant_Click(sender, e);
+                e.Handled = true;
+            }
+            else
+                base.Window_KeyDown(sender, e);
+        }
     }
 }

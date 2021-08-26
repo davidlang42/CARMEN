@@ -172,5 +172,41 @@ namespace CarmenUI.Properties {
                 this["SaveAndExitOnCtrlEnter"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool NewOnCtrlN {
+            get {
+                return ((bool)(this["NewOnCtrlN"]));
+            }
+            set {
+                this["NewOnCtrlN"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShortcutsOnStartWindow {
+            get {
+                return ((bool)(this["ShortcutsOnStartWindow"]));
+            }
+            set {
+                this["ShortcutsOnStartWindow"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ShortcutsOnMainMenu {
+            get {
+                return ((bool)(this["ShortcutsOnMainMenu"]));
+            }
+            set {
+                this["ShortcutsOnMainMenu"] = value;
+            }
+        }
     }
 }

@@ -54,7 +54,7 @@ namespace CarmenUI.Pages
                 windowWithEventsAttached.KeyDown -= Window_KeyDown;
         }
 
-        private void Window_KeyDown(object sender, KeyEventArgs e)
+        protected virtual void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers == ModifierKeys.Control)
             {

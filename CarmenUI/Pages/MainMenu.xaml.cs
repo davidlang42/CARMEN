@@ -169,20 +169,23 @@ namespace CarmenUI.Pages
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            var list_item = e.Key switch
+            if (Properties.Settings.Default.ShortcutsOnMainMenu)
             {
-                Key.S => ConfigureShow,
-                Key.P => RegisterApplicants,
-                Key.A => AuditionApplicants,
-                Key.C => SelectCast,
-                Key.I => ConfigureItems,
-                Key.R => AllocateRoles,
-                _ => null
-            };
-            if (list_item != null)
-            {
-                e.Handled = true;
-                menuList_SelectionChanged(sender, new(e.RoutedEvent, Array.Empty<object>(), new[] { list_item }));
+                var list_item = e.Key switch
+                {
+                    Key.S => ConfigureShow,
+                    Key.P => RegisterApplicants,
+                    Key.A => AuditionApplicants,
+                    Key.C => SelectCast,
+                    Key.I => ConfigureItems,
+                    Key.R => AllocateRoles,
+                    _ => null
+                };
+                if (list_item != null)
+                {
+                    e.Handled = true;
+                    menuList_SelectionChanged(sender, new(e.RoutedEvent, Array.Empty<object>(), new[] { list_item }));
+                }
             }
         }
 

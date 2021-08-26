@@ -149,14 +149,17 @@ namespace CarmenUI.Windows
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.N)
-                NewButton_Click(sender, e);
-            else if (e.Key == Key.O)
-                OpenButton_Click(sender, e);
-            else if (e.Key == Key.N)
-                ConnectButton_Click(sender, e);
-            else if (e.Key.IsDigit(out var digit) && digit > 0 && digit <= RecentList.Items.Count)
-                RecentList_SelectionChanged(sender, new(e.RoutedEvent, Array.Empty<object>(), new[] { RecentList.Items[digit.Value - 1] }));
+            if (Properties.Settings.Default.ShortcutsOnStartWindow)
+            {
+                if (e.Key == Key.N)
+                    NewButton_Click(sender, e);
+                else if (e.Key == Key.O)
+                    OpenButton_Click(sender, e);
+                else if (e.Key == Key.N)
+                    ConnectButton_Click(sender, e);
+                else if (e.Key.IsDigit(out var digit) && digit > 0 && digit <= RecentList.Items.Count)
+                    RecentList_SelectionChanged(sender, new(e.RoutedEvent, Array.Empty<object>(), new[] { RecentList.Items[digit.Value - 1] }));
+            }
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
