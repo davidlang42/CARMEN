@@ -284,8 +284,11 @@ namespace CarmenUI.Pages
         private bool ConfirmDelete(string msg)
             => MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 
-        private void ResetToDefaults_Click(object sender, RoutedEventArgs e)
-            => context.SetDefaultShowSettings();
+        private void ImportShowConfiguration_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Importing show configuration is not currently supported.\nWould you like to reset to the default configuration instead?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                context.SetDefaultShowSettings();
+        }
 
         #region Drag & drop in objectList
 

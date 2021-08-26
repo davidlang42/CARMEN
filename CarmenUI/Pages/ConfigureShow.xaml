@@ -67,9 +67,6 @@
                 <ListBoxItem Selected="Requirements_Selected">
                     <TextBlock Text="Allocate roles based on..."/>
                 </ListBoxItem>
-                <ListBoxItem IsEnabled="False">
-                    <TextBlock Text="Import settings from..." FontStyle="Italic" TextDecorations="Strikethrough"/>
-                </ListBoxItem>
             </ListBox>
         </DockPanel>
         <DockPanel Grid.Column="1" Margin="5">
@@ -905,8 +902,8 @@
                 </ContentControl.Resources>
             </ContentControl>
         </DockPanel>
-        <Button Grid.Row="1" Width="200" Height="35" Margin="5" HorizontalAlignment="Left" Click="ResetToDefaults_Click">
-            <TextBlock Text="Reset to default configuration"/>
+        <Button Grid.Row="1" Width="180" Height="35" Margin="5" HorizontalAlignment="Left" Click="ImportShowConfiguration_Click">
+            <TextBlock Text="Import show configuration"/>
         </Button>
         <StackPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
