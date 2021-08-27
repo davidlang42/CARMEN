@@ -271,7 +271,10 @@ namespace CarmenUI.Pages
         }
 
         private void filterText_GotFocus(object sender, RoutedEventArgs e)
-            => ConfigureFiltering();
+        {
+            ConfigureFiltering();
+            filterText.SelectAll();
+        }
 
         protected override void Window_KeyDown(object sender, KeyEventArgs e)
         {
@@ -279,6 +282,12 @@ namespace CarmenUI.Pages
                 && e.Key == Key.N && Keyboard.Modifiers == ModifierKeys.Control)
             {
                 AddApplicant_Click(sender, e);
+                e.Handled = true;
+            }
+            else if (Properties.Settings.Default.FilterOnCtrlF
+                && e.Key == Key.F && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                filterText.Focus();
                 e.Handled = true;
             }
             else if (e.Key == Key.Escape && applicantsList.SelectedItem != null)

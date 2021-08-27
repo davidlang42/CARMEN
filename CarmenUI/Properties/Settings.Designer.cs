@@ -208,5 +208,17 @@ namespace CarmenUI.Properties {
                 this["ShortcutsOnMainMenu"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool FilterOnCtrlF {
+            get {
+                return ((bool)(this["FilterOnCtrlF"]));
+            }
+            set {
+                this["FilterOnCtrlF"] = value;
+            }
+        }
     }
 }
