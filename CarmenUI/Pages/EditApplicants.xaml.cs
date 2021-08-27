@@ -320,5 +320,8 @@ namespace CarmenUI.Pages
                 e.Handled = true;
             }
         }
+
+        private void NoApplicantsPanel_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => AddApplicant_Click(sender, e);
     }
 }

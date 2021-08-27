@@ -118,9 +118,13 @@
         </DockPanel>
         <Grid Grid.Column="2"
               Visibility="{Binding ElementName=applicantsList, Path=SelectedItem, Converter={StaticResource showIfNull}, ConverterParameter={x:Type modelApplicants:Applicant}}">
-            <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20">
-                No applicant selected.
-            </TextBlock>
+            <ItemsControl Background="White" MouseDoubleClick="NoApplicantsPanel_MouseDoubleClick"/>
+            <StackPanel VerticalAlignment="Center">
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"
+                       Text="No applicant selected."/>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" FontSize="20"
+                       Text="Double-click to add."/>
+            </StackPanel>
         </Grid>
         <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="5"
                 DataContext="{Binding ElementName=applicantsList, Path=SelectedItem}"
