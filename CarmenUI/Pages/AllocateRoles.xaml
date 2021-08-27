@@ -385,16 +385,19 @@
                                 <ListView.View>
                                     <GridView AllowsColumnReorder="False">
                                         <GridView.Columns>
-                                            <GridViewColumn>
+                                            <GridViewColumn Width="{bd:WidthBinding AllocateRolesGrid[Selected]}">
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <CheckBox IsChecked="{Binding IsSelected}"/>
                                                     </DataTemplate>
                                                 </GridViewColumn.CellTemplate>
                                             </GridViewColumn>
-                                            <GridViewColumn Header="Suitability" DisplayMemberBinding="{Binding Suitability, Converter={StaticResource doubleToPercentage}}"/>
-                                            <GridViewColumn Header="Cast Number" DisplayMemberBinding="{Binding CastNumberAndCast}"/>
-                                            <GridViewColumn Header="Name">
+                                            <GridViewColumn Header="Suitability" DisplayMemberBinding="{Binding Suitability, Converter={StaticResource doubleToPercentage}}"
+                                                             Width="{bd:WidthBinding AllocateRolesGrid[Suitability]}"/>
+                                            <GridViewColumn Header="Cast Number" DisplayMemberBinding="{Binding CastNumberAndCast}"
+                                                             Width="{bd:WidthBinding AllocateRolesGrid[CastNumber]}"/>
+                                            <GridViewColumn Header="Name"
+                                                             Width="{bd:WidthBinding AllocateRolesGrid[Name]}">
                                                 <GridViewColumn.DisplayMemberBinding>
                                                     <MultiBinding Converter="{StaticResource fullName}">
                                                         <MultiBinding.Bindings>
@@ -405,7 +408,8 @@
                                                 </GridViewColumn.DisplayMemberBinding>
                                             </GridViewColumn>
                                             <!-- Criteria columns are added here dynamically -->
-                                            <GridViewColumn Header="Overall" DisplayMemberBinding="{Binding OverallAbility}"/>
+                                            <GridViewColumn Header="Overall" DisplayMemberBinding="{Binding OverallAbility}"
+                                                             Width="{bd:WidthBinding AllocateRolesGrid[Overall]}"/>
                                         </GridView.Columns>
                                     </GridView>
                                 </ListView.View>

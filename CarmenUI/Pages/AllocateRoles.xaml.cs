@@ -25,6 +25,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CarmenUI.Bindings;
 
 namespace CarmenUI.Pages
 {
@@ -129,16 +130,20 @@ namespace CarmenUI.Pages
             int array_index = 0;
             foreach (var criteria in primaryCriterias)
             {
-                gridview.Columns.Insert(column_index++, new GridViewColumn
+                var mark_column = new GridViewColumn
                 {
                     Header = criteria.Name,
-                    DisplayMemberBinding = new Binding($"{nameof(ApplicantForRole.Marks)}[{array_index}]")
-                });
-                gridview.Columns.Insert(column_index++, new GridViewColumn
+                    DisplayMemberBinding = new Binding($"{nameof(ApplicantForRole.Marks)}[{array_index}]"),
+                };
+                BindingOperations.SetBinding(mark_column, GridViewColumn.WidthProperty, new WidthBinding($"{nameof(Properties.Widths.AllocateRolesGrid)}[{criteria.Name}_Mark]"));
+                gridview.Columns.Insert(column_index++, mark_column);
+                var count_column = new GridViewColumn
                 {
                     Header = "Roles",
                     DisplayMemberBinding = new Binding($"{nameof(ApplicantForRole.ExistingRoles)}[{array_index}]")
-                });
+                };
+                BindingOperations.SetBinding(count_column, GridViewColumn.WidthProperty, new WidthBinding($"{nameof(Properties.Widths.AllocateRolesGrid)}[{criteria.Name}_Count]"));
+                gridview.Columns.Insert(column_index++, count_column);
                 array_index++;
             }
         }
