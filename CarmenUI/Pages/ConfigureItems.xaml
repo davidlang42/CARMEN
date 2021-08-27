@@ -43,7 +43,7 @@
         <cv:TrueIfNull x:Key="trueIfNull"/>
     </Page.Resources>
     <Page.CommandBindings>
-        <CommandBinding Command="{StaticResource addNodeCommand}" Executed="AddNode"/>
+        <CommandBinding Command="{StaticResource addNodeCommand}" Executed="AddNodeCommand_Executed"/>
     </Page.CommandBindings>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -152,6 +152,7 @@
                                   CanUserSortColumns="True" CanUserDeleteRows="True"
                                   ItemsSource="{Binding Roles}"
                                   Background="{Binding NoRolesErrorBackgroundColor}"
+                                  MouseDoubleClick="RolesDataGrid_MouseDoubleClick"
                                   Initialized="RolesDataGrid_Initialized"><!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Role.Name}"/>
@@ -285,6 +286,7 @@
                                   CanUserDeleteRows="True" FontSize="14"
                                   ItemsSource="{Binding Children}"
                                   Background="{Binding NoChildrenErrorBackgroundColor}"
+                                  MouseDoubleClick="ChildrenDataGrid_MouseDoubleClick"
                                   Initialized="ChildrenDataGrid_Initialized"><!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Node.Name}"/>

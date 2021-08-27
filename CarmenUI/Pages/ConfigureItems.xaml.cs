@@ -64,9 +64,11 @@ namespace CarmenUI.Pages
                     castMembersDictionarySource.Source = cast_groups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
                 castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
+                {
                     await context.Requirements.LoadAsync();
-                requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
-                requirementsViewSource.SortDescriptions.Add(StandardSort.For<Requirement>());
+                    requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
+                    requirementsViewSource.SortDescriptions.Add(StandardSort.For<Requirement>());
+                }
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
                     await context.Nodes.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Requirements), "Items"))
@@ -340,23 +342,24 @@ namespace CarmenUI.Pages
             data_grid.CurrentCell = new DataGridCellInfo(role_view, data_grid.Columns.First());
         }
 
-        private void AddNode(object sender, ExecutedRoutedEventArgs e)
+        private void AddNodeCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+            => AddNode(e.Parameter as SectionType);
+
+        private void AddNode(SectionType? section_type)
         {
             var section_view = (ShowRootOrSectionView)rolesPanel.Content;
             var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
             data_grid.Focus();
-            Node new_node = e.Parameter switch
-            {
-                SectionType section_type => new Section
+            Node new_node = section_type != null
+                ? new Section
                 {
                     Name = $"New {section_type.Name}",
                     SectionType = section_type
-                },
-                _ => new Item
+                }
+                : new Item
                 {
                     Name = "New Item"
-                }
-            };
+                };
             var child_view = section_view.AddChild(new_node, data_grid.SelectedItems.OfType<ChildView>().SingleOrDefaultSafe());
             data_grid.SelectedItem = child_view;
             data_grid.CurrentCell = new DataGridCellInfo(child_view, data_grid.Columns.First());
@@ -402,6 +405,18 @@ namespace CarmenUI.Pages
             if (rolesPanel.Content is ItemView existing_view)
                 existing_view.Dispose();
             base.DisposeInternal();
+        }
+
+        private void RolesDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is ScrollViewer) // Double clicked empty space
+                AddRole_Click(sender, e);
+        }
+
+        private void ChildrenDataGrid_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (e.OriginalSource is ScrollViewer) // Double clicked empty space
+                AddNode(null);
         }
     }
 }
