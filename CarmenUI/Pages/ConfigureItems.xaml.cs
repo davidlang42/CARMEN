@@ -231,7 +231,7 @@ namespace CarmenUI.Pages
             // Insert columns for CountByGroups (which can't be done in XAML
             // because they are dynamic and DataGridColumns is not a panel)
             var datagrid = (DataGrid)sender;
-            int column_index = 1;
+            int column_index = 2;
             int array_index = 0;
             foreach (var cast_group in context.CastGroups.Local)
             {

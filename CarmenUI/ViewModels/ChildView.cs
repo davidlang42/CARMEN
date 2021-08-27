@@ -19,6 +19,24 @@ namespace CarmenUI.ViewModels
 
         public Node Node { get; init; }//LATER this should probably be private
 
+        public SectionType? SectionType
+        {
+            get => (Node as Section)?.SectionType;
+            set
+            {
+                if (Node is not Section section)
+                    throw new ApplicationException("Cannot set SectionType of Item.");
+                if (value == null)
+                    throw new ApplicationException("SectionType cannot be null.");
+                if (section.SectionType == value)
+                    return;
+                section.SectionType = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string SectionTypeName => SectionType?.Name ?? "Item";
+
         public CastGroup[] CastGroups { get; init; }
 
         /// <summary>Indicies match CastGroups</summary>

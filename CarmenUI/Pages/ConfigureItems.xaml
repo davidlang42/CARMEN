@@ -40,6 +40,7 @@
         <cv:SelectableItemsList x:Key="selectableItemsList"/>
         <RoutedUICommand x:Key="addNodeCommand"/>
         <CollectionViewSource x:Key="sectionTypesViewSource"/>
+        <cv:TrueIfNull x:Key="trueIfNull"/>
     </Page.Resources>
     <Page.CommandBindings>
         <CommandBinding Command="{StaticResource addNodeCommand}" Executed="AddNode"/>
@@ -287,6 +288,29 @@
                                   Initialized="ChildrenDataGrid_Initialized"><!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->
                             <DataGrid.Columns>
                                 <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Node.Name}"/>
+                                <DataGridTemplateColumn Header="Type">
+                                    <DataGridTemplateColumn.CellStyle>
+                                        <Style TargetType="{x:Type DataGridCell}">
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding SectionType, Converter={StaticResource trueIfNull}}" Value="True">
+                                                    <Setter Property="IsTabStop" Value="False"></Setter>
+                                                    <Setter Property="Focusable" Value="False"></Setter>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGridTemplateColumn.CellStyle>
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding SectionTypeName}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                    <DataGridTemplateColumn.CellEditingTemplate>
+                                        <DataTemplate>
+                                            <ComboBox SelectedItem="{Binding SectionType}"
+                                                      ItemsSource="{Binding Source={StaticResource sectionTypesViewSource}}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellEditingTemplate>
+                                </DataGridTemplateColumn>
                                 <!-- CountByGroup columns are added here dynamically -->
                                 <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}', TargetNullValue='=*'}" IsReadOnly="True"/>
                             </DataGrid.Columns>
