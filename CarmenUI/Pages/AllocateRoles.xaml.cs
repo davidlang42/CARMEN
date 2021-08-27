@@ -34,6 +34,7 @@ namespace CarmenUI.Pages
     public partial class AllocateRoles : SubPage
     {
         private CastGroupAndCast[]? _castGroupsByCast;
+        private AlternativeCast[]? _alternativeCasts;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
         private NodeView? _rootNodeView;
@@ -43,6 +44,9 @@ namespace CarmenUI.Pages
 
         private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
             ?? throw new ApplicationException($"Tried to used {nameof(castGroupsByCast)} before it was loaded.");
+
+        private AlternativeCast[] alternativeCasts => _alternativeCasts
+            ?? throw new ApplicationException($"Tried to used {nameof(alternativeCasts)} before it was loaded.");
 
         private Applicant[] applicantsInCast => _applicantsInCast
             ?? throw new ApplicationException($"Tried to used {nameof(applicantsInCast)} before it was loaded.");
@@ -69,8 +73,8 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
                     await context.CastGroups.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
-                    await context.AlternativeCasts.LoadAsync();
-                _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, context.AlternativeCasts.Local).ToArray();
+                    _alternativeCasts = await context.AlternativeCasts.ToArrayAsync();
+                _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, _alternativeCasts).ToArray();
                 using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles) + nameof(Role.Items), "Applicants"))
                     _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
@@ -111,7 +115,6 @@ namespace CarmenUI.Pages
         {
             if (applicantsPanel.Content is not EditableRoleWithApplicantsView current_view)
                 return;
-            current_view.ClearSelectedApplicants();
             var new_applicants = engine.PickCast(applicantsInCast, current_view.Role, context.AlternativeCasts.Local);
             current_view.SelectApplicants(new_applicants);
         }
@@ -151,6 +154,8 @@ namespace CarmenUI.Pages
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
                 RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
+                ItemNodeView item_node_view => new NodeRolesOverview(item_node_view.Item, alternativeCasts),
+                SectionNodeView section_node_view => new NodeRolesOverview(section_node_view.Section, alternativeCasts),
                 _ => defaultPanelContent
             };
             return true;
@@ -276,6 +281,67 @@ namespace CarmenUI.Pages
             var value = value_or_toggle ?? !(selected_items.Where(afr => afr.IsSelected).Count() > selected_items.Length / 2);
             foreach (var afr in selected_items)
                 afr.IsSelected = value;
+        }
+
+        private void BalanceCastButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (applicantsPanel.Content is not NodeRolesOverview current_view)
+                return;
+            if (current_view.IncompleteRoles.Count == 0)
+            {
+                MessageBox.Show("There are no incomplete roles to cast.");
+                return;
+            }
+            if (ParseSelectedRoles(current_view.IncompleteRoles) is not List<Role> selected_roles)
+                return;
+            if (selected_roles.Count == 0)
+            {
+                if (MessageBox.Show("No roles are selected. Would you like to select them all?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
+                    return;
+                foreach (var ir in current_view.IncompleteRoles)
+                    ir.IsSelected = true;
+                if (ParseSelectedRoles(current_view.IncompleteRoles) is not List<Role> all_selected_roles)
+                    return;
+                if (all_selected_roles.Count == 0)
+                {
+                    MessageBox.Show("No roles are selected.", WindowTitle);
+                    return;
+                }
+                selected_roles = all_selected_roles;
+            }
+            if (selected_roles.Count == 1 && MessageBox.Show("Only 1 role is selected, so no balancing will occur."
+                + "\nDo you still want to automatically cast this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
+                return;
+            var new_role_applicants = engine.BalanceCast(applicantsInCast, selected_roles, context.AlternativeCasts.Local);
+            foreach (var pair in new_role_applicants)
+                foreach (var applicant in pair.Value)
+                    pair.Key.Cast.Add(applicant);
+            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts);
+            //TODO (BALANCE) should we allow IdealCastingOrder() to return sets of roles to be cast together? how will the UI handle this?
+        }
+
+        private List<Role>? ParseSelectedRoles(IEnumerable<IncompleteRole> incomplete_roles)
+        {
+            var selected_roles = new List<Role>();
+            foreach (var incomplete_role in incomplete_roles)
+            {
+                if (incomplete_role.IsSelected && incomplete_role.Role.CastingStatus(alternativeCasts) == Role.RoleStatus.OverCast)
+                {
+                    var msg = $"Selected role '{incomplete_role.Role.Name}' is currently over cast."
+                        + "\nWould you like to clear the currently selected cast before balancing cast?"
+                        + "\n(Choosing No will remove this role from the selection)";
+                    var result = MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNoCancel);
+                    if (result == MessageBoxResult.Yes)
+                        incomplete_role.Role.Cast.Clear();
+                    else if (result == MessageBoxResult.No)
+                        incomplete_role.IsSelected = false;
+                    else
+                        return null;
+                }
+                if (incomplete_role.IsSelected)
+                    selected_roles.Add(incomplete_role.Role);
+            }
+            return selected_roles;
         }
     }
 }

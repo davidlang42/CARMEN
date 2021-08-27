@@ -91,6 +91,56 @@
                 </Grid>
             </ContentControl.Content>
             <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type vm:NodeRolesOverview}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.ColumnSpan="2" Text="{Binding Node.Name}" FontSize="22" Margin="0 0 0 10"/>
+                        <TextBlock Grid.Row="1" Text="Roles not cast:" FontSize="18"/>
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text="Errors:" FontSize="18"/>
+                        <ListBox Grid.Row="2" x:Name="incompleteRolesList"
+                                 FontSize="14" Margin="0 0 0 10"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding IncompleteRoles}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected}"
+                                                  Width="{Binding ElementName=incompleteRolesList, Path=ActualWidth}"
+                                                  Content="{Binding Role.Name}" VerticalAlignment="Center"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <ListBox Grid.Row="2" Grid.Column="3"
+                                 FontSize="14" Margin="0 0 0 10"
+                                 ItemsSource="{Binding ValidationErrors}"/>
+                        <Grid Grid.Row="3" Grid.ColumnSpan="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button HorizontalAlignment="Left" Width="250" Height="35" Margin="0 0 0 5"
+                                Content="Allocate balanced cast to selected roles"
+                                Click="BalanceCastButton_Click" />
+                            <Button Grid.Column="1" Width="160" Height="35" Margin="0 0 0 5"
+                                IsCancel="True" Content="Return to Main Menu"
+                                Click="MainMenuButton_Click" />
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:RoleWithApplicantsView}">
                     <Grid>
                         <Grid.RowDefinitions>

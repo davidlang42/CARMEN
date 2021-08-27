@@ -58,7 +58,8 @@ namespace Carmen.CastingEngine
         public IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order)
             => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();
 
-        /// <summary>Dummy selection picks the number of required applicants of each type from the list of applicants, ignoring availability and eligibility</summary>
+        /// <summary>Dummy selection picks the number of required applicants of each type from the list of applicants, ignoring availability and eligibility.
+        /// This does not take into account people already cast in the role.</summary>
         public IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts)
         {
             var casts = alternative_casts.ToArray();
@@ -76,6 +77,14 @@ namespace Carmen.CastingEngine
                         yield return applicant;
                 }
             }
+        }
+
+        /// <summary>Dummy balancing just calls PickCast on the roles in order, performing no balancing.</summary>
+        public IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts)
+        {
+            var casts = alternative_casts.ToArray();
+            foreach (var role in roles)
+                yield return new KeyValuePair<Role, IEnumerable<Applicant>>(role, PickCast(applicants, role, casts));
         }
 
         /// <summary>Dummy implementation selects the required number of cast in each group, in random order, overwriting every applicants existing cast group</summary>

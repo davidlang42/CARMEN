@@ -125,5 +125,8 @@ namespace Carmen.CastingEngine
 
         /// <summary>Pick the cast for a role</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
+
+        /// <summary>Pick the cast for one or more roles, balancing talent between them</summary>
+        IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts);
     }
 }

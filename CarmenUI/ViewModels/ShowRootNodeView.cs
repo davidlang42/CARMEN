@@ -12,20 +12,20 @@ namespace CarmenUI.ViewModels
 {
     public class ShowRootNodeView : NodeView
     {
-        private ShowRoot showRoot;
+        public ShowRoot ShowRoot { get; init; }
 
-        public override string Name => showRoot.Name;
+        public override string Name => ShowRoot.Name;
 
         protected override async Task<(double progress, bool has_errors)> CalculateAsync(double child_progress, bool child_errors)
         {
-            child_errors |= !await Task.Run(() => showRoot.VerifyConsecutiveItems());
+            child_errors |= !await Task.Run(() => ShowRoot.VerifyConsecutiveItems());
             return (child_progress, child_errors);
         }
 
         public ShowRootNodeView(ShowRoot show_root, uint total_cast, AlternativeCast[] alternative_casts)
             : base(show_root.Children.InOrder().Select(n => CreateView(n, total_cast, alternative_casts)))
         {
-            showRoot = show_root;
+            ShowRoot = show_root;
         }
     }
 }
