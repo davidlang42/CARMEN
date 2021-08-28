@@ -76,6 +76,19 @@ namespace CarmenUI.ViewModels
 
         public string NoRolesErrorBackgroundColor => Item.Roles.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
 
+        public uint[] SumOfPrimaryRequirements
+        {
+            get
+            {
+                var sum = new uint[primaryRequirements.Length];
+                foreach (var role in Roles)
+                    for (var i = 0; i < sum.Length; i++)
+                        if (role.PrimaryRequirements[i].IsSelected)
+                            sum[i] += role.TotalCount;
+                return sum;
+            }
+        }
+
         public ItemView(Item item, CastGroup[] cast_groups, Requirement[] primary_requirements)
         {
             Item = item;
@@ -154,6 +167,10 @@ namespace CarmenUI.ViewModels
                 OnPropertyChanged(nameof(SumOfRolesTotal));
                 OnPropertyChanged(nameof(CountErrorBackgroundColors));
                 OnPropertyChanged(nameof(NoRolesErrorBackgroundColor));
+            }
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(RoleOnlyView.PrimaryRequirements))
+            {
+                OnPropertyChanged(nameof(SumOfPrimaryRequirements));
             }
         }
 

@@ -139,6 +139,7 @@
                                 <ColumnDefinition Width="5"/>
                                 <ColumnDefinition Width="{Binding ElementName=RolesDataGrid, Path=Columns[0].ActualWidth}"/>
                                 <!-- CountByGroup footer columns are added here dynamically -->
+                                <!-- PrimaryRequirement footer columns are added here dynamically -->
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition/>
@@ -147,6 +148,7 @@
                             <TextBlock Grid.Column="1" Text="Total Role Counts" FontSize="14"/>
                             <TextBlock Grid.Row="1" Grid.Column="1" Text="Required in Item" FontSize="14"/>
                             <!-- CountByGroup footer cells are added here dynamically -->
+                            <!-- PrimaryRequirement footer cells are added here dynamically -->
                         </Grid>
                         <DataGrid Grid.Row="1" x:Name="RolesDataGrid" FontSize="14" AutoGenerateColumns="False"
                                   CanUserSortColumns="True" CanUserDeleteRows="True"

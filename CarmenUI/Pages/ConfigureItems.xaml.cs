@@ -194,10 +194,11 @@ namespace CarmenUI.Pages
                     }
                 });
             }
-            // Populate all footer cells (because doing any in XAML would require
-            // knowing how many CountByGroup columns there are in the DataGrid)
+            // Populate all footer cells (because doing any in XAML would require knowing
+            // how many CountByGroup/PrimaryRequirement columns there are in the DataGrid)
             var footer = ((Grid)datagrid.Parent).Children.OfType<Grid>().Single();
             column_index = 2;
+            // count by group columns
             for (var i = 0; i < castGroups.Length; i++)
             {
                 // define column
@@ -253,6 +254,27 @@ namespace CarmenUI.Pages
             Grid.SetColumn(bottom_total, column_index);
             Grid.SetRow(bottom_total, 1);
             footer.Children.Add(bottom_total);
+            // increment column
+            column_index++;
+            // primary requirement columns
+            for (var i = 0; i < primaryRequirements.Length; i++)
+            {
+                // define column
+                var column_definition = new ColumnDefinition();
+                column_definition.SetBinding(ColumnDefinition.WidthProperty, new Binding
+                {
+                    ElementName = datagrid.Name,
+                    Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - 1}].{nameof(DataGridColumn.ActualWidth)}")
+                });
+                footer.ColumnDefinitions.Add(column_definition);
+                // add top text
+                var top_text = new TextBlock() { FontSize = datagrid.FontSize };
+                top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ItemView.SumOfPrimaryRequirements)}[{i}]"));
+                Grid.SetColumn(top_text, column_index);
+                footer.Children.Add(top_text);
+                // increment column
+                column_index++;
+            }
         }
 
         private void ChildrenDataGrid_Initialized(object sender, EventArgs e)//LATER mostly copied from RolesDataGrid_Initialized, abstract somehow

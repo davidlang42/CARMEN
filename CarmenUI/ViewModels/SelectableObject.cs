@@ -2,14 +2,18 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CarmenUI.ViewModels
 {
-    public class SelectableObject<T>
+    public class SelectableObject<T> : INotifyPropertyChanged
     {
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         public ICollection<T> Collection { get; init; }
         public T ObjectValue { get; init; }
 
@@ -18,16 +22,13 @@ namespace CarmenUI.ViewModels
             get => Collection.Contains(ObjectValue);
             set
             {
+                if (value == IsSelected)
+                    return;
                 if (value)
-                {
-                    if (!Collection.Contains(ObjectValue))
-                        Collection.Add(ObjectValue);
-                }
+                    Collection.Add(ObjectValue);
                 else
-                {
-                    if (Collection.Contains(ObjectValue))
-                        Collection.Remove(ObjectValue);
-                }
+                    Collection.Remove(ObjectValue);
+                OnPropertyChanged();
             }
         }
 
@@ -35,6 +36,11 @@ namespace CarmenUI.ViewModels
         {
             this.Collection = collection;
             this.ObjectValue = objectValue;
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

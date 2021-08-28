@@ -44,9 +44,17 @@ namespace CarmenUI.ViewModels
             }
             PrimaryRequirements = new SelectableObject<Requirement>[primary_requirements.Length];
             for (var i = 0; i < primary_requirements.Length; i++)
+            {
                 PrimaryRequirements[i] = new SelectableObject<Requirement>(role.Requirements, primary_requirements[i]);
+                PrimaryRequirements[i].PropertyChanged += PrimaryRequirement_PropertyChanged;
+            }
             if (role.Items is ObservableCollection<Item> items)
                 items.CollectionChanged += Items_CollectionChanged;
+        }
+
+        private void PrimaryRequirement_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(PrimaryRequirements));
         }
 
         private void Items_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -69,6 +77,8 @@ namespace CarmenUI.ViewModels
         {
             foreach (var cbg in CountByGroups)
                 cbg.PropertyChanged -= CountByGroup_PropertyChanged;
+            foreach (var pr in PrimaryRequirements)
+                pr.PropertyChanged -= PrimaryRequirement_PropertyChanged;
             if (Role.Items is ObservableCollection<Item> items)
                 items.CollectionChanged -= Items_CollectionChanged;
             base.DisposeInternal();
