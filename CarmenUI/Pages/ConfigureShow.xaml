@@ -485,21 +485,27 @@
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is the root block of show settings, which define your show.
                                 The show date will be used to calculate the age of applicants.
-                                The cast number order option allows you to pick which Audition Criteria is used to determine the automatic cast numbering order. If no Audition Criteria has been set, cast numbers will be allocated based on each applicant's overall ability level.
+                                The cast number order option allows you to pick which Audition Criteria is used to determine the automatic cast numbering order.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Show Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Show Date" FontSize="14" VerticalAlignment="Center"/>
                             <DatePicker Grid.Row="2" Grid.Column="1" SelectedDate="{Binding ShowDate}" FontSize="14"/>
                             <TextBlock Grid.Row="3" Text="Cast Number Order" FontSize="14" VerticalAlignment="Center"/>
-                            <ComboBox Grid.Row="3" Grid.Column="1" FontSize="14" SelectedItem="{Binding CastNumberOrderBy, TargetNullValue='Overall ability'}" DisplayMemberPath="Name">
+                            <ComboBox Grid.Row="3" Grid.Column="1" FontSize="14" SelectedItem="{Binding CastNumberOrderBy, TargetNullValue='Overall ability'}">
                                 <ComboBox.Resources>
-                                    <DataTemplate DataType="{x:Type modelCriterias:Criteria}">
+                                    <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="{x:Type modelCriterias:NumericCriteria}">
+                                        <TextBlock Text="{Binding Path=Name}"/>
+                                    </DataTemplate>
+                                    <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">
                                         <TextBlock Text="{Binding Path=Name}"/>
                                     </DataTemplate>
                                 </ComboBox.Resources>
                                 <ComboBox.ItemsSource>
-                                    <CompositeCollection >
+                                    <CompositeCollection>
                                         <sys:String>Overall ability</sys:String>
                                         <CollectionContainer Collection="{Binding Source={StaticResource criteriasSelectionSource}}"/>
                                     </CompositeCollection>
