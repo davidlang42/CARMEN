@@ -47,7 +47,7 @@ namespace CarmenUI.Pages
 
         private readonly CollectionViewSource rootNodesViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
-        private readonly CollectionViewSource requirementsViewSource;
+        private readonly CollectionViewSource nonPrimaryRequirementsViewSource;
         private readonly CollectionViewSource itemsViewSource;
         private readonly CollectionViewSource sectionTypesViewSource;
         private readonly CollectionViewSource castMembersDictionarySource;
@@ -57,7 +57,7 @@ namespace CarmenUI.Pages
             InitializeComponent();
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
-            requirementsViewSource = (CollectionViewSource)FindResource(nameof(requirementsViewSource));
+            nonPrimaryRequirementsViewSource = (CollectionViewSource)FindResource(nameof(nonPrimaryRequirementsViewSource));
             itemsViewSource = (CollectionViewSource)FindResource(nameof(itemsViewSource));
             sectionTypesViewSource = (CollectionViewSource)FindResource(nameof(sectionTypesViewSource));
             castMembersDictionarySource = (CollectionViewSource)FindResource(nameof(castMembersDictionarySource));
@@ -77,8 +77,8 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 {
                     await context.Requirements.LoadAsync();
-                    requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
-                    requirementsViewSource.SortDescriptions.Add(StandardSort.For<Requirement>());
+                    nonPrimaryRequirementsViewSource.Source = context.Requirements.Local.Where(r => !r.Primary).ToArray();
+                    nonPrimaryRequirementsViewSource.SortDescriptions.Add(StandardSort.For<Requirement>());
                     _primaryRequirements = context.Requirements.Local.Where(r => r.Primary).ToArray();
                 }
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))

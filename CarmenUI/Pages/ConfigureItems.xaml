@@ -17,7 +17,7 @@
     <Page.Resources>
         <CollectionViewSource x:Key="rootNodesViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
-        <CollectionViewSource x:Key="requirementsViewSource" IsLiveSortingRequested="True"/>
+        <CollectionViewSource x:Key="nonPrimaryRequirementsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="itemsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="castMembersDictionarySource"/>
         <cv:FakeItTilYouUpdateIt x:Key="nodeErrorBackground">
@@ -159,20 +159,20 @@
                                 <!-- CountByGroup columns are added here dynamically -->
                                 <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True"/>
                                 <!-- PrimaryRequirement columns are added here dynamically -->
-                                <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Requirements" Width="*">
+                                <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Other Requirements" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding CommaSeparatedRequirements, TargetNullValue=''}"/>
+                                            <TextBlock Text="{Binding CommaSeparatedOtherRequirements, TargetNullValue=''}"/>
                                         </DataTemplate>
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
                                         <DataTemplate>
-                                            <ComboBox x:Name="requirementsCombo" SelectedIndex="0" ItemsSource="{Binding Requirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource requirementsViewSource}}">
+                                            <ComboBox x:Name="requirementsCombo" SelectedIndex="0" ItemsSource="{Binding Requirements, Converter={StaticResource selectableRequirementsList}, ConverterParameter={StaticResource nonPrimaryRequirementsViewSource}}">
                                                 <ComboBox.ItemTemplateSelector>
                                                     <cv:ComboBoxFaceTemplateSelector>
                                                         <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                                                             <DataTemplate>
-                                                                <TextBlock Text="{Binding ElementName=requirementsCombo, Path=DataContext.CommaSeparatedRequirements, TargetNullValue=''}"/>
+                                                                <TextBlock Text="{Binding ElementName=requirementsCombo, Path=DataContext.CommaSeparatedOtherRequirements, TargetNullValue=''}"/>
                                                             </DataTemplate>
                                                         </cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                                                         <cv:ComboBoxFaceTemplateSelector.ItemTemplate>

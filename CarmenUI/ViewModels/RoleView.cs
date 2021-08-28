@@ -27,6 +27,17 @@ namespace CarmenUI.ViewModels
 
         public string? CommaSeparatedRequirements => Role.Requirements.Count == 0 ? null : string.Join(", ", Role.Requirements.InOrder().Select(r => r.Name));
 
+        public string? CommaSeparatedOtherRequirements
+        {
+            get
+            {
+                var non_primary_requirements = Role.Requirements.Where(r => !r.Primary).ToArray();
+                if (non_primary_requirements.Length == 0)
+                    return null;
+                return string.Join(", ", non_primary_requirements.InOrder().Select(r => r.Name));
+            }
+        }
+
         public RoleView(Role role)
         {
             Role = role;
