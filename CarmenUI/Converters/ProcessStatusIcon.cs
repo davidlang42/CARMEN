@@ -11,12 +11,12 @@ namespace CarmenUI.Converters
 {
     public class ProcessStatusIcon : IValueConverter
     {
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? Convert(object? value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is ProcessStatus status)
                 value = status switch
                 {
-                    ProcessStatus.None => "",
+                    ProcessStatus.None => null,
                     ProcessStatus.Loading => "/Icons/Ellipsis_bold.png",
                     ProcessStatus.Complete => "/Icons/Checkmark.png",
                     ProcessStatus.Error => "/Icons/Cancel.png",
@@ -25,7 +25,7 @@ namespace CarmenUI.Converters
             return value;
         }
         
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public object? ConvertBack(object? value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();
     }
 }
