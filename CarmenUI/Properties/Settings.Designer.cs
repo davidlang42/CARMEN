@@ -220,5 +220,17 @@ namespace CarmenUI.Properties {
                 this["FilterOnCtrlF"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool SelectAllOnFocusTextBox {
+            get {
+                return ((bool)(this["SelectAllOnFocusTextBox"]));
+            }
+            set {
+                this["SelectAllOnFocusTextBox"] = value;
+            }
+        }
     }
 }

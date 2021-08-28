@@ -29,6 +29,8 @@ namespace CarmenUI.Windows
 
         public MainWindow(DbContextOptions<ShowContext> context_options, string connection_label, string default_show_name)
         {
+            if (Properties.Settings.Default.SelectAllOnFocusTextBox)
+                EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotFocusEvent, new RoutedEventHandler(TextBox_GotFocus));
             InitializeComponent();
             connectionLabel = connection_label;
             var main_menu = new MainMenu(context_options, default_show_name);
@@ -39,6 +41,11 @@ namespace CarmenUI.Windows
         {
             if (e.Content is Page page)
                 Title = $"CARMEN: {page.Title} ({connectionLabel})";
+        }
+
+        private void TextBox_GotFocus(object sender, RoutedEventArgs e)
+        {
+            (sender as TextBox)?.SelectAll();
         }
     }
 }
