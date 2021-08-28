@@ -245,10 +245,10 @@ namespace CarmenUI.Pages
         private void showCompleted_Unchecked(object sender, RoutedEventArgs e)
             => rootNodeView.SetShowCompleted(false);
 
-        private void ListView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            var list_view = (ListView)sender;
-            if (list_view.SelectedItem is ApplicantForRole afr && list_view.SelectedItems.Count == 1)
+            var list_view_item = (ListViewItem)sender;
+            if (list_view_item.DataContext is ApplicantForRole afr)
                 afr.IsSelected = !afr.IsSelected;
         }
 

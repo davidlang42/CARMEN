@@ -372,8 +372,13 @@
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <ListView Grid.ColumnSpan="2" Initialized="ListView_Initialized" ItemsSource="{Binding Applicants}"
-                                        MouseDoubleClick="ListView_MouseDoubleClick" KeyDown="ListView_KeyDown" PreviewKeyDown="ListView_PreviewKeyDown"
+                                      KeyDown="ListView_KeyDown" PreviewKeyDown="ListView_PreviewKeyDown"
                                       x:Name="EditableApplicantsListView">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+                                    </Style>
+                                </ListView.ItemContainerStyle>
                                 <ListView.Resources>
                                     <Style TargetType="{x:Type ListViewItem}">
                                         <Style.Triggers>
