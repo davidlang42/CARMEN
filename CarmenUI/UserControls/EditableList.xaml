@@ -4,7 +4,8 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800">
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="ControlRoot">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -22,8 +23,8 @@
             <RowDefinition Height="5"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <TextBlock Text="{Binding Title}" Grid.ColumnSpan="3"/>
-        <ListBox x:Name="optionsList" ItemsSource="{Binding ItemsSource}" Grid.ColumnSpan="2" Grid.RowSpan="5" Grid.Row="1" MouseDoubleClick="optionsList_MouseDoubleClick" KeyDown="optionsList_KeyDown" />
+        <TextBlock Text="{Binding ElementName=ControlRoot, Path=Title}" Grid.ColumnSpan="3"/>
+        <ListBox x:Name="optionsList" ItemsSource="{Binding ElementName=ControlRoot, Path=ItemsSource}" Grid.ColumnSpan="2" Grid.RowSpan="5" Grid.Row="1" MouseDoubleClick="optionsList_MouseDoubleClick" KeyDown="optionsList_KeyDown" />
         <Button x:Name="optionsMoveUp" Grid.Row="1" Grid.Column="3" Content="Move Up" Click="optionsMoveUp_Click"/>
         <Button x:Name="optionsDelete" Grid.Row="3" Grid.Column="3" Content="Delete" Click="optionsDelete_Click"/>
         <Button x:Name="optionsMoveDown" Grid.Row="5" Grid.Column="3" Click="optionsMoveDown_Click">

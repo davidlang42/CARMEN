@@ -37,7 +37,6 @@ namespace CarmenUI.UserControls
         public EditableList()
         {
             InitializeComponent();
-            DataContext = this;
         }
 
         private void optionsMoveUp_Click(object sender, RoutedEventArgs e)
