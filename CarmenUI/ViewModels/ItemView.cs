@@ -89,6 +89,17 @@ namespace CarmenUI.ViewModels
             }
         }
 
+        public string? DescriptiveSumOfPrimaryRequirements
+        {
+            get
+            {
+                var non_zero_counts = primaryRequirements.Zip(SumOfPrimaryRequirements).Where(p => p.Second != 0).ToArray();
+                if (non_zero_counts.Length == 0)
+                    return null;
+                return string.Join(", ", non_zero_counts.Select(p => p.Second.Plural(p.First.Name.ToLower())));
+            }
+        }
+
         public ItemView(Item item, CastGroup[] cast_groups, Requirement[] primary_requirements)
         {
             Item = item;
@@ -171,6 +182,7 @@ namespace CarmenUI.ViewModels
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(RoleOnlyView.PrimaryRequirements))
             {
                 OnPropertyChanged(nameof(SumOfPrimaryRequirements));
+                OnPropertyChanged(nameof(DescriptiveSumOfPrimaryRequirements));
             }
         }
 

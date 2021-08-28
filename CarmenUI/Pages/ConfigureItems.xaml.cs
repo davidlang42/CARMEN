@@ -198,7 +198,6 @@ namespace CarmenUI.Pages
             // how many CountByGroup/PrimaryRequirement columns there are in the DataGrid)
             var footer = ((Grid)datagrid.Parent).Children.OfType<Grid>().Single();
             column_index = 2;
-            // count by group columns
             for (var i = 0; i < castGroups.Length; i++)
             {
                 // define column
@@ -248,7 +247,7 @@ namespace CarmenUI.Pages
             var bottom_total = new TextBlock() { FontSize = datagrid.FontSize };
             bottom_total.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.TotalCount))
             {
-                TargetNullValue="=*",
+                TargetNullValue = "=*",
                 StringFormat = "={0}"
             });
             Grid.SetColumn(bottom_total, column_index);
@@ -256,25 +255,21 @@ namespace CarmenUI.Pages
             footer.Children.Add(bottom_total);
             // increment column
             column_index++;
-            // primary requirement columns
-            for (var i = 0; i < primaryRequirements.Length; i++)
+            // define primary requirement description column
+            var primary_requirements_column = new ColumnDefinition()
             {
-                // define column
-                var column_definition = new ColumnDefinition();
-                column_definition.SetBinding(ColumnDefinition.WidthProperty, new Binding
-                {
-                    ElementName = datagrid.Name,
-                    Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - 1}].{nameof(DataGridColumn.ActualWidth)}")
-                });
-                footer.ColumnDefinitions.Add(column_definition);
-                // add top text
-                var top_text = new TextBlock() { FontSize = datagrid.FontSize };
-                top_text.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ItemView.SumOfPrimaryRequirements)}[{i}]"));
-                Grid.SetColumn(top_text, column_index);
-                footer.Children.Add(top_text);
-                // increment column
-                column_index++;
-            }
+                Width = new(1, GridUnitType.Star)
+            };
+            footer.ColumnDefinitions.Add(primary_requirements_column);
+            // add top text
+            var primary_requirements_text = new TextBlock() { FontSize = datagrid.FontSize };
+            primary_requirements_text.SetBinding(TextBlock.TextProperty, new Binding(nameof(ItemView.DescriptiveSumOfPrimaryRequirements))
+            {
+                TargetNullValue = "",
+                StringFormat = "({0})"
+            });
+            Grid.SetColumn(primary_requirements_text, column_index);
+            footer.Children.Add(primary_requirements_text);
         }
 
         private void ChildrenDataGrid_Initialized(object sender, EventArgs e)//LATER mostly copied from RolesDataGrid_Initialized, abstract somehow
