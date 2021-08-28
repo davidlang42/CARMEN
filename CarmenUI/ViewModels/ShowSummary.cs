@@ -53,7 +53,7 @@ namespace CarmenUI.ViewModels
             await c.Entry(c.ShowRoot).ReloadAsync();//TODO (SUMMARY) do I need to force reload entities on invalidate to ensure new values get checked? -- YES
             var show_root = c.ShowRoot;
             Heading = show_root.Name;
-            SubHeading = show_root.ShowDate.HasValue ? $"opening {show_root.ShowDate.Value:dd MMMM yyyy}" : "";//LATER opening 12th July 2021
+            SubHeading = show_root.ShowDate.HasValue ? $"opening {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}" : "";
             LogoImage = show_root.Logo?.ImageData;
             if (string.IsNullOrEmpty(show_root.Name))
                 Rows.Add(new Row { Fail = "Show name is required" });

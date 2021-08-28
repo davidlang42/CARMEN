@@ -128,5 +128,21 @@ namespace CarmenUI
                 return "";
             return word.Substring(0, 1).ToUpper() + word.Substring(1);
         }
+
+        public static string ToOrdinal(this int number)
+        {
+            if (number <= 0)
+                throw new ArgumentException($"{nameof(number)} must be positive.");
+            if (number == 11 || number == 12 || number == 13)
+                return $"{number}th";
+            else if (number % 10 == 1)
+                return $"{number}st";
+            else if (number % 10 == 2)
+                return $"{number}nd";
+            else if (number % 10 == 3)
+                return $"{number}rd";
+            else
+                return $"{number}th";
+        }
     }
 }
