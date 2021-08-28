@@ -323,5 +323,43 @@ namespace CarmenUI.Pages
 
         private void NoApplicantsPanel_MouseDoubleClick(object sender, MouseButtonEventArgs e)
             => AddApplicant_Click(sender, e);
+
+        private void ImportApplicants_Click(object sender, RoutedEventArgs e)
+        {
+            if (MessageBox.Show("Importing applicants is not currently supported. Would you like to add randomly generated applicants instead?\n(This will delete all existing applicants)", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                if (!TryInputNumber("How many applicants would you like to add?", WindowTitle, out var applicant_count, 100))
+                    return;
+                if (!TryInputBoolean("Would you like to include randomly generated ability marks?", WindowTitle, out var include_abilities))
+                    return;
+                context.Applicants.Local.Clear();
+                using var test_data = new TestDataGenerator(context);
+                test_data.AddApplicants(applicant_count, 0.5, include_abilities, false, false);
+                applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
+            }
+        }
+
+        private static bool TryInputBoolean(string message, string title, out bool value)
+        {
+            var result = MessageBox.Show(message, title, MessageBoxButton.YesNoCancel);
+            value = result == MessageBoxResult.Yes;
+            return result != MessageBoxResult.Cancel;
+        }
+
+        private static bool TryInputNumber(string message, string title, out uint value, uint? default_response = null)
+        {
+            var response = default_response?.ToString() ?? "";
+            while (true)
+            {
+                response = Microsoft.VisualBasic.Interaction.InputBox(message, title, response); // I'm sorry
+                if (string.IsNullOrEmpty(response))
+                {
+                    value = default;
+                    return false;
+                }
+                else if (uint.TryParse(response, out value))
+                    return true;
+            }
+        }
     }
 }

@@ -171,7 +171,7 @@ namespace Carmen.ShowModel
                         var ability = new Ability
                         {
                             Criteria = criteria,
-                            Mark = (uint)random.Next((int)criteria.MaxMark)
+                            Mark = (uint)random.Next((int)criteria.MaxMark + 1)
                         };
                         applicant.Abilities.Add(ability);
                     }
