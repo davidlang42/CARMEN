@@ -191,7 +191,7 @@ namespace CarmenUI.Pages
         };
 
         private void Requirements_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Role Requirements", "Drag to re-order", requirementsViewSource, requirementsButtons);
+            => BindObjectList("Requirements", "Drag to re-order", requirementsViewSource, requirementsButtons);
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
             => CancelChangesAndReturn();
