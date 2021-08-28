@@ -115,7 +115,7 @@ namespace CarmenUI.ViewModels
             if (missing_roles != 0)
                 fails.Add($"{missing_roles} missing roles");
             if (too_many_roles != 0)
-                fails.Add($"({too_many_roles} with too many roles");
+                fails.Add($"{too_many_roles} with too many roles");
             if (incorrect_sum != 0)
                 fails.Add(incorrect_sum.Plural("incorrect sum"));
             if (fails.Count != 0)
