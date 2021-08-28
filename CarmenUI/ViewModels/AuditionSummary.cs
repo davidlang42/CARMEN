@@ -18,8 +18,8 @@ namespace CarmenUI.ViewModels
             await c.Criterias.LoadAsync();
             var auditioned = await c.Applicants.Local.Where(a => a.HasAuditioned(c.Criterias.Local)).ToListAsync();
             Rows.Add(new Row { Success = $"{auditioned.Count} Applicants Auditioned" });
-            await c.CastGroups.Include(cg => cg.Requirements).LoadAsync();
-            foreach (var cast_group in c.CastGroups.Local)
+            var cast_groups = await c.CastGroups.Include(cg => cg.Requirements).ToArrayAsync();
+            foreach (var cast_group in cast_groups)
             {
                 var applicant_count = await auditioned.CountAsync(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)));//LATER paralleise
                 var row = new Row { Success = $"{applicant_count} eligible for {cast_group.Name}" };

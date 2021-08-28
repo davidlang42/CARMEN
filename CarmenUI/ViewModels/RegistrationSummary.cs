@@ -14,19 +14,19 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
-            await c.Applicants.LoadAsync();
+            var applicants = await c.Applicants.ToArrayAsync();
             Rows.Add(new Row { Success = $"{c.Applicants.Local.Count} Applicants Registered" });
-            await c.CastGroups.Include(cg => cg.Requirements).LoadAsync();
-            foreach (var cast_group in c.CastGroups.Local)
+            var cast_groups = await c.CastGroups.Include(cg => cg.Requirements).ToArrayAsync();
+            foreach (var cast_group in cast_groups)
             {
-                var applicant_count = await c.Applicants.Local.CountAsync(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)));//LATER paralleise
+                var applicant_count = await applicants.CountAsync(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)));//LATER paralleise
                 var row = new Row { Success = $"{applicant_count} eligible for {cast_group.Name}" };
                 if (applicant_count < cast_group.RequiredCount)
                     row.Fail = $"({cast_group.RequiredCount} required)";
                 Rows.Add(row);
             }
             await c.Criterias.LoadAsync();
-            var incomplete = await c.Applicants.Local.CountAsync(a => !a.IsRegistered);//LATER paralleise
+            var incomplete = await applicants.CountAsync(a => !a.IsRegistered);//LATER paralleise
             if (incomplete > 0)
                 Rows.Add(new Row { Fail = $"{incomplete} Applicants are Incomplete" });
             FinishLoad(true);
