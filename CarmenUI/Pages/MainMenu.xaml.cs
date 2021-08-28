@@ -114,7 +114,7 @@ namespace CarmenUI.Pages
         private void Page_Initialized(object sender, EventArgs e)
             => InvalidateSummaries(DataObjects.All);
 
-        private void InvalidateSummaries(DataObjects changes)//TODO (SUMMARY) force update of objects?
+        private void InvalidateSummaries(DataObjects changes)
         {
             // Determine which summaries need updating
             List<Summary> summaries = new();
@@ -151,11 +151,14 @@ namespace CarmenUI.Pages
         }
 
         bool updating_summaries = false;
-        private async void UpdateSummariesAsync()//TODO (SUMMARY) force update of objects?
+        private async void UpdateSummariesAsync()
         {
             if (updating_summaries)
                 return; // already running
             updating_summaries = true;
+            // Start with a fresh context
+            context.Dispose();
+            _context = new ShowContext(contextOptions);
             // Update summaries sequentially
             while (allSummaries.FirstOrDefault(s => s.NeedsUpdate) is Summary next_to_update)
             {
