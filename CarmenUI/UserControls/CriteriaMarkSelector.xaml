@@ -20,7 +20,7 @@
                 <TextBox Text="{Binding ElementName=ControlRoot, Path=Mark, TargetNullValue=''}"/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
-                <ComboBox SelectedIndex="{Binding ElementName=ControlRoot, Path=Mark, TargetNullValue=''}" ItemsSource="{Binding Options}"/>
+                <ComboBox SelectedIndex="{Binding ElementName=ControlRoot, Path=Mark, TargetNullValue='-1'}" ItemsSource="{Binding Options}"/>
             </DataTemplate>
         </ContentControl.Resources>
     </ContentControl>
