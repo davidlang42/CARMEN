@@ -25,6 +25,7 @@
                 <x:Type TypeName="local:CastStatus"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+        <cv:BytesToImage x:Key="bytesToImage"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -87,7 +88,8 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
-            <ListBox ItemsSource="{Binding Source={StaticResource castNumbersViewSource}, Path=Groups}" HorizontalContentAlignment="Stretch">
+            <ListBox ItemsSource="{Binding Source={StaticResource castNumbersViewSource}, Path=Groups}" HorizontalContentAlignment="Stretch"
+                     x:Name="CastNumbersList">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
@@ -104,7 +106,24 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <ListBoxItem Content="{Binding}" HorizontalAlignment="Center"/>
+                                        <ListBoxItem HorizontalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal">
+                                                <ContentControl Content="{Binding}"/>
+                                                <ItemsControl ItemsSource="{Binding Tags}">
+                                                    <ItemsControl.ItemsPanel>
+                                                        <ItemsPanelTemplate>
+                                                            <StackPanel Orientation="Horizontal"/>
+                                                        </ItemsPanelTemplate>
+                                                    </ItemsControl.ItemsPanel>
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Image Margin="5 0 0 0" Source="{Binding Icon.ImageData, Converter={StaticResource bytesToImage}}"
+                                                                   Height="{Binding ElementName=CastNumbersList, Path=FontSize}"/>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </StackPanel>
+                                        </ListBoxItem>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
