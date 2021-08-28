@@ -105,7 +105,7 @@
                 </ListBox.Resources>
             </ListBox>
         </DockPanel>
-        <DockPanel Grid.Column="2" Margin="5" DataContext="{Binding ElementName=objectList,Path=SelectedItem}">
+        <DockPanel x:Name="editPanel" Grid.Column="2" Margin="5" DataContext="{Binding ElementName=objectList,Path=SelectedItem}">
             <TextBlock DockPanel.Dock="Top" Text="{Binding Name, StringFormat='Editing: \{0\}'}" FontSize="22"/>
             <ContentControl Content="{Binding}" KeyboardNavigation.IsTabStop="False">
                 <ContentControl.Resources>

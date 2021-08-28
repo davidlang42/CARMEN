@@ -210,6 +210,7 @@ namespace CarmenUI.Pages
                     ordered.Order = list.OfType<IOrdered>().NextOrder();
                 list.Add(new_object);
                 objectList.SelectedItem = new_object;
+                editPanel.VisualDescendants<TextBox>().FirstOrDefault()?.Focus();
             }
         }
 
