@@ -188,7 +188,7 @@ namespace CarmenUI.ViewModels
 
         public RoleOnlyView AddRole(RoleOnlyView? insert_after = null)
         {
-            var role_view = new RoleOnlyView(new Role(), castGroups, primaryRequirements, this);
+            var role_view = new RoleOnlyView(new Role { Name = "New Role" }, castGroups, primaryRequirements, this);
             if (insert_after != null)
                 for (var i = 0; i < Roles.Count; i++)
                     if (Roles[i] == insert_after)
