@@ -211,7 +211,12 @@
                                 Visibility="{Binding AnyCastSelected, Converter={StaticResource inverseBooleanToVisibility}}">
                             <ItemsControl KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick"
                                           Background="White" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
-                                <TextBlock Text="No cast selected" FontSize="16" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                <TextBlock FontSize="16" Margin="5 10 5 5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    No cast allocated to this role.
+                                </TextBlock>
+                                <TextBlock FontSize="16" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    Double click to start casting.
+                                </TextBlock>
                             </ItemsControl>
                         </Border>
                         <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5"
