@@ -29,7 +29,7 @@ namespace CarmenUI.ViewModels
             var incomplete = await applicants.CountAsync(a => !a.IsRegistered);//LATER paralleise
             if (incomplete > 0)
                 Rows.Add(new Row { Fail = $"{incomplete} Applicants are Incomplete" });
-            FinishLoad(true);
+            FinishLoad(applicants.Length == 0 || incomplete > 0);
         }
     }
 }

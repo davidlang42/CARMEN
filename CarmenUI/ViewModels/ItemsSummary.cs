@@ -15,26 +15,52 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
-            await c.Nodes.Include(i => i.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
+            await c.Nodes.Include(i => i.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync(); //LATER evaluate how much of this "loading" before using actually helps (in all summaries and page loads)
             await c.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
             await c.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
             var items_in_order = c.ShowRoot.ItemsInOrder().ToList();
-            Rows.Add(CreateItemsRow(items_in_order, out int item_count));
+            var items_row = CreateItemsRow(items_in_order, out int item_count);
+            bool anything_exists = item_count != 0;
+            Rows.Add(items_row);
             await c.CastGroups.Include(cg => cg.Members).LoadAsync();
             var alternative_casts_count = await c.AlternativeCasts.CountAsync();
             var cast_members = c.CastGroups.Local.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
-            await c.SectionTypes.Include(st => st.Sections).ThenInclude(s => s.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
+            var section_types = await c.SectionTypes.Include(st => st.Sections).ThenInclude(s => s.CountByGroups).ThenInclude(cbg => cbg.CastGroup).ToArrayAsync();
             if (!c.ShowRoot.CountMatchesSumOfRoles())
                 Rows.Add(new Row { Fail = "Show has incorrect sum of roles" });
-            foreach (var section_type in c.SectionTypes.Local)
-                Rows.Add(CreateSectionTypeRow(section_type, cast_members));
-            var role_count = items_in_order.SelectMany(i => i.Roles).Distinct().Count();
-            Rows.Add(new Row { Success = $"{role_count} Roles" });
-            if (item_count == 0)
-                Rows.Add(new Row { Fail = "At least one Item is required" });
+            foreach (var section_type in section_types)
+            {
+                Rows.Add(CreateSectionTypeRow(section_type, cast_members, out int section_count));
+                anything_exists |= section_count != 0;
+            }
+            Rows.Add(CreateRolesRow(items_in_order.SelectMany(i => i.Roles).Distinct(), out int role_count));
+            anything_exists |= role_count != 0;
+            FinishLoad(!anything_exists);
+        }
+
+        private static Row CreateRolesRow(IEnumerable<Role> roles, out int role_count)
+        {
+            role_count = 0;
+            var blank_name = 0;
+            var zero_count = 0;
+            foreach (var role in roles)
+            {
+                if (string.IsNullOrEmpty(role.Name))
+                    blank_name += 1; //TODO (SUMMARY) show this as an error in ConfigureItems
+                if (role.CountByGroups.Sum(cbg => cbg.Count) == 0)
+                    zero_count += 1; //TODO (SUMMARY) show this as an error in ConfigureItems
+                role_count += 1;
+            }
+            var row = new Row { Success = $"{role_count} Roles" };
             if (role_count == 0)
-                Rows.Add(new Row { Fail = "At least one Role is required" });
-            FinishLoad(true);
+                row.Fail = $"(at least 1 required)";
+            else if (blank_name != 0 && zero_count != 0)
+                row.Fail = $"({blank_name} with blank name, {zero_count} with no cast required)";
+            else if (blank_name != 0)
+                row.Fail = $"({blank_name} with blank name)";
+            else if (zero_count != 0)
+                row.Fail = $"({zero_count} with no cast required)";
+            return row;
         }
 
         private static Row CreateItemsRow(IEnumerable<Item> items, out int item_count)
@@ -50,19 +76,21 @@ namespace CarmenUI.ViewModels
                     incorrect_sum += 1;
                 item_count += 1;
             }
-            var row = new Row { Success = $"{item_count} Items" };
-            if (without_roles != 0 && incorrect_sum != 0)
+            var row = new Row { Success = item_count.Plural("Item") };
+            if (item_count == 0)
+                row.Fail = $"(at least 1 required)";
+            else if (without_roles != 0 && incorrect_sum != 0)
                 row.Fail = $"({without_roles} without roles, {incorrect_sum.Plural("incorrect sum")})";
             else if (without_roles != 0)
                 row.Fail = $"({without_roles} without roles)";
             else if (incorrect_sum != 0)
-                row.Fail = incorrect_sum.Plural("incorrect sum");
+                row.Fail = $"({incorrect_sum.Plural("incorrect sum")})";
             return row;
         }
 
-        private static Row CreateSectionTypeRow(SectionType section_type, Dictionary<CastGroup, uint> cast_members)
+        private static Row CreateSectionTypeRow(SectionType section_type, Dictionary<CastGroup, uint> cast_members, out int section_count)
         {
-            var section_count = 0;
+            section_count = 0;
             var without_children = 0;
             var missing_roles = 0;
             var too_many_roles = 0;

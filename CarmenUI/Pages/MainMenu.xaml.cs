@@ -27,12 +27,13 @@ namespace CarmenUI.Pages
     public partial class MainMenu : Page, IDisposable
     {
         DbContextOptions<ShowContext> contextOptions;
+        string defaultShowName;
 
         private ShowContext? _context;
         private ShowContext context => _context
             ?? throw new ApplicationException("Tried to use context after it was disposed.");
 
-        public ShowSummary ShowSummary { get; init; } = new();
+        public ShowSummary ShowSummary { get; init; }
         public RegistrationSummary RegistrationSummary { get; init; } = new();
         public AuditionSummary AuditionSummary { get; init; } = new();
         public CastSummary CastSummary { get; init; } = new();
@@ -41,8 +42,10 @@ namespace CarmenUI.Pages
 
         private Summary[] allSummaries => new Summary[] { ShowSummary, RegistrationSummary, AuditionSummary, CastSummary, ItemsSummary, RolesSummary };
 
-        public MainMenu(DbContextOptions<ShowContext> context_options)
+        public MainMenu(DbContextOptions<ShowContext> context_options, string default_show_name)
         {
+            defaultShowName = default_show_name;
+            ShowSummary = new(default_show_name);
             _context = new ShowContext(context_options);
             contextOptions = context_options;
             InitializeComponent();
@@ -75,7 +78,7 @@ namespace CarmenUI.Pages
         {
             if (e.AddedItems.Count > 0 && e.AddedItems[0] is ListViewItem selected) {
                 if (selected == ConfigureShow)
-                    NavigateToSubPage(new ConfigureShow(contextOptions));
+                    NavigateToSubPage(new ConfigureShow(contextOptions, defaultShowName));
                 else if (selected == AllocateRoles)
                     NavigateToSubPage(new AllocateRoles(contextOptions));
                 else if (selected == ConfigureItems)
@@ -111,7 +114,7 @@ namespace CarmenUI.Pages
         private void Page_Initialized(object sender, EventArgs e)
             => InvalidateSummaries(DataObjects.All);
 
-        private void InvalidateSummaries(DataObjects changes)
+        private void InvalidateSummaries(DataObjects changes)//TODO (SUMMARY) force update of objects?
         {
             // Determine which summaries need updating
             List<Summary> summaries = new();
@@ -148,7 +151,7 @@ namespace CarmenUI.Pages
         }
 
         bool updating_summaries = false;
-        private async void UpdateSummariesAsync()
+        private async void UpdateSummariesAsync()//TODO (SUMMARY) force update of objects?
         {
             if (updating_summaries)
                 return; // already running

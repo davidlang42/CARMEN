@@ -89,8 +89,8 @@ namespace Carmen.CastingEngine
 
         private IEnumerable<AdjacentItem> FindAdjacentItems(HashSet<Item> applicant_items, HashSet<Item> role_items)
         {
-            var applicant_non_consecutive_nodes = applicant_items.Select(i => HighestNonConsecutiveNode(i));
-            var role_non_consecutive_nodes = role_items.Select(i => HighestNonConsecutiveNode(i));
+            var applicant_non_consecutive_nodes = applicant_items.Select(i => HighestNonConsecutiveNode(i)).OfType<InnerNode>();
+            var role_non_consecutive_nodes = role_items.Select(i => HighestNonConsecutiveNode(i)).OfType<InnerNode>();
             var non_consecutive_nodes_to_check = applicant_non_consecutive_nodes.Intersect(role_non_consecutive_nodes);
             foreach (var non_consecutive_node in non_consecutive_nodes_to_check)
             {
@@ -120,8 +120,8 @@ namespace Carmen.CastingEngine
             }
         }
 
-        private InnerNode HighestNonConsecutiveNode(Item item)
-            => item.Parents().Where(n => !n.AllowConsecutiveItems).Last();
+        private InnerNode? HighestNonConsecutiveNode(Item item)
+            => item.Parents().Where(n => !n.AllowConsecutiveItems).LastOrDefault();
 
         /// <summary>Pick the cast for a role</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);

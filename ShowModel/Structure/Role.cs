@@ -77,10 +77,10 @@ namespace Carmen.ShowModel.Structure
 
         public RoleStatus CastingStatus(AlternativeCast[] alternative_casts)
         {
-            if (CountByGroups.Count == 0 || CountByGroups.All(cbg => cbg.Count == 0))
-                return Cast.Count > 0 ? RoleStatus.OverCast : RoleStatus.FullyCast;
             if (Cast.Count == 0)
                 return RoleStatus.NotCast;
+            if (CountByGroups.Count == 0 || CountByGroups.All(cbg => cbg.Count == 0))
+                return RoleStatus.OverCast;
             bool under_cast = false;
             foreach (var cast_by_group in Cast.GroupBy(a => a.CastGroup))
             {
@@ -91,9 +91,9 @@ namespace Carmen.ShowModel.Structure
                 foreach (var alternative_cast in group_casts)
                 {
                     var actual_count = cast_by_group.Where(a => a.AlternativeCast == alternative_cast).Count();//LATER check there are no cast in this CastGroup which have null AlternativeCast when CastGroup.AlternateCasts and vice versa
-                    if (required_count > actual_count)
+                    if (actual_count > required_count)
                         return RoleStatus.OverCast;
-                    if (required_count < actual_count)
+                    if (actual_count < required_count)
                         under_cast = true; // don't return yet, because if any count is over cast, we want to return that first
                 }
             }

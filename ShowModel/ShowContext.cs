@@ -11,6 +11,7 @@ using System.Data.Common;
 using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel;
+using System.IO;
 
 namespace Carmen.ShowModel
 {
@@ -38,9 +39,19 @@ namespace Carmen.ShowModel
         public ShowContext(DbContextOptions<ShowContext> context_options) : base(context_options)
         { }
 
-        /// <summary>Configures the default AlternativeCasts, CastGroups, Tags, Criterias, Requirements and SectionTypes</summary>
-        public void SetDefaultShowSettings()
+        /// <summary>Configures the default AlternativeCasts, CastGroups, Tags, Criterias, Requirements, SectionTypes and ShowRoot.
+        /// Must match the logic of CheckDefaultShowSettings().</summary>
+        public void SetDefaultShowSettings(string default_show_name, bool load_required = true)
         {
+            if (load_required)
+            {
+                AlternativeCasts.Load();
+                CastGroups.Load();
+                Tags.Load();
+                Criterias.Load();
+                Requirements.Load();
+                SectionTypes.Load();
+            }
             AlternativeCasts.Local.Clear();
             CastGroups.Local.Clear();
             CastGroups.Add(new CastGroup { Name = "Cast" });
@@ -49,10 +60,60 @@ namespace Carmen.ShowModel
             Requirements.Local.Clear();
             SectionTypes.Local.Clear();
             SectionTypes.Add(new SectionType { Name = "Section" });
+            ShowRoot.Name = default_show_name;
+            ShowRoot.ShowDate = null;
             ShowRoot.AllowConsecutiveItems = false;
             ShowRoot.CastNumberOrderBy = null;
             ShowRoot.CastNumberOrderDirection = ListSortDirection.Ascending;
             ShowRoot.Logo = null;
+        }
+
+        /// <summary>Returns true if show settings match the default values.
+        /// Must match the logic of SetDefaultShowSettings().</summary>
+        public bool CheckDefaultShowSettings(string default_show_name, bool load_required = true)
+        {
+            var show_root_match = ShowRoot.Name == default_show_name
+                && ShowRoot.ShowDate == null
+                && ShowRoot.AllowConsecutiveItems == false
+                && ShowRoot.CastNumberOrderBy == null
+                && ShowRoot.CastNumberOrderDirection == ListSortDirection.Ascending
+                && ShowRoot.Logo == null;
+            if (!show_root_match)
+                return false;
+            if (load_required)
+                AlternativeCasts.Load();
+            if (AlternativeCasts.Local.Any())
+                return false;
+            if (load_required)
+                CastGroups.Load();
+            var cast_group_match = CastGroups.Local.SingleOrDefaultSafe() is CastGroup single_cast_group
+                && single_cast_group.Name == "Cast"
+                && single_cast_group.Abbreviation == "Cast"
+                && single_cast_group.AlternateCasts == false
+                && single_cast_group.RequiredCount == null
+                && single_cast_group.Requirements.Count == 0;
+            if (!cast_group_match)
+                return false;
+            if (load_required)
+                Tags.Load();
+            if (Tags.Local.Any())
+                return false;
+            if (load_required)
+                Criterias.Load();
+            if (Criterias.Local.Any())
+                return false;
+            if (load_required)
+                Requirements.Load();
+            if (Requirements.Local.Any())
+                return false;
+            if (load_required)
+                SectionTypes.Load();
+            var section_type_match = SectionTypes.Local.SingleOrDefaultSafe() is SectionType single_section_type
+                && single_section_type.Name == "Section"
+                && single_section_type.AllowConsecutiveItems == true
+                && single_section_type.AllowMultipleRoles == false
+                && single_section_type.AllowNoRoles == false;
+            return section_type_match;
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

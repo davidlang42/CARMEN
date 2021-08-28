@@ -14,10 +14,10 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
-            await c.CastGroups.Include(cg => cg.Members).LoadAsync();
+            var cast_groups = await c.CastGroups.Include(cg => cg.Members).ToArrayAsync();
             var alternative_cast_count = await c.AlternativeCasts.CountAsync();
             var sum = 0;
-            foreach (var cast_group in c.CastGroups.Local)
+            foreach (var cast_group in cast_groups)
             {
                 var count = cast_group.Members.Count;
                 var row = new Row { Success = $"{count} in {cast_group.Name}" };
@@ -31,15 +31,15 @@ namespace CarmenUI.ViewModels
                 sum += count;
             }
             Rows.Insert(0, new Row { Success = $"{sum} Cast Selected" });
-            await c.Tags.Include(cg => cg.Members).LoadAsync();
-            foreach (var tag in c.Tags.Local)
+            var tags = await c.Tags.Include(cg => cg.Members).ToArrayAsync();
+            foreach (var tag in tags)
             {
                 var row = new Row { Success = $"{tag.Members.Count} tagged {tag.Name}" };
-                if (tag.Members.GroupBy(a => a.CastGroup).Any(g => g.Key == null || tag.CountFor(g.Key) is not uint required_count || required_count != g.Count())) //LATER does this need await?
+                if (tag.Members.GroupBy(a => a.CastGroup).Any(g => g.Key == null || (tag.CountFor(g.Key) is uint required_count && required_count != g.Count()))) //LATER does this need await?
                     row.Fail = $"(doesn't match required)";
                 Rows.Add(row);
             }
-            FinishLoad(true);
+            FinishLoad(sum == 0);
         }
     }
 }

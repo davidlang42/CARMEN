@@ -33,6 +33,8 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureShow : SubPage
     {
+        string fileName;
+
         private readonly CollectionViewSource criteriasViewSource = new()
         {
             IsLiveSortingRequested = true,
@@ -55,8 +57,9 @@ namespace CarmenUI.Pages
 
         private CollectionViewSource? currentViewSource;
 
-        public ConfigureShow(DbContextOptions<ShowContext> context_options) : base(context_options)
+        public ConfigureShow(DbContextOptions<ShowContext> context_options, string file_name) : base(context_options)
         {
+            fileName = file_name;
             InitializeComponent();
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
@@ -288,7 +291,7 @@ namespace CarmenUI.Pages
         private void ImportShowConfiguration_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Importing show configuration is not currently supported.\nWould you like to reset to the default configuration instead?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                context.SetDefaultShowSettings();
+                context.SetDefaultShowSettings(fileName, false);
         }
 
         #region Drag & drop in objectList

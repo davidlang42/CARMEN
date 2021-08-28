@@ -35,7 +35,7 @@
             <TextBlock Text="{Binding ElementName=PageRoot, Path=ShowSummary.SubHeading, FallbackValue='Loading...'}" HorizontalAlignment="Center" FontSize="20" FontStyle="Italic"/>
         </StackPanel>
         <Image Grid.Row="1" Grid.Column="0" Source="{Binding ElementName=PageRoot, Path=ShowSummary.LogoImage, Converter={StaticResource bytesToImage}}"/>
-        <ListView KeyboardNavigation.IsTabStop="False" Grid.Row="2" Grid.Column="0" x:Name="menuList" Margin="20" BorderThickness="0" VerticalAlignment="Bottom" SelectionChanged="menuList_SelectionChanged">
+        <ListView KeyboardNavigation.IsTabStop="False" Grid.Row="2" Grid.Column="0" x:Name="menuList" Margin="20 20 20 0" BorderThickness="0" VerticalAlignment="Bottom" SelectionChanged="menuList_SelectionChanged">
             <ListViewItem x:Name="ConfigureShow" MouseEnter="ConfigureShow_MouseEnter" KeyboardNavigation.IsTabStop="False">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding ElementName=PageRoot, Path=ShowSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
@@ -73,11 +73,8 @@
                 </StackPanel>
             </ListViewItem>
         </ListView>
-        <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" KeyboardNavigation.IsTabStop="False">
-            <Image Height="20" Margin="2 0"/>
-            <TextBlock x:Name="CastingComplete" Visibility="Hidden" Text="IT'S SHOWTIME" HorizontalAlignment="Left" FontStyle="Italic" FontSize="20"/>
-        </StackPanel>
-        <ScrollViewer Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="20" KeyboardNavigation.IsTabStop="False">
+        <TextBlock Grid.Row="3" x:Name="CastingComplete" Visibility="Hidden" Margin="20 0 20 20" Text="IT'S SHOWTIME" HorizontalAlignment="Right" FontStyle="Italic" FontSize="20"/>
+        <ScrollViewer Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="20 20 20 0" KeyboardNavigation.IsTabStop="False">
             <ContentControl x:Name="SummaryPanel" VerticalAlignment="Bottom" KeyboardNavigation.IsTabStop="False">
                 <ContentControl.Resources>
                     <DataTemplate DataType="{x:Type vm:Summary}">

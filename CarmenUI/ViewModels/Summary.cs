@@ -38,14 +38,26 @@ namespace CarmenUI.ViewModels
             Rows.Clear();
         }
 
-        protected void FinishLoad(bool complete_if_no_errors)
+        protected void FinishLoad(bool incomplete = false)
         {
-            if (Rows.Any(r => r.IsFail))
-                Status = ProcessStatus.Error;
-            else if (complete_if_no_errors)
-                Status = ProcessStatus.Complete;
-            else
+            if (incomplete)
                 Status = ProcessStatus.None;
+            else if (Rows.Any(r => r.IsFail))
+                Status = ProcessStatus.Error;
+            else
+                Status = ProcessStatus.Complete;
+        }
+
+        protected static Row CountRow(int actual_count, int minimum_count, string single_name, bool same_plural = false) //LATER move this to ShowSummary if its only used there
+        {
+            var row = new Row();
+            if (same_plural)
+                row.Success = $"{actual_count} {single_name}";
+            else
+                row.Success = actual_count.Plural(single_name);
+            if (actual_count < minimum_count)
+                row.Fail = $"(at least {minimum_count} required)";
+            return row;
         }
     }
 }

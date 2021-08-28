@@ -75,5 +75,16 @@ namespace UnitTests.Database
             last_value.ToString().Should().Be("All", "because its helpful for flag enums to have an all option");
             ((int)last_value).Should().Be(other_values_sum, "because the value of all must be the sum of all others");
         }
+
+        [Test]
+        public void CheckDefaultSettings_TrueAfterSetDefault_FalseAfterChange()
+        {
+            var default_show_name = "DefaultShow";
+            using var context = new ShowContext(contextOptions);
+            context.SetDefaultShowSettings(default_show_name);
+            context.CheckDefaultShowSettings(default_show_name).Should().BeTrue();
+            context.ShowRoot.Name = "";
+            context.CheckDefaultShowSettings(default_show_name).Should().BeFalse();
+        }
     }
 }

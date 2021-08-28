@@ -70,16 +70,15 @@ namespace CarmenUI.Windows
                         }
                         else
                         {
-                            context.SetDefaultShowSettings();
+                            context.SetDefaultShowSettings(show.DefaultShowName);
                         }
 #else
-                        context.SetDefaultShowSettings();
+                        context.SetDefaultShowSettings(show.DefaultShowName);
 #endif
-                        context.ShowRoot.Name = System.IO.Path.GetFileNameWithoutExtension(dialog.FileName);
                         context.SaveChanges();
                     }
                     AddToRecentList(show);
-                    LaunchMainWindow(options, show.Label);
+                    LaunchMainWindow(options, show);
                 }
             }
         }
@@ -99,7 +98,7 @@ namespace CarmenUI.Windows
                 {
                     CheckIntegrity(options);
                     AddToRecentList(show);
-                    LaunchMainWindow(options, show.Label);
+                    LaunchMainWindow(options, show);
                 }
             }
         }
@@ -125,9 +124,9 @@ namespace CarmenUI.Windows
                 recent.RemoveAt(recent.Count - 1);
         }
 
-        private void LaunchMainWindow(DbContextOptions<ShowContext> options, string label)
+        private void LaunchMainWindow(DbContextOptions<ShowContext> options, RecentShow show)
         {
-            var main = new MainWindow(options, label);
+            var main = new MainWindow(options, show.Label, show.DefaultShowName);
             main.Show();
             this.Close();
         }
@@ -142,7 +141,7 @@ namespace CarmenUI.Windows
                     CheckIntegrity(options);
                     show.LastOpened = DateTime.Now;
                     AddToRecentList(show);
-                    LaunchMainWindow(options, show.Label);
+                    LaunchMainWindow(options, show);
                 }
             }
         }

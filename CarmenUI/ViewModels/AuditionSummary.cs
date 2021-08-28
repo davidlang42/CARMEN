@@ -30,7 +30,7 @@ namespace CarmenUI.ViewModels
             var not_auditioned = c.Applicants.Local.Count - auditioned.Count;
             if (not_auditioned > 0)
                 Rows.Add(new Row { Fail = $"{not_auditioned.Plural("Appliant has","Applicants have")} not auditioned" });
-            FinishLoad(true);
+            FinishLoad(auditioned.Count == 0 || not_auditioned > 0);
         }
     }
 }

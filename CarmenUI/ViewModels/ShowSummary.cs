@@ -7,11 +7,14 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using Carmen.ShowModel.Requirements;
 
 namespace CarmenUI.ViewModels
 {
     public class ShowSummary : Summary
     {
+        string defaultShowName;
+
         public static readonly DependencyProperty HeadingProperty = DependencyProperty.Register(
             nameof(Heading), typeof(string), typeof(ShowSummary), new PropertyMetadata(""));
 
@@ -39,39 +42,45 @@ namespace CarmenUI.ViewModels
             set => SetValue(LogoImageProperty, value);
         }
 
+        public ShowSummary(string default_show_name)
+        {
+            defaultShowName = default_show_name;
+        }
+
         public override async Task LoadAsync(ShowContext c)
         {
             StartLoad();
-            await c.Entry(c.ShowRoot).ReloadAsync();//LATER do I need to force reload entities on invalidate to ensure new values get checked?
+            await c.Entry(c.ShowRoot).ReloadAsync();//TODO (SUMMARY) do I need to force reload entities on invalidate to ensure new values get checked? -- YES
             var show_root = c.ShowRoot;
             Heading = show_root.Name;
             SubHeading = show_root.ShowDate.HasValue ? $"opening {show_root.ShowDate.Value:dd MMMM yyyy}" : "";//LATER opening 12th July 2021
             LogoImage = show_root.Logo?.ImageData;
+            if (string.IsNullOrEmpty(show_root.Name))
+                Rows.Add(new Row { Fail = "Show name is required" });
+            if (!show_root.ShowDate.HasValue)
+                Rows.Add(new Row { Fail = "Show date is required" });
             await c.Criterias.LoadAsync();
-            Rows.Add(new Row { Success = $"{c.Criterias.Local.Count} Audition Criteria" });
+            Rows.Add(CountRow(c.Criterias.Local.Count, 1, "Audition Criteria", true));
             await c.CastGroups.LoadAsync();
-            Rows.Add(new Row { Success = c.CastGroups.Local.Count.Plural("Cast Group") });
-            var any_groups_alternating = c.CastGroups.Local.Any(g => g.AlternateCasts);
+            Rows.Add(CountRow(c.CastGroups.Local.Count, 1, "Cast Group"));
             await c.AlternativeCasts.LoadAsync();
-            if (any_groups_alternating)
-                Rows.Add(new Row { Success = c.AlternativeCasts.Local.Count.Plural("Alternative Cast") });
-            else
+            if (c.CastGroups.Local.Any(g => g.AlternateCasts))
+                Rows.Add(CountRow(c.AlternativeCasts.Local.Count, 2, "Alternative Cast"));
+            else if (c.AlternativeCasts.Local.Count == 0)
                 Rows.Add(new Row { Success = "Alternating Casts are disabled" });
+            else
+                Rows.Add(new Row
+                {
+                    Success = c.AlternativeCasts.Local.Count.Plural("Alternative Cast"),
+                    Fail = "(but are not enabled)"
+                });
             await c.Tags.LoadAsync();
-            Rows.Add(new Row { Success = c.Tags.Local.Count.Plural("Cast Tag") });
+            Rows.Add(CountRow(c.Tags.Local.Count, 0, "Cast Tag"));
             await c.SectionTypes.LoadAsync();
-            Rows.Add(new Row { Success = c.SectionTypes.Local.Count.Plural("Section Type") });
+            Rows.Add(CountRow(c.SectionTypes.Local.Count, 1, "Section Type"));
             await c.Requirements.LoadAsync();
-            Rows.Add(new Row { Success = c.Requirements.Local.Count.Plural("Requirement") });
-            if (c.Criterias.Local.Count == 0)
-                Rows.Add(new Row { Fail = "At least one Criteria is required" });
-            if (c.CastGroups.Local.Count == 0)
-                Rows.Add(new Row { Fail = "At least one Cast Group is required" });
-            if (any_groups_alternating && c.AlternativeCasts.Local.Count < 2)
-                Rows.Add(new Row { Fail = "At least 2 alternative casts are required" });
-            if (c.SectionTypes.Local.Count == 0)
-                Rows.Add(new Row { Fail = "At least one Section Type is required" });
-            FinishLoad(true);
+            Rows.Add(CountRow(c.Requirements.Local.Count, 0, "Requirement"));
+            FinishLoad(c.CheckDefaultShowSettings(defaultShowName, false));
         }
     }
 }

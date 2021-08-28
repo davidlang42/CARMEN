@@ -27,11 +27,11 @@ namespace CarmenUI.Windows
     {
         string connectionLabel;
 
-        public MainWindow(DbContextOptions<ShowContext> context_options, string connection_label)
+        public MainWindow(DbContextOptions<ShowContext> context_options, string connection_label, string default_show_name)
         {
             InitializeComponent();
             connectionLabel = connection_label;
-            var main_menu = new MainMenu(context_options);
+            var main_menu = new MainMenu(context_options, default_show_name);
             MainFrame.Navigate(main_menu);
         }
 

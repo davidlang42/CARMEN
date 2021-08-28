@@ -28,6 +28,8 @@ namespace CarmenUI.ViewModels
         public string ConnectionString { get; set; } = "";
         /// <summary>The label to be shown to the user</summary>
         public string Label { get; set; } = "";
+        /// <summary>The default name for the show</summary>
+        public string DefaultShowName { get; set; } = "";
         /// <summary>The last time the user opened this show</summary>
         public DateTime LastOpened { get; set; } = DateTime.Now;
 
@@ -38,6 +40,7 @@ namespace CarmenUI.ViewModels
             => new RecentShow
             {
                 Label = Path.GetFileName(filename),
+                DefaultShowName = Path.GetFileNameWithoutExtension(filename),
                 ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString()
             };
 
@@ -56,7 +59,7 @@ namespace CarmenUI.ViewModels
                 return false;
             if (this.ConnectionString != other.ConnectionString)
                 return false;
-            // Label & LastOpened don't matter
+            // Label,LastOpened,DefaultShowName don't matter
             return true;
         }
 
