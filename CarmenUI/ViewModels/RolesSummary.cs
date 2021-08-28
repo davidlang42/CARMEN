@@ -62,7 +62,7 @@ namespace CarmenUI.ViewModels
             // append combined showroot & section consecutive item failures
             foreach (var failure in consecutive_item_failures)
                 Rows.Add(new Row { Fail = $"{failure.CastCount.Plural("Applicant is", "Applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}" });
-            FinishLoad(roles_blank != 0);
+            FinishLoad(roles_cast == 0 || roles_blank != 0);
         }
     }
 }
