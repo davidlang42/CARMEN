@@ -513,7 +513,7 @@
                             </ComboBox>
                             <TextBlock Grid.Row="4" Text="Cast Number Direction" FontSize="14" VerticalAlignment="Center"/>
                             <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding CastNumberOrderDirection}" ItemsSource="{Binding Source={StaticResource listSortDirectionEnumSource}}" FontSize="14"/>
-                            <CheckBox Grid.Row="5" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items" VerticalContentAlignment="Center"/>
+                            <CheckBox Grid.Row="5" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items across the entire show" VerticalContentAlignment="Center"/>
                             <TextBlock Grid.Row="6" Text="Company Logo" FontSize="14"/>
                             <uc:EditableImage Grid.Row="6" Grid.Column="1" Margin="5 0 0 0" HorizontalAlignment="Left"
                                               ImageObject="{Binding Logo, Mode=TwoWay}"
