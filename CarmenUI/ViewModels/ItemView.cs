@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,7 @@ namespace CarmenUI.ViewModels
         bool disposed = false;
 
         private CastGroup[] castGroups;
+        private Requirement[] primaryRequirements;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -74,12 +76,12 @@ namespace CarmenUI.ViewModels
 
         public string NoRolesErrorBackgroundColor => Item.Roles.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
 
-        public ItemView(Item item, CastGroup[] cast_groups)
+        public ItemView(Item item, CastGroup[] cast_groups, Requirement[] primary_requirements)
         {
             Item = item;
             Roles = new ObservableCollection<RoleOnlyView>(item.Roles.InOrder().Select(r =>
             {
-                var rv = new RoleOnlyView(r, cast_groups, this);
+                var rv = new RoleOnlyView(r, cast_groups, primary_requirements, this);
                 rv.PropertyChanged += RoleView_PropertyChanged;
                 return rv;
             }));
@@ -91,6 +93,7 @@ namespace CarmenUI.ViewModels
                 return ncbg;
             }).ToArray();
             this.castGroups = cast_groups;
+            this.primaryRequirements = primary_requirements;
         }
 
         private void NullableCountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -156,7 +159,7 @@ namespace CarmenUI.ViewModels
 
         public RoleOnlyView AddRole(RoleOnlyView? insert_after = null)
         {
-            var role_view = new RoleOnlyView(new Role(), castGroups, this);
+            var role_view = new RoleOnlyView(new Role(), castGroups, primaryRequirements, this);
             if (insert_after != null)
                 for (var i = 0; i < Roles.Count; i++)
                     if (Roles[i] == insert_after)

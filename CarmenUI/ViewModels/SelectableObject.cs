@@ -10,7 +10,7 @@ namespace CarmenUI.ViewModels
 {
     public class SelectableObject<T>
     {
-        public ObservableCollection<T> Collection { get; init; }
+        public ICollection<T> Collection { get; init; }
         public T ObjectValue { get; init; }
 
         public bool IsSelected
@@ -31,7 +31,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public SelectableObject(ObservableCollection<T> collection, T objectValue)
+        public SelectableObject(ICollection<T> collection, T objectValue)
         {
             this.Collection = collection;
             this.ObjectValue = objectValue;

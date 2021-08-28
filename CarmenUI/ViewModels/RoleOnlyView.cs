@@ -1,4 +1,6 @@
 ﻿using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
 using System;
 using System.Collections;
@@ -16,10 +18,11 @@ namespace CarmenUI.ViewModels
     {
         private ItemView itemView;
 
-        public CastGroup[] CastGroups { get; init; }
-
-        /// <summary>Indicies match CastGroups</summary>
+        /// <summary>Indicies match cast_groups provided in constructor</summary>
         public NullableCountByGroup[] CountByGroups { get; init; }
+
+        /// <summary>Indicies match primary_requirements provided in constructor</summary>
+        public SelectableObject<Requirement>[] PrimaryRequirements { get; init; }
 
         public uint TotalCount => CountByGroups.Select(cbg => cbg.Count ?? 0).Sum();
 
@@ -29,17 +32,19 @@ namespace CarmenUI.ViewModels
 
         public string? CommaSeparatedOtherItems => Role.Items.Count < 2 ? null : string.Join(", ", Role.Items.Where(i => i != itemView.Item).Select(i => i.Name).OrderBy(n => n));
 
-        public RoleOnlyView(Role role, CastGroup[] cast_groups, ItemView item_view)
+        public RoleOnlyView(Role role, CastGroup[] cast_groups, Requirement[] primary_requirements, ItemView item_view)
             : base(role)
         {
             itemView = item_view;
-            CastGroups = cast_groups;
             CountByGroups = new NullableCountByGroup[cast_groups.Length];
             for (var i = 0; i < cast_groups.Length; i++)
             {
                 CountByGroups[i] = new NullableCountByGroup(role.CountByGroups, cast_groups[i]);
                 CountByGroups[i].PropertyChanged += CountByGroup_PropertyChanged;
             }
+            PrimaryRequirements = new SelectableObject<Requirement>[primary_requirements.Length];
+            for (var i = 0; i < primary_requirements.Length; i++)
+                PrimaryRequirements[i] = new SelectableObject<Requirement>(role.Requirements, primary_requirements[i]);
             if (role.Items is ObservableCollection<Item> items)
                 items.CollectionChanged += Items_CollectionChanged;
         }

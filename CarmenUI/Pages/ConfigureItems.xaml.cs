@@ -32,6 +32,19 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureItems : SubPage
     {
+        private CastGroup[]? _castGroups;
+        private AlternativeCast[]? _alternativeCasts;
+        private Requirement[]? _primaryRequirements;
+
+        private CastGroup[] castGroups => _castGroups
+            ?? throw new ApplicationException($"Tried to used {nameof(castGroups)} before it was loaded.");
+
+        private AlternativeCast[] alternativeCasts => _alternativeCasts
+            ?? throw new ApplicationException($"Tried to used {nameof(alternativeCasts)} before it was loaded.");
+
+        private Requirement[] primaryRequirements => _primaryRequirements
+            ?? throw new ApplicationException($"Tried to used {nameof(_primaryRequirements)} before it was loaded.");
+
         private readonly CollectionViewSource rootNodesViewSource;
         private readonly CollectionViewSource castGroupsViewSource;
         private readonly CollectionViewSource requirementsViewSource;
@@ -55,19 +68,18 @@ namespace CarmenUI.Pages
             using (var loading = new LoadingOverlay(this).AsSegment(nameof(ConfigureItems)))
             {
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
-                    await context.AlternativeCasts.LoadAsync();
+                    _alternativeCasts = await context.AlternativeCasts.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
-                    await context.CastGroups.LoadAsync();
-                var alternative_casts_count = context.AlternativeCasts.Local.Count;
-                var cast_groups = context.CastGroups.Local.ToArray();
+                    _castGroups = await context.CastGroups.ToArrayAsync();
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
-                    castMembersDictionarySource.Source = cast_groups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
+                    castMembersDictionarySource.Source = castGroups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternativeCasts.Length));
                 castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 {
                     await context.Requirements.LoadAsync();
                     requirementsViewSource.Source = context.Requirements.Local.ToObservableCollection();
                     requirementsViewSource.SortDescriptions.Add(StandardSort.For<Requirement>());
+                    _primaryRequirements = context.Requirements.Local.Where(r => r.Primary).ToArray();
                 }
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
                     await context.Nodes.LoadAsync();
@@ -155,7 +167,7 @@ namespace CarmenUI.Pages
             var datagrid = (DataGrid)sender;
             int column_index = 1;
             int array_index = 0;
-            foreach (var cast_group in context.CastGroups.Local)
+            foreach (var cast_group in castGroups)
             {
                 datagrid.Columns.Insert(column_index++, new DataGridTextColumn
                 {
@@ -167,11 +179,26 @@ namespace CarmenUI.Pages
                     }
                 });
             }
+            // Insert columns for PrimaryRequirements (which can't be done in XAML
+            // because they are dynamic and DataGridColumns is not a panel)
+            column_index++; // skip the "Total count" column
+            array_index = 0;
+            foreach (var requirement in primaryRequirements)
+            {
+                datagrid.Columns.Insert(column_index++, new DataGridCheckBoxColumn
+                {
+                    Header = requirement.Name,
+                    Binding = new Binding($"{nameof(RoleOnlyView.PrimaryRequirements)}[{array_index++}].{nameof(SelectableObject<Requirement>.IsSelected)}")
+                    {
+                        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
+                    }
+                });
+            }
             // Populate all footer cells (because doing any in XAML would require
             // knowing how many CountByGroup columns there are in the DataGrid)
             var footer = ((Grid)datagrid.Parent).Children.OfType<Grid>().Single();
             column_index = 2;
-            for (var i = 0; i < context.CastGroups.Local.Count; i++)
+            for (var i = 0; i < castGroups.Length; i++)
             {
                 // define column
                 var column_definition = new ColumnDefinition();
@@ -325,9 +352,9 @@ namespace CarmenUI.Pages
                 existing_view.Dispose();
             rolesPanel.Content = itemsTreeView.SelectedItem switch
             {
-                Item item => new ItemView(item, context.CastGroups.Local.ToArray()),
-                Section section => new ShowRootOrSectionView(section, context.CastGroups.Local.ToArray(), context.AlternativeCasts.Local.Count),
-                ShowRoot show_root => new ShowRootOrSectionView(show_root, context.CastGroups.Local.ToArray(), context.AlternativeCasts.Local.Count),
+                Item item => new ItemView(item, castGroups, primaryRequirements),
+                Section section => new ShowRootOrSectionView(section, castGroups, alternativeCasts.Length),
+                ShowRoot show_root => new ShowRootOrSectionView(show_root, castGroups, alternativeCasts.Length),
                 _ => null
             };
         }

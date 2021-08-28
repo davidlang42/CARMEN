@@ -158,6 +158,7 @@
                                 <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Role.Name}"/>
                                 <!-- CountByGroup columns are added here dynamically -->
                                 <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True"/>
+                                <!-- PrimaryRequirement columns are added here dynamically -->
                                 <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Requirements" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>
                                         <DataTemplate>
