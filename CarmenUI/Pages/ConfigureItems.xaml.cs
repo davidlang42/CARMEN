@@ -162,10 +162,12 @@ namespace CarmenUI.Pages
 
         private void RolesDataGrid_Initialized(object sender, EventArgs e)
         {
+            const int COLUMNS_BEFORE_CBG = 1;
+            const int EXTRA_FOOTER_COLUMNS = 1; // accounts for DataGrid row header
             // Insert columns for CountByGroups (which can't be done in XAML
             // because they are dynamic and DataGridColumns is not a panel)
             var datagrid = (DataGrid)sender;
-            int column_index = 1;
+            int column_index = COLUMNS_BEFORE_CBG;
             int array_index = 0;
             foreach (var cast_group in castGroups)
             {
@@ -197,7 +199,7 @@ namespace CarmenUI.Pages
             // Populate all footer cells (because doing any in XAML would require knowing
             // how many CountByGroup/PrimaryRequirement columns there are in the DataGrid)
             var footer = ((Grid)datagrid.Parent).Children.OfType<Grid>().Single();
-            column_index = 2;
+            column_index = COLUMNS_BEFORE_CBG + EXTRA_FOOTER_COLUMNS;
             for (var i = 0; i < castGroups.Length; i++)
             {
                 // define column
@@ -205,7 +207,7 @@ namespace CarmenUI.Pages
                 column_definition.SetBinding(ColumnDefinition.WidthProperty, new Binding
                 {
                     ElementName = datagrid.Name,
-                    Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index-1}].{nameof(DataGridColumn.ActualWidth)}")
+                    Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - EXTRA_FOOTER_COLUMNS}].{nameof(DataGridColumn.ActualWidth)}")
                 });
                 footer.ColumnDefinitions.Add(column_definition);
                 // add top text
@@ -232,7 +234,7 @@ namespace CarmenUI.Pages
             total_column.SetBinding(ColumnDefinition.WidthProperty, new Binding
             {
                 ElementName = datagrid.Name,
-                Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - 1}].{nameof(DataGridColumn.ActualWidth)}")
+                Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - EXTRA_FOOTER_COLUMNS}].{nameof(DataGridColumn.ActualWidth)}")
             });
             footer.ColumnDefinitions.Add(total_column);
             // add top total
@@ -270,16 +272,20 @@ namespace CarmenUI.Pages
             });
             Grid.SetColumn(primary_requirements_text, column_index);
             footer.Children.Add(primary_requirements_text);
+            // increment column
+            //column_index++;
         }
 
         private void ChildrenDataGrid_Initialized(object sender, EventArgs e)//LATER mostly copied from RolesDataGrid_Initialized, abstract somehow
         {
+            const int COLUMNS_BEFORE_CBG = 2;
+            const int EXTRA_FOOTER_COLUMNS = 1; // accounts for DataGrid row header
             // Insert columns for CountByGroups (which can't be done in XAML
             // because they are dynamic and DataGridColumns is not a panel)
             var datagrid = (DataGrid)sender;
-            int column_index = 2;
+            int column_index = COLUMNS_BEFORE_CBG;
             int array_index = 0;
-            foreach (var cast_group in context.CastGroups.Local)
+            foreach (var cast_group in castGroups)
             {
                 datagrid.Columns.Insert(column_index++, new DataGridTextColumn
                 {
@@ -294,15 +300,15 @@ namespace CarmenUI.Pages
             // Populate all footer cells (because doing any in XAML would require
             // knowing how many CountByGroup columns there are in the DataGrid)
             var footer = ((Grid)datagrid.Parent).Children.OfType<Grid>().Single();
-            column_index = 2;
-            for (var i = 0; i < context.CastGroups.Local.Count; i++)
+            column_index = COLUMNS_BEFORE_CBG + EXTRA_FOOTER_COLUMNS;
+            for (var i = 0; i < castGroups.Length; i++)
             {
                 // define column
                 var column_definition = new ColumnDefinition();
                 column_definition.SetBinding(ColumnDefinition.WidthProperty, new Binding
                 {
                     ElementName = datagrid.Name,
-                    Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - 1}].{nameof(DataGridColumn.ActualWidth)}")
+                    Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - EXTRA_FOOTER_COLUMNS}].{nameof(DataGridColumn.ActualWidth)}")
                 });
                 footer.ColumnDefinitions.Add(column_definition);
                 // add top text
@@ -329,7 +335,7 @@ namespace CarmenUI.Pages
             total_column.SetBinding(ColumnDefinition.WidthProperty, new Binding
             {
                 ElementName = datagrid.Name,
-                Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - 1}].{nameof(DataGridColumn.ActualWidth)}")
+                Path = new PropertyPath($"{nameof(DataGrid.Columns)}[{column_index - EXTRA_FOOTER_COLUMNS}].{nameof(DataGridColumn.ActualWidth)}")
             });
             footer.ColumnDefinitions.Add(total_column);
             // add top total
@@ -350,6 +356,8 @@ namespace CarmenUI.Pages
             Grid.SetColumn(bottom_total, column_index);
             Grid.SetRow(bottom_total, 1);
             footer.Children.Add(bottom_total);
+            // increment column
+            //column_index++;
         }
 
         private void itemsTreeView_KeyDown(object sender, KeyEventArgs e)

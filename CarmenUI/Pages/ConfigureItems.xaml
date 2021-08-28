@@ -275,6 +275,7 @@
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="5"/>
                                 <ColumnDefinition Width="{Binding ElementName=ChildrenDataGrid, Path=Columns[0].ActualWidth}"/>
+                                <ColumnDefinition Width="{Binding ElementName=ChildrenDataGrid, Path=Columns[1].ActualWidth}"/>
                                 <!-- CountByGroup footer columns are added here dynamically -->
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
