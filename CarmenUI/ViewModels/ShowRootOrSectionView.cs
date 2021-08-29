@@ -214,6 +214,11 @@ namespace CarmenUI.ViewModels
             return child_view;
         }
 
+        public void RemoveChild(ChildView child_view)
+        {
+            Children.Remove(child_view);
+        }
+
         public void Dispose()
         {
             if (!disposed)

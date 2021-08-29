@@ -470,5 +470,23 @@ namespace CarmenUI.Pages
             if (e.OriginalSource is ScrollViewer) // Double clicked empty space
                 AddNode(null);
         }
+
+        private void RemoveRole_Click(object sender, RoutedEventArgs e)
+        {
+            var item_view = (ItemView)rolesPanel.Content;
+            var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
+            var selected_roles = data_grid.SelectedItems.OfType<RoleOnlyView>().ToArray();
+            foreach (var selected_role in selected_roles)
+                item_view.RemoveRole(selected_role);
+        }
+
+        private void DeleteItemOrSection_Click(object sender, RoutedEventArgs e)
+        {
+            var view = (ShowRootOrSectionView)rolesPanel.Content;
+            var data_grid = rolesPanel.VisualDescendants<DataGrid>().First();
+            var selected_children = data_grid.SelectedItems.OfType<ChildView>().ToArray();
+            foreach (var selected_child in selected_children)
+                view.RemoveChild(selected_child);
+        }
     }
 }
