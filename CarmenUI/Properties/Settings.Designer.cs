@@ -25,6 +25,7 @@ namespace CarmenUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double Top {
             get {
                 return ((double)(this["Top"]));
@@ -36,6 +37,7 @@ namespace CarmenUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double Left {
             get {
                 return ((double)(this["Left"]));
@@ -47,6 +49,7 @@ namespace CarmenUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double Height {
             get {
                 return ((double)(this["Height"]));
@@ -58,6 +61,7 @@ namespace CarmenUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
         public double Width {
             get {
                 return ((double)(this["Width"]));
@@ -81,6 +85,7 @@ namespace CarmenUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Normal")]
         public global::System.Windows.WindowState WindowState {
             get {
                 return ((global::System.Windows.WindowState)(this["WindowState"]));

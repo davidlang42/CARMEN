@@ -1,6 +1,8 @@
 ﻿using Carmen.ShowModel.Applicants;
+using CarmenUI.Properties;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +22,8 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class SettingsWindow : Window
     {
+        bool closing = false;
+
         public Applicant ExampleApplicant { get; init; } = new Applicant {
             FirstName = "David",
             LastName = "Lang"
@@ -33,34 +37,47 @@ namespace CarmenUI.Windows
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
         {
-            Reload();//TODO handle closing event and do the same as cancel if nothing was pressed
+            Reload();
+            closing = true;
             this.Close();
         }
 
         private void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             Save();
+            closing = true;
             this.Close();
         }
 
         private void ResetButton_Click(object sender, RoutedEventArgs e)
         {
-            Reset();
+            ResetAndSave();
+            closing = true;
+            this.Close();
         }
 
         private void Save()
         {
-            Properties.Settings.Default.Save();
+            Settings.Default.Save();
+            Widths.Default.Save();
+            Timings.Default.Save();
         }
 
         private void Reload()
         {
-            Properties.Settings.Default.Reload();
+            Settings.Default.Reload();
+            Widths.Default.Reload();
+            Timings.Default.Reload();
         }
 
-        private void Reset()
+        private void ResetAndSave()
         {
-            Properties.Settings.Default.Reset();
+            Settings.Default.Reset();
+            Settings.Default.SetDefaultWindowPosition();
+            Settings.Default.ClearRecentShowsList();
+            Widths.Default.Reset();
+            Timings.Default.Reset();
+            Timings.Default.ClearTimings();
         }
 
         private void FullNameFormatCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -72,6 +89,27 @@ namespace CarmenUI.Windows
                 fullNameExample.DataContext = null;
                 fullNameExample.DataContext = data_context;
             }
+        }
+
+        private void ResetWindowPositionButton_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.SetDefaultWindowPosition();
+        }
+
+        private void ClearRecentShowsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Settings.Default.ClearRecentShowsList();
+        }
+
+        private void ClearLoadingTimesButton_Click(object sender, RoutedEventArgs e)
+        {
+            Timings.Default.ClearTimings();
+        }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            if (!closing)
+                Reload(); // equivalent to cancel
         }
     }
 }

@@ -3,22 +3,22 @@
   <Profiles />
   <Settings>
     <Setting Name="Top" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="Left" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="Height" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="Width" Type="System.Double" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">0</Value>
     </Setting>
     <Setting Name="FirstRun" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
     <Setting Name="WindowState" Type="System.Windows.WindowState" Scope="User">
-      <Value Profile="(Default)" />
+      <Value Profile="(Default)">Normal</Value>
     </Setting>
     <Setting Name="RecentShows" Type="System.Collections.Generic.List&lt;CarmenUI.ViewModels.RecentShow&gt;" Scope="User">
       <Value Profile="(Default)" />

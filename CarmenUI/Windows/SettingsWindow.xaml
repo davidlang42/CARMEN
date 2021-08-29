@@ -10,7 +10,8 @@
         mc:Ignorable="d"
         Title="CARMEN: Application Settings" Width="1024" Height="768" WindowStartupLocation="CenterScreen"
         MinWidth="640" MinHeight="480"
-        x:Name="WindowRoot">
+        x:Name="WindowRoot"
+        Closing="Window_Closing">
     <Window.Resources>
         <ObjectDataProvider x:Key="fullNameFormatEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -34,7 +35,41 @@
         </TextBlock>
         <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" HorizontalScrollBarVisibility="Disabled" Margin="0 10">
             <StackPanel>
-                <Expander>
+                <Expander IsExpanded="True" Margin="0 5">
+                    <Expander.Header>
+                        <TextBlock Text="General" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <CheckBox Content="Automatically select all text within a text box when it is selected (by tab or otherwise)" Margin="0 5"
+                                  IsChecked="{bd:SettingBinding SelectAllOnFocusTextBox}"/>
+                        <TextBlock VerticalAlignment="Center">
+                                The size/position/minimised/maximised state of the main window is saved when you close the program.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Reset saved window position" Width="170" HorizontalAlignment="Left" Margin="0 0 0 5" Click="ResetWindowPositionButton_Click"/>
+                            <TextBlock Text="{bd:SettingBinding Left, StringFormat=' (Left: #'}"/>
+                            <TextBlock Text="{bd:SettingBinding Top, StringFormat=', Top: #'}"/>
+                            <TextBlock Text="{bd:SettingBinding Width, StringFormat=', Width: #'}"/>
+                            <TextBlock Text="{bd:SettingBinding Height, StringFormat=', Height: #'}"/>
+                            <TextBlock Text="{bd:SettingBinding WindowState, StringFormat=', WindowState: \{0\})'}"/>
+                        </StackPanel>
+                        <TextBlock VerticalAlignment="Center">
+                                The most recently opened shows are stored to allow easy access from a list on the starting window.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Clear recently opened shows list" Width="185" HorizontalAlignment="Left" Margin="0 0 0 5" Click="ClearRecentShowsButton_Click"/>
+                            <TextBlock Text="{bd:SettingBinding RecentShows.Count, Mode=OneWay, StringFormat=' (\{0\} recent shows in list)'}"/>
+                        </StackPanel>
+                        <TextBlock VerticalAlignment="Center">
+                                The most recently loading time for each screen is remembered to make the progress bar move more smoothly and accurately.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Clear last loading times" Width="140" HorizontalAlignment="Left" Margin="0 0 0 5" Click="ClearLoadingTimesButton_Click"/>
+                            <TextBlock Text="{bd:TimingBinding TotalTime.Count, Mode=OneWay, StringFormat=' (\{0\} loading times stored)'}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Expander>
+                <Expander IsExpanded="True">
                     <Expander.Header>
                         <TextBlock Text="Formatting" FontWeight="Bold" FontSize="14"/>
                     </Expander.Header>

@@ -45,5 +45,11 @@ namespace CarmenUI.Properties
                 this[nameof(SubSegments)] = value;
             }
         }
+
+        public void ClearTimings()
+        {
+            TotalTime = new();
+            SubSegments = new();
+        }
     }
 }

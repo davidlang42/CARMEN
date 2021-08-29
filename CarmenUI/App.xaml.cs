@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.IO;
 using System.Text.Json;
+using CarmenUI.Properties;
 
 namespace CarmenUI
 {
@@ -20,27 +21,20 @@ namespace CarmenUI
     {
         private void Application_Exit(object sender, ExitEventArgs e)
         {
-            CarmenUI.Properties.Settings.Default.Save();
-            CarmenUI.Properties.Timings.Default.Save();
-            CarmenUI.Properties.Widths.Default.Save();
+            Settings.Default.Save();
+            Timings.Default.Save();
+            Widths.Default.Save();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
         {
-            if (CarmenUI.Properties.Settings.Default.FirstRun)
-                SetDefaultUserSettings();
-        }
-
-        public void SetDefaultUserSettings()
-        {
-            var settings = CarmenUI.Properties.Settings.Default;
-            settings.FirstRun = false;
-            settings.Width = 1024;
-            settings.Height = 768;
-            settings.Left = (SystemParameters.PrimaryScreenWidth - settings.Width) / 2;
-            settings.Top = (SystemParameters.PrimaryScreenHeight - settings.Height) / 2;
-            settings.WindowState = WindowState.Normal;
-            settings.RecentShows = new List<RecentShow>();
+            var settings = Settings.Default;
+            if (settings.FirstRun)
+            {
+                settings.FirstRun = false;
+                settings.SetDefaultWindowPosition();
+                settings.ClearRecentShowsList();
+            }
         }
 
         protected override void OnStartup(StartupEventArgs e)
