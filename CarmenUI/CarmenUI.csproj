@@ -41,6 +41,8 @@
     <Resource Include="Icons\Ellipsis_bold.png" />
     <Resource Include="Icons\CarmenC.png" />
     <Resource Include="Icons\EditPencil.png" />
+    <Resource Include="Icons\Settings.png" />
+    <Resource Include="Icons\Return.png" />
   </ItemGroup>
 
   <ItemGroup>

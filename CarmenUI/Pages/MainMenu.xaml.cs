@@ -167,7 +167,12 @@ namespace CarmenUI.Pages
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (Properties.Settings.Default.ShortcutsOnMainMenu)
+            if (Properties.Settings.Default.ExitToStartOnBackspace && e.Key == Key.Back)
+            {
+                BackButton_Click(sender, e);
+                e.Handled = true;
+            }
+            else if (Properties.Settings.Default.ShortcutsOnMainMenu)
             {
                 var list_item = e.Key switch
                 {
@@ -198,6 +203,19 @@ namespace CarmenUI.Pages
         {
             if (window != null)
                 window.KeyDown -= Window_KeyDown;
+        }
+
+        private void BackButton_Click(object sender, RoutedEventArgs e)
+        {
+            var this_window = Window.GetWindow(this);
+            var start_window = new StartWindow();
+            start_window.Show();
+            this_window.Close();
+        }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Not yet implemented
         }
     }
 }

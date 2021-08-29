@@ -232,5 +232,17 @@ namespace CarmenUI.Properties {
                 this["SelectAllOnFocusTextBox"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ExitToStartOnBackspace {
+            get {
+                return ((bool)(this["ExitToStartOnBackspace"]));
+            }
+            set {
+                this["ExitToStartOnBackspace"] = value;
+            }
+        }
     }
 }
