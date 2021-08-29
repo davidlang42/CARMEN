@@ -7,12 +7,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace CarmenUI.ViewModels
 {
     public class ItemsSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext c)
+        public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
             await c.Nodes.Include(i => i.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync(); //LATER evaluate how much of this "loading" before using actually helps (in all summaries and page loads)
@@ -35,7 +36,7 @@ namespace CarmenUI.ViewModels
             }
             Rows.Add(CreateRolesRow(items_in_order.SelectMany(i => i.Roles).Distinct(), out int role_count));
             anything_exists |= role_count != 0;
-            FinishLoad(!anything_exists);
+            FinishLoad(cancel, !anything_exists);
         }
 
         private static Row CreateRolesRow(IEnumerable<Role> roles, out int role_count)

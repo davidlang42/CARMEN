@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 
@@ -11,7 +12,7 @@ namespace CarmenUI.ViewModels
 {
     public abstract class Summary : DependencyObject
     {
-        public bool NeedsUpdate { get; set; } = true;
+        public bool NeedsUpdate { get; set; } = true;//TODO remove
 
         public struct Row
         {
@@ -30,7 +31,7 @@ namespace CarmenUI.ViewModels
 
         public ObservableCollection<Row> Rows { get; init; } = new();
 
-        public abstract Task LoadAsync(ShowContext c);
+        public abstract Task LoadAsync(ShowContext c, CancellationToken cancel);
 
         protected void StartLoad()
         {
@@ -38,8 +39,10 @@ namespace CarmenUI.ViewModels
             Rows.Clear();
         }
 
-        protected void FinishLoad(bool incomplete = false)
+        protected void FinishLoad(CancellationToken cancel, bool incomplete = false)
         {
+            if (cancel.IsCancellationRequested)
+                return; // leave status as loading if we were cancelled
             if (incomplete)
                 Status = ProcessStatus.None;
             else if (Rows.Any(r => r.IsFail))

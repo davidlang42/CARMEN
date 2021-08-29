@@ -47,7 +47,7 @@ namespace CarmenUI.ViewModels
             defaultShowName = default_show_name;
         }
 
-        public override async Task LoadAsync(ShowContext c)
+        public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
             var show_root = c.ShowRoot;
@@ -79,7 +79,7 @@ namespace CarmenUI.ViewModels
             Rows.Add(CountRow(c.SectionTypes.Local.Count, 1, "Section Type"));
             await c.Requirements.LoadAsync();
             Rows.Add(CountRow(c.Requirements.Local.Count, 0, "Requirement"));
-            FinishLoad(c.CheckDefaultShowSettings(defaultShowName, false));
+            FinishLoad(cancel, c.CheckDefaultShowSettings(defaultShowName, false));
         }
     }
 }

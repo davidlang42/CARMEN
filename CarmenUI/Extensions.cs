@@ -34,6 +34,12 @@ namespace CarmenUI
                 return null;
             return first;
         }
+
+        public static void AddRange<T>(this HashSet<T> set, IEnumerable<T> range)
+        {
+            foreach (var item in range)
+                set.Add(item);
+        }
     }
 
     internal static class AsyncExtensions

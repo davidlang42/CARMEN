@@ -29,10 +29,6 @@ namespace CarmenUI.Pages
         DbContextOptions<ShowContext> contextOptions;
         string defaultShowName;
 
-        private ShowContext? _context;
-        private ShowContext context => _context
-            ?? throw new ApplicationException("Tried to use context after it was disposed.");
-
         public ShowSummary ShowSummary { get; init; }
         public RegistrationSummary RegistrationSummary { get; init; } = new();
         public AuditionSummary AuditionSummary { get; init; } = new();
@@ -41,22 +37,22 @@ namespace CarmenUI.Pages
         public RolesSummary RolesSummary { get; init; } = new();
 
         private Summary[] allSummaries => new Summary[] { ShowSummary, RegistrationSummary, AuditionSummary, CastSummary, ItemsSummary, RolesSummary };
+        private CancellationTokenSource? updatingSummaries;
 
         public MainMenu(DbContextOptions<ShowContext> context_options, string default_show_name)
         {
             defaultShowName = default_show_name;
             ShowSummary = new(default_show_name);
-            _context = new ShowContext(context_options);
             contextOptions = context_options;
             InitializeComponent();
         }
 
         public void Dispose()
         {
-            if (_context != null)
+            if (updatingSummaries != null)
             {
-                _context.Dispose();
-                _context = null;
+                updatingSummaries.Dispose();
+                updatingSummaries = null;
             }
         }
 
@@ -117,7 +113,7 @@ namespace CarmenUI.Pages
         private void InvalidateSummaries(DataObjects changes)
         {
             // Determine which summaries need updating
-            List<Summary> summaries = new();
+            HashSet<Summary> summaries = new();
             if (changes.HasFlag(DataObjects.Criterias)
                 || changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.AlternativeCasts)
@@ -137,40 +133,36 @@ namespace CarmenUI.Pages
                 || changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.SectionTypes))
                 summaries.AddRange(new Summary[] { ItemsSummary, RolesSummary });
-            // Mark them as 'Loading'
+            // Trigger update if required
             if (summaries.Count == 0)
                 return; // nothing to do
-            CastingComplete.Visibility = Visibility.Hidden;
-            foreach (var summary in summaries)
+            if (updatingSummaries != null)
             {
-                summary.NeedsUpdate = true;
-                summary.Status = ProcessStatus.Loading;
+                updatingSummaries.Cancel();
+                updatingSummaries.Dispose();
             }
-            // Trigger update (does nothing if already running)
-            UpdateSummariesAsync();
+            updatingSummaries = new();
+            UpdateSummariesAsync(summaries, updatingSummaries.Token);
         }
 
-        bool updating_summaries = false;
-        private async void UpdateSummariesAsync()
+        private async void UpdateSummariesAsync(IEnumerable<Summary> summaries, CancellationToken cancel)
         {
-            if (updating_summaries)
-                return; // already running
-            updating_summaries = true;
-            // Start with a fresh context
-            context.Dispose();
-            _context = new ShowContext(contextOptions);
+            // Mark them as 'Loading'
+            foreach (var summary in summaries)
+                summary.Status = ProcessStatus.Loading;
+            CastingComplete.Visibility = Visibility.Hidden;
+            // Use a short-lived context
+            using var context = new ShowContext(contextOptions);
             // Update summaries sequentially
-            while (allSummaries.FirstOrDefault(s => s.NeedsUpdate) is Summary next_to_update)
+            foreach (var summary in allSummaries.Where(s => summaries.Contains(s)))
             {
-                next_to_update.NeedsUpdate = false;
-                await next_to_update.LoadAsync(context);
-                if (next_to_update.NeedsUpdate) // may have been set while LoadAsync() was running, eg. if we went to another page and came back
-                    next_to_update.Status = ProcessStatus.Loading;
+                await summary.LoadAsync(context, cancel);
+                if (cancel.IsCancellationRequested)
+                    return;
             }  
             // Show complete text if required
             if (allSummaries.All(s => s.Status == ProcessStatus.Complete))
                 CastingComplete.Visibility = Visibility.Visible;
-            updating_summaries = false;
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)

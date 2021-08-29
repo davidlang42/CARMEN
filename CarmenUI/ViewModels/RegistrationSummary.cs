@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace CarmenUI.ViewModels
 {
     public class RegistrationSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext c)
+        public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
             var applicants = await c.Applicants.ToArrayAsync();
@@ -29,7 +30,7 @@ namespace CarmenUI.ViewModels
             var incomplete = await applicants.CountAsync(a => !a.IsRegistered);//LATER paralleise
             if (incomplete > 0)
                 Rows.Add(new Row { Fail = $"{incomplete} Applicants are Incomplete" });
-            FinishLoad(applicants.Length == 0 || incomplete > 0);
+            FinishLoad(cancel, applicants.Length == 0 || incomplete > 0);
         }
     }
 }

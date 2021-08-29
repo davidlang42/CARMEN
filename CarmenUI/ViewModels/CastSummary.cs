@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace CarmenUI.ViewModels
 {
     public class CastSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext c)
+        public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
             var cast_groups = await c.CastGroups.Include(cg => cg.Members).ToArrayAsync();
@@ -39,7 +40,7 @@ namespace CarmenUI.ViewModels
                     row.Fail = $"(doesn't match required)";
                 Rows.Add(row);
             }
-            FinishLoad(sum == 0);
+            FinishLoad(cancel, sum == 0);
         }
     }
 }

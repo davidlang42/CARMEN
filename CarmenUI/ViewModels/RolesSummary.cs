@@ -8,12 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Carmen.ShowModel.Structure.Role;
+using System.Threading;
 
 namespace CarmenUI.ViewModels
 {
     public class RolesSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext c)
+        public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
             await c.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
@@ -62,7 +63,7 @@ namespace CarmenUI.ViewModels
             // append combined showroot & section consecutive item failures
             foreach (var failure in consecutive_item_failures)
                 Rows.Add(new Row { Fail = $"{failure.CastCount.Plural("Applicant is", "Applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}" });
-            FinishLoad(roles_cast == 0 || roles_blank != 0);
+            FinishLoad(cancel, roles_cast == 0 || roles_blank != 0);
         }
     }
 }

@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Threading;
 
 namespace CarmenUI.ViewModels
 {
     public class AuditionSummary : Summary
     {
-        public override async Task LoadAsync(ShowContext c)
+        public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
             await c.Applicants.LoadAsync();
@@ -30,7 +31,7 @@ namespace CarmenUI.ViewModels
             var not_auditioned = c.Applicants.Local.Count - auditioned.Count;
             if (not_auditioned > 0)
                 Rows.Add(new Row { Fail = $"{not_auditioned.Plural("Appliant has","Applicants have")} not auditioned" });
-            FinishLoad(auditioned.Count == 0 || not_auditioned > 0);
+            FinishLoad(cancel, auditioned.Count == 0 || not_auditioned > 0);
         }
     }
 }
