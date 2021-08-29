@@ -90,12 +90,13 @@ namespace CarmenUI.Pages
         }
 
         /// <summary>Save changes to the database and return true if succeeded</summary>
-        protected bool SaveChanges()
+        protected bool SaveChanges(bool user_initiated = true)
         {
             CommitTextboxValue();
             if (!context.ChangeTracker.HasChanges())
             {
-                MessageBox.Show("No unsaved changes have been made.", WindowTitle);
+                if (user_initiated)
+                    MessageBox.Show("No unsaved changes have been made.", WindowTitle);
                 return true;
             }
             using var saving = new LoadingOverlay(this);

@@ -257,7 +257,7 @@ namespace CarmenUI.Pages
         private void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (Properties.Settings.Default.SaveOnApplicantChange)
-                SaveChanges();
+                SaveChanges(user_initiated: false);
         }
 
         private void ExpandAll_Click(object sender, RoutedEventArgs e)
