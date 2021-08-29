@@ -4,9 +4,79 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarmenUI.Windows"
+        xmlns:bd="clr-namespace:CarmenUI.Bindings"
+        xmlns:cv="clr-namespace:CarmenUI.Converters"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         mc:Ignorable="d"
-        Title="SettingsWindow" Height="450" Width="800">
-    <Grid>
-        
+        Title="CARMEN: Application Settings" Width="1024" Height="768" WindowStartupLocation="CenterScreen"
+        MinWidth="640" MinHeight="480"
+        x:Name="WindowRoot">
+    <Window.Resources>
+        <ObjectDataProvider x:Key="fullNameFormatEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="cv:FullNameFormat"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <cv:FullName x:Key="fullName"/>
+    </Window.Resources>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <TextBlock TextWrapping="Wrap" Grid.ColumnSpan="2">
+            The application settings are specific to the current user account on this computer. They are not saved in the show database, and are global to all shows.
+        </TextBlock>
+        <ScrollViewer Grid.Row="1" Grid.ColumnSpan="2" HorizontalScrollBarVisibility="Disabled" Margin="0 10">
+            <StackPanel>
+                <Expander>
+                    <Expander.Header>
+                        <TextBlock Text="Formatting" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock TextWrapping="Wrap">
+                            The display format of the full name used throughout the program. This setting is purely for display. When searching for applicants, all formatted values are searched.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Full name format:" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding Source={StaticResource fullNameFormatEnumValues}}" SelectedItem="{bd:SettingBinding FullNameFormat}" Margin="0 0 10 0" SelectionChanged="FullNameFormatCombo_SelectionChanged"/>
+                            <TextBlock Text="for example:" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="fullNameExample" DataContext="{Binding ElementName=WindowRoot, Path=ExampleApplicant}" VerticalAlignment="Center">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource fullName}">
+                                        <MultiBinding.Bindings>
+                                            <Binding Path="FirstName"/>
+                                            <Binding Path="LastName"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+        <Button Grid.Row="2" Width="180" Height="35" Click="ResetButton_Click" HorizontalAlignment="Left"
+                Content="Reset all settings to default">
+        </Button>
+        <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+            <Button IsCancel="True" Width="100" Height="35" Margin="0 0 10 0" Click="CancelButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Cancel_grey.png" Width="16" Margin="2 0"/>
+                    <TextBlock Text="Cancel" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+            <Button IsDefault="False" Width="100" Height="35" Click="SaveButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="/Icons/Checkmark_blue.png" Width="16" Margin="2 0"/>
+                    <TextBlock Text="Save" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+        </StackPanel>
     </Grid>
 </Window>
