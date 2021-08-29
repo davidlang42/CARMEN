@@ -33,7 +33,7 @@ namespace CarmenUI.Windows
                 EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotFocusEvent, new RoutedEventHandler(TextBox_GotFocus)); //LATER does this need to undo on unload?
             InitializeComponent();
             connectionLabel = connection_label;
-            var main_menu = new MainMenu(context_options, default_show_name);
+            var main_menu = new MainMenu(context_options, connection_label, default_show_name);
             MainFrame.Navigate(main_menu);
         }
 

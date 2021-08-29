@@ -27,6 +27,7 @@ namespace CarmenUI.Pages
     public partial class MainMenu : Page, IDisposable
     {
         DbContextOptions<ShowContext> contextOptions;
+        string connectionLabel;
         string defaultShowName;
 
         public ShowSummary ShowSummary { get; init; }
@@ -39,9 +40,10 @@ namespace CarmenUI.Pages
         private Summary[] allSummaries => new Summary[] { ShowSummary, RegistrationSummary, AuditionSummary, CastSummary, ItemsSummary, RolesSummary };
         private CancellationTokenSource? updatingSummaries;
 
-        public MainMenu(DbContextOptions<ShowContext> context_options, string default_show_name)
+        public MainMenu(DbContextOptions<ShowContext> context_options, string connection_label, string default_show_name)
         {
             defaultShowName = default_show_name;
+            connectionLabel = connection_label;
             ShowSummary = new(default_show_name);
             contextOptions = context_options;
             InitializeComponent();
@@ -212,15 +214,31 @@ namespace CarmenUI.Pages
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
-            var this_window = Window.GetWindow(this);
-            var start_window = new StartWindow();
-            start_window.Show();
-            this_window.Close();
+            var start = new StartWindow();
+            start.Show();
+            this.Close();
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            // Not yet implemented
+            var settings = new SettingsWindow();
+            settings.Closing += Settings_Closing;
+            settings.Show();
+            this.Close();
+        }
+
+        private void Settings_Closing(object sender, EventArgs e)
+        {
+            var settings = (SettingsWindow)sender;
+            using var loading = new LoadingOverlay(settings);
+            var new_main_window = new MainWindow(contextOptions, connectionLabel, defaultShowName);
+            new_main_window.Show();
+        }
+
+        private void Close()
+        {
+            var this_window = Window.GetWindow(this);
+            this_window.Close();
         }
     }
 }

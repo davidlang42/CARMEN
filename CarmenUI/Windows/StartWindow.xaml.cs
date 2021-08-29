@@ -173,7 +173,16 @@ namespace CarmenUI.Windows
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
-            // Not yet implemented
+            var settings = new SettingsWindow();
+            settings.Closing += Settings_Closing;
+            settings.Show();
+            this.Close();
+        }
+
+        private void Settings_Closing(object? sender, EventArgs e)
+        {
+            var new_start_window = new StartWindow();
+            new_start_window.Show();
         }
     }
 }
