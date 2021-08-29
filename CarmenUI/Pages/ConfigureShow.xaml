@@ -32,6 +32,7 @@
         <CollectionViewSource x:Key="listSortDirectionEnumSource"/>
         <cv:MinimumIntValue x:Key="minimumIntValue"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
+        <cv:HideIfNullOrType x:Key="hideIfNullOrType"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -107,6 +108,10 @@
         </DockPanel>
         <DockPanel x:Name="editPanel" Grid.Column="2" Margin="5" DataContext="{Binding ElementName=objectList,Path=SelectedItem}">
             <TextBlock DockPanel.Dock="Top" Text="{Binding Name, StringFormat='Editing: \{0\}'}" FontSize="22"/>
+            <Button DockPanel.Dock="Bottom" Height="30" Click="DeleteObject_Click"
+                    Visibility="{Binding Converter={StaticResource hideIfNullOrType}, ConverterParameter={x:Type modelStructure:ShowRoot}}">
+                <TextBlock Text="{Binding Name, StringFormat='Delete &quot;\{0\}&quot;'}"/>
+            </Button>
             <ContentControl Content="{Binding}" KeyboardNavigation.IsTabStop="False">
                 <ContentControl.Resources>
                     <Style TargetType="TextBlock">

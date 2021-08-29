@@ -214,6 +214,12 @@ namespace CarmenUI.Pages
             }
         }
 
+        private void DeleteObject_Click(object sender, RoutedEventArgs e)
+        {
+            if (objectList.ItemsSource is ListCollectionView list && objectList.SelectedItem is not ShowRoot)
+                DeleteObject(list);
+        }
+
         private void Name_LostFocus(object sender, RoutedEventArgs e)
         {
             currentViewSource?.View.Refresh();
@@ -224,65 +230,71 @@ namespace CarmenUI.Pages
             if (e.Key == Key.Delete && objectList.ItemsSource is ListCollectionView list)
             {
                 e.Handled = true;
-                switch (objectList.SelectedItem) {
-                    case Criteria criteria:
-                        if (!criteria.Abilities.Any() || ConfirmDelete($"Are you sure you want to delete the '{criteria.Name}' criteria?\nThis will delete the {criteria.Name} mark of {criteria.Abilities.Count.Plural("applicant")}."))
-                            list.Remove(criteria);
-                        break;
-                    case CastGroup cast_group:
-                        if (context.CastGroups.Local.Count == 1)
-                        {
-                            MessageBox.Show("You must have at least one Cast Group.", WindowTitle);
-                            return;
-                        }
-                        if (!cast_group.Members.Any() || ConfirmDelete($"Are you sure you want to delete the '{cast_group.Name}' cast group?\nThis will remove the {cast_group.Members.Count.Plural($"currently selected {cast_group.Name}")} from the cast."))
-                            list.Remove(cast_group);
-                        break;
-                    case AlternativeCast alternative_cast:
-                        bool any_members = alternative_cast.Members.Any();
-                        int cast_groups_alternating = context.CastGroups.Local.Count(cg => cg.AlternateCasts);
-                        bool needed_to_alternate = context.AlternativeCasts.Local.Count <= 2 && cast_groups_alternating > 0;
-                        var allow_delete = (any_members, needed_to_alternate) switch
-                        {
-                            (true, true) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from the cast, and disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
-                            (true, false) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from the cast."),
-                            (false, true) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
-                            _ => true // (false, false)
-                        };
-                        if (allow_delete)
-                        {
-                            if (any_members)
-                                foreach (var member in alternative_cast.Members)
-                                    member.CastGroup = null;
-                            if (needed_to_alternate)
-                                foreach (var cast_group in context.CastGroups.Local)
-                                {
-                                    foreach (var other_cast_member in cast_group.Members)
-                                        other_cast_member.AlternativeCast = null;
-                                    cast_group.AlternateCasts = false;
-                                }
-                            list.Remove(alternative_cast);
-                        }
-                        break;
-                    case Tag tag:
-                        if (!tag.Members.Any() || ConfirmDelete($"Are you sure you want to delete the '{tag.Name}' tag?\nThis will remove the tag from {tag.Members.Count.Plural($"currently tagged applicant")}."))
-                            list.Remove(tag);
-                        break;
-                    case SectionType section_type:
-                        if (context.SectionTypes.Local.Count == 1)
-                        {
-                            MessageBox.Show("You must have at least one Section Type.", WindowTitle);
-                            return;
-                        }
-                        if (!section_type.Sections.Any() || ConfirmDelete($"Are you sure you want to delete the '{section_type.Name}' section type?\nThis will remove the {section_type.Sections.Count.Plural(section_type.Name)} and any sections, items and roles within them."))
-                            list.Remove(section_type);
-                        break;
-                    case Requirement requirement:
-                        var used_count = requirement.UsedByCastGroups.Count + requirement.UsedByCombinedRequirements.Count + requirement.UsedByRoles.Count + requirement.UsedByTags.Count;//LATER is this missing NotRequirements?
-                        if (used_count == 0 || ConfirmDelete($"Are you sure you want to delete the '{requirement.Name}' reqirement?\nThis requirement is currently in used {used_count.Plural("time")}."))
-                            list.Remove(requirement);
-                        break;
-                }
+                DeleteObject(list);
+            }
+        }
+
+        private void DeleteObject(ListCollectionView list)
+        {
+            switch (objectList.SelectedItem)
+            {
+                case Criteria criteria:
+                    if (!criteria.Abilities.Any() || ConfirmDelete($"Are you sure you want to delete the '{criteria.Name}' criteria?\nThis will delete the {criteria.Name} mark of {criteria.Abilities.Count.Plural("applicant")}."))
+                        list.Remove(criteria);
+                    break;
+                case CastGroup cast_group:
+                    if (context.CastGroups.Local.Count == 1)
+                    {
+                        MessageBox.Show("You must have at least one Cast Group.", WindowTitle);
+                        return;
+                    }
+                    if (!cast_group.Members.Any() || ConfirmDelete($"Are you sure you want to delete the '{cast_group.Name}' cast group?\nThis will remove the {cast_group.Members.Count.Plural($"currently selected {cast_group.Name}")} from the cast."))
+                        list.Remove(cast_group);
+                    break;
+                case AlternativeCast alternative_cast:
+                    bool any_members = alternative_cast.Members.Any();
+                    int cast_groups_alternating = context.CastGroups.Local.Count(cg => cg.AlternateCasts);
+                    bool needed_to_alternate = context.AlternativeCasts.Local.Count <= 2 && cast_groups_alternating > 0;
+                    var allow_delete = (any_members, needed_to_alternate) switch
+                    {
+                        (true, true) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from the cast, and disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
+                        (true, false) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from the cast."),
+                        (false, true) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
+                        _ => true // (false, false)
+                    };
+                    if (allow_delete)
+                    {
+                        if (any_members)
+                            foreach (var member in alternative_cast.Members)
+                                member.CastGroup = null;
+                        if (needed_to_alternate)
+                            foreach (var cast_group in context.CastGroups.Local)
+                            {
+                                foreach (var other_cast_member in cast_group.Members)
+                                    other_cast_member.AlternativeCast = null;
+                                cast_group.AlternateCasts = false;
+                            }
+                        list.Remove(alternative_cast);
+                    }
+                    break;
+                case Tag tag:
+                    if (!tag.Members.Any() || ConfirmDelete($"Are you sure you want to delete the '{tag.Name}' tag?\nThis will remove the tag from {tag.Members.Count.Plural($"currently tagged applicant")}."))
+                        list.Remove(tag);
+                    break;
+                case SectionType section_type:
+                    if (context.SectionTypes.Local.Count == 1)
+                    {
+                        MessageBox.Show("You must have at least one Section Type.", WindowTitle);
+                        return;
+                    }
+                    if (!section_type.Sections.Any() || ConfirmDelete($"Are you sure you want to delete the '{section_type.Name}' section type?\nThis will remove the {section_type.Sections.Count.Plural(section_type.Name)} and any sections, items and roles within them."))
+                        list.Remove(section_type);
+                    break;
+                case Requirement requirement:
+                    var used_count = requirement.UsedByCastGroups.Count + requirement.UsedByCombinedRequirements.Count + requirement.UsedByRoles.Count + requirement.UsedByTags.Count;//LATER is this missing NotRequirements?
+                    if (used_count == 0 || ConfirmDelete($"Are you sure you want to delete the '{requirement.Name}' reqirement?\nThis requirement is currently in used {used_count.Plural("time")}."))
+                        list.Remove(requirement);
+                    break;
             }
         }
 
