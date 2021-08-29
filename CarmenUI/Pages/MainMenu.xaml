@@ -13,6 +13,7 @@
       Loaded="Page_Loaded" Unloaded="Page_Unloaded">
     <Page.Resources>
         <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
+        <cv:ProcessStatusColor x:Key="processStatusColor"/>
         <cv:MultiConverter x:Key="showIfStatusValue">
             <cv:MatchStatusValue/>
             <BooleanToVisibilityConverter/>
@@ -53,37 +54,43 @@
         </Grid>
         <Image Grid.Row="1" Grid.Column="0" Source="{Binding ElementName=PageRoot, Path=ShowSummary.LogoImage, Converter={StaticResource bytesToImage}}"/>
         <ListView KeyboardNavigation.IsTabStop="False" Grid.Row="2" Grid.Column="0" x:Name="menuList" Margin="20 20 20 0" BorderThickness="0" VerticalAlignment="Bottom" SelectionChanged="menuList_SelectionChanged">
-            <ListViewItem x:Name="ConfigureShow" MouseEnter="ConfigureShow_MouseEnter" KeyboardNavigation.IsTabStop="False">
+            <ListViewItem x:Name="ConfigureShow" MouseEnter="ConfigureShow_MouseEnter" KeyboardNavigation.IsTabStop="False"
+                          Background="{Binding ElementName=PageRoot, Path=ShowSummary.Status, Converter={StaticResource processStatusColor}}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding ElementName=PageRoot, Path=ShowSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Configuring Show" HorizontalAlignment="Left" FontSize="20" Margin="2 0"/>
                 </StackPanel>
             </ListViewItem>
-            <ListViewItem x:Name="RegisterApplicants" MouseEnter="RegisterApplicants_MouseEnter" KeyboardNavigation.IsTabStop="False">
+            <ListViewItem x:Name="RegisterApplicants" MouseEnter="RegisterApplicants_MouseEnter" KeyboardNavigation.IsTabStop="False"
+                          Background="{Binding ElementName=PageRoot, Path=RegistrationSummary.Status, Converter={StaticResource processStatusColor}}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding ElementName=PageRoot, Path=RegistrationSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Registering Applicants" HorizontalAlignment="Left" FontSize="20"/>
                 </StackPanel>
             </ListViewItem>
-            <ListViewItem x:Name="AuditionApplicants" MouseEnter="AuditionApplicants_MouseEnter" KeyboardNavigation.IsTabStop="False">
+            <ListViewItem x:Name="AuditionApplicants" MouseEnter="AuditionApplicants_MouseEnter" KeyboardNavigation.IsTabStop="False"
+                          Background="{Binding ElementName=PageRoot, Path=AuditionSummary.Status, Converter={StaticResource processStatusColor}}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding ElementName=PageRoot, Path=AuditionSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Auditioning" HorizontalAlignment="Left" FontSize="20"/>
                 </StackPanel>
             </ListViewItem>
-            <ListViewItem x:Name="SelectCast" MouseEnter="SelectCast_MouseEnter" KeyboardNavigation.IsTabStop="False">
+            <ListViewItem x:Name="SelectCast" MouseEnter="SelectCast_MouseEnter" KeyboardNavigation.IsTabStop="False"
+                          Background="{Binding ElementName=PageRoot, Path=CastSummary.Status, Converter={StaticResource processStatusColor}}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding ElementName=PageRoot, Path=CastSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Selecting Cast" HorizontalAlignment="Left" FontSize="20"/>
                 </StackPanel>
             </ListViewItem>
-            <ListViewItem x:Name="ConfigureItems" MouseEnter="ConfigureItems_MouseEnter" KeyboardNavigation.IsTabStop="False">
+            <ListViewItem x:Name="ConfigureItems" MouseEnter="ConfigureItems_MouseEnter" KeyboardNavigation.IsTabStop="False"
+                          Background="{Binding ElementName=PageRoot, Path=ItemsSummary.Status, Converter={StaticResource processStatusColor}}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding ElementName=PageRoot, Path=ItemsSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Configuring Items" HorizontalAlignment="Left" FontSize="20"/>
                 </StackPanel>
             </ListViewItem>
-            <ListViewItem x:Name="AllocateRoles" MouseEnter="AllocateRoles_MouseEnter" KeyboardNavigation.IsTabStop="False">
+            <ListViewItem x:Name="AllocateRoles" MouseEnter="AllocateRoles_MouseEnter" KeyboardNavigation.IsTabStop="False"
+                          Background="{Binding ElementName=PageRoot, Path=RolesSummary.Status, Converter={StaticResource processStatusColor}}">
                 <StackPanel Orientation="Horizontal">
                     <Image Source="{Binding ElementName=PageRoot, Path=RolesSummary.Status, Converter={StaticResource processStatusIcon}}" Width="20" Height="20" Margin="2 0"/>
                     <TextBlock Text="Allocating Roles" HorizontalAlignment="Left" FontSize="20"/>
