@@ -22,7 +22,7 @@ namespace CarmenUI.Properties
             AllocateRolesGrid = new(AllocateRolesGridRaw, double.NaN); // NaN means "Auto"
         }
 
-        public OmnificentDictionaryWrapper<string, double> AllocateRolesGrid { get; init; }
+        public OmnificentDictionaryWrapper<string, double> AllocateRolesGrid { get; private set; }
 
         /// <summary>The width in pixels of columns in the AllocateRoles grid view</summary>
         [UserScopedSetting]
@@ -30,7 +30,13 @@ namespace CarmenUI.Properties
         public Dictionary<string, double> AllocateRolesGridRaw
         {
             get => (Dictionary<string, double>)this[nameof(AllocateRolesGridRaw)];
-            init => this[nameof(AllocateRolesGridRaw)] = value;
+            private set => this[nameof(AllocateRolesGridRaw)] = value;
+        }
+
+        public void ClearAllocateRolesGrid()
+        {
+            AllocateRolesGridRaw = new();
+            AllocateRolesGrid = new(AllocateRolesGridRaw, double.NaN); // NaN means "Auto"
         }
     }
 }

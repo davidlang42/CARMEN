@@ -76,6 +76,7 @@ namespace CarmenUI.Windows
             Settings.Default.SetDefaultWindowPosition();
             Settings.Default.ClearRecentShowsList();
             Widths.Default.Reset();
+            Widths.Default.ClearAllocateRolesGrid();
             Timings.Default.Reset();
             Timings.Default.ClearTimings();
         }
@@ -110,6 +111,11 @@ namespace CarmenUI.Windows
         {
             if (!closing)
                 Reload(); // equivalent to cancel
+        }
+
+        private void ClearAllocateRolesWidthsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Widths.Default.ClearAllocateRolesGrid();
         }
     }
 }
