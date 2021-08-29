@@ -188,6 +188,29 @@ namespace Carmen.ShowModel
             }
         }
 
+        /// <summary>Fills any missing abilities with randomly generated values.
+        /// If specific_applicant is not set, all applicants will be filled.</summary>
+        public void FillAbilities(Applicant? specific_applicant = null)
+        {
+            var criterias = Context.Criterias.ToArray();
+            var applicants = specific_applicant?.Yield() ?? Context.Applicants;
+            foreach (var applicant in applicants)
+            {
+                var needs_criterias = criterias.ToHashSet();
+                foreach (var existing_ability in applicant.Abilities)
+                    needs_criterias.Remove(existing_ability.Criteria);
+                foreach (var criteria in needs_criterias)
+                {
+                    var ability = new Ability
+                    {
+                        Criteria = criteria,
+                        Mark = (uint)random.Next((int)criteria.MaxMark + 1)
+                    };
+                    applicant.Abilities.Add(ability);
+                }
+            }
+        }
+
         private uint TotalSections(uint sections_per_section, uint section_depth)
             => Convert.ToUInt32(Enumerable.Range(1, (int)section_depth).Select(d => Math.Pow(sections_per_section, d)).Sum());
 

@@ -54,7 +54,6 @@
                         <VisualBrush>
                             <VisualBrush.Visual>
                                 <Rectangle StrokeDashArray="4 4" Stroke="DarkGray"
-                                    StrokeThickness="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=BorderThickness}"
                                     RadiusX="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=CornerRadius.TopRight}"
                                     RadiusY="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=CornerRadius.BottomLeft}"
                                     Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"

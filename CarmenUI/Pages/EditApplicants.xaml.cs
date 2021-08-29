@@ -152,7 +152,7 @@ namespace CarmenUI.Pages
 
         private void groupCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            //LATER persist the "group by" in user settings, but as 2 separate settings for Register/Audition UI links
+            //TODO persist the "group by" in user settings, but as 2 separate settings for Register/Audition UI links
             if (groupCombo.SelectedItem != null)
                 ConfigureGroupingAndSorting(groupCombo.SelectedItem);
         }
@@ -239,7 +239,7 @@ namespace CarmenUI.Pages
         /// assuming that filterText is blank. This duplicates logic in FilterPredicate()</summary>
         private void EnsureApplicantIsShown(Applicant applicant)
         {
-            //TODO
+            //TODO EnsureApplicantIsShown
             //if (!applicant.IsRegistered)
             //    showIncompleteApplicants.IsChecked = true;
             //else if (ShowIfApplicantRegisteredAndAuditioned.Check(applicant.IsRegistered, applicant.Abilities, criteriasViewSource))
@@ -358,32 +358,29 @@ namespace CarmenUI.Pages
                 throw new NotImplementedException($"Enum not handled: {Mode}");
         }
 
-        private void ImportApplicants() //TODO only import applicants
+        private void ImportApplicants()
         {
-            if (MessageBox.Show("Importing applicants is not currently supported. Would you like to add randomly generated applicants instead?\n(This will delete all existing applicants)", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show("Importing applicants is not currently supported. Would you like to add some randomly generated applicants instead?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 if (!TryInputNumber("How many applicants would you like to add?", WindowTitle, out var applicant_count, 100))
                     return;
-                if (!TryInputBoolean("Would you like to include randomly generated ability marks?", WindowTitle, out var include_abilities))
-                    return;
-                context.Applicants.Local.Clear();
                 using var test_data = new TestDataGenerator(context);
-                test_data.AddApplicants(applicant_count, 0.5, include_abilities, false, false);
+                test_data.AddApplicants(applicant_count, 0.5, false, false, false);
                 applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             }
         }
 
-        private void ImportMarks()//TODO only add marks
+        private void ImportMarks()
         {
-            if (MessageBox.Show("Importing marks from another show is not currently supported. Would you like to add randomly generated applicants instead?\n(This will delete all existing applicants)", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show("Importing marks from another show is not currently supported. Would you like fill missing abilities with randomly generated marks instead?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                if (!TryInputNumber("How many applicants would you like to add?", WindowTitle, out var applicant_count, 100))
+                if (!TryInputBoolean("Would you like to fill marks for all applicants?\n(Clicking 'No' will fill only the currently selected applicant)", WindowTitle, out var fill_all))
                     return;
-                if (!TryInputBoolean("Would you like to include randomly generated ability marks?", WindowTitle, out var include_abilities))
+                var selected_applicant = applicantsList.SelectedItem as Applicant;
+                if (!fill_all && selected_applicant == null)
                     return;
-                context.Applicants.Local.Clear();
                 using var test_data = new TestDataGenerator(context);
-                test_data.AddApplicants(applicant_count, 0.5, include_abilities, false, false);
+                test_data.FillAbilities(fill_all ? null : selected_applicant);
                 applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             }
         }

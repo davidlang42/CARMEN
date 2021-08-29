@@ -30,14 +30,9 @@ namespace CarmenUI.Converters
                 return Visibility.Collapsed;
             if (parameter is not CollectionViewSource view_source)
                 throw new ArgumentException("ConverterParameter must be an CollectionViewSource containing all criterias.");
-            return Check(is_registered, abilities, view_source) ? Visibility.Visible : Visibility.Collapsed;
-        }
-
-        public static bool Check(bool is_registered, IEnumerable<Ability> applicant_abilities, CollectionViewSource criterias)//TODO this seems messy
-        {
-            if (criterias.Source is not IList list)
-                return false;
-            return Applicant.HasAuditioned(is_registered, applicant_abilities, list.OfType<Criteria>());
+            if (view_source.Source is not IList list)
+                return Visibility.Collapsed;
+            return Applicant.HasAuditioned(is_registered, abilities, list.OfType<Criteria>()) ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public object[] ConvertBack(object value, Type[] targetType, object parameter, CultureInfo culture)
