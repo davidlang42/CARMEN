@@ -53,14 +53,14 @@
                             <TextBlock Text="{bd:SettingBinding Height, StringFormat=', Height: #'}"/>
                             <TextBlock Text="{bd:SettingBinding WindowState, StringFormat=', WindowState: \{0\})'}"/>
                         </StackPanel>
-                        <TextBlock VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" TextWrapping="Wrap">
                                 The most recently opened shows are stored to allow easy access from a list on the starting window.
                         </TextBlock>
                         <StackPanel Orientation="Horizontal">
                             <Button Content="Clear recently opened shows list" Width="185" HorizontalAlignment="Left" Margin="0 0 0 5" Click="ClearRecentShowsButton_Click"/>
                             <TextBlock Text="{bd:SettingBinding RecentShows.Count, Mode=OneWay, StringFormat=' (\{0\} recent shows in list)'}"/>
                         </StackPanel>
-                        <TextBlock VerticalAlignment="Center">
+                        <TextBlock VerticalAlignment="Center" TextWrapping="Wrap">
                                 The most recently loading time for each screen is remembered to make the progress bar move more smoothly and accurately.
                         </TextBlock>
                         <StackPanel Orientation="Horizontal">
@@ -69,7 +69,7 @@
                         </StackPanel>
                     </StackPanel>
                 </Expander>
-                <Expander IsExpanded="True">
+                <Expander IsExpanded="True" Margin="0 5">
                     <Expander.Header>
                         <TextBlock Text="Formatting" FontWeight="Bold" FontSize="14"/>
                     </Expander.Header>
@@ -92,6 +92,16 @@
                                 </TextBlock.Text>
                             </TextBlock>
                         </StackPanel>
+                    </StackPanel>
+                </Expander>
+                <Expander IsExpanded="True" Margin="0 5">
+                    <Expander.Header>
+                        <TextBlock Text="Register/audition applicants" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <CheckBox Content="Save changes whenever a different applicant is selected" Margin="0 5 0 0"
+                                  IsChecked="{bd:SettingBinding SaveOnApplicantChange}"/>
+                        <TextBlock Margin="0 0 0 5" Text="If not enabled, changes to applicants will only be saved when the save button is pressed, or one of the save related shortcut keys are used." TextWrapping="Wrap"/>
                     </StackPanel>
                 </Expander>
             </StackPanel>
