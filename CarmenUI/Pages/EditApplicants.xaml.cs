@@ -53,7 +53,8 @@ namespace CarmenUI.Pages
             {
                 using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
                     await context.Applicants.LoadAsync();
-                applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
+                using (loading.Segment(nameof(EditApplicants) + nameof(Applicant), "First applicant")) //LATER ideally setting the source wouldn't auto-show the first applicant (which takes time because it loads an image)
+                    applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
                 using (loading.Segment(nameof(EditApplicants) + nameof(ConfigureGroupingAndSorting), "Sorting"))
                     ConfigureGroupingAndSorting(groupCombo.SelectedItem);
                 applicantsList.SelectedItem = null;
