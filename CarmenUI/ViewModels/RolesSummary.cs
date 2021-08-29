@@ -55,7 +55,7 @@ namespace CarmenUI.ViewModels
                         if (multi_roles > 0)
                             Rows.Add(new Row { Fail = $"{multi_roles.Plural("Applicant has", "Applicants have")} multiple roles in {section.Name}" });
                     }
-                    if (!c.ShowRoot.VerifyConsecutiveItems(out var section_failures))
+                    if (!section.VerifyConsecutiveItems(out var section_failures))
                         foreach (var failure in section_failures)
                             consecutive_item_failures.Add(failure);
                 }
