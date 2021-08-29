@@ -202,6 +202,7 @@ namespace CarmenUI.ViewModels
 
         public ChildView AddChild(Node new_child, ChildView? insert_after = null)
         {
+            new_child.Parent = InnerNode;
             var child_view = new ChildView(new_child, castGroups);
             if (insert_after != null)
                 for (var i = 0; i < Children.Count; i++)
