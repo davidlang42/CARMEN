@@ -94,7 +94,8 @@ namespace CarmenUI.Pages
 
         private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-            using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click),"Processing...");
+            //LATER handle exceptions on all engine calls
+            using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
             using (processing.Segment(nameof(ICastingEngine.SelectCastGroups), "Selecting applicants"))
                 engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local, (uint)alternative_casts.Length);
@@ -173,6 +174,7 @@ namespace CarmenUI.Pages
                 numbersPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = cast_group.Members;
                 selectionPanel.Visibility = Visibility.Visible;
+                castStatusNoun.Text = "applicants";
                 ConfigureAllApplicantsFiltering();
             }
             else if (selectionList.SelectedItem is Tag tag)
@@ -180,6 +182,7 @@ namespace CarmenUI.Pages
                 numbersPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = tag.Members;
                 selectionPanel.Visibility = Visibility.Visible;
+                castStatusNoun.Text = "cast members";
                 ConfigureAllApplicantsFiltering();
             }
             else if (selectionList.SelectedItem != null) // Cast Numbers
@@ -203,9 +206,9 @@ namespace CarmenUI.Pages
                 view.Filter = (selectionList.SelectedItem, castStatusCombo.SelectedItem) switch
                 {
                     (CastGroup, CastStatus.Available) => o => o is Applicant a && !selected_applicants.Contains(a) && a.CastGroup == null,
-                    (A.Tag, CastStatus.Available) => o => o is Applicant a && !selected_applicants.Contains(a),
                     (CastGroup cg, CastStatus.Eligible) => o => o is Applicant a && !selected_applicants.Contains(a) && cg.Requirements.All(r => r.IsSatisfiedBy(a)),
-                    (Tag t, CastStatus.Eligible) => o => o is Applicant a && !selected_applicants.Contains(a) && t.Requirements.All(r => r.IsSatisfiedBy(a)),
+                    (A.Tag, CastStatus.Available) => o => o is Applicant a && a.IsAccepted && !selected_applicants.Contains(a),
+                    (Tag t, CastStatus.Eligible) => o => o is Applicant a && a.IsAccepted && !selected_applicants.Contains(a) && t.Requirements.All(r => r.IsSatisfiedBy(a)),
                     _ => null
                 };
             }
