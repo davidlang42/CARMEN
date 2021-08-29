@@ -261,5 +261,29 @@ namespace CarmenUI.Properties {
                 this["OpenSettingsOnF1"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int RegisterApplicantsGroupByIndex {
+            get {
+                return ((int)(this["RegisterApplicantsGroupByIndex"]));
+            }
+            set {
+                this["RegisterApplicantsGroupByIndex"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int AuditionApplicantsGroupByIndex {
+            get {
+                return ((int)(this["AuditionApplicantsGroupByIndex"]));
+            }
+            set {
+                this["AuditionApplicantsGroupByIndex"] = value;
+            }
+        }
     }
 }

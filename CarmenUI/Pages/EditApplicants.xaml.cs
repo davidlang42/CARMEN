@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CarmenUI.Bindings;
 
 namespace CarmenUI.Pages
 {
@@ -44,6 +45,9 @@ namespace CarmenUI.Pages
         {
             this.Mode = mode;
             InitializeComponent();
+            applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
+            criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
+            groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
             if (mode == EditApplicantsMode.RegisterApplicants)
             {
                 this.Title = "Register Applicants";
@@ -51,6 +55,7 @@ namespace CarmenUI.Pages
                 hideFinishedApplicants.Content = $"Hide applicants who have completed registration";
                 addApplicantText.Text = "Add new applicant";
                 importButton.Content = "Import applicants from CSV";
+                groupCombo.SetBinding(ComboBox.SelectedIndexProperty, new SettingBinding(nameof(Properties.Settings.RegisterApplicantsGroupByIndex)));
             }
             else if (mode == EditApplicantsMode.AuditionApplicants)
             {
@@ -59,30 +64,26 @@ namespace CarmenUI.Pages
                 hideFinishedApplicants.Content = $"Hide auditionees who have all marks set";
                 addApplicantText.Text = "Add new auditionee";
                 importButton.Content = "Import marks from another show";
+                groupCombo.SetBinding(ComboBox.SelectedIndexProperty, new SettingBinding(nameof(Properties.Settings.AuditionApplicantsGroupByIndex)));
             }
             else
                 throw new NotImplementedException($"Enum not handled: {mode}");
-            applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
-            criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
-            groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
-            //TODO do we actually want to set the groupCombo? it should really be a user setting (per mode)
-            groupCombo.SelectedIndex = 0; // must be after InitializeComponent() because it triggers groupCombo_SelectionChanged
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             using (var loading = new LoadingOverlay(this).AsSegment(nameof(EditApplicants)))
             {
+                using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
+                    _criterias = await context.Criterias.ToArrayAsync();
+                criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
                 using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
                     await context.Applicants.LoadAsync();
                 using (loading.Segment(nameof(EditApplicants) + nameof(Applicant), "First applicant")) //LATER ideally setting the source wouldn't auto-show the first applicant (which takes time because it loads an image)
                     applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
                 using (loading.Segment(nameof(EditApplicants) + nameof(ConfigureGroupingAndSorting), "Sorting"))
-                    ConfigureGroupingAndSorting(groupCombo.SelectedItem);
+                    ConfigureGroupingAndSorting();
                 applicantsList.SelectedItem = null;
-                using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
-                    _criterias = await context.Criterias.ToArrayAsync();
-                criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
             }
             filterText.Focus();
         }
@@ -111,8 +112,7 @@ namespace CarmenUI.Pages
                     if (names.Length > 1)
                         applicant.LastName = names[1].Trim().ToProperCase();
                 }
-                filterText.Text = "";
-                EnsureApplicantIsShown(applicant);
+                ClearFilter();
                 list.Add(applicant);
                 applicantsList.SelectedItem = applicant;
                 applicantsList.ScrollIntoView(applicant);
@@ -120,6 +120,12 @@ namespace CarmenUI.Pages
                     applicantsList.VisualDescendants<Expander>().First(ex => ex.DataContext == group).IsExpanded = true; // ensure new applicant group is expanded
                 firstNameText.Focus();
             }
+        }
+
+        private void ClearFilter()
+        {
+            filterText.Text = "";
+            hideFinishedApplicants.IsChecked = false;
         }
 
         private void filterText_TextChanged(object sender, TextChangedEventArgs e)
@@ -151,13 +157,9 @@ namespace CarmenUI.Pages
         }
 
         private void groupCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //TODO persist the "group by" in user settings, but as 2 separate settings for Register/Audition UI links
-            if (groupCombo.SelectedItem != null)
-                ConfigureGroupingAndSorting(groupCombo.SelectedItem);
-        }
+            => ConfigureGroupingAndSorting();
 
-        private void ConfigureGroupingAndSorting(object selected_grouping)
+        private void ConfigureGroupingAndSorting()
         {
             if (applicantsViewSource.View == null)
                 return;
@@ -166,37 +168,34 @@ namespace CarmenUI.Pages
             // add new grouping
             applicantListContextMenu.IsOpen = false;
             applicantListContextMenu.Visibility = Visibility.Visible;
-            if (selected_grouping is string group_by_string)
-            {
-                if (group_by_string == string.Empty)
-                {
-                    // don't group by anything
-                    applicantListContextMenu.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    PropertyGroupDescription gd = groupCombo.SelectedItem switch
-                    {
-                        "First Name" => new(nameof(Applicant.FirstName)),
-                        "Last Name" => new(nameof(Applicant.LastName)),
-                        "Gender" => new(nameof(Applicant.Gender)),
-                        "Year of Birth" => new(nameof(Applicant.DateOfBirth), new DateToYear()),
-                        _ => throw new NotImplementedException($"String value not implemented: {group_by_string}")
-                    }; 
-                    applicantsViewSource.GroupDescriptions.Add(gd);
-                    applicantsViewSource.View.SortDescriptions.Add(new(gd.PropertyName, ListSortDirection.Ascending));
-                }
-            }
-            else if (selected_grouping is Criteria group_by_criteria)
+            if (groupCombo.SelectedItem is Criteria group_by_criteria)
             {
                 var converter = new AbilitySelector(group_by_criteria);
                 PropertyGroupDescription gd = new(nameof(Applicant.Abilities), converter);
                 applicantsViewSource.GroupDescriptions.Add(gd);
                 gd.SortDescriptions.Add(new(nameof(CollectionViewGroup.Name), ListSortDirection.Ascending));
             }
+            else if (groupCombo.SelectedItem == null || string.Empty.Equals(groupCombo.SelectedItem))
+            {
+                // don't group by anything
+                applicantListContextMenu.Visibility = Visibility.Collapsed;
+            }
+            else if (groupCombo.SelectedItem is string non_empty_string)
+            {
+                PropertyGroupDescription gd = non_empty_string switch
+                {
+                    "First Name" => new(nameof(Applicant.FirstName)),
+                    "Last Name" => new(nameof(Applicant.LastName)),
+                    "Gender" => new(nameof(Applicant.Gender)),
+                    "Year of Birth" => new(nameof(Applicant.DateOfBirth), new DateToYear()),
+                    _ => throw new NotImplementedException($"String value not implemented: {non_empty_string}")
+                };
+                applicantsViewSource.GroupDescriptions.Add(gd);
+                applicantsViewSource.View.SortDescriptions.Add(new(gd.PropertyName, ListSortDirection.Ascending));
+            }
             else
             {
-                throw new NotImplementedException($"Object value not implemented: {selected_grouping.GetType().Name}");
+                throw new NotImplementedException($"Object value not implemented: {groupCombo.SelectedItem.GetType().Name}");
             }
             // add sort by name (based on full name formatting setting)
             foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
@@ -235,20 +234,8 @@ namespace CarmenUI.Pages
             }
         }
 
-        /// <summary>This modifies at most one of the show*Applicants checkboxes to ensure the given applicant is shown,
-        /// assuming that filterText is blank. This duplicates logic in FilterPredicate()</summary>
-        private void EnsureApplicantIsShown(Applicant applicant)
-        {
-            //TODO EnsureApplicantIsShown
-            //if (!applicant.IsRegistered)
-            //    showIncompleteApplicants.IsChecked = true;
-            //else if (ShowIfApplicantRegisteredAndAuditioned.Check(applicant.IsRegistered, applicant.Abilities, criteriasViewSource))
-            //    showAuditionedApplicants.IsChecked = true;
-            //else
-            //    showRegisteredApplicants.IsChecked = true;
-        }
-
         private FullNameFormat[] allNameFormats = Enum.GetValues<FullNameFormat>();
+
         /// <summary>Checks if this appliants name, in any of the possible name formats, contains the filter text</summary>
         private bool AnyNameContains(Applicant applicant, string filter_text)
             => allNameFormats.Any(f => FullName.Format(applicant, f).Contains(filter_text, StringComparison.OrdinalIgnoreCase));
@@ -280,7 +267,7 @@ namespace CarmenUI.Pages
             => ExpandListHeaders(false);
 
         private void RefreshGroups_Click(object sender, RoutedEventArgs e)
-            => ConfigureGroupingAndSorting(groupCombo.SelectedItem);//TODO what triggers this?
+            => ConfigureGroupingAndSorting();
 
         private void ExpandListHeaders(bool expanded)
         {
@@ -296,7 +283,7 @@ namespace CarmenUI.Pages
 
         private void filterText_GotFocus(object sender, RoutedEventArgs e)
         {
-            ConfigureFiltering();//TODO why is this needed?
+            ConfigureFiltering();
             filterText.SelectAll();
         }
 
@@ -328,7 +315,7 @@ namespace CarmenUI.Pages
         {
             if (e.Key == Key.Escape && filterText.Text != "")
             {
-                filterText.Text = "";
+                ClearFilter();
                 e.Handled = true;
             }
             else if (e.Key == Key.Enter)
