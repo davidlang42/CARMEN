@@ -33,7 +33,7 @@ namespace CarmenUI.Converters
             return Check(is_registered, abilities, view_source) ? Visibility.Visible : Visibility.Collapsed;
         }
 
-        public static bool Check(bool is_registered, IEnumerable<Ability> applicant_abilities, CollectionViewSource criterias)
+        public static bool Check(bool is_registered, IEnumerable<Ability> applicant_abilities, CollectionViewSource criterias)//TODO this seems messy
         {
             if (criterias.Source is not IList list)
                 return false;

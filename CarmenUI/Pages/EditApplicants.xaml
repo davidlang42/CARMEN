@@ -12,7 +12,7 @@
     xmlns:modelApplicants="clr-namespace:Carmen.ShowModel.Applicants;assembly=Carmen.ShowModel"
     mc:Ignorable="d"
     d:DesignHeight="600" d:DesignWidth="800"
-    Title="Edit Applicants" Loaded="Page_Loaded">
+    Loaded="Page_Loaded">
     <Page.Resources>
         <CollectionViewSource x:Key="applicantsViewSource"/>
         <CollectionViewSource x:Key="criteriasViewSource"/>
@@ -48,18 +48,17 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="Filter applicants list by:" FontSize="14"/>
+                <TextBlock x:Name="filterHeading" FontSize="14"/>
                 <Border Grid.Row="1" BorderThickness="1" CornerRadius="5">
                     <Border.BorderBrush>
                         <VisualBrush>
                             <VisualBrush.Visual>
-                                <Rectangle StrokeDashArray="4 4"
-                           Stroke="DarkGray"
-                           StrokeThickness="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=BorderThickness}"
-                           RadiusX="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=CornerRadius.TopRight}"
-                           RadiusY="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=CornerRadius.BottomLeft}"
-                           Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
-                           Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}"/>
+                                <Rectangle StrokeDashArray="4 4" Stroke="DarkGray"
+                                    StrokeThickness="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=BorderThickness}"
+                                    RadiusX="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=CornerRadius.TopRight}"
+                                    RadiusY="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=CornerRadius.BottomLeft}"
+                                    Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualWidth}"
+                                    Height="{Binding RelativeSource={RelativeSource AncestorType={x:Type Border}}, Path=ActualHeight}"/>
                             </VisualBrush.Visual>
                         </VisualBrush>
                     </Border.BorderBrush>
@@ -75,19 +74,10 @@
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="Name: " FontSize="14" VerticalAlignment="Center"/>
                             <TextBox x:Name="filterText" Grid.Column="1" TextChanged="filterText_TextChanged"
-                         FontSize="14" GotFocus="filterText_GotFocus"
-                         KeyDown="filterText_KeyDown"/>
+                                 FontSize="14" GotFocus="filterText_GotFocus"
+                                 KeyDown="filterText_KeyDown"/>
                         </Grid>
-                        <Grid Grid.Row="1">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                            </Grid.ColumnDefinitions>
-                            <CheckBox x:Name="showIncompleteApplicants" Content="Incomplete" Margin="5" Checked="showApplicantsCheckbox_Changed" Unchecked="showApplicantsCheckbox_Changed"/>
-                            <CheckBox Grid.Column="1" x:Name="showRegisteredApplicants" Content="Registered" Margin="5" Checked="showApplicantsCheckbox_Changed" Unchecked="showApplicantsCheckbox_Changed"/>
-                            <CheckBox Grid.Column="2" x:Name="showAuditionedApplicants" Content="Auditioned" Margin="5" Checked="showApplicantsCheckbox_Changed" Unchecked="showApplicantsCheckbox_Changed"/>
-                        </Grid>
+                        <CheckBox Grid.Row="1" x:Name="hideFinishedApplicants" Margin="5 0 5 5" Checked="hideFinishedApplicants_Changed" Unchecked="hideFinishedApplicants_Changed"/>
                     </Grid>
                 </Border>
             </Grid>
@@ -110,7 +100,12 @@
                     </ComboBox.ItemsSource>
                 </ComboBox>
             </Grid>
-            <Button DockPanel.Dock="Bottom" Content="Add new applicant" Margin="5" Click="AddApplicant_Click" Height="30"/>
+            <Button DockPanel.Dock="Bottom" Margin="5 0 5 5" Click="AddApplicant_Click" Height="35">
+                <StackPanel Orientation="Horizontal">
+                    <Image Source="\Icons\Add.png" Width="16" Margin="2 0"/>
+                    <TextBlock x:Name="addApplicantText" Margin="2 0"/>
+                </StackPanel>
+            </Button>
             <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5" KeyUp="applicantsList_KeyUp" SelectionChanged="applicantsList_SelectionChanged">
                 <ListBox.GroupStyle>
                     <GroupStyle>
@@ -154,7 +149,7 @@
                        Text="Double-click to add."/>
             </StackPanel>
         </Grid>
-        <Border Grid.Column="2" BorderBrush="Black" BorderThickness="1" Margin="5"
+        <Border Grid.Column="2" BorderBrush="DarkGray" BorderThickness="1" Margin="5"
                 DataContext="{Binding ElementName=applicantsList, Path=SelectedItem}"
                 Visibility="{Binding Converter={StaticResource hideIfNull}, ConverterParameter={x:Type modelApplicants:Applicant}}">
             <Grid>
@@ -299,7 +294,7 @@
                 </Grid>
             </Grid>
         </Border>
-        <Button Grid.Row="1" Content="Import applicants" Margin="5" Height="35" Click="ImportApplicants_Click"/>
+        <Button x:Name="importButton" Grid.Row="1" Margin="5" Height="35" Click="importButton_Click"/>
         <Grid Grid.Row="1" Grid.Column="2" Grid.ColumnSpan="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>

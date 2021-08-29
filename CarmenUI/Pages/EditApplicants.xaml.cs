@@ -29,22 +29,44 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class EditApplicants : SubPage
     {
-        const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10; //LATER why not make this a user setting?
+        const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10; //LATER why not make this a user setting? (per mode?)
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;
         private BooleanLookupDictionary groupExpansionLookup;
 
-        public EditApplicants(DbContextOptions<ShowContext> context_options, bool show_incomplete_applicants, bool show_registered_applicants, bool show_auditioned_applicants) : base(context_options)
+        private Criteria[]? _criterias;
+        private Criteria[] criterias => _criterias ?? throw new ApplicationException($"Tried to used {nameof(criterias)} before it was loaded.");
+
+        public EditApplicantsMode Mode { get; init; }
+
+        public EditApplicants(DbContextOptions<ShowContext> context_options, EditApplicantsMode mode) : base(context_options)
         {
+            this.Mode = mode;
             InitializeComponent();
+            if (mode == EditApplicantsMode.RegisterApplicants)
+            {
+                this.Title = "Register Applicants";
+                filterHeading.Text = $"Filter applicants list by:";
+                hideFinishedApplicants.Content = $"Hide applicants who have completed registration";
+                addApplicantText.Text = "Add new applicant";
+                importButton.Content = "Import applicants from CSV";
+            }
+            else if (mode == EditApplicantsMode.AuditionApplicants)
+            {
+                this.Title = "Audition Applicants";
+                filterHeading.Text = $"Filter auditionees list by:";
+                hideFinishedApplicants.Content = $"Hide auditionees who have all marks set";
+                addApplicantText.Text = "Add new auditionee";
+                importButton.Content = "Import marks from another show";
+            }
+            else
+                throw new NotImplementedException($"Enum not handled: {mode}");
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
             groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
+            //TODO do we actually want to set the groupCombo? it should really be a user setting (per mode)
             groupCombo.SelectedIndex = 0; // must be after InitializeComponent() because it triggers groupCombo_SelectionChanged
-            showIncompleteApplicants.IsChecked = show_incomplete_applicants;
-            showRegisteredApplicants.IsChecked = show_registered_applicants;
-            showAuditionedApplicants.IsChecked = show_auditioned_applicants;
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -59,7 +81,7 @@ namespace CarmenUI.Pages
                     ConfigureGroupingAndSorting(groupCombo.SelectedItem);
                 applicantsList.SelectedItem = null;
                 using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
-                    await context.Criterias.LoadAsync();
+                    _criterias = await context.Criterias.ToArrayAsync();
                 criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
             }
             filterText.Focus();
@@ -189,7 +211,16 @@ namespace CarmenUI.Pages
             if (applicantsViewSource.View is ICollectionView view)
             {
                 var previous_counts = GetGroupCounts(view);
-                view.Filter = o => o is not Applicant a || FilterPredicate(a);
+                var text = filterText.Text;
+                view.Filter = (Mode, hideFinishedApplicants.IsChecked) switch
+                {
+                    (EditApplicantsMode.RegisterApplicants, true) when string.IsNullOrEmpty(text) => o => o is Applicant a && !a.IsRegistered,
+                    (EditApplicantsMode.RegisterApplicants, true) => o => o is Applicant a && AnyNameContains(a, text) && !a.IsRegistered,
+                    (EditApplicantsMode.AuditionApplicants, true) when string.IsNullOrEmpty(text) => o => o is Applicant a && !a.HasAuditioned(criterias),
+                    (EditApplicantsMode.AuditionApplicants, true) => o => o is Applicant a && AnyNameContains(a, text) && !a.HasAuditioned(criterias),
+                    _ when string.IsNullOrEmpty(text) => o => o is Applicant a,
+                    _ => o => o is Applicant a && AnyNameContains(a, text),
+                };
                 var new_counts = GetGroupCounts(view);
                 foreach (var (key, new_count) in new_counts)
                 {
@@ -204,31 +235,23 @@ namespace CarmenUI.Pages
             }
         }
 
-        private bool FilterPredicate(Applicant applicant)
-        {
-            if (!AnyFormatOfNameContains(applicant, filterText.Text))
-                return false;
-            if (!applicant.IsRegistered)
-                return showIncompleteApplicants.IsChecked == true;
-            if (ShowIfApplicantRegisteredAndAuditioned.Check(applicant.IsRegistered, applicant.Abilities, criteriasViewSource))
-                return showAuditionedApplicants.IsChecked == true;
-            return showRegisteredApplicants.IsChecked == true;
-        }
-
         /// <summary>This modifies at most one of the show*Applicants checkboxes to ensure the given applicant is shown,
         /// assuming that filterText is blank. This duplicates logic in FilterPredicate()</summary>
         private void EnsureApplicantIsShown(Applicant applicant)
         {
-            if (!applicant.IsRegistered)
-                showIncompleteApplicants.IsChecked = true;
-            else if (ShowIfApplicantRegisteredAndAuditioned.Check(applicant.IsRegistered, applicant.Abilities, criteriasViewSource))
-                showAuditionedApplicants.IsChecked = true;
-            else
-                showRegisteredApplicants.IsChecked = true;
+            //TODO
+            //if (!applicant.IsRegistered)
+            //    showIncompleteApplicants.IsChecked = true;
+            //else if (ShowIfApplicantRegisteredAndAuditioned.Check(applicant.IsRegistered, applicant.Abilities, criteriasViewSource))
+            //    showAuditionedApplicants.IsChecked = true;
+            //else
+            //    showRegisteredApplicants.IsChecked = true;
         }
 
-        private bool AnyFormatOfNameContains(Applicant applicant, string filter_text)
-            => Enum.GetValues<FullNameFormat>().Any(f => FullName.Format(applicant, f).Contains(filter_text, StringComparison.OrdinalIgnoreCase));
+        private FullNameFormat[] allNameFormats = Enum.GetValues<FullNameFormat>();
+        /// <summary>Checks if this appliants name, in any of the possible name formats, contains the filter text</summary>
+        private bool AnyNameContains(Applicant applicant, string filter_text)
+            => allNameFormats.Any(f => FullName.Format(applicant, f).Contains(filter_text, StringComparison.OrdinalIgnoreCase));
 
         private void applicantsList_KeyUp(object sender, KeyEventArgs e)
         {
@@ -241,7 +264,7 @@ namespace CarmenUI.Pages
             }
         }
 
-        private void showApplicantsCheckbox_Changed(object sender, RoutedEventArgs e)
+        private void hideFinishedApplicants_Changed(object sender, RoutedEventArgs e)
             => ConfigureFiltering();
 
         private void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -257,7 +280,7 @@ namespace CarmenUI.Pages
             => ExpandListHeaders(false);
 
         private void RefreshGroups_Click(object sender, RoutedEventArgs e)
-            => ConfigureGroupingAndSorting(groupCombo.SelectedItem);
+            => ConfigureGroupingAndSorting(groupCombo.SelectedItem);//TODO what triggers this?
 
         private void ExpandListHeaders(bool expanded)
         {
@@ -273,7 +296,7 @@ namespace CarmenUI.Pages
 
         private void filterText_GotFocus(object sender, RoutedEventArgs e)
         {
-            ConfigureFiltering();
+            ConfigureFiltering();//TODO why is this needed?
             filterText.SelectAll();
         }
 
@@ -325,9 +348,34 @@ namespace CarmenUI.Pages
         private void NoApplicantsPanel_MouseDoubleClick(object sender, MouseButtonEventArgs e)
             => AddApplicant_Click(sender, e);
 
-        private void ImportApplicants_Click(object sender, RoutedEventArgs e)
+        private void importButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Mode == EditApplicantsMode.RegisterApplicants)
+                ImportApplicants();
+            else if (Mode == EditApplicantsMode.AuditionApplicants)
+                ImportMarks();
+            else
+                throw new NotImplementedException($"Enum not handled: {Mode}");
+        }
+
+        private void ImportApplicants() //TODO only import applicants
         {
             if (MessageBox.Show("Importing applicants is not currently supported. Would you like to add randomly generated applicants instead?\n(This will delete all existing applicants)", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                if (!TryInputNumber("How many applicants would you like to add?", WindowTitle, out var applicant_count, 100))
+                    return;
+                if (!TryInputBoolean("Would you like to include randomly generated ability marks?", WindowTitle, out var include_abilities))
+                    return;
+                context.Applicants.Local.Clear();
+                using var test_data = new TestDataGenerator(context);
+                test_data.AddApplicants(applicant_count, 0.5, include_abilities, false, false);
+                applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
+            }
+        }
+
+        private void ImportMarks()//TODO only add marks
+        {
+            if (MessageBox.Show("Importing marks from another show is not currently supported. Would you like to add randomly generated applicants instead?\n(This will delete all existing applicants)", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
                 if (!TryInputNumber("How many applicants would you like to add?", WindowTitle, out var applicant_count, 100))
                     return;
@@ -362,5 +410,11 @@ namespace CarmenUI.Pages
                     return true;
             }
         }
+    }
+
+    public enum EditApplicantsMode
+    {
+        RegisterApplicants,
+        AuditionApplicants
     }
 }

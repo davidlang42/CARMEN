@@ -8,7 +8,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              x:Name="ControlRoot"
-             BorderThickness="1" BorderBrush="Black">
+             BorderThickness="1" BorderBrush="DarkGray">
     <Control.Resources>
         <cv:BytesToImage x:Key="bytesToImage"/>
     </Control.Resources>

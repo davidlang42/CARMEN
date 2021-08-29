@@ -84,9 +84,9 @@ namespace CarmenUI.Pages
                 else if (selected == SelectCast)
                     NavigateToSubPage(new SelectCast(contextOptions));
                 else if (selected == AuditionApplicants)
-                    NavigateToSubPage(new EditApplicants(contextOptions, false, true, false));
+                    NavigateToSubPage(new EditApplicants(contextOptions, EditApplicantsMode.AuditionApplicants));
                 else if (selected == RegisterApplicants)
-                    NavigateToSubPage(new EditApplicants(contextOptions, true, true, true));
+                    NavigateToSubPage(new EditApplicants(contextOptions, EditApplicantsMode.RegisterApplicants));
                 menuList.SelectedItem = null;
             }
         }
