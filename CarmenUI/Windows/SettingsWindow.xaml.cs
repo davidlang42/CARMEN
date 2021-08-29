@@ -3,7 +3,9 @@ using CarmenUI.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -13,6 +15,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
 
 namespace CarmenUI.Windows
@@ -28,6 +31,22 @@ namespace CarmenUI.Windows
             FirstName = "David",
             LastName = "Lang"
         };
+
+        public string ApplicationVersion
+        {
+            get
+            {
+                var assembly = Assembly.GetExecutingAssembly();
+                return (assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion,
+                    assembly.GetName().Version) switch
+                {
+                    (string info, Version v) => $"v{info} (build {v.Build} revision {v.Revision})",
+                    (_, Version v) => $"v{v.Major}.{v.Minor}.{v.Build}.{v.Revision}",
+                    (string info, _) => $"v{info}",
+                    _ => "unknown"
+                };
+            }
+        }
 
         public SettingsWindow()
         {
@@ -116,6 +135,12 @@ namespace CarmenUI.Windows
         private void ClearAllocateRolesWidthsButton_Click(object sender, RoutedEventArgs e)
         {
             Widths.Default.ClearAllocateRolesGrid();
+        }
+
+        private void Hyperlink_RequestNavigate(object sender, RequestNavigateEventArgs e)
+        {
+            Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
+            e.Handled = true;
         }
     }
 }

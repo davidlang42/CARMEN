@@ -157,6 +157,30 @@
                         </StackPanel>
                     </StackPanel>
                 </Expander>
+                <Expander IsExpanded="False" Margin="0 5">
+                    <Expander.Header>
+                        <TextBlock Text="Software version" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock Text="{Binding ElementName=WindowRoot, Path=ApplicationVersion, StringFormat='Current version: \{0\}'}" Margin="0 5 0 0"/>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                            <TextBlock Text="Written by "/>
+                            <TextBlock>
+                                <Hyperlink NavigateUri="mailto://carmen@davidlang.net" RequestNavigate="Hyperlink_RequestNavigate">
+                                    David Lang
+                                </Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                            <TextBlock Text="Full source code available at "/>
+                            <TextBlock>
+                                <Hyperlink NavigateUri="https://github.com/davidlang42/CARMEN" RequestNavigate="Hyperlink_RequestNavigate">
+                                    https://github.com/davidlang42/CARMEN
+                                </Hyperlink>
+                            </TextBlock>
+                        </StackPanel>
+                    </StackPanel>
+                </Expander>
             </StackPanel>
         </ScrollViewer>
         <Button Grid.Row="2" Width="180" Height="35" Click="ResetButton_Click" HorizontalAlignment="Left"
