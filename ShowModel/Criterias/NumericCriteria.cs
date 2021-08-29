@@ -13,5 +13,7 @@ namespace Carmen.ShowModel.Criterias
         {
             base.MaxMark = DEFAULT_MAX_MARK;
         }
+
+        public override string Format(uint mark) => MaxMark == 100 ? $"{mark}%" : mark.ToString();
     }
 }

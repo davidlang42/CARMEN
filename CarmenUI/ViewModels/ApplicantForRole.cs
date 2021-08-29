@@ -48,7 +48,7 @@ namespace CarmenUI.ViewModels
         public string? CastNumberAndCast => Applicant.CastNumberAndCast;
 
         /// <summary>Indicies match Criterias</summary>
-        public uint[] Marks { get; init; }
+        public string[] Marks { get; init; }
 
         /// <summary>Not including this role, even if already cast in it</summary>
         public double[] ExistingRoles { get; init; }
@@ -97,9 +97,9 @@ namespace CarmenUI.ViewModels
             Criterias = criterias;
             Suitability = engine.SuitabilityOf(applicant, role);
             OverallAbility = engine.OverallAbility(applicant);
-            Marks = new uint[Criterias.Length];
+            Marks = new string[Criterias.Length];
             for (var i = 0; i < Marks.Length; i++)
-                Marks[i] = applicant.MarkFor(Criterias[i]);
+                Marks[i] = applicant.FormattedMarkFor(Criterias[i]);
             ExistingRoles = new double[Criterias.Length];
             for (var i = 0; i < ExistingRoles.Length; i++)
                 ExistingRoles[i] = engine.CountRoles(applicant, Criterias[i], role);

@@ -37,5 +37,7 @@ namespace Carmen.ShowModel.Criterias
             options = DEFAULT_OPTIONS;
             base.MaxMark = (uint)(options.Length - 1);
         }
+
+        public override string Format(uint mark) => mark > MaxMark ? "?" : Options[mark];
     }
 }

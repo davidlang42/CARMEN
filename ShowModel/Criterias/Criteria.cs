@@ -32,5 +32,7 @@ namespace Carmen.ShowModel.Criterias
                 maxMark = value;
             }
         }
+
+        public abstract string Format(uint mark);
     }
 }

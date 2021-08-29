@@ -16,5 +16,7 @@ namespace Carmen.ShowModel.Criterias
         {
             base.MaxMark = 1;
         }
+
+        public override string Format(uint mark) => mark == 0 ? "✕" : "✓";
     }
 }

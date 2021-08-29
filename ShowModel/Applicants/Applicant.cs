@@ -253,6 +253,8 @@ namespace Carmen.ShowModel.Applicants
         public uint MarkFor(Criteria criteria)
             => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark ?? 0;
 
+        public string FormattedMarkFor(Criteria criteria) => criteria.Format(MarkFor(criteria));
+
         /// <summary>Determines if an Applicant has been accepted into the cast.
         /// This is determined by membership in a CastGroup.</summary>
         public bool IsAccepted => CastGroup != null;
