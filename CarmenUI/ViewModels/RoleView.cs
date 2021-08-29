@@ -46,7 +46,10 @@ namespace CarmenUI.ViewModels
         }
 
         private void Requirements_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-            => OnPropertyChanged(nameof(CommaSeparatedRequirements));
+        {
+            OnPropertyChanged(nameof(CommaSeparatedRequirements));
+            OnPropertyChanged(nameof(CommaSeparatedOtherRequirements));
+        }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
