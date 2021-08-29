@@ -148,7 +148,12 @@ namespace CarmenUI.Windows
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if (Properties.Settings.Default.ShortcutsOnStartWindow)
+            if(Properties.Settings.Default.OpenSettingsOnF1 && e.Key == Key.F1)
+            {
+                SettingsButton_Click(sender, e);
+                e.Handled = true;
+            }
+            else if (Properties.Settings.Default.ShortcutsOnStartWindow)
             {
                 if (e.Key == Key.N)
                     NewButton_Click(sender, e);
@@ -162,6 +167,11 @@ namespace CarmenUI.Windows
         }
 
         private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Not yet implemented
+        }
+
+        private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             // Not yet implemented
         }

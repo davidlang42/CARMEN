@@ -18,6 +18,11 @@
         <TextBlock Grid.Row="0" FontSize="84" HorizontalAlignment="Center">
             C.A.R.M.E.N.
         </TextBlock>
+        <Button Background="White" Width="30" Height="30" BorderThickness="0" Click="SettingsButton_Click"
+                HorizontalAlignment="Right" VerticalAlignment="Top"
+                Margin="0 0 2 0" IsEnabled="False">
+            <Image Source="/Icons/SettingsOutline.png" VerticalAlignment="Top"/>
+        </Button>
         <TextBlock Grid.Row="1" FontSize="20" HorizontalAlignment="Center">
             Casting And Role Management Equality Network
         </TextBlock>

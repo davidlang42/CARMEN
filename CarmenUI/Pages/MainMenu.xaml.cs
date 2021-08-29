@@ -172,6 +172,11 @@ namespace CarmenUI.Pages
                 BackButton_Click(sender, e);
                 e.Handled = true;
             }
+            else if (Properties.Settings.Default.OpenSettingsOnF1 && e.Key == Key.F1)
+            {
+                SettingsButton_Click(sender, e);
+                e.Handled = true;
+            }
             else if (Properties.Settings.Default.ShortcutsOnMainMenu)
             {
                 var list_item = e.Key switch

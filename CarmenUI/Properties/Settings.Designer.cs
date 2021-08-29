@@ -244,5 +244,17 @@ namespace CarmenUI.Properties {
                 this["ExitToStartOnBackspace"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool OpenSettingsOnF1 {
+            get {
+                return ((bool)(this["OpenSettingsOnF1"]));
+            }
+            set {
+                this["OpenSettingsOnF1"] = value;
+            }
+        }
     }
 }
