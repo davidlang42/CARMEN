@@ -245,9 +245,7 @@ namespace CarmenUI.Pages
             if (e.Key == Key.Delete && applicantsList.SelectedItem is Applicant applicant)
             {
                 e.Handled = true;
-                var msg = $"Are you sure you want to delete '{FullName.Format(applicant)}'?";
-                if (MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                    ((IList)applicantsViewSource.Source).Remove(applicant);
+                DeleteApplicant(applicant);
             }
         }
 
@@ -393,6 +391,19 @@ namespace CarmenUI.Pages
                 else if (uint.TryParse(response, out value))
                     return true;
             }
+        }
+
+        private void DeleteApplicant_Click(object sender, RoutedEventArgs e)
+        {
+            if (applicantsList.SelectedItem is Applicant applicant)
+                DeleteApplicant(applicant);
+        }
+
+        private void DeleteApplicant(Applicant applicant)
+        {
+            var msg = $"Are you sure you want to delete '{FullName.Format(applicant)}'?";
+            if (MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                ((IList)applicantsViewSource.Source).Remove(applicant);
         }
     }
 

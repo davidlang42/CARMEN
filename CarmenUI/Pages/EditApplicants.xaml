@@ -160,6 +160,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
                         <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
                     <Grid>
                         <Grid.RowDefinitions>
@@ -275,6 +276,9 @@
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>
+                    <Grid Grid.Row="2" Margin="0 5 0 0">
+                        <Button Content="Delete applicant" Click="DeleteApplicant_Click" Height="29"/>
+                    </Grid>
                 </Grid>
                 <Grid Grid.Column="1" Margin="5">
                     <Grid.RowDefinitions>
