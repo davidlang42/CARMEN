@@ -68,8 +68,12 @@ namespace UnitTests.SAT
         }
 
         [Test]
-        [TestCase(100, 10, 50, 3)]
-        public void Simple_Random(int test_cases, int n_variables, int j_clauses, int k_literals)
+        [TestCase(100, 10, 50, 3, TestName = "10_Vars_Easy")] // 60ms
+        [TestCase(100, 15, 70, 3, TestName = "15_Vars_Medium")] // 80ms
+        [TestCase(100, 20, 90, 3, TestName = "20_Vars_Hard")] // 150ms
+        [TestCase(100, 25, 110, 3, TestName = "25_Vars_VeryHard")] // 270ms
+        //[TestCase(100, 50, 210, 3, TestName = "50_Vars_Extreme")] // 6.3s
+        public void Random(int test_cases, int n_variables, int j_clauses, int k_literals)
         {
             var vars = GenerateVariables(n_variables);
             var sat = new DpllSolver(vars);

@@ -68,8 +68,12 @@ namespace UnitTests.SAT
         }
 
         [Test]
-        [TestCase(100, 10, 50, 3)]
-        public void Simple_Random(int test_cases, int n_variables, int j_clauses, int k_literals)
+        [TestCase(100, 10, 50, 3, TestName = "10_Vars_Easy")] // 200ms
+        //[TestCase(100, 15, 70, 3, TestName = "15_Vars_Medium")] // 5.2s
+        //[TestCase(100, 20, 90, 3, TestName = "20_Vars_Hard")] // 2.8m
+        //[TestCase(100, 25, 110, 3, TestName = "25_Vars_VeryHard")] // 87m
+        //[TestCase(100, 50, 210, 3, TestName = "50_Vars_Extreme")] // > 12h
+        public void Random(int test_cases, int n_variables, int j_clauses, int k_literals)
         {
             var vars = GenerateVariables(n_variables);
             var sat = new BruteForceSolver(vars);
