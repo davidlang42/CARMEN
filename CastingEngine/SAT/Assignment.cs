@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.SAT
 {
+    /// <summary>
+    /// A specified assignment of a boolean value to a variable.
+    /// </summary>
     public struct Assignment
     {
         public Variable Variable { get; set; }

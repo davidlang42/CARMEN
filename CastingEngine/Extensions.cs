@@ -60,5 +60,10 @@ namespace Carmen.CastingEngine
                 return default;
             return first;
         }
+
+        public static IEnumerable<T> Yield<T>(this T obj)
+        {
+            yield return obj;
+        }
     }
 }

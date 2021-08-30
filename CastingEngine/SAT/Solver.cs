@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.SAT
 {
-    public class Solver
+    /// <summary>
+    /// An abstract SAT solver of the Boolean Satisfiability Problem.
+    /// </summary>
+    public abstract class Solver
     {
         public HashSet<Variable> Variables { get; init; }
 
@@ -15,20 +18,8 @@ namespace Carmen.CastingEngine.SAT
             Variables = variables;
         }
 
-        public Solver(IEnumerable<Variable> variables)
-            : this(variables.ToHashSet())
-        { }
-
-        public Solver()
-            : this(new())
-        { }
-
         /// <summary>Solves a boolean expression, or returns null if it is found to be unsolveable</summary>
-        public Solution? Solve(Expression expression)
-        {
-            throw new NotImplementedException();
-            //TODO
-        }
+        public abstract Solution? Solve(Expression expression);
 
         /// <summary>Checks than a boolean expression is valid. That is:
         /// - it only contains Variables known to the solver
@@ -38,12 +29,12 @@ namespace Carmen.CastingEngine.SAT
         /// - no Clause contains duplicate Literals</summary>
         public bool Check(Expression expression)
         {
-            if (expression.Clauses.Length == 0)
+            if (expression.IsEmpty())
                 return false;
             HashSet<Clause> valid_clauses = new();
             foreach (var clause in expression.Clauses)
             {
-                if (clause.Literals.Length == 0)
+                if (clause.IsEmpty())
                     return false;
                 if (!valid_clauses.Add(clause))
                     return false;

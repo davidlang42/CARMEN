@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.SAT
 {
+    /// <summary>
+    /// An object representing a unique boolean variable, excluding state.
+    /// </summary>
     public abstract class Variable
     {
         public Literal PositiveLiteral => new Literal { Variable = this, Inverse = false };
@@ -26,5 +29,18 @@ namespace Carmen.CastingEngine.SAT
         public string Name { get; set; } = "";
 
         public override string ToString() => Name;
+    }
+
+    public class ObjectVariable<T> : Variable
+        where T : class
+    {
+        public T Object { get; init; }
+
+        public ObjectVariable(T obj)
+        {
+            Object = obj;
+        }
+
+        public override string ToString() => $"VAR:{Object.ToString() ?? "?"}";
     }
 }
