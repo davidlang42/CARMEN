@@ -48,7 +48,7 @@ namespace Carmen.CastingEngine.SAT
         }
 
         public Solution Clone()
-            => new()
+            => new Solution
             {
                 Assignments = (bool?[])Assignments.Clone()
             };

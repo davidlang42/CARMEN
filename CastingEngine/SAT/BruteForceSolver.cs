@@ -1,5 +1,4 @@
-﻿using Carmen.CastingEngine.SAT.Internal;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -17,15 +16,15 @@ namespace Carmen.CastingEngine.SAT
             : base(variables)
         { }
 
-        protected override IEnumerable<Solution> PartialSolve(Expression expression, Solution partial_solution)
+        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
             => PartialSolve(expression, new Solution { Assignments = new bool?[Variables.Count] }, 0);
 
-        private IEnumerable<Solution> PartialSolve(Expression expression, Solution partial_solution, int depth = 0)
+        private IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution, int depth = 0)
         {
             partial_solution = partial_solution.Clone();
             if (depth == partial_solution.Assignments.Length)
             {
-                if (expression.Evaluate(partial_solution))
+                if (Evaluate(expression, partial_solution))
                     yield return partial_solution;
             }
             else

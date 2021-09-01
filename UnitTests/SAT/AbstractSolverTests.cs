@@ -1,5 +1,4 @@
 ﻿using Carmen.CastingEngine.SAT;
-using Carmen.CastingEngine.SAT.Internal;
 using FluentAssertions;
 using NUnit.Framework;
 using System;
@@ -141,6 +140,6 @@ namespace UnitTests.SAT
             : base(variables)
         { }
 
-        protected override IEnumerable<Solution> PartialSolve(Expression expression, Solution partial_solution) => throw new NotImplementedException();
+        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution) => throw new NotImplementedException();
     }
 }
