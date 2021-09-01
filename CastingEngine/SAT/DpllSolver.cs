@@ -9,12 +9,17 @@ namespace Carmen.CastingEngine.SAT
     public class DpllSolver<T> : Solver<T>
         where T : notnull
     {
+        /// <summary>Propogating pure literals may cause skipping some solutions.
+        /// If every solution is needed, set SkipPureLiterals to true.</summary>
+        public bool SkipPureLiterals { get; set; } = false;
+
         public DpllSolver(IEnumerable<T>? variables = null)
             : base(variables)
         { }
 
         protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
         {
+            partial_solution = partial_solution.Clone();
             expression = expression.Clone();
             // Propogate unit clauses
             while (true)
@@ -46,31 +51,34 @@ namespace Carmen.CastingEngine.SAT
                 yield break;
             }
             // Propogate pure literals
-            while (true)
+            if (!SkipPureLiterals) //LATER if I want to keep pure literals and have all solutions, could possibly back-check the inverse pure literal when returning solutions
             {
-                // Find next pure literal
-                var unique_literals = expression.Clauses.SelectMany(c => c.Literals).ToHashSet(); //LATER speed this up by grouping literals by variable and finding the first with only 1
-                Literal<int>? pure_literal = null;
-                foreach (var literal in unique_literals)
+                while (true)
                 {
-                    if (!unique_literals.Contains(literal.Inverse()))
+                    // Find next pure literal
+                    var unique_literals = expression.Clauses.SelectMany(c => c.Literals).ToHashSet(); //LATER speed this up by grouping literals by variable and finding the first with only 1
+                    Literal<int>? pure_literal = null;
+                    foreach (var literal in unique_literals)
                     {
-                        pure_literal = literal;
-                        break;
+                        if (!unique_literals.Contains(literal.Inverse()))
+                        {
+                            pure_literal = literal;
+                            break;
+                        }
                     }
+                    if (!pure_literal.HasValue)
+                        break; // no more pure literals
+                               // Assign pure literal value (might not be required, but is always safe)
+                    partial_solution.Assignments[pure_literal.Value.Variable] = pure_literal.Value.Polarity;
+                    // Remove all clauses containing the pure literal
+                    expression.Clauses.RemoveWhere(c => c.Literals.Contains(pure_literal.Value));
                 }
-                if (!pure_literal.HasValue)
-                    break; // no more pure literals
-                // Assign pure literal value (might not be required, but is always safe)
-                partial_solution.Assignments[pure_literal.Value.Variable] = pure_literal.Value.Polarity;
-                // Remove all clauses containing the pure literal
-                expression.Clauses.RemoveWhere(c => c.Literals.Contains(pure_literal.Value));
-            }
-            // Check for solved (again)
-            if (expression.IsEmpty())
-            {
-                yield return partial_solution; // solved
-                yield break;
+                // Check for solved (again)
+                if (expression.IsEmpty())
+                {
+                    yield return partial_solution; // solved
+                    yield break;
+                }
             }
             // Pick an unassigned literal and branch
             var unassigned_literal = expression.Clauses.First().Literals.First(); //LATER speed this up by branching on the most common literal

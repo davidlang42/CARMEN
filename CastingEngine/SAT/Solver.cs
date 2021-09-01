@@ -70,15 +70,17 @@ namespace Carmen.CastingEngine.SAT
 
         protected abstract IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution);
 
-        public bool Evaluate(Expression<T> expression, bool[] fully_assigned)
+        public bool Evaluate(Expression<T> expression, Solution full_solution)
         {
+            if (!full_solution.IsFullyAssigned)
+                throw new ArgumentException("Cannot evaulate a non-fully assigned solution");
             int i = 0;
             var map = Variables.ToDictionary(v => v, v => i++);
             var expression_int = expression.Remap(map);
-            return Evaluate(expression_int, fully_assigned);
+            return Evaluate(expression_int, full_solution);
         }
 
-        protected static bool Evaluate(Expression<int> expression, bool[] fully_assigned)
-            => expression.Clauses.All(c => c.Literals.Any(l => l.Polarity == fully_assigned[l.Variable]));
+        protected static bool Evaluate(Expression<int> expression, Solution full_solution)
+            => expression.Clauses.All(c => c.Literals.Any(l => l.Polarity == full_solution.Assignments[l.Variable]));
     }
 }

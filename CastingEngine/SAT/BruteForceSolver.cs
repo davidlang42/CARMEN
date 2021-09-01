@@ -21,9 +21,10 @@ namespace Carmen.CastingEngine.SAT
 
         private IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution, int depth = 0)
         {
+            partial_solution = partial_solution.Clone();
             if (depth == partial_solution.Assignments.Length)
             {
-                if (Evaluate(expression, partial_solution.Assignments.Cast<bool>().ToArray()))
+                if (Evaluate(expression, partial_solution))
                     yield return partial_solution;
             }
             else

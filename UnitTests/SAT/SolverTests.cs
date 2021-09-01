@@ -15,8 +15,8 @@ namespace UnitTests.SAT
             var solution = sat.Solve(expression).FirstOrDefault();
             if (!solution.IsUnsolvable)
             {
-                sat.Evaluate(expression, solution.FullyAssigned(false)).Should().BeTrue();
-                sat.Evaluate(expression, solution.FullyAssigned(true)).Should().BeTrue();
+                sat.Evaluate(expression, solution.Enumerate().First()).Should().BeTrue();
+                sat.Evaluate(expression, solution.Enumerate().Last()).Should().BeTrue();
                 return true;
             }
             else

@@ -17,38 +17,41 @@ namespace Carmen.CastingEngine.SAT
 
         public bool IsUnsolvable => Assignments == null;
 
-        public bool[] FullyAssigned(bool value_to_assign_free_variables = false)
-        {
-            if (Assignments == null)
-                throw new ApplicationException($"Cannot get a full assignment of an a unsolveable solution");
-            return Assignments.Select(a => a ?? value_to_assign_free_variables).ToArray();
-        }
+        public bool IsFullyAssigned
+            => Assignments?.All(a => a != null) ?? throw new ApplicationException($"Cannot check full assignment of an a unsolveable solution");
 
-        public IEnumerable<bool[]> Enumerate() => Enumerate(Assignments, 0);
+        public IEnumerable<Solution> Enumerate() => Enumerate(this, 0);
 
-        private static IEnumerable<bool[]> Enumerate(bool?[] partial_assignments, int start_at)
+        private static IEnumerable<Solution> Enumerate(Solution partial, int start_at)
         {
+            partial = partial.Clone();
             var first_unassigned = -1;
-            for (var i = start_at; i < partial_assignments.Length; i++)
+            for (var i = start_at; i < partial.Assignments.Length; i++)
             {
-                if (partial_assignments[i] == null)
+                if (partial.Assignments[i] == null)
                 {
                     first_unassigned = i;
                     break;
                 }
             }
             if (first_unassigned == -1)
-                yield return partial_assignments.Cast<bool>().ToArray();
+                yield return partial;
             else
             {
-                partial_assignments[first_unassigned] = false;
-                foreach (var full_assignment in Enumerate(partial_assignments, first_unassigned + 1))
+                partial.Assignments[first_unassigned] = false;
+                foreach (var full_assignment in Enumerate(partial, first_unassigned + 1))
                     yield return full_assignment;
-                partial_assignments[first_unassigned] = true;
-                foreach (var full_assignment in Enumerate(partial_assignments, first_unassigned + 1))
+                partial.Assignments[first_unassigned] = true;
+                foreach (var full_assignment in Enumerate(partial, first_unassigned + 1))
                     yield return full_assignment;
             }
         }
+
+        public Solution Clone()
+            => new Solution
+            {
+                Assignments = (bool?[])Assignments.Clone()
+            };
 
         public override string ToString()
             => Assignments == null ? "Unsolvable" : "Solution: " + string.Join("", Assignments.Select(a => a.HasValue ? a.Value ? "1" : "0" : "X"));
