@@ -68,11 +68,11 @@ namespace UnitTests.SAT
         }
 
         [Test]
-        [TestCase(100, 10, 50, 3, TestName = "10_Vars_Easy")] // 200ms
-        //[TestCase(100, 15, 70, 3, TestName = "15_Vars_Medium")] // 5.2s
-        //[TestCase(100, 20, 90, 3, TestName = "20_Vars_Hard")] // 2.8m
-        //[TestCase(100, 25, 110, 3, TestName = "25_Vars_VeryHard")] // 87m
-        //[TestCase(100, 50, 210, 3, TestName = "50_Vars_Extreme")] // > 12h
+        [TestCase(100, 10, 50, 3, TestName = "10_Vars_Easy")] // 160ms
+        //[TestCase(100, 15, 70, 3, TestName = "15_Vars_Medium")] // 4.6s
+        //[TestCase(100, 20, 90, 3, TestName = "20_Vars_Hard")] // 2.7m
+        //[TestCase(100, 25, 110, 3, TestName = "25_Vars_VeryHard")] // 87m (not re-tested)
+        //[TestCase(100, 50, 210, 3, TestName = "50_Vars_Extreme")] // > 12h (not re-tested)
         public void Random(int test_cases, int n_variables, int j_clauses, int k_literals)
         {
             var vars = Enumerable.Range(1, n_variables).ToArray();
