@@ -18,11 +18,11 @@ namespace Carmen.CastingEngine.SAT
 
         public bool IsEmpty() => Literals == null || Literals.Count == 0;
 
-        public bool IsUnitClause(out Literal<T>? single_literal)
+        public bool IsUnitClause(out Literal<T> single_literal)
         {
             if (Literals == null || Literals.Count == 0 || Literals.Count > 1)
             {
-                single_literal = null;
+                single_literal = default;
                 return false;
             }
             else

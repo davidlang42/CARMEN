@@ -25,30 +25,21 @@ namespace Carmen.CastingEngine.SAT
             while (true)
             {
                 // Find next unit clause literal
-                Literal<int>? unit_clause_literal = null;
-                foreach (var clause in expression.Clauses)
-                {
-                    if (clause.IsEmpty())
-                        yield break; // unsolvable
-                    if (clause.IsUnitClause(out unit_clause_literal))
-                        break;
-                }
-                if (!unit_clause_literal.HasValue)
-                    break; // no more unit clauses
+                var unit = FindUnitClause(expression);
+                if (unit.Solved)
+                    yield return partial_solution;
+                if (unit.Solved || unit.Failed)
+                    yield break;
+                if (!unit.Found)
+                    break;
                 // Assign unit clause value
-                partial_solution.Assignments[unit_clause_literal.Value.Variable] = unit_clause_literal.Value.Polarity;
+                partial_solution.Assignments[unit.Literal.Variable] = unit.Literal.Polarity;
                 // Remove unit clause and any other clauses containing the unit clause literal
-                expression.Clauses.RemoveWhere(c => c.Literals.Contains(unit_clause_literal.Value));
+                expression.Clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal));
                 // Remove inverse literal from any remaining clauses
-                var inverse_literal = unit_clause_literal.Value.Inverse();
+                var inverse_literal = unit.Literal.Inverse();
                 foreach (var clause in expression.Clauses)
                     clause.Literals.RemoveWhere(l => l.Equals(inverse_literal));
-            }
-            // Check for solved
-            if (expression.IsEmpty())
-            {
-                yield return partial_solution; // solved
-                yield break;
             }
             // Propogate pure literals
             if (!SkipPureLiterals) //LATER if I want to keep pure literals and have all solutions, could possibly back-check the inverse pure literal when returning solutions
@@ -56,28 +47,17 @@ namespace Carmen.CastingEngine.SAT
                 while (true)
                 {
                     // Find next pure literal
-                    var unique_literals = expression.Clauses.SelectMany(c => c.Literals).ToHashSet(); //LATER speed this up by grouping literals by variable and finding the first with only 1
-                    Literal<int>? pure_literal = null;
-                    foreach (var literal in unique_literals)
-                    {
-                        if (!unique_literals.Contains(literal.Inverse()))
-                        {
-                            pure_literal = literal;
-                            break;
-                        }
-                    }
-                    if (!pure_literal.HasValue)
-                        break; // no more pure literals
-                               // Assign pure literal value (might not be required, but is always safe)
-                    partial_solution.Assignments[pure_literal.Value.Variable] = pure_literal.Value.Polarity;
+                    var pure = FindPureLiteral(expression);
+                    if (pure.Solved)
+                        yield return partial_solution;
+                    if (pure.Solved || pure.Failed)
+                        yield break;
+                    if (!pure.Found)
+                        break;
+                    // Assign pure literal value (might not be required, but is always safe)
+                    partial_solution.Assignments[pure.Literal.Variable] = pure.Literal.Polarity;
                     // Remove all clauses containing the pure literal
-                    expression.Clauses.RemoveWhere(c => c.Literals.Contains(pure_literal.Value));
-                }
-                // Check for solved (again)
-                if (expression.IsEmpty())
-                {
-                    yield return partial_solution; // solved
-                    yield break;
+                    expression.Clauses.RemoveWhere(c => c.Literals.Contains(pure.Literal));
                 }
             }
             // Pick an unassigned literal and branch
@@ -91,6 +71,49 @@ namespace Carmen.CastingEngine.SAT
             expression.Clauses.Add(branching_clause);
             foreach (var solution in PartialSolve(expression, partial_solution))
                 yield return solution; // propogate any found solutions
+        }
+
+        private struct SearchResult
+        {
+            public bool Solved { get; set; }
+            public bool Failed { get; set; }
+            public bool Found { get; set; }
+            public Literal<int> Literal { get; set; }
+
+            public static SearchResult Fail() => new() { Failed = true };
+            public static SearchResult Solve() => new() { Solved = true };
+            public static SearchResult Find(Literal<int> literal) => new()
+            {
+                Found = true,
+                Literal = literal
+            };
+        }
+
+        private static SearchResult FindUnitClause(Expression<int> exp)
+        {
+            if (exp.Clauses.Count == 0)
+                return SearchResult.Solve();
+            foreach (var clause in exp.Clauses)
+            {
+                if (clause.IsEmpty())
+                    return SearchResult.Fail();
+                if (clause.IsUnitClause(out var literal))
+                    return SearchResult.Find(literal);
+            }
+            return default;
+        }
+
+        private static SearchResult FindPureLiteral(Expression<int> exp)
+        {
+            if (exp.Clauses.Count == 0)
+                return SearchResult.Solve();
+            var unique_literals = exp.Clauses.SelectMany(c => c.Literals).ToHashSet(); //LATER speed this up by grouping literals by variable and finding the first with only 1
+            foreach (var literal in unique_literals)
+            {
+                if (!unique_literals.Contains(literal.Inverse()))
+                    return SearchResult.Find(literal);
+            }
+            return default;
         }
     }
 }
