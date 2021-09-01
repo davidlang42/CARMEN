@@ -6,62 +6,54 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.SAT
 {
-    public class DpllSolver : Solver
+    public class DpllSolver<T> : Solver<T>
+        where T : notnull
     {
-        public DpllSolver(IEnumerable<Variable> variables)
-            : base(variables.ToHashSet())
+        public DpllSolver(IEnumerable<T>? variables = null)
+            : base(variables)
         { }
 
-        public override Solution? Solve(Expression expression)
+        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
         {
-            if (PartialSolve(expression) is Assignment[] assignments)
-            {
-                var free_variables = Variables.ToHashSet();
-                foreach (var a in assignments)
-                    free_variables.Remove(a.Variable);
-                return new Solution { Assignments = assignments.ToArray(), FreeVariables = free_variables.ToArray() };
-            }
-            return null;
-        }
-
-        private static Assignment[]? PartialSolve(Expression expression)
-        {
-            var assignments = new List<Assignment>();
+            expression = expression.Clone();
             // Propogate unit clauses
             while (true)
             {
                 // Find next unit clause literal
-                Literal? unit_clause_literal = null;
+                Literal<int>? unit_clause_literal = null;
                 foreach (var clause in expression.Clauses)
                 {
                     if (clause.IsEmpty())
-                        return null; // unsolvable
+                        yield break; // unsolvable
                     if (clause.IsUnitClause(out unit_clause_literal))
                         break;
                 }
                 if (!unit_clause_literal.HasValue)
                     break; // no more unit clauses
                 // Assign unit clause value
-                assignments.Add(unit_clause_literal.Value.AssignmentForTrue());
+                partial_solution.Assignments[unit_clause_literal.Value.Variable] = unit_clause_literal.Value.Polarity;
                 // Remove unit clause and any other clauses containing the unit clause literal
-                expression.Clauses = expression.Clauses.Where(c => !c.Literals.Contains(unit_clause_literal.Value)).ToArray();
+                expression.Clauses.RemoveWhere(c => c.Literals.Contains(unit_clause_literal.Value));
                 // Remove inverse literal from any remaining clauses
-                var inverse_literal = unit_clause_literal.Value.InverseLiteral();
-                for (var i = 0; i < expression.Clauses.Length; i++)
-                    expression.Clauses[i].Literals = expression.Clauses[i].Literals.Where(l => !l.Equals(inverse_literal)).ToArray();
+                var inverse_literal = unit_clause_literal.Value.Inverse();
+                foreach (var clause in expression.Clauses)
+                    clause.Literals.RemoveWhere(l => l.Equals(inverse_literal));
             }
             // Check for solved
             if (expression.IsEmpty())
-                return assignments.ToArray(); // solved
+            {
+                yield return partial_solution; // solved
+                yield break;
+            }
             // Propogate pure literals
             while (true)
             {
                 // Find next pure literal
-                var unique_literals = expression.Clauses.SelectMany(c => c.Literals).ToHashSet();
-                Literal? pure_literal = null;
+                var unique_literals = expression.Clauses.SelectMany(c => c.Literals).ToHashSet(); //LATER speed this up by grouping literals by variable and finding the first with only 1
+                Literal<int>? pure_literal = null;
                 foreach (var literal in unique_literals)
                 {
-                    if (!unique_literals.Contains(literal.InverseLiteral()))
+                    if (!unique_literals.Contains(literal.Inverse()))
                     {
                         pure_literal = literal;
                         break;
@@ -70,18 +62,27 @@ namespace Carmen.CastingEngine.SAT
                 if (!pure_literal.HasValue)
                     break; // no more pure literals
                 // Assign pure literal value (might not be required, but is always safe)
-                assignments.Add(pure_literal.Value.AssignmentForTrue());
+                partial_solution.Assignments[pure_literal.Value.Variable] = pure_literal.Value.Polarity;
                 // Remove all clauses containing the pure literal
-                expression.Clauses = expression.Clauses.Where(c => !c.Literals.Contains(pure_literal.Value)).ToArray();
+                expression.Clauses.RemoveWhere(c => c.Literals.Contains(pure_literal.Value));
             }
             // Check for solved (again)
             if (expression.IsEmpty())
-                return assignments.ToArray(); // solved
+            {
+                yield return partial_solution; // solved
+                yield break;
+            }
             // Pick an unassigned literal and branch
-            var unassigned_literal = expression.Clauses[0].Literals[0];
-            Assignment[]? partial_assignments = PartialSolve(new Expression { Clauses = expression.Clauses.Concat(new Clause { Literals = new[] { unassigned_literal } }.Yield()).ToArray() })
-                ?? PartialSolve(new Expression { Clauses = expression.Clauses.Concat(new Clause { Literals = new[] { unassigned_literal.InverseLiteral() } }.Yield()).ToArray() });
-            return partial_assignments?.Concat(assignments).ToArray(); // propogate solved/unsolved
-        }   
+            var unassigned_literal = expression.Clauses.First().Literals.First(); //LATER speed this up by branching on the most common literal
+            var branching_clause = new Clause<int> { Literals = unassigned_literal.Yield().ToHashSet() };
+            expression.Clauses.Add(branching_clause);
+            foreach (var solution in PartialSolve(expression, partial_solution))
+                yield return solution; // propogate any found solutions
+            expression.Clauses.Remove(branching_clause);
+            branching_clause = new Clause<int> { Literals = unassigned_literal.Inverse().Yield().ToHashSet() };
+            expression.Clauses.Add(branching_clause);
+            foreach (var solution in PartialSolve(expression, partial_solution))
+                yield return solution; // propogate any found solutions
+        }
     }
 }

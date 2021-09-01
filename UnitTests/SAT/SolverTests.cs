@@ -10,44 +10,37 @@ namespace UnitTests.SAT
 {
     public abstract class SolverTests
     {
-        protected Variable[] GenerateVariables(int count)
+        protected void TestSolve(Solver<int> sat, Expression<int> expression, bool expected_solvable)
         {
-            var variables = new Variable[count];
-            for (var i = 0; i < count; i++)
-                variables[i] = new NumberedVariable { Number = (uint)i + 1 };
-            return variables;
-        }
-
-        protected void TestSolve(Solver sat, Expression expression, bool expected_solvable)
-        {
-            var solution = sat.Solve(expression);
+            var solution = sat.Solve(expression).FirstOrDefault();
             if (expected_solvable)
             {
-                solution.Should().NotBeNull();
-                expression.Evaluate(solution!.Value.FullyAssigned(false)).Should().BeTrue();
-                expression.Evaluate(solution.Value.FullyAssigned(true)).Should().BeTrue();
+                solution.IsUnsolvable.Should().BeFalse();
+                sat.Evaluate(expression, solution.FullyAssigned(false)).Should().BeTrue();
+                sat.Evaluate(expression, solution.FullyAssigned(true)).Should().BeTrue();
             }
             else
             {
-                solution.Should().BeNull();
+                solution.IsUnsolvable.Should().BeTrue();
             }
         }
 
-        protected Expression GenerateExpression(int random_seed, Variable[] variables, int j_clauses, int k_literals_per_clause)
+        protected Expression<T> GenerateExpression<T>(int random_seed, T[] variables, int j_clauses, int k_literals_per_clause)
+            where T : notnull
         {
             var random = new Random(random_seed);
-            var all_literals = variables.SelectMany(v => new[] { v.PositiveLiteral, v.NegativeLiteral }).ToArray();
-            var clauses = new List<Clause>();
+            var all_literals = variables.SelectMany(v => new[] { Literal<T>.Positive(v), Literal<T>.Negative(v) }).ToArray();
+            var clauses = new List<Clause<T>>();
             for (var j = 0; j < j_clauses; j++)
             {
-                var literals = new List<Literal>();
+                var literals = new List<Literal<T>>();
                 for (var k = 0; k < k_literals_per_clause; k++)
                 {
                     literals.Add(all_literals[random.Next(all_literals.Length)]);
                 }
-                clauses.Add(new Clause { Literals = literals.ToArray() });
+                clauses.Add(new Clause<T> { Literals = literals.ToHashSet() });
             }
-            return new Expression { Clauses = clauses.ToArray() };
+            return new Expression<T> { Clauses = clauses.ToHashSet() };
         }
     }
 }

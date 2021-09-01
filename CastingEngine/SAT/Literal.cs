@@ -9,27 +9,43 @@ namespace Carmen.CastingEngine.SAT
     /// <summary>
     /// A positive or negative literal of a boolean variable.
     /// </summary>
-    public struct Literal
+    public struct Literal<T>
+        where T : notnull
     {
-        public Variable Variable { get; set; }
-        public bool Inverse { get; set; }
+        public T Variable { get; set; }
+        public bool Polarity { get; set; }
 
-        public Literal InverseLiteral() => new Literal { Variable = Variable, Inverse = !Inverse };
+        public Literal<T> Inverse() => new Literal<T> { Variable = Variable, Polarity = !Polarity };
 
-        public Assignment AssignmentForTrue() => new Assignment { Variable = Variable, Value = !Inverse };
+        public static Literal<T> Positive(T variable) => new Literal<T> { Variable = variable, Polarity = true };
 
-        public bool Evaluate(Dictionary<Variable, bool> assignments)
-        {
-            if (!assignments.TryGetValue(Variable, out var assigned_value))
-                throw new ArgumentException($"{nameof(assignments)} did not contain variable {Variable}");
-            return assigned_value != Inverse;
-        }
+        public static Literal<T> Negative(T variable) => new Literal<T> { Variable = variable, Polarity = false };
 
-        public override string ToString() => Inverse ? $"neg({Variable})" : Variable.ToString();
+        public override string ToString() => Polarity ? VariableName : $"neg({VariableName})";
+
+        public string VariableName => Variable switch
+            {
+                int i => $"X{i}",
+                string s => s,
+                _ => Variable.ToString() ?? "?"
+            };
 
         public override bool Equals(object? obj)
-            => obj is Literal other && other.Inverse == Inverse && other.Variable == Variable;
+            => obj is Literal<T> other && other.Polarity == Polarity && other.Variable.Equals(Variable);
 
-        public override int GetHashCode() => Variable.GetHashCode() ^ Inverse.GetHashCode();
+        public override int GetHashCode() => Variable.GetHashCode() ^ Polarity.GetHashCode();
+
+        public Literal<U> Remap<U>(Dictionary<T, U> variable_map) where U : notnull
+        {
+            if (!variable_map.TryGetValue(Variable, out var mapped_variable))
+                throw new ArgumentException($"{nameof(variable_map)} did not contain variable '{VariableName}'");
+            return new()
+            {
+                Variable = mapped_variable,
+                Polarity = Polarity
+            };
+        }
+
+        public Literal<T> Clone() => new Literal<T> { Variable = Variable, Polarity = Polarity };
     }
 }

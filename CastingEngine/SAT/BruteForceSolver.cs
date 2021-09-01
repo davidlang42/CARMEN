@@ -9,30 +9,31 @@ namespace Carmen.CastingEngine.SAT
     /// <summary>
     /// A really bad SAT solver
     /// </summary>
-    public class BruteForceSolver : Solver
+    public class BruteForceSolver<T> : Solver<T>
+        where T : notnull
     {
-        public BruteForceSolver(IEnumerable<Variable> variables)
-            : base(variables.ToHashSet())
+        public BruteForceSolver(IEnumerable<T>? variables = null)
+            : base(variables)
         { }
 
-        public override Solution? Solve(Expression expression)
-            => Solve(expression, new Assignment[0], Variables.ToArray());
+        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
+            => PartialSolve(expression, new Solution { Assignments = new bool?[Variables.Count] }, 0);
 
-        private static Solution? Solve(Expression expression, Assignment[] assignments, Variable[] unassigned_variables)
+        private IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution, int depth = 0)
         {
-            if (unassigned_variables.Length == 0)
+            if (depth == partial_solution.Assignments.Length)
             {
-                if (expression.Evaluate(assignments))
-                    return new Solution { Assignments = assignments };
-                else
-                    return null;
+                if (Evaluate(expression, partial_solution.Assignments.Cast<bool>().ToArray()))
+                    yield return partial_solution;
             }
             else
             {
-                var first_var = unassigned_variables[0];
-                var remaining_vars = unassigned_variables.Skip(1).ToArray();
-                return Solve(expression, assignments.Concat(new Assignment { Variable = first_var, Value = false }.Yield()).ToArray(), remaining_vars)
-                    ?? Solve(expression, assignments.Concat(new Assignment { Variable = first_var, Value = true }.Yield()).ToArray(), remaining_vars);
+                partial_solution.Assignments[depth] = false;
+                foreach (var solution in PartialSolve(expression, partial_solution, depth + 1))
+                    yield return solution;
+                partial_solution.Assignments[depth] = true;
+                foreach (var solution in PartialSolve(expression, partial_solution, depth + 1))
+                    yield return solution;
             }
         }
     }

@@ -9,17 +9,23 @@ namespace Carmen.CastingEngine.SAT
     /// <summary>
     /// An abstract SAT solver of the Boolean Satisfiability Problem.
     /// </summary>
-    public abstract class Solver
+    public abstract class Solver<T>
+        where T : notnull
     {
-        public HashSet<Variable> Variables { get; init; }
+        public SortedSet<T> Variables { get; init; }
 
-        public Solver(HashSet<Variable> variables)
+        public Solver(IEnumerable<T>? variables = null)
         {
-            Variables = variables;
+            Variables = variables == null ? new SortedSet<T>() : new SortedSet<T>(variables);
         }
 
-        /// <summary>Solves a boolean expression, or returns null if it is found to be unsolveable</summary>
-        public abstract Solution? Solve(Expression expression);
+        /// <summary>Introduces the solver to all variables in the given expression</summary>
+        public void Introduce(Expression<T> expression)
+        {
+            foreach (var clause in expression.Clauses)
+                foreach (var literal in clause.Literals)
+                    Variables.Add(literal.Variable);
+        }
 
         /// <summary>Checks than a boolean expression is valid. That is:
         /// - it only contains Variables known to the solver
@@ -27,18 +33,18 @@ namespace Carmen.CastingEngine.SAT
         /// - it does not contain duplicate Clauses
         /// - each Clause contains at least one Literal
         /// - no Clause contains duplicate Literals</summary>
-        public bool Check(Expression expression)
+        public bool Check(Expression<T> expression)
         {
             if (expression.IsEmpty())
                 return false;
-            HashSet<Clause> valid_clauses = new();
+            HashSet<Clause<T>> valid_clauses = new();
             foreach (var clause in expression.Clauses)
             {
                 if (clause.IsEmpty())
                     return false;
                 if (!valid_clauses.Add(clause))
                     return false;
-                HashSet<Literal> valid_literals = new();
+                HashSet<Literal<T>> valid_literals = new();
                 foreach (var literal in clause.Literals)
                 {
                     if (!Variables.Contains(literal.Variable))
@@ -50,12 +56,29 @@ namespace Carmen.CastingEngine.SAT
             return true;
         }
 
-        /// <summary>Introduces the solver to all variables in the given expression</summary>
-        public void Introduce(Expression expression)
+        /// <summary>Solves a boolean expression, or returns an empty sequence if it is found to be unsolveable</summary>
+        public IEnumerable<Solution> Solve(Expression<T> expression)
         {
-            foreach (var clause in expression.Clauses)
-                foreach (var literal in clause.Literals)
-                    Variables.Add(literal.Variable);
+            if (!Check(expression))
+                throw new ArgumentException($"{nameof(expression)} is not a valid boolean expression");
+            int i = 0;
+            var map = Variables.ToDictionary(v => v, v => i++);
+            var expression_int = expression.Remap(map);
+            foreach (var solution in PartialSolve(expression_int, new Solution { Assignments = new bool?[i] }))
+                yield return solution;
         }
+
+        protected abstract IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution);
+
+        public bool Evaluate(Expression<T> expression, bool[] fully_assigned)
+        {
+            int i = 0;
+            var map = Variables.ToDictionary(v => v, v => i++);
+            var expression_int = expression.Remap(map);
+            return Evaluate(expression_int, fully_assigned);
+        }
+
+        protected static bool Evaluate(Expression<int> expression, bool[] fully_assigned)
+            => expression.Clauses.All(c => c.Literals.Any(l => l.Polarity == fully_assigned[l.Variable]));
     }
 }

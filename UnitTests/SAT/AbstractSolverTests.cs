@@ -14,19 +14,19 @@ namespace UnitTests.SAT
         [Test]
         public void Check_UnknownVariables_Invalid()
         {
-            var var = new NumberedVariable { Number = 1 };
-            var expression = new Expression
+            var var = 1;
+            var expression = new Expression<int>
             {
                 Clauses = new[]
                 {
-                    new Clause
+                    new Clause<int>
                     {
                         Literals = new[]
                         {
-                            var.PositiveLiteral
-                        }
+                            Literal<int>.Positive(var)
+                        }.ToHashSet()
                     }
-                }
+                }.ToHashSet()
             };
             var sat = new AbstractSolver();
             sat.Check(expression).Should().BeFalse();
@@ -38,7 +38,7 @@ namespace UnitTests.SAT
         [Test]
         public void Check_NoClauses_Invalid()
         {
-            var expression = new Expression();
+            var expression = new Expression<int>();
             var sat = new AbstractSolver();
             sat.Check(expression).Should().BeFalse();
         }
@@ -46,26 +46,26 @@ namespace UnitTests.SAT
         [Test]
         public void Check_DuplicateClauses_Invalid()
         {
-            var var = new NumberedVariable { Number = 1 };
-            var expression = new Expression
+            var var = 1;
+            var expression = new Expression<int>
             {
                 Clauses = new[]
                 {
-                    new Clause
+                    new Clause<int>
                     {
                         Literals = new[]
                         {
-                            var.PositiveLiteral
-                        }
+                            Literal<int>.Positive(var)
+                        }.ToHashSet()
                     },
-                    new Clause
+                    new Clause<int>
                     {
                         Literals = new[]
                         {
-                            var.PositiveLiteral
-                        }
+                            Literal<int>.Positive(var)
+                        }.ToHashSet()
                     }
-                }
+                }.ToHashSet()
             };
             var sat = new AbstractSolver();
             sat.Check(expression).Should().BeFalse();
@@ -74,13 +74,12 @@ namespace UnitTests.SAT
         [Test]
         public void Check_ClauseNoLiterals_Invalid()
         {
-            var var = new NumberedVariable { Number = 1 };
-            var expression = new Expression
+            var expression = new Expression<int>
             {
                 Clauses = new[]
                 {
-                    new Clause()
-                }
+                    new Clause<int>()
+                }.ToHashSet()
             };
             var sat = new AbstractSolver();
             sat.Check(expression).Should().BeFalse();
@@ -89,20 +88,20 @@ namespace UnitTests.SAT
         [Test]
         public void Check_ClauseDuplicateLiterals_Invalid()
         {
-            var var = new NumberedVariable { Number = 1 };
-            var expression = new Expression
+            var var = 1;
+            var expression = new Expression<int>
             {
                 Clauses = new[]
                 {
-                    new Clause
+                    new Clause<int>
                     {
                         Literals = new[]
                         {
-                            var.PositiveLiteral,
-                            var.PositiveLiteral
-                        }
+                            Literal<int>.Positive(var),
+                            Literal<int>.Positive(var)
+                        }.ToHashSet()
                     }
-                }
+                }.ToHashSet()
             };
             var sat = new AbstractSolver();
             sat.Check(expression).Should().BeFalse();
@@ -111,32 +110,36 @@ namespace UnitTests.SAT
         [Test]
         public void Check_ClauseOppositeLiterals_Valid()
         {
-            var var = new NumberedVariable { Number = 1 };
-            var expression = new Expression
+            var var = 1;
+            var expression = new Expression<int>
             {
                 Clauses = new[]
                 {
-                    new Clause
+                    new Clause<int>
                     {
                         Literals = new[]
                         {
-                            var.PositiveLiteral,
-                            var.NegativeLiteral
-                        }
+                            Literal<int>.Positive(var),
+                            Literal<int>.Negative(var)
+                        }.ToHashSet()
                     }
-                }
+                }.ToHashSet()
             };
-            var sat = new AbstractSolver();
-            sat.Check(expression).Should().BeFalse();
+            var sat = new AbstractSolver(var);
+            sat.Check(expression).Should().BeTrue();
         }
     }
 
-    public class AbstractSolver : Solver
+    public class AbstractSolver : Solver<int>
     {
-        public AbstractSolver()
-            : base(new())
+        public AbstractSolver(int variable)
+            : this(new[] { variable })
         { }
 
-        public override Solution? Solve(Expression expression) => throw new NotImplementedException();
+        public AbstractSolver(IEnumerable<int>? variables = null)
+            : base(variables)
+        { }
+
+        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution) => throw new NotImplementedException();
     }
 }

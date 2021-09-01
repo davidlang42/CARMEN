@@ -14,57 +14,57 @@ namespace UnitTests.SAT
         [Test]
         public void Simple_Solvable()
         {
-            var v = GenerateVariables(2);
-            var expression = new Expression
+            var v = new[] { 1, 2 };
+            var expression = new Expression<int>
             {
                 Clauses = new[]
                 {
-                    new Clause
+                    new Clause<int>
                     {
                         Literals = new[]
                         {
-                            v[0].PositiveLiteral,
-                            v[1].PositiveLiteral
-                        }
+                            Literal<int>.Positive(v[0]),
+                            Literal<int>.Positive(v[1])
+                        }.ToHashSet()
                     },
-                    new Clause
+                    new Clause<int>
                     {
                         Literals = new[]
                         {
-                            v[0].NegativeLiteral,
-                            v[1].NegativeLiteral
-                        }
+                            Literal<int>.Negative(v[0]),
+                            Literal<int>.Negative(v[1])
+                        }.ToHashSet()
                     }
-                }
+                }.ToHashSet()
             };
-            TestSolve(new DpllSolver(v), expression, true);
+            TestSolve(new DpllSolver<int>(v), expression, true);
         }
 
         [Test]
         public void Simple_Unsolvable()
         {
-            var v = GenerateVariables(1);
-            var expression = new Expression
+            var v = new[] { 1 };
+            var expression = new Expression<int>
             {
                 Clauses = new[]
                 {
-                    new Clause
+                    new Clause<int>
                     {
                         Literals = new[]
                         {
-                            v[0].PositiveLiteral
-                        }
+                            Literal<int>.Positive(v[0])
+                        }.ToHashSet()
                     },
-                    new Clause
+                    new Clause<int>
                     {
                         Literals = new[]
                         {
-                            v[0].NegativeLiteral
-                        }
+                            Literal<int>.Negative(v[0])
+                        }.ToHashSet()
                     }
-                }
+                }.ToHashSet()
             };
-            TestSolve(new DpllSolver(v), expression, false);
+            TestSolve(new DpllSolver<int>(v), expression, false);
         }
 
         [Test]
@@ -75,18 +75,20 @@ namespace UnitTests.SAT
         //[TestCase(100, 50, 210, 3, TestName = "50_Vars_Extreme")] // 6.3s
         public void Random(int test_cases, int n_variables, int j_clauses, int k_literals)
         {
-            var vars = GenerateVariables(n_variables);
-            var sat = new DpllSolver(vars);
+            var vars = Enumerable.Range(1, n_variables).ToArray();
+            var sat = new DpllSolver<int>(vars);
             var solved = 0;
             for (var seed = 0; seed < test_cases; seed++)
             {
-                var expression = GenerateExpression(seed, vars, j_clauses, k_literals);
-                if (sat.Solve(expression) is Solution solution)
+                var expression = GenerateExpression<int>(seed, vars, j_clauses, k_literals);
+                Solution solution = sat.Solve(expression).FirstOrDefault();
+                if (!solution.IsUnsolvable)
                 {
-                    expression.Evaluate(solution.FullyAssigned(false)).Should().BeTrue();
-                    expression.Evaluate(solution.FullyAssigned(true)).Should().BeTrue();
+                    sat.Evaluate(expression, solution.FullyAssigned(false)).Should().BeTrue();
+                    sat.Evaluate(expression, solution.FullyAssigned(true)).Should().BeTrue();
                     solved++;
                 }
+                //TODO check if false
             }
             var percent_solved = solved * 100 / test_cases;
             percent_solved.Should().BeInRange(40, 60);

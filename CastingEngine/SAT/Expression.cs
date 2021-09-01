@@ -9,18 +9,27 @@ namespace Carmen.CastingEngine.SAT
     /// <summary>
     /// A conjunction (AND) of boolean clauses.
     /// </summary>
-    public struct Expression
+    public struct Expression<T>
+        where T : notnull
     {
         public const string CONJUNCTION = "∧";
 
-        public Clause[] Clauses { get; set; }
+        public HashSet<Clause<T>> Clauses { get; set; }//TODO maybe make ReadOnlyCollection later
 
-        public bool IsEmpty() => Clauses == null || Clauses.Length == 0;
+        public bool IsEmpty() => Clauses == null || Clauses.Count == 0;
 
-        public bool Evaluate(IEnumerable<Assignment> assignments) => Evaluate(assignments.ToDictionary(a => a.Variable, a => a.Value));
-
-        public bool Evaluate(Dictionary<Variable, bool> assignments) => Clauses.All(c => c.Evaluate(assignments));
-        
         public override string ToString() => string.Join(CONJUNCTION, Clauses.Select(c => $"({c})"));
+
+        public Expression<U> Remap<U>(Dictionary<T, U> variable_map) where U : notnull
+            => new()
+            {
+                Clauses = Clauses.Select(c => c.Remap(variable_map)).ToHashSet()
+            };
+
+        public Expression<T> Clone()
+            => new()
+            {
+                Clauses = Clauses.Select(c => c.Clone()).ToHashSet()
+            };
     }
 }
