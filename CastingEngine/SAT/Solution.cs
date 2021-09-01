@@ -24,10 +24,30 @@ namespace Carmen.CastingEngine.SAT
             return Assignments.Select(a => a ?? value_to_assign_free_variables).ToArray();
         }
 
-        public IEnumerable<bool[]> Enumerate()
+        public IEnumerable<bool[]> Enumerate() => Enumerate(Assignments, 0);
+
+        private static IEnumerable<bool[]> Enumerate(bool?[] partial_assignments, int start_at)
         {
-            //TODO
-            throw new NotImplementedException();
+            var first_unassigned = -1;
+            for (var i = start_at; i < partial_assignments.Length; i++)
+            {
+                if (partial_assignments[i] == null)
+                {
+                    first_unassigned = i;
+                    break;
+                }
+            }
+            if (first_unassigned == -1)
+                yield return partial_assignments.Cast<bool>().ToArray();
+            else
+            {
+                partial_assignments[first_unassigned] = false;
+                foreach (var full_assignment in Enumerate(partial_assignments, first_unassigned + 1))
+                    yield return full_assignment;
+                partial_assignments[first_unassigned] = true;
+                foreach (var full_assignment in Enumerate(partial_assignments, first_unassigned + 1))
+                    yield return full_assignment;
+            }
         }
 
         public override string ToString()

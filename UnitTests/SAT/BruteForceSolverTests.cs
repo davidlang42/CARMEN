@@ -69,7 +69,7 @@ namespace UnitTests.SAT
 
         [Test]
         [TestCase(100, 10, 50, 3, TestName = "10_Vars_Easy")] // 160ms
-        [TestCase(100, 15, 70, 3, TestName = "15_Vars_Medium")] // 4.5s
+        //[TestCase(100, 15, 70, 3, TestName = "15_Vars_Medium")] // 4.5s
         //[TestCase(100, 20, 90, 3, TestName = "20_Vars_Hard")] // 2.7m
         //[TestCase(100, 25, 110, 3, TestName = "25_Vars_VeryHard")] // 87m (not re-tested)
         //[TestCase(100, 50, 210, 3, TestName = "50_Vars_Extreme")] // > 12h (not re-tested)
@@ -82,6 +82,25 @@ namespace UnitTests.SAT
             {
                 var expression = GenerateExpression(seed, vars, j_clauses, k_literals);
                 if (TestSolve(sat, expression))
+                    solved++;
+            }
+            var percent_solved = solved * 100 / test_cases;
+            percent_solved.Should().BeInRange(40, 60);
+        }
+
+        [Test]
+        [TestCase(100, 10, 50, 3, TestName = "All_10_Vars_Easy")] // 160ms
+        //[TestCase(100, 15, 70, 3, TestName = "All_15_Vars_Medium")] // 4.5s
+        //[TestCase(100, 20, 90, 3, TestName = "All_20_Vars_Hard")] // 2.7m
+        public void RandomAll(int test_cases, int n_variables, int j_clauses, int k_literals)
+        {
+            var vars = Enumerable.Range(1, n_variables).ToArray();
+            var sat = new BruteForceSolver<int>(vars);
+            var solved = 0;
+            for (var seed = 0; seed < test_cases; seed++)
+            {
+                var expression = GenerateExpression(seed, vars, j_clauses, k_literals);
+                if (TestSolveAll(sat, expression))
                     solved++;
             }
             var percent_solved = solved * 100 / test_cases;
