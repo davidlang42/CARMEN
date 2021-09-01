@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.SAT
     {
         public const string CONJUNCTION = "∧";
 
-        public HashSet<Clause<T>> Clauses { get; set; }//TODO maybe make ReadOnlyCollection later
+        public HashSet<Clause<T>> Clauses { get; set; }
 
         public bool IsEmpty() => Clauses == null || Clauses.Count == 0;
 

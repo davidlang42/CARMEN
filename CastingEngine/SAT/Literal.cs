@@ -30,11 +30,6 @@ namespace Carmen.CastingEngine.SAT
                 _ => Variable.ToString() ?? "?"
             };
 
-        public override bool Equals(object? obj)
-            => obj is Literal<T> other && other.Polarity == Polarity && other.Variable.Equals(Variable);
-
-        public override int GetHashCode() => Variable.GetHashCode() ^ Polarity.GetHashCode();
-
         public Literal<U> Remap<U>(Dictionary<T, U> variable_map) where U : notnull
         {
             if (!variable_map.TryGetValue(Variable, out var mapped_variable))
@@ -47,5 +42,10 @@ namespace Carmen.CastingEngine.SAT
         }
 
         public Literal<T> Clone() => new Literal<T> { Variable = Variable, Polarity = Polarity };
+
+        public override bool Equals(object? obj)
+            => obj is Literal<T> other && other.Polarity == Polarity && other.Variable.Equals(Variable);
+
+        public override int GetHashCode() => Variable.GetHashCode() ^ Polarity.GetHashCode();
     }
 }

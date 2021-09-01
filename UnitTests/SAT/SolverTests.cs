@@ -10,19 +10,32 @@ namespace UnitTests.SAT
 {
     public abstract class SolverTests
     {
-        protected void TestSolve(Solver<int> sat, Expression<int> expression, bool expected_solvable)
+        protected bool TestSolve(Solver<int> sat, Expression<int> expression)
         {
             var solution = sat.Solve(expression).FirstOrDefault();
-            if (expected_solvable)
+            if (!solution.IsUnsolvable)
             {
-                solution.IsUnsolvable.Should().BeFalse();
                 sat.Evaluate(expression, solution.FullyAssigned(false)).Should().BeTrue();
                 sat.Evaluate(expression, solution.FullyAssigned(true)).Should().BeTrue();
+                return true;
             }
             else
             {
-                solution.IsUnsolvable.Should().BeTrue();
+                return false;
             }
+        }
+
+        protected bool TestSolveAll(Solver<int> sat, Expression<int> expression)
+        {
+            var solved = false;
+            foreach(var solution in sat.Solve(expression))
+            {
+                solution.IsUnsolvable.Should().BeFalse();
+                foreach (var full_assignment in solution.Enumerate())
+                    sat.Evaluate(expression, full_assignment).Should().BeTrue();
+                solved = true;
+            }
+            return solved;
         }
 
         protected Expression<T> GenerateExpression<T>(int random_seed, T[] variables, int j_clauses, int k_literals_per_clause)

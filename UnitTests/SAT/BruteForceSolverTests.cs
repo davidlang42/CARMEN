@@ -37,7 +37,7 @@ namespace UnitTests.SAT
                     }
                 }.ToHashSet()
             };
-            TestSolve(new BruteForceSolver<int>(v), expression, true);
+            TestSolve(new BruteForceSolver<int>(v), expression).Should().BeTrue();
         }
 
         [Test]
@@ -64,12 +64,12 @@ namespace UnitTests.SAT
                     }
                 }.ToHashSet()
             };
-            TestSolve(new BruteForceSolver<int>(v), expression, false);
+            TestSolve(new BruteForceSolver<int>(v), expression).Should().BeFalse();
         }
 
         [Test]
         [TestCase(100, 10, 50, 3, TestName = "10_Vars_Easy")] // 160ms
-        //[TestCase(100, 15, 70, 3, TestName = "15_Vars_Medium")] // 4.6s
+        [TestCase(100, 15, 70, 3, TestName = "15_Vars_Medium")] // 4.5s
         //[TestCase(100, 20, 90, 3, TestName = "20_Vars_Hard")] // 2.7m
         //[TestCase(100, 25, 110, 3, TestName = "25_Vars_VeryHard")] // 87m (not re-tested)
         //[TestCase(100, 50, 210, 3, TestName = "50_Vars_Extreme")] // > 12h (not re-tested)
@@ -80,15 +80,9 @@ namespace UnitTests.SAT
             var solved = 0;
             for (var seed = 0; seed < test_cases; seed++)
             {
-                var expression = GenerateExpression<int>(seed, vars, j_clauses, k_literals);
-                Solution solution = sat.Solve(expression).FirstOrDefault();
-                if (!solution.IsUnsolvable)
-                {
-                    sat.Evaluate(expression, solution.FullyAssigned(false)).Should().BeTrue();
-                    sat.Evaluate(expression, solution.FullyAssigned(true)).Should().BeTrue();
+                var expression = GenerateExpression(seed, vars, j_clauses, k_literals);
+                if (TestSolve(sat, expression))
                     solved++;
-                }
-                //TODO check if false
             }
             var percent_solved = solved * 100 / test_cases;
             percent_solved.Should().BeInRange(40, 60);

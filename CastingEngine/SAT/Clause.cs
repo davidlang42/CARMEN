@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.SAT
     {
         public const string DISJUNCTION = "∨";
 
-        public HashSet<Literal<T>> Literals { get; set; }//TODO maybe make ReadOnlyCollection later
+        public HashSet<Literal<T>> Literals { get; set; }
 
         public bool IsEmpty() => Literals == null || Literals.Count == 0;
 
@@ -33,17 +33,6 @@ namespace Carmen.CastingEngine.SAT
         }
 
         public override string ToString() => string.Join(DISJUNCTION, Literals.Select(l => l.ToString()));
-
-        public override bool Equals(object? obj)
-        {
-            if (obj is not Clause<T> other)
-                return false;
-            if (other.Literals == null || other.Literals == null)
-                return other.Literals == Literals;
-            return other.Literals.SetEquals(Literals);
-        }
-
-        public override int GetHashCode() => Literals?.GetHashCode() ?? 0; //TODO make sure this hashes all elements and count
 
         public Clause<U> Remap<U>(Dictionary<T, U> variable_map) where U : notnull
             => new()
