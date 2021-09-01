@@ -40,12 +40,5 @@ namespace Carmen.CastingEngine.SAT
                 Polarity = Polarity
             };
         }
-
-        public Literal<T> Clone() => new Literal<T> { Variable = Variable, Polarity = Polarity };
-
-        public override bool Equals(object? obj)
-            => obj is Literal<T> other && other.Polarity == Polarity && other.Variable.Equals(Variable);
-
-        public override int GetHashCode() => Variable.GetHashCode() ^ Polarity.GetHashCode();
     }
 }

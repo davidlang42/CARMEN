@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Carmen.CastingEngine.SAT.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -34,16 +35,13 @@ namespace Carmen.CastingEngine.SAT
 
         public override string ToString() => string.Join(DISJUNCTION, Literals.Select(l => l.ToString()));
 
-        public Clause<U> Remap<U>(Dictionary<T, U> variable_map) where U : notnull
-            => new()
+        public Clause Compress(IEnumerable<T> ordered_variables)
+        {
+            var referenced_literals = Literals;
+            return new()
             {
-                Literals = Literals.Select(l => l.Remap(variable_map)).ToHashSet()
+                Variables = ordered_variables.Select(v => Variable.FromReferences(v, referenced_literals)).ToArray()
             };
-
-        public Clause<T> Clone()
-            => new()
-            {
-                Literals = Literals.Select(l => l.Clone()).ToHashSet()
-            };
+        }
     }
 }

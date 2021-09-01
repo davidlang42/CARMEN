@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Carmen.CastingEngine.SAT.Internal;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -61,26 +62,19 @@ namespace Carmen.CastingEngine.SAT
         {
             if (!Check(expression))
                 throw new ArgumentException($"{nameof(expression)} is not a valid boolean expression");
-            int i = 0;
-            var map = Variables.ToDictionary(v => v, v => i++);
-            var expression_int = expression.Remap(map);
-            foreach (var solution in PartialSolve(expression_int, new Solution { Assignments = new bool?[i] }))
+            var internal_expression = expression.Compress(Variables);
+            foreach (var solution in PartialSolve(internal_expression, new Solution { Assignments = new bool?[Variables.Count] }))
                 yield return solution;
         }
 
-        protected abstract IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution);
+        protected abstract IEnumerable<Solution> PartialSolve(Expression expression, Solution partial_solution);
 
         public bool Evaluate(Expression<T> expression, Solution full_solution)
         {
             if (!full_solution.IsFullyAssigned)
                 throw new ArgumentException("Cannot evaulate a non-fully assigned solution");
-            int i = 0;
-            var map = Variables.ToDictionary(v => v, v => i++);
-            var expression_int = expression.Remap(map);
-            return Evaluate(expression_int, full_solution);
+            var internal_expression = expression.Compress(Variables);
+            return internal_expression.Evaluate(full_solution);
         }
-
-        protected static bool Evaluate(Expression<int> expression, Solution full_solution)
-            => expression.Clauses.All(c => c.Literals.Any(l => l.Polarity == full_solution.Assignments[l.Variable]));
     }
 }
