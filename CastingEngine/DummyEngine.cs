@@ -144,8 +144,8 @@ namespace Carmen.CastingEngine
             }
         }
 
-        /// <summary>Dummy implementation applies tags to cast randomly, overwriting any tags previously applied to an applicant, ignoring requriements</summary>
-        public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)
+        /// <summary>Dummy implementation applies tags to cast randomly, overwriting any tags previously applied to an applicant, ignoring requriements and failing to take into account alternative casts</summary>
+        public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts)
         {
             foreach (var tag in tags)
             {

@@ -23,6 +23,7 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using CarmenUI.Windows;
 using Carmen.CastingEngine;
+using Carmen.CastingEngine.Heuristic;
 
 namespace CarmenUI.Pages
 {
@@ -37,7 +38,7 @@ namespace CarmenUI.Pages
         private CollectionViewSource tagsViewSource;
         private CollectionViewSource alternativeCastsViewSource;
         private CollectionViewSource castNumbersViewSource;
-        private ICastingEngine engine;
+        private ISelectionEngine engine;
 
         public SelectCast(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -57,7 +58,7 @@ namespace CarmenUI.Pages
                 selectedApplicantsViewSource.SortDescriptions.Add(sd);
             }
             castStatusCombo.SelectedIndex = 0; // must be here because it triggers event below
-            engine = new DummyEngine(); //LATER use real engine
+            engine = new OriginalHeuristicEngine(null, ListSortDirection.Descending); //LATER use real engine
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -107,7 +108,7 @@ namespace CarmenUI.Pages
             using (processing.Segment(nameof(ICastingEngine.AllocateCastNumbers), "Allocating cast numbers"))
                 engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection);
             using (processing.Segment(nameof(ICastingEngine.ApplyTags), "Applying tags"))
-                engine.ApplyTags(context.Applicants.Local, context.Tags.Local);
+                engine.ApplyTags(context.Applicants.Local, context.Tags.Local, (uint)alternative_casts.Length);
             TriggerCastNumbersRefresh();
         }
 

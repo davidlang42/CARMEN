@@ -30,6 +30,6 @@ namespace Carmen.CastingEngine
         /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set,
         /// Tag requirements may depend on other Tags as long as there is no circular dependency and the dependee
         /// tag is also being applied as part of this call</summary>
-        void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags);
+        void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts);
     }
 }
