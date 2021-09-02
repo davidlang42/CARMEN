@@ -45,6 +45,8 @@
     <Resource Include="Icons\SettingsOutline.png" />
     <Resource Include="Icons\Return.png" />
     <Resource Include="Icons\Add.png" />
+    <Resource Include="Icons\Download_grey.png" />
+    <Resource Include="Icons\Upload_grey.png" />
   </ItemGroup>
 
   <ItemGroup>

@@ -97,8 +97,21 @@
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
-            <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled" KeyUp="objectList_KeyUp"
-                     AllowDrop="True" PreviewMouseLeftButtonDown="objectList_PreviewMouseLeftButtonDown" MouseMove="objectList_MouseMove" DragOver="objectList_DragOver" Drop="objectList_Drop">
+            <UniformGrid x:Name="moveButtons" DockPanel.Dock="Bottom" Rows="1" Margin="0 5 0 0" Height="30">
+                <Button x:Name="moveUpButton" Margin="0 0 2.5 0" Click="moveUpButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Icons/Upload_grey.png" Width="16" Margin="2 0"/>
+                        <TextBlock Text="Move Up" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="moveDownButton" Margin="2.5 0 0 0" Click="moveDownButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <Image Source="/Icons/Download_grey.png" Width="16" Margin="2 0"/>
+                        <TextBlock Text="Move Down" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+            </UniformGrid>
+            <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled" KeyUp="objectList_KeyUp" SelectionChanged="objectList_SelectionChanged">
                 <ListBox.Resources>
                     <DataTemplate DataType="{x:Type modelStructure:ShowRoot}">
                         <TextBlock Text="Details for the current show"/>

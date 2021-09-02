@@ -100,18 +100,19 @@ namespace CarmenUI.Pages
             showRootSource.Source = context.ShowRoot.Yield();
         }
 
-        private void BindObjectList(string header, string? tool_tip, CollectionViewSource view_source, AddableObject[][] add_buttons, bool hide_panel = false)
+        private void BindObjectList(string header, bool show_move_buttons, CollectionViewSource view_source, AddableObject[][] add_buttons, bool hide_panel = false)
         {
             objectPanelColumn.Width = hide_panel ? new(0) : new(1, GridUnitType.Star);
+            moveButtons.Visibility = show_move_buttons ? Visibility.Visible : Visibility.Collapsed;
             objectHeading.Text = header;
-            objectList.ToolTip = tool_tip;
+            objectList.ToolTip = show_move_buttons ? null : "Sorted by name";
             objectList.SetBinding(ItemsControl.ItemsSourceProperty, new Binding { Source = view_source });
             currentViewSource = view_source;
             objectAddButtons.ItemsSource = add_buttons;
         }
 
         private void ShowRoot_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("", null, showRootSource, new AddableObject[0][], true);
+            => BindObjectList("", false, showRootSource, new AddableObject[0][], true);
 
         readonly AddableObject[][] criteriasButtons = new[]
         {
@@ -124,7 +125,7 @@ namespace CarmenUI.Pages
         };
 
         private void Criteria_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Audition Criteria", "Drag to re-order", criteriasViewSource, criteriasButtons);
+            => BindObjectList("Audition Criteria", true, criteriasViewSource, criteriasButtons);
 
         readonly AddableObject[][] castGroupsButtons = new[]
         {
@@ -135,7 +136,7 @@ namespace CarmenUI.Pages
         };
 
         private void CastGroups_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Cast Groups", "Drag to re-order", castGroupsViewSource, castGroupsButtons);
+            => BindObjectList("Cast Groups", true, castGroupsViewSource, castGroupsButtons);
 
 
         readonly AddableObject[][] alternativeCastsButtons = new[]
@@ -147,7 +148,7 @@ namespace CarmenUI.Pages
         };
 
         private void AlternativeCasts_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Alternative Casts", "Sorted by name", alternativeCastsViewSource, alternativeCastsButtons);
+            => BindObjectList("Alternative Casts", false, alternativeCastsViewSource, alternativeCastsButtons);
 
         readonly AddableObject[][] tagsButtons = new[]
         {
@@ -158,7 +159,7 @@ namespace CarmenUI.Pages
         };
 
         private void Tags_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Tags", "Sorted by name", tagsViewSource, tagsButtons);
+            => BindObjectList("Tags", false, tagsViewSource, tagsButtons);
 
         readonly AddableObject[][] sectionTypesButtons = new[]
         {
@@ -169,7 +170,7 @@ namespace CarmenUI.Pages
         };
 
         private void SectionTypes_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Section Types", "Sorted by name", sectionTypesViewSource, sectionTypesButtons);
+            => BindObjectList("Section Types", false, sectionTypesViewSource, sectionTypesButtons);
 
         readonly AddableObject[][] requirementsButtons = new[]
         {
@@ -191,7 +192,7 @@ namespace CarmenUI.Pages
         };
 
         private void Requirements_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("Requirements", "Drag to re-order", requirementsViewSource, requirementsButtons);
+            => BindObjectList("Requirements", true, requirementsViewSource, requirementsButtons);
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
             => CancelChangesAndReturn();
@@ -307,66 +308,37 @@ namespace CarmenUI.Pages
                 context.SetDefaultShowSettings(fileName, false);
         }
 
-        #region Drag & drop in objectList
-
-        private Point lastMouseDown;
-        private IOrdered? draggedItem;
-        private IOrdered? draggedTarget;
-
-        private void objectList_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-                lastMouseDown = e.GetPosition(objectList);
-        }
-
-        private void objectList_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                if ((e.GetPosition(objectList) - lastMouseDown).Length > 1)
-                {
-                    draggedItem = objectList.SelectedItem as IOrdered;
-                    if (draggedItem != null)
-                    {
-                        var drop_effect = DragDrop.DoDragDrop(objectList, objectList.SelectedValue, DragDropEffects.Move);
-                        if (drop_effect == DragDropEffects.Move && draggedTarget != null && draggedItem != draggedTarget)
-                        {
-                            MoveObject(draggedItem, draggedTarget);
-                            draggedTarget = null;
-                            draggedItem = null;
-                        }
-                    }
-                }
-            }
-        }
-
-        private void objectList_DragOver(object sender, DragEventArgs e)
-        {
-            if ((e.GetPosition(objectList) - lastMouseDown).Length > 1)
-                ProcessDragDrop(e, out _);
-            e.Handled = true;
-        }
-
-        private void objectList_Drop(object sender, DragEventArgs e)
-        {
-            ProcessDragDrop(e, out draggedTarget);
-            e.Handled = true;
-        }
-
-        private void ProcessDragDrop(DragEventArgs e, out IOrdered? target_item)
-        {
-            target_item = (e.OriginalSource as TextBlock)?.DataContext as IOrdered;
-            e.Effects = target_item != null && draggedItem != null && target_item != draggedItem ? DragDropEffects.Move : DragDropEffects.None;
-        }
-        #endregion
-
-        private void MoveObject(IOrdered dragged, IOrdered target)
+        private void moveUpButton_Click(object sender, RoutedEventArgs e)
         {
             if (currentViewSource?.Source is IList list)
             {
-                var typed_list = list.OfType<IOrdered>().ToList();
-                typed_list.MoveInOrder(dragged, target);
+                var selected = (IOrdered)objectList.SelectedItem;
+                var index_above = objectList.SelectedIndex - 1;
+                var above = (IOrdered)objectList.Items[index_above];
+                list.OfType<IOrdered>().ToArray().MoveInOrder(selected, above.Order);
+                EnableMoveButtons(index_above);
             }
+        }
+
+        private void moveDownButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (currentViewSource?.Source is IList list)
+            {
+                var index_below = objectList.SelectedIndex + 1;
+                var selected = (IOrdered)objectList.SelectedItem;
+                var below = (IOrdered)objectList.Items[index_below];
+                list.OfType<IOrdered>().ToArray().MoveInOrder(selected, below);
+                EnableMoveButtons(index_below);
+            }
+        }
+
+        private void objectList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+            => EnableMoveButtons(objectList.SelectedIndex);
+
+        private void EnableMoveButtons(int selected_index)
+        {
+            moveUpButton.IsEnabled = selected_index != -1 && selected_index > 0;
+            moveDownButton.IsEnabled = selected_index != -1 && selected_index < objectList.Items.Count - 1;
         }
     }
 }

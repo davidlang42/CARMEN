@@ -98,7 +98,7 @@ namespace Carmen.ShowModel
             if (!objects.Contains(move_object))
                 throw new ArgumentException($"'{nameof(move_object)}' must be in this collection.");
             var old_order = move_object.Order;   
-            if (new_order == old_order || new_order == old_order + 1)
+            if (new_order == old_order)
                 return; // no change
             Dictionary<int, T> objects_between;
             int delta;
