@@ -226,9 +226,23 @@ namespace CarmenUI.Pages
             currentViewSource?.View.Refresh();
         }
 
-        private void objectList_KeyUp(object sender, KeyEventArgs e)
+        private void objectList_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Delete && objectList.ItemsSource is ListCollectionView list)
+            if (Properties.Settings.Default.MoveOnCtrlArrow
+                && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (e.Key == Key.Up)
+                {
+                    moveUpButton_Click(sender, e);
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Down)
+                {
+                    moveDownButton_Click(sender, e);
+                    e.Handled = true;
+                }
+            }
+            else if (e.Key == Key.Delete && objectList.ItemsSource is ListCollectionView list)
             {
                 e.Handled = true;
                 DeleteObject(list);
@@ -310,24 +324,26 @@ namespace CarmenUI.Pages
 
         private void moveUpButton_Click(object sender, RoutedEventArgs e)
         {
-            if (currentViewSource?.Source is IList list)
+            if (currentViewSource?.Source is IList list 
+                && objectList.SelectedItem is IOrdered selected
+                && objectList.SelectedIndex > 0)
             {
-                var selected = (IOrdered)objectList.SelectedItem;
                 var index_above = objectList.SelectedIndex - 1;
-                var above = (IOrdered)objectList.Items[index_above];
-                list.OfType<IOrdered>().ToArray().MoveInOrder(selected, above.Order);
+                var item_above = (IOrdered)objectList.Items[index_above];
+                list.OfType<IOrdered>().ToArray().MoveInOrder(selected, item_above.Order);
                 EnableMoveButtons(index_above);
             }
         }
 
         private void moveDownButton_Click(object sender, RoutedEventArgs e)
         {
-            if (currentViewSource?.Source is IList list)
+            if (currentViewSource?.Source is IList list
+                && objectList.SelectedItem is IOrdered selected
+                && objectList.SelectedIndex < objectList.Items.Count - 1)
             {
                 var index_below = objectList.SelectedIndex + 1;
-                var selected = (IOrdered)objectList.SelectedItem;
-                var below = (IOrdered)objectList.Items[index_below];
-                list.OfType<IOrdered>().ToArray().MoveInOrder(selected, below);
+                var item_below = (IOrdered)objectList.Items[index_below];
+                list.OfType<IOrdered>().ToArray().MoveInOrder(selected, item_below);
                 EnableMoveButtons(index_below);
             }
         }

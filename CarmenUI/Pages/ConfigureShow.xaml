@@ -111,7 +111,7 @@
                     </StackPanel>
                 </Button>
             </UniformGrid>
-            <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled" KeyUp="objectList_KeyUp" SelectionChanged="objectList_SelectionChanged">
+            <ListBox x:Name="objectList" FontSize="16" ScrollViewer.HorizontalScrollBarVisibility="Disabled" PreviewKeyDown="objectList_PreviewKeyDown" SelectionChanged="objectList_SelectionChanged">
                 <ListBox.Resources>
                     <DataTemplate DataType="{x:Type modelStructure:ShowRoot}">
                         <TextBlock Text="Details for the current show"/>

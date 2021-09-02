@@ -129,6 +129,8 @@
                                   IsChecked="{bd:SettingBinding ExitToStartOnBackspace}"/>
                         <CheckBox Content="Press F1 to open this settings window (from starting window or Main Menu)" Margin="0 5"
                                   IsChecked="{bd:SettingBinding OpenSettingsOnF1}"/>
+                        <CheckBox Content="Press Ctrl+Up/Down to move items within a list (while configuring show settings or items)" Margin="0 5"
+                                  IsChecked="{bd:SettingBinding MoveOnCtrlArrow}"/>
                     </StackPanel>
                 </Expander>
                 <Expander IsExpanded="False" Margin="0 5">

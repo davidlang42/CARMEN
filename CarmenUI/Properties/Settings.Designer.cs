@@ -285,5 +285,17 @@ namespace CarmenUI.Properties {
                 this["AuditionApplicantsGroupByIndex"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool MoveOnCtrlArrow {
+            get {
+                return ((bool)(this["MoveOnCtrlArrow"]));
+            }
+            set {
+                this["MoveOnCtrlArrow"] = value;
+            }
+        }
     }
 }
