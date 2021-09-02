@@ -6,7 +6,7 @@ namespace Carmen.ShowModel.Criterias
     /// A criteria which is marked as one of a set of discreet options.
     /// This can also be a numeric scale in the order of the options.
     /// </summary>
-    public class SelectCriteria : Criteria //LATER implement INotifyPropertyChanged for completeness
+    public class SelectCriteria : Criteria
     {
         internal static string[] DEFAULT_OPTIONS = new[] { "", "" };
 
@@ -22,8 +22,11 @@ namespace Carmen.ShowModel.Criterias
             {
                 if (value.Length < 2)
                     throw new ArgumentException("SelectCriteria.Options must contain at least 2 elements.");
+                if (options.Equals(value))
+                    return;
                 options = value;
                 base.MaxMark = (uint)(options.Length - 1);
+                OnPropertyChanged();
             }
         }
 

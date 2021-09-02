@@ -3,11 +3,35 @@ using Carmen.ShowModel.Criterias;
 
 namespace Carmen.ShowModel.Requirements
 {
-    public class AbilityRangeRequirement : RangeRequirement, ICriteriaRequirement //LATER implement INotifyPropertyChanged for completeness
+    public class AbilityRangeRequirement : RangeRequirement, ICriteriaRequirement
     {
         internal int CriteriaId { get; private set; } // DbSet.Load() throws IndexOutOfRangeException if foreign key is not defined
-        public virtual Criteria Criteria { get; set; } = null!;
-        public bool ScaleSuitability { get; set; }
+
+        private Criteria criteria = null!;
+        public virtual Criteria Criteria
+        {
+            get => criteria;
+            set
+            {
+                if (criteria == value)
+                    return;
+                criteria = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool scaleSuitability;
+        public bool ScaleSuitability
+        {
+            get => scaleSuitability;
+            set
+            {
+                if (scaleSuitability == value)
+                    return;
+                scaleSuitability = value;
+                OnPropertyChanged();
+            }
+        }
 
         public override bool IsSatisfiedBy(Applicant applicant)
             => IsInRange(applicant.MarkFor(Criteria));

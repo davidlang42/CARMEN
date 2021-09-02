@@ -5,9 +5,10 @@ using System.Linq;
 
 namespace Carmen.ShowModel.Requirements
 {
-    public abstract class CombinedRequirement : Requirement //LATER implement INotifyPropertyChanged for completeness
+    public abstract class CombinedRequirement : Requirement
     {
-        public virtual ICollection<Requirement> SubRequirements { get; private set; } = new ObservableCollection<Requirement>();
+        private ObservableCollection<Requirement> subRequirements = new();
+        public virtual ICollection<Requirement> SubRequirements => subRequirements;
 
         public CombinedRequirement(params Requirement[] requirements)
         {
@@ -26,10 +27,21 @@ namespace Carmen.ShowModel.Requirements
         }
     }
 
-    public class AndRequirement : CombinedRequirement //LATER implement INotifyPropertyChanged for completeness
+    public class AndRequirement : CombinedRequirement
     {
+        private bool averageSuitability;
         /// <summary>If false, Suitability will the product of the SubRequirement suitabilities</summary>
-        public bool AverageSuitability { get; set; }
+        public bool AverageSuitability
+        {
+            get => averageSuitability;
+            set
+            {
+                if (averageSuitability == value)
+                    return;
+                averageSuitability = value;
+                OnPropertyChanged();
+            }
+        }
 
         public override bool IsSatisfiedBy(Applicant applicant)
             => SubRequirements.All(r => r.IsSatisfiedBy(applicant));
@@ -46,10 +58,21 @@ namespace Carmen.ShowModel.Requirements
         }
     }
 
-    public class OrRequirement : CombinedRequirement //LATER implement INotifyPropertyChanged for completeness
+    public class OrRequirement : CombinedRequirement
     {
+        private bool averageSuitability;
         /// <summary>If false, Suitability will the maximum of the SubRequirement suitabilities</summary>
-        public bool AverageSuitability { get; set; }
+        public bool AverageSuitability
+        {
+            get => averageSuitability;
+            set
+            {
+                if (averageSuitability == value)
+                    return;
+                averageSuitability = value;
+                OnPropertyChanged();
+            }
+        }
 
         public override bool IsSatisfiedBy(Applicant applicant)
             => SubRequirements.Any(r => r.IsSatisfiedBy(applicant));

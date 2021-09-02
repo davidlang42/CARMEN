@@ -2,28 +2,86 @@
 using Carmen.ShowModel.Structure;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace Carmen.ShowModel.Requirements
 {
     /// <summary>
     /// A requirement which can be satisfied by an Applicant
     /// </summary>
-    public abstract class Requirement : IOrdered, IValidatable, INamed //LATER implement INotifyPropertyChanged for completeness
+    public abstract class Requirement : IOrdered, IValidatable, INamed, INotifyPropertyChanged
     {
-        #region Database fields
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         [Key]
         public int RequirementId { get; private set; }
-        public string Name { get; set; } = "";
-        public int Order { get; set; }
-        public bool Primary { get; set; }
-        public string? Reason { get; set; }
-        public virtual ICollection<Role> UsedByRoles { get; private set; } = new ObservableCollection<Role>();
-        public virtual ICollection<CastGroup> UsedByCastGroups { get; private set; } = new ObservableCollection<CastGroup>();
-        public virtual ICollection<CombinedRequirement> UsedByCombinedRequirements { get; private set; } = new ObservableCollection<CombinedRequirement>();
-        public virtual ICollection<Tag> UsedByTags { get; private set; } = new ObservableCollection<Tag>();
-        #endregion
+
+        private string name = "";
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if (name == value)
+                    return;
+                name = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private int order;
+        public int Order
+        {
+            get => order;
+            set
+            {
+                if (order == value)
+                    return;
+                order = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private bool primary;
+        public bool Primary
+        {
+            get => primary;
+            set
+            {
+                if (primary == value)
+                    return;
+                primary = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string? reason;
+        public string? Reason
+        {
+            get => reason;
+            set
+            {
+                if (reason == value)
+                    return;
+                reason = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<Role> usedByRoles = new();
+        public virtual ICollection<Role> UsedByRoles => usedByRoles;
+
+        private ObservableCollection<CastGroup> usedByCastGroups = new();
+        public virtual ICollection<CastGroup> UsedByCastGroups => usedByCastGroups;
+
+        private ObservableCollection<CombinedRequirement> usedByCombinedRequirements = new();
+        public virtual ICollection<CombinedRequirement> UsedByCombinedRequirements => usedByCombinedRequirements;
+
+        private ObservableCollection<Tag> usedByTags = new();
+        public virtual ICollection<Tag> UsedByTags => usedByTags;
 
         /// <summary>Checks if an Applicant satisfies this requirement.</summary>
         public abstract bool IsSatisfiedBy(Applicant applicant);
@@ -44,6 +102,11 @@ namespace Carmen.ShowModel.Requirements
             var visited = new HashSet<Requirement>();
             if (HasCircularReference(visited))
                 yield return $"Requirement has a circular reference: ({string.Join(", ", visited.Select(r => r.Name))})";
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }

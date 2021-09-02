@@ -3,8 +3,10 @@ using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -14,20 +16,67 @@ namespace Carmen.ShowModel.Applicants
     /// A group of people which an applicant can be selected into.
     /// An applicant can have many Tags.
     /// </summary>
-    public class Tag : INameOrdered //LATER implement INotifyPropertyChanged for completeness
+    public class Tag : INameOrdered, INotifyPropertyChanged
     {
-        #region Database fields
+        public event PropertyChangedEventHandler? PropertyChanged;
+
         [Key]
         public int TagId { get; private set; }
-        public string Name { get; set; } = "";
-        public string Description { get; set; } = "";
-        public virtual Image? Icon { get; set; }
-        public virtual ICollection<Applicant> Members { get; private set; } = new ObservableCollection<Applicant>();
-        public virtual ICollection<Requirement> Requirements { get; private set; } = new ObservableCollection<Requirement>();
-        public virtual ICollection<CountByGroup> CountByGroups { get; private set; } = new ObservableCollection<CountByGroup>();
-        #endregion
+
+        private string name = "";
+        public string Name
+        {
+            get => name;
+            set
+            {
+                if (name == value)
+                    return;
+                name = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private string description = "";
+        public string Description
+        {
+            get => description;
+            set
+            {
+                if (description == value)
+                    return;
+                description = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private Image? icon;
+        public virtual Image? Icon
+        {
+            get => icon;
+            set
+            {
+                if (icon == value)
+                    return;
+                icon = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private ObservableCollection<Applicant> members = new();
+        public virtual ICollection<Applicant> Members => members;
+
+        private ObservableCollection<Requirement> requirements = new();
+        public virtual ICollection<Requirement> Requirements => requirements;
+
+        private ObservableCollection<CountByGroup> countByGroups = new();
+        public virtual ICollection<CountByGroup> CountByGroups => countByGroups;
 
         public uint? CountFor(CastGroup group)
             => CountByGroups.Where(c => c.CastGroup == group).Select(c => (uint?)c.Count).SingleOrDefault();
+
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
     }
 }

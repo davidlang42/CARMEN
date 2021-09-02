@@ -1,11 +1,35 @@
 ﻿using System;
+using System.ComponentModel;
 
 namespace Carmen.ShowModel.Requirements
 {
-    public abstract class RangeRequirement : Requirement //LATER implement INotifyPropertyChanged for completeness
+    public abstract class RangeRequirement : Requirement
     {
-        public uint? Minimum { get; set; }
-        public uint? Maximum { get; set; }
+        private uint? minimum;
+        public uint? Minimum
+        {
+            get => minimum;
+            set
+            {
+                if (minimum == value)
+                    return;
+                minimum = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private uint? maximum;
+        public uint? Maximum
+        {
+            get => maximum;
+            set
+            {
+                if (maximum == value)
+                    return;
+                maximum = value;
+                OnPropertyChanged();
+            }
+        }
 
         protected bool IsInRange(uint value)
         {
