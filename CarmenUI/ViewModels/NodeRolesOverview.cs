@@ -20,7 +20,7 @@ namespace CarmenUI.ViewModels
         public NodeRolesOverview(Node node, AlternativeCast[] alternative_casts)
         {
             Node = node;
-            foreach (var role in node.ItemsInOrder().SelectMany(i => i.Roles).Distinct().InOrder())
+            foreach (var role in node.ItemsInOrder().SelectMany(i => i.Roles).Distinct().InNameOrder())
                 if (role.CastingStatus(alternative_casts) != Role.RoleStatus.FullyCast)
                     IncompleteRoles.Add(new IncompleteRole(role));
             //TODO (BALANCE) add real validation errors

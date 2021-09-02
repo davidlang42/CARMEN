@@ -16,7 +16,7 @@
     Loaded="Page_Loaded">
     <Page.Resources>
         <CollectionViewSource x:Key="rootNodesViewSource"/>
-        <CollectionViewSource x:Key="castGroupsViewSource"/>
+        <CollectionViewSource x:Key="castGroupsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="nonPrimaryRequirementsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="itemsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="castMembersDictionarySource"/>

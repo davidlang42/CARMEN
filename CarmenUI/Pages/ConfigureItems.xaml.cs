@@ -57,9 +57,11 @@ namespace CarmenUI.Pages
             InitializeComponent();
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
+            castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
             nonPrimaryRequirementsViewSource = (CollectionViewSource)FindResource(nameof(nonPrimaryRequirementsViewSource));
             itemsViewSource = (CollectionViewSource)FindResource(nameof(itemsViewSource));
             sectionTypesViewSource = (CollectionViewSource)FindResource(nameof(sectionTypesViewSource));
+            sectionTypesViewSource.SortDescriptions.Add(StandardSort.For<SectionType>());
             castMembersDictionarySource = (CollectionViewSource)FindResource(nameof(castMembersDictionarySource));
         }
 
@@ -68,9 +70,9 @@ namespace CarmenUI.Pages
             using (var loading = new LoadingOverlay(this).AsSegment(nameof(ConfigureItems)))
             {
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
-                    _alternativeCasts = await context.AlternativeCasts.ToArrayAsync();
+                    _alternativeCasts = await context.AlternativeCasts.InNameOrder().ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
-                    _castGroups = await context.CastGroups.ToArrayAsync();
+                    _castGroups = await context.CastGroups.InOrder().ToArrayAsync();
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
                     castMembersDictionarySource.Source = castGroups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternativeCasts.Length));
                 castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
@@ -79,7 +81,7 @@ namespace CarmenUI.Pages
                     await context.Requirements.LoadAsync();
                     nonPrimaryRequirementsViewSource.Source = context.Requirements.Local.Where(r => !r.Primary).ToArray();
                     nonPrimaryRequirementsViewSource.SortDescriptions.Add(StandardSort.For<Requirement>());
-                    _primaryRequirements = context.Requirements.Local.Where(r => r.Primary).ToArray();
+                    _primaryRequirements = context.Requirements.Local.Where(r => r.Primary).InOrder().ToArray();
                 }
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
                     await context.Nodes.LoadAsync();

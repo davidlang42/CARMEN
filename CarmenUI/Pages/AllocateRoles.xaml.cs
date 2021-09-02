@@ -70,12 +70,12 @@ namespace CarmenUI.Pages
             using (var loading = new LoadingOverlay(this).AsSegment(nameof(AllocateRoles)))
             {
                 using (loading.Segment(nameof(ShowContext.Criterias) + nameof(Criteria.Primary), "Criteria"))
-                    _primaryCriterias = await context.Criterias.Where(c => c.Primary).ToArrayAsync();
+                    _primaryCriterias = await context.Criterias.Where(c => c.Primary).InOrder().ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
                     await context.CastGroups.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
-                    _alternativeCasts = await context.AlternativeCasts.ToArrayAsync();
-                _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local, _alternativeCasts).ToArray();
+                    _alternativeCasts = await context.AlternativeCasts.InNameOrder().ToArrayAsync();
+                _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local.InOrder(), _alternativeCasts).ToArray();
                 using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles) + nameof(Role.Items), "Applicants"))
                     _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))

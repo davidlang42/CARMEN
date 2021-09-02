@@ -205,13 +205,20 @@ namespace CarmenUI.ViewModels
             new_child.Parent = InnerNode;
             var child_view = new ChildView(new_child, castGroups);
             if (insert_after != null)
+            {
                 for (var i = 0; i < Children.Count; i++)
                     if (Children[i] == insert_after)
                     {
                         Children.Insert(i + 1, child_view);
-                        return child_view;
+                        break;
                     }
-            Children.Add(child_view);
+                InnerNode.Children.MoveInOrder(new_child, insert_after.Node);
+            }
+            else
+            {
+                Children.Add(child_view);
+                new_child.Order = InnerNode.Children.NextOrder();
+            }
             return child_view;
         }
 

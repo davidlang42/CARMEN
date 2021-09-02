@@ -103,7 +103,7 @@ namespace CarmenUI.ViewModels
         public ItemView(Item item, CastGroup[] cast_groups, Requirement[] primary_requirements)
         {
             Item = item;
-            Roles = new ObservableCollection<RoleOnlyView>(item.Roles.InOrder().Select(r =>
+            Roles = new ObservableCollection<RoleOnlyView>(item.Roles.InNameOrder().Select(r =>
             {
                 var rv = new RoleOnlyView(r, cast_groups, primary_requirements, this);
                 rv.PropertyChanged += RoleView_PropertyChanged;

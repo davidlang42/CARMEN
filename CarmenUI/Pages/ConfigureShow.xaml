@@ -17,11 +17,11 @@
     Title="Configure Show" Loaded="Page_Loaded">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
-        <CollectionViewSource x:Key="alternativeCastsViewSource"/>
-        <CollectionViewSource x:Key="criteriasSelectionSource"/>
+        <CollectionViewSource x:Key="alternativeCastsViewSource" IsLiveSortingRequested="True"/>
+        <CollectionViewSource x:Key="criteriasSelectionSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="castGroupsViewSource" IsLiveSortingRequested="True"/>
-        <CollectionViewSource x:Key="tagsSelectionSource"/>
-        <CollectionViewSource x:Key="requirementsSelectionSource"/>
+        <CollectionViewSource x:Key="tagsSelectionSource"  IsLiveSortingRequested="True"/>
+        <CollectionViewSource x:Key="requirementsSelectionSource" IsLiveSortingRequested="True"/>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:InvertBoolean x:Key="inverseBoolean"/>
         <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">

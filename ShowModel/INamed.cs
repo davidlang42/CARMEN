@@ -21,8 +21,12 @@ namespace Carmen.ShowModel
 
     public static class INameOrderedExtensions
     {
+        /// <summary>Enumerates this queryable ordered by Name value.</summary>
+        public static IOrderedQueryable<T> InNameOrder<T>(this IQueryable<T> objects) where T : INameOrdered
+            => objects.OrderBy(o => o.Name);
+
         /// <summary>Enumerates this collection ordered by Name value.</summary>
-        public static IOrderedEnumerable<T> InOrder<T>(this IEnumerable<T> objects) where T : INameOrdered
+        public static IOrderedEnumerable<T> InNameOrder<T>(this IEnumerable<T> objects) where T : INameOrdered
             => objects.OrderBy(o => o.Name);
     }
 }

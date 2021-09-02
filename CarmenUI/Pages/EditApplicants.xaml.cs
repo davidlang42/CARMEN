@@ -47,6 +47,7 @@ namespace CarmenUI.Pages
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
+            criteriasViewSource.SortDescriptions.Add(StandardSort.For<Criteria>());
             groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
             if (mode == EditApplicantsMode.RegisterApplicants)
             {

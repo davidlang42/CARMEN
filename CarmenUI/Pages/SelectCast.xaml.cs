@@ -44,8 +44,11 @@ namespace CarmenUI.Pages
             InitializeComponent();
             castNumbersViewSource = (CollectionViewSource)FindResource(nameof(castNumbersViewSource));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
+            castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
+            tagsViewSource.SortDescriptions.Add(StandardSort.For<Tag>());
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
+            alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
             selectedApplicantsViewSource = (CollectionViewSource)FindResource(nameof(selectedApplicantsViewSource));
             allApplicantsViewSource = (CollectionViewSource)FindResource(nameof(allApplicantsViewSource));
             foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
