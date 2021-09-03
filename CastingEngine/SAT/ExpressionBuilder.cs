@@ -11,23 +11,23 @@ namespace Carmen.CastingEngine.SAT
     /// </summary>
     public class ExpressionBuilder
     {
-        private int nVariables;
-        private Expression<int> expression;
+        public int VariablesCount { get; init; }
+        public Expression<int> Expression { get; init; }
 
         public ExpressionBuilder(int n_variables, Func<bool[], bool> boolean_function)
         {
-            nVariables = n_variables;
-            expression = TruthTableExpression(nVariables, boolean_function);
+            VariablesCount = n_variables;
+            Expression = TruthTableExpression(n_variables, boolean_function);
         }
 
         public Expression<T> Apply<T>(T[] variables)
             where T : notnull
         {
-            if (variables.Length != nVariables)
-                throw new ArgumentException($"Must provide exactly {nVariables} variables, as per constructor argument");
+            if (variables.Length != VariablesCount)
+                throw new ArgumentException($"Must provide exactly {VariablesCount} variables, as per constructor argument");
             int i = 0;
             var map = variables.ToDictionary(v => i++, v => v);
-            return expression.Remap(map);
+            return Expression.Remap(map);
         }
 
         /// <summary>Enumerate all possible boolean values for the given array size, starting from a given index</summary>
