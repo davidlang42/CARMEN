@@ -45,5 +45,18 @@ namespace Carmen.CastingEngine.SAT
             {
                 Literals = Literals.Select(l => l.Clone()).ToHashSet()
             };
+
+        public static Clause<T> Unit(T variable, bool polarity) //LATER reuse this in tests and solvers, add more helpers as required
+            => new()
+            {
+                Literals = new[]
+                {
+                    new Literal<T>()
+                    {
+                        Variable = variable,
+                        Polarity = polarity
+                    }
+                }.ToHashSet()
+            };
     }
 }

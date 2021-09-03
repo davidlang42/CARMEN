@@ -82,5 +82,14 @@ namespace Carmen.CastingEngine.SAT
 
         protected static bool Evaluate(Expression<int> expression, Solution full_solution)
             => expression.Clauses.All(c => c.Literals.Any(l => l.Polarity == full_solution.Assignments[l.Variable]));
+
+        /// <summary>Maps a solution into pairs of Variable and Value</summary>
+        public IEnumerable<Assignment<T>> MapAssignments(Solution solution)
+        {
+            if (solution.Assignments is not bool?[] assignments)
+                throw new ArgumentException("Cannot map an unsolvable solution");
+            foreach (var pair in Variables.Zip(assignments))
+                yield return new Assignment<T> { Variable = pair.First, Value = pair.Second };
+        }
     }
 }

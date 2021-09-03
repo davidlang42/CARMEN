@@ -93,7 +93,7 @@ namespace Carmen.CastingEngine.Heuristic
                     // allocate alternative cast
                     //TODO (HEURISTIC) currently this overwrites, but it should respect
                     int next_cast = 0;
-                    foreach (var applicant in Sort(applicants, CastNumberOrderBy, CastNumberOrderDirection))
+                    foreach (var applicant in Sort(applicants_group, CastNumberOrderBy, CastNumberOrderDirection))
                     {
                         applicant.AlternativeCast = alternative_casts[next_cast++];
                         if (next_cast == alternative_casts.Length)
@@ -183,15 +183,16 @@ namespace Carmen.CastingEngine.Heuristic
             }
         }
 
+        #region Copied from DummyEngine
         /// <summary>Calculate the suitability of an applicant against a set of requirements.
         /// This assumes no circular references.</summary>
-        private double SuitabilityOf(Applicant applicant, IEnumerable<Requirement> requirements)
+        private double SuitabilityOf(Applicant applicant, IEnumerable<Requirement> requirements) //LATER copied from DummyEngine
         {
             var sub_suitabilities = requirements.Select(req => SuitabilityOf(applicant, req)).DefaultIfEmpty();
             return sub_suitabilities.Average(); //LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
         }
 
-        private double SuitabilityOf(Applicant applicant, Requirement requirement)
+        private double SuitabilityOf(Applicant applicant, Requirement requirement) //LATER copied from DummyEngine
             => requirement switch
             {
                 AbilityRangeRequirement arr => ScaledSuitability(arr.IsSatisfiedBy(applicant), arr.ScaleSuitability, applicant.MarkFor(arr.Criteria), arr.Criteria.MaxMark),
@@ -204,7 +205,7 @@ namespace Carmen.CastingEngine.Heuristic
                 Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
             };
 
-        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark)
+        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark) //LATER copied from DummyEngine
         {
             //LATER real implementation might not test if in range
             if (!in_range)
@@ -214,5 +215,6 @@ namespace Carmen.CastingEngine.Heuristic
             else
                 return 1;
         }
+        #endregion
     }
 }
