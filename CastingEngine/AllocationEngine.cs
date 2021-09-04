@@ -15,11 +15,18 @@ namespace Carmen.CastingEngine
     /// </summary>
     public abstract class AllocationEngine : IAllocationEngine
     {
+        public IApplicantEngine ApplicantEngine { get; init; }
+
         public abstract IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts);
         public abstract double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role);
         public abstract IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order);
         public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
         public abstract double SuitabilityOf(Applicant applicant, Role role);
+
+        public AllocationEngine(IApplicantEngine applicant_engine)
+        {
+            ApplicantEngine = applicant_engine;
+        }
 
         /// <summary>Finds the next Role in IdealCastingOrder() which has not yet been fully cast,
         /// optionally exlcuding a specified role.</summary>

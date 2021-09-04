@@ -41,7 +41,7 @@ namespace CarmenUI.Pages
         private Criteria[]? _primaryCriterias;
         private Criteria[]? _criterias;
         private NodeView? _rootNodeView;
-        private ICastingEngine? _engine; //LATER really this should be IAllocationEngine
+        private IAllocationEngine? _engine;
 
         private object defaultPanelContent;
 
@@ -63,7 +63,7 @@ namespace CarmenUI.Pages
         private NodeView rootNodeView => _rootNodeView
             ?? throw new ApplicationException($"Tried to used {nameof(rootNodeView)} before it was loaded.");
 
-        private ICastingEngine engine => _engine
+        private IAllocationEngine engine => _engine
             ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
 
         public AllocateRoles(DbContextOptions<ShowContext> context_options) : base(context_options)

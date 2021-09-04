@@ -118,13 +118,13 @@ namespace CarmenUI.Pages
             //LATER handle exceptions on all engine calls
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
-            using (processing.Segment(nameof(ICastingEngine.SelectCastGroups), "Selecting applicants"))
+            using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
                 engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local, (uint)alternative_casts.Length);
-            using (processing.Segment(nameof(ICastingEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
+            using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
                 engine.BalanceAlternativeCasts(context.Applicants.Local, alternative_casts, Enumerable.Empty<SameCastSet>());
-            using (processing.Segment(nameof(ICastingEngine.AllocateCastNumbers), "Allocating cast numbers"))
+            using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
                 engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection);
-            using (processing.Segment(nameof(ICastingEngine.ApplyTags), "Applying tags"))
+            using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
                 engine.ApplyTags(context.Applicants.Local, context.Tags.Local, (uint)alternative_casts.Length);
             TriggerCastNumbersRefresh();
             //LATER remove test message

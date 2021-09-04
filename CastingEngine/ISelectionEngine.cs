@@ -14,6 +14,9 @@ namespace Carmen.CastingEngine
     /// </summary>
     public interface ISelectionEngine
     {
+        /// <summary>An accessor to the IApplicantEngine used by this selection engine</summary>
+        IApplicantEngine ApplicantEngine { get; }//LATER remove if not needed, but trust me, it will be
+
         /// <summary>Select applicants into cast groups, respecting those already placed
         /// NOTE: CastGroup requirements may not depend on CastGroups or Tags</summary>
         void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts);

@@ -14,9 +14,16 @@ namespace Carmen.CastingEngine
     /// </summary>
     public abstract class SelectionEngine : ISelectionEngine
     {
+        public IApplicantEngine ApplicantEngine { get; init; }
+
         public abstract void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? order_by, ListSortDirection sort_direction);
         public abstract void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts);
         public abstract void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets);
         public abstract void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts);
+
+        public SelectionEngine(IApplicantEngine applicant_engine)
+        {
+            ApplicantEngine = applicant_engine;
+        }
     }
 }

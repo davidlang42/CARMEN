@@ -89,14 +89,14 @@ namespace CarmenUI.ViewModels
 
         public string CommaSeparatedIneligibilityReason => string.Join(", ", IneligibilityReasons);
 
-        public ApplicantForRole(ICastingEngine engine, Applicant applicant, Role role, Criteria[] primary_criterias)
+        public ApplicantForRole(IAllocationEngine engine, Applicant applicant, Role role, Criteria[] primary_criterias)
         {
             this.Applicant = applicant;
             CastGroupAndCast = new CastGroupAndCast(Applicant);
             this.role = role;
             PrimaryCriterias = primary_criterias;
             Suitability = engine.SuitabilityOf(applicant, role);
-            OverallAbility = engine.OverallAbility(applicant);
+            OverallAbility = engine.ApplicantEngine.OverallAbility(applicant);
             Marks = new string[PrimaryCriterias.Length];
             for (var i = 0; i < Marks.Length; i++)
                 Marks[i] = applicant.FormattedMarkFor(PrimaryCriterias[i]);

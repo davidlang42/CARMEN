@@ -15,10 +15,17 @@ namespace Carmen.CastingEngine
     /// </summary>
     public interface IAllocationEngine
     {
+        /// <summary>An accessor to the IApplicantEngine used by this allocation engine</summary>
+        IApplicantEngine ApplicantEngine { get; }
+
         /// <summary>Determine the recommended order in which the roles should be cast.
         /// This should return all roles found within the specified set of items, regardless of whether
         /// or not they are already cast.</summary>
         IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order);
+
+        /// <summary>Finds the next Role in IdealCastingOrder() which has not yet been fully cast,
+        /// optionally excluding a specified role.</summary>
+        Role? NextUncastRole(IEnumerable<Item> items_in_order, AlternativeCast[] alternative_casts, Role? excluding_role = null);
 
         /// <summary>Calculate the suitability of an applicant for a role, regardless of availability and eligibility.
         /// Value returned will be between 0 and 1 (inclusive).</summary>
@@ -35,5 +42,13 @@ namespace Carmen.CastingEngine
 
         /// <summary>Pick the best cast for one or more roles, balancing talent between them</summary>
         IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts); //LATER is there a better return argument than this?
+
+        /// <summary>Determine if an applicant is eligible to be cast in a role
+        /// (ie. whether all minimum requirements of the role are met)</summary>
+        Eligibility EligibilityOf(Applicant applicant, Role role);
+
+        /// <summary>Determine if an applicant is available to be cast in a role
+        /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
+        Availability AvailabilityOf(Applicant applicant, Role role);
     }
 }

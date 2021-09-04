@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Heuristic
 {
-    public class OriginalHeuristicEngine : WeightedSumEngine, ISelectionEngine, IAllocationEngine, ICastingEngine
+    public class OriginalHeuristicEngine : WeightedSumEngine, ISelectionEngine, IAllocationEngine
     {
         #region ISelectionEngine
         public Criteria? CastNumberOrderBy { get; set; }

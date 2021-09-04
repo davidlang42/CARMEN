@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine
 {
-    public class ChunkedPairsSatEngine : WeightedSumEngine, ISelectionEngine
+    public class ChunkedPairsSatEngine : SelectionEngine
     {
         // expression building is O(2^n) and will be slow for large numbers, therefore cache
         Dictionary<int, ExpressionBuilder> cachedKeepTogether = new();
@@ -30,7 +30,7 @@ namespace Carmen.CastingEngine
         }
 
         #region Copied from OriginalHeuristicEngine
-        public void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts) //LATER copied from OriginalHeuristicEngine
+        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts) //LATER copied from OriginalHeuristicEngine
         {
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
             var remaining_groups = new Dictionary<CastGroup, uint?>();
@@ -49,7 +49,7 @@ namespace Carmen.CastingEngine
                     remaining_groups.Add(cast_group, null);
             }
             // Allocate non-accepted applicants to cast groups, until the remaining counts are 0
-            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => OverallAbility(a)))
+            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => ApplicantEngine.OverallAbility(a)))
             {
                 if (NextAvailableCastGroup(remaining_groups, applicant) is CastGroup cg)
                 {
@@ -84,12 +84,12 @@ namespace Carmen.CastingEngine
             {
                 (Criteria c, ListSortDirection.Ascending) => applicants.OrderBy(a => a.MarkFor(c)),
                 (Criteria c, ListSortDirection.Descending) => applicants.OrderByDescending(a => a.MarkFor(c)),
-                (null, ListSortDirection.Ascending) => applicants.OrderBy(a => OverallAbility(a)),
-                (null, ListSortDirection.Descending) => applicants.OrderByDescending(a => OverallAbility(a)),
+                (null, ListSortDirection.Ascending) => applicants.OrderBy(a => ApplicantEngine.OverallAbility(a)),
+                (null, ListSortDirection.Descending) => applicants.OrderByDescending(a => ApplicantEngine.OverallAbility(a)),
                 _ => throw new ApplicationException($"Sort not handled: {by} / {direction}")
             };
 
-        public void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? order_by, ListSortDirection sort_direction)
+        public override void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? order_by, ListSortDirection sort_direction)
         {
             var cast_numbers = new CastNumberSet();
             // find cast numbers which are already set
@@ -116,7 +116,7 @@ namespace Carmen.CastingEngine
             }
         }
 
-        public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts)
+        public override void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts)
         {
             // allocate tags sequentially because they aren't dependant on each other
             tags = tags.ToArray(); //TODO (HEURISTIC) fix this hack for concurrent modification of collecion
@@ -124,7 +124,7 @@ namespace Carmen.CastingEngine
                 ApplyTag(applicants, tag, number_of_alternative_casts);
         }
 
-        public void ApplyTag(IEnumerable<Applicant> applicants, Tag tag, uint number_of_alternative_casts)
+        public override void ApplyTag(IEnumerable<Applicant> applicants, Tag tag, uint number_of_alternative_casts)
         {
             // In this dictionary, if a key is missing that means infinite are allowed
             var remaining = tag.CountByGroups.ToDictionary(
@@ -191,15 +191,15 @@ namespace Carmen.CastingEngine
         }
         #endregion
 
-        private Criteria[] criterias;
+        private Criteria[] primaryCriterias;
 
-        public ChunkedPairsSatEngine(Criteria[] criterias)
-            : base(criterias)
+        public ChunkedPairsSatEngine(IApplicantEngine applicant_engine, Criteria[] criterias)
+            : base(applicant_engine)
         {
-            this.criterias = criterias;
+            primaryCriterias = criterias.Where(c => c.Primary).ToArray();
         }
 
-        public void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets)
+        public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets)
         {
             if (alternative_casts.Length != 2)
                 throw new ApplicationException("The Chunked-Pairs approach only works for exactly 2 alternative casts.");
@@ -287,7 +287,7 @@ namespace Carmen.CastingEngine
         /// <summary>Creates clauses for chunks of applicants within one cast group, for each primary criteria</summary>
         private IEnumerable<Clause<Applicant>> BuildChunkClauses(IEnumerable<Applicant> applicants, int chunk_size, Dictionary<Applicant, SameCastSet> same_cast_lookup)
         {
-            foreach (var criteria in criterias.Where(c => c.Primary))
+            foreach (var criteria in primaryCriterias)
             {
                 var sorted_applicants = new Stack<Applicant>(applicants.OrderBy(a => a.MarkFor(criteria))); // order by marks ascending so that the lowest mark is at the bottom of the stack
                 while (sorted_applicants.Count >= chunk_size)
@@ -346,7 +346,7 @@ namespace Carmen.CastingEngine
         /// <summary>Fills any free (null) assignments, keeping the totals in each alternative cast as close to equal as possible</summary>
         private Assignment<Applicant>[] EvenlyFillAssignments(IEnumerable<Assignment<Applicant>> assignments)
         {
-            var result = assignments.OrderByDescending(a => OverallAbility(a.Variable)).ToArray();
+            var result = assignments.OrderByDescending(a => ApplicantEngine.OverallAbility(a.Variable)).ToArray();
             int count_true = 0;
             int count_false = 0;
             for (var r = 0; r < result.Length; r++)
