@@ -309,14 +309,29 @@ namespace CarmenUI.Pages
             //column_index++;
         }
 
-        private void itemsTreeView_KeyDown(object sender, KeyEventArgs e)
+        private void itemsTreeView_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Delete && itemsTreeView.SelectedItem is Node node && node is not ShowRoot)
+            if (Properties.Settings.Default.MoveOnCtrlArrow
+                && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (e.Key == Key.Up)
+                {
+                    moveUpButton_Click(sender, e);
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Down)
+                {
+                    moveDownButton_Click(sender, e);
+                    e.Handled = true;
+                }
+            }
+            else if (e.Key == Key.Delete && itemsTreeView.SelectedItem is Node node && node is not ShowRoot)
             {
                 var parent = node.Parent ?? throw new ApplicationException("Non-ShowRoot must have a parent.");
                 parent.Children.Remove(node);
                 var collection = (ObservableCollection<Node>)rootNodesViewSource.Source;
                 collection.Remove(node);
+                e.Handled = true;
             }
         }
 

@@ -62,7 +62,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="Items:" FontSize="22"/>
-            <TreeView Grid.Row="1" x:Name="itemsTreeView" KeyDown="itemsTreeView_KeyDown"
+            <TreeView Grid.Row="1" x:Name="itemsTreeView" PreviewKeyDown="itemsTreeView_PreviewKeyDown"
                     ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}"
                     SelectedItemChanged="itemsTreeView_SelectedItemChanged"
                     FontSize="14">
