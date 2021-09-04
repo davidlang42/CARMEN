@@ -47,11 +47,32 @@ namespace Carmen.ShowModel
 
         private static void InsertInOrder<T>(this IDbSetOrCollection<T> objects, T add_object, T? after = null) where T : class, IOrdered
         {
-            if (after != null)
+            int? new_order;
+            if (after == null)
+                new_order = null;
+            else
             {
                 if (!objects.Contains(after))
                     throw new ArgumentException($"'{nameof(after)}' must be in this collection.");
-                var new_order = after.Order + 1;
+                new_order = after.Order + 1;
+            }
+            InsertInOrder(objects, add_object, new_order);
+        }
+
+        /// <summary>Updates the Order value of objects in this collection to make space for the new object
+        /// at the provided order value, and adds the new object.</summary>
+        public static void InsertInOrder<T>(this ICollection<T> objects, T add_object, int at_order) where T : class, IOrdered
+            => InsertInOrder(new CollectionWrapper<T>(objects), add_object, at_order);
+
+        /// <summary>Updates the Order value of objects in this collection to make space for the new object
+        /// at the provided order value, and adds the new object.</summary>
+        public static void InsertInOrder<T>(this DbSet<T> objects, T add_object, int at_order) where T : class, IOrdered
+            => InsertInOrder(new DbSetWrapper<T>(objects), add_object, at_order);
+
+        private static void InsertInOrder<T>(this IDbSetOrCollection<T> objects, T add_object, int? at_order = null) where T : class, IOrdered
+        {
+            if (at_order is int new_order)
+            {
                 var objects_after = objects.Where(o => o.Order >= new_order).ToDictionary(o => o.Order);
                 var shift_order = new_order;
                 T? shift_object;

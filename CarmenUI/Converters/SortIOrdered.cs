@@ -12,7 +12,7 @@ namespace CarmenUI.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is IList list)
-                return new ListCollectionView(list) { SortDescriptions = { StandardSort.For<IOrdered>() } };
+                return new ListCollectionView(list) { SortDescriptions = { StandardSort.For<IOrdered>() }, IsLiveSorting = true };
             return value;
         }
 

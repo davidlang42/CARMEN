@@ -203,6 +203,7 @@ namespace CarmenUI.ViewModels
         public ChildView AddChild(Node new_child, ChildView? insert_after = null)
         {
             new_child.Parent = InnerNode;
+            new_child.Order = InnerNode.Children.NextOrder();
             var child_view = new ChildView(new_child, castGroups);
             if (insert_after != null)
             {
@@ -217,7 +218,6 @@ namespace CarmenUI.ViewModels
             else
             {
                 Children.Add(child_view);
-                new_child.Order = InnerNode.Children.NextOrder();
             }
             return child_view;
         }

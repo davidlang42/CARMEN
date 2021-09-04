@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
@@ -98,6 +99,40 @@ namespace Carmen.ShowModel.Structure
                 yield return parent;
                 parent = parent.Parent;
             }
+        }
+
+        /// <summary>Find the sibling directly above this Node, or null if top of parent</summary>
+        public Node? SiblingAbove()
+        {
+            if (parent == null)
+                throw new ApplicationException("Cannot get siblings when parent is null.");
+            Node? last = null;
+            foreach(var sibling in parent.Children.InOrder())
+            {
+                if (sibling == this)
+                    return last;
+                last = sibling;
+            }
+            throw new ApplicationException("Node not found in parent.");
+        }
+
+        /// <summary>Find the sibling directly below this Node, or null if bottom of parent</summary>
+        public Node? SiblingBelow()
+        {
+            if (parent == null)
+                throw new ApplicationException("Cannot get siblings when parent is null.");
+            var e = parent.Children.InOrder().GetEnumerator();
+            while (e.MoveNext())
+            {
+                if (e.Current == this)
+                {
+                    if (e.MoveNext())
+                        return e.Current;
+                    else
+                        return null;
+                }
+            }
+            throw new ApplicationException("Node not found in parent.");
         }
 
         /// <summary>Checks if this node's required counts equals the sum of the roles within it.</summary>

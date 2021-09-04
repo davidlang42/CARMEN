@@ -59,16 +59,12 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
             <TextBlock Text="Items:" FontSize="22"/>
             <TreeView Grid.Row="1" x:Name="itemsTreeView" KeyDown="itemsTreeView_KeyDown"
                     ItemsSource="{Binding Source={StaticResource rootNodesViewSource}}"
-                    AllowDrop="True"
-                    PreviewMouseLeftButtonDown="itemsTreeView_PreviewMouseLeftButtonDown"
-                    MouseMove="itemsTreeView_MouseMove" 
-                    DragOver="itemsTreeView_DragOver" 
-                    Drop="itemsTreeView_Drop"
-                    SelectedItemChanged="itemsTreeView_SelectedItemChanged" ToolTip="Drag to re-order"
+                    SelectedItemChanged="itemsTreeView_SelectedItemChanged"
                     FontSize="14">
                 <TreeView.ItemContainerStyle>
                     <Style TargetType="{x:Type TreeViewItem}">
@@ -119,6 +115,20 @@
                     </HierarchicalDataTemplate>
                 </TreeView.Resources>
             </TreeView>
+            <UniformGrid Grid.Row="2" Rows="1" Margin="0 5 0 0" Height="35">
+                <Button x:Name="moveUpButton" Margin="0 0 2.5 0" Click="moveUpButton_Click">
+                    <DockPanel>
+                        <Image Source="/Icons/Upload_grey.png" Width="16" Margin="2 0"/>
+                        <TextBlock Text="Move Up" Margin="2 0" TextWrapping="Wrap"/>
+                    </DockPanel>
+                </Button>
+                <Button x:Name="moveDownButton" Margin="2.5 0 0 0" Click="moveDownButton_Click">
+                    <DockPanel>
+                        <Image Source="/Icons/Download_grey.png" Width="16" Margin="2 0"/>
+                        <TextBlock Text="Move Down" Margin="2 0" TextWrapping="Wrap"/>
+                    </DockPanel>
+                </Button>
+            </UniformGrid>
         </Grid>
         <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5" KeyboardNavigation.IsTabStop="False"/>
         <ContentControl Grid.Column="2" Margin="5 0" x:Name="rolesPanel" KeyboardNavigation.IsTabStop="False">

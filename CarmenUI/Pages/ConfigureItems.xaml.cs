@@ -109,59 +109,6 @@ namespace CarmenUI.Pages
         private void SaveButton_Click(object sender, RoutedEventArgs e)
             => SaveChangesAndReturn();
 
-        #region Drag & drop in itemsTreeView
-
-        private Point lastMouseDown;
-        private Node? draggedItem;
-        private Node? draggedTarget;
-
-        private void itemsTreeView_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.ChangedButton == MouseButton.Left)
-                lastMouseDown = e.GetPosition(itemsTreeView);
-        }
-
-        private void itemsTreeView_MouseMove(object sender, MouseEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                if ((e.GetPosition(itemsTreeView) - lastMouseDown).Length > 10)
-                {
-                    draggedItem = (Node?)itemsTreeView.SelectedItem;
-                    if (draggedItem != null)
-                    {
-                        var drop_effect = DragDrop.DoDragDrop(itemsTreeView, itemsTreeView.SelectedValue, DragDropEffects.Move);
-                        if (drop_effect == DragDropEffects.Move && draggedTarget != null && draggedItem != draggedTarget)
-                        {
-                            MoveNode(draggedItem, draggedTarget);
-                            draggedTarget = null;
-                            draggedItem = null;
-                        }
-                    }
-                }
-            }
-        }
-
-        private void itemsTreeView_DragOver(object sender, DragEventArgs e)
-        {
-            if ((e.GetPosition(itemsTreeView) - lastMouseDown).Length > 10)
-                ProcessDragDrop(e, out _);
-            e.Handled = true;
-        }
-
-        private void itemsTreeView_Drop(object sender, DragEventArgs e)
-        {
-            ProcessDragDrop(e, out draggedTarget);
-            e.Handled = true;
-        }
-
-        private void ProcessDragDrop(DragEventArgs e, out Node? target_item)
-        {
-            target_item = (e.OriginalSource as TextBlock)?.DataContext as Node;
-            e.Effects = target_item != null && draggedItem != null && target_item != draggedItem ? DragDropEffects.Move : DragDropEffects.None;
-        }
-        #endregion
-
         private void RolesDataGrid_Initialized(object sender, EventArgs e)
         {
             const int COLUMNS_BEFORE_CBG = 1;
@@ -384,6 +331,7 @@ namespace CarmenUI.Pages
                 ShowRoot show_root => new ShowRootOrSectionView(show_root, castGroups, alternativeCasts.Length),
                 _ => null
             };
+            EnableMoveButtons(itemsTreeView.SelectedItem as Node);
         }
 
         private void AddRole_Click(object sender, RoutedEventArgs e)
@@ -419,7 +367,7 @@ namespace CarmenUI.Pages
             data_grid.CurrentCell = new DataGridCellInfo(child_view, data_grid.Columns.First());
         }
 
-        private void MoveNode(Node dragged, Node target)
+        private void MoveNode(Node dragged, Node target)//LATER remove if not needed
         {
             if (dragged is ShowRoot)
                 return;
@@ -489,6 +437,89 @@ namespace CarmenUI.Pages
             var selected_children = data_grid.SelectedItems.OfType<ChildView>().ToArray();
             foreach (var selected_child in selected_children)
                 view.RemoveChild(selected_child);
+        }
+
+        private void moveUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (itemsTreeView.SelectedItem is Node n)
+                MoveNodeUp(n);
+            //TODO EnableMoveButtons(index_below);
+        }
+
+        private void moveDownButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (itemsTreeView.SelectedItem is Node n)
+                MoveNodeDown(n);
+            //TODO EnableMoveButtons(index_below);
+        }
+
+        private void EnableMoveButtons(Node? selected)
+        {
+            if (selected is not Node node || node.Parent is not InnerNode parent)
+                moveUpButton.IsEnabled = moveDownButton.IsEnabled = false;
+            else if (parent is not ShowRoot show_root)
+                moveUpButton.IsEnabled = moveDownButton.IsEnabled = true;
+            else
+            {
+                moveUpButton.IsEnabled = show_root.Children.InOrder().First() != node;
+                moveDownButton.IsEnabled = show_root.Children.InOrder().Last() != node;
+            }
+        }
+
+        private void MoveNodeUp(Node node)
+        {
+            if (node is ShowRoot)
+                return;
+            if (node.Parent is not InnerNode parent)
+                throw new ApplicationException("Non-ShowRoot node must have a parent.");
+            if (node.SiblingAbove() is not Node sibling_above)
+            {
+                if (parent is ShowRoot)
+                    return; // already at top of everything, do nothing
+                var grandparent = parent.Parent ?? throw new ApplicationException("Non-ShowRoot node must have a parent.");
+                // at top of parent, move to sibling of parent above parent
+                parent.Children.Remove(node);
+                grandparent.Children.InsertInOrder(node, parent.Order);
+            }
+            else if (sibling_above is InnerNode inner_node_above)
+            {
+                // sibling above can have children, move to last child of sibling above
+                parent.Children.Remove(node);
+                inner_node_above.Children.InsertInOrder(node);
+            }
+            else
+            {
+                // sibling above cannot have children, move above sibling
+                parent.Children.MoveInOrder(node, sibling_above.Order);
+            }
+        }
+
+        private void MoveNodeDown(Node node)
+        {
+            if (node is ShowRoot)
+                return;
+            if (node.Parent is not InnerNode parent)
+                throw new ApplicationException("Non-ShowRoot node must have a parent.");
+            if (node.SiblingBelow() is not Node sibling_below)
+            {
+                if (parent is ShowRoot)
+                    return; // already at bottom of everything, do nothing
+                var grandparent = parent.Parent ?? throw new ApplicationException("Non-ShowRoot node must have a parent.");
+                // at bottom of parent, move to sibling of parent after parent
+                parent.Children.Remove(node);
+                grandparent.Children.InsertInOrder(node, parent);
+            }
+            else if (sibling_below is InnerNode inner_node_below)
+            {
+                // sibling below can have children, move to first child of sibling below
+                parent.Children.Remove(node);
+                inner_node_below.Children.InsertInOrder(node, inner_node_below.Children.FirstOrder());
+            }
+            else
+            {
+                // sibling below cannot have children, move after sibling
+                parent.Children.MoveInOrder(node, sibling_below);
+            }
         }
     }
 }
