@@ -39,12 +39,15 @@ namespace CarmenUI.Pages
         private CollectionViewSource tagsViewSource;
         private CollectionViewSource alternativeCastsViewSource;
         private CollectionViewSource castNumbersViewSource;
-        private ISelectionEngine engine;
 
-        private Criteria[]? _primaryCriterias;
+        private Criteria[]? _criterias;
+        private ISelectionEngine? _engine;
 
-        private Criteria[] primaryCriterias => _primaryCriterias
-            ?? throw new ApplicationException($"Tried to used {nameof(primaryCriterias)} before it was loaded.");
+        private Criteria[] criterias => _criterias
+            ?? throw new ApplicationException($"Tried to used {nameof(criterias)} before it was loaded.");
+
+        private ISelectionEngine engine => _engine
+            ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
 
         public SelectCast(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -64,9 +67,6 @@ namespace CarmenUI.Pages
                 selectedApplicantsViewSource.SortDescriptions.Add(sd);
             }
             castStatusCombo.SelectedIndex = 0; // must be here because it triggers event below
-            //LATER use real engine
-            //engine = new DummyEngine();
-            //engine = new OriginalHeuristicEngine(null, ListSortDirection.Descending);
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -90,8 +90,14 @@ namespace CarmenUI.Pages
             using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 await context.Requirements.LoadAsync();
             using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
-                _primaryCriterias = await context.Criterias.Where(c => c.Primary).ToArrayAsync();
-            engine = new ChunkedPairsSatEngine(primaryCriterias); //LATER not here
+                _criterias = await context.Criterias.ToArrayAsync();
+            using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
+            {
+                //LATER have a mechanism to choose which engine
+                //_engine = new DummyEngine();
+                _engine = new OriginalHeuristicEngine(criterias, null, ListSortDirection.Descending);
+                //_engine = new ChunkedPairsSatEngine(criterias);
+            }
         }
 
         private void TriggerCastNumbersRefresh()
@@ -135,7 +141,7 @@ namespace CarmenUI.Pages
                         + $"\nAfter {chunky.Results.Count} chunking attempts, and a final chunk size of {r.ChunkSize}, it was still unsolvable.";
                 msg += "\n\n";
             }
-            var marks = primaryCriterias.Select(c => alternative_casts.Select(ac => ac.Members.Select(a => a.MarkFor(c)).ToArray()).Select(m => (m, MarkDistribution.Analyse(m))).ToArray()).ToArray();
+            var marks = criterias.Select(c => alternative_casts.Select(ac => ac.Members.Select(a => a.MarkFor(c)).ToArray()).Select(m => (m, MarkDistribution.Analyse(m))).ToArray()).ToArray();
             msg += "The resulting casts have the follow distributions by primary criteria:\n";
             foreach (var criteria in marks)
             {

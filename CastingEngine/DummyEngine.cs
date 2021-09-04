@@ -16,6 +16,12 @@ namespace Carmen.CastingEngine
     /// </summary>
     public class DummyEngine : ICastingEngine
     {
+        /// <summary>Dummy value is always 100</summary>
+        public int MaxOverallAbility => 100;
+
+        /// <summary>Dummy value is always 0</summary>
+        public int MinOverallAbility => 0;
+
         /// <summary>Dummy value is the basic implementation of recursive requirements.
         /// This assumes there are no circular references.</summary>
         public double SuitabilityOf(Applicant applicant, Role role)

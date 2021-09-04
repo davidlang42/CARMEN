@@ -19,7 +19,8 @@ namespace Carmen.CastingEngine.Heuristic
 
         /// <summary>The original heuristic engine does things in an abnormal way,
         /// which requires these values before they would otherwise be supplied</summary>
-        public OriginalHeuristicEngine(Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
+        public OriginalHeuristicEngine(Criteria[] criterias, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
+            : base(criterias)
         {
             CastNumberOrderBy = cast_number_order_by;
             CastNumberOrderDirection = cast_number_order_direction;
@@ -238,10 +239,24 @@ namespace Carmen.CastingEngine.Heuristic
         }
         #endregion
 
+        public OriginalHeuristicEngine(Criteria[] criterias)
+            : base(criterias)
+        { }
+
         #region IAllocationEngine
         public double SuitabilityOf(Applicant applicant, Role role)
         {
-            //TODO
+            double score = (OverallAbility(applicant) + MinOverallAbility) / MaxOverallAbility; // between 0 and 1 inclusive
+            var max = 1;
+            foreach (var requirement in role.Requirements)
+            {
+                if (requirement is ICriteriaRequirement based_on)
+                {
+                    score += 2 * SuitabilityOf(applicant, requirement) - 0.5 * CountRoles(applicant, based_on.Criteria, role) / 100;
+                    max += 2;
+                }
+            }
+            return score / max;
         }
 
 
@@ -258,7 +273,8 @@ namespace Carmen.CastingEngine.Heuristic
                     required_cast_groups.Add(cbg.CastGroup, cbg.Count);
             var potential_cast_by_group = applicants
                 .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
-                .Where(a => AvailabilityOf(a, role).IsAvailable) //TODO (HEURISTIC) modified heuristic should look at eligibility as well as availability
+                .Where(a => AvailabilityOf(a, role).IsAvailable)
+                .Where(a => EligibilityOf(a, role).IsEligible) //TODO (HEURISTIC) document bonus: original didn't look at eligible, but now it does
                 .OrderByDescending(a => SuitabilityOf(a, role))
                 .GroupBy(a => a.CastGroup!)
                 .ToDictionary(g => g.Key, g => new Queue<Applicant>(g));
@@ -294,6 +310,19 @@ namespace Carmen.CastingEngine.Heuristic
         #endregion
 
         #region Copied from IAllocationEngine
+        /// <summary>Determine if an applicant is eligible to be cast in a role
+        /// (ie. whether all minimum requirements of the role are met)</summary>
+        public Eligibility EligibilityOf(Applicant applicant, Role role)
+        {
+            var requirements_not_met = new HashSet<Requirement>();
+            foreach (var req in role.Requirements)
+                _ = req.IsSatisfiedBy(applicant, requirements_not_met);
+            return new Eligibility
+            {
+                RequirementsNotMet = requirements_not_met.ToArray()
+            };
+        }
+
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
         Availability AvailabilityOf(Applicant applicant, Role role)//LATER thoroughly unit test

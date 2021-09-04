@@ -191,11 +191,12 @@ namespace Carmen.CastingEngine
         }
         #endregion
 
-        public Criteria[] PrimaryCriterias;
+        private Criteria[] criterias;
 
-        public ChunkedPairsSatEngine(Criteria[] primary_criterias)//LATER shouldn't need this
+        public ChunkedPairsSatEngine(Criteria[] criterias)
+            : base(criterias)
         {
-            PrimaryCriterias = primary_criterias;
+            this.criterias = criterias;
         }
 
         public void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets)
@@ -286,7 +287,7 @@ namespace Carmen.CastingEngine
         /// <summary>Creates clauses for chunks of applicants within one cast group, for each primary criteria</summary>
         private IEnumerable<Clause<Applicant>> BuildChunkClauses(IEnumerable<Applicant> applicants, int chunk_size, Dictionary<Applicant, SameCastSet> same_cast_lookup)
         {
-            foreach (var criteria in PrimaryCriterias)
+            foreach (var criteria in criterias.Where(c => c.Primary))
             {
                 var sorted_applicants = new Queue<Applicant>(applicants.OrderByDescending(a => a.MarkFor(criteria)));
                 while (sorted_applicants.Count >= chunk_size)

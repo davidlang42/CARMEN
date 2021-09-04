@@ -14,5 +14,11 @@ namespace Carmen.CastingEngine
     {
         /// <summary>Calculate the overall ability of an applicant</summary>
         int OverallAbility(Applicant applicant);
+
+        /// <summary>The maximum value an applicant's overall ability can be</summary>
+        int MaxOverallAbility { get; }
+
+        /// <summary>The minimum value an applicant's overall ability can be</summary>
+        int MinOverallAbility { get; }
     }
 }
