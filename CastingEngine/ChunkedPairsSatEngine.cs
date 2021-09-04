@@ -31,13 +31,13 @@ namespace Carmen.CastingEngine
         Dictionary<int, ExpressionBuilder> cachedKeepTogether = new();
         Dictionary<int, ExpressionBuilder> cachedKeepSeparate = new();
 
-        public ChunkedPairsSatEngine(IApplicantEngine applicant_engine, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
-            : base(applicant_engine, cast_number_order_by, cast_number_order_direction)
+        public ChunkedPairsSatEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
+            : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction)
         {
             primaryCriterias = criterias.Where(c => c.Primary).ToArray();
         }
 
-        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts)
+        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
         {
             //LATER handle the fact that cast group requirements may not be mutually exclusive, possibly using SAT (current implementation is copied from HeuristicSelectionEngine)
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
@@ -48,7 +48,7 @@ namespace Carmen.CastingEngine
                 if (cast_group.RequiredCount is uint required)
                 {
                     if (cast_group.AlternateCasts)
-                        required *= number_of_alternative_casts;
+                        required *= (uint)alternativeCasts.Length;
                     required -= (uint)cast_group.Members.Count;
                     if (required > 0)
                         remaining_groups.Add(cast_group, required);
@@ -86,9 +86,9 @@ namespace Carmen.CastingEngine
             return null;
         }
 
-        public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets)
+        public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets)
         {
-            if (alternative_casts.Length != 2)
+            if (alternativeCasts.Length != 2)
                 throw new ApplicationException("The Chunked-Pairs approach only works for exactly 2 alternative casts.");
             // sort the applicants into cast groups
             var applicants_needing_alternative_cast = new List<(CastGroup, HashSet<Applicant>)>();
@@ -109,7 +109,7 @@ namespace Carmen.CastingEngine
                     // add clauses for applicants with alternative cast already set
                     foreach (var applicant in applicants_set)
                         if (applicant.AlternativeCast != null)
-                            existing_assignments.Add(Clause<Applicant>.Unit(applicant, applicant.AlternativeCast == alternative_casts[1]));
+                            existing_assignments.Add(Clause<Applicant>.Unit(applicant, applicant.AlternativeCast == alternativeCasts[1]));
                 }
             }
             // create clauses for same cast sets
@@ -161,13 +161,13 @@ namespace Carmen.CastingEngine
                 grouped_assignments = applicants_needing_alternative_cast
                     .Select(p => p.Item2.Select(a => new Assignment<Applicant> {
                         Variable = a,
-                        Value = a.AlternativeCast?.Equals(alternative_casts[1]) // keep the existing value if set
+                        Value = a.AlternativeCast?.Equals(alternativeCasts[1]) // keep the existing value if set
                     })).ToList();
             foreach (var group in grouped_assignments)
             {
                 var full_assignments = EvenlyFillAssignments(group);
                 foreach (var assignment in full_assignments)
-                    assignment.Variable.AlternativeCast = alternative_casts[assignment.Value!.Value ? 1 : 0];
+                    assignment.Variable.AlternativeCast = alternativeCasts[assignment.Value!.Value ? 1 : 0];
             }
         }
 

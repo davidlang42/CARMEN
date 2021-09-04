@@ -23,19 +23,20 @@ namespace Carmen.CastingEngine
             typeof(ChunkedPairsSatEngine)
         };
 
-        //TODO look at common arguments, eg. cast groups/ alternative casts ande decide what should be in the constructor
         public IApplicantEngine ApplicantEngine { get; init; }
 
         /// <summary>If null, order by OverallAbility</summary>
-        private Criteria? castNumberOrderBy { get; set; }
-        private ListSortDirection castNumberOrderDirection { get; set; }
+        protected Criteria? castNumberOrderBy { get; init; }
+        protected ListSortDirection castNumberOrderDirection { get; init; }
+        protected AlternativeCast[] alternativeCasts { get; init; }
 
-        public abstract void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets);
-        public abstract void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts);
+        public abstract void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets);
+        public abstract void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups);
 
-        public SelectionEngine(IApplicantEngine applicant_engine, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
+        public SelectionEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
         {
             ApplicantEngine = applicant_engine;
+            alternativeCasts = alternative_casts;
             castNumberOrderBy = cast_number_order_by;
             castNumberOrderDirection = cast_number_order_direction;
         }
@@ -57,7 +58,7 @@ namespace Carmen.CastingEngine
         /// <summary>Default implementation allocates cast numbers to accepted applicants based on the requested order.
         /// Members of cast groups which alternate casts are given the first available cast number for their alternative
         /// cast, leaving gaps which are later filled from the bottom up.</summary>
-        public virtual void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? _, ListSortDirection __)//TODO remove these arguments
+        public virtual void AllocateCastNumbers(IEnumerable<Applicant> applicants)
         {
             var cast_numbers = new CastNumberSet();
             // find cast numbers which are already set
@@ -86,7 +87,7 @@ namespace Carmen.CastingEngine
 
         /// <summary>Default implementation applies tags in a order that ensures any tags which depend on other tags through
         /// requirements are processed first. This assumes there are no circular dependency between tags.</summary>
-        public virtual void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts)
+        public virtual void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)
         {
             // list all tags referenced by each tag
             var tag_references = new Dictionary<Tag, HashSet<Tag>>();
@@ -112,7 +113,7 @@ namespace Carmen.CastingEngine
                 {
                     if (!references.Any(t => tag_references.ContainsKey(t)))
                     {
-                        ApplyTag(applicants, tag, number_of_alternative_casts);
+                        ApplyTag(applicants, tag);
                         tag_references.Remove(tag);
                         any_change = true;
                     }
@@ -125,12 +126,12 @@ namespace Carmen.CastingEngine
         /// <summary>Default implementation applies tags by list accepted cast who aren't in this tag, ordering them
         /// by suitability for this tag, then ordering by overall mark. Tags are applied down this list until all the
         /// cast groups have the required number or there are no more eligible cast.</summary>
-        public void ApplyTag(IEnumerable<Applicant> applicants, Tag tag, uint number_of_alternative_casts)
+        public void ApplyTag(IEnumerable<Applicant> applicants, Tag tag)
         {
             // In this dictionary, if a key is missing that means infinite are allowed
             var remaining = tag.CountByGroups.ToDictionary(
                 cbg => cbg.CastGroup,
-                cbg => cbg.CastGroup.AlternateCasts ? number_of_alternative_casts * cbg.Count : cbg.Count);
+                cbg => cbg.CastGroup.AlternateCasts ? alternativeCasts.Length * cbg.Count : cbg.Count);
             // Subtract cast already allocated to tags
             foreach (var applicant in applicants)
             {

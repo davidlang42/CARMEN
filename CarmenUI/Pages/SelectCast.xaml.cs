@@ -72,8 +72,9 @@ namespace CarmenUI.Pages
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             using var loading = new LoadingOverlay(this).AsSegment(nameof(SelectCast));
+            AlternativeCast[] alternative_casts;
             using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
-                await context.AlternativeCasts.LoadAsync();
+                alternative_casts = await context.AlternativeCasts.ToArrayAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
             using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
@@ -93,6 +94,7 @@ namespace CarmenUI.Pages
                 _criterias = await context.Criterias.ToArrayAsync();
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
+                var show_root = context.ShowRoot;
                 IApplicantEngine applicant_engine = ParseApplicantEngine() switch
                 {
                     nameof(DummyApplicantEngine) => new DummyApplicantEngine(),
@@ -101,9 +103,9 @@ namespace CarmenUI.Pages
                 };
                 _engine = ParseSelectionEngine() switch
                 {
-                    nameof(DummySelectionEngine) => new DummySelectionEngine(applicant_engine, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection),
-                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(applicant_engine, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection),
-                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(applicant_engine, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
+                    nameof(DummySelectionEngine) => new DummySelectionEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
+                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
+                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
                     _ => throw new ArgumentException($"Allocation engine not handled: {ParseSelectionEngine()}")
                 };
             }
@@ -126,18 +128,18 @@ namespace CarmenUI.Pages
         {
             //LATER handle exceptions on all engine calls
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
-            var alternative_casts = context.AlternativeCasts.Local.ToArray();
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
-                engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local, (uint)alternative_casts.Length);
+                engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local);
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                engine.BalanceAlternativeCasts(context.Applicants.Local, alternative_casts, Enumerable.Empty<SameCastSet>());
+                engine.BalanceAlternativeCasts(context.Applicants.Local, Enumerable.Empty<SameCastSet>());
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                engine.AllocateCastNumbers(context.Applicants.Local, alternative_casts, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection);
+                engine.AllocateCastNumbers(context.Applicants.Local);
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
-                engine.ApplyTags(context.Applicants.Local, context.Tags.Local, (uint)alternative_casts.Length);
+                engine.ApplyTags(context.Applicants.Local, context.Tags.Local);
             TriggerCastNumbersRefresh();
             //LATER remove test message
 #if DEBUG
+            var alternative_casts = context.AlternativeCasts.Local.ToArray();
             string msg = "";
             if (engine is ChunkedPairsSatEngine chunky)
             {

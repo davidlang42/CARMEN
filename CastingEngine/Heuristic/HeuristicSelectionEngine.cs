@@ -11,12 +11,12 @@ namespace Carmen.CastingEngine.Heuristic
 {
     public class HeuristicSelectionEngine : SelectionEngine
     {
-        public HeuristicSelectionEngine(IApplicantEngine applicant_engine, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
-            : base(applicant_engine, cast_number_order_by, cast_number_order_direction)
+        public HeuristicSelectionEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
+            : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction)
         { }
 
         //TODO summary comment
-        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts)
+        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
         {
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
             var remaining_groups = new Dictionary<CastGroup, uint?>();
@@ -26,7 +26,7 @@ namespace Carmen.CastingEngine.Heuristic
                 if (cast_group.RequiredCount is uint required)
                 {
                     if (cast_group.AlternateCasts)
-                        required *= number_of_alternative_casts;
+                        required *= (uint)alternativeCasts.Length;
                     required -= (uint)cast_group.Members.Count;
                     if (required > 0)
                         remaining_groups.Add(cast_group, required);
@@ -65,7 +65,7 @@ namespace Carmen.CastingEngine.Heuristic
         }
 
         //TODO summary comment
-        public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> _)
+        public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> _)
         {
             //TODO heuristic- ModifiedHeuristicEngine should take into account locked sets, by process:
             // - do not buddy people within a locked set
@@ -89,8 +89,8 @@ namespace Carmen.CastingEngine.Heuristic
                     int next_cast = 0;
                     foreach (var applicant in CastNumberingOrder(applicants_group))
                     {
-                        applicant.AlternativeCast = alternative_casts[next_cast++];
-                        if (next_cast == alternative_casts.Length)
+                        applicant.AlternativeCast = alternativeCasts[next_cast++];
+                        if (next_cast == alternativeCasts.Length)
                             next_cast = 0;
                     }
                 }
