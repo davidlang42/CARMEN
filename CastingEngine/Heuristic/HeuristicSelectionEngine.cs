@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,14 +16,23 @@ namespace Carmen.CastingEngine.Heuristic
             : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction)
         { }
 
-        //TODO summary comment
-        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)//TODO NOTE: CastGroup requirements may not depend on CastGroups or Tags
+        /// <summary>Select applicants into Cast Groups, respecting those already selected, by calculating the remaining count for each group,
+        /// then taking the applicants with the highest overall ability until all cast groups are filled or there are no more applicants.
+        /// This intentionally ignores the suitability of the applicant for the Cast Group, only checking that the minimum requirements are satisfied.</summary>
+        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
         {
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
             var remaining_groups = new Dictionary<CastGroup, uint?>();
             // Calculate the remaining number of cast needed in each group (respecting those already accepted)
             foreach (var cast_group in cast_groups)
             {
+                // Check that requirements don't include TagRequirements
+                var tag_requirements = cast_group.Requirements
+                    .SelectMany(r => r.References()).Concat(cast_group.Requirements)
+                    .OfType<TagRequirement>();
+                if (tag_requirements.Any())
+                    throw new ApplicationException("Cast group requirements cannot refer to Tags.");
+                // Add remaining cast to dictionary
                 if (cast_group.RequiredCount is uint required)
                 {
                     if (cast_group.AlternateCasts)
@@ -35,7 +45,7 @@ namespace Carmen.CastingEngine.Heuristic
                     remaining_groups.Add(cast_group, null);
             }
             // Allocate non-accepted applicants to cast groups, until the remaining counts are 0
-            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => ApplicantEngine.OverallAbility(a)))//TODO note that this ignored suitabilityof(cast group)
+            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => ApplicantEngine.OverallAbility(a)))
             {
                 if (NextAvailableCastGroup(remaining_groups, applicant) is CastGroup cg)
                 {

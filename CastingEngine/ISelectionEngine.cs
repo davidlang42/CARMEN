@@ -28,7 +28,7 @@ namespace Carmen.CastingEngine
         double SuitabilityOf(Applicant applicant, Tag tag);
 
         /// <summary>Select applicants into cast groups, respecting those already placed
-        /// NOTE: CastGroup requirements may not depend on CastGroups or Tags</summary>
+        /// NOTE: CastGroup requirements may not depend on Tags</summary>
         void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups);
 
         /// <summary>Balance applicants between alternative casts, respecting those already set

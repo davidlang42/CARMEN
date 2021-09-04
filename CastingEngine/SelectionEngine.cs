@@ -45,20 +45,20 @@ namespace Carmen.CastingEngine
         public virtual double SuitabilityOf(Applicant applicant, CastGroup cast_group)
         {
             var sub_suitabilities = cast_group.Requirements.Select(req => ApplicantEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
-            return sub_suitabilities.Average(); //TODO handle ties with OverallAbility elsewhere
+            return sub_suitabilities.Average();
         }
 
         /// <summary>Default implementation returns an average of the suitability for each individual requirement</summary>
         public virtual double SuitabilityOf(Applicant applicant, Tag tag)
         {
             var sub_suitabilities = tag.Requirements.Select(req => ApplicantEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
-            return sub_suitabilities.Average(); //TODO handle ties with OverallAbility elsewhere
+            return sub_suitabilities.Average();
         }
 
         /// <summary>Default implementation allocates cast numbers to accepted applicants based on the requested order.
         /// Members of cast groups which alternate casts are given the first available cast number for their alternative
         /// cast, leaving gaps which are later filled from the bottom up.</summary>
-        public virtual void AllocateCastNumbers(IEnumerable<Applicant> applicants)//TODO Accepted applicants must have an AlternativeCast set when CastGroup.AlternateCasts == true
+        public virtual void AllocateCastNumbers(IEnumerable<Applicant> applicants)
         {
             var cast_numbers = new CastNumberSet();
             // find cast numbers which are already set
@@ -66,6 +66,9 @@ namespace Carmen.CastingEngine
             {
                 if (applicant.CastGroup != null)
                 {
+                    if (applicant.CastGroup.AlternateCasts != (applicant.AlternativeCast != null))
+                        throw new ApplicationException($"Applicant '{applicant.FirstName} {applicant.LastName}' is in a cast group with Alternate Casts"
+                            + $" set to {applicant.CastGroup.AlternateCasts}, but {(applicant.AlternativeCast != null ? "has" : "doesn't have")} an alternative cast.");
                     if (applicant.CastNumber is int cast_number)
                         if (!cast_numbers.Add(cast_number, applicant.AlternativeCast, applicant.CastGroup))
                             // if add fails, this cast number has already been allocated, therefore remove it
@@ -87,7 +90,7 @@ namespace Carmen.CastingEngine
 
         /// <summary>Default implementation applies tags in a order that ensures any tags which depend on other tags through
         /// requirements are processed first. This assumes there are no circular dependency between tags.</summary>
-        public virtual void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)//TODO Accepted applicants must have an AlternativeCast set when CastGroup.AlternateCasts == true
+        public virtual void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)
         {
             // list all tags referenced by each tag
             var tag_references = new Dictionary<Tag, HashSet<Tag>>();
@@ -137,10 +140,16 @@ namespace Carmen.CastingEngine
             {
                 if (applicant.CastGroup == null)
                     applicant.Tags.Remove(tag); // not accepted, therefore remove tag
-                else if (applicant.Tags.Contains(tag)
-                    && remaining.TryGetValue(applicant.CastGroup, out var remaining_count)
-                    && remaining_count != 0)
-                    remaining[applicant.CastGroup] = remaining_count - 1;
+                else
+                {
+                    if (applicant.CastGroup.AlternateCasts != (applicant.AlternativeCast != null))
+                        throw new ApplicationException($"Applicant '{applicant.FirstName} {applicant.LastName}' is in a cast group with Alternate Casts"
+                            + $" set to {applicant.CastGroup.AlternateCasts}, but {(applicant.AlternativeCast != null ? "has" : "doesn't have")} an alternative cast.");
+                    if (applicant.Tags.Contains(tag)
+                        && remaining.TryGetValue(applicant.CastGroup, out var remaining_count)
+                        && remaining_count != 0)
+                        remaining[applicant.CastGroup] = remaining_count - 1;
+                }
             }
             // Apply tags to accepted applicants in order of suitability
             var prioritised_applicants = applicants.Where(a => a.IsAccepted)

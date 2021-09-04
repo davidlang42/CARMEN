@@ -64,6 +64,7 @@ namespace Carmen.CastingEngine.Heuristic
                 .Where(a => AvailabilityOf(a, role).IsAvailable)
                 .Where(a => EligibilityOf(a, role).IsEligible)
                 .OrderBy(a => SuitabilityOf(a, role)) // order by suitability ascending so that the lowest suitability is at the bottom of the stack
+                .ThenBy(a => ApplicantEngine.OverallAbility(a)) // then by overall ability ascending so that the lowest ability is at the bottom of the stack
                 .GroupBy(a => a.CastGroup!)
                 .ToDictionary(g => g.Key, g => new Stack<Applicant>(g));
             // select the required number of cast in the priority order, adding alternative cast buddies as required

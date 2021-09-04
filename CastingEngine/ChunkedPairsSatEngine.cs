@@ -37,14 +37,26 @@ namespace Carmen.CastingEngine
             primaryCriterias = criterias.Where(c => c.Primary).ToArray();
         }
 
-        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)//TODO NOTE: CastGroup requirements may not depend on CastGroups or Tags
+        /// <summary>Select applicants into Cast Groups, respecting those already selected, by calculating the remaining count for each group,
+        /// then taking the applicants with the highest overall ability until all cast groups are filled or there are no more applicants.
+        /// NOTE: This currently ignores the suitability of the applicant for the Cast Group, only checking that the minimum requirements are satisfied,
+        /// but this should be improved in the future.</summary>
+        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
         {
             //LATER handle the fact that cast group requirements may not be mutually exclusive, possibly using SAT (current implementation is copied from HeuristicSelectionEngine)
+            //LATER use SuitabilityOf(Applicant, CastGroup) to order applicants, handling ties with OverallAbility
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
             var remaining_groups = new Dictionary<CastGroup, uint?>();
             // Calculate the remaining number of cast needed in each group (respecting those already accepted)
             foreach (var cast_group in cast_groups)
             {
+                // Check that requirements don't include TagRequirements
+                var tag_requirements = cast_group.Requirements
+                    .SelectMany(r => r.References()).Concat(cast_group.Requirements)
+                    .OfType<TagRequirement>();
+                if (tag_requirements.Any())
+                    throw new ApplicationException("Cast group requirements cannot refer to Tags.");
+                // Add remaining cast to dictionary
                 if (cast_group.RequiredCount is uint required)
                 {
                     if (cast_group.AlternateCasts)
