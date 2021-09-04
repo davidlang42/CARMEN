@@ -479,7 +479,7 @@ namespace CarmenUI.Pages
                 parent.Children.Remove(node);
                 grandparent.Children.InsertInOrder(node, parent.Order);
                 node.Parent = grandparent;
-                SelectTreeNode(node);
+                itemsTreeView.SetSelectedItem(node);
             }
             else if (sibling_above is InnerNode inner_node_above)
             {
@@ -487,7 +487,7 @@ namespace CarmenUI.Pages
                 parent.Children.Remove(node);
                 inner_node_above.Children.InsertInOrder(node);
                 node.Parent = inner_node_above;
-                SelectTreeNode(node);
+                itemsTreeView.SetSelectedItem(node);
             }
             else
             {
@@ -512,7 +512,7 @@ namespace CarmenUI.Pages
                 parent.Children.Remove(node);
                 grandparent.Children.InsertInOrder(node, parent);
                 node.Parent = grandparent;
-                SelectTreeNode(node);
+                itemsTreeView.SetSelectedItem(node);
             }
             else if (sibling_below is InnerNode inner_node_below)
             {
@@ -520,7 +520,7 @@ namespace CarmenUI.Pages
                 parent.Children.Remove(node);
                 inner_node_below.Children.InsertInOrder(node, inner_node_below.Children.FirstOrder());
                 node.Parent = inner_node_below;
-                SelectTreeNode(node);
+                itemsTreeView.SetSelectedItem(node);
             }
             else
             {
@@ -528,18 +528,6 @@ namespace CarmenUI.Pages
                 parent.Children.MoveInOrder(node, sibling_below);
             }
             EnableMoveButtons(node);
-        }
-
-        private void SelectTreeNode(Node select_node)
-        {
-            foreach (var tvi in itemsTreeView.VisualDescendants<TreeViewItem>())
-            {
-                if (tvi.DataContext is Node node && node == select_node)
-                {
-                    tvi.IsSelected = true;
-                    break;
-                }
-            }
         }
     }
 }
