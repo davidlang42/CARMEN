@@ -480,12 +480,16 @@ namespace CarmenUI.Pages
                 // at top of parent, move to sibling of parent above parent
                 parent.Children.Remove(node);
                 grandparent.Children.InsertInOrder(node, parent.Order);
+                node.Parent = grandparent;
+                //TODO re-select node
             }
             else if (sibling_above is InnerNode inner_node_above)
             {
                 // sibling above can have children, move to last child of sibling above
                 parent.Children.Remove(node);
                 inner_node_above.Children.InsertInOrder(node);
+                node.Parent = inner_node_above;
+                //TODO re-select node
             }
             else
             {
@@ -508,12 +512,16 @@ namespace CarmenUI.Pages
                 // at bottom of parent, move to sibling of parent after parent
                 parent.Children.Remove(node);
                 grandparent.Children.InsertInOrder(node, parent);
+                node.Parent = grandparent;
+                //TODO re-select node
             }
             else if (sibling_below is InnerNode inner_node_below)
             {
                 // sibling below can have children, move to first child of sibling below
                 parent.Children.Remove(node);
                 inner_node_below.Children.InsertInOrder(node, inner_node_below.Children.FirstOrder());
+                node.Parent = inner_node_below;
+                //TODO re-select node
             }
             else
             {
