@@ -18,15 +18,25 @@ namespace Carmen.CastingEngine
         //TODO look at common arguments, eg. cast groups/ alternative casts ande decide what should be in the constructor
         public IApplicantEngine ApplicantEngine { get; init; }
 
-        public abstract IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts);
         public abstract double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role);
-        public abstract IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order);
         public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
         public abstract double SuitabilityOf(Applicant applicant, Role role);
 
         public AllocationEngine(IApplicantEngine applicant_engine)
         {
             ApplicantEngine = applicant_engine;
+        }
+
+        /// <summary>Default implementation enumerates roles in item order, then by name, removing duplicates</summary>
+        public virtual IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order)
+            => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();
+
+        /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
+        public virtual IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts)
+        {
+            var casts = alternative_casts.ToArray();
+            foreach (var role in roles)
+                yield return new KeyValuePair<Role, IEnumerable<Applicant>>(role, PickCast(applicants, role, casts));
         }
 
         /// <summary>Finds the next Role in IdealCastingOrder() which has not yet been fully cast,

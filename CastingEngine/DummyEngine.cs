@@ -165,17 +165,5 @@ namespace Carmen.CastingEngine
                 }
             }
         }
-
-        /// <summary>Dummy value enumerates roles in item order, then by name, removing duplicates</summary>
-        public override IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order)//TODO move default implementation in AllocationEngine
-            => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();//TODO action write better default implentation into AllocationEngine based on which roles have the least number of eligible applicants, maybe this needs its own IEngine type?
-
-        /// <summary>Dummy balancing just calls PickCast on the roles in order, performing no balancing.</summary>
-        public override IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts)//TODO move default implementation into AllocationEngine
-        {
-            var casts = alternative_casts.ToArray();
-            foreach (var role in roles)
-                yield return new KeyValuePair<Role, IEnumerable<Applicant>>(role, PickCast(applicants, role, casts));
-        }
     }
 }
