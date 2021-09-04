@@ -104,7 +104,7 @@ namespace CarmenUI.Pages
                     IApplicantEngine applicant_engine = ParseApplicantEngine() switch
                     {
                         nameof(DummyApplicantEngine) => new DummyApplicantEngine(),
-                        nameof(HeuristicAllocationEngine) => new WeightedSumEngine(criterias),
+                        nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
                         _ => throw new ArgumentException($"Applicant engine not handled: {ParseApplicantEngine()}")
                     };
                     _engine = ParseAllocationEngine() switch

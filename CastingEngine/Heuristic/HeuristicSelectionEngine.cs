@@ -74,14 +74,12 @@ namespace Carmen.CastingEngine.Heuristic
             return null;
         }
 
-        //TODO summary comment
-        public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> _)
+        /// <summary>Allocate applicants into alternative casts by grouping by cast group, counting the applicants already in casts,
+        /// allocating the same_cast_set applicants first, then filling the rest by sorting the applicants into cast number order
+        /// and putting one at a time into the cast with the current smallest count.</summary>
+        public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets)
         {
-            //TODO heuristic- ModifiedHeuristicEngine should take into account locked sets, by process:
-            // - do not buddy people within a locked set
-            // - do not buddy someone in a locked set with someone in any other locked set
-            // - swap casts within a buddy set afterwards, in order to meet all locked set requirements (should work as long as the above is true)
-
+            same_cast_sets = same_cast_sets.ToArray(); // make it safe to enumerate repeatedly
             // sort the applicants into cast groups
             foreach (var applicants_group in applicants.GroupBy(a => a.CastGroup))
             {
@@ -94,10 +92,38 @@ namespace Carmen.CastingEngine.Heuristic
                 }
                 else
                 {
-                    // allocate alternative cast
-                    //TODO heuristic- currently this overwrites, but it should respect
+                    // count existing alternative casts
+                    var applicants_needing_cast = new List<Applicant>();
+                    var cast_counts = new int[alternativeCasts.Length];
+                    foreach (var applicant in applicants_group)
+                    {
+                        if (applicant.AlternativeCast is AlternativeCast ac)
+                        {
+                            var index = Array.IndexOf(alternativeCasts, ac);
+                            if (index < 0)
+                                throw new ApplicationException($"Alternative cast '{ac.Name}' not found in AlternativeCasts provided.");
+                            cast_counts[index]++;
+                        }
+                        else
+                            applicants_needing_cast.Add(applicant);
+                    }
+                    // allocate casts to same cast sets first
+                    foreach (var same_cast_set in same_cast_sets)
+                    {
+                        int cast_index;
+                        if (same_cast_set.Select(a => a.AlternativeCast).OfType<AlternativeCast>().Distinct().SingleOrDefaultSafe() is AlternativeCast alternative_cast)
+                            cast_index = Array.IndexOf(alternativeCasts, alternative_cast);
+                        else
+                            cast_index = MinimumIndex(cast_counts);
+                        foreach (var unset_cast in same_cast_set.Where(a => a.CastGroup == cast_group).Where(a => a.AlternativeCast == null))
+                        {
+                            unset_cast.AlternativeCast = alternativeCasts[cast_index];
+                            cast_counts[cast_index]++;
+                        }
+                    }
+                    // allocate remaining alternative casts
                     int next_cast = 0;
-                    foreach (var applicant in CastNumberingOrder(applicants_group))
+                    foreach (var applicant in CastNumberingOrder(applicants_group.Where(a => a.AlternativeCast == null)))
                     {
                         applicant.AlternativeCast = alternativeCasts[next_cast++];
                         if (next_cast == alternativeCasts.Length)
@@ -105,6 +131,18 @@ namespace Carmen.CastingEngine.Heuristic
                     }
                 }
             }
+        }
+
+        /// <summary>Finds the index of the minimum value in the array</summary>
+        private int MinimumIndex(int[] counts)
+        {
+            if (counts.Length == 0)
+                throw new ApplicationException("Counts array is empty.");
+            int min = 0;
+            for (var i = 1; i < counts.Length; i++)
+                if (counts[i] < counts[min])
+                    min = i;
+            return min;
         }
     }
 }

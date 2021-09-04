@@ -77,11 +77,11 @@ namespace CarmenUI.Pages
                 alternative_casts = await context.AlternativeCasts.ToArrayAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
-            using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
-                await context.CastGroups.Include(cg => cg.Members).LoadAsync();
+            using (loading.Segment(nameof(ShowContext.CastGroups) + nameof(CastGroup.Members) + nameof(CastGroup.Requirements), "Cast groups"))
+                await context.CastGroups.Include(cg => cg.Members).Include(cg => cg.Requirements).LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
-            using (loading.Segment(nameof(ShowContext.Tags) + nameof(A.Tag.Members), "Tags"))
-                await context.Tags.Include(cg => cg.Members).LoadAsync();
+            using (loading.Segment(nameof(ShowContext.Tags) + nameof(A.Tag.Members) + nameof(A.Tag.Requirements), "Tags"))
+                await context.Tags.Include(t => t.Members).Include(t => t.Requirements).LoadAsync();
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
                 await context.Applicants.LoadAsync();
@@ -98,7 +98,7 @@ namespace CarmenUI.Pages
                 IApplicantEngine applicant_engine = ParseApplicantEngine() switch
                 {
                     nameof(DummyApplicantEngine) => new DummyApplicantEngine(),
-                    nameof(HeuristicAllocationEngine) => new WeightedSumEngine(criterias),
+                    nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
                     _ => throw new ArgumentException($"Applicant engine not handled: {ParseApplicantEngine()}")
                 };
                 _engine = ParseSelectionEngine() switch
