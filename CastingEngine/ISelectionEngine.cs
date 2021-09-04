@@ -19,17 +19,21 @@ namespace Carmen.CastingEngine
         void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts);
 
         /// <summary>Balance applicants between alternative casts, respecting those already set
-        /// NOTE: All applicants must have a CastGroup set</summary>
+        /// NOTE: This will clear the AlternativeCast of rejected Applicants</summary>
         void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets);
 
         /// <summary>Allocate cast numbers, respecting those already set, ordered by a criteria, otherwise overall ability
-        /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set</summary>
+        /// NOTE:
+        /// - This will clear the cast number of rejected Applicants
+        /// - Accepted applicants must have an AlternativeCast set when CastGroup.AlternateCasts == true</summary>
         void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? order_by, ListSortDirection sort_direction);
 
         /// <summary>Apply tags to applicants, respecting those already applied
-        /// NOTE: All applicants must have a CastGroup (and AlternativeCast when CastGroup.AlternateCasts) set,
-        /// Tag requirements may depend on other Tags as long as there is no circular dependency and the dependee
-        /// tag is also being applied as part of this call</summary>
-        void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts);
+        /// NOTE:
+        /// - This will remove Tags from rejected Applicants
+        /// - Accepted applicants must have an AlternativeCast set when CastGroup.AlternateCasts == true
+        /// - Tag requirements may depend on other Tags as long as there is no circular dependency and the dependee
+        ///   tag is also being applied as part of this call</summary>
+        void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts);//TODO handle tag dependent tags
     }
 }
