@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine.SAT
+namespace Carmen.CastingEngine.SAT.Internal
 {
     /// <summary>
     /// Calculate the boolean expression representing a given boolean function, using the truth table method

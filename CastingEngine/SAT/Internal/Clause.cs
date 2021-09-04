@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine.SAT
+namespace Carmen.CastingEngine.SAT.Internal
 {
     /// <summary>
     /// A disjunction (OR) of boolean literals.

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine.SAT
+namespace Carmen.CastingEngine.SAT.Internal
 {
     public class DpllSolver<T> : Solver<T>
         where T : notnull

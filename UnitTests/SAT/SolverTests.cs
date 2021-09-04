@@ -1,4 +1,5 @@
 ﻿using Carmen.CastingEngine.SAT;
+using Carmen.CastingEngine.SAT.Internal;
 using FluentAssertions;
 using System;
 using System.Collections.Generic;
