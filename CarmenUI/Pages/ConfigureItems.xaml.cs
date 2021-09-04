@@ -443,14 +443,12 @@ namespace CarmenUI.Pages
         {
             if (itemsTreeView.SelectedItem is Node n)
                 MoveNodeUp(n);
-            //TODO EnableMoveButtons(index_below);
         }
 
         private void moveDownButton_Click(object sender, RoutedEventArgs e)
         {
             if (itemsTreeView.SelectedItem is Node n)
                 MoveNodeDown(n);
-            //TODO EnableMoveButtons(index_below);
         }
 
         private void EnableMoveButtons(Node? selected)
@@ -481,7 +479,7 @@ namespace CarmenUI.Pages
                 parent.Children.Remove(node);
                 grandparent.Children.InsertInOrder(node, parent.Order);
                 node.Parent = grandparent;
-                //TODO re-select node
+                SelectTreeNode(node);
             }
             else if (sibling_above is InnerNode inner_node_above)
             {
@@ -489,13 +487,14 @@ namespace CarmenUI.Pages
                 parent.Children.Remove(node);
                 inner_node_above.Children.InsertInOrder(node);
                 node.Parent = inner_node_above;
-                //TODO re-select node
+                SelectTreeNode(node);
             }
             else
             {
                 // sibling above cannot have children, move above sibling
                 parent.Children.MoveInOrder(node, sibling_above.Order);
             }
+            EnableMoveButtons(node);
         }
 
         private void MoveNodeDown(Node node)
@@ -513,7 +512,7 @@ namespace CarmenUI.Pages
                 parent.Children.Remove(node);
                 grandparent.Children.InsertInOrder(node, parent);
                 node.Parent = grandparent;
-                //TODO re-select node
+                SelectTreeNode(node);
             }
             else if (sibling_below is InnerNode inner_node_below)
             {
@@ -521,12 +520,25 @@ namespace CarmenUI.Pages
                 parent.Children.Remove(node);
                 inner_node_below.Children.InsertInOrder(node, inner_node_below.Children.FirstOrder());
                 node.Parent = inner_node_below;
-                //TODO re-select node
+                SelectTreeNode(node);
             }
             else
             {
                 // sibling below cannot have children, move after sibling
                 parent.Children.MoveInOrder(node, sibling_below);
+            }
+            EnableMoveButtons(node);
+        }
+
+        private void SelectTreeNode(Node select_node)
+        {
+            foreach (var tvi in itemsTreeView.VisualDescendants<TreeViewItem>())
+            {
+                if (tvi.DataContext is Node node && node == select_node)
+                {
+                    tvi.IsSelected = true;
+                    break;
+                }
             }
         }
     }
