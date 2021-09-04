@@ -93,7 +93,7 @@ namespace CarmenUI.Pages
                 _criterias = await context.Criterias.ToArrayAsync();
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
-                //LATER have a mechanism to choose which engine
+                //TODO have a mechanism to choose which engine
                 //_engine = new DummyEngine();
                 _engine = new OriginalHeuristicEngine(criterias, null, ListSortDirection.Descending);
                 //_engine = new ChunkedPairsSatEngine(criterias);

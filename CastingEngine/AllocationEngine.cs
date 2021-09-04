@@ -15,6 +15,7 @@ namespace Carmen.CastingEngine
     /// </summary>
     public abstract class AllocationEngine : IAllocationEngine
     {
+        //TODO look at common arguments, eg. cast groups/ alternative casts ande decide what should be in the constructor
         public IApplicantEngine ApplicantEngine { get; init; }
 
         public abstract IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts);

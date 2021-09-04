@@ -112,7 +112,7 @@ namespace Carmen.CastingEngine
         public override double SuitabilityOf(Applicant applicant, Role role)//TODO move suitability into applicantengine
         {
             var sub_suitabilities = role.Requirements.Select(req => SuitabilityOf(applicant, req)).DefaultIfEmpty();
-            return sub_suitabilities.Average();//LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
+            return sub_suitabilities.Average();//TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
         }
 
         private double SuitabilityOf(Applicant applicant, Requirement requirement)
@@ -121,16 +121,16 @@ namespace Carmen.CastingEngine
                 AbilityRangeRequirement arr => ScaledSuitability(arr.IsSatisfiedBy(applicant), arr.ScaleSuitability, applicant.MarkFor(arr.Criteria), arr.Criteria.MaxMark),
                 NotRequirement nr => 1 - SuitabilityOf(applicant, nr.SubRequirement),
                 AndRequirement ar => ar.AverageSuitability ? ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(), //LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
+                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
                 OrRequirement or => or.AverageSuitability ? or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(), //LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
+                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
                 XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? SuitabilityOf(applicant, req) : 0,
                 Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
             };
 
         private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark)
         {
-            //LATER real implementation might not test if in range
+            //TODO real implementation might not test if in range
             if (!in_range)
                 return 0;
             else if (scale_suitability)

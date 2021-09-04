@@ -14,6 +14,7 @@ namespace Carmen.CastingEngine
     /// </summary>
     public abstract class SelectionEngine : ISelectionEngine
     {
+        //TODO look at common arguments, eg. cast groups/ alternative casts ande decide what should be in the constructor
         public IApplicantEngine ApplicantEngine { get; init; }
 
         public abstract void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? order_by, ListSortDirection sort_direction);

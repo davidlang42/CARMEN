@@ -101,7 +101,7 @@ namespace CarmenUI.Pages
                     total_cast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
                 {
-                    //LATER have a mechanism to choose which engine
+                    //TODO have a mechanism to choose which engine
                     //_engine = new DummyEngine();
                     _engine = new OriginalHeuristicEngine(criterias, null, ListSortDirection.Descending);
                 }
@@ -336,7 +336,7 @@ namespace CarmenUI.Pages
                 foreach (var applicant in pair.Value)
                     pair.Key.Cast.Add(applicant);
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts);
-            //TODO (BALANCE) should we allow IdealCastingOrder() to return sets of roles to be cast together? how will the UI handle this?
+            //TODO balance- should we allow IdealCastingOrder() to return sets of roles to be cast together? how will the UI handle this?
         }
 
         private List<Role>? ParseSelectedRoles(IEnumerable<IncompleteRole> incomplete_roles)

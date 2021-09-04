@@ -16,23 +16,8 @@ namespace Carmen.CastingEngine.Heuristic
 
         /// Calculate the overall ability of an Applicant as a simple weighted sum of their Abilities</summary>
         public int OverallAbility(Applicant applicant)
-        {
-            try
-            {
-                return Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
-            }
-            catch (OverflowException)
-            {
-                //LATER log exception
-                return int.MaxValue;
-            }
-            catch (DivideByZeroException)
-            {
-                //LATER log exception
-                return 0;
-            }
-        }
-
+            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
+        
         public WeightedSumEngine(Criteria[] criterias)
         {
             var max = criterias.Select(c => c.Weight).Where(w => w > 0).Sum();

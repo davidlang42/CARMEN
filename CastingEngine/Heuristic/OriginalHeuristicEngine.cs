@@ -22,7 +22,7 @@ namespace Carmen.CastingEngine.Heuristic
         public OriginalHeuristicEngine(Criteria[] criterias, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
             : base(criterias)
         {
-            CastNumberOrderBy = cast_number_order_by; //LATER remove these, only relevant to ISelectionEngine
+            CastNumberOrderBy = cast_number_order_by; //TODO remove these, only relevant to ISelectionEngine
             CastNumberOrderDirection = cast_number_order_direction;
         }
 
@@ -76,7 +76,7 @@ namespace Carmen.CastingEngine.Heuristic
 
         public void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> _)
         {
-            //TODO (HEURISTIC) ModifiedHeuristicEngine should take into account locked sets, by process:
+            //TODO heuristic- ModifiedHeuristicEngine should take into account locked sets, by process:
             // - do not buddy people within a locked set
             // - do not buddy someone in a locked set with someone in any other locked set
             // - swap casts within a buddy set afterwards, in order to meet all locked set requirements (should work as long as the above is true)
@@ -94,7 +94,7 @@ namespace Carmen.CastingEngine.Heuristic
                 else
                 {
                     // allocate alternative cast
-                    //TODO (HEURISTIC) currently this overwrites, but it should respect
+                    //TODO heuristic- currently this overwrites, but it should respect
                     int next_cast = 0;
                     foreach (var applicant in Sort(applicants_group, CastNumberOrderBy, CastNumberOrderDirection))
                     {
@@ -147,7 +147,7 @@ namespace Carmen.CastingEngine.Heuristic
         public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts)
         {
             // allocate tags sequentially because they aren't dependant on each other
-            tags = tags.ToArray(); //TODO (HEURISTIC) fix this hack for concurrent modification of collecion
+            tags = tags.ToArray(); //TODO heuristic- fix this hack for concurrent modification of collecion
             foreach (var tag in tags)
                 ApplyTag(applicants, tag, number_of_alternative_casts);
         }
@@ -169,7 +169,7 @@ namespace Carmen.CastingEngine.Heuristic
                     remaining[applicant.CastGroup] = remaining_count - 1;
             }
             // Apply tags to accepted applicants in order of suitability
-            foreach (var applicant in applicants.Where(a => a.IsAccepted).OrderByDescending(a => SuitabilityOf(a, tag.Requirements))) //TODO (HEURISTIC) ModifiedHeuristicEngine should fallback to OverallAbility if tied on tag requirements
+            foreach (var applicant in applicants.Where(a => a.IsAccepted).OrderByDescending(a => SuitabilityOf(a, tag.Requirements))) //TODO heuristic- ModifiedHeuristicEngine should fallback to OverallAbility if tied on tag requirements
             {
                 if (tag.Requirements.All(r => r.IsSatisfiedBy(applicant))) // cast member meets minimum requirement
                 {
@@ -190,33 +190,33 @@ namespace Carmen.CastingEngine.Heuristic
         #region Copied from DummyEngine
         /// <summary>Calculate the suitability of an applicant against a set of requirements.
         /// This assumes no circular references.</summary>
-        private double SuitabilityOf(Applicant applicant, IEnumerable<Requirement> requirements) //LATER copied from DummyEngine
+        private double SuitabilityOf(Applicant applicant, IEnumerable<Requirement> requirements) //TODO copied from DummyEngine
         {
             var sub_suitabilities = requirements.Select(req => SuitabilityOf(applicant, req)).DefaultIfEmpty();
-            return sub_suitabilities.Average(); //LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
+            return sub_suitabilities.Average(); //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
         }
 
-        private double SuitabilityOf(Applicant applicant, Requirement requirement) //LATER copied from DummyEngine
+        private double SuitabilityOf(Applicant applicant, Requirement requirement) //TODO copied from DummyEngine
             => requirement switch
             {
                 AbilityRangeRequirement arr => ScaledSuitability(arr.IsSatisfiedBy(applicant), arr.ScaleSuitability, applicant.MarkFor(arr.Criteria), arr.Criteria.MaxMark),
                 NotRequirement nr => 1 - SuitabilityOf(applicant, nr.SubRequirement),
                 AndRequirement ar => ar.AverageSuitability ? ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(), //LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
+                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
                 OrRequirement or => or.AverageSuitability ? or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(), //LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
+                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
                 XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? SuitabilityOf(applicant, req) : 0,
                 Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
             };
 
         /// <summary>Counts top level AbilityExact/AbilityRange requirements only</summary>
-        public double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role) //LATER copied from DummyEngine
+        public double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role) //TODO copied from DummyEngine
             => applicant.Roles.Where(r => r != excluding_role)
             .Where(r => r.Requirements.Any(req => req is ICriteriaRequirement cr && cr.Criteria == criteria))
             .Count();
 
         /// <summary>Enumerates roles in item order, then by name, removing duplicates</summary>
-        public IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order) //LATER copied from DummyEngine
+        public IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order) //TODO copied from DummyEngine
             => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();
 
         /// <summary>Calls PickCast on the roles in order, performing no balancing</summary>
@@ -228,9 +228,9 @@ namespace Carmen.CastingEngine.Heuristic
         }
         #endregion
 
-        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark) //LATER modified from DummyEngine
+        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark) //TODO modified from DummyEngine
         {
-            //LATER real implementation might not test if in range
+            //TODO real implementation might not test if in range
             if (scale_suitability)
                 return (double)mark / max_mark;
             else if (!in_range)
@@ -265,8 +265,8 @@ namespace Carmen.CastingEngine.Heuristic
         /// NOTE: This does not respect existing casting, and expects it to be cleared before calling</summary>
         public IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts)
         {
-            alternative_casts = alternative_casts.ToArray(); //LATER maybe pass this in as an array?
-            //TODO (HEURISTIC) this whole algorithm doesn't respect already picked, but thats what the original heuristic did, so...
+            alternative_casts = alternative_casts.ToArray(); //TODO maybe pass this in as an array?
+            //TODO heuristic- this whole algorithm doesn't respect already picked, but thats what the original heuristic did, so...
             var required_cast_groups = new Dictionary<CastGroup, uint>();
             foreach (var cbg in role.CountByGroups)
                 if (cbg.Count != 0)
@@ -274,7 +274,7 @@ namespace Carmen.CastingEngine.Heuristic
             var potential_cast_by_group = applicants
                 .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
                 .Where(a => AvailabilityOf(a, role).IsAvailable)
-                .Where(a => EligibilityOf(a, role).IsEligible) //TODO (HEURISTIC) document bonus: original didn't look at eligible, but now it does
+                .Where(a => EligibilityOf(a, role).IsEligible) //TODO heuristic- document bonus: original didn't look at eligible, but now it does
                 .OrderBy(a => SuitabilityOf(a, role)) // order by suitability ascending so that the lowest suitability is at the bottom of the stack
                 .GroupBy(a => a.CastGroup!)
                 .ToDictionary(g => g.Key, g => new Stack<Applicant>(g));

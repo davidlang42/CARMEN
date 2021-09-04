@@ -30,7 +30,7 @@ namespace Carmen.CastingEngine
         }
 
         #region Copied from OriginalHeuristicEngine
-        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts) //LATER copied from OriginalHeuristicEngine
+        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts) //TODO copied from OriginalHeuristicEngine
         {
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
             var remaining_groups = new Dictionary<CastGroup, uint?>();
@@ -68,7 +68,7 @@ namespace Carmen.CastingEngine
         }
 
         /// <summary>Find a cast group with availability for which this applicant meets the cast group's requirements</summary>
-        private CastGroup? NextAvailableCastGroup(Dictionary<CastGroup, uint?> remaining_groups, Applicant applicant) //LATER copied from OriginalHeuristicEngine
+        private CastGroup? NextAvailableCastGroup(Dictionary<CastGroup, uint?> remaining_groups, Applicant applicant) //TODO copied from OriginalHeuristicEngine
         {
             foreach (var (cg, remaining_count) in remaining_groups)
             {
@@ -119,7 +119,7 @@ namespace Carmen.CastingEngine
         public override void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts)
         {
             // allocate tags sequentially because they aren't dependant on each other
-            tags = tags.ToArray(); //TODO (HEURISTIC) fix this hack for concurrent modification of collecion
+            tags = tags.ToArray(); //TODO heuristic- fix this hack for concurrent modification of collecion
             foreach (var tag in tags)
                 ApplyTag(applicants, tag, number_of_alternative_casts);
         }
@@ -141,7 +141,7 @@ namespace Carmen.CastingEngine
                     remaining[applicant.CastGroup] = remaining_count - 1;
             }
             // Apply tags to accepted applicants in order of suitability
-            foreach (var applicant in applicants.Where(a => a.IsAccepted).OrderByDescending(a => SuitabilityOf(a, tag.Requirements))) //TODO (HEURISTIC) ModifiedHeuristicEngine should fallback to OverallAbility if tied on tag requirements
+            foreach (var applicant in applicants.Where(a => a.IsAccepted).OrderByDescending(a => SuitabilityOf(a, tag.Requirements))) //TODO heuristic- ModifiedHeuristicEngine should fallback to OverallAbility if tied on tag requirements
             {
                 if (tag.Requirements.All(r => r.IsSatisfiedBy(applicant))) // cast member meets minimum requirement
                 {
@@ -163,25 +163,25 @@ namespace Carmen.CastingEngine
         private double SuitabilityOf(Applicant applicant, IEnumerable<Requirement> requirements)
         {
             var sub_suitabilities = requirements.Select(req => SuitabilityOf(applicant, req)).DefaultIfEmpty();
-            return sub_suitabilities.Average(); //LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
+            return sub_suitabilities.Average(); //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
         }
 
-        private double SuitabilityOf(Applicant applicant, Requirement requirement) //LATER copied from DummyEngine
+        private double SuitabilityOf(Applicant applicant, Requirement requirement) //TODO copied from DummyEngine
             => requirement switch
             {
                 AbilityRangeRequirement arr => ScaledSuitability(arr.IsSatisfiedBy(applicant), arr.ScaleSuitability, applicant.MarkFor(arr.Criteria), arr.Criteria.MaxMark),
                 NotRequirement nr => 1 - SuitabilityOf(applicant, nr.SubRequirement),
                 AndRequirement ar => ar.AverageSuitability ? ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(), //LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
+                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
                 OrRequirement or => or.AverageSuitability ? or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(), //LATER real implementation might use a different combination function (eg. average, weighted average, product, or max)
+                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
                 XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? SuitabilityOf(applicant, req) : 0,
                 Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
             };
 
-        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark) //LATER copied from DummyEngine
+        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark) //TODO copied from DummyEngine
         {
-            //LATER real implementation might not test if in range
+            //TODO real implementation might not test if in range
             if (!in_range)
                 return 0;
             else if (scale_suitability)
@@ -304,7 +304,7 @@ namespace Carmen.CastingEngine
         /// <summary>Creates a clause specifying that all these applicants are in the same alternative cast</summary>
         private IEnumerable<Clause<Applicant>> KeepTogether(Applicant[] applicants)
         {
-            //LATER cache builders, because they are probably quite slow (cache should persist at least as long as the engine, maybe application, maybe to disk)
+            //TODO cache builders, because they are probably quite slow (cache should persist at least as long as the engine, maybe application, maybe to disk)
             var builder = new ExpressionBuilder(applicants.Length, values => values.All(v => v) || values.All(v => !v));
             foreach (var clause in builder.Apply(applicants).Clauses)
                 yield return clause;
@@ -313,7 +313,7 @@ namespace Carmen.CastingEngine
         /// <summary>Creates a clause specifying that exactly half of the given applicants are in each alternative cast</summary>
         private IEnumerable<Clause<Applicant>> KeepSeparate(Applicant[] applicants)
         {
-            //LATER cache builders, because they are probably quite slow (cache should persist at least as long as the engine, maybe application, maybe to disk)
+            //TODO cache builders, because they are probably quite slow (cache should persist at least as long as the engine, maybe application, maybe to disk)
             var builder = new ExpressionBuilder(applicants.Length, values => values.Count(v => v) == applicants.Length / 2);
             foreach (var clause in builder.Apply(applicants).Clauses)
                 yield return clause;
