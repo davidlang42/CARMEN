@@ -33,6 +33,8 @@ namespace CarmenUI.Windows
                 EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotFocusEvent, new RoutedEventHandler(TextBox_GotFocus)); //LATER does this need to undo on unload?
             InitializeComponent();
             connectionLabel = connection_label;
+            NavigationCommands.BrowseBack.InputGestures.Clear(); // otherwise the backspace key changes pages without saving or confirming
+            NavigationCommands.BrowseForward.InputGestures.Clear();
             var main_menu = new MainMenu(context_options, connection_label, default_show_name);
             MainFrame.Navigate(main_menu);
         }
