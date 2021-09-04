@@ -24,6 +24,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Section = Carmen.ShowModel.Structure.Section;
+using System.Collections;
 
 namespace CarmenUI.Pages
 {
@@ -87,13 +88,11 @@ namespace CarmenUI.Pages
                     await context.Nodes.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Requirements), "Items"))
                     await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-                using (loading.Segment(nameof(ConfigureItems) + nameof(rootNodesViewSource) + nameof(itemsViewSource), "Sorting"))
+                using (loading.Segment(nameof(ConfigureItems) + nameof(rootNodesViewSource), "Sorting"))
                 {
-                    rootNodesViewSource.Source = itemsViewSource.Source = context.Nodes.Local.ToObservableCollection();
+                    rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
                     rootNodesViewSource.View.Filter = n => ((Node)n).Parent == null;
                     rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
-                    itemsViewSource.View.Filter = n => n is Item;
-                    itemsViewSource.SortDescriptions.Add(new(nameof(Item.Name), ListSortDirection.Ascending)); // sorting by order isn't possible in a flat structure, so use name instead
                 }
                 using (loading.Segment(nameof(ShowContext.SectionTypes), "Section types"))
                     await context.SectionTypes.LoadAsync();
@@ -101,6 +100,11 @@ namespace CarmenUI.Pages
             }
             if (itemsTreeView.VisualDescendants<TreeViewItem>().FirstOrDefault() is TreeViewItem show_root_tvi)
                 show_root_tvi.IsSelected = true;
+        }
+
+        private void PopulateItemsViewSource()
+        {
+            itemsViewSource.Source = context.ShowRoot.ItemsInOrder().ToArray();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -339,6 +343,7 @@ namespace CarmenUI.Pages
         {
             if (rolesPanel.Content is ItemView existing_view)
                 existing_view.Dispose();
+            PopulateItemsViewSource();
             rolesPanel.Content = itemsTreeView.SelectedItem switch
             {
                 Item item => new ItemView(item, castGroups, primaryRequirements),
