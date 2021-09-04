@@ -17,6 +17,16 @@ namespace Carmen.CastingEngine
         /// <summary>An accessor to the IApplicantEngine used by this selection engine</summary>
         IApplicantEngine ApplicantEngine { get; }//LATER remove if not needed, but trust me, it will be
 
+        /// <summary>Calculate the suitability of an applicant for a cast group, regardless of whether they meet all requirements.
+        /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to cast groups, and is therefore
+        /// different to IApplicantEngine.SuitabilityOf(Applicant, Requirement).</summary>
+        double SuitabilityOf(Applicant applicant, CastGroup cast_group);
+
+        /// <summary>Calculate the suitability of an applicant for a tag, regardless of whether they meet all requirements.
+        /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to tags, and is therefore
+        /// different to IApplicantEngine.SuitabilityOf(Applicant, Requirement).</summary>
+        double SuitabilityOf(Applicant applicant, Tag tag);
+
         /// <summary>Select applicants into cast groups, respecting those already placed
         /// NOTE: CastGroup requirements may not depend on CastGroups or Tags</summary>
         void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts);

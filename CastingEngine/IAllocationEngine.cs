@@ -28,7 +28,8 @@ namespace Carmen.CastingEngine
         Role? NextUncastRole(IEnumerable<Item> items_in_order, AlternativeCast[] alternative_casts, Role? excluding_role = null);
 
         /// <summary>Calculate the suitability of an applicant for a role, regardless of availability and eligibility.
-        /// Value returned will be between 0 and 1 (inclusive).</summary>
+        /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to roles, and is therefore
+        /// different to IApplicantEngine.SuitabilityOf(Applicant, Requirement).</summary>
         double SuitabilityOf(Applicant applicant, Role role);
 
         /// <summary>Count the number of roles an applicant has which require a certain criteria,

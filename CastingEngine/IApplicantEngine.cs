@@ -1,4 +1,5 @@
 ﻿using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,5 +21,9 @@ namespace Carmen.CastingEngine
 
         /// <summary>Calculate the overall ability of an applicant</summary>
         int OverallAbility(Applicant applicant);
+
+        /// <summary>Calculate the suitability of an applicant against a single requirement.
+        /// Value returned will be between 0 and 1 (inclusive).</summary>
+        double SuitabilityOf(Applicant applicant, Requirement requirement);
     }
 }

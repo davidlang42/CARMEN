@@ -14,16 +14,16 @@ namespace Carmen.CastingEngine
     /// <summary>
     /// For testing only, does not nessesarily produce valid casting, only valid at a data model/type level.
     /// </summary>
-    public class DummyApplicantEngine : IApplicantEngine
+    public class DummyApplicantEngine : ApplicantEngine
     {
         /// <summary>Dummy value is always 100</summary>
-        public int MaxOverallAbility => 100;
+        public override int MaxOverallAbility => 100;
 
         /// <summary>Dummy value is always 0</summary>
-        public int MinOverallAbility => 0;
+        public override int MinOverallAbility => 0;
 
         /// <summary>Dummy value is the weighted average of abilities, not checking for any missing values</summary>
-        public int OverallAbility(Applicant applicant)
+        public override int OverallAbility(Applicant applicant)
             => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
     }
 
@@ -32,6 +32,10 @@ namespace Carmen.CastingEngine
     /// </summary>
     public class DummySelectionEngine : SelectionEngine
     {
+        public DummySelectionEngine(IApplicantEngine applicant_engine, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
+            : base(applicant_engine, cast_number_order_by, cast_number_order_direction)
+        { }
+
         /// <summary>Dummy implementation selects the required number of cast in each group, in random order, overwriting every applicants existing cast group</summary>
         public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts)
         {
@@ -107,36 +111,16 @@ namespace Carmen.CastingEngine
     /// </summary>
     public class DummyAllocationEngine : AllocationEngine
     {
+        public DummyAllocationEngine(IApplicantEngine applicant_engine)
+            : base(applicant_engine)
+        { }
+
         /// <summary>Dummy value is the basic implementation of recursive requirements.
         /// This assumes there are no circular references.</summary>
-        public override double SuitabilityOf(Applicant applicant, Role role)//TODO move suitability into applicantengine
+        public override double SuitabilityOf(Applicant applicant, Role role)
         {
-            var sub_suitabilities = role.Requirements.Select(req => SuitabilityOf(applicant, req)).DefaultIfEmpty();
-            return sub_suitabilities.Average();//TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
-        }
-
-        private double SuitabilityOf(Applicant applicant, Requirement requirement)
-            => requirement switch
-            {
-                AbilityRangeRequirement arr => ScaledSuitability(arr.IsSatisfiedBy(applicant), arr.ScaleSuitability, applicant.MarkFor(arr.Criteria), arr.Criteria.MaxMark),
-                NotRequirement nr => 1 - SuitabilityOf(applicant, nr.SubRequirement),
-                AndRequirement ar => ar.AverageSuitability ? ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
-                OrRequirement or => or.AverageSuitability ? or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
-                XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? SuitabilityOf(applicant, req) : 0,
-                Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
-            };
-
-        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark)
-        {
-            //TODO real implementation might not test if in range
-            if (!in_range)
-                return 0;
-            else if (scale_suitability)
-                return mark / max_mark;
-            else
-                return 1;
+            var sub_suitabilities = role.Requirements.Select(req => ApplicantEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
+            return sub_suitabilities.Average();
         }
 
         /// <summary>Dummy value counts top level AbilityExact/AbilityRange requirements only</summary>

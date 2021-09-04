@@ -95,7 +95,7 @@ namespace CarmenUI.Pages
             {
                 //TODO have a mechanism to choose which engine
                 //_engine = new DummyEngine();
-                _engine = new OriginalHeuristicEngine(criterias, null, ListSortDirection.Descending);
+                _engine = new HeuristicAllocationEngine(criterias, null, ListSortDirection.Descending);
                 //_engine = new ChunkedPairsSatEngine(criterias);
             }
         }
