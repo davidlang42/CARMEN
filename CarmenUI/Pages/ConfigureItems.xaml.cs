@@ -80,8 +80,7 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 {
                     await context.Requirements.LoadAsync();
-                    nonPrimaryRequirementsViewSource.Source = context.Requirements.Local.Where(r => !r.Primary).ToArray();
-                    nonPrimaryRequirementsViewSource.SortDescriptions.Add(StandardSort.For<Requirement>());
+                    nonPrimaryRequirementsViewSource.Source = context.Requirements.Local.Where(r => !r.Primary).InOrder().ToArray();
                     _primaryRequirements = context.Requirements.Local.Where(r => r.Primary).InOrder().ToArray();
                 }
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
