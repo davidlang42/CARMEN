@@ -16,7 +16,7 @@ namespace Carmen.CastingEngine.Heuristic
         { }
 
         //TODO summary comment
-        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
+        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)//TODO NOTE: CastGroup requirements may not depend on CastGroups or Tags
         {
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
             var remaining_groups = new Dictionary<CastGroup, uint?>();

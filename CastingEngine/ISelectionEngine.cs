@@ -15,7 +15,7 @@ namespace Carmen.CastingEngine
     public interface ISelectionEngine
     {
         /// <summary>An accessor to the IApplicantEngine used by this selection engine</summary>
-        IApplicantEngine ApplicantEngine { get; }//LATER remove if not needed, but trust me, it will be
+        IApplicantEngine ApplicantEngine { get; }
 
         /// <summary>Calculate the suitability of an applicant for a cast group, regardless of whether they meet all requirements.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to cast groups, and is therefore

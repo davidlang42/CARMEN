@@ -58,7 +58,7 @@ namespace Carmen.CastingEngine
         /// <summary>Default implementation allocates cast numbers to accepted applicants based on the requested order.
         /// Members of cast groups which alternate casts are given the first available cast number for their alternative
         /// cast, leaving gaps which are later filled from the bottom up.</summary>
-        public virtual void AllocateCastNumbers(IEnumerable<Applicant> applicants)
+        public virtual void AllocateCastNumbers(IEnumerable<Applicant> applicants)//TODO Accepted applicants must have an AlternativeCast set when CastGroup.AlternateCasts == true
         {
             var cast_numbers = new CastNumberSet();
             // find cast numbers which are already set
@@ -87,7 +87,7 @@ namespace Carmen.CastingEngine
 
         /// <summary>Default implementation applies tags in a order that ensures any tags which depend on other tags through
         /// requirements are processed first. This assumes there are no circular dependency between tags.</summary>
-        public virtual void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)
+        public virtual void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)//TODO Accepted applicants must have an AlternativeCast set when CastGroup.AlternateCasts == true
         {
             // list all tags referenced by each tag
             var tag_references = new Dictionary<Tag, HashSet<Tag>>();

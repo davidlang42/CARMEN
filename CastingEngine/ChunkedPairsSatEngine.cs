@@ -37,7 +37,7 @@ namespace Carmen.CastingEngine
             primaryCriterias = criterias.Where(c => c.Primary).ToArray();
         }
 
-        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
+        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)//TODO NOTE: CastGroup requirements may not depend on CastGroups or Tags
         {
             //LATER handle the fact that cast group requirements may not be mutually exclusive, possibly using SAT (current implementation is copied from HeuristicSelectionEngine)
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
