@@ -297,5 +297,41 @@ namespace CarmenUI.Properties {
                 this["MoveOnCtrlArrow"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ApplicantEngine {
+            get {
+                return ((string)(this["ApplicantEngine"]));
+            }
+            set {
+                this["ApplicantEngine"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SelectionEngine {
+            get {
+                return ((string)(this["SelectionEngine"]));
+            }
+            set {
+                this["SelectionEngine"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string AllocationEngine {
+            get {
+                return ((string)(this["AllocationEngine"]));
+            }
+            set {
+                this["AllocationEngine"] = value;
+            }
+        }
     }
 }

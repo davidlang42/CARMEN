@@ -93,10 +93,19 @@ namespace CarmenUI.Pages
                 _criterias = await context.Criterias.ToArrayAsync();
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
-                //TODO have a mechanism to choose which engine
-                //_engine = new DummyEngine();
-                _engine = new HeuristicSelectionEngine(new WeightedSumEngine(criterias), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection);
-                //_engine = new ChunkedPairsSatEngine(criterias);
+                IApplicantEngine applicant_engine = ParseApplicantEngine() switch
+                {
+                    nameof(DummyApplicantEngine) => new DummyApplicantEngine(),
+                    nameof(HeuristicAllocationEngine) => new WeightedSumEngine(criterias),
+                    _ => throw new ArgumentException($"Applicant engine not handled: {ParseApplicantEngine()}")
+                };
+                _engine = ParseSelectionEngine() switch
+                {
+                    nameof(DummySelectionEngine) => new DummySelectionEngine(applicant_engine, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection),
+                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(applicant_engine, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection),
+                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(applicant_engine, context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
+                    _ => throw new ArgumentException($"Allocation engine not handled: {ParseSelectionEngine()}")
+                };
             }
         }
 

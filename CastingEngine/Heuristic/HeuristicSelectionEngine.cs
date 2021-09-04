@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine
+namespace Carmen.CastingEngine.Heuristic
 {
     public class HeuristicSelectionEngine : SelectionEngine
     {

@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.CastingEngine.Heuristic;
+using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,12 @@ namespace Carmen.CastingEngine
     /// </summary>
     public abstract class ApplicantEngine : IApplicantEngine
     {
+        /// <summary>A list of available applicant engines</summary>
+        public static readonly Type[] Implementations = new[] {
+            typeof(WeightedSumEngine),
+            typeof(DummyApplicantEngine) //LATER remove
+        };
+
         public abstract int MaxOverallAbility { get; }
         public abstract int MinOverallAbility { get; }
 

@@ -52,4 +52,11 @@ namespace Carmen.CastingEngine
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
         Availability AvailabilityOf(Applicant applicant, Role role);
     }
+
+    /// <summary>A list of the available implementations of IAllocationEngine</summary>
+    public enum AllocationEngineType
+    {
+        DummyAllocationEngine, //LATER remove dummy engine
+        HeuristicAllocationEngine
+    }
 }

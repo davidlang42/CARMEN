@@ -162,6 +162,39 @@
                 </Expander>
                 <Expander IsExpanded="False" Margin="0 5">
                     <Expander.Header>
+                        <TextBlock Text="Advanced" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <TextBlock Margin="0 5 0 0" TextWrapping="Wrap">
+                            Behind the scenes, CARMEN uses specialised casting engines designed to give the best and most balanced outcomes.
+                            There are a number of variations of these engines which each operate in a slightly different way and may work better or worse in certain circumstances.
+                        </TextBlock>
+                        <TextBlock Margin="0 5 0 0" TextWrapping="Wrap">
+                            These are separated into 3 types;
+                            <LineBreak/>• The "Applicant Engine" controls how the Applicant's overall ability number is calculated, as well as the raw suitability percentage for a given requirement.
+                            <LineBreak/>• The "Selection Engine" controls how cast is accepted/rejected from the Cast Groups and Tags, as well as how the talent is balanced between Alternative Casts.
+                            <LineBreak/>• The "Allocation Engine" controls how cast are allocated to Roles, and the order in which it recommends for you to cast the Roles.
+                        </TextBlock>
+                        <TextBlock Margin="0 5 0 0" TextWrapping="Wrap">
+                            Each of these can be changed below, but it is highly recommended that you leave them on their default values.
+                            After changing any of the casting engines, you should thoroughly test and investigate the suggestions which CARMEN presents to you, to ensure that it is operating in a manner which achieves your goals.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0" >
+                            <TextBlock Text="Applicant Engine:" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding ElementName=WindowRoot, Path=ApplicantEngines}" SelectedItem="{bd:SettingBinding ApplicantEngine, TargetNullValue=''}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0" >
+                            <TextBlock Text="Selection Engine:" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding ElementName=WindowRoot, Path=SelectionEngines}" SelectedItem="{bd:SettingBinding SelectionEngine, TargetNullValue=''}"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0" >
+                            <TextBlock Text="Allocation Engine:" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding ElementName=WindowRoot, Path=AllocationEngines}" SelectedItem="{bd:SettingBinding AllocationEngine, TargetNullValue=''}"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Expander>
+                <Expander IsExpanded="False" Margin="0 5">
+                    <Expander.Header>
                         <TextBlock Text="Software version" FontWeight="Bold" FontSize="14"/>
                     </Expander.Header>
                     <StackPanel>

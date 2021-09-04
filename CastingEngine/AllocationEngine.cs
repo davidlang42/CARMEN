@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.CastingEngine.Heuristic;
+using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
@@ -15,6 +16,12 @@ namespace Carmen.CastingEngine
     /// </summary>
     public abstract class AllocationEngine : IAllocationEngine
     {
+        /// <summary>A list of available selection engines</summary>
+        public static readonly Type[] Implementations = new[] {
+            typeof(HeuristicAllocationEngine),
+            typeof(DummyAllocationEngine), //LATER remove
+        };
+
         //TODO look at common arguments, eg. cast groups/ alternative casts ande decide what should be in the constructor
         public IApplicantEngine ApplicantEngine { get; init; }
 

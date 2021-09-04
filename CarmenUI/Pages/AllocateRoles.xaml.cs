@@ -101,9 +101,18 @@ namespace CarmenUI.Pages
                     total_cast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
                 {
-                    //TODO have a mechanism to choose which engine
-                    //_engine = new DummyEngine();
-                    _engine = new HeuristicAllocationEngine(new WeightedSumEngine(criterias));
+                    IApplicantEngine applicant_engine = ParseApplicantEngine() switch
+                    {
+                        nameof(DummyApplicantEngine) => new DummyApplicantEngine(),
+                        nameof(HeuristicAllocationEngine) => new WeightedSumEngine(criterias),
+                        _ => throw new ArgumentException($"Applicant engine not handled: {ParseApplicantEngine()}")
+                    };
+                    _engine = ParseAllocationEngine() switch
+                    {
+                        nameof(DummyAllocationEngine) => new DummyAllocationEngine(applicant_engine),
+                        nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine),
+                        _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
+                    };
                 }
                 _rootNodeView = new ShowRootNodeView(context.ShowRoot, total_cast, context.AlternativeCasts.Local.ToArray());
                 showCompleted.IsChecked = true; // must be set after creating ShowRootNodeView because it triggers Checked event

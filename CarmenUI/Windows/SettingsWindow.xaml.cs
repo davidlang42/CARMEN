@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.CastingEngine;
+using Carmen.ShowModel.Applicants;
 using CarmenUI.Properties;
 using System;
 using System.Collections.Generic;
@@ -47,6 +48,10 @@ namespace CarmenUI.Windows
                 };
             }
         }
+
+        public string[] ApplicantEngines => ApplicantEngine.Implementations.Select(t => t.Name).ToArray();
+        public string[] SelectionEngines => SelectionEngine.Implementations.Select(t => t.Name).ToArray();
+        public string[] AllocationEngines => AllocationEngine.Implementations.Select(t => t.Name).ToArray();
 
         public SettingsWindow()
         {

@@ -12,6 +12,7 @@ using CarmenUI.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Data;
+using Carmen.CastingEngine;
 
 namespace CarmenUI.Pages
 {
@@ -133,6 +134,30 @@ namespace CarmenUI.Pages
             reverting.MainText = "Reverting...";
             RecreateContext(); //LATER there has to be a better way than this
             return true;
+        }
+
+        protected string ParseApplicantEngine()
+        {
+            var name = Properties.Settings.Default.ApplicantEngine;
+            if (ApplicantEngine.Implementations.Any(t => t.Name == name))
+                return name;
+            return ApplicantEngine.Implementations.First().Name;
+        }
+
+        protected string ParseSelectionEngine()
+        {
+            var name = Properties.Settings.Default.SelectionEngine;
+            if (SelectionEngine.Implementations.Any(t => t.Name == name))
+                return name;
+            return SelectionEngine.Implementations.First().Name;
+        }
+
+        protected string ParseAllocationEngine()
+        {
+            var name = Properties.Settings.Default.AllocationEngine;
+            if (AllocationEngine.Implementations.Any(t => t.Name == name))
+                return name;
+            return AllocationEngine.Implementations.First().Name;
         }
 
         /// <summary>Actually dispose change handlers, etc.
