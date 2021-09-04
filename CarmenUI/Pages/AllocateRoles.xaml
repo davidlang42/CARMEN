@@ -377,10 +377,6 @@
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="{x:Type ListViewItem}">
                                         <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
-                                    </Style>
-                                </ListView.ItemContainerStyle>
-                                <ListView.Resources>
-                                    <Style TargetType="{x:Type ListViewItem}">
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Eligibility.IsEligible}" Value="False">
                                                 <Setter Property="Background" Value="LightCoral" />
@@ -393,7 +389,7 @@
                                             </DataTrigger>
                                         </Style.Triggers>
                                     </Style>
-                                </ListView.Resources>
+                                </ListView.ItemContainerStyle>
                                 <ListView.View>
                                     <GridView AllowsColumnReorder="False">
                                         <GridView.Columns>
