@@ -14,6 +14,21 @@ namespace Carmen.CastingEngine
 {
     public class ChunkedPairsSatEngine : WeightedSumEngine, ISelectionEngine
     {
+        // expression building is O(2^n) and will be slow for large numbers, therefore cache
+        Dictionary<int, ExpressionBuilder> cachedKeepTogether = new();
+        Dictionary<int, ExpressionBuilder> cachedKeepSeparate = new();
+
+        public List<Result> Results { get; init; } = new(); //LATER read only
+
+        public struct Result
+        {
+            public int ChunkSize;
+            public int Variables;
+            public int Clauses;
+            public int MaxLiterals;
+            public bool Solved;
+        }
+
         #region Copied from OriginalHeuristicEngine
         public void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts) //LATER copied from OriginalHeuristicEngine
         {
@@ -222,6 +237,7 @@ namespace Carmen.CastingEngine
             var sat = new DpllSolver<Applicant>(applicants_needing_alternative_cast.SelectMany(p => p.Item2));
             var max_chunk = applicants_needing_alternative_cast.Max(p => p.Item2.Count);
             Solution solution = Solution.Unsolveable;
+            Results.Clear();
             for (int chunk_size = 2; chunk_size <= max_chunk; chunk_size += 2)
             {
                 // compile clauses
@@ -234,6 +250,14 @@ namespace Carmen.CastingEngine
                     break; // no clauses to solve
                 // run sat solver
                 solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
+                Results.Add(new Result
+                {
+                    ChunkSize = chunk_size,
+                    Variables = sat.Variables.Count,
+                    Clauses = clauses.Count,
+                    MaxLiterals = clauses.Max(c => c.Literals.Count),
+                    Solved = !solution.IsUnsolvable
+                });
                 if (!solution.IsUnsolvable)
                     break; // solved
             }
@@ -325,7 +349,6 @@ namespace Carmen.CastingEngine
             int count_true = 0;
             int count_false = 0;
             for (var r = 0; r < result.Length; r++)
-            {
                 if (result[r].Value is bool value)
                 {
                     if (value)
@@ -333,23 +356,19 @@ namespace Carmen.CastingEngine
                     else
                         count_false++;
                 }
-            }
-            for (var r = 0; r < result.Length; r++)
-            {
-                if (!result[r].Value.HasValue)
-                {
-                    if (count_true < count_false)
-                    {
-                        result[r].Value = true;
-                        count_true++;
-                    }
-                    else
-                    {
-                        result[r].Value = false;
-                        count_false++;
-                    }
-                }
-            }
+            if (count_true + count_false != result.Length) // don't reiterate if no gaps
+                for (var r = 0; r < result.Length; r++)
+                    if (!result[r].Value.HasValue)
+                        if (count_true < count_false)
+                        {
+                            result[r].Value = true;
+                            count_true++;
+                        }
+                        else
+                        {
+                            result[r].Value = false;
+                            count_false++;
+                        }
             return result;
         }
     }

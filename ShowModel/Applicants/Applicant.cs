@@ -14,7 +14,7 @@ namespace Carmen.ShowModel.Applicants
     /// <summary>
     /// A person who has auditioned to be in a show.
     /// </summary>
-    public class Applicant : IValidatable, INotifyPropertyChanged
+    public class Applicant : IValidatable, INotifyPropertyChanged, IComparable<Applicant>
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -279,6 +279,8 @@ namespace Carmen.ShowModel.Applicants
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
+        public int CompareTo(Applicant? other) => ApplicantId.CompareTo(other?.ApplicantId);
     }
 
     public enum Gender

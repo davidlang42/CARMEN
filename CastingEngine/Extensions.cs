@@ -8,13 +8,15 @@ namespace Carmen.CastingEngine
 {
     internal static class Extensions
     {
-        public static double Mean(this IEnumerable<uint> values, out uint min, out uint max, out double median)
+        /// <summary>Calculates the min/max/mean/middle of a set of values
+        /// NOTE: median will only be correct only if values are in order</summary>
+        public static double Mean(this IEnumerable<uint> values, out uint min, out uint max, out double median_if_in_order)
         {
             var list = new List<uint>();
             uint total;
             var e = values.GetEnumerator();
             if (!e.MoveNext())
-                return median = min = max = 0; // empty sequence
+                return median_if_in_order = min = max = 0; // empty sequence
             list.Add(e.Current);
             total = min = max = e.Current;
             while (e.MoveNext())
@@ -28,9 +30,9 @@ namespace Carmen.CastingEngine
             }
             var middle = list.Count / 2;
             if (list.Count % 2 == 0)
-                median = (list[middle] + list[middle - 1]) / 2.0;
+                median_if_in_order = (list[middle] + list[middle - 1]) / 2.0;
             else
-                median = list[middle];
+                median_if_in_order = list[middle];
             return (double)total / list.Count;
         }
     }

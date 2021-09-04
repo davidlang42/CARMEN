@@ -24,6 +24,7 @@ using System.ComponentModel;
 using CarmenUI.Windows;
 using Carmen.CastingEngine;
 using Carmen.CastingEngine.Heuristic;
+using Carmen.ShowModel.Criterias;
 
 namespace CarmenUI.Pages
 {
@@ -39,6 +40,11 @@ namespace CarmenUI.Pages
         private CollectionViewSource alternativeCastsViewSource;
         private CollectionViewSource castNumbersViewSource;
         private ISelectionEngine engine;
+
+        private Criteria[]? _primaryCriterias;
+
+        private Criteria[] primaryCriterias => _primaryCriterias
+            ?? throw new ApplicationException($"Tried to used {nameof(primaryCriterias)} before it was loaded.");
 
         public SelectCast(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
@@ -58,7 +64,9 @@ namespace CarmenUI.Pages
                 selectedApplicantsViewSource.SortDescriptions.Add(sd);
             }
             castStatusCombo.SelectedIndex = 0; // must be here because it triggers event below
-            engine = new OriginalHeuristicEngine(null, ListSortDirection.Descending); //LATER use real engine
+            //LATER use real engine
+            //engine = new DummyEngine();
+            //engine = new OriginalHeuristicEngine(null, ListSortDirection.Descending);
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
@@ -81,6 +89,9 @@ namespace CarmenUI.Pages
             TriggerCastNumbersRefresh();
             using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 await context.Requirements.LoadAsync();
+            using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
+                _primaryCriterias = await context.Criterias.Where(c => c.Primary).ToArrayAsync();
+            engine = new ChunkedPairsSatEngine(primaryCriterias); //LATER not here
         }
 
         private void TriggerCastNumbersRefresh()
@@ -110,6 +121,33 @@ namespace CarmenUI.Pages
             using (processing.Segment(nameof(ICastingEngine.ApplyTags), "Applying tags"))
                 engine.ApplyTags(context.Applicants.Local, context.Tags.Local, (uint)alternative_casts.Length);
             TriggerCastNumbersRefresh();
+            //LATER remove test message
+#if DEBUG
+            string msg = "";
+            if (engine is ChunkedPairsSatEngine chunky)
+            {
+                var r = chunky.Results.Last();
+                if (r.Solved)
+                    msg += $"Balanced casts by solving a {r.MaxLiterals}-SAT problem with {r.Variables} variables and {r.Clauses} clauses."
+                        + $"\nIt took {chunky.Results.Count} chunking attempts with a final chunk size of {r.ChunkSize}";
+                else
+                    msg += $"Failed to solve a {r.MaxLiterals}-SAT problem with {r.Variables} variables and {r.Clauses} clauses."
+                        + $"\nAfter {chunky.Results.Count} chunking attempts, and a final chunk size of {r.ChunkSize}, it was still unsolvable.";
+                msg += "\n\n";
+            }
+            var marks = primaryCriterias.Select(c => alternative_casts.Select(ac => ac.Members.Select(a => a.MarkFor(c)).ToArray()).Select(m => (m, MarkDistribution.Analyse(m))).ToArray()).ToArray();
+            msg += "The resulting casts have the follow distributions by primary criteria:\n";
+            foreach (var criteria in marks)
+            {
+                foreach (var ac in criteria)
+                {
+                    msg += $"\n{ac.Item2}";
+                    msg += $"\n[{string.Join(",", ac.Item1.OrderByDescending(m => m))}]";
+                }
+                msg += "\n";
+            }
+            MessageBox.Show(msg);
+#endif
         }
 
         private void addButton_Click(object sender, RoutedEventArgs e)
