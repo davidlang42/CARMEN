@@ -218,7 +218,7 @@ namespace Carmen.CastingEngine
             if (!cachedKeepSeparate.TryGetValue(applicants.Length, out var builder))
             {
                 builder = new ExpressionBuilder(applicants.Length, values => values.Count(v => v) == applicants.Length / 2);
-                cachedKeepTogether.Add(applicants.Length, builder);
+                cachedKeepSeparate.Add(applicants.Length, builder);
             }
             foreach (var clause in builder.Apply(applicants).Clauses)
                 yield return clause;

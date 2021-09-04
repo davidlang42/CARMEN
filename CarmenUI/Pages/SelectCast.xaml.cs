@@ -152,7 +152,7 @@ namespace CarmenUI.Pages
                         + $"\nAfter {chunky.Results.Count} chunking attempts, and a final chunk size of {r.ChunkSize}, it was still unsolvable.";
                 msg += "\n\n";
             }
-            var marks = criterias.Select(c => alternative_casts.Select(ac => ac.Members.Select(a => a.MarkFor(c)).ToArray()).Select(m => (m, MarkDistribution.Analyse(m))).ToArray()).ToArray();
+            var marks = criterias.Where(c => c.Primary).Select(c => alternative_casts.Select(ac => ac.Members.Select(a => a.MarkFor(c)).ToArray()).Select(m => (m, MarkDistribution.Analyse(m))).ToArray()).ToArray();
             msg += "The resulting casts have the follow distributions by primary criteria:\n";
             foreach (var criteria in marks)
             {
