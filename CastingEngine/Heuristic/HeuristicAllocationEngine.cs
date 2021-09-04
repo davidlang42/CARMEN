@@ -15,25 +15,7 @@ namespace Carmen.CastingEngine.Heuristic
     {
         #region Copied from DummyEngine
         
-
-        private double SuitabilityOf(Applicant applicant, Requirement requirement) //TODO copied from DummyEngine
-            => requirement switch
-            {
-                AbilityRangeRequirement arr => ScaledSuitability(arr.IsSatisfiedBy(applicant), arr.ScaleSuitability, applicant.MarkFor(arr.Criteria), arr.Criteria.MaxMark),
-                NotRequirement nr => 1 - SuitabilityOf(applicant, nr.SubRequirement),
-                AndRequirement ar => ar.AverageSuitability ? ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
-                OrRequirement or => or.AverageSuitability ? or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
-                XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? SuitabilityOf(applicant, req) : 0,
-                Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
-            };
-
-        /// <summary>Counts top level AbilityExact/AbilityRange requirements only</summary>
-        public double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role) //TODO copied from DummyEngine
-            => applicant.Roles.Where(r => r != excluding_role)
-            .Where(r => r.Requirements.Any(req => req is ICriteriaRequirement cr && cr.Criteria == criteria))
-            .Count();
+        
 
         /// <summary>Enumerates roles in item order, then by name, removing duplicates</summary>
         public IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order) //TODO copied from DummyEngine

@@ -18,7 +18,6 @@ namespace Carmen.CastingEngine
         //TODO look at common arguments, eg. cast groups/ alternative casts ande decide what should be in the constructor
         public IApplicantEngine ApplicantEngine { get; init; }
 
-        public abstract double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role);
         public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
         public abstract double SuitabilityOf(Applicant applicant, Role role);
 
@@ -38,6 +37,12 @@ namespace Carmen.CastingEngine
             foreach (var role in roles)
                 yield return new KeyValuePair<Role, IEnumerable<Applicant>>(role, PickCast(applicants, role, casts));
         }
+
+        /// <summary>Default implementation counts roles based on top level AbilityExact/AbilityRange requirements only</summary>
+        public virtual double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)
+            => applicant.Roles.Where(r => r != excluding_role)
+            .Where(r => r.Requirements.Any(req => req is ICriteriaRequirement cr && cr.Criteria == criteria))
+            .Count();
 
         /// <summary>Finds the next Role in IdealCastingOrder() which has not yet been fully cast,
         /// optionally exlcuding a specified role.</summary>
