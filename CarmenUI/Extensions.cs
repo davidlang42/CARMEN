@@ -222,12 +222,12 @@ namespace CarmenUI
                         {
                             return resultContainer;
                         }
-                        else
-                        {
-                            // The object is not under this TreeViewItem
-                            // so collapse it.
-                            subContainer.IsExpanded = false;
-                        }
+                        //else
+                        //{
+                        //    // The object is not under this TreeViewItem
+                        //    // so collapse it.
+                        //    subContainer.IsExpanded = false;
+                        //}
                     }
                 }
             }
