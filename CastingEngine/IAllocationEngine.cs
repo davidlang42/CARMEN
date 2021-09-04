@@ -41,7 +41,7 @@ namespace Carmen.CastingEngine
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>
-        Eligibility EligibilityOf(Applicant applicant, Role role)
+        public Eligibility EligibilityOf(Applicant applicant, Role role)
         {
             var requirements_not_met = new HashSet<Requirement>();
             foreach (var req in role.Requirements)

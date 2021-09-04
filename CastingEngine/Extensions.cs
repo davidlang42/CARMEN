@@ -72,6 +72,26 @@ namespace Carmen.CastingEngine
         {
             foreach (var item in collection)
                 set.Add(item);
-        }    
+        }  
+        
+        public static T? FindAndRemove<T>(this Queue<T> queue, Predicate<T> predicate)
+            where T : class
+        {
+            var skipped = new Queue<T>();
+            T? found = null;
+            while (queue.Count > 0)
+            {
+                var next = queue.Dequeue();
+                if (predicate(next))
+                {
+                    found = next;
+                    break;
+                }
+                skipped.Prepend(next);
+            }
+            while (skipped.Count > 0)
+                queue.Prepend(skipped.Dequeue());
+            return found;
+        }
     }
 }
