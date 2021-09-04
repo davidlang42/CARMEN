@@ -1,4 +1,6 @@
-﻿using Carmen.CastingEngine.Heuristic;
+﻿using Carmen.CastingEngine.Allocation;
+using Carmen.CastingEngine.Dummy;
+using Carmen.CastingEngine.Heuristic;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Requirements;
@@ -9,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine
+namespace Carmen.CastingEngine.Base
 {
     /// <summary>
     /// The abstract base class of most IAllocationEngine based engines

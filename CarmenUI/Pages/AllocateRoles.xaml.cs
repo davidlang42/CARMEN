@@ -27,6 +27,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CarmenUI.Bindings;
 using Carmen.CastingEngine.Heuristic;
+using Carmen.CastingEngine.Dummy;
 
 namespace CarmenUI.Pages
 {

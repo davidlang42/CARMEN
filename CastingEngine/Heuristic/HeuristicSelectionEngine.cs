@@ -1,4 +1,6 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.CastingEngine.Base;
+using Carmen.CastingEngine.Selection;
+using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Requirements;
 using System;

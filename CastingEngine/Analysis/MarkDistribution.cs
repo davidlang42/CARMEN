@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine
+namespace Carmen.CastingEngine.Analysis
 {
     public struct MarkDistribution
     {

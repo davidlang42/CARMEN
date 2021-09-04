@@ -13,6 +13,7 @@ using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Carmen.CastingEngine;
+using Carmen.CastingEngine.Base;
 
 namespace CarmenUI.Pages
 {

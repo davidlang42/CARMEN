@@ -25,6 +25,10 @@ using CarmenUI.Windows;
 using Carmen.CastingEngine;
 using Carmen.CastingEngine.Heuristic;
 using Carmen.ShowModel.Criterias;
+using Carmen.CastingEngine.SAT;
+using Carmen.CastingEngine.Selection;
+using Carmen.CastingEngine.Dummy;
+using Carmen.CastingEngine.Analysis;
 
 namespace CarmenUI.Pages
 {

@@ -1,4 +1,5 @@
 ﻿using Carmen.CastingEngine;
+using Carmen.CastingEngine.Base;
 using Carmen.ShowModel.Applicants;
 using CarmenUI.Properties;
 using System;

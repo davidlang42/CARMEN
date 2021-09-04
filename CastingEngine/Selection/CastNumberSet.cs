@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine
+namespace Carmen.CastingEngine.Selection
 {
     /// <summary>
     /// A set of cast numbers stored in a dictionary-based structure, with some special handling:

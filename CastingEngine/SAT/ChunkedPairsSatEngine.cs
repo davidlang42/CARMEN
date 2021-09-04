@@ -1,5 +1,7 @@
-﻿using Carmen.CastingEngine.Heuristic;
+﻿using Carmen.CastingEngine.Base;
+using Carmen.CastingEngine.Heuristic;
 using Carmen.CastingEngine.SAT;
+using Carmen.CastingEngine.Selection;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Requirements;
@@ -10,7 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine
+namespace Carmen.CastingEngine.SAT
 {
     public class ChunkedPairsSatEngine : SelectionEngine
     {
