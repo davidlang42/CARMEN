@@ -14,10 +14,6 @@ namespace Carmen.CastingEngine
 {
     public class ChunkedPairsSatEngine : SelectionEngine
     {
-        // expression building is O(2^n) and will be slow for large numbers, therefore cache
-        Dictionary<int, ExpressionBuilder> cachedKeepTogether = new();
-        Dictionary<int, ExpressionBuilder> cachedKeepSeparate = new();
-
         public List<Result> Results { get; init; } = new(); //LATER read only
 
         public struct Result
@@ -29,9 +25,21 @@ namespace Carmen.CastingEngine
             public bool Solved;
         }
 
-        #region Copied from OriginalHeuristicEngine
-        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts) //TODO copied from OriginalHeuristicEngine
+        private Criteria[] primaryCriterias;
+
+        // expression building is O(2^n) and will be slow for large numbers, therefore cache
+        Dictionary<int, ExpressionBuilder> cachedKeepTogether = new();
+        Dictionary<int, ExpressionBuilder> cachedKeepSeparate = new();
+
+        public ChunkedPairsSatEngine(IApplicantEngine applicant_engine, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
+            : base(applicant_engine, cast_number_order_by, cast_number_order_direction)
         {
+            primaryCriterias = criterias.Where(c => c.Primary).ToArray();
+        }
+
+        public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups, uint number_of_alternative_casts)
+        {
+            //LATER handle the fact that cast group requirements may not be mutually exclusive, possibly using SAT (current implementation is copied from HeuristicSelectionEngine)
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
             var remaining_groups = new Dictionary<CastGroup, uint?>();
             // Calculate the remaining number of cast needed in each group (respecting those already accepted)
@@ -68,7 +76,7 @@ namespace Carmen.CastingEngine
         }
 
         /// <summary>Find a cast group with availability for which this applicant meets the cast group's requirements</summary>
-        private CastGroup? NextAvailableCastGroup(Dictionary<CastGroup, uint?> remaining_groups, Applicant applicant) //TODO copied from OriginalHeuristicEngine
+        private CastGroup? NextAvailableCastGroup(Dictionary<CastGroup, uint?> remaining_groups, Applicant applicant)
         {
             foreach (var (cg, remaining_count) in remaining_groups)
             {
@@ -76,127 +84,6 @@ namespace Carmen.CastingEngine
                     return cg;
             }
             return null;
-        }
-
-        /// <summary>Orders the applicants by the specified criteria</summary>
-        private IEnumerable<Applicant> Sort(IEnumerable<Applicant> applicants, Criteria? by, ListSortDirection direction)
-            => (by, direction) switch
-            {
-                (Criteria c, ListSortDirection.Ascending) => applicants.OrderBy(a => a.MarkFor(c)),
-                (Criteria c, ListSortDirection.Descending) => applicants.OrderByDescending(a => a.MarkFor(c)),
-                (null, ListSortDirection.Ascending) => applicants.OrderBy(a => ApplicantEngine.OverallAbility(a)),
-                (null, ListSortDirection.Descending) => applicants.OrderByDescending(a => ApplicantEngine.OverallAbility(a)),
-                _ => throw new ApplicationException($"Sort not handled: {by} / {direction}")
-            };
-
-        public override void AllocateCastNumbers(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, Criteria? order_by, ListSortDirection sort_direction)
-        {
-            var cast_numbers = new CastNumberSet();
-            // find cast numbers which are already set
-            foreach (var applicant in applicants)
-            {
-                if (applicant.CastGroup != null)
-                {
-                    if (applicant.CastNumber is int cast_number)
-                        if (!cast_numbers.Add(cast_number, applicant.AlternativeCast, applicant.CastGroup))
-                            // if add fails, this cast number has already been allocated, therefore remove it
-                            applicant.CastNumber = null;
-                }
-                else
-                {
-                    // clear cast numbers of rejected applicants
-                    applicant.CastNumber = null;
-                }
-            }
-            // allocate cast numbers to those who need them
-            foreach (var applicant in Sort(applicants.Where(a => a.IsAccepted), order_by, sort_direction))
-            {
-                if (applicant.CastNumber == null)
-                    applicant.CastNumber = cast_numbers.AddNextAvailable(applicant.AlternativeCast, applicant.CastGroup!); // not null because IsAccepted
-            }
-        }
-
-        public override void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts)
-        {
-            // allocate tags sequentially because they aren't dependant on each other
-            tags = tags.ToArray(); //TODO heuristic- fix this hack for concurrent modification of collecion
-            foreach (var tag in tags)
-                ApplyTag(applicants, tag, number_of_alternative_casts);
-        }
-
-        public override void ApplyTag(IEnumerable<Applicant> applicants, Tag tag, uint number_of_alternative_casts)
-        {
-            // In this dictionary, if a key is missing that means infinite are allowed
-            var remaining = tag.CountByGroups.ToDictionary(
-                cbg => cbg.CastGroup,
-                cbg => cbg.CastGroup.AlternateCasts ? number_of_alternative_casts * cbg.Count : cbg.Count);
-            // Subtract cast already allocated to tags
-            foreach (var applicant in applicants)
-            {
-                if (applicant.CastGroup == null)
-                    applicant.Tags.Remove(tag); // not accepted, therefore remove tag
-                else if (applicant.Tags.Contains(tag)
-                    && remaining.TryGetValue(applicant.CastGroup, out var remaining_count)
-                    && remaining_count != 0)
-                    remaining[applicant.CastGroup] = remaining_count - 1;
-            }
-            // Apply tags to accepted applicants in order of suitability
-            foreach (var applicant in applicants.Where(a => a.IsAccepted).OrderByDescending(a => SuitabilityOf(a, tag.Requirements))) //TODO heuristic- ModifiedHeuristicEngine should fallback to OverallAbility if tied on tag requirements
-            {
-                if (tag.Requirements.All(r => r.IsSatisfiedBy(applicant))) // cast member meets minimum requirement
-                {
-                    var cast_group = applicant.CastGroup!; // not null because IsAccepted
-                    if (!remaining.TryGetValue(cast_group, out var remaining_count))
-                        applicant.Tags.Add(tag); // no limit on this cast group
-                    else if (remaining_count > 0)
-                    {
-                        // limited, but space remaining for this cast group
-                        applicant.Tags.Add(tag);
-                        remaining[cast_group] = remaining_count - 1;
-                    }
-                }
-            }
-        }
-
-        /// <summary>Calculate the suitability of an applicant against a set of requirements.
-        /// This assumes no circular references.</summary>
-        private double SuitabilityOf(Applicant applicant, IEnumerable<Requirement> requirements)
-        {
-            var sub_suitabilities = requirements.Select(req => SuitabilityOf(applicant, req)).DefaultIfEmpty();
-            return sub_suitabilities.Average(); //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
-        }
-
-        private double SuitabilityOf(Applicant applicant, Requirement requirement) //TODO copied from DummyEngine
-            => requirement switch
-            {
-                AbilityRangeRequirement arr => ScaledSuitability(arr.IsSatisfiedBy(applicant), arr.ScaleSuitability, applicant.MarkFor(arr.Criteria), arr.Criteria.MaxMark),
-                NotRequirement nr => 1 - SuitabilityOf(applicant, nr.SubRequirement),
-                AndRequirement ar => ar.AverageSuitability ? ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
-                OrRequirement or => or.AverageSuitability ? or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(), //TODO real implementation might use a different combination function (eg. average, weighted average, product, or max)
-                XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? SuitabilityOf(applicant, req) : 0,
-                Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
-            };
-
-        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark) //TODO copied from DummyEngine
-        {
-            //TODO real implementation might not test if in range
-            if (!in_range)
-                return 0;
-            else if (scale_suitability)
-                return mark / max_mark;
-            else
-                return 1;
-        }
-        #endregion
-
-        private Criteria[] primaryCriterias;
-
-        public ChunkedPairsSatEngine(IApplicantEngine applicant_engine, Criteria[] criterias)
-            : base(applicant_engine)
-        {
-            primaryCriterias = criterias.Where(c => c.Primary).ToArray();
         }
 
         public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts, IEnumerable<SameCastSet> same_cast_sets)
@@ -304,8 +191,11 @@ namespace Carmen.CastingEngine
         /// <summary>Creates a clause specifying that all these applicants are in the same alternative cast</summary>
         private IEnumerable<Clause<Applicant>> KeepTogether(Applicant[] applicants)
         {
-            //TODO cache builders, because they are probably quite slow (cache should persist at least as long as the engine, maybe application, maybe to disk)
-            var builder = new ExpressionBuilder(applicants.Length, values => values.All(v => v) || values.All(v => !v));
+            if (!cachedKeepTogether.TryGetValue(applicants.Length, out var builder))
+            {
+                builder = new ExpressionBuilder(applicants.Length, values => values.All(v => v) || values.All(v => !v));
+                cachedKeepTogether.Add(applicants.Length, builder);
+            }
             foreach (var clause in builder.Apply(applicants).Clauses)
                 yield return clause;
         }
@@ -313,8 +203,11 @@ namespace Carmen.CastingEngine
         /// <summary>Creates a clause specifying that exactly half of the given applicants are in each alternative cast</summary>
         private IEnumerable<Clause<Applicant>> KeepSeparate(Applicant[] applicants)
         {
-            //TODO cache builders, because they are probably quite slow (cache should persist at least as long as the engine, maybe application, maybe to disk)
-            var builder = new ExpressionBuilder(applicants.Length, values => values.Count(v => v) == applicants.Length / 2);
+            if (!cachedKeepSeparate.TryGetValue(applicants.Length, out var builder))
+            {
+                builder = new ExpressionBuilder(applicants.Length, values => values.Count(v => v) == applicants.Length / 2);
+                cachedKeepTogether.Add(applicants.Length, builder);
+            }
             foreach (var clause in builder.Apply(applicants).Clauses)
                 yield return clause;
         }
