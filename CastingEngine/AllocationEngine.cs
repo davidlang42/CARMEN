@@ -22,15 +22,17 @@ namespace Carmen.CastingEngine
             typeof(DummyAllocationEngine), //LATER remove
         };
 
-        //TODO look at common arguments, eg. cast groups/ alternative casts ande decide what should be in the constructor
         public IApplicantEngine ApplicantEngine { get; init; }
 
-        public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
+        protected AlternativeCast[] alternativeCasts { get; init; }
+
+        public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
         public abstract double SuitabilityOf(Applicant applicant, Role role);
 
-        public AllocationEngine(IApplicantEngine applicant_engine)
+        public AllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts)
         {
             ApplicantEngine = applicant_engine;
+            alternativeCasts = alternative_casts;
         }
 
         /// <summary>Default implementation enumerates roles in item order, then by name, removing duplicates</summary>
@@ -38,11 +40,10 @@ namespace Carmen.CastingEngine
             => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();
 
         /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
-        public virtual IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts)
+        public virtual IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
         {
-            var casts = alternative_casts.ToArray();
             foreach (var role in roles)
-                yield return new KeyValuePair<Role, IEnumerable<Applicant>>(role, PickCast(applicants, role, casts));
+                yield return new KeyValuePair<Role, IEnumerable<Applicant>>(role, PickCast(applicants, role));
         }
 
         /// <summary>Default implementation counts roles based on top level AbilityExact/AbilityRange requirements only</summary>
@@ -53,10 +54,10 @@ namespace Carmen.CastingEngine
 
         /// <summary>Finds the next Role in IdealCastingOrder() which has not yet been fully cast,
         /// optionally exlcuding a specified role.</summary>
-        public Role? NextUncastRole(IEnumerable<Item> items_in_order, AlternativeCast[] alternative_casts, Role? excluding_role = null)
+        public Role? NextUncastRole(IEnumerable<Item> items_in_order, Role? excluding_role = null)
         {
             var e = IdealCastingOrder(items_in_order)
-                .Where(r => r.CastingStatus(alternative_casts) != Role.RoleStatus.FullyCast)
+                .Where(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast)
                 .GetEnumerator();
             if (!e.MoveNext())
                 return null;

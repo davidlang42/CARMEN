@@ -13,8 +13,8 @@ namespace Carmen.CastingEngine.Heuristic
 {
     public class HeuristicAllocationEngine : AllocationEngine
     {
-        public HeuristicAllocationEngine(IApplicantEngine applicant_engine)
-            : base(applicant_engine)
+        public HeuristicAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts)
+            : base(applicant_engine, alternative_casts)
         { }
 
         public override double SuitabilityOf(Applicant applicant, Role role)
@@ -35,9 +35,8 @@ namespace Carmen.CastingEngine.Heuristic
         /// <summary>Return a list of the best cast to pick for the role, based on suitability.
         /// If a role has no requirements, select other alternative casts by matching cast number, if possible.
         /// NOTE: This does not respect existing casting, and expects it to be cleared before calling</summary>
-        public override IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts)
+        public override IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role)
         {
-            alternative_casts = alternative_casts.ToArray(); //TODO maybe pass this in as an array?
             //TODO heuristic- this whole algorithm doesn't respect already picked, but thats what the original heuristic did, so...
             var required_cast_groups = new Dictionary<CastGroup, uint>();
             foreach (var cbg in role.CountByGroups)
@@ -60,7 +59,7 @@ namespace Carmen.CastingEngine.Heuristic
                     yield return next_cast;
                     if (cast_group.AlternateCasts)
                     {
-                        var need_alternative_casts = alternative_casts.Where(ac => ac != next_cast.AlternativeCast).ToHashSet();
+                        var need_alternative_casts = alternativeCasts.Where(ac => ac != next_cast.AlternativeCast).ToHashSet();
                         if (role.Requirements.Count == 0)
                         {
                             // if not a special role, take the cast number buddies, if possible

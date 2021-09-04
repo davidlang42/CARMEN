@@ -25,7 +25,7 @@ namespace Carmen.CastingEngine
 
         /// <summary>Finds the next Role in IdealCastingOrder() which has not yet been fully cast,
         /// optionally excluding a specified role.</summary>
-        Role? NextUncastRole(IEnumerable<Item> items_in_order, AlternativeCast[] alternative_casts, Role? excluding_role = null);
+        Role? NextUncastRole(IEnumerable<Item> items_in_order, Role? excluding_role = null);
 
         /// <summary>Calculate the suitability of an applicant for a role, regardless of availability and eligibility.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to roles, and is therefore
@@ -39,10 +39,10 @@ namespace Carmen.CastingEngine
         double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role);
 
         /// <summary>Pick the best cast for a role</summary>
-        IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts);
+        IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
 
         /// <summary>Pick the best cast for one or more roles, balancing talent between them</summary>
-        IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles, IEnumerable<AlternativeCast> alternative_casts); //TODO is there a better return argument than this?
+        IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles); //TODO is there a better return argument than this?
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>
@@ -51,12 +51,5 @@ namespace Carmen.CastingEngine
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
         Availability AvailabilityOf(Applicant applicant, Role role);
-    }
-
-    /// <summary>A list of the available implementations of IAllocationEngine</summary>
-    public enum AllocationEngineType
-    {
-        DummyAllocationEngine, //LATER remove dummy engine
-        HeuristicAllocationEngine
     }
 }

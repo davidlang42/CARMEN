@@ -116,8 +116,8 @@ namespace Carmen.CastingEngine
     /// </summary>
     public class DummyAllocationEngine : AllocationEngine
     {
-        public DummyAllocationEngine(IApplicantEngine applicant_engine)
-            : base(applicant_engine)
+        public DummyAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts)
+            : base(applicant_engine, alternative_casts)
         { }
 
         /// <summary>Dummy value is the basic implementation of recursive requirements.
@@ -136,14 +136,13 @@ namespace Carmen.CastingEngine
 
         /// <summary>Dummy selection picks the number of required applicants of each type from the list of applicants, ignoring availability and eligibility.
         /// This does not take into account people already cast in the role.</summary>
-        public override IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts)
+        public override IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role)
         {
-            var casts = alternative_casts.ToArray();
             foreach (var cbg in role.CountByGroups)
             {
                 if (cbg.CastGroup.AlternateCasts)
                 {
-                    foreach (var cast in casts)
+                    foreach (var cast in alternativeCasts)
                         foreach (var applicant in applicants.Where(a => a.CastGroup == cbg.CastGroup && a.AlternativeCast == cast).Take((int)cbg.Count))
                             yield return applicant;
                 }

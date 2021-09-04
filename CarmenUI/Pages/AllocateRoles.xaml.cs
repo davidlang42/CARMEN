@@ -109,8 +109,8 @@ namespace CarmenUI.Pages
                     };
                     _engine = ParseAllocationEngine() switch
                     {
-                        nameof(DummyAllocationEngine) => new DummyAllocationEngine(applicant_engine),
-                        nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine),
+                        nameof(DummyAllocationEngine) => new DummyAllocationEngine(applicant_engine, alternativeCasts),
+                        nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine, alternativeCasts),
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }
@@ -139,7 +139,7 @@ namespace CarmenUI.Pages
         {
             if (applicantsPanel.Content is not EditableRoleWithApplicantsView current_view)
                 return;
-            var new_applicants = engine.PickCast(applicantsInCast, current_view.Role, context.AlternativeCasts.Local);
+            var new_applicants = engine.PickCast(applicantsInCast, current_view.Role);
             current_view.SelectApplicants(new_applicants);
         }
 
@@ -219,7 +219,7 @@ namespace CarmenUI.Pages
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
             var current_role = (rolesTreeView.SelectedItem as RoleNodeView)?.Role;
-            var next_role = engine.NextUncastRole(context.ShowRoot.ItemsInOrder(), context.AlternativeCasts.Local.ToArray(), current_role);
+            var next_role = engine.NextUncastRole(context.ShowRoot.ItemsInOrder(), current_role);
             if (next_role != null)
                 rootNodeView.SelectRole(next_role);
             else
@@ -340,7 +340,7 @@ namespace CarmenUI.Pages
             if (selected_roles.Count == 1 && MessageBox.Show("Only 1 role is selected, so no balancing will occur."
                 + "\nDo you still want to automatically cast this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
-            var new_role_applicants = engine.BalanceCast(applicantsInCast, selected_roles, context.AlternativeCasts.Local);
+            var new_role_applicants = engine.BalanceCast(applicantsInCast, selected_roles);
             foreach (var pair in new_role_applicants)
                 foreach (var applicant in pair.Value)
                     pair.Key.Cast.Add(applicant);
