@@ -47,7 +47,6 @@ namespace CarmenUI.Pages
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
-            criteriasViewSource.SortDescriptions.Add(StandardSort.For<Criteria>());
             groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
             if (mode == EditApplicantsMode.RegisterApplicants)
             {
@@ -76,8 +75,9 @@ namespace CarmenUI.Pages
             using (var loading = new LoadingOverlay(this).AsSegment(nameof(EditApplicants)))
             {
                 using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
-                    _criterias = await context.Criterias.ToArrayAsync();
+                    _criterias = await context.Criterias.InOrder().ToArrayAsync();
                 criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
+                criteriasViewSource.View.SortDescriptions.Add(StandardSort.For<Criteria>());
                 using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
                     await context.Applicants.LoadAsync();
                 using (loading.Segment(nameof(EditApplicants) + nameof(Applicant), "First applicant")) //LATER ideally setting the source wouldn't auto-show the first applicant (which takes time because it loads an image)

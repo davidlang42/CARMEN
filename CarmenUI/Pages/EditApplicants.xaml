@@ -15,7 +15,7 @@
     Loaded="Page_Loaded">
     <Page.Resources>
         <CollectionViewSource x:Key="applicantsViewSource"/>
-        <CollectionViewSource x:Key="criteriasViewSource"/>
+        <CollectionViewSource x:Key="criteriasViewSource" IsLiveFilteringRequested="true"/>
         <cv:FullName x:Key="fullName"/>
         <cv:MatchGenderValue x:Key="matchGenderValue"/>
         <cv:BooleanLookupDictionary x:Key="groupExpansionLookup"/>
