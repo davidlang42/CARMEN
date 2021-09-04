@@ -1,6 +1,7 @@
 ﻿using Carmen.CastingEngine.Heuristic;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -84,17 +85,46 @@ namespace Carmen.CastingEngine
         }
 
         /// <summary>Default implementation applies tags in a order that ensures any tags which depend on other tags through
-        /// requirements are processed first. This assumes there are no circular references.</summary>
+        /// requirements are processed first. This assumes there are no circular dependency between tags.</summary>
         public virtual void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags, uint number_of_alternative_casts)
         {
-            // allocate tags sequentially because they aren't dependant on each other
-            //TODO handle tag dependencies
-            tags = tags.ToArray(); //TODO heuristic- fix this hack for concurrent modification of collecion
+            // list all tags referenced by each tag
+            var tag_references = new Dictionary<Tag, HashSet<Tag>>();
             foreach (var tag in tags)
-                ApplyTag(applicants, tag, number_of_alternative_casts);
+            {
+                var references = tag.Requirements
+                    .SelectMany(r => r.References()).Concat(tag.Requirements)
+                    .OfType<TagRequirement>().Select(tr => tr.RequiredTag)
+                    .ToHashSet();
+                tag_references.Add(tag, references);
+            }
+            // check that all referenced tags are included in this ApplyTags() call
+            foreach (var (tag, references) in tag_references)
+                foreach (var ref_tag in references)
+                    if (!tag_references.ContainsKey(ref_tag))
+                        throw new ArgumentException($"Tag '{ref_tag.Name}' is referenced by '{tag.Name}' but was not included in the ApplyTags() call.");
+            // allocate tags which aren't dependant on those remaining
+            bool any_change;
+            while (tag_references.Any())
+            {
+                any_change = false;
+                foreach (var (tag, references) in tag_references)
+                {
+                    if (!references.Any(t => tag_references.ContainsKey(t)))
+                    {
+                        ApplyTag(applicants, tag, number_of_alternative_casts);
+                        tag_references.Remove(tag);
+                        any_change = true;
+                    }
+                }
+                if (!any_change)
+                    throw new ArgumentException("Cannot apply tags with circular dependency between tags.");
+            } 
         }
 
-        //TODO summary comment
+        /// <summary>Default implementation applies tags by list accepted cast who aren't in this tag, ordering them
+        /// by suitability for this tag, then ordering by overall mark. Tags are applied down this list until all the
+        /// cast groups have the required number or there are no more eligible cast.</summary>
         public void ApplyTag(IEnumerable<Applicant> applicants, Tag tag, uint number_of_alternative_casts)
         {
             // In this dictionary, if a key is missing that means infinite are allowed
@@ -113,9 +143,10 @@ namespace Carmen.CastingEngine
             }
             // Apply tags to accepted applicants in order of suitability
             var prioritised_applicants = applicants.Where(a => a.IsAccepted)
+                .Where(a => !a.Tags.Contains(tag))
                 .Where(a => tag.Requirements.All(r => r.IsSatisfiedBy(a)))
                 .OrderByDescending(a => SuitabilityOf(a, tag))
-                .ThenByDescending(a => ApplicantEngine.OverallAbility(a)); //TODO document that this is an improvement over original heuristic
+                .ThenByDescending(a => ApplicantEngine.OverallAbility(a));
             foreach (var applicant in prioritised_applicants) 
             {
                 var cast_group = applicant.CastGroup!; // not null because IsAccepted

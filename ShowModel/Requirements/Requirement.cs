@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -94,14 +95,31 @@ namespace Carmen.ShowModel.Requirements
             return result;
         }
 
-        internal virtual bool HasCircularReference(HashSet<Requirement> visited) => false;
+        /// <summary>Recursively visit all requirements which are referenced directly
+        /// or indirectly by this requirement, checking for a circular reference.</summary>
+        internal virtual bool HasCircularReference(HashSet<Requirement> path, HashSet<Requirement> visited)
+        {
+            visited.Add(this);
+            return false;
+        }
+
+        /// <summary>Recursively enumerate all Requirements which are referenced directly or indirectly by this requirement</summary>
+        public IEnumerable<Requirement> References()
+        {
+            var visited = new HashSet<Requirement>();
+            var path = new HashSet<Requirement>();
+            if (HasCircularReference(path, visited))
+                throw new ApplicationException($"Requirement has a circular reference: ({string.Join(", ", path.Select(r => r.Name))})");
+            return visited;
+        }
 
         /// <summary>Checks if this requirement has a circular reference.</summary>
         public IEnumerable<string> Validate()
         {
             var visited = new HashSet<Requirement>();
-            if (HasCircularReference(visited))
-                yield return $"Requirement has a circular reference: ({string.Join(", ", visited.Select(r => r.Name))})";
+            var path = new HashSet<Requirement>();
+            if (HasCircularReference(path, visited))
+                yield return $"Requirement has a circular reference: ({string.Join(", ", path.Select(r => r.Name))})";
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

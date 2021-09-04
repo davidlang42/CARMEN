@@ -23,13 +23,14 @@ namespace Carmen.ShowModel.Requirements
         public override bool IsSatisfiedBy(Applicant applicant)
             => !SubRequirement.IsSatisfiedBy(applicant);
 
-        internal override bool HasCircularReference(HashSet<Requirement> visited)
+        internal override bool HasCircularReference(HashSet<Requirement> path, HashSet<Requirement> visited)
         {
-            if (!visited.Add(this))
+            visited.Add(this);
+            if (!path.Add(this))
                 return true;
-            if (SubRequirement.HasCircularReference(visited))
+            if (SubRequirement.HasCircularReference(path, visited))
                 return true;
-            visited.Remove(this);
+            path.Remove(this);
             return false;
         }
     }

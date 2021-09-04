@@ -16,13 +16,14 @@ namespace Carmen.ShowModel.Requirements
                 SubRequirements.Add(requirement);
         }
 
-        internal override bool HasCircularReference(HashSet<Requirement> visited)
+        internal override bool HasCircularReference(HashSet<Requirement> path, HashSet<Requirement> visited)
         {
-            if (!visited.Add(this))
+            visited.Add(this);
+            if (!path.Add(this))
                 return true;
-            if (SubRequirements.Any(sr => sr.HasCircularReference(visited)))
+            if (SubRequirements.Any(sr => sr.HasCircularReference(path, visited)))
                 return true;
-            visited.Remove(this);
+            path.Remove(this);
             return false;
         }
     }
