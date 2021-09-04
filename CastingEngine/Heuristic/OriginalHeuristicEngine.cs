@@ -209,17 +209,6 @@ namespace Carmen.CastingEngine.Heuristic
                 Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
             };
 
-        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark) //LATER copied from DummyEngine
-        {
-            //LATER real implementation might not test if in range
-            if (!in_range)
-                return 0;
-            else if (scale_suitability)
-                return mark / max_mark;
-            else
-                return 1;
-        }
-
         /// <summary>Counts top level AbilityExact/AbilityRange requirements only</summary>
         public double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role) //LATER copied from DummyEngine
             => applicant.Roles.Where(r => r != excluding_role)
@@ -239,6 +228,17 @@ namespace Carmen.CastingEngine.Heuristic
         }
         #endregion
 
+        private double ScaledSuitability(bool in_range, bool scale_suitability, uint mark, uint max_mark) //LATER modified from DummyEngine
+        {
+            //LATER real implementation might not test if in range
+            if (scale_suitability)
+                return (double)mark / max_mark;
+            else if (!in_range)
+                return 0;
+            else
+                return 1;
+        }
+
         public OriginalHeuristicEngine(Criteria[] criterias)
             : base(criterias)
         { }
@@ -246,13 +246,13 @@ namespace Carmen.CastingEngine.Heuristic
         #region IAllocationEngine
         public double SuitabilityOf(Applicant applicant, Role role)
         {
-            double score = (OverallAbility(applicant) + MinOverallAbility) / MaxOverallAbility; // between 0 and 1 inclusive
+            double score = (OverallAbility(applicant) + MinOverallAbility) / (double)MaxOverallAbility; // between 0 and 1 inclusive
             var max = 1;
             foreach (var requirement in role.Requirements)
             {
                 if (requirement is ICriteriaRequirement based_on)
                 {
-                    score += 2 * SuitabilityOf(applicant, requirement) - 0.5 * CountRoles(applicant, based_on.Criteria, role) / 100;
+                    score += 2 * SuitabilityOf(applicant, requirement) - 0.5 * CountRoles(applicant, based_on.Criteria, role) / 100.0;
                     max += 2;
                 }
             }
@@ -262,11 +262,11 @@ namespace Carmen.CastingEngine.Heuristic
 
         /// <summary>Return a list of the best cast to pick for the role, based on suitability.
         /// If a role has no requirements, select other alternative casts by matching cast number, if possible.
-        /// NOTE: This clears the current cast of the role (re-selecting is left to the caller).</summary>
+        /// NOTE: This does not respect existing casting, and expects it to be cleared before calling</summary>
         public IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role, IEnumerable<AlternativeCast> alternative_casts)
         {
             alternative_casts = alternative_casts.ToArray(); //LATER maybe pass this in as an array?
-            role.Cast.Clear(); //TODO (HEURISTIC) this whole algorithm doesn't respect already picked, but thats what the original heuristic did, so...
+            //TODO (HEURISTIC) this whole algorithm doesn't respect already picked, but thats what the original heuristic did, so...
             var required_cast_groups = new Dictionary<CastGroup, uint>();
             foreach (var cbg in role.CountByGroups)
                 if (cbg.Count != 0)
@@ -275,15 +275,15 @@ namespace Carmen.CastingEngine.Heuristic
                 .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
                 .Where(a => AvailabilityOf(a, role).IsAvailable)
                 .Where(a => EligibilityOf(a, role).IsEligible) //TODO (HEURISTIC) document bonus: original didn't look at eligible, but now it does
-                .OrderByDescending(a => SuitabilityOf(a, role))
+                .OrderBy(a => SuitabilityOf(a, role)) // order by suitability ascending so that the lowest suitability is at the bottom of the stack
                 .GroupBy(a => a.CastGroup!)
-                .ToDictionary(g => g.Key, g => new Queue<Applicant>(g));
+                .ToDictionary(g => g.Key, g => new Stack<Applicant>(g));
             foreach (var (cast_group, potential_cast) in potential_cast_by_group)
             {
                 var required = required_cast_groups[cast_group];
                 for (var i = 0; i < required; i++)
                 {
-                    if (!potential_cast.TryDequeue(out var next_cast))
+                    if (!potential_cast.TryPop(out var next_cast))
                         break; // no more available applicants
                     yield return next_cast;
                     if (cast_group.AlternateCasts)

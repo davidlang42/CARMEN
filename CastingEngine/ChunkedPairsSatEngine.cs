@@ -289,7 +289,7 @@ namespace Carmen.CastingEngine
         {
             foreach (var criteria in criterias.Where(c => c.Primary))
             {
-                var sorted_applicants = new Queue<Applicant>(applicants.OrderByDescending(a => a.MarkFor(criteria)));
+                var sorted_applicants = new Stack<Applicant>(applicants.OrderBy(a => a.MarkFor(criteria))); // order by marks ascending so that the lowest mark is at the bottom of the stack
                 while (sorted_applicants.Count >= chunk_size)
                 {
                     // TakeChunk may still fail, even though there are technically enough applicants,
@@ -319,24 +319,24 @@ namespace Carmen.CastingEngine
                 yield return clause;
         }
 
-        /// <summary>Dequeues chunk_size applicants from the start of the queue, with at most chunk_size/2 from any one SameCastSet</summary>
-        private Applicant[]? TakeChunk(Queue<Applicant> applicants, int chunk_size, Dictionary<Applicant, SameCastSet> same_cast_lookup)
+        /// <summary>Takes chunk_size applicants from the top of the stack, with at most chunk_size/2 from any one SameCastSet</summary>
+        private Applicant[]? TakeChunk(Stack<Applicant> applicants, int chunk_size, Dictionary<Applicant, SameCastSet> same_cast_lookup)
         {
             var chunk = new Applicant[chunk_size];
             var c = 0;
-            var skipped = new Queue<Applicant>();
+            var skipped = new Stack<Applicant>();
             while (c < chunk.Length)
             {
-                if (!applicants.TryDequeue(out var next_applicant))
+                if (!applicants.TryPop(out var next_applicant))
                     break;
                 if (same_cast_lookup.TryGetValue(next_applicant, out var same_cast_set)
                     && chunk.Count(c => same_cast_set.Contains(c)) + 1 > chunk_size / 2)
-                    skipped.Prepend(next_applicant);
+                    skipped.Push(next_applicant);
                 else
                     chunk[c++] = next_applicant;
             }
-            foreach (var skip in skipped)
-                applicants.Prepend(skip);
+            while (skipped.Count > 0)
+                applicants.Push(skipped.Pop());
             if (c == chunk.Length)
                 return chunk;
             else

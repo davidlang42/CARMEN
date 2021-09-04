@@ -74,23 +74,23 @@ namespace Carmen.CastingEngine
                 set.Add(item);
         }  
         
-        public static T? FindAndRemove<T>(this Queue<T> queue, Predicate<T> predicate)
+        public static T? FindAndRemove<T>(this Stack<T> stack, Predicate<T> predicate)
             where T : class
         {
-            var skipped = new Queue<T>();
+            var skipped = new Stack<T>();
             T? found = null;
-            while (queue.Count > 0)
+            while (stack.Count > 0)
             {
-                var next = queue.Dequeue();
+                var next = stack.Pop();
                 if (predicate(next))
                 {
                     found = next;
                     break;
                 }
-                skipped.Prepend(next);
+                skipped.Push(next);
             }
             while (skipped.Count > 0)
-                queue.Prepend(skipped.Dequeue());
+                stack.Push(skipped.Pop());
             return found;
         }
     }
