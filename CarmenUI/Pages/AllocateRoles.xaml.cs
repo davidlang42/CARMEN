@@ -345,7 +345,7 @@ namespace CarmenUI.Pages
                 foreach (var applicant in pair.Value)
                     pair.Key.Cast.Add(applicant);
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts);
-            //TODO balance- should we allow IdealCastingOrder() to return sets of roles to be cast together? how will the UI handle this?
+            //TODO (BALANCE) should we allow IdealCastingOrder() to return sets of roles to be cast together? how will the UI handle this?
         }
 
         private List<Role>? ParseSelectedRoles(IEnumerable<IncompleteRole> incomplete_roles)

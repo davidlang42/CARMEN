@@ -37,18 +37,36 @@ namespace Carmen.CastingEngine.Heuristic
         /// NOTE: This does not respect existing casting, and expects it to be cleared before calling</summary>
         public override IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role)
         {
-            //TODO heuristic- this whole algorithm doesn't respect already picked, but thats what the original heuristic did, so...
+            // list existing cast by cast group
+            var existing_cast = new Dictionary<CastGroup, HashSet<Applicant>>();
+            foreach (var group in role.Cast.GroupBy(a => a.CastGroup))
+                if (group.Key is CastGroup cast_group)
+                    existing_cast.Add(cast_group, group.ToHashSet());
+            // calculate how many of each cast group we need to pick
             var required_cast_groups = new Dictionary<CastGroup, uint>();
             foreach (var cbg in role.CountByGroups)
-                if (cbg.Count != 0)
+            {
+                var required = (int)cbg.Count;
+                if (existing_cast.TryGetValue(cbg.CastGroup, out var existing_cast_in_this_group))
+                {
+                    var already_allocated = existing_cast_in_this_group.Count;
+                    if (cbg.CastGroup.AlternateCasts)
+                        already_allocated /= alternativeCasts.Length;
+                    required -= already_allocated;
+                }
+                if (required > 0)
                     required_cast_groups.Add(cbg.CastGroup, cbg.Count);
+            }
+            // list available cast in priority order, grouped by cast group
             var potential_cast_by_group = applicants
                 .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
+                .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
                 .Where(a => AvailabilityOf(a, role).IsAvailable)
-                .Where(a => EligibilityOf(a, role).IsEligible) //TODO heuristic- document bonus: original didn't look at eligible, but now it does
+                .Where(a => EligibilityOf(a, role).IsEligible)
                 .OrderBy(a => SuitabilityOf(a, role)) // order by suitability ascending so that the lowest suitability is at the bottom of the stack
                 .GroupBy(a => a.CastGroup!)
                 .ToDictionary(g => g.Key, g => new Stack<Applicant>(g));
+            // select the required number of cast in the priority order, adding alternative cast buddies as required
             foreach (var (cast_group, potential_cast) in potential_cast_by_group)
             {
                 var required = required_cast_groups[cast_group];
