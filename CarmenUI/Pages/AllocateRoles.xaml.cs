@@ -103,7 +103,7 @@ namespace CarmenUI.Pages
                 {
                     //TODO have a mechanism to choose which engine
                     //_engine = new DummyEngine();
-                    _engine = new HeuristicAllocationEngine(criterias, null, ListSortDirection.Descending);
+                    _engine = new HeuristicAllocationEngine(new WeightedSumEngine(criterias));
                 }
                 _rootNodeView = new ShowRootNodeView(context.ShowRoot, total_cast, context.AlternativeCasts.Local.ToArray());
                 showCompleted.IsChecked = true; // must be set after creating ShowRootNodeView because it triggers Checked event
