@@ -26,6 +26,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CarmenUI.Bindings;
+using Carmen.CastingEngine.Heuristic;
 
 namespace CarmenUI.Pages
 {
@@ -38,8 +39,9 @@ namespace CarmenUI.Pages
         private AlternativeCast[]? _alternativeCasts;
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
+        private Criteria[]? _criterias;
         private NodeView? _rootNodeView;
-        private ICastingEngine engine;
+        private ICastingEngine? _engine; //LATER really this should be IAllocationEngine
 
         private object defaultPanelContent;
 
@@ -52,25 +54,31 @@ namespace CarmenUI.Pages
         private Applicant[] applicantsInCast => _applicantsInCast
             ?? throw new ApplicationException($"Tried to used {nameof(applicantsInCast)} before it was loaded.");
 
+        private Criteria[] criterias => _criterias
+            ?? throw new ApplicationException($"Tried to used {nameof(criterias)} before it was loaded.");
+
         private Criteria[] primaryCriterias => _primaryCriterias
             ?? throw new ApplicationException($"Tried to used {nameof(primaryCriterias)} before it was loaded.");
-        
+
         private NodeView rootNodeView => _rootNodeView
             ?? throw new ApplicationException($"Tried to used {nameof(rootNodeView)} before it was loaded.");
+
+        private ICastingEngine engine => _engine
+            ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
 
         public AllocateRoles(DbContextOptions<ShowContext> context_options) : base(context_options)
         {
             InitializeComponent();
             defaultPanelContent = applicantsPanel.Content;
-            engine = new DummyEngine(); //LATER use real engine, maybe have it supplied by constructor, and type determined by a user setting
         }
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             using (var loading = new LoadingOverlay(this).AsSegment(nameof(AllocateRoles)))
             {
-                using (loading.Segment(nameof(ShowContext.Criterias) + nameof(Criteria.Primary), "Criteria"))
-                    _primaryCriterias = await context.Criterias.Where(c => c.Primary).InOrder().ToArrayAsync();
+                using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
+                    _criterias = await context.Criterias.InOrder().ToArrayAsync();
+                _primaryCriterias = _criterias.Where(c => c.Primary).ToArray();
                 using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
                     await context.CastGroups.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
@@ -91,6 +99,12 @@ namespace CarmenUI.Pages
                 uint total_cast;
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
                     total_cast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
+                using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
+                {
+                    //LATER have a mechanism to choose which engine
+                    //_engine = new DummyEngine();
+                    _engine = new OriginalHeuristicEngine(criterias, null, ListSortDirection.Descending);
+                }
                 _rootNodeView = new ShowRootNodeView(context.ShowRoot, total_cast, context.AlternativeCasts.Local.ToArray());
                 showCompleted.IsChecked = true; // must be set after creating ShowRootNodeView because it triggers Checked event
                 rolesTreeView.ItemsSource = rootNodeView.ChildrenInOrder;

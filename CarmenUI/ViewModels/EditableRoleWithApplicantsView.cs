@@ -21,13 +21,13 @@ namespace CarmenUI.ViewModels
 
         /// <summary>Array arguments are not expected not to change over the lifetime of this View.
         /// Elements of the array may be monitored for changes, but the collection itself is not.</summary>
-        public EditableRoleWithApplicantsView(ICastingEngine engine, Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] criterias, Applicant[] applicants, bool show_unavailable, bool show_ineligible)
+        public EditableRoleWithApplicantsView(ICastingEngine engine, Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] primary_criterias, Applicant[] applicants, bool show_unavailable, bool show_ineligible)
             : base(role, cast_groups_by_cast)
         {
             var required_cast_groups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
             Applicants = applicants.Where(a => required_cast_groups.Contains(a.CastGroup!) || role.Cast.Contains(a)).Select(a =>
             {
-                var av = new ApplicantForRole(engine, a, role, criterias);
+                var av = new ApplicantForRole(engine, a, role, primary_criterias);
                 av.PropertyChanged += ApplicantForRole_PropertyChanged;
                 return av;
             }).ToArray();

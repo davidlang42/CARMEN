@@ -16,7 +16,7 @@ namespace CarmenUI.ViewModels
     public class ApplicantForRole : INotifyPropertyChanged
     {
         public Applicant Applicant { get; init; }//LATER should really be private
-        public Criteria[] Criterias { get; init; }
+        public Criteria[] PrimaryCriterias { get; init; }
 
         private Role role;
 
@@ -47,7 +47,7 @@ namespace CarmenUI.ViewModels
 
         public string? CastNumberAndCast => Applicant.CastNumberAndCast;
 
-        /// <summary>Indicies match Criterias</summary>
+        /// <summary>Indicies match PrimaryCriterias</summary>
         public string[] Marks { get; init; }
 
         /// <summary>Not including this role, even if already cast in it</summary>
@@ -89,20 +89,20 @@ namespace CarmenUI.ViewModels
 
         public string CommaSeparatedIneligibilityReason => string.Join(", ", IneligibilityReasons);
 
-        public ApplicantForRole(ICastingEngine engine, Applicant applicant, Role role, Criteria[] criterias)
+        public ApplicantForRole(ICastingEngine engine, Applicant applicant, Role role, Criteria[] primary_criterias)
         {
             this.Applicant = applicant;
             CastGroupAndCast = new CastGroupAndCast(Applicant);
             this.role = role;
-            Criterias = criterias;
+            PrimaryCriterias = primary_criterias;
             Suitability = engine.SuitabilityOf(applicant, role);
             OverallAbility = engine.OverallAbility(applicant);
-            Marks = new string[Criterias.Length];
+            Marks = new string[PrimaryCriterias.Length];
             for (var i = 0; i < Marks.Length; i++)
-                Marks[i] = applicant.FormattedMarkFor(Criterias[i]);
-            ExistingRoles = new double[Criterias.Length];
+                Marks[i] = applicant.FormattedMarkFor(PrimaryCriterias[i]);
+            ExistingRoles = new double[PrimaryCriterias.Length];
             for (var i = 0; i < ExistingRoles.Length; i++)
-                ExistingRoles[i] = engine.CountRoles(applicant, Criterias[i], role);
+                ExistingRoles[i] = engine.CountRoles(applicant, PrimaryCriterias[i], role);
             Availability = engine.AvailabilityOf(applicant, role);
             Eligibility = engine.EligibilityOf(applicant, role);
         }
