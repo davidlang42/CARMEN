@@ -42,7 +42,7 @@ namespace Carmen.CastingEngine
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
 
         /// <summary>Pick the best cast for one or more roles, balancing talent between them</summary>
-        IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles); //TODO is there a better return argument than this?
+        IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>

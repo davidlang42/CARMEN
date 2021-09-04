@@ -40,10 +40,10 @@ namespace Carmen.CastingEngine
             => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();
 
         /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
-        public virtual IEnumerable<KeyValuePair<Role, IEnumerable<Applicant>>> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
+        public virtual IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
         {
             foreach (var role in roles)
-                yield return new KeyValuePair<Role, IEnumerable<Applicant>>(role, PickCast(applicants, role));
+                yield return (role, PickCast(applicants, role));
         }
 
         /// <summary>Default implementation counts roles based on top level AbilityExact/AbilityRange requirements only</summary>

@@ -341,9 +341,9 @@ namespace CarmenUI.Pages
                 + "\nDo you still want to automatically cast this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
             var new_role_applicants = engine.BalanceCast(applicantsInCast, selected_roles);
-            foreach (var pair in new_role_applicants)
-                foreach (var applicant in pair.Value)
-                    pair.Key.Cast.Add(applicant);
+            foreach (var (role, applicants) in new_role_applicants)
+                foreach (var applicant in applicants)
+                    role.Cast.Add(applicant);
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts);
             //TODO (BALANCE) should we allow IdealCastingOrder() to return sets of roles to be cast together? how will the UI handle this?
         }
