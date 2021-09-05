@@ -161,6 +161,9 @@ namespace CarmenUI.Pages
             return AllocationEngine.Implementations.First().Name;
         }
 
+        protected bool Confirm(string msg)
+            => MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+
         /// <summary>Actually dispose change handlers, etc.
         /// This will only be called once.</summary>
         protected virtual void DisposeInternal()

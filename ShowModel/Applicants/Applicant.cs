@@ -141,6 +141,7 @@ namespace Carmen.ShowModel.Applicants
                 {
                     CastNumber = null;
                     AlternativeCast = null;
+                    Roles.Clear();
                 }    
             }
         }

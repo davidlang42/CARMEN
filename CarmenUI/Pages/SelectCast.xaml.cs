@@ -174,51 +174,84 @@ namespace CarmenUI.Pages
         private void addButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectedApplicantsViewSource.Source is IList list)
-                foreach (var item in availableList.SelectedItems)
-                {
-                    if (!list.Contains(item))
-                        list.Add(item);
-                    if (selectionList.SelectedItem is CastGroup cast_group)
-                        ((Applicant)item).CastGroup = cast_group;
-                }
+                AddToList(list, availableList.SelectedItems.Cast<Applicant>());
             ConfigureAllApplicantsFiltering();
         }
 
         private void addAllButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectedApplicantsViewSource.Source is IList list)
-                foreach (var item in availableList.Items)
-                {
-                    if (!list.Contains(item))
-                        list.Add(item);
-                    if (selectionList.SelectedItem is CastGroup cast_group)
-                        ((Applicant)item).CastGroup = cast_group;
-                }
+                AddToList(list, availableList.Items.Cast<Applicant>());
             ConfigureAllApplicantsFiltering();
+        }
+
+        private void AddToList(IList list, IEnumerable<Applicant> applicants)
+        {
+            foreach (var applicant in applicants)
+            {
+                if (!list.Contains(applicant))
+                    list.Add(applicant);
+                if (selectionList.SelectedItem is CastGroup cast_group)
+                    applicant.CastGroup = cast_group;
+                else if (selectionList.SelectedItem is Tag tag)
+                    if (!applicant.Tags.Contains(tag))
+                        applicant.Tags.Add(tag);
+                //LATER alternative cast needs to be handled here
+            }
         }
 
         private void removeButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectedApplicantsViewSource.Source is IList list)
-                foreach (var item in selectedList.SelectedItems.OfType<object>().ToList())
-                {
-                    list.Remove(item);
-                    if (selectionList.SelectedItem is CastGroup)
-                        ((Applicant)item).CastGroup = null;
-                }
+                RemoveFromList(list, selectedList.SelectedItems.Cast<Applicant>().ToArray());
             ConfigureAllApplicantsFiltering();
         }
 
         private void removeAllButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectedApplicantsViewSource.Source is IList list)
-                foreach (var item in selectedList.Items.OfType<object>().ToList())
-                {
-                    list.Remove(item);
-                    if (selectionList.SelectedItem is CastGroup)
-                        ((Applicant)item).CastGroup = null;
-                }
+                RemoveFromList(list, selectedList.Items.OfType<Applicant>().ToArray());
             ConfigureAllApplicantsFiltering();
+        }
+
+        private void RemoveFromList(IList list, Applicant[] applicants)
+        {
+            if (applicants.Length == 0)
+                return;
+            if (selectionList.SelectedItem is CastGroup cast_group)
+            {
+                string prefix, alt_cast;
+                if (applicants.Length == 1)
+                {
+                    prefix = $"Removing '{applicants[0].FirstName} {applicants[0].LastName}' from '{cast_group.Name}' will also";
+                    alt_cast = $"the '{applicants[0].AlternativeCast?.Name}' cast";
+                }
+                else
+                {
+                    prefix = $"Removing {applicants.Length} applicants from '{cast_group.Name}' will also";
+                    alt_cast = "their alternative casts";
+                }
+                var has_roles = applicants.Any(a => a.Roles.Any());
+                var has_alternative_cast = cast_group.AlternateCasts && applicants.Any(a => a.AlternativeCast != null);
+                var confirmed = (has_roles, has_alternative_cast) switch
+                {
+                    (true, true) => Confirm($"{prefix} remove them from {alt_cast} and uncast them from any roles allocated to them. Do you want to continue?"),
+                    (true, false) => Confirm($"{prefix} uncast them from any roles allocated to them. Do you want to continue?"),
+                    (false, true) => Confirm($"{prefix} remove them from {alt_cast}. Do you want to continue?"),
+                    _ => true // (false, false)
+                };
+                if (!confirmed)
+                    return;
+            }
+            foreach (var applicant in applicants)
+            {
+                list.Remove(applicant);
+                if (selectionList.SelectedItem is CastGroup)
+                    applicant.CastGroup = null;
+                else if (selectionList.SelectedItem is Tag tag)
+                    applicant.Tags.Remove(tag);
+                //LATER alternative cast needs to be handled here
+            }
         }
 
         private void availableList_MouseDoubleClick(object sender, MouseButtonEventArgs e)

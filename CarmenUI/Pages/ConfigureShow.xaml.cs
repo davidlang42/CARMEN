@@ -254,7 +254,7 @@ namespace CarmenUI.Pages
             switch (objectList.SelectedItem)
             {
                 case Criteria criteria:
-                    if (!criteria.Abilities.Any() || ConfirmDelete($"Are you sure you want to delete the '{criteria.Name}' criteria?\nThis will delete the {criteria.Name} mark of {criteria.Abilities.Count.Plural("applicant")}."))
+                    if (!criteria.Abilities.Any() || Confirm($"Are you sure you want to delete the '{criteria.Name}' criteria?\nThis will delete the {criteria.Name} mark of {criteria.Abilities.Count.Plural("applicant")}."))
                         list.Remove(criteria);
                     break;
                 case CastGroup cast_group:
@@ -263,7 +263,7 @@ namespace CarmenUI.Pages
                         MessageBox.Show("You must have at least one Cast Group.", WindowTitle);
                         return;
                     }
-                    if (!cast_group.Members.Any() || ConfirmDelete($"Are you sure you want to delete the '{cast_group.Name}' cast group?\nThis will remove the {cast_group.Members.Count.Plural($"currently selected {cast_group.Name}")} from the cast."))
+                    if (!cast_group.Members.Any() || Confirm($"Are you sure you want to delete the '{cast_group.Name}' cast group?\nThis will remove the {cast_group.Members.Count.Plural($"currently selected {cast_group.Name}")} from the cast."))
                         list.Remove(cast_group);
                     break;
                 case AlternativeCast alternative_cast:
@@ -272,16 +272,16 @@ namespace CarmenUI.Pages
                     bool needed_to_alternate = context.AlternativeCasts.Local.Count <= 2 && cast_groups_alternating > 0;
                     var allow_delete = (any_members, needed_to_alternate) switch
                     {
-                        (true, true) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from this alternative cast, and disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
-                        (true, false) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from this alternative cast."),
-                        (false, true) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
+                        (true, true) => Confirm($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from this alternative cast, and disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
+                        (true, false) => Confirm($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from this alternative cast."),
+                        (false, true) => Confirm($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
                         _ => true // (false, false)
                     };
                     if (allow_delete)
                         context.DeleteAlternativeCast(alternative_cast);
                     break;
                 case Tag tag:
-                    if (!tag.Members.Any() || ConfirmDelete($"Are you sure you want to delete the '{tag.Name}' tag?\nThis will remove the tag from {tag.Members.Count.Plural($"currently tagged applicant")}."))
+                    if (!tag.Members.Any() || Confirm($"Are you sure you want to delete the '{tag.Name}' tag?\nThis will remove the tag from {tag.Members.Count.Plural($"currently tagged applicant")}."))
                         list.Remove(tag);
                     break;
                 case SectionType section_type:
@@ -290,19 +290,16 @@ namespace CarmenUI.Pages
                         MessageBox.Show("You must have at least one Section Type.", WindowTitle);
                         return;
                     }
-                    if (!section_type.Sections.Any() || ConfirmDelete($"Are you sure you want to delete the '{section_type.Name}' section type?\nThis will remove the {section_type.Sections.Count.Plural(section_type.Name)} and any sections, items and roles within them."))
+                    if (!section_type.Sections.Any() || Confirm($"Are you sure you want to delete the '{section_type.Name}' section type?\nThis will remove the {section_type.Sections.Count.Plural(section_type.Name)} and any sections, items and roles within them."))
                         context.DeleteSectionType(section_type);
                     break;
                 case Requirement requirement:
                     var used_count = requirement.UsedByCastGroups.Count + requirement.UsedByCombinedRequirements.Count + requirement.UsedByRoles.Count + requirement.UsedByTags.Count;//LATER is this missing NotRequirements?
-                    if (used_count == 0 || ConfirmDelete($"Are you sure you want to delete the '{requirement.Name}' reqirement?\nThis will also delete any NOT requirements which refer to it, and is currently in used {used_count.Plural("time")}."))
+                    if (used_count == 0 || Confirm($"Are you sure you want to delete the '{requirement.Name}' reqirement?\nThis will also delete any NOT requirements which refer to it, and is currently in used {used_count.Plural("time")}."))
                         context.DeleteRequirement(requirement);
                     break;
             }
         }
-
-        private bool ConfirmDelete(string msg)
-            => MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 
         private void ImportShowConfiguration_Click(object sender, RoutedEventArgs e)
         {
