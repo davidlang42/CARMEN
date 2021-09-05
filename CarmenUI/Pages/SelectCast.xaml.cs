@@ -155,8 +155,13 @@ namespace CarmenUI.Pages
                 else if (response == MessageBoxResult.Yes)
                 {
                     // auto-complete cast numbers & alternative casts
-                    engine.BalanceAlternativeCasts(context.Applicants.Local, Enumerable.Empty<SameCastSet>());
-                    engine.AllocateCastNumbers(context.Applicants.Local);
+                    using (var processing = new LoadingOverlay(this).AsSegment(nameof(PreSaveChecks), "Processing..."))
+                    {
+                        using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
+                            engine.BalanceAlternativeCasts(context.Applicants.Local, Enumerable.Empty<SameCastSet>());
+                        using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
+                            engine.AllocateCastNumbers(context.Applicants.Local);
+                    }
                     var updated_inconsistent_applicants = context.Applicants.Local
                         .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)));
                     if (updated_inconsistent_applicants.Any())
