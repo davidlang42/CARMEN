@@ -15,8 +15,11 @@ namespace CarmenUI.ViewModels
 
         public override string Name => Item.Name;
 
-        protected override Task<(double progress, bool has_errors)> CalculateAsync(double child_progress, bool child_errors)
-            => Task.Run(() => (child_progress, child_errors));//TODO show consecutive item errors from show root here (or all?) maybe use common code from NodeRolesOverview
+        protected override async Task<(double progress, bool has_errors)> CalculateAsync(double child_progress, bool child_errors)
+        {
+            child_errors |= await Task.Run(() => Item.FindConsecutiveCast().Any());
+            return (child_progress, child_errors);
+        }
 
         public ItemNodeView(Item item, AlternativeCast[] alternative_casts)
             : base(item.Roles.OrderBy(r => r.Name).Select(r => new RoleNodeView(r, alternative_casts)))

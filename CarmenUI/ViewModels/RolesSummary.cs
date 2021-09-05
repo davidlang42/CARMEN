@@ -34,7 +34,7 @@ namespace CarmenUI.ViewModels
             if (counts.TryGetValue(RoleStatus.OverCast, out var roles_overcast))
                 Rows.Add(new Row { Fail = $"{roles_overcast.Plural("Role")} with too many cast" });
             // check showroot consecutive items
-            var consecutive_item_failures = new HashSet<ConsecutiveItemSummary>();
+            var consecutive_item_failures = new HashSet<ConsecutiveItemCast>();
             if (!c.ShowRoot.VerifyConsecutiveItems(out var show_root_failures))
                 foreach (var failure in show_root_failures)
                     consecutive_item_failures.Add(failure);
@@ -62,7 +62,7 @@ namespace CarmenUI.ViewModels
             }
             // append combined showroot & section consecutive item failures
             foreach (var failure in consecutive_item_failures)
-                Rows.Add(new Row { Fail = $"{failure.CastCount.Plural("Applicant is", "Applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}" });
+                Rows.Add(new Row { Fail = $"{failure.Cast.Count.Plural("Applicant is", "Applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}" });
             FinishLoad(cancel, roles_cast == 0 || roles_blank != 0);
         }
     }

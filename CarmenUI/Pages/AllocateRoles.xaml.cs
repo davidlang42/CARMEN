@@ -42,6 +42,7 @@ namespace CarmenUI.Pages
         private Criteria[]? _primaryCriterias;
         private Criteria[]? _criterias;
         private NodeView? _rootNodeView;
+        private uint? _totalCast;
         private IAllocationEngine? _engine;
 
         private object defaultPanelContent;
@@ -64,6 +65,9 @@ namespace CarmenUI.Pages
         private NodeView rootNodeView => _rootNodeView
             ?? throw new ApplicationException($"Tried to used {nameof(rootNodeView)} before it was loaded.");
 
+        private uint totalCast => _totalCast
+            ?? throw new ApplicationException($"Tried to used {nameof(totalCast)} before it was loaded.");
+
         private IAllocationEngine engine => _engine
             ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
 
@@ -84,6 +88,7 @@ namespace CarmenUI.Pages
                     await context.CastGroups.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
                     _alternativeCasts = await context.AlternativeCasts.InNameOrder().ToArrayAsync();
+                _totalCast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(_alternativeCasts.Length));
                 _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local.InOrder(), _alternativeCasts).ToArray();
                 using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles) + nameof(Role.Items), "Applicants"))
                     _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
@@ -183,8 +188,8 @@ namespace CarmenUI.Pages
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
                 RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
-                ItemNodeView item_node_view => new NodeRolesOverview(item_node_view.Item, alternativeCasts),
-                SectionNodeView section_node_view => new NodeRolesOverview(section_node_view.Section, alternativeCasts),
+                ItemNodeView item_node_view => new NodeRolesOverview(item_node_view.Item, alternativeCasts, totalCast),
+                SectionNodeView section_node_view => new NodeRolesOverview(section_node_view.Section, alternativeCasts, totalCast),
                 _ => defaultPanelContent
             };
             return true;
@@ -345,7 +350,7 @@ namespace CarmenUI.Pages
             foreach (var (role, applicants) in new_role_applicants)
                 foreach (var applicant in applicants)
                     role.Cast.Add(applicant);
-            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts);
+            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, totalCast);
             //TODO (BALANCE) should we allow IdealCastingOrder() to return sets of roles to be cast together? how will the UI handle this? -- allow IdealCastingOrder() to return sets of roles (within a non-multi section ONLY)
         }
 

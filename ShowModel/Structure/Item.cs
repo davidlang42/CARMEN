@@ -91,5 +91,32 @@ namespace Carmen.ShowModel.Structure
             }
             return null; // if no sibling below and parent is showroot, we are really the bottom
         }
+
+        /// <summary>Find cast allocated to roles consecutive items (previous item, this item) or (this item, next item).
+        /// NOTE: If all parent Sections and ShowRoot allow consecutive items, this will return an empty sequence.</summary>
+        public IEnumerable<ConsecutiveItemCast> FindConsecutiveCast()
+        {
+            var item_roles = Roles.ToHashSet();
+            var item_cast = item_roles.SelectMany(r => r.Cast).ToHashSet();
+            if (PreviousItem() is Item previous && CommonParents(previous, this).Any(p => !p.AllowConsecutiveItems))
+            {
+                var previous_cast = previous.Roles
+                    .Where(r => !item_roles.Contains(r)) // a role is allowed to be in 2 consecutive items
+                    .SelectMany(r => r.Cast).ToHashSet();
+                previous_cast.IntersectWith(item_cast); // result in previous_cast
+                yield return new ConsecutiveItemCast { Cast = previous_cast, Item1 = previous, Item2 = this };
+            }
+            if (NextItem() is Item next && CommonParents(this, next).Any(p => !p.AllowConsecutiveItems))
+            {
+                var next_cast = next.Roles
+                    .Where(r => !item_roles.Contains(r)) // a role is allowed to be in 2 consecutive items
+                    .SelectMany(r => r.Cast).ToHashSet();
+                next_cast.IntersectWith(item_cast); // result in next_cast
+                yield return new ConsecutiveItemCast { Cast = next_cast, Item1 = this, Item2 = next };
+            }
+        }
+
+        private static IEnumerable<InnerNode> CommonParents(Item item1, Item item2)
+            => item1.Parents().Intersect(item2.Parents());
     }
 }
