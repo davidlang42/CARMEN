@@ -40,7 +40,7 @@ namespace CarmenUI.Converters
             if (a.AlternativeCast is AlternativeCast ac)
                 elements.Add(ac.Initial.ToString());
             if (ApplicantEngine is IApplicantEngine engine)
-                elements.Add($"{engine.OverallAbility(a)} overall");
+                elements.Add($"overall {engine.OverallAbility(a)}");
             return string.Join(" ", elements);
         }
 

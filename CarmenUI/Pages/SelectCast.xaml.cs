@@ -333,7 +333,7 @@ namespace CarmenUI.Pages
             }
             else if (selectionList.SelectedItem != null) // Cast Numbers
             {
-                TriggerCastNumbersRefresh(); //TODO (TAGS) this isn't picking up changed tags for tag icons
+                TriggerCastNumbersRefresh();
                 selectionPanel.Visibility = Visibility.Collapsed;
                 numbersPanel.Visibility = Visibility.Visible;
             }

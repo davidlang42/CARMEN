@@ -88,7 +88,11 @@ namespace CarmenUI.Pages
         protected void SaveChangesAndReturn()
         {
             if (SaveChanges())
-                OnReturn(new ReturnEventArgs<DataObjects>(DataObjects.All)); //TODO (SAVE) maybe a better way to do this is return which *pages* may have changed --- figure out what has actually changed from ChangeTracker rather than argument (note: savechanges() may have been called multiple times befoer this)
+                OnReturn(new ReturnEventArgs<DataObjects>(DataObjects.All));
+            //TODO (SAVE) maybe a better way to do this is return which *pages* may have changed --- figure out what has actually changed from ChangeTracker rather than argument (note: savechanges() may have been called multiple times befoer this)
+            //* check what objects have changed (from ChangeTracker) when SaveChanges() is called, and store this in SubPage
+            //* return what has changed from SubPage CancelChangesAndReturn() / SaveChangesAndReturn()
+            //* maybe change from which "objects" to which "pages" if some pages make changes to objects which would affect many pages and really should only affect one
         }
 
         /// <summary>Save changes to the database and return true if succeeded</summary>

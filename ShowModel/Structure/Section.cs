@@ -26,7 +26,7 @@ namespace Carmen.ShowModel.Structure
                     return;
                 sectionType = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(AllowConsecutiveItems)); //LATER this will miss the case when the SectionType is not changed, but SectionType.AllowConsecutiveItems is changed
+                OnPropertyChanged(nameof(AllowConsecutiveItems));
             }
         }
 
