@@ -135,19 +135,21 @@ namespace Carmen.ShowModel.Applicants
             {
                 if (castGroup == value)
                     return;
+                if (castGroup is CastGroup existing)
+                    existing.Members.Remove(this);
                 castGroup = value;
                 OnPropertyChanged();
+                AlternativeCast = null;
                 if (castGroup == null)
                 {
                     CastNumber = null;
-                    AlternativeCast = null;
                     foreach (var role in Roles)
                         role.Cast.Remove(this);
                     Roles.Clear();
                     foreach (var tag in Tags)
                         tag.Members.Remove(this);
                     Tags.Clear();
-                }    
+                }
             }
         }
 
@@ -174,8 +176,11 @@ namespace Carmen.ShowModel.Applicants
             {
                 if (alternativeCast == value)
                     return;
+                if (alternativeCast is AlternativeCast existing)
+                    existing.Members.Remove(this);
                 alternativeCast = value;
                 OnPropertyChanged();
+                CastNumber = null;
             }
         }
 

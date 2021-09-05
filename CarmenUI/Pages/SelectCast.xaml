@@ -51,6 +51,11 @@
                     </ListBoxItem>
                     <CollectionContainer Collection="{Binding Source={StaticResource castGroupsViewSource}}" />
                     <ListBoxItem IsEnabled="False" Margin="0 20 0 0"
+                                 Visibility="{Binding Source={StaticResource alternativeCastsViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
+                        <TextBlock Text="Alternative Casts"/>
+                    </ListBoxItem>
+                    <CollectionContainer Collection="{Binding Source={StaticResource alternativeCastsViewSource}}" />
+                    <ListBoxItem IsEnabled="False" Margin="0 20 0 0"
                                  Visibility="{Binding Source={StaticResource tagsViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
                         <TextBlock Text="Tags"/>
                     </ListBoxItem>
@@ -67,6 +72,9 @@
                     </StackPanel>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type modelApplicants:Tag}">
+                    <TextBlock Text="{Binding Name}" Margin="20 0 0 0"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type modelApplicants:AlternativeCast}">
                     <TextBlock Text="{Binding Name}" Margin="20 0 0 0"/>
                 </DataTemplate>
             </ListBox.Resources>

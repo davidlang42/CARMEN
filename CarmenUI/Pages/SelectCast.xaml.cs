@@ -239,16 +239,30 @@ namespace CarmenUI.Pages
 
         private void AddToList(IList list, IEnumerable<Applicant> applicants)
         {
+            //TODO when someone is moved *into* an alternative cast:
+            //- check if they have any locked sets associated with them, and if it breaks any of them,
+            //  if so warn (could offer to undo, but that might not be easy, so probably just warn)
+            //- if they are already in an alternative cast, warn that you are removing them from that
+            //  one, and will clear their cast number
+            //TODO when someone is moved into a cast group:
+            //- if they are already in a cast group, warn that you are removing them from that one
+            //- if they already have an alternative cast, warn that you are removing them from that
+            //  one, and will clear their cast number
             foreach (var applicant in applicants)
             {
                 if (!list.Contains(applicant))
                     list.Add(applicant);
                 if (selectionList.SelectedItem is CastGroup cast_group)
                     applicant.CastGroup = cast_group;
+                else if (selectionList.SelectedItem is AlternativeCast alternative_cast)
+                    applicant.AlternativeCast = alternative_cast;
                 else if (selectionList.SelectedItem is Tag tag)
+                {
                     if (!applicant.Tags.Contains(tag))
                         applicant.Tags.Add(tag);
-                //LATER alternative cast needs to be handled here
+                }
+                else
+                    throw new NotImplementedException($"Selection list type not handled: {selectionList.SelectedItem.GetType().Name}");
             }
         }
 
@@ -293,14 +307,18 @@ namespace CarmenUI.Pages
                 if (actions.Any() && !Confirm($"Removing {description} from '{cast_group.Name}' will also {actions.JoinWithCommas()}. Do you want to continue?"))
                     return;
             }
+            //TODO warn that removing alternative cast, also clears their cast number
             foreach (var applicant in applicants)
             {
                 list.Remove(applicant);
                 if (selectionList.SelectedItem is CastGroup)
                     applicant.CastGroup = null;
+                else if (selectionList.SelectedItem is AlternativeCast)
+                    applicant.AlternativeCast = null;
                 else if (selectionList.SelectedItem is Tag tag)
                     applicant.Tags.Remove(tag);
-                //LATER alternative cast needs to be handled here
+                else
+                    throw new NotImplementedException($"Selection list type not handled: {selectionList.SelectedItem.GetType().Name}");
             }
         }
 
@@ -321,6 +339,14 @@ namespace CarmenUI.Pages
                 selectedApplicantsViewSource.Source = cast_group.Members;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "applicants";
+                ConfigureAllApplicantsFiltering();
+            }
+            else if (selectionList.SelectedItem is AlternativeCast alternative_cast)
+            {
+                numbersPanel.Visibility = Visibility.Collapsed;
+                selectedApplicantsViewSource.Source = alternative_cast.Members;
+                selectionPanel.Visibility = Visibility.Visible;
+                castStatusNoun.Text = "alternating cast members";
                 ConfigureAllApplicantsFiltering();
             }
             else if (selectionList.SelectedItem is Tag tag)
@@ -353,6 +379,8 @@ namespace CarmenUI.Pages
                 {
                     (CastGroup, CastStatus.Available) => o => o is Applicant a && !selected_applicants.Contains(a) && a.CastGroup == null,
                     (CastGroup cg, CastStatus.Eligible) => o => o is Applicant a && !selected_applicants.Contains(a) && cg.Requirements.All(r => r.IsSatisfiedBy(a)),
+                    (AlternativeCast, CastStatus.Available) => o => o is Applicant a && !selected_applicants.Contains(a) && a.CastGroup is CastGroup cg && cg.AlternateCasts && a.AlternativeCast == null,
+                    (AlternativeCast ac, CastStatus.Eligible) => o => o is Applicant a && !selected_applicants.Contains(a) && a.CastGroup is CastGroup cg && cg.AlternateCasts,
                     (A.Tag, CastStatus.Available) => o => o is Applicant a && a.IsAccepted && !selected_applicants.Contains(a),
                     (Tag t, CastStatus.Eligible) => o => o is Applicant a && a.IsAccepted && !selected_applicants.Contains(a) && t.Requirements.All(r => r.IsSatisfiedBy(a)),
                     _ => null
