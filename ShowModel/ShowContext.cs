@@ -39,6 +39,31 @@ namespace Carmen.ShowModel
         public ShowContext(DbContextOptions<ShowContext> context_options) : base(context_options)
         { }
 
+
+        /// <summary>For any current members of this alternative cast, this sets their alternative cast to null.
+        /// If deleting this alternative cast brings the total number below 2, then any CastGroup which has
+        /// AlternateCasts set to true, will have it set to false, and the alternative cast of their current
+        /// members also set to null.</summary>
+        public void DeleteAlternativeCast(AlternativeCast alternative_cast)
+        {
+            foreach (var member in alternative_cast.Members.ToArray())
+                member.AlternativeCast = null;
+            var alternative_casts = AlternativeCasts.ToArray();
+            if (alternative_casts.Length <= 2)
+            {
+                foreach (var cast_group in CastGroups.ToArray())
+                {
+                    if (cast_group.AlternateCasts)
+                    {
+                        foreach (var other_cast_member in cast_group.Members)
+                            other_cast_member.AlternativeCast = null;
+                        cast_group.AlternateCasts = false;
+                    }
+                }
+            }
+            AlternativeCasts.Remove(alternative_cast);
+        }
+
         /// <summary>Configures the default AlternativeCasts, CastGroups, Tags, Criterias, Requirements, SectionTypes and ShowRoot.
         /// Must match the logic of CheckDefaultShowSettings().</summary>
         public void SetDefaultShowSettings(string default_show_name, bool load_required = true)

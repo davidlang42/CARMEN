@@ -272,25 +272,13 @@ namespace CarmenUI.Pages
                     bool needed_to_alternate = context.AlternativeCasts.Local.Count <= 2 && cast_groups_alternating > 0;
                     var allow_delete = (any_members, needed_to_alternate) switch
                     {
-                        (true, true) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from the cast, and disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
-                        (true, false) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from the cast."),
+                        (true, true) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from this alternative cast, and disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
+                        (true, false) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will remove the {alternative_cast.Members.Count.Plural($"currently selected {alternative_cast.Name}")} from this alternative cast."),
                         (false, true) => ConfirmDelete($"Are you sure you want to delete the '{alternative_cast.Name}' cast?\nThis will disable alternating casts on the {cast_groups_alternating.Plural("cast group")} for which it is enabled."),
                         _ => true // (false, false)
                     };
                     if (allow_delete)
-                    {
-                        if (any_members)
-                            foreach (var member in alternative_cast.Members)
-                                member.CastGroup = null;
-                        if (needed_to_alternate)
-                            foreach (var cast_group in context.CastGroups.Local)
-                            {
-                                foreach (var other_cast_member in cast_group.Members)
-                                    other_cast_member.AlternativeCast = null;
-                                cast_group.AlternateCasts = false;
-                            }
-                        list.Remove(alternative_cast);
-                    }
+                        context.DeleteAlternativeCast(alternative_cast);
                     break;
                 case Tag tag:
                     if (!tag.Members.Any() || ConfirmDelete($"Are you sure you want to delete the '{tag.Name}' tag?\nThis will remove the tag from {tag.Members.Count.Plural($"currently tagged applicant")}."))
