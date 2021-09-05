@@ -20,6 +20,7 @@ namespace CarmenUI.ViewModels
 
         private CastGroup[] castGroups;
         private Requirement[] primaryRequirements;
+        private Action<Role> removeRoleAction;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -100,7 +101,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public ItemView(Item item, CastGroup[] cast_groups, Requirement[] primary_requirements)
+        public ItemView(Item item, CastGroup[] cast_groups, Requirement[] primary_requirements, Action<Role> remove_role_action)
         {
             Item = item;
             Roles = new ObservableCollection<RoleOnlyView>(item.Roles.InNameOrder().Select(r =>
@@ -118,6 +119,7 @@ namespace CarmenUI.ViewModels
             }).ToArray();
             this.castGroups = cast_groups;
             this.primaryRequirements = primary_requirements;
+            this.removeRoleAction = remove_role_action;
         }
 
         private void NullableCountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -137,7 +139,9 @@ namespace CarmenUI.ViewModels
                         foreach (RoleOnlyView rv in e.OldItems)
                         {
                             rv.PropertyChanged -= RoleView_PropertyChanged;
-                            Item.Roles.Remove(rv.Role);
+                            removeRoleAction(rv.Role);
+                            if (Item.Roles.Contains(rv.Role))
+                                throw new ApplicationException("Called removeRoleAction but Role is still attached.");
                             rv.Dispose();
                         }
                     if (e.NewItems != null)

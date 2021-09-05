@@ -342,9 +342,9 @@ namespace CarmenUI.Pages
             PopulateItemsViewSource();
             rolesPanel.Content = itemsTreeView.SelectedItem switch
             {
-                Item item => new ItemView(item, castGroups, primaryRequirements),
-                Section section => new ShowRootOrSectionView(section, castGroups, alternativeCasts.Length),
-                ShowRoot show_root => new ShowRootOrSectionView(show_root, castGroups, alternativeCasts.Length),
+                Item item => new ItemView(item, castGroups, primaryRequirements, role => context.RemoveRole(role, item)),
+                Section section => new ShowRootOrSectionView(section, castGroups, alternativeCasts.Length, context.DeleteNode),
+                ShowRoot show_root => new ShowRootOrSectionView(show_root, castGroups, alternativeCasts.Length, context.DeleteNode),
                 _ => null
             };
             EnableMoveButtons(itemsTreeView.SelectedItem as Node);

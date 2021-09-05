@@ -92,8 +92,7 @@ namespace Carmen.ShowModel
             else if (node is Item item)
             {
                 foreach (var role in item.Roles.ToArray())
-                    if (role.Items.SingleOrDefaultSafe() == item)
-                        DeleteRole(role);
+                    RemoveRole(role, item);
             }
             else
                 throw new NotImplementedException($"Node type not handled: {node.GetType().Name}");
@@ -104,10 +103,18 @@ namespace Carmen.ShowModel
                 section.SectionType.Sections.Remove(section);
         }
 
-        /// <summary>Also unsets the cast allocated to this role.</summary>
-        public void DeleteRole(Role role) //LATER unit test
+        /// <summary>Removes the role from this item only, but if the role is no longer in any items, this also
+        /// deletes the roles and unallocates any cast from it.</summary>
+        public void RemoveRole(Role role, Item item) //LATER unit test
         {
-            //TODO not sure how to delete a role without a DbSet of roles
+            role.Items.Remove(item);
+            item.Roles.Remove(role);
+            if (!role.Items.Any())
+            {
+                var entry = Entry(role);
+                if (entry.State != EntityState.Detached)
+                    entry.State = EntityState.Deleted;
+            }
         }
 
         /// <summary>Also deletes any NOT requirements which use this requirement, because a NOT requirement must have a

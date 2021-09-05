@@ -20,6 +20,7 @@ namespace CarmenUI.ViewModels
 
         private CastGroup[] castGroups;
         private Dictionary<CastGroup, uint> castMemberCounts;
+        private Action<Node> removeNodeAction;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -114,7 +115,7 @@ namespace CarmenUI.ViewModels
 
         public string NoChildrenErrorBackgroundColor => InnerNode.Children.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
 
-        public ShowRootOrSectionView(InnerNode inner_node, CastGroup[] cast_groups, int alternative_casts_count)
+        public ShowRootOrSectionView(InnerNode inner_node, CastGroup[] cast_groups, int alternative_casts_count, Action<Node> remove_node_action)
         {
             InnerNode = inner_node;
             Children = new ObservableCollection<ChildView>(inner_node.Children.InOrder().Select(c =>
@@ -132,6 +133,7 @@ namespace CarmenUI.ViewModels
             }).ToArray();
             this.castGroups = cast_groups;
             this.castMemberCounts = castGroups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
+            this.removeNodeAction = remove_node_action;
         }
 
         private void NullableCountByGroup_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -151,7 +153,9 @@ namespace CarmenUI.ViewModels
                         foreach (ChildView cv in e.OldItems)
                         {
                             cv.PropertyChanged -= ChildView_PropertyChanged;
-                            InnerNode.Children.Remove(cv.Node);
+                            removeNodeAction(cv.Node);
+                            if (InnerNode.Children.Contains(cv.Node))
+                                throw new ApplicationException("Called removeNodeAction but Node is still attached.");
                             cv.Dispose();
                         }
                     if (e.NewItems != null)
