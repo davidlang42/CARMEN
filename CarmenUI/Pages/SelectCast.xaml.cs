@@ -220,27 +220,25 @@ namespace CarmenUI.Pages
                 return;
             if (selectionList.SelectedItem is CastGroup cast_group)
             {
-                string prefix, alt_cast;
+                string description, alt_cast;
                 if (applicants.Length == 1)
                 {
-                    prefix = $"Removing '{applicants[0].FirstName} {applicants[0].LastName}' from '{cast_group.Name}' will also";
+                    description = $"'{applicants[0].FirstName} {applicants[0].LastName}'";
                     alt_cast = $"the '{applicants[0].AlternativeCast?.Name}' cast";
                 }
                 else
                 {
-                    prefix = $"Removing {applicants.Length} applicants from '{cast_group.Name}' will also";
+                    description = $"{applicants.Length} applicants";
                     alt_cast = "their alternative casts";
                 }
-                var has_roles = applicants.Any(a => a.Roles.Any());
-                var has_alternative_cast = cast_group.AlternateCasts && applicants.Any(a => a.AlternativeCast != null);
-                var confirmed = (has_roles, has_alternative_cast) switch
-                {
-                    (true, true) => Confirm($"{prefix} remove them from {alt_cast} and uncast them from any roles allocated to them. Do you want to continue?"),
-                    (true, false) => Confirm($"{prefix} uncast them from any roles allocated to them. Do you want to continue?"),
-                    (false, true) => Confirm($"{prefix} remove them from {alt_cast}. Do you want to continue?"),
-                    _ => true // (false, false)
-                };
-                if (!confirmed)
+                var actions = new List<string>();
+                if (cast_group.AlternateCasts && applicants.Any(a => a.AlternativeCast != null))
+                    actions.Add($"remove them from {alt_cast}");
+                if (applicants.Any(a => a.Roles.Any()))
+                    actions.Add("uncast them from any roles allocated to them");
+                if (applicants.Any(a => a.Tags.Any()))
+                    actions.Add("remove any tags they have been applied");
+                if (actions.Any() && !Confirm($"Removing {description} from '{cast_group.Name}' will also {actions.JoinWithCommas()}. Do you want to continue?"))
                     return;
             }
             foreach (var applicant in applicants)

@@ -269,5 +269,22 @@ namespace CarmenUI
             else
                 return $"{number}th";
         }
+
+        public static string JoinWithCommas(this IEnumerable<string> things, bool use_and_instead_of_last_comma = true)
+        {
+            var e = things.GetEnumerator();
+            if (!e.MoveNext())
+                return "";
+            var result = e.Current;
+            bool moved_next = e.MoveNext();
+            while (moved_next)
+            {
+                string thing = e.Current;
+                moved_next = e.MoveNext();
+                string sep = (moved_next || !use_and_instead_of_last_comma) ? ", " : " and ";
+                result += sep + thing;
+            }
+            return result;
+        }
     }
 }
