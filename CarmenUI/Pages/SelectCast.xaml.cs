@@ -226,28 +226,57 @@ namespace CarmenUI.Pages
         private void addButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectedApplicantsViewSource.Source is IList list)
-                AddToList(list, availableList.SelectedItems.Cast<Applicant>());
+                AddToList(list, availableList.SelectedItems.Cast<Applicant>().ToArray());
             ConfigureAllApplicantsFiltering();
         }
 
         private void addAllButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectedApplicantsViewSource.Source is IList list)
-                AddToList(list, availableList.Items.Cast<Applicant>());
+                AddToList(list, availableList.Items.Cast<Applicant>().ToArray());
             ConfigureAllApplicantsFiltering();
         }
 
-        private void AddToList(IList list, IEnumerable<Applicant> applicants)
+        private void AddToList(IList list, Applicant[] applicants)
         {
-            //TODO when someone is moved *into* an alternative cast:
-            //- check if they have any locked sets associated with them, and if it breaks any of them,
-            //  if so warn (could offer to undo, but that might not be easy, so probably just warn)
-            //- if they are already in an alternative cast, warn that you are removing them from that
-            //  one, and will clear their cast number
-            //TODO when someone is moved into a cast group:
-            //- if they are already in a cast group, warn that you are removing them from that one
-            //- if they already have an alternative cast, warn that you are removing them from that
-            //  one, and will clear their cast number
+            string description, alt_cast, cast_group_name;
+            if (applicants.Length == 1)
+            {
+                description = $"'{applicants[0].FirstName} {applicants[0].LastName}'";
+                alt_cast = $"the '{applicants[0].AlternativeCast?.Name}' cast";
+                cast_group_name = $"'{applicants[0].CastGroup?.Name}'";
+            }
+            else
+            {
+                description = $"{applicants.Length} applicants";
+                alt_cast = "their existing alternative casts";
+                cast_group_name = "their existing cast groups";
+            }
+            if (selectionList.SelectedItem is CastGroup cg)
+            {
+                var actions = new List<string>();
+                if (applicants.Any(a => a.CastGroup != null))
+                    actions.Add($"remove them from {cast_group_name}");
+                if (applicants.Any(a => a.AlternativeCast != null))
+                {
+                    actions.Add($"remove them from {alt_cast}");
+                    actions.Add($"clear their cast number");
+                }
+                if (actions.Any() && !Confirm($"Adding {description} to '{cg.Name}' will also {actions.JoinWithCommas()}. Do you want to continue?"))
+                    return;
+            }
+            else if (selectionList.SelectedItem is AlternativeCast ac)
+            {
+                var actions = new List<string>();
+                //TODO check if applicants have any locked sets associated with them, warn if this assignment breaks any of them
+                if (applicants.Any(a => a.AlternativeCast != null))
+                {
+                    actions.Add($"remove them from {alt_cast}");
+                    actions.Add($"clear their cast number");
+                }
+                if (actions.Any() && !Confirm($"Adding {description} to '{ac.Name}' will also {actions.JoinWithCommas()}. Do you want to continue?"))
+                    return;
+            }
             foreach (var applicant in applicants)
             {
                 if (!list.Contains(applicant))
@@ -284,22 +313,25 @@ namespace CarmenUI.Pages
         {
             if (applicants.Length == 0)
                 return;
+            string description, alt_cast;
+            if (applicants.Length == 1)
+            {
+                description = $"'{applicants[0].FirstName} {applicants[0].LastName}'";
+                alt_cast = $"the '{applicants[0].AlternativeCast?.Name}' cast";
+            }
+            else
+            {
+                description = $"{applicants.Length} applicants";
+                alt_cast = "their alternative casts";
+            }
             if (selectionList.SelectedItem is CastGroup cast_group)
             {
-                string description, alt_cast;
-                if (applicants.Length == 1)
-                {
-                    description = $"'{applicants[0].FirstName} {applicants[0].LastName}'";
-                    alt_cast = $"the '{applicants[0].AlternativeCast?.Name}' cast";
-                }
-                else
-                {
-                    description = $"{applicants.Length} applicants";
-                    alt_cast = "their alternative casts";
-                }
                 var actions = new List<string>();
                 if (cast_group.AlternateCasts && applicants.Any(a => a.AlternativeCast != null))
+                {
                     actions.Add($"remove them from {alt_cast}");
+                    actions.Add($"clear their cast number");
+                }
                 if (applicants.Any(a => a.Roles.Any()))
                     actions.Add("uncast them from any roles allocated to them");
                 if (applicants.Any(a => a.Tags.Any()))
@@ -307,7 +339,11 @@ namespace CarmenUI.Pages
                 if (actions.Any() && !Confirm($"Removing {description} from '{cast_group.Name}' will also {actions.JoinWithCommas()}. Do you want to continue?"))
                     return;
             }
-            //TODO warn that removing alternative cast, also clears their cast number
+            else if (selectionList.SelectedItem is AlternativeCast alternative_cast)
+            {
+                if (!Confirm($"Removing {description} from '{alternative_cast.Name}' will also clear their cast number. Do you want to continue?"))
+                    return;
+            }
             foreach (var applicant in applicants)
             {
                 list.Remove(applicant);
