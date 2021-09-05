@@ -141,7 +141,11 @@ namespace Carmen.ShowModel.Applicants
                 {
                     CastNumber = null;
                     AlternativeCast = null;
+                    foreach (var role in Roles)
+                        role.Cast.Remove(this);
                     Roles.Clear();
+                    foreach (var tag in Tags)
+                        tag.Members.Remove(this);
                     Tags.Clear();
                 }    
             }
