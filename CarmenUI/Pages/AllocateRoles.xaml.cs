@@ -115,7 +115,7 @@ namespace CarmenUI.Pages
                     _engine = ParseAllocationEngine() switch
                     {
                         nameof(DummyAllocationEngine) => new DummyAllocationEngine(applicant_engine, alternativeCasts),
-                        nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine, alternativeCasts),
+                        nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine, alternativeCasts, criterias),
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }

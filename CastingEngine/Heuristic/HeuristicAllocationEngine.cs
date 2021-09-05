@@ -1,4 +1,5 @@
 ﻿using Carmen.CastingEngine.Base;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Requirements;
@@ -14,9 +15,13 @@ namespace Carmen.CastingEngine.Heuristic
 {
     public class HeuristicAllocationEngine : AllocationEngine
     {
-        public HeuristicAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts)
+        private Criteria[] criterias;
+
+        public HeuristicAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria[] criterias)
             : base(applicant_engine, alternative_casts)
-        { }
+        {
+            this.criterias = criterias;
+        }
 
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
@@ -97,6 +102,42 @@ namespace Carmen.CastingEngine.Heuristic
                     }
                 }
             }
+        }
+
+        /// <summary>Recommend casting section by section (for sections that directly contain items). Within each section:
+        /// - first individually cast roles which require* the first primary criteria, in item order within the section
+        /// - repeat for subsequent primary criterias in order
+        /// - then cast all the remaining roles within the section as one balanced set
+        /// (*roles count as requiring a criteria if one of their direct requirements is an Ability based requirement)
+        /// </summary>
+        public override IEnumerable<Role[]> IdealCastingOrder(IEnumerable<Item> items_in_order)
+        {
+            if (items_in_order.FirstOrDefault()?.Parents().Last() is not ShowRoot show_root)
+                yield break; // no items, or broken structure
+            foreach (var section in ItemContainingSections(show_root))
+            {
+                var section_roles = section.ItemsInOrder().SelectMany(i => i.Roles).ToHashSet();
+                foreach (var primary_criteria in criterias.InOrder().Where(c => c.Primary))
+                {
+                    var criteria_roles = section_roles.Where(r => r.Requirements.OfType<ICriteriaRequirement>().Any(cr => cr.Criteria == primary_criteria)).ToArray();
+                    foreach (var criteria_role in criteria_roles)
+                    {
+                        yield return new[] { criteria_role };
+                        section_roles.Remove(criteria_role);
+                    }
+                }
+                yield return section_roles.ToArray();
+            }
+        }
+
+        private IEnumerable<InnerNode> ItemContainingSections(InnerNode inner)
+        {
+            if (inner.Children.OfType<Item>().Any())
+                yield return inner;
+            else
+                foreach (var child in inner.Children.Cast<InnerNode>())
+                    foreach (var section in ItemContainingSections(child))
+                        yield return section;
         }
     }
 }
