@@ -46,29 +46,50 @@ namespace Carmen.ShowModel.Structure
 
         public override IEnumerable<Item> ItemsInOrder() => this.Yield();
 
-        public Item? NextItem()//TODO
+        public Item? NextItem()
         {
-            var e = RootParent().ItemsInOrder().GetEnumerator();
-            while (e.MoveNext())
+            Node node = this;
+            while (node is not ShowRoot)
             {
-                if (e.Current == this)
-                    return e.MoveNext() ? e.Current : null;
+                var below = node.SiblingBelow();
+                if (below is Item item_below)
+                    return item_below;
+                else if (below is InnerNode inner_below)
+                {
+                    if (inner_below.ItemsInOrder().FirstOrDefault() is Item first_of_inner_below)
+                        return first_of_inner_below;
+                    else
+                        node = inner_below;
+                }
+                else if (below == null)
+                    node = node.Parent ?? throw new ApplicationException("Non-ShowRoot must have parent.");
+                else
+                    throw new ApplicationException($"Node type not handled: {node.GetType().Name}");
             }
-            throw new ApplicationException("Item not found in root parent's items.");
+            return null; // if no sibling below and parent is showroot, we are really the bottom
         }
 
-        public Item? PreviousItem()//TODO
+        public Item? PreviousItem()
         {
-            var e = RootParent().ItemsInOrder().GetEnumerator();
-            Item? last_item = null;
-            while (e.MoveNext())
+            Node node = this;
+            while (node is not ShowRoot)
             {
-                if (e.Current == this)
-                    return last_item;
-                last_item = e.Current;
+                var above = node.SiblingAbove();
+                if (above is Item item_above)
+                    return item_above;
+                else if (above is InnerNode inner_above)
+                {
+                    if (inner_above.ItemsInOrder().LastOrDefault() is Item last_of_inner_above)
+                        return last_of_inner_above;
+                    else
+                        node = inner_above;
+                }
+                else if (above == null)
+                    node = node.Parent ?? throw new ApplicationException("Non-ShowRoot must have parent.");
+                else
+                    throw new ApplicationException($"Node type not handled: {node.GetType().Name}");
             }
-            throw new ApplicationException("Item not found in root parent's items.");
+            return null; // if no sibling below and parent is showroot, we are really the bottom
         }
     }
-}
 }
