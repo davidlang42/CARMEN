@@ -61,6 +61,7 @@ namespace Carmen.ShowModel.Structure
             if (AllowConsecutiveItems)
                 return true; // nothing to check
             var items = ItemsInOrder().ToList();
+            //LATER possible bug: what happens if a role is in 2 consecutive items?
             var cast_per_item = items.Select(i => i.Roles.SelectMany(r => r.Cast).ToHashSet()).ToList(); //LATER does this need await? also parallelise
             for (var i = 1; i < items.Count; i++)
             {
