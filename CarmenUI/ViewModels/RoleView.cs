@@ -21,7 +21,7 @@ namespace CarmenUI.ViewModels
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public Role Role { get; init; } //LATER this should be protected
+        public Role Role { get; init; }
 
         public ICollection<Requirement> Requirements => Role.Requirements;
 

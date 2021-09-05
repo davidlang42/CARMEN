@@ -26,8 +26,6 @@ namespace CarmenUI.ViewModels
 
         public uint TotalCount => CountByGroups.Select(cbg => cbg.Count ?? 0).Sum();
 
-        public ICollection<Item> Items => Role.Items;
-
         public string CommaSeparatedItems => string.Join(", ", Role.Items.Select(i => i.Name).OrderBy(n => n));
 
         public string? CommaSeparatedOtherItems => Role.Items.Count < 2 ? null : string.Join(", ", Role.Items.Where(i => i != itemView.Item).Select(i => i.Name).OrderBy(n => n));

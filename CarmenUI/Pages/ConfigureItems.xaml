@@ -213,7 +213,7 @@
                                     </DataGridTemplateColumn.CellTemplate>
                                     <DataGridTemplateColumn.CellEditingTemplate>
                                         <DataTemplate>
-                                            <ComboBox x:Name="itemsCombo" SelectedIndex="0" ItemsSource="{Binding Items, Converter={StaticResource selectableItemsList}, ConverterParameter={StaticResource itemsViewSource}}">
+                                            <ComboBox x:Name="itemsCombo" SelectedIndex="0" ItemsSource="{Binding Role, Converter={StaticResource selectableItemsList}, ConverterParameter={StaticResource itemsViewSource}}">
                                                 <ComboBox.ItemTemplateSelector>
                                                     <cv:ComboBoxFaceTemplateSelector>
                                                         <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
