@@ -19,6 +19,7 @@
         <CollectionViewSource x:Key="castGroupsViewSource"/>
         <CollectionViewSource x:Key="alternativeCastsViewSource"/>
         <CollectionViewSource x:Key="tagsViewSource"/>
+        <CollectionViewSource x:Key="castNumberMissingViewSource"/>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <ObjectDataProvider x:Key="castStatusEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -28,6 +29,10 @@
         <cv:BytesToImage x:Key="bytesToImage"/>
         <cv:FullName x:Key="fullName"/>
         <cv:ApplicantDescription x:Key="applicantDescription"/>
+        <cv:MultiConverter x:Key="hideIfTrue">
+            <cv:InvertBoolean/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -83,6 +88,20 @@
                             <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" FontSize="22"/>
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+            <Grid DockPanel.Dock="Bottom" Visibility="{Binding Source={StaticResource castNumberMissingViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Cast members without numbers:" FontSize="18"/>
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource castNumberMissingViewSource}}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
                 </ItemsControl>
             </Grid>
             <ListBox ItemsSource="{Binding Source={StaticResource castNumbersViewSource}, Path=Groups}" HorizontalContentAlignment="Stretch"

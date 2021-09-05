@@ -43,6 +43,7 @@ namespace CarmenUI.Pages
         private CollectionViewSource tagsViewSource;
         private CollectionViewSource alternativeCastsViewSource;
         private CollectionViewSource castNumbersViewSource;
+        private CollectionViewSource castNumberMissingViewSource;
         private ApplicantDescription applicantDescription;
 
         private Criteria[]? _criterias;
@@ -66,6 +67,7 @@ namespace CarmenUI.Pages
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
             selectedApplicantsViewSource = (CollectionViewSource)FindResource(nameof(selectedApplicantsViewSource));
             allApplicantsViewSource = (CollectionViewSource)FindResource(nameof(allApplicantsViewSource));
+            castNumberMissingViewSource = (CollectionViewSource)FindResource(nameof(castNumberMissingViewSource));
             applicantDescription = (ApplicantDescription)FindResource(nameof(applicantDescription));
             foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
             {
@@ -92,7 +94,8 @@ namespace CarmenUI.Pages
             using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
                 await context.Applicants.LoadAsync();
             castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
-            allApplicantsViewSource.Source = castNumbersViewSource.Source = context.Applicants.Local.ToObservableCollection();
+            allApplicantsViewSource.Source = castNumbersViewSource.Source = castNumberMissingViewSource.Source
+                = context.Applicants.Local.ToObservableCollection();
             TriggerCastNumbersRefresh();
             using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 await context.Requirements.LoadAsync();
@@ -123,6 +126,7 @@ namespace CarmenUI.Pages
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
             castNumbersViewSource.View.Filter = a => ((Applicant)a).CastNumber != null;
+            castNumberMissingViewSource.View.Filter = a => ((Applicant)a).CastNumber == null && ((Applicant)a).CastGroup != null;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
