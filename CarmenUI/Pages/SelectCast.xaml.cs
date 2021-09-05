@@ -135,6 +135,46 @@ namespace CarmenUI.Pages
         private void SaveButton_Click(object sender, RoutedEventArgs e)
             => SaveChangesAndReturn();
 
+        protected override bool PreSaveChecks()
+        {
+            var inconsistent_applicants = context.Applicants.Local
+                .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)))
+                .ToArray();
+            if (inconsistent_applicants.Any())
+            {
+                string msg;
+                if (inconsistent_applicants.Length == 1)
+                    msg = $"'{inconsistent_applicants[0].FirstName} {inconsistent_applicants[0].LastName}' has";
+                else
+                    msg = $"{inconsistent_applicants.Length} applicants have";
+                msg += " accepted into the cast but don't have a Cast Number or Alternative Cast set. Would you like to auto-complete them?";
+                msg += "\nClick 'No' to remove them from the cast instead, or 'Cancel' to continue editing without saving.";
+                var response = MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNoCancel);
+                if (response == MessageBoxResult.Cancel)
+                    return false;
+                else if (response == MessageBoxResult.Yes)
+                {
+                    // auto-complete cast numbers & alternative casts
+                    engine.BalanceAlternativeCasts(context.Applicants.Local, Enumerable.Empty<SameCastSet>());
+                    engine.AllocateCastNumbers(context.Applicants.Local);
+                    var updated_inconsistent_applicants = context.Applicants.Local
+                        .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)));
+                    if (updated_inconsistent_applicants.Any())
+                    {
+                        MessageBox.Show("Failed to auto-complete cast numbers. Changes not saved.", WindowTitle);
+                        return false;
+                    }
+                }
+                else
+                {
+                    // remove cast group
+                    foreach (var applicant in inconsistent_applicants)
+                        applicant.CastGroup = null;
+                }
+            }
+            return true;
+        }
+
         private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
             //LATER handle exceptions on all engine calls

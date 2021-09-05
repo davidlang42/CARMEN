@@ -95,6 +95,8 @@ namespace CarmenUI.Pages
         protected bool SaveChanges(bool user_initiated = true)
         {
             CommitTextboxValue();
+            if (!PreSaveChecks())
+                return false;
             if (!context.ChangeTracker.HasChanges())
             {
                 if (user_initiated)
@@ -106,6 +108,10 @@ namespace CarmenUI.Pages
             context.SaveChanges(); //LATER handle db errors, could this be async?
             return true;
         }
+
+        /// <summary>Check any data consistency constraints before allowing save to be processed.
+        /// This may contain user interaction. Return true to continue or false to cancel saving.</summary>
+        protected virtual bool PreSaveChecks() => true;
 
         /// <summary>Confirm cancel with the user and exit to main menu</summary>
         protected void CancelChangesAndReturn()
