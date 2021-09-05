@@ -219,20 +219,6 @@ namespace Carmen.ShowModel.Applicants
         }
 
         private void Abilities_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
-        {
-            OnPropertyChanged(nameof(Abilities));
-            if (e.Action != NotifyCollectionChangedAction.Move)
-            {
-                var new_items = e.NewItems?.Cast<Ability>().ToHashSet() ?? new HashSet<Ability>();
-                var old_items = e.OldItems?.Cast<Ability>().ToHashSet() ?? new HashSet<Ability>();
-                foreach (var added in new_items.Where(n => !old_items.Contains(n)))
-                    added.PropertyChanged += Ability_PropertyChanged;
-                foreach (var removed in old_items.Where(o => !new_items.Contains(o)))
-                    removed.PropertyChanged -= Ability_PropertyChanged;
-            }
-        }
-
-        private void Ability_PropertyChanged(object? sender, PropertyChangedEventArgs e)
             => OnPropertyChanged(nameof(Abilities));
 
         private void Tags_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
