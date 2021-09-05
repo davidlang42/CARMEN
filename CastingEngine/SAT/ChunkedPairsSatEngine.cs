@@ -132,9 +132,9 @@ namespace Carmen.CastingEngine.SAT
             var same_cast_lookup = new Dictionary<Applicant, SameCastSet>();
             foreach (var same_cast_set in same_cast_sets)
             {
-                foreach (var applicant in same_cast_set)
+                foreach (var applicant in same_cast_set.Applicants)
                     same_cast_lookup.Add(applicant, same_cast_set); // Applicants can only be in one SameCastSet
-                same_cast_clauses.AddRange(KeepTogether(same_cast_set.Where(a => applicants_needing_alternative_cast.Any(p => p.Item2.Contains(a))).ToArray()));
+                same_cast_clauses.AddRange(KeepTogether(same_cast_set.Applicants.Where(a => applicants_needing_alternative_cast.Any(p => p.Item2.Contains(a))).ToArray()));
             }
             // start with pairs, then increase chunk size until success
             var sat = new DpllSolver<Applicant>(applicants_needing_alternative_cast.SelectMany(p => p.Item2));
@@ -238,7 +238,7 @@ namespace Carmen.CastingEngine.SAT
                 if (!applicants.TryPop(out var next_applicant))
                     break;
                 if (same_cast_lookup.TryGetValue(next_applicant, out var same_cast_set)
-                    && chunk.Count(c => same_cast_set.Contains(c)) + 1 > chunk_size / 2)
+                    && chunk.Count(c => same_cast_set.Applicants.Contains(c)) + 1 > chunk_size / 2)
                     skipped.Push(next_applicant);
                 else
                     chunk[c++] = next_applicant;

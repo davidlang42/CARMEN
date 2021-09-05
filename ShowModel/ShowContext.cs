@@ -25,6 +25,7 @@ namespace Carmen.ShowModel
         public DbSet<Applicant> Applicants => Set<Applicant>();
         public DbSet<AlternativeCast> AlternativeCasts => Set<AlternativeCast>();
         public DbSet<CastGroup> CastGroups => Set<CastGroup>();
+        public DbSet<SameCastSet> SameCastSets => Set<SameCastSet>();
         public DbSet<Tag> Tags => Set<Tag>();
         public DbSet<Criteria> Criterias => Set<Criteria>();
         public DbSet<Requirement> Requirements => Set<Requirement>();
@@ -52,6 +53,8 @@ namespace Carmen.ShowModel
                     changes |= DataObjects.AlternativeCasts;
                 else if (entry.Entity is CastGroup)
                     changes |= DataObjects.CastGroups;
+                else if (entry.Entity is SameCastSet)
+                    changes |= DataObjects.SameCastSets;
                 else if (entry.Entity is Tag)
                     changes |= DataObjects.Tags;
                 else if (entry.Entity is Criteria)

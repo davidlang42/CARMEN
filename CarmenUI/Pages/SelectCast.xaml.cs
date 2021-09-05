@@ -40,6 +40,7 @@ namespace CarmenUI.Pages
         private CollectionViewSource selectedApplicantsViewSource;
         private CollectionViewSource allApplicantsViewSource;
         private CollectionViewSource castGroupsViewSource;
+        private CollectionViewSource sameCastSetsViewSource;
         private CollectionViewSource tagsViewSource;
         private CollectionViewSource alternativeCastsViewSource;
         private CollectionViewSource castNumbersViewSource;
@@ -61,6 +62,7 @@ namespace CarmenUI.Pages
             castNumbersViewSource = (CollectionViewSource)FindResource(nameof(castNumbersViewSource));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
+            sameCastSetsViewSource = (CollectionViewSource)FindResource(nameof(sameCastSetsViewSource));
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
             tagsViewSource.SortDescriptions.Add(StandardSort.For<Tag>());
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
@@ -88,6 +90,9 @@ namespace CarmenUI.Pages
             using (loading.Segment(nameof(ShowContext.CastGroups) + nameof(CastGroup.Members) + nameof(CastGroup.Requirements), "Cast groups"))
                 await context.CastGroups.Include(cg => cg.Members).Include(cg => cg.Requirements).LoadAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
+            using (loading.Segment(nameof(ShowContext.SameCastSets), "Same cast sets"))
+                await context.SameCastSets.LoadAsync();
+            sameCastSetsViewSource.Source = context.SameCastSets.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.Tags) + nameof(A.Tag.Members) + nameof(A.Tag.Requirements), "Tags"))
                 await context.Tags.Include(t => t.Members).Include(t => t.Requirements).LoadAsync();
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
@@ -371,7 +376,7 @@ namespace CarmenUI.Pages
         {
             if (selectionList.SelectedItem is CastGroup cast_group)
             {
-                numbersPanel.Visibility = Visibility.Collapsed;
+                numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = cast_group.Members;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "applicants";
@@ -379,7 +384,7 @@ namespace CarmenUI.Pages
             }
             else if (selectionList.SelectedItem is AlternativeCast alternative_cast)
             {
-                numbersPanel.Visibility = Visibility.Collapsed;
+                numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = alternative_cast.Members;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "alternating cast members";
@@ -387,23 +392,31 @@ namespace CarmenUI.Pages
             }
             else if (selectionList.SelectedItem is Tag tag)
             {
-                numbersPanel.Visibility = Visibility.Collapsed;
+                numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = tag.Members;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "cast members";
                 ConfigureAllApplicantsFiltering();
             }
-            else if (selectionList.SelectedItem != null) // Cast Numbers
+            else if (selectionList.SelectedItem is ListBoxItem lbi
+                && lbi.Content is string text_content)
             {
-                TriggerCastNumbersRefresh();
-                selectionPanel.Visibility = Visibility.Collapsed;
-                numbersPanel.Visibility = Visibility.Visible;
+                if (text_content == "Final Cast List")
+                {
+                    TriggerCastNumbersRefresh();
+                    selectionPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
+                    numbersPanel.Visibility = Visibility.Visible;
+                }
+                else if (text_content == "Keep Applicants Together")
+                {
+                    selectionPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
+                    sameCastSetsPanel.Visibility = Visibility.Visible;
+                }
+                else
+                    throw new ApplicationException($"Text content not handled: {text_content}");
             }
-            else
-            {
-                selectionPanel.Visibility = Visibility.Collapsed;
-                numbersPanel.Visibility = Visibility.Collapsed;
-            }
+            else // no selection (initial state)
+                selectionPanel.Visibility = numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
         }
 
         private void ConfigureAllApplicantsFiltering()
@@ -422,6 +435,21 @@ namespace CarmenUI.Pages
                     _ => null
                 };
             }
+        }
+
+        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void selectedSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+
+        }
+
+        private void availableSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+
         }
     }
 

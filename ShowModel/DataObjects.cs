@@ -17,12 +17,13 @@ namespace Carmen.ShowModel
         Applicants = 1,
         AlternativeCasts = 2,
         CastGroups = 4,
-        Tags = 8,
-        Criterias = 16,
-        Requirements = 32,
-        Nodes = 64,
-        SectionTypes = 128,
-        Images = 256,
-        All = 511
+        SameCastSets = 8,
+        Tags = 16,
+        Criterias = 32,
+        Requirements = 64,
+        Nodes = 128,
+        SectionTypes = 256,
+        Images = 512,
+        All = 1023
     }
 }

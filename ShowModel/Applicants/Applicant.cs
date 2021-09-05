@@ -184,6 +184,21 @@ namespace Carmen.ShowModel.Applicants
             }
         }
 
+        private SameCastSet? sameCastSet;
+        public virtual SameCastSet? SameCastSet
+        {
+            get => sameCastSet;
+            set
+            {
+                if (sameCastSet == value)
+                    return;
+                if (sameCastSet is SameCastSet existing)
+                    existing.Applicants.Remove(this);
+                sameCastSet = value;
+                OnPropertyChanged();
+            }
+        }
+
         private readonly ObservableCollection<Tag> tags = new();
         public virtual ICollection<Tag> Tags => tags;
 

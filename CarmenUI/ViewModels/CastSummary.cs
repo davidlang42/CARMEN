@@ -14,6 +14,7 @@ namespace CarmenUI.ViewModels
     {
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
+            //TODO add same cast sets (X same cast sets including Y applicants, error if any empty or single applicant) also verify that they are respected
             StartLoad();
             var cast_groups = await c.CastGroups.Include(cg => cg.Members).ToArrayAsync();
             var alternative_cast_count = await c.AlternativeCasts.CountAsync();

@@ -126,6 +126,7 @@ namespace CarmenUI.Pages
                 || changes.HasFlag(DataObjects.Criterias))
                 summaries.AddRange(new Summary[] { RegistrationSummary, AuditionSummary });
             if (changes.HasFlag(DataObjects.CastGroups)
+                || changes.HasFlag(DataObjects.SameCastSets)
                 || changes.HasFlag(DataObjects.Tags))
                 summaries.Add(CastSummary);
             if (changes.HasFlag(DataObjects.Nodes)
