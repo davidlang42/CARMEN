@@ -232,6 +232,8 @@ namespace CarmenUI.Pages
             while (recommendedCastingOrder.MoveNext())
                 if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
                 {
+                    rootNodeView.ClearSelection();
+                    rootNodeView.CollapseAll();
                     if (recommendedCastingOrder.Current.Length == 1)
                     {
                         if (!rootNodeView.SelectRole(recommendedCastingOrder.Current[0])) // select a single role
