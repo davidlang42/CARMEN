@@ -50,11 +50,12 @@
                         <TextBlock Text="Cast Groups"/>
                     </ListBoxItem>
                     <CollectionContainer Collection="{Binding Source={StaticResource castGroupsViewSource}}" />
-                    <ListBoxItem IsEnabled="False" Margin="0 20 0 0">
+                    <ListBoxItem IsEnabled="False" Margin="0 20 0 0"
+                                 Visibility="{Binding Source={StaticResource tagsViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
                         <TextBlock Text="Tags"/>
                     </ListBoxItem>
                     <CollectionContainer Collection="{Binding Source={StaticResource tagsViewSource}}" />
-                    <ListBoxItem Content="Cast Numbers" Margin="0 20 0 0"/>
+                    <ListBoxItem Content="Final Cast List" Margin="0 20 0 0"/>
                 </CompositeCollection>
             </ItemsControl.ItemsSource>
             <ListBox.Resources>
