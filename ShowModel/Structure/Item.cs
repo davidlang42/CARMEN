@@ -37,9 +37,11 @@ namespace Carmen.ShowModel.Structure
 
         private void Role_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            // Only propogate changes to counts
-            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(CountByGroups))
+            // Only propogate changes to counts and name
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Role.CountByGroups))
                 OnPropertyChanged(nameof(CountByGroups));
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Role.Name))
+                OnPropertyChanged(nameof(Roles ));
         }
 
         public override IEnumerable<Item> ItemsInOrder() => this.Yield();

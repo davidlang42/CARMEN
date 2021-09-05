@@ -47,9 +47,9 @@ namespace CarmenUI.ViewModels
             foreach (var role in roles)
             {
                 if (string.IsNullOrEmpty(role.Name))
-                    blank_name += 1; //TODO (SUMMARY) show this as an error in ConfigureItems
+                    blank_name += 1;
                 if (role.CountByGroups.Sum(cbg => cbg.Count) == 0)
-                    zero_count += 1; //TODO (SUMMARY) show this as an error in ConfigureItems
+                    zero_count += 1;
                 role_count += 1;
             }
             var row = new Row { Success = $"{role_count} Roles" };

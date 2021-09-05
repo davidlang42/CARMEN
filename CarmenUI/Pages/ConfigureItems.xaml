@@ -172,9 +172,29 @@
                                   MouseDoubleClick="RolesDataGrid_MouseDoubleClick"
                                   Initialized="RolesDataGrid_Initialized"><!-- Must be after footer grid, otherwise it hasn't been made when Initialized is called -->
                             <DataGrid.Columns>
-                                <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Role.Name}"/>
+                                <DataGridTextColumn Header="Name" Width="*" Binding="{Binding Role.Name}">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Style.Triggers>
+                                                <Trigger Property="Text" Value="">
+                                                    <Setter Property="Background" Value="LightCoral"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
                                 <!-- CountByGroup columns are added here dynamically -->
-                                <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True"/>
+                                <DataGridTextColumn Header="Total" Binding="{Binding TotalCount, StringFormat='=\{0\}'}" IsReadOnly="True">
+                                    <DataGridTextColumn.ElementStyle>
+                                        <Style TargetType="{x:Type TextBlock}">
+                                            <Style.Triggers>
+                                                <Trigger Property="Text" Value="=0">
+                                                    <Setter Property="Background" Value="LightCoral"/>
+                                                </Trigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </DataGridTextColumn.ElementStyle>
+                                </DataGridTextColumn>
                                 <!-- PrimaryRequirement columns are added here dynamically -->
                                 <DataGridTemplateColumn x:Name="HeaderRequirements" Header="Other Requirements" Width="*">
                                     <DataGridTemplateColumn.CellTemplate>

@@ -25,8 +25,13 @@ namespace CarmenUI.Converters
                 return true; // incorrect parameter type
             if (value is not Node node)
                 return true; // incorrect value type
-            if (node is Item item && item.Roles.Count == 0)
-                return true;
+            if (node is Item item)
+            {
+                if (item.Roles.Count == 0)
+                    return true;
+                if (item.Roles.Any(r => string.IsNullOrEmpty(r.Name) || r.CountByGroups.Sum(cbg => cbg.Count) == 0))
+                    return true;
+            }
             if (node is InnerNode inner && inner.Children.Count == 0)
                 return true;
             if (!node.CountMatchesSumOfRoles())
