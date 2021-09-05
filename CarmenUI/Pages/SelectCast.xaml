@@ -50,6 +50,8 @@
                         <TextBlock Text="Cast Groups"/>
                     </ListBoxItem>
                     <CollectionContainer Collection="{Binding Source={StaticResource castGroupsViewSource}}" />
+                    <ListBoxItem Content="Keep Applicants Together" Margin="0 20 0 0"
+                                 Visibility="{Binding Source={StaticResource alternativeCastsViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}"/>
                     <ListBoxItem IsEnabled="False" Margin="0 20 0 0"
                                  Visibility="{Binding Source={StaticResource alternativeCastsViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
                         <TextBlock Text="Alternative Casts"/>
