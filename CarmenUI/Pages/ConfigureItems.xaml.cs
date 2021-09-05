@@ -383,41 +383,6 @@ namespace CarmenUI.Pages
             data_grid.CurrentCell = new DataGridCellInfo(child_view, data_grid.Columns.First());
         }
 
-        private void MoveNode(Node dragged, Node target)//LATER remove if not needed
-        {
-            if (dragged is ShowRoot)
-                return;
-            if (dragged.Parent == null)
-                throw new ApplicationException("Non-ShowRoot node must have a parent.");
-            if (dragged.Parent == target.Parent) // move within parent
-            {
-                dragged.Parent.Children.MoveInOrder(dragged, target);
-                var parent = dragged.Parent;
-                parent.Children.Remove(dragged);
-                parent.Children.Add(dragged);
-            }
-            else if (dragged.Parent == target) // move to start of parent
-            {
-                dragged.Parent.Children.MoveInOrder(dragged, dragged.Parent.Children.FirstOrder());
-                var parent = dragged.Parent;
-                parent.Children.Remove(dragged);
-                parent.Children.Add(dragged);
-            }
-            else if (target is InnerNode inner_node) // move into the targeted section/show (at the end of existing children)
-            {
-                dragged.Parent.Children.Remove(dragged);
-                dragged.Parent = inner_node;
-                inner_node.Children.InsertInOrder(dragged);
-            }
-            else // move into a new parent (after the targeted item)
-            {
-                var new_parent = target.Parent ?? throw new ApplicationException("Non-InnerNode node must have a parent.");
-                dragged.Parent.Children.Remove(dragged);
-                dragged.Parent = new_parent;
-                new_parent.Children.InsertInOrder(dragged, target);
-            }
-        }
-
         protected override void DisposeInternal()
         {
             if (rolesPanel.Content is ItemView existing_view)
