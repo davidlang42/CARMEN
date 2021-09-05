@@ -243,7 +243,7 @@
                                 </Grid>
                                 <TextBlock Grid.Row="3" Text="Date of Birth: " VerticalAlignment="Center" Margin="0 0 0 10"/>
                                 <DatePicker Grid.Row="3" Grid.Column="1" SelectedDate="{Binding DateOfBirth}" Margin="0 0 0 10"/>
-                                <ItemsControl Grid.Row="4" ItemsSource="{Binding Abilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}" KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl Grid.Row="4" ItemsSource="{Binding Source={StaticResource criteriasViewSource}}" KeyboardNavigation.IsTabStop="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <UniformGrid Columns="1" KeyboardNavigation.IsTabStop="False"/>
@@ -251,11 +251,11 @@
                                     </ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding Criteria.Name, StringFormat='\{0\}: '}" VerticalAlignment="Center" Margin="0 0 0 10"/>
+                                            <TextBlock Text="{Binding Name, StringFormat='\{0\}: '}" VerticalAlignment="Center" Margin="0 0 0 10"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
-                                <ItemsControl Grid.Row="4" Grid.Column="1" ItemsSource="{Binding Abilities, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}" KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl Grid.Row="4" Grid.Column="1" ItemsSource="{Binding Abilities, Mode=OneTime, Converter={StaticResource sparseAbilities}, ConverterParameter={StaticResource criteriasViewSource}}" KeyboardNavigation.IsTabStop="False">
                                     <ItemsControl.ItemsPanel>
                                         <ItemsPanelTemplate>
                                             <UniformGrid Columns="1" KeyboardNavigation.IsTabStop="False"/>
