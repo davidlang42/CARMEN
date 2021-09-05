@@ -43,6 +43,7 @@ namespace CarmenUI.Pages
         private CollectionViewSource tagsViewSource;
         private CollectionViewSource alternativeCastsViewSource;
         private CollectionViewSource castNumbersViewSource;
+        private ApplicantDescription applicantDescription;
 
         private Criteria[]? _criterias;
         private ISelectionEngine? _engine;
@@ -65,6 +66,7 @@ namespace CarmenUI.Pages
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
             selectedApplicantsViewSource = (CollectionViewSource)FindResource(nameof(selectedApplicantsViewSource));
             allApplicantsViewSource = (CollectionViewSource)FindResource(nameof(allApplicantsViewSource));
+            applicantDescription = (ApplicantDescription)FindResource(nameof(applicantDescription));
             foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
             {
                 allApplicantsViewSource.SortDescriptions.Add(sd);
@@ -105,6 +107,7 @@ namespace CarmenUI.Pages
                     nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
                     _ => throw new ArgumentException($"Applicant engine not handled: {ParseApplicantEngine()}")
                 };
+                applicantDescription.ApplicantEngine = applicant_engine;
                 _engine = ParseSelectionEngine() switch
                 {
                     nameof(DummySelectionEngine) => new DummySelectionEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
