@@ -45,5 +45,15 @@ namespace CarmenUI.ViewModels
                         ValidationErrors.Add($"{cast.FirstName} {cast.LastName} is cast in {consecutive_cast.Item1.Name} and {consecutive_cast.Item2.Name}");
             }
         }
+
+        /// <summary>Find the given roles in the IncompleteRoles list, and mark them as selected.
+        /// Ignore any roles which are not found. Does not deselect other roles.</summary>
+        public void SelectRoles(IEnumerable<Role> roles)
+        {
+            var roles_to_select = roles.ToHashSet();
+            foreach (var incomplete_role in IncompleteRoles)
+                if (roles_to_select.Contains(incomplete_role.Role))
+                    incomplete_role.IsSelected = true;
+        }
     }
 }

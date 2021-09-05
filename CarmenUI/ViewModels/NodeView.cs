@@ -173,6 +173,19 @@ namespace CarmenUI.ViewModels
             return false;
         }
 
+        /// <summary>Searches recursively for the Section/ItemNodeView representing the given Node, and marks it as selected.
+        /// Any nodes on the path to it will be expanded once found. Returns whether or not it was found.</summary>
+        public bool SelectNode(Node node)
+        {
+            if (node is Section section && this is SectionNodeView sv && sv.Section == section
+                || node is Item item && this is ItemNodeView iv && iv.Item == item)
+                return IsSelected = true;
+            foreach (var child in ChildrenInOrder)
+                if (child.SelectNode(node))
+                    return IsExpanded = true;
+            return false;
+        }
+
         /// <summary>Searches recursively for the NodeView which is selected, and marks it as not selected.
         /// Returns whether or not it was found.</summary>
         public bool ClearSelection()

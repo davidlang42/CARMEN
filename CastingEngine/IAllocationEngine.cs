@@ -20,13 +20,12 @@ namespace Carmen.CastingEngine
         IApplicantEngine ApplicantEngine { get; }
 
         /// <summary>Determine the recommended order in which the roles should be cast.
-        /// This should return all roles found within the specified set of items, regardless of whether
-        /// or not they are already cast.</summary>
-        IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order);
-
-        /// <summary>Finds the next Role in IdealCastingOrder() which has not yet been fully cast,
-        /// optionally excluding a specified role.</summary>
-        Role? NextUncastRole(IEnumerable<Item> items_in_order, Role? excluding_role = null);
+        /// Each array in the sequence should be cast as one step, ie. a single element array recommends
+        /// a call to <see cref="PickCast(IEnumerable{Applicant}, Role)"/>, whereas a multi-element array
+        /// recommends a call to <see cref="BalanceCast(IEnumerable{Applicant}, IEnumerable{Role})"/>.
+        /// This should return all roles found within the specified set of items exactly once, regardless
+        /// of whether or not they are already cast.</summary>
+        IEnumerable<Role[]> IdealCastingOrder(IEnumerable<Item> items_in_order);
 
         /// <summary>Calculate the suitability of an applicant for a role, regardless of availability and eligibility.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to roles, and is therefore

@@ -37,9 +37,9 @@ namespace Carmen.CastingEngine.Base
             alternativeCasts = alternative_casts;
         }
 
-        /// <summary>Default implementation enumerates roles in item order, then by name, removing duplicates</summary>
-        public virtual IEnumerable<Role> IdealCastingOrder(IEnumerable<Item> items_in_order)
-            => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct();
+        /// <summary>Default implementation enumerates roles singularly in item order, then by name, removing duplicates</summary>
+        public virtual IEnumerable<Role[]> IdealCastingOrder(IEnumerable<Item> items_in_order) //LATER implement a better approach
+            => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct().Select(r => new[] { r });
 
         /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
         public virtual IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
@@ -53,21 +53,6 @@ namespace Carmen.CastingEngine.Base
             => applicant.Roles.Where(r => r != excluding_role)
             .Where(r => r.Requirements.Any(req => req is ICriteriaRequirement cr && cr.Criteria == criteria))
             .Count();
-
-        /// <summary>Finds the next Role in IdealCastingOrder() which has not yet been fully cast,
-        /// optionally exlcuding a specified role.</summary>
-        public Role? NextUncastRole(IEnumerable<Item> items_in_order, Role? excluding_role = null)
-        {
-            var e = IdealCastingOrder(items_in_order)
-                .Where(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast)
-                .GetEnumerator();
-            if (!e.MoveNext())
-                return null;
-            if (e.Current == excluding_role)
-                if (!e.MoveNext())
-                    return null;
-            return e.Current;
-        }
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>

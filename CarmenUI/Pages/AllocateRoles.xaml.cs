@@ -46,6 +46,7 @@ namespace CarmenUI.Pages
         private IAllocationEngine? _engine;
 
         private object defaultPanelContent;
+        private IEnumerator<Role[]>? recommendedCastingOrder;
 
         private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
             ?? throw new ApplicationException($"Tried to used {nameof(castGroupsByCast)} before it was loaded.");
@@ -88,7 +89,6 @@ namespace CarmenUI.Pages
                     await context.CastGroups.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
                     _alternativeCasts = await context.AlternativeCasts.InNameOrder().ToArrayAsync();
-                _totalCast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(_alternativeCasts.Length));
                 _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local.InOrder(), _alternativeCasts).ToArray();
                 using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles) + nameof(Role.Items), "Applicants"))
                     _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
@@ -102,9 +102,8 @@ namespace CarmenUI.Pages
                     await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Requirements), "Items"))
                     await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
-                uint total_cast;
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
-                    total_cast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
+                    _totalCast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
                 {
                     IApplicantEngine applicant_engine = ParseApplicantEngine() switch
@@ -120,7 +119,7 @@ namespace CarmenUI.Pages
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }
-                _rootNodeView = new ShowRootNodeView(context.ShowRoot, total_cast, context.AlternativeCasts.Local.ToArray());
+                _rootNodeView = new ShowRootNodeView(context.ShowRoot, totalCast, context.AlternativeCasts.Local.ToArray());
                 showCompleted.IsChecked = true; // must be set after creating ShowRootNodeView because it triggers Checked event
                 rolesTreeView.ItemsSource = rootNodeView.ChildrenInOrder;
                 castingProgress.DataContext = rootNodeView;
@@ -222,14 +221,42 @@ namespace CarmenUI.Pages
             base.DisposeInternal();
         }
 
+        bool selectingRoleProgrammatically = false;
         private void NextButton_Click(object sender, RoutedEventArgs e)
         {
-            var current_role = (rolesTreeView.SelectedItem as RoleNodeView)?.Role;
-            var next_role = engine.NextUncastRole(context.ShowRoot.ItemsInOrder(), current_role);
-            if (next_role != null)
-                rootNodeView.SelectRole(next_role);
-            else
-                rootNodeView.ClearSelection();
+            if (selectingRoleProgrammatically)
+                throw new ApplicationException("Called next role while already selecting a role programatically.");
+            selectingRoleProgrammatically = true;
+            if (recommendedCastingOrder == null)
+                recommendedCastingOrder = engine.IdealCastingOrder(context.ShowRoot.ItemsInOrder()).GetEnumerator();
+            while (recommendedCastingOrder.MoveNext())
+                if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
+                {
+                    if (recommendedCastingOrder.Current.Length == 1)
+                    {
+                        if (!rootNodeView.SelectRole(recommendedCastingOrder.Current[0])) // select a single role
+                            break; // if role fails to select, exit process
+                    }
+                    else
+                    {
+                        var node = Role.CommonItemsAndSections(recommendedCastingOrder.Current) // find nodes which contain ALL of these roles
+                            .OrderBy(n => n.ItemsInOrder().Count()) // find the node containing the minimum number of items (possibly only 1)
+                            .ThenBy(n => n.ItemsInOrder().SelectMany(i => i.Roles).Distinct().Count()) // if tied, find the node with the minimum descendent roles
+                            .FirstOrDefault(); // ShowRoot was excluded by Role.ItemsAndSections(), which is fine because its not selectable
+                        if (node == null)
+                            break; // not selectable
+                        if (!rootNodeView.SelectNode(node)) // select the node containing these roles
+                            break; // if node fails to select, exit process
+                        if (applicantsPanel.Content is not NodeRolesOverview overview)
+                            break; // if node overview not shown, exit process
+                        overview.SelectRoles(recommendedCastingOrder.Current); // pre-select the recommended roles in the incomplete roles list
+                    }
+                    selectingRoleProgrammatically = false;
+                    return; // success
+                }
+            rootNodeView.ClearSelection(); // clear when no more roles, or another reason to stop the process
+            recommendedCastingOrder = null;
+            selectingRoleProgrammatically = false;
         }
 
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
@@ -257,6 +284,11 @@ namespace CarmenUI.Pages
         {
             if (!ChangeToViewMode())
             { } //LATER ideally change the selection back, but this causes the event to get called again and infinitely loop asking if you want to cancel, until you do -- a better way to handle this might be to disable the items tree when in edit mode
+            if (!selectingRoleProgrammatically)
+            {
+                // clear recommender state if user manually initiates editing a role
+                recommendedCastingOrder = null;
+            }
         }
 
         private void rolesTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
@@ -351,7 +383,6 @@ namespace CarmenUI.Pages
                 foreach (var applicant in applicants)
                     role.Cast.Add(applicant);
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, totalCast);
-            //TODO (BALANCE) should we allow IdealCastingOrder() to return sets of roles to be cast together? how will the UI handle this? -- allow IdealCastingOrder() to return sets of roles (within a non-multi section ONLY)
         }
 
         private List<Role>? ParseSelectedRoles(IEnumerable<IncompleteRole> incomplete_roles)

@@ -102,6 +102,20 @@ namespace Carmen.ShowModel.Structure
             return RoleStatus.FullyCast;
         }
 
+        /// <summary>Returns a set of all the items and sections which contain this Role</summary>
+        public HashSet<Node> ItemsAndSections()
+            => Items.Cast<Node>().Concat(Items.SelectMany(item => item.Parents())).Where(n => n is not ShowRoot).ToHashSet();
+
+        public static HashSet<Node> CommonItemsAndSections(params Role[] roles)
+        {
+            if (roles.Length == 0)
+                return new HashSet<Node>();
+            var parents = roles[0].ItemsAndSections();
+            for (var i = 1; i < roles.Length; i++)
+                parents.IntersectWith(roles[i].ItemsAndSections());
+            return parents;
+        }
+
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

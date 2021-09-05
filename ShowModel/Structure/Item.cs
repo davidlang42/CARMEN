@@ -116,7 +116,14 @@ namespace Carmen.ShowModel.Structure
             }
         }
 
-        private static IEnumerable<InnerNode> CommonParents(Item item1, Item item2)
-            => item1.Parents().Intersect(item2.Parents());
+        public static HashSet<InnerNode> CommonParents(params Item[] items)
+        {
+            if (items.Length == 0)
+                return new HashSet<InnerNode>();
+            var parents = items[0].Parents().ToHashSet();
+            for (var i = 1; i < items.Length; i++)
+                parents.IntersectWith(items[i].Parents());
+            return parents;
+        }
     }
 }
