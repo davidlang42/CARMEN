@@ -63,6 +63,8 @@ namespace CarmenUI.Pages
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
             sameCastSetsViewSource = (CollectionViewSource)FindResource(nameof(sameCastSetsViewSource));
+            //TODO filter all applicants list of same cast sets to be any applicant (even if not in cast group) which doesn't have a SameCastSet
+            //TODO hide middle and right lists of same cast set UI if nothing selected in first list
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
             tagsViewSource.SortDescriptions.Add(StandardSort.For<Tag>());
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
@@ -224,7 +226,7 @@ namespace CarmenUI.Pages
                 }
                 msg += "\n";
             }
-            MessageBox.Show(msg);
+            MessageBox.Show(msg, "DEBUG");
 #endif
         }
 
@@ -437,19 +439,49 @@ namespace CarmenUI.Pages
             }
         }
 
-        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-
-        }
-
         private void selectedSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-
+            //TODO
         }
 
         private void availableSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            //TODO
+        }
 
+        private void DetectSiblings_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
+        private void AddSameCastSet_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
+        private void DeleteSameCastSet_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
+        private void addSameCastSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
+        private void addAllSameCastSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
+        private void removeSameCastSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
+        private void removeAllSameCastSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
         }
     }
 
