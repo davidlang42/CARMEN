@@ -291,12 +291,12 @@ namespace CarmenUI.Pages
                         return;
                     }
                     if (!section_type.Sections.Any() || ConfirmDelete($"Are you sure you want to delete the '{section_type.Name}' section type?\nThis will remove the {section_type.Sections.Count.Plural(section_type.Name)} and any sections, items and roles within them."))
-                        list.Remove(section_type);
+                        context.DeleteSectionType(section_type);
                     break;
                 case Requirement requirement:
                     var used_count = requirement.UsedByCastGroups.Count + requirement.UsedByCombinedRequirements.Count + requirement.UsedByRoles.Count + requirement.UsedByTags.Count;//LATER is this missing NotRequirements?
-                    if (used_count == 0 || ConfirmDelete($"Are you sure you want to delete the '{requirement.Name}' reqirement?\nThis requirement is currently in used {used_count.Plural("time")}."))
-                        list.Remove(requirement);
+                    if (used_count == 0 || ConfirmDelete($"Are you sure you want to delete the '{requirement.Name}' reqirement?\nThis will also delete any NOT requirements which refer to it, and is currently in used {used_count.Plural("time")}."))
+                        context.DeleteRequirement(requirement);
                     break;
             }
         }

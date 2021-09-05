@@ -12,6 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.ComponentModel;
 using System.IO;
+using System;
 
 namespace Carmen.ShowModel
 {
@@ -44,7 +45,7 @@ namespace Carmen.ShowModel
         /// If deleting this alternative cast brings the total number below 2, then any CastGroup which has
         /// AlternateCasts set to true, will have it set to false, and the alternative cast of their current
         /// members also set to null.</summary>
-        public void DeleteAlternativeCast(AlternativeCast alternative_cast)
+        public void DeleteAlternativeCast(AlternativeCast alternative_cast) //LATER unit test
         {
             foreach (var member in alternative_cast.Members.ToArray())
                 member.AlternativeCast = null;
@@ -62,6 +63,61 @@ namespace Carmen.ShowModel
                 }
             }
             AlternativeCasts.Remove(alternative_cast);
+        }
+
+        /// <summary>Also deletes any sections currently set to this section type, any items or sections under
+        /// those sections, any roles which are no longer in any items, and unsets the cast allocated to those roles.</summary>
+        public void DeleteSectionType(SectionType section_type) //LATER unit test
+        {
+            while (section_type.Sections.Any())
+            {
+                // Deleting this section may have also deleted sub-sections which are of this section type,
+                // therefore after every delete, re-check the section_type for any sections and take the first.
+                DeleteNode(section_type.Sections.First()); 
+            }
+            SectionTypes.Remove(section_type);
+        }
+
+        /// <summary>Also deletes any child nodes under this node, any roles which are no longer in any items, and unsets the
+        /// cast allocated to those roles.</summary>
+        public void DeleteNode(Node node) //LATER unit test
+        {
+            if (node is ShowRoot)
+                throw new ArgumentException("Cannot delete ShowRoot.");
+            else if (node is InnerNode inner)
+            {
+                foreach (var child in inner.Children.ToArray())
+                    DeleteNode(child);
+            }
+            else if (node is Item item)
+            {
+                foreach (var role in item.Roles.ToArray())
+                    if (role.Items.SingleOrDefaultSafe() == item)
+                        DeleteRole(role);
+            }
+            else
+                throw new NotImplementedException($"Node type not handled: {node.GetType().Name}");
+            var parent = node.Parent ?? throw new ApplicationException("Non-ShowRoot node must have a parent.");
+            parent.Children.Remove(node);
+            Nodes.Remove(node);
+            if (node is Section section)
+                section.SectionType.Sections.Remove(section);
+        }
+
+        /// <summary>Also unsets the cast allocated to this role.</summary>
+        public void DeleteRole(Role role) //LATER unit test
+        {
+            //TODO not sure how to delete a role without a DbSet of roles
+        }
+
+        /// <summary>Also deletes any NOT requirements which use this requirement, because a NOT requirement must have a
+        /// sub-requirement set.</summary>
+        public void DeleteRequirement(Requirement requirement) //LATER unit test
+        {
+            var used_by_not_requirements = Requirements.Local.OfType<NotRequirement>().Where(nr => nr.SubRequirement == requirement).ToArray();
+            foreach (var not_requirement in used_by_not_requirements)
+                DeleteRequirement(not_requirement);
+            Requirements.Remove(requirement);
         }
 
         /// <summary>Configures the default AlternativeCasts, CastGroups, Tags, Criterias, Requirements, SectionTypes and ShowRoot.

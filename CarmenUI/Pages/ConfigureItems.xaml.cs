@@ -330,10 +330,7 @@ namespace CarmenUI.Pages
             }
             else if (e.Key == Key.Delete && itemsTreeView.SelectedItem is Node node && node is not ShowRoot)
             {
-                var parent = node.Parent ?? throw new ApplicationException("Non-ShowRoot must have a parent.");
-                parent.Children.Remove(node);
-                var collection = (ObservableCollection<Node>)rootNodesViewSource.Source;
-                collection.Remove(node);
+                context.DeleteNode(node);
                 e.Handled = true;
             }
         }
