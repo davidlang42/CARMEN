@@ -40,6 +40,33 @@ namespace Carmen.ShowModel
         public ShowContext(DbContextOptions<ShowContext> context_options) : base(context_options)
         { }
 
+        /// <summary>Detect which DataObjects have changed in the current context since the last save</summary>
+        public DataObjects DataChanges()
+        {
+            var changes = DataObjects.None;
+            foreach (var entry in ChangeTracker.Entries().Where(e => e.State != EntityState.Unchanged))
+            {
+                if (entry.Entity is Applicant)
+                    changes |= DataObjects.Applicants;
+                else if (entry.Entity is AlternativeCast)
+                    changes |= DataObjects.AlternativeCasts;
+                else if (entry.Entity is CastGroup)
+                    changes |= DataObjects.CastGroups;
+                else if (entry.Entity is Tag)
+                    changes |= DataObjects.Tags;
+                else if (entry.Entity is Criteria)
+                    changes |= DataObjects.Criterias;
+                else if (entry.Entity is Requirement)
+                    changes |= DataObjects.Requirements;
+                else if (entry.Entity is Node)
+                    changes |= DataObjects.Nodes;
+                else if (entry.Entity is SectionType)
+                    changes |= DataObjects.SectionTypes;
+                else if (entry.Entity is Image)
+                    changes |= DataObjects.Images;
+            }
+            return changes;
+        }
 
         /// <summary>For any current members of this alternative cast, this sets their alternative cast to null.
         /// If deleting this alternative cast brings the total number below 2, then any CastGroup which has

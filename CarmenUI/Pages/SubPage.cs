@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Carmen.CastingEngine;
 using Carmen.CastingEngine.Base;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace CarmenUI.Pages
 {
@@ -26,6 +27,7 @@ namespace CarmenUI.Pages
         private ShowContext? _context;
         private DbContextOptions<ShowContext> contextOptions;
         Window? windowWithEventsAttached;
+        DataObjects saved_changes = DataObjects.None;
 
         protected ShowContext context => _context
             ?? throw new ApplicationException("Tried to use context after it was disposed.");
@@ -88,11 +90,7 @@ namespace CarmenUI.Pages
         protected void SaveChangesAndReturn()
         {
             if (SaveChanges())
-                OnReturn(new ReturnEventArgs<DataObjects>(DataObjects.All));
-            //TODO (SAVE) maybe a better way to do this is return which *pages* may have changed --- figure out what has actually changed from ChangeTracker rather than argument (note: savechanges() may have been called multiple times befoer this)
-            //* check what objects have changed (from ChangeTracker) when SaveChanges() is called, and store this in SubPage
-            //* return what has changed from SubPage CancelChangesAndReturn() / SaveChangesAndReturn()
-            //* maybe change from which "objects" to which "pages" if some pages make changes to objects which would affect many pages and really should only affect one
+                OnReturn(new ReturnEventArgs<DataObjects>(saved_changes));
         }
 
         /// <summary>Save changes to the database and return true if succeeded</summary>
@@ -109,7 +107,9 @@ namespace CarmenUI.Pages
             }
             using var saving = new LoadingOverlay(this);
             saving.MainText = "Saving...";
+            var changes = context.DataChanges();
             context.SaveChanges(); //LATER handle db errors, could this be async?
+            saved_changes |= changes;
             return true;
         }
 
@@ -121,7 +121,7 @@ namespace CarmenUI.Pages
         protected void CancelChangesAndReturn()
         {
             if (CancelChanges())
-                OnReturn(null); //TODO (SAVE) figure out what has actually changed from ChangeTracker rather than argument (note: savechanges() may have been called multiple times befoer this)
+                OnReturn(new ReturnEventArgs<DataObjects>(saved_changes));
         }
 
         /// <summary>Confirms cancel with the user (if any changes have been made) and returns true if its okay to cancel</summary>

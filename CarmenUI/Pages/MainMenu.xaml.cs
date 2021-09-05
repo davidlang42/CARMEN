@@ -58,13 +58,10 @@ namespace CarmenUI.Pages
             }
         }
 
-        /// <summary>Handles return events from sub-pages (e==null for cancel,
-        /// otherwise e.Result indicates which objects may have changed)</summary>
+        /// <summary>Handles return events from sub-pages (e.Result returns what has changed,
+        /// even on cancel, because changes might have been saved at another time)</summary>
         private void HandleChangesOnReturn(object sender, ReturnEventArgs<DataObjects> e)
-        {
-            if (e?.Result is DataObjects changes)
-                InvalidateSummaries(changes);
-        }
+            => InvalidateSummaries(e.Result);
 
         private void NavigateToSubPage(SubPage sub_page)
         {
