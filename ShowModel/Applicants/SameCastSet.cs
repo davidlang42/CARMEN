@@ -23,8 +23,21 @@ namespace Carmen.ShowModel.Applicants
 
         public bool VerifyAlternativeCasts()
         {
-            //TODO implement VerifyAlternativeCasts
-            throw new NotImplementedException();
+            AlternativeCast? common = null;
+            foreach (var applicant in Applicants)
+            {
+                if (applicant.CastGroup is not CastGroup cg)
+                    continue; // skip not accepted applicants
+                if (!cg.AlternateCasts)
+                    continue; // skip if CastGroup doesn't alternate casts
+                if (applicant.AlternativeCast is not AlternativeCast ac)
+                    continue; // skip if AlternativeCast not set yet
+                if (common == null)
+                    common = ac;
+                else if (common != ac)
+                    return false;
+            }
+            return true;
         }
     }
 }
