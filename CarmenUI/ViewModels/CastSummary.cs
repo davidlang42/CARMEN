@@ -36,7 +36,7 @@ namespace CarmenUI.ViewModels
             if (cast_groups.Any(cg => cg.AlternateCasts))
             {
                 // same cast sets
-                var same_cast_sets = await c.SameCastSets.ToArrayAsync();//TODO auto .Include(set => set.Applicants)
+                var same_cast_sets = await c.SameCastSets.ToArrayAsync();
                 var total_applicants = same_cast_sets.Sum(set => set.Applicants.Count);
                 var row = new Row { Success = $"{same_cast_sets.Length} same-cast sets including {total_applicants} applicants" };
                 var incomplete_sets = same_cast_sets.Count(set => set.Applicants.Count < 2);

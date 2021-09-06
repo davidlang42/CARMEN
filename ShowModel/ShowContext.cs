@@ -336,6 +336,7 @@ namespace Carmen.ShowModel
             modelBuilder.Entity<Applicant>().Navigation(a => a.Abilities).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.CastGroup).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.AlternativeCast).AutoInclude();
+            modelBuilder.Entity<Applicant>().Navigation(a => a.SameCastSet).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.Tags).AutoInclude();
             modelBuilder.Entity<TagRequirement>().Navigation(tr => tr.RequiredTag).AutoInclude();
             modelBuilder.Entity<AbilityExactRequirement>().Navigation(aer => aer.Criteria).AutoInclude();
@@ -345,6 +346,7 @@ namespace Carmen.ShowModel
             modelBuilder.Entity<Role>().Navigation(r => r.CountByGroups).AutoInclude();
             modelBuilder.Entity<Role>().Navigation(r => r.Requirements).AutoInclude();
             modelBuilder.Entity<Section>().Navigation(s => s.SectionType).AutoInclude();
+            modelBuilder.Entity<SameCastSet>().Navigation(set => set.Applicants).AutoInclude();
         }
 
 #if SLOW_DATABASE
