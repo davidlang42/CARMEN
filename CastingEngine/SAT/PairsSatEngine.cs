@@ -85,7 +85,7 @@ namespace Carmen.CastingEngine.SAT
             var sat = new DpllSolver<Applicant>(applicants_needing_alternative_cast.SelectMany(p => p.Item2));
             Solution solution = Solution.Unsolveable;
             Results.Clear();
-            Initialise(out int chunk_size, out int max_chunks);
+            Initialise(applicants_needing_alternative_cast.Select(p => p.Item2.Count), out int chunk_size, out int max_chunks);
             do
             {
                 // compile clauses
@@ -140,10 +140,10 @@ namespace Carmen.CastingEngine.SAT
         /// The default implementation is to start by chunking the whole list of applicants into pairs.
         /// It may be helpful to override this if your Simplify() method uses state which needs to be
         /// reset between runs.</summary>
-        protected virtual void Initialise(out int chunk_size, out int max_chunks)
+        protected virtual void Initialise(IEnumerable<int> applicants_per_cast_group, out int chunk_size, out int max_chunks)
         {
             chunk_size = 2;
-            max_chunks = int.MaxValue; // chunk until no more applicants
+            max_chunks = applicants_per_cast_group.Max() / chunk_size; // at this value, the limit will not be hit before all applicants have been chunked
         }
 
         /// <summary>If the current SAT problem is unsolvable, this is called to modify the chunking parameters to make

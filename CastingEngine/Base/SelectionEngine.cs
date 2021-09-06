@@ -23,7 +23,8 @@ namespace Carmen.CastingEngine.Base
         public static readonly Type[] Implementations = new[] {
             typeof(HeuristicSelectionEngine),
             typeof(DummySelectionEngine), //LATER remove
-            typeof(ChunkedPairsSatEngine)
+            typeof(ChunkedPairsSatEngine),
+            typeof(TopPairsSatEngine),
         };
 
         public IApplicantEngine ApplicantEngine { get; init; }
