@@ -193,7 +193,7 @@ namespace CarmenUI.Pages
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
                 engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local);
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                engine.BalanceAlternativeCasts(context.Applicants.Local, Enumerable.Empty<SameCastSet>());
+                engine.BalanceAlternativeCasts(context.Applicants.Local, Enumerable.Empty<SameCastSet>());//TODO use actual same cast sets wherever BalanceAlternativeCasts() is called
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
                 engine.AllocateCastNumbers(context.Applicants.Local);
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
@@ -203,15 +203,17 @@ namespace CarmenUI.Pages
 #if DEBUG
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
             string msg = "";
-            if (engine is ChunkedPairsSatEngine chunky)
+            if (engine is PairsSatEngine chunky && chunky.Results.LastOrDefault() is PairsSatEngine.Result r)
             {
-                var r = chunky.Results.Last();
+                var chunk_size = $"{r.ChunkSize}";
+                if (r.MaxChunks != int.MaxValue)
+                    chunk_size += $" (max {r.MaxChunks})";
                 if (r.Solved)
                     msg += $"Balanced casts by solving a {r.MaxLiterals}-SAT problem with {r.Variables} variables and {r.Clauses} clauses."
-                        + $"\nIt took {chunky.Results.Count} chunking attempts with a final chunk size of {r.ChunkSize}";
+                        + $"\nIt took {chunky.Results.Count} chunking attempts with a final chunk size of {chunk_size}";
                 else
                     msg += $"Failed to solve a {r.MaxLiterals}-SAT problem with {r.Variables} variables and {r.Clauses} clauses."
-                        + $"\nAfter {chunky.Results.Count} chunking attempts, and a final chunk size of {r.ChunkSize}, it was still unsolvable.";
+                        + $"\nAfter {chunky.Results.Count} chunking attempts, and a final chunk size of {chunk_size}, it was still unsolvable.";
                 msg += "\n\n";
             }
             var marks = criterias.Where(c => c.Primary).Select(c => alternative_casts.Select(ac => ac.Members.Select(a => a.MarkFor(c)).ToArray()).Select(m => (m, MarkDistribution.Analyse(m))).ToArray()).ToArray();
