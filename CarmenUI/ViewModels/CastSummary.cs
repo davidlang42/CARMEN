@@ -15,27 +15,50 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            // cast groups
+            // cast groups / alternative casts
             var cast_groups = await c.CastGroups.Include(cg => cg.Members).ToArrayAsync();
-            var alternative_cast_count = await c.AlternativeCasts.CountAsync();
+            var alternative_casts = await c.AlternativeCasts.ToArrayAsync();
             var sum = 0;
             foreach (var cast_group in cast_groups)
             {
                 var count = cast_group.Members.Count;
                 var row = new Row { Success = $"{count} in {cast_group.Name}" };
-                var alternative_casts_for_group = cast_group.AlternateCasts ? alternative_cast_count : 1;
+                var alternative_casts_for_group = cast_group.AlternateCasts ? alternative_casts.Length : 1;
                 var extra = count - cast_group.RequiredCount * alternative_casts_for_group;
                 if (extra > 0)
                     row.Fail = $"({extra} too many)";
                 else if (extra < 0)
                     row.Fail = $"({-extra} missing)";
                 Rows.Add(row);
+                if (cast_group.AlternateCasts)
+                {
+                    foreach (var alternative_cast in alternative_casts)
+                    {
+                        var assigned = cast_group.Members.Where(a => a.AlternativeCast == alternative_cast).Count();
+                        var ac_row = new Row { Success = $"{assigned.Plural(cast_group.Abbreviation)} assigned to {alternative_cast.Name}" };
+                        var ac_extra = assigned - cast_group.RequiredCount;
+                        if (ac_extra > 0)
+                            ac_row.Fail = $"({ac_extra} too many)";
+                        else if (ac_extra < 0)
+                            ac_row.Fail = $"({-ac_extra} missing)";
+                        Rows.Add(ac_row);
+                    }
+                    var not_asigned = cast_group.Members.Where(a => a.AlternativeCast == null).Count();
+                    if (not_asigned > 0)
+                        Rows.Add(new Row { Fail = $"{not_asigned.Plural(cast_group.Abbreviation)} not assigned to an alternative cast" });
+                }
+                else
+                {
+                    var wrongly_assigned = cast_group.Members.Where(a => a.AlternativeCast != null).Count();
+                    if (wrongly_assigned > 0)
+                        Rows.Add(new Row { Fail = $"{wrongly_assigned.Plural(cast_group.Abbreviation)} wrongly assigned to an alternative cast" });
+                }
                 sum += count;
             }
             Rows.Insert(0, new Row { Success = $"{sum} Cast Selected" });
+            // same cast sets
             if (cast_groups.Any(cg => cg.AlternateCasts))
             {
-                // same cast sets
                 var same_cast_sets = await c.SameCastSets.ToArrayAsync();
                 var total_applicants = same_cast_sets.Sum(set => set.Applicants.Count);
                 var row = new Row { Success = $"{same_cast_sets.Length} same-cast sets including {total_applicants} applicants" };
@@ -45,8 +68,6 @@ namespace CarmenUI.ViewModels
                 Rows.Add(row);
                 foreach (var failed_set in same_cast_sets.Where(set => !set.VerifyAlternativeCasts(out _)))
                     Rows.Add(new Row { Fail = $"{failed_set.Description} are not all in the same cast" });
-                // alternative casts
-                //TODO alternative casts
             }
             // tags
             var tags = await c.Tags.Include(cg => cg.Members).ToArrayAsync();
@@ -72,7 +93,7 @@ namespace CarmenUI.ViewModels
                 while (cast_num != group.Key)
                     missing_nums.Add(cast_num++);
                 var cast = group.ToArray();
-                var expected_length = cast[0].CastGroup!.AlternateCasts ? alternative_cast_count : 1;
+                var expected_length = cast[0].CastGroup!.AlternateCasts ? alternative_casts.Length : 1;
                 if (cast.Length != expected_length)
                     incomplete_nums.Add(cast_num);
                 cast_num++;
