@@ -51,7 +51,7 @@ namespace CarmenUI.Converters
             };
         }
 
-        private static string Initial(string name)//LATER make this handle double barrel names
+        private static string Initial(string name)//LATER make this handle double barrel names and move it into StringExtensions (also in ShowModel)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return "";

@@ -133,5 +133,38 @@ namespace Carmen.ShowModel
             suffix_plural ??= suffix_single + "s";
             return number == 1 ? $"{number} {suffix_single}" : $"{number} {suffix_plural}";
         }
+
+        public static string JoinWithCommas(this IEnumerable<string> things, bool use_and_instead_of_last_comma = true)
+        {
+            var e = things.GetEnumerator();
+            if (!e.MoveNext())
+                return "";
+            var result = e.Current;
+            bool moved_next = e.MoveNext();
+            while (moved_next)
+            {
+                string thing = e.Current;
+                moved_next = e.MoveNext();
+                string sep = (moved_next || !use_and_instead_of_last_comma) ? ", " : " and ";
+                result += sep + thing;
+            }
+            return result;
+        }
+
+        public static string Initial(this string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return "";
+            return name.Substring(0, 1);
+        }
+
+        public static string Plural(this string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                return "";
+            if (name.EndsWith("s"))
+                return name + "es";
+            return name + "s";
+        }
     }
 }

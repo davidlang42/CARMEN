@@ -262,17 +262,21 @@
                             <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>
                         </Style>
                     </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Description}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
                 </ListBox>
             </DockPanel>
             <TextBlock Grid.Column="2" Grid.Row="1" FontSize="18" VerticalAlignment="Center"
-                       Text="{Binding ElementName=sameCastSetsList, Path=SelectedIndex, StringFormat='Applicants in set #\{0\}'}"/>
+                       Text="Applicants in selected set"/>
             <DockPanel Grid.Column="2" Grid.Row="2" Grid.RowSpan="7">
-                <Button DockPanel.Dock="Bottom" Height="30" Margin="0 5 0 0" Click="DeleteSameCastSet_Click">
-                    <TextBlock Text="{Binding ElementName=sameCastSetsList, Path=SelectedIndex, StringFormat='Delete set #\{0\}'}"/>
-                </Button>
+                <Button DockPanel.Dock="Bottom" Height="30" Margin="0 5 0 0" Click="DeleteSameCastSet_Click"
+                        Content="Delete selected set"/>
                 <ListBox x:Name="selectedSameCastSetList" 
                      SelectionMode="Extended" MouseDoubleClick="selectedSameCastSetList_MouseDoubleClick"
-                     ItemsSource="{Binding ElementName=sameCastSetsList, Path=SelectedItem}">
+                     ItemsSource="{Binding ElementName=sameCastSetsList, Path=SelectedItem.Applicants}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>

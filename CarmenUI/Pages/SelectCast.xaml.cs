@@ -63,8 +63,9 @@ namespace CarmenUI.Pages
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
             sameCastSetsViewSource = (CollectionViewSource)FindResource(nameof(sameCastSetsViewSource));
-            //TODO filter all applicants list of same cast sets to be any applicant (even if not in cast group) which doesn't have a SameCastSet
             //TODO hide middle and right lists of same cast set UI if nothing selected in first list
+            //TODO highlight same cast set in red if empty set or set of one
+            //TODO bug: dont show in avaialbel applicants if already in a same cast set
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
             tagsViewSource.SortDescriptions.Add(StandardSort.For<Tag>());
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
@@ -374,6 +375,59 @@ namespace CarmenUI.Pages
         private void castStatusCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
             => ConfigureAllApplicantsFiltering();
 
+        private void addSameCastSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sameCastSetsList.SelectedItem is SameCastSet set)
+                AddToSameCastSet(set, availableSameCastSetList.SelectedItems.Cast<Applicant>().ToArray());
+            ConfigureAllApplicantsFiltering();
+        }
+
+        private void addAllSameCastSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sameCastSetsList.SelectedItem is SameCastSet set)
+                AddToSameCastSet(set, availableSameCastSetList.Items.Cast<Applicant>().ToArray());
+            ConfigureAllApplicantsFiltering();
+        }
+
+        private void AddToSameCastSet(SameCastSet set, Applicant[] applicants)
+        {
+            foreach (var applicant in applicants)
+            {
+                if (!set.Applicants.Contains(applicant))
+                    set.Applicants.Add(applicant);
+                applicant.SameCastSet = set;
+            }
+        }
+
+        private void removeSameCastSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sameCastSetsList.SelectedItem is SameCastSet set)
+                RemoveFromSameCastSet(set, selectedSameCastSetList.SelectedItems.Cast<Applicant>().ToArray());
+            ConfigureAllApplicantsFiltering();
+        }
+
+        private void removeAllSameCastSetButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sameCastSetsList.SelectedItem is SameCastSet set)
+                RemoveFromSameCastSet(set, selectedSameCastSetList.Items.Cast<Applicant>().ToArray());
+            ConfigureAllApplicantsFiltering();
+        }
+
+        private void RemoveFromSameCastSet(SameCastSet set, Applicant[] applicants)
+        {
+            foreach (var applicant in applicants)
+            {
+                set.Applicants.Remove(applicant);
+                applicant.SameCastSet = set;
+            }
+        }
+
+        private void availableSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => addSameCastSetButton_Click(sender, e);
+
+        private void selectedSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => removeSameCastSetButton_Click(sender, e);
+
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (selectionList.SelectedItem is CastGroup cast_group)
@@ -416,6 +470,7 @@ namespace CarmenUI.Pages
                 }
                 else
                     throw new ApplicationException($"Text content not handled: {text_content}");
+                ConfigureAllApplicantsFiltering();
             }
             else // no selection (initial state)
                 selectionPanel.Visibility = numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
@@ -434,54 +489,32 @@ namespace CarmenUI.Pages
                     (AlternativeCast ac, CastStatus.Eligible) => o => o is Applicant a && !selected_applicants.Contains(a) && a.CastGroup is CastGroup cg && cg.AlternateCasts,
                     (A.Tag, CastStatus.Available) => o => o is Applicant a && a.IsAccepted && !selected_applicants.Contains(a),
                     (Tag t, CastStatus.Eligible) => o => o is Applicant a && a.IsAccepted && !selected_applicants.Contains(a) && t.Requirements.All(r => r.IsSatisfiedBy(a)),
+                    (string s, _) when s == "Keep Applicants Toegther" => o => o is Applicant a && a.SameCastSet == null,
                     _ => null
                 };
             }
         }
 
-        private void selectedSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            //TODO
-        }
-
-        private void availableSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-        {
-            //TODO
-        }
-
         private void DetectSiblings_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            //TODO detect siblings
         }
 
         private void AddSameCastSet_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            if (sameCastSetsViewSource.Source is IList list)
+            {
+                var set = new SameCastSet();
+                list.Add(set);
+                sameCastSetsList.SelectedItem = set;
+            }
         }
 
         private void DeleteSameCastSet_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
-        }
-
-        private void addSameCastSetButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO
-        }
-
-        private void addAllSameCastSetButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO
-        }
-
-        private void removeSameCastSetButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO
-        }
-
-        private void removeAllSameCastSetButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO
+            if (sameCastSetsViewSource.Source is IList list
+                && sameCastSetsList.SelectedItem is SameCastSet set)
+                list.Remove(set);
         }
     }
 
