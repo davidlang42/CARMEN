@@ -480,7 +480,27 @@ namespace CarmenUI.Pages
 
         private void DetectSiblings_Click(object sender, RoutedEventArgs e)
         {
-            //TODO detect siblings
+            var siblings = context.Applicants.Local
+                .Where(a => !string.IsNullOrEmpty(a.LastName))
+                .OrderBy(a => a.LastName).ThenBy(a => a.FirstName)
+                .GroupBy(a => a.LastName)
+                .Select(g => g.ToArray())
+                .ToArray();
+            foreach (var family in siblings.Where(f => f.Length > 1))
+            {
+                var set = family.Select(a => a.SameCastSet).OfType<SameCastSet>().FirstOrDefault();
+                if (set == null)
+                {
+                    set = new SameCastSet();
+                    context.SameCastSets.Add(set);
+                }
+                foreach (var applicant in family)
+                    if (applicant.SameCastSet == null)
+                    {
+                        applicant.SameCastSet = set;
+                        set.Applicants.Add(applicant);
+                    }
+            }
         }
 
         private void AddSameCastSet_Click(object sender, RoutedEventArgs e)
