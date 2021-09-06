@@ -256,7 +256,7 @@
                 <Button DockPanel.Dock="Bottom" Height="30" Margin="0 5 0 0" Click="AddSameCastSet_Click"
                         Content="Add new set"/>
                 <ListBox x:Name="sameCastSetsList"
-                     SelectionMode="Extended"
+                     SelectionMode="Extended" KeyDown="sameCastSetsList_KeyDown"
                      ItemsSource="{Binding Source={StaticResource sameCastSetsViewSource}}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}">

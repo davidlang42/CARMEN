@@ -521,6 +521,12 @@ namespace CarmenUI.Pages
                 ConfigureAllApplicantsFiltering();
             }
         }
+
+        private void sameCastSetsList_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Delete)
+                DeleteSameCastSet_Click(sender, e);
+        }
     }
 
     public enum CastStatus
