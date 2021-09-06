@@ -36,8 +36,15 @@ namespace CarmenUI.ViewModels
             if (cast_groups.Any(cg => cg.AlternateCasts))
             {
                 // same cast sets
-                //TODO same cast sets (X same cast sets including Y applicants, error if any empty or single applicant)
-                //TODO error if that they are not respected
+                var same_cast_sets = await c.SameCastSets.ToArrayAsync();//TODO auto .Include(set => set.Applicants)
+                var total_applicants = same_cast_sets.Sum(set => set.Applicants.Count);
+                var row = new Row { Success = $"{same_cast_sets.Length} same-cast sets including {total_applicants} applicants" };
+                var incomplete_sets = same_cast_sets.Count(set => set.Applicants.Count < 2);
+                if (incomplete_sets > 0)
+                    row.Fail = $"({incomplete_sets} incomplete)";
+                Rows.Add(row);
+                foreach (var failed_set in same_cast_sets.Where(set => !set.VerifyAlternativeCasts(out _)))
+                    Rows.Add(new Row { Fail = $"{failed_set.Description} are not all in the same cast" });
                 // alternative casts
                 //TODO alternative casts
             }
