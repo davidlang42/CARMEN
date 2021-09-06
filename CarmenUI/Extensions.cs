@@ -40,6 +40,19 @@ namespace CarmenUI
             foreach (var item in range)
                 set.Add(item);
         }
+
+        public static bool AllEqual<T>(this IEnumerable<T> sequence)
+            where T : notnull
+        {
+            var e = sequence.GetEnumerator();
+            if (!e.MoveNext())
+                return true;
+            var first = e.Current;
+            while (e.MoveNext())
+                if (!e.Current.Equals(first))
+                    return false;
+            return true;
+        }
     }
 
     internal static class AsyncExtensions

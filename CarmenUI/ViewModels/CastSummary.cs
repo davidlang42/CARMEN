@@ -32,9 +32,19 @@ namespace CarmenUI.ViewModels
                 Rows.Add(row);
                 if (cast_group.AlternateCasts)
                 {
+                    var ac_assigned = new Dictionary<AlternativeCast, int>();
+                    int not_assigned = 0;
+                    foreach (var group in cast_group.Members.GroupBy(a => a.AlternativeCast))
+                    {
+                        if (group.Key is AlternativeCast alternative_cast)
+                            ac_assigned.Add(alternative_cast, group.Count());
+                        else
+                            not_assigned = cast_group.Members.Where(a => a.AlternativeCast == null).Count();
+                    }
                     foreach (var alternative_cast in alternative_casts)
                     {
-                        var assigned = cast_group.Members.Where(a => a.AlternativeCast == alternative_cast).Count();
+                        if (!ac_assigned.TryGetValue(alternative_cast, out int assigned))
+                            assigned = ac_assigned[alternative_cast] = 0;
                         var ac_row = new Row { Success = $"{assigned.Plural(cast_group.Abbreviation)} assigned to {alternative_cast.Name}" };
                         var ac_extra = assigned - cast_group.RequiredCount;
                         if (ac_extra > 0)
@@ -43,9 +53,10 @@ namespace CarmenUI.ViewModels
                             ac_row.Fail = $"({-ac_extra} missing)";
                         Rows.Add(ac_row);
                     }
-                    var not_asigned = cast_group.Members.Where(a => a.AlternativeCast == null).Count();
-                    if (not_asigned > 0)
-                        Rows.Add(new Row { Fail = $"{not_asigned.Plural(cast_group.Abbreviation)} not assigned to an alternative cast" });
+                    if (!ac_assigned.Values.AllEqual())
+                        Rows.Add(new Row { Fail = $"Alternative casts of {cast_group.Abbreviation}s are not equal" });
+                    if (not_assigned > 0)
+                        Rows.Add(new Row { Fail = $"{not_assigned.Plural(cast_group.Abbreviation)} not assigned to an alternative cast" });
                 }
                 else
                 {
