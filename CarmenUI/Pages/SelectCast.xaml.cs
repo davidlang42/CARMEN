@@ -63,7 +63,6 @@ namespace CarmenUI.Pages
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
             sameCastSetsViewSource = (CollectionViewSource)FindResource(nameof(sameCastSetsViewSource));
-            //TODO highlight same cast set in red if empty set or set of one
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
             tagsViewSource.SortDescriptions.Add(StandardSort.For<Tag>());
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));

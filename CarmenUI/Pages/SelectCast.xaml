@@ -269,7 +269,16 @@
                      ItemsSource="{Binding Source={StaticResource sameCastSetsViewSource}}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}">
-                            <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Applicants.Count}" Value="0">
+                                    <Setter Property="Background" Value="LightCoral"/>
+                                    <Setter Property="ToolTip" Value="A set must contain at least 2 applicants"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Applicants.Count}" Value="1">
+                                    <Setter Property="Background" Value="LightCoral"/>
+                                    <Setter Property="ToolTip" Value="A set must contain at least 2 applicants"/>
+                                </DataTrigger>
+                            </Style.Triggers>
                         </Style>
                     </ListBox.ItemContainerStyle>
                     <ListBox.ItemTemplate>
