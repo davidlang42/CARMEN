@@ -247,9 +247,18 @@
                 <RowDefinition Height="5"/>
                 <RowDefinition/>
             </Grid.RowDefinitions>
-            <TextBlock Grid.ColumnSpan="5" FontSize="22"
+            <StackPanel Grid.ColumnSpan="5" Margin="0 0 0 5">
+                <TextBlock FontSize="22" TextWrapping="Wrap"
                        Text="Keep these sets of applicants together in the same alternative cast:" />
-            <TextBlock Grid.Row="1" Text="Same cast sets" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock FontSize="14" TextWrapping="Wrap">
+                    Sometimes it is important that two or more applicants are allocated to the SAME alternative cast, but doesn't matter which cast that is.
+                    The most common example of this is keeping siblings within the same cast.
+                    In circumstances like this, rather than manually set the alternative cast of the applicants, you can add them to a set of "same-cast" applicants,
+                    which will keep them in the same alternative cast when automatically selecting casts.
+                    It is safe to add any applicant to these sets, even rejected applicants or those accepted into non-alternating cast groups, but each applicant can only be in one "same-cast" set (or none).
+                </TextBlock>
+            </StackPanel>
+            <TextBlock Grid.Row="1" Text="Same-cast sets" FontSize="18" VerticalAlignment="Center"/>
             <DockPanel Grid.Row="2" Grid.RowSpan="7">
                 <Button DockPanel.Dock="Bottom" Height="30" Margin="0 5 0 0" Click="DetectSiblings_Click"
                         Content="Detect siblings by last name"/>
