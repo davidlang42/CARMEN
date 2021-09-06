@@ -1,6 +1,7 @@
 ﻿using Carmen.CastingEngine.Selection;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -20,12 +21,12 @@ namespace Carmen.CastingEngine
 
         /// <summary>Calculate the suitability of an applicant for a cast group, regardless of whether they meet all requirements.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to cast groups, and is therefore
-        /// different to IApplicantEngine.SuitabilityOf(Applicant, Requirement).</summary>
+        /// different to <see cref="IApplicantEngine.SuitabilityOf(Applicant, Requirement)"/>.</summary>
         double SuitabilityOf(Applicant applicant, CastGroup cast_group);
 
         /// <summary>Calculate the suitability of an applicant for a tag, regardless of whether they meet all requirements.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to tags, and is therefore
-        /// different to IApplicantEngine.SuitabilityOf(Applicant, Requirement).</summary>
+        /// different to <see cref="IApplicantEngine.SuitabilityOf(Applicant, Requirement)"/>.</summary>
         double SuitabilityOf(Applicant applicant, Tag tag);
 
         /// <summary>Select applicants into cast groups, respecting those already placed

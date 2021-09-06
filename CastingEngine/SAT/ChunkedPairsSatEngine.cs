@@ -46,6 +46,8 @@ namespace Carmen.CastingEngine.SAT
         /// but this should be improved in the future.</summary>
         public override void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
         {
+            //LATER add a comment about if an applicant meets the requirements for multiple cast groups, it chooses the first cast group in order which has an available spot (and implement that)
+            // also make these changes back into the heuristic engine, or move this to be a common implmenetation, possibly tweak so that it chooses the cast group which an applicant is most suitable for, but think about the use case
             //LATER handle the fact that cast group requirements may not be mutually exclusive, possibly using SAT (current implementation is copied from HeuristicSelectionEngine)
             //LATER use SuitabilityOf(Applicant, CastGroup) to order applicants, handling ties with OverallAbility
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
@@ -93,7 +95,7 @@ namespace Carmen.CastingEngine.SAT
         /// <summary>Find a cast group with availability for which this applicant meets the cast group's requirements</summary>
         private CastGroup? NextAvailableCastGroup(Dictionary<CastGroup, uint?> remaining_groups, Applicant applicant)
         {
-            foreach (var (cg, remaining_count) in remaining_groups)
+            foreach (var (cg, _) in remaining_groups)//LATER implement order here, can probably use .Keys
             {
                 if (cg.Requirements.All(r => r.IsSatisfiedBy(applicant)))
                     return cg;
