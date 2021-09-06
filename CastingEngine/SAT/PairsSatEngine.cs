@@ -86,7 +86,7 @@ namespace Carmen.CastingEngine.SAT
             Solution solution = Solution.Unsolveable;
             Results.Clear();
             Initialise(applicants_needing_alternative_cast.Select(p => p.Item2.Count), out int chunk_size, out int max_chunks);
-            do
+            do //LATER probably need some way of communicating progress back to the main program, especially as chunk size increases in ChunkedPairsSatEngine
             {
                 // compile clauses
                 var clauses = new HashSet<Clause<Applicant>>();

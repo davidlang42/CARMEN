@@ -165,7 +165,7 @@ namespace CarmenUI.Pages
                     using (var processing = new LoadingOverlay(this).AsSegment(nameof(PreSaveChecks), "Processing..."))
                     {
                         using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                            engine.BalanceAlternativeCasts(context.Applicants.Local, Enumerable.Empty<SameCastSet>());
+                            engine.BalanceAlternativeCasts(context.Applicants.Local, context.SameCastSets.Local);
                         using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
                             engine.AllocateCastNumbers(context.Applicants.Local);
                     }
@@ -194,7 +194,7 @@ namespace CarmenUI.Pages
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
                 engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local);
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                engine.BalanceAlternativeCasts(context.Applicants.Local, Enumerable.Empty<SameCastSet>());//TODO use actual same cast sets wherever BalanceAlternativeCasts() is called
+                engine.BalanceAlternativeCasts(context.Applicants.Local, context.SameCastSets.Local);
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
                 engine.AllocateCastNumbers(context.Applicants.Local);
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
