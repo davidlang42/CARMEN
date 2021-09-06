@@ -68,10 +68,13 @@ namespace Carmen.CastingEngine
             yield return obj;
         }
 
-        public static void AddRange<T>(this HashSet<T> set, IEnumerable<T> collection)
+        /// <summary>Returns true if any values are added</summary>
+        public static bool AddRange<T>(this HashSet<T> set, IEnumerable<T> collection)
         {
+            bool added = false;
             foreach (var item in collection)
-                set.Add(item);
+                added |= set.Add(item);
+            return added;
         }  
         
         public static T? FindAndRemove<T>(this Stack<T> stack, Predicate<T> predicate)
