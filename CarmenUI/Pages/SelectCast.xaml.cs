@@ -274,12 +274,20 @@ namespace CarmenUI.Pages
             else if (selectionList.SelectedItem is AlternativeCast ac)
             {
                 var actions = new List<string>();
-                //TODO check if applicants have any locked sets associated with them, warn if this assignment breaks any of them
                 if (applicants.Any(a => a.AlternativeCast != null))
                 {
                     actions.Add($"remove them from {alt_cast}");
                     actions.Add($"clear their cast number");
                 }
+                var broken_sets = applicants
+                    .Select(a => a.SameCastSet).OfType<SameCastSet>().Distinct() // any sets containing these applicants
+                    .Where(set => set.VerifyAlternativeCasts(out var common_or_null) // which are currently met
+                        && common_or_null is AlternativeCast common_ac && common_ac != ac) // and will be broken by this assignment
+                    .ToArray();
+                if (broken_sets.Length == 1)
+                    actions.Add($"split up the same-cast {broken_sets[0].Description.UnCapitalise()}");
+                else if (broken_sets.Length > 1)
+                    actions.Add($"split up {broken_sets.Length} same-cast sets.");
                 if (actions.Any() && !Confirm($"Adding {description} to '{ac.Name}' will also {actions.JoinWithCommas()}. Do you want to continue?"))
                     return;
             }
@@ -347,7 +355,7 @@ namespace CarmenUI.Pages
             }
             else if (selectionList.SelectedItem is AlternativeCast alternative_cast)
             {
-                if (!Confirm($"Removing {description} from '{alternative_cast.Name}' will also clear their cast number. Do you want to continue?"))
+                if (applicants.Any(a => a.CastNumber.HasValue) && !Confirm($"Removing {description} from '{alternative_cast.Name}' will also clear their cast number. Do you want to continue?"))
                     return;
             }
             foreach (var applicant in applicants)

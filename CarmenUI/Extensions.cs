@@ -267,6 +267,13 @@ namespace CarmenUI
             return word.Substring(0, 1).ToUpper() + word.Substring(1);
         }
 
+        public static string UnCapitalise(this string word)
+        {
+            if (string.IsNullOrEmpty(word))
+                return "";
+            return word.Substring(0, 1).ToLower() + word.Substring(1);
+        }
+
         public static string ToOrdinal(this int number)
         {
             if (number <= 0)
