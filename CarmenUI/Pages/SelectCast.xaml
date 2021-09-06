@@ -34,6 +34,7 @@
             <cv:InvertBoolean/>
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
+        <cv:HideIfNull x:Key="hideIfNull"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -51,7 +52,7 @@
                         <TextBlock Text="Cast Groups"/>
                     </ListBoxItem>
                     <CollectionContainer Collection="{Binding Source={StaticResource castGroupsViewSource}}" />
-                    <ListBoxItem Content="Keep Applicants Together" Margin="0 20 0 0"
+                    <ListBoxItem x:Name="keepApplicantsTogether" Content="Keep Applicants Together" Margin="0 20 0 0"
                                  DataContext="{Binding Source={StaticResource sameCastSetsViewSource}}"
                                  Visibility="{Binding Source={StaticResource alternativeCastsViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}"/>
                     <ListBoxItem IsEnabled="False" Margin="0 20 0 0"
@@ -64,7 +65,7 @@
                         <TextBlock Text="Tags"/>
                     </ListBoxItem>
                     <CollectionContainer Collection="{Binding Source={StaticResource tagsViewSource}}" />
-                    <ListBoxItem Content="Final Cast List" Margin="0 20 0 0"/>
+                    <ListBoxItem x:Name="finalCastList" Content="Final Cast List" Margin="0 20 0 0"/>
                 </CompositeCollection>
             </ItemsControl.ItemsSource>
             <ListBox.Resources>
@@ -270,8 +271,10 @@
                 </ListBox>
             </DockPanel>
             <TextBlock Grid.Column="2" Grid.Row="1" FontSize="18" VerticalAlignment="Center"
-                       Text="Applicants in selected set"/>
-            <DockPanel Grid.Column="2" Grid.Row="2" Grid.RowSpan="7">
+                       Text="Applicants in selected set"
+                       Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}"/>
+            <DockPanel Grid.Column="2" Grid.Row="2" Grid.RowSpan="7"
+                       Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
                 <Button DockPanel.Dock="Bottom" Height="30" Margin="0 5 0 0" Click="DeleteSameCastSet_Click"
                         Content="Delete selected set"/>
                 <ListBox x:Name="selectedSameCastSetList" 
@@ -284,23 +287,29 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </DockPanel>
-            <Button Grid.Column="3" Grid.Row="2" Click="addSameCastSetButton_Click" Margin="5 0">
+            <Button Grid.Column="3" Grid.Row="2" Click="addSameCastSetButton_Click" Margin="5 0"
+                    Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
                 <TextBlock>&lt;</TextBlock>
             </Button>
-            <Button Grid.Column="3" Grid.Row="4" Click="addAllSameCastSetButton_Click" Margin="5 0">
+            <Button Grid.Column="3" Grid.Row="4" Click="addAllSameCastSetButton_Click" Margin="5 0"
+                    Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
                 <TextBlock>&lt;&lt;</TextBlock>
             </Button>
-            <Button Grid.Column="3" Grid.Row="6" Click="removeSameCastSetButton_Click" Margin="5 0">
+            <Button Grid.Column="3" Grid.Row="6" Click="removeSameCastSetButton_Click" Margin="5 0"
+                    Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
                 <TextBlock>&gt;</TextBlock>
             </Button>
-            <Button Grid.Column="3" Grid.Row="8" Click="removeAllSameCastSetButton_Click" Margin="5 0">
+            <Button Grid.Column="3" Grid.Row="8" Click="removeAllSameCastSetButton_Click" Margin="5 0"
+                    Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
                 <TextBlock>&gt;&gt;</TextBlock>
             </Button>
             <TextBlock Grid.Column="4" Grid.Row="1" FontSize="18"
-                       Text="Available applicants"/>
+                       Text="Available applicants"
+                       Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}"/>
             <ListBox x:Name="availableSameCastSetList" Grid.Column="4" Grid.Row="2" Grid.RowSpan="7"
                      SelectionMode="Extended" MouseDoubleClick="availableSameCastSetList_MouseDoubleClick"
-                     ItemsSource="{Binding Source={StaticResource allApplicantsViewSource}}">
+                     ItemsSource="{Binding Source={StaticResource allApplicantsViewSource}}"
+                     Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>

@@ -157,6 +157,14 @@ namespace Carmen.ShowModel
             Requirements.Remove(requirement);
         }
 
+        /// <summary>Also sets the SameCastSet of all applicants in the set to null</summary>
+        public void DeleteSameCastSet(SameCastSet same_cast_set)
+        {
+            foreach (var applicant in same_cast_set.Applicants.ToArray())
+                applicant.SameCastSet = null;
+            SameCastSets.Remove(same_cast_set);
+        }
+
         /// <summary>Configures the default AlternativeCasts, CastGroups, Tags, Criterias, Requirements, SectionTypes and ShowRoot.
         /// Must match the logic of CheckDefaultShowSettings().</summary>
         public void SetDefaultShowSettings(string default_show_name, bool load_required = true)

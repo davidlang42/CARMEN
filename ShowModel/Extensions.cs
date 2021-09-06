@@ -163,7 +163,7 @@ namespace Carmen.ShowModel
             if (string.IsNullOrWhiteSpace(name))
                 return "";
             if (name.EndsWith("s"))
-                return name + "es";
+                return name + "'";
             return name + "s";
         }
     }

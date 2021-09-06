@@ -63,9 +63,7 @@ namespace CarmenUI.Pages
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
             sameCastSetsViewSource = (CollectionViewSource)FindResource(nameof(sameCastSetsViewSource));
-            //TODO hide middle and right lists of same cast set UI if nothing selected in first list
             //TODO highlight same cast set in red if empty set or set of one
-            //TODO bug: dont show in avaialbel applicants if already in a same cast set
             tagsViewSource = (CollectionViewSource)FindResource(nameof(tagsViewSource));
             tagsViewSource.SortDescriptions.Add(StandardSort.For<Tag>());
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
@@ -418,7 +416,7 @@ namespace CarmenUI.Pages
             foreach (var applicant in applicants)
             {
                 set.Applicants.Remove(applicant);
-                applicant.SameCastSet = set;
+                applicant.SameCastSet = null;
             }
         }
 
@@ -430,57 +428,42 @@ namespace CarmenUI.Pages
 
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            selectionPanel.Visibility = numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
             if (selectionList.SelectedItem is CastGroup cast_group)
             {
-                numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = cast_group.Members;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "applicants";
-                ConfigureAllApplicantsFiltering();
             }
             else if (selectionList.SelectedItem is AlternativeCast alternative_cast)
             {
-                numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = alternative_cast.Members;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "alternating cast members";
-                ConfigureAllApplicantsFiltering();
             }
             else if (selectionList.SelectedItem is Tag tag)
             {
-                numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
                 selectedApplicantsViewSource.Source = tag.Members;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "cast members";
-                ConfigureAllApplicantsFiltering();
             }
-            else if (selectionList.SelectedItem is ListBoxItem lbi
-                && lbi.Content is string text_content)
+            else if (selectionList.SelectedItem == finalCastList)
             {
-                if (text_content == "Final Cast List")
-                {
-                    TriggerCastNumbersRefresh();
-                    selectionPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
-                    numbersPanel.Visibility = Visibility.Visible;
-                }
-                else if (text_content == "Keep Applicants Together")
-                {
-                    selectionPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
-                    sameCastSetsPanel.Visibility = Visibility.Visible;
-                }
-                else
-                    throw new ApplicationException($"Text content not handled: {text_content}");
-                ConfigureAllApplicantsFiltering();
+                TriggerCastNumbersRefresh();
+                numbersPanel.Visibility = Visibility.Visible;
             }
+            else if (selectionList.SelectedItem == keepApplicantsTogether)
+                sameCastSetsPanel.Visibility = Visibility.Visible;
             else // no selection (initial state)
-                selectionPanel.Visibility = numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
+                return;
+            ConfigureAllApplicantsFiltering();
         }
 
         private void ConfigureAllApplicantsFiltering()
         {
-            if (allApplicantsViewSource.View is CollectionView view
-                && selectedApplicantsViewSource.Source is ObservableCollection<Applicant> selected_applicants)
+            if (allApplicantsViewSource.View is CollectionView view)
             {
+                var selected_applicants = (ObservableCollection<Applicant>)selectedApplicantsViewSource.Source;
                 view.Filter = (selectionList.SelectedItem, castStatusCombo.SelectedItem) switch
                 {
                     (CastGroup, CastStatus.Available) => o => o is Applicant a && !selected_applicants.Contains(a) && a.CastGroup == null,
@@ -489,7 +472,7 @@ namespace CarmenUI.Pages
                     (AlternativeCast ac, CastStatus.Eligible) => o => o is Applicant a && !selected_applicants.Contains(a) && a.CastGroup is CastGroup cg && cg.AlternateCasts,
                     (A.Tag, CastStatus.Available) => o => o is Applicant a && a.IsAccepted && !selected_applicants.Contains(a),
                     (Tag t, CastStatus.Eligible) => o => o is Applicant a && a.IsAccepted && !selected_applicants.Contains(a) && t.Requirements.All(r => r.IsSatisfiedBy(a)),
-                    (string s, _) when s == "Keep Applicants Toegther" => o => o is Applicant a && a.SameCastSet == null,
+                    (ListBoxItem lbi, _) when lbi == keepApplicantsTogether => o => o is Applicant a && a.SameCastSet == null,
                     _ => null
                 };
             }
@@ -512,9 +495,11 @@ namespace CarmenUI.Pages
 
         private void DeleteSameCastSet_Click(object sender, RoutedEventArgs e)
         {
-            if (sameCastSetsViewSource.Source is IList list
-                && sameCastSetsList.SelectedItem is SameCastSet set)
-                list.Remove(set);
+            if (sameCastSetsList.SelectedItem is SameCastSet set)
+            {
+                context.DeleteSameCastSet(set);
+                ConfigureAllApplicantsFiltering();
+            }
         }
     }
 
