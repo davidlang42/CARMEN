@@ -12,6 +12,7 @@ namespace Carmen.CastingEngine.SAT
     /// <summary>
     /// A concrete approach for balancing alternative casts by initially pairing off the full list of applicants in order,
     /// then reducing the number of pairs each iteration until success.
+    /// NOTE: this approach may cause uneven alternative cast counts
     /// </summary>
     public class TopPairsSatEngine : PairsSatEngine
     {
