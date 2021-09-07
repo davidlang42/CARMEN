@@ -217,17 +217,25 @@ namespace CarmenUI.Pages
                         + $"\nAfter {chunky.Results.Count} chunking attempts, and a final chunk size of {chunk_size}, it was still unsolvable.";
                 msg += "\n\n";
             }
-            var marks = criterias.Where(c => c.Primary).Select(c => alternative_casts.Select(ac => ac.Members.Select(a => a.MarkFor(c)).ToArray()).Select(m => (m, MarkDistribution.Analyse(m))).ToArray()).ToArray();
-            msg += "The resulting casts have the follow distributions by primary criteria:\n";
-            foreach (var criteria in marks)
+            msg += "The resulting casts have the follow distributions:\n";
+            foreach (var cg in context.CastGroups.Local)
             {
-                foreach (var ac in criteria)
+                if (cg.Members.Count == 0 || !cg.AlternateCasts)
+                    continue;
+                foreach (var c in criterias.Where(c => c.Primary))
                 {
-                    msg += $"\n{ac.Item2}";
-                    msg += $"\n[{string.Join(",", ac.Item1.OrderByDescending(m => m))}]";
+                    msg += $"\n{c.Name} ({cg.Abbreviation})";
+                    foreach (var ac in alternative_casts)
+                    {
+                        var marks = ac.Members.Where(a => a.CastGroup == cg).Select(a => a.MarkFor(c)).ToArray();
+                        var dist = MarkDistribution.Analyse(marks);
+                        msg += $"\n{dist}";
+                        msg += $"\n[{string.Join(",", marks.OrderByDescending(m => m))}]";
+                    }
+                    msg += "\n";
                 }
-                msg += "\n";
             }
+            ((App)App.Current).CreateLog("Cast", msg);
             MessageBox.Show(msg, "DEBUG");
 #endif
         }

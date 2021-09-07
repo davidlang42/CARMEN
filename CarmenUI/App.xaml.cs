@@ -59,11 +59,7 @@ namespace CarmenUI
 #if !DEBUG
         private void HandleUnhandledException(Exception ex, string handler)
         {
-            var path = $"{AppDomain.CurrentDomain.BaseDirectory}\\Logs";
-            Directory.CreateDirectory(path);
-            var filename = $"{path}\\Error_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fffffff}.log";
-            using (var file = File.CreateText(filename))
-                file.WriteLine($"Handler: {handler}\n{ExceptionString(ex)}");
+            CreateLog("Error", $"Handler: {handler}\n{ExceptionString(ex)}");
             MessageBox.Show($"Error in {handler}: {ex.Message}");
         }
 
@@ -80,6 +76,15 @@ namespace CarmenUI
                 str += $"\nInner:\n{ExceptionString(inner)}";
             return str;
         }
+
 #endif
+        public void CreateLog(string type_name, string text)
+        {
+            var path = $"{AppDomain.CurrentDomain.BaseDirectory}\\Logs";
+            Directory.CreateDirectory(path);
+            var filename = $"{path}\\{type_name}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fffffff}.log";
+            using (var file = File.CreateText(filename))
+                file.WriteLine(text);
+        }
     }
 }
