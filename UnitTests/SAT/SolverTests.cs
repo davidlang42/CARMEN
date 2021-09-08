@@ -39,6 +39,25 @@ namespace UnitTests.SAT
             return solved;
         }
 
+        protected bool TestSolveTheory(Solver<int> sat, Expression<int> expression, Func<Solution, bool?> validity_test)
+        {
+            var solution = sat.Solve(expression).FirstOrDefault();
+            if (!solution.IsUnsolvable)
+            {
+                var first_filled = solution.Enumerate().First();
+                sat.Evaluate(expression, first_filled).Should().BeTrue();
+                validity_test(first_filled).Should().BeTrue();
+                var last_filled = solution.Enumerate().Last();
+                sat.Evaluate(expression, last_filled).Should().BeTrue();
+                validity_test(last_filled).Should().BeTrue();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         protected Expression<T> GenerateExpression<T>(int random_seed, T[] variables, int j_clauses, int k_literals_per_clause)
             where T : notnull
         {

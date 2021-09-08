@@ -26,13 +26,25 @@ namespace Carmen.CastingEngine.SAT.Internal
             propogatePureLiterals = false; //LATER if I want to keep pure literals and have all solutions, could possibly back-check the inverse pure literal when returning solutions
         }
 
+        public override IEnumerable<Solution> Solve(Expression<T> expression)
+        {
+            foreach (var solution in base.Solve(expression))
+            {
+                var validity = validityTest(solution);
+                if (validity == true)
+                    yield return solution;
+                else if (validity == null)
+                    foreach (var enumerated_solution in solution.Enumerate())
+                        if (validityTest(enumerated_solution) == true)
+                            yield return enumerated_solution;
+            }
+        }
+
         protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
         {
             if (validityTest(partial_solution) == false)
-                yield break;
-            foreach (var full_solution in base.PartialSolve(expression, partial_solution))
-                if (validityTest(full_solution) == true)
-                    yield return full_solution;
+                return Enumerable.Empty<Solution>();
+            return base.PartialSolve(expression, partial_solution);
         }
     }
 }

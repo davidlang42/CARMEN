@@ -57,7 +57,7 @@ namespace Carmen.CastingEngine.SAT.Internal
         }
 
         /// <summary>Solves a boolean expression, or returns an empty sequence if it is found to be unsolveable</summary>
-        public IEnumerable<Solution> Solve(Expression<T> expression)
+        public virtual IEnumerable<Solution> Solve(Expression<T> expression)
         {
             if (!Check(expression))
                 throw new ArgumentException($"{nameof(expression)} is not a valid boolean expression");
