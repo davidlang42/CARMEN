@@ -6,12 +6,15 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.SAT.Internal
 {
+    /// <summary>
+    /// A SAT solver implementing the DPLL algorithm
+    /// </summary>
     public class DpllSolver<T> : Solver<T>
         where T : notnull
     {
-        /// <summary>Propogating pure literals may cause skipping some solutions.
-        /// If every solution is needed, set SkipPureLiterals to true.</summary>
-        public bool SkipPureLiterals { get; set; } = false;
+        /// <summary>Propogating pure literals may cause skipping some solutions,
+        /// set to false to ensure every solution is enumerated.</summary>
+        protected bool propogatePureLiterals { get; set; } = true;
 
         public DpllSolver(IEnumerable<T>? variables = null)
             : base(variables)
@@ -42,7 +45,7 @@ namespace Carmen.CastingEngine.SAT.Internal
                     clause.Literals.RemoveWhere(l => l.Equals(inverse_literal));
             }
             // Propogate pure literals
-            if (!SkipPureLiterals) //LATER if I want to keep pure literals and have all solutions, could possibly back-check the inverse pure literal when returning solutions
+            if (propogatePureLiterals)
             {
                 while (true)
                 {

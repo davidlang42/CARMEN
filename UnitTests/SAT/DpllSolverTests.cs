@@ -109,30 +109,5 @@ namespace UnitTests.SAT
             var percent_solved = solved * 100 / test_cases;
             percent_solved.Should().BeInRange(40, 60);
         }
-
-        [Test]
-        [TestCase(100, 10, 50, 3, TestName = "Count_10_Vars_Easy")] // 200ms
-        //[TestCase(100, 15, 70, 3, TestName = "Count_15_Vars_Medium")] // 3.1s
-        public void CompareCounts(int test_cases, int n_variables, int j_clauses, int k_literals)
-        {
-            var vars = Enumerable.Range(1, n_variables).ToArray();
-            var dpll = new DpllSolver<int>(vars) { SkipPureLiterals = true };
-            var brute = new BruteForceSolver<int>(vars);
-            var maximum_solutions = 0;
-            for (var seed = 0; seed < test_cases; seed++)
-            {
-                var expression = GenerateExpression(seed, vars, j_clauses, k_literals);
-                var dpll_sol = dpll.Solve(expression).ToArray();
-                var brute_sol = brute.Solve(expression).ToArray();
-                var dpll_all = dpll_sol.SelectMany(s => s.Enumerate()).ToArray();
-                var brute_all = brute_sol.SelectMany(s => s.Enumerate()).ToArray();
-                var dpll_count = dpll_all.Length;
-                var brute_count = brute_all.Length;
-                dpll_count.Should().Be(brute_count);
-                if (dpll_count > maximum_solutions)
-                    maximum_solutions = dpll_count;
-            }
-            maximum_solutions.Should().BeGreaterThan(1); // otherwise we didn't really test anything
-        }
     }
 }
