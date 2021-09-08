@@ -25,6 +25,7 @@ namespace Carmen.CastingEngine.Base
             typeof(DummySelectionEngine), //LATER remove
             typeof(ChunkedPairsSatEngine),
             typeof(TopPairsSatEngine),
+            typeof(ThreesACrowdSatEngine),
         };
 
         public IApplicantEngine ApplicantEngine { get; init; }
