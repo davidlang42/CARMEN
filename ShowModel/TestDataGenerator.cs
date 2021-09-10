@@ -17,8 +17,8 @@ namespace Carmen.ShowModel
         static string[] MALE_FIRST_NAMES = "JAMES,JOHN,ROBERT,MICHAEL,WILLIAM,DAVID,RICHARD,CHARLES,JOSEPH,THOMAS,CHRISTOPHER,DANIEL,PAUL,MARK,DONALD,GEORGE,KENNETH,STEVEN,EDWARD,BRIAN,RONALD,ANTHONY,KEVIN,JASON,MATTHEW,GARY,TIMOTHY,JOSE,LARRY,JEFFREY,FRANK,SCOTT,ERIC,STEPHEN,ANDREW,RAYMOND,GREGORY,JOSHUA,JERRY,DENNIS,WALTER,PATRICK,PETER,HAROLD,DOUGLAS,HENRY,CARL,ARTHUR,RYAN,ROGER,JOE,JUAN,JACK,ALBERT,JONATHAN,JUSTIN,TERRY,GERALD,KEITH,SAMUEL,WILLIE,RALPH,LAWRENCE,NICHOLAS,ROY,BENJAMIN,BRUCE,BRANDON,ADAM,HARRY,FRED,WAYNE,BILLY,STEVE,LOUIS,JEREMY,AARON,RANDY,HOWARD,EUGENE,CARLOS,RUSSELL,BOBBY,VICTOR,MARTIN,ERNEST,PHILLIP,TODD,JESSE,CRAIG,ALAN,SHAWN,CLARENCE,SEAN,PHILIP,CHRIS,JOHNNY,EARL,JIMMY,ANTONIO".Split(',');
         static string[] FEMALE_FIRST_NAMES = "MARY,PATRICIA,LINDA,BARBARA,ELIZABETH,JENNIFER,MARIA,SUSAN,MARGARET,DOROTHY,LISA,NANCY,KAREN,BETTY,HELEN,SANDRA,DONNA,CAROL,RUTH,SHARON,MICHELLE,LAURA,SARAH,KIMBERLY,DEBORAH,JESSICA,SHIRLEY,CYNTHIA,ANGELA,MELISSA,BRENDA,AMY,ANNA,REBECCA,VIRGINIA,KATHLEEN,PAMELA,MARTHA,DEBRA,AMANDA,STEPHANIE,CAROLYN,CHRISTINE,MARIE,JANET,CATHERINE,FRANCES,ANN,JOYCE,DIANE,ALICE,JULIE,HEATHER,TERESA,DORIS,GLORIA,EVELYN,JEAN,CHERYL,MILDRED,KATHERINE,JOAN,ASHLEY,JUDITH,ROSE,JANICE,KELLY,NICOLE,JUDY,CHRISTINA,KATHY,THERESA,BEVERLY,DENISE,TAMMY,IRENE,JANE,LORI,RACHEL,MARILYN,ANDREA,KATHRYN,LOUISE,SARA,ANNE,JACQUELINE,WANDA,BONNIE,JULIA,RUBY,LOIS,TINA,PHYLLIS,NORMA,PAULA,DIANA,ANNIE,LILLIAN,EMILY,ROBIN".Split(',');
 
-        static DateTime MINIMUM_DOB = new DateTime(2001, 1, 1);
-        static DateTime MAXIMUM_DOB = new DateTime(2011, 1, 1);
+        DateTime minimumDob = new DateTime(2001, 1, 1);
+        DateTime maximumDob = new DateTime(2011, 1, 1);
 
         ShowContext? _context;
         Random random;
@@ -33,6 +33,11 @@ namespace Carmen.ShowModel
         {
             this._context = context;
             this.random = random ?? new Random();
+            if (context.ShowRoot.ShowDate is DateTime show_date)
+            {
+                minimumDob = show_date.AddYears(-20);
+                maximumDob = show_date.AddYears(-10);
+            }
         }
 
         public void Dispose()
@@ -162,7 +167,7 @@ namespace Carmen.ShowModel
                     FirstName = FormatName(random.NextOf(first_names)),
                     LastName = FormatName(random.NextOf(LAST_NAMES)),
                     Gender = gender,
-                    DateOfBirth = RandomDate(random, MINIMUM_DOB, MAXIMUM_DOB),
+                    DateOfBirth = RandomDate(random, minimumDob, maximumDob),
                     ShowRoot = Context.ShowRoot
                 };
                 if (include_criteria_abilities)
