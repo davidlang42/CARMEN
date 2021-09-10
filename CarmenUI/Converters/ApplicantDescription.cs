@@ -31,7 +31,7 @@ namespace CarmenUI.Converters
                     Gender.Female => "F",
                     _ => throw new NotImplementedException($"Gender not handled: {a.Gender}")
                 };
-                elements.Add($"{a.AgeToday}{g}");
+                elements.Add($"{a.Age}{g}");
             }
             if (a.CastGroup is CastGroup cg)
                 elements.Add(cg.Abbreviation);

@@ -162,7 +162,8 @@ namespace Carmen.ShowModel
                     FirstName = FormatName(random.NextOf(first_names)),
                     LastName = FormatName(random.NextOf(LAST_NAMES)),
                     Gender = gender,
-                    DateOfBirth = RandomDate(random, MINIMUM_DOB, MAXIMUM_DOB)
+                    DateOfBirth = RandomDate(random, MINIMUM_DOB, MAXIMUM_DOB),
+                    ShowRoot = Context.ShowRoot
                 };
                 if (include_criteria_abilities)
                 {

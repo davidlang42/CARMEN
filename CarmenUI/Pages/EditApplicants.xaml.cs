@@ -99,7 +99,7 @@ namespace CarmenUI.Pages
         {//LATER this is really slow, maybe add a loading dialog? but hang on, why the hell is it slow?
             if (applicantsViewSource.Source is IList list)//LATER change ilist/not null view checks into hard casts (now that loading is done before showing page)
             {
-                var applicant = new Applicant();
+                var applicant = new Applicant { ShowRoot = context.ShowRoot };
                 if (filterText.Text.Contains(","))
                 {
                     var names = filterText.Text.Split(",");

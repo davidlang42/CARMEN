@@ -22,6 +22,10 @@ namespace Carmen.ShowModel.Applicants
         [Key]
         public int ApplicantId { get; private set; }
 
+        /// <summary>Applicant needs a reference to ShowRoot in order to know the ShowDate,
+        /// so their age at show can be calculated</summary>
+        public virtual ShowRoot ShowRoot { get; set; } = null!;
+
         private string firstName = "";
         public string FirstName
         {
@@ -75,7 +79,7 @@ namespace Carmen.ShowModel.Applicants
                     return;
                 dateOfBirth = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(AgeToday));
+                OnPropertyChanged(nameof(Age));
                 OnPropertyChanged(nameof(Description));
                 OnPropertyChanged(nameof(IsRegistered));
             }
@@ -206,14 +210,15 @@ namespace Carmen.ShowModel.Applicants
         public virtual ICollection<Role> Roles => roles;
         #endregion
 
-        public uint? AgeToday => AgeAt(DateTime.Now);
+        /// <summary>Calculates the applicant's age at the show date, if set, otherwise age as of today</summary>
+        public uint? Age => ShowRoot.ShowDate.HasValue ? AgeAt(ShowRoot.ShowDate.Value) : AgeAt(DateTime.Now);
 
         public string Description
         {
             get
             {
                 var gender = Gender?.ToString();
-                var age = AgeToday?.Plural("year old", "years old");
+                var age = Age?.Plural("year old", "years old");
                 return string.Join(", ", new[] { gender, age }.Where(s => !string.IsNullOrEmpty(s)));
             }
         }

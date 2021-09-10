@@ -6,12 +6,17 @@ using NUnit.Framework;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Carmen.ShowModel.Structure;
 
 namespace UnitTests.Model
 {
     public class ApplicantTests
     {
         readonly List<Applicant> Applicants = new List<Applicant>();
+        readonly ShowRoot showRoot = new ShowRoot
+        {
+            ShowDate = new DateTime(2021, 1, 1)
+        };
 
         [OneTimeSetUp]
         public void CreateTestData()
@@ -23,7 +28,8 @@ namespace UnitTests.Model
                 FirstName = "John",
                 LastName = "Smith",
                 Gender = Gender.Male,
-                DateOfBirth = new DateTime(1990, 1, 1)
+                DateOfBirth = new DateTime(1990, 1, 1),
+                ShowRoot = showRoot
             };
 
             var jane = new Applicant
@@ -31,7 +37,8 @@ namespace UnitTests.Model
                 FirstName = "Jane",
                 LastName = "Doe",
                 Gender = Gender.Female,
-                DateOfBirth = new DateTime(2000, 1, 1)
+                DateOfBirth = new DateTime(2000, 1, 1),
+                ShowRoot = showRoot
             };
 
             Applicants.Add(john);
@@ -41,7 +48,7 @@ namespace UnitTests.Model
         [Test]
         public void Positive_Ages()
         {
-            Applicants.All(a => a.AgeToday > 0).Should().BeTrue();
+            Applicants.All(a => a.Age > 0).Should().BeTrue();
         }
 
         [Test]
@@ -52,11 +59,12 @@ namespace UnitTests.Model
                 FirstName = "Not-Bjorn",
                 LastName = "Yet",
                 Gender = Gender.Male,
-                DateOfBirth = new DateTime(3000, 1, 1)
+                DateOfBirth = new DateTime(3000, 1, 1),
+                ShowRoot = showRoot
             };
             try
             {
-                _ = invalid.AgeToday;
+                _ = invalid.Age;
                 Assert.Fail();
             }
             catch { }
@@ -83,12 +91,12 @@ namespace UnitTests.Model
             using var mon = applicant.Monitor();
             applicant.DateOfBirth = new DateTime(1990, 1, 1);
             mon.Should().RaisePropertyChangeFor(a => a.DateOfBirth);
-            mon.Should().RaisePropertyChangeFor(a => a.AgeToday);
+            mon.Should().RaisePropertyChangeFor(a => a.Age);
             mon.Should().RaisePropertyChangeFor(a => a.Description);
             mon.Clear();
             applicant.DateOfBirth = new DateTime(1990, 1, 1);
             mon.Should().NotRaisePropertyChangeFor(a => a.DateOfBirth);
-            mon.Should().NotRaisePropertyChangeFor(a => a.AgeToday);
+            mon.Should().NotRaisePropertyChangeFor(a => a.Age);
             mon.Should().NotRaisePropertyChangeFor(a => a.Description);
         }
 
@@ -148,6 +156,22 @@ namespace UnitTests.Model
             mon.Clear();
             ability.Mark = 50;
             mon.Should().NotRaisePropertyChangeFor(a => a.Abilities);
+        }
+
+        [Test]
+        public void Age_AtShow_DefaultsTo_Today()
+        {
+            var show_root = new ShowRoot();
+            var applicant = new Applicant
+            {
+                DateOfBirth = new DateTime(2010, 1, 1),
+                ShowRoot = show_root
+            };
+            var age_today = applicant.AgeAt(DateTime.Now);
+            age_today.Should().BeGreaterThan(10);
+            applicant.Age.Should().Be(age_today);
+            show_root.ShowDate = new DateTime(2014, 1, 1);
+            applicant.Age.Should().Be(4);
         }
     }
 }
