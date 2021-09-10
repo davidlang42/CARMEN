@@ -48,7 +48,7 @@ namespace Carmen.ShowModel
                 for (var s = 0; s < sections_in_this_node; s++)
                 {
                     var section = new Section {
-                        Name = $"Section {next_section_number++}",
+                        Name = $"{section_type.Name} {next_section_number++}",
                         Order = order_in_node++,
                         SectionType = section_type
                     };
@@ -364,7 +364,7 @@ namespace Carmen.ShowModel
         public void AddRoles(uint roles_per_item, bool include_castgroup_count_by_groups = true, bool include_requirements = true)
         {
             var cast_groups = Context.CastGroups.ToArray();
-            var requirements = Context.Requirements.ToArray();
+            var requirements = Context.Requirements.Where(r => r.Primary).ToArray();
             var applicants = Context.Applicants.ToArray();
             foreach (var item in Context.ShowRoot.ItemsInOrder())
             {
