@@ -83,7 +83,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [Test] // ~5min
+        [Test] // ~1min
         public void Converted()
         {
             Console.WriteLine(SummaryRow.ToHeader());
@@ -94,7 +94,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [Test] // ~5min
+        [Test] // ~1min
         public void Converted_Quantized()
         {
             Console.WriteLine(SummaryRow.ToHeader());
