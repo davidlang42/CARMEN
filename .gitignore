@@ -386,5 +386,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
 /ExpertConverter/Properties/launchSettings.json
-/UnitTests/Benchmarks/Test data/converted
+/UnitTests/Benchmarks/Test data/converted*
