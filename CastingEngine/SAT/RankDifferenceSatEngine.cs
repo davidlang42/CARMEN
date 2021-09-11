@@ -17,6 +17,8 @@ namespace Carmen.CastingEngine.SAT
     /// </summary>
     public class RankDifferenceSatEngine : SatEngine
     {
+        const int RANK_INCREMENT = 2;
+
         bool inProgress = false;
         int[][] applicantRanks = new int[0][]; // [criteria][applicant variable]
         int[] castGroupIndexFromVariableIndex = new int[0];
@@ -55,7 +57,8 @@ namespace Carmen.CastingEngine.SAT
                         castGroupIndexFromVariableIndex[av] = cg;
                         if (mark != previous)
                         {
-                            applicantRanks[c][av] = ++rank;
+                            applicantRanks[c][av] = rank;
+                            rank += RANK_INCREMENT;
                             previous = mark;
                         }
                         else
@@ -64,7 +67,7 @@ namespace Carmen.CastingEngine.SAT
                 }
             }
             // build the sat
-            var termination_threshold = primaryCriterias.Length * castGroups.Length; // 1 rank difference per criteria per cast group
+            var termination_threshold = RANK_INCREMENT * primaryCriterias.Length * castGroups.Length; // 1 rank difference per criteria per cast group
             //LATER try this without the termination threshold, or even consider a time based threshold
             this._sat = sat = new BranchAndBoundSolver<Applicant>(CostFunction, termination_threshold, applicant_variables);
             var clauses = new HashSet<Clause<Applicant>>();
