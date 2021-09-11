@@ -55,10 +55,11 @@ namespace UnitTests.Benchmarks
             var applicants = context.Applicants.ToArray();
             var cast_groups = context.CastGroups.ToArray();
             var criterias = context.Criterias.ToArray();
+            var same_cast_sets = context.SameCastSets.ToArray();
             foreach (var engine in CreateEngines(context))
             {
                 ClearAlternativeCasts(applicants);
-                engine.BalanceAlternativeCasts(applicants, Enumerable.Empty<SameCastSet>());
+                engine.BalanceAlternativeCasts(applicants, same_cast_sets);
                 DisplaySummary(engine, cast_groups, criterias);
             }
         }
