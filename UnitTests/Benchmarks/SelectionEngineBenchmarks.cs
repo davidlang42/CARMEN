@@ -51,6 +51,7 @@ namespace UnitTests.Benchmarks
         [Test]
         public void BalanceAlternativeCasts(string file)
         {
+            Console.WriteLine(SummaryRow.ToHeader());
             using var context = new ShowContext(OptionsFor(testDataPath + file));
             var applicants = context.Applicants.ToArray();
             var cast_groups = context.CastGroups.ToArray();
@@ -92,7 +93,6 @@ namespace UnitTests.Benchmarks
 
         private void DisplaySummary(ISelectionEngine engine, IEnumerable<CastGroup> cast_groups, IEnumerable<Criteria> criterias)
         {
-            Console.WriteLine(SummaryRow.ToHeader());
             var summary = new SummaryRow { Engine = engine };
             foreach (var cg in cast_groups)
             {
