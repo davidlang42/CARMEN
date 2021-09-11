@@ -338,7 +338,6 @@ namespace Carmen.ShowModel
             modelBuilder.Entity<Applicant>().Navigation(a => a.AlternativeCast).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.SameCastSet).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.Tags).AutoInclude();
-            modelBuilder.Entity<Applicant>().Navigation(a => a.ShowRoot).AutoInclude();
             modelBuilder.Entity<TagRequirement>().Navigation(tr => tr.RequiredTag).AutoInclude();
             modelBuilder.Entity<AbilityExactRequirement>().Navigation(aer => aer.Criteria).AutoInclude();
             modelBuilder.Entity<AbilityRangeRequirement>().Navigation(arr => arr.Criteria).AutoInclude();
