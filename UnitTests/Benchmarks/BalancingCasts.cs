@@ -108,7 +108,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [TestCase("random1993")] // ~30s
+        [TestCase("random1993")] // ~12s
         public void Individual(string test_case_name_containing, double quantize_to_nearest = 1)
         {
             Console.WriteLine(SummaryRow.ToHeader());

@@ -18,9 +18,9 @@ namespace Carmen.CastingEngine.SAT
     public class RankDifferenceSatEngine : SatEngine
     {
         bool inProgress = false;
-        Dictionary<(Applicant, Criteria), int> applicantRanks = new();
-        Applicant[] applicantsByVariableIndex = new Applicant[0];
-        CastGroup[] castGroupsByVariableIndex = new CastGroup[0];
+        int[][] applicantRanks = new int[0][]; // [criteria][applicant variable]
+        int[] castGroupIndexFromVariableIndex = new int[0];
+        CastGroup[] castGroups = new CastGroup[0];
         Solver<Applicant>? _sat;
 
         Solver<Applicant> sat => _sat ?? throw new ApplicationException($"Tried to access {nameof(sat)} before it has been initialized");
@@ -37,35 +37,39 @@ namespace Carmen.CastingEngine.SAT
                 throw new ApplicationException("FindSatSolution() already in progress");
             inProgress = true;
             // calculate and cache applicant ranks
-            applicantRanks.Clear();
-            foreach (var criteria in primaryCriterias)
+            applicantRanks = new int[primaryCriterias.Length][];
+            Applicant[] applicant_variables = applicants_needing_alternative_cast.SelectMany(p => p.Item2).ToArray();
+            castGroupIndexFromVariableIndex = new int[applicant_variables.Length];
+            castGroups = applicant_variables.Select(a => a.CastGroup!).Distinct().ToArray();
+            for (var c = 0; c < primaryCriterias.Length; c++)
             {
-                foreach (var (cg, applicants) in applicants_needing_alternative_cast)
+                applicantRanks[c] = new int[applicant_variables.Length];
+                foreach (var (cast_group, applicants) in applicants_needing_alternative_cast)
                 {
+                    var cg = Array.IndexOf(castGroups, cast_group);
                     int rank = 0;
                     uint? previous = null;
-                    foreach (var (applicant, mark) in applicants.Select(a => (a, a.MarkFor(criteria))).OrderBy(p => p.Item2))
+                    foreach (var (applicant, mark) in applicants.Select(a => (a, a.MarkFor(primaryCriterias[c]))).OrderBy(p => p.Item2))
                     {
+                        var av = Array.IndexOf(applicant_variables, applicant);
+                        castGroupIndexFromVariableIndex[av] = cg;
                         if (mark != previous)
                         {
-                            applicantRanks.Add((applicant, criteria), ++rank);
+                            applicantRanks[c][av] = ++rank;
                             previous = mark;
                         }
                         else
-                            applicantRanks.Add((applicant, criteria), rank);
+                            applicantRanks[c][av] = rank;
                     }
                 }
             }
             // build the sat
-            var termination_threshold = primaryCriterias.Length * applicants_needing_alternative_cast.SelectMany(p => p.Item2).Select(a => a.CastGroup).Distinct().Count(); // 1 rank difference per criteria per cast group
+            var termination_threshold = primaryCriterias.Length * castGroups.Length; // 1 rank difference per criteria per cast group
             //LATER try this without the termination threshold, or even consider a time based threshold
-            this._sat = sat = new BranchAndBoundSolver<Applicant>(CostFunction, termination_threshold, applicants_needing_alternative_cast.SelectMany(p => p.Item2));
+            this._sat = sat = new BranchAndBoundSolver<Applicant>(CostFunction, termination_threshold, applicant_variables);
             var clauses = new HashSet<Clause<Applicant>>();
             clauses.AddRange(existing_assignments);
             clauses.AddRange(same_cast_clauses);
-            // cache variable mapping to applicant & cast group
-            applicantsByVariableIndex = sat.Variables.ToArray();
-            castGroupsByVariableIndex = applicantsByVariableIndex.Select(a => a.CastGroup!).ToArray();
             // solve the sat
             var solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
             inProgress = false;
@@ -78,19 +82,21 @@ namespace Carmen.CastingEngine.SAT
         {
             var best_total = 0;
             var worst_total = 0;
-            foreach (var criteria in primaryCriterias)
+            for (var c = 0; c < primaryCriterias.Length; c++)
             {
-                var assigned_rank_difference = new OmnificentDictionary<CastGroup, int>();
-                var not_assigned_ranks = new List<(CastGroup, int)>();
-                var count_true = new OmnificentDictionary<CastGroup, int>(); //TODO speed up by using arrays instead of dictionaries
-                var count_false = new OmnificentDictionary<CastGroup, int>(); //TODO speed up by using arrays instead of dictionaries
-                var count_total = new OmnificentDictionary<CastGroup, int>(); //TODO speed up by using arrays instead of dictionaries
-                for (var i = 0; i < partial_solution.Assignments.Length; i++)
+                var assigned_rank_difference = new int[castGroups.Length];
+                var not_assigned_ranks = new List<int>[castGroups.Length];
+                for (var cg = 0; cg < castGroups.Length; cg++)
+                    not_assigned_ranks[cg] = new List<int>();
+                var count_true = new int[castGroups.Length];
+                var count_false = new int[castGroups.Length];
+                var count_total = new int[castGroups.Length];
+                for (var av = 0; av < partial_solution.Assignments.Length; av++)
                 {
-                    var cg = castGroupsByVariableIndex[i];
-                    var rank = applicantRanks[(applicantsByVariableIndex[i], criteria)]; //TODO speed up by using arrays instead of dictionaries
-                    if (partial_solution.Assignments[i] is not bool value)
-                        not_assigned_ranks.Add((cg, rank));
+                    var cg = castGroupIndexFromVariableIndex[av];
+                    var rank = applicantRanks[c][av];
+                    if (partial_solution.Assignments[av] is not bool value)
+                        not_assigned_ranks[cg].Add(rank);
                     else if (value)
                     {
                         assigned_rank_difference[cg] += rank;
@@ -105,19 +111,14 @@ namespace Carmen.CastingEngine.SAT
                 }
                 var best_criteria = 0;
                 var worst_criteria = 0;
-                var not_assigned_ranks_by_cg = not_assigned_ranks.OrderByDescending(p => p.Item2).GroupBy(p => p.Item1).ToDictionary(g => g.Key, g => g.Select(p => p.Item2).ToArray());
-                foreach (var (cg, total) in count_total)
+                for (var cg = 0; cg < castGroups.Length; cg++)
                 {
-                    int max = (total + 1) / 2;
+                    int max = (count_total[cg] + 1) / 2;
                     if (count_true[cg] > max || count_false[cg] > max)
                         return (double.MaxValue, double.MaxValue); // invalid solution, casts are not even
-                    int assignable_true = 0;
-                    int assignable_false = 0;
-                    if (not_assigned_ranks_by_cg.TryGetValue(cg, out var ranks))
-                    {
-                        assignable_true = ranks.Take(max - count_true[cg]).Sum();
-                        assignable_false = ranks.Take(max - count_false[cg]).Sum();
-                    }
+                    var not_assigned_sorted = not_assigned_ranks[cg].OrderByDescending(r => r).ToArray();
+                    var assignable_true = not_assigned_sorted.Take(max - count_true[cg]).Sum();
+                    var assignable_false = not_assigned_sorted.Take(max - count_false[cg]).Sum();
                     var (best_cg, worst_cg) = FindBestAndWorstCases(assigned_rank_difference[cg], assignable_true, assignable_false);
                     best_criteria += best_cg;
                     worst_criteria += worst_cg;
