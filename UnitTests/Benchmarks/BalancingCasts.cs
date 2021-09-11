@@ -156,7 +156,7 @@ namespace UnitTests.Benchmarks
                 var h = "Test case\tEngine\tTotal seconds\tCast group\tCriteria\t";
                 for(var i=0; i<CAST_COUNT; i++)
                     h += $"Cast({i})\tMin({i})\tMax({i})\tMean({i})\tMedian({i})\tStd-dev({i})\tSorted marks({i})\t";
-                h += $"Mean difference\tMedian difference\tStd-dev difference\tCast rank order";
+                h += $"Mean difference\tMedian difference\tStd-dev difference\tRank difference\tCast rank order";
                 return h;
             }
 
@@ -164,15 +164,15 @@ namespace UnitTests.Benchmarks
             {
                 if (CastRows.Count != CAST_COUNT)
                     throw new Exception($"Expected {CAST_COUNT} cast rows but found {CastRows.Count}.");
-                var s = $"{TestCase}\t{Engine}\t{TotalSeconds:#.#}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t";
+                var s = $"{TestCase}\t{Engine}\t{TotalSeconds:0.0}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t";
                 foreach (var cr in CastRows)
-                    s += $"{cr.AlternativeCast.Initial}\t{cr.Distribution.Min}\t{cr.Distribution.Max}\t{cr.Distribution.Mean:#.#}\t{cr.Distribution.Median:#.#}\t{cr.Distribution.StandardDeviation:#.#}\t{string.Join(", ",cr.SortedMarks.OrderByDescending(m => m))}\t";
+                    s += $"{cr.AlternativeCast.Initial}\t{cr.Distribution.Min}\t{cr.Distribution.Max}\t{cr.Distribution.Mean:0.0}\t{cr.Distribution.Median:0.0}\t{cr.Distribution.StandardDeviation:0.0}\t{string.Join(", ",cr.SortedMarks.OrderByDescending(m => m))}\t";
                 var a = CastRows[0];
                 var b = CastRows[1];
-                s += $"{Math.Abs(a.Distribution.Mean-b.Distribution.Mean):#.#}\t{Math.Abs(a.Distribution.Median-b.Distribution.Median):#.#}\t{Math.Abs(a.Distribution.StandardDeviation-b.Distribution.StandardDeviation):#.#}\t";
-                s += $"{CastRankOrder(a, b)}\t";
+                s += $"{Math.Abs(a.Distribution.Mean-b.Distribution.Mean):0.0}\t{Math.Abs(a.Distribution.Median-b.Distribution.Median):0.0}\t{Math.Abs(a.Distribution.StandardDeviation-b.Distribution.StandardDeviation):0.0}\t";
+                CalculateRankings(a, b, out var rank_letter_order, out var rank_difference);
+                s += $"{rank_difference}\t{rank_letter_order}\t";
                 //TODO add to cast comparisons:
-                //- ranking difference
                 //- ranking difference for top10
                 //- mean difference for top10
                 //- median difference for top10
@@ -182,10 +182,12 @@ namespace UnitTests.Benchmarks
                 return s;
             }
 
-            private static string CastRankOrder(CastRow row_a, CastRow row_b)
+            private static void CalculateRankings(CastRow row_a, CastRow row_b, out string rank_letter_order, out int rank_difference)
             {
-                var s = "";
+                rank_letter_order = "";
+                rank_difference = 0;
                 int a = 0, b = 0;
+                int current_rank = row_a.SortedMarks.Concat(row_b.SortedMarks).Distinct().Count();
                 while (a < row_a.SortedMarks.Length && b < row_b.SortedMarks.Length)
                 {
                     var value_a = row_a.SortedMarks[a];
@@ -193,33 +195,37 @@ namespace UnitTests.Benchmarks
                     if (value_a > value_b)
                     {
                         a++;
-                        s += row_a.AlternativeCast.Initial;
+                        rank_letter_order += row_a.AlternativeCast.Initial;
+                        rank_difference += current_rank--;
                     }
                     else if (value_a < value_b)
                     {
                         b++;
-                        s += row_b.AlternativeCast.Initial;
+                        rank_letter_order += row_b.AlternativeCast.Initial;
+                        rank_difference -= current_rank--;
                     }
                     else
                     {
                         // if equal, default to opposite of last
-                        if (s.LastOrDefault() == row_a.AlternativeCast.Initial)
+                        if (rank_letter_order.LastOrDefault() == row_a.AlternativeCast.Initial)
                         {
                             b++;
-                            s += row_b.AlternativeCast.Initial;
+                            rank_letter_order += row_b.AlternativeCast.Initial;
+                            rank_difference -= current_rank;
                         }
                         else
                         {
                             a++;
-                            s += row_a.AlternativeCast.Initial;
+                            rank_letter_order += row_a.AlternativeCast.Initial;
+                            rank_difference += current_rank;
                         }
                     }
                 }
                 for (; a < row_a.SortedMarks.Length; a++)
-                    s += row_a.AlternativeCast.Initial;
+                    rank_letter_order += row_a.AlternativeCast.Initial;
                 for (; b < row_b.SortedMarks.Length; b++)
-                    s += row_b.AlternativeCast.Initial;
-                return s;
+                    rank_letter_order += row_b.AlternativeCast.Initial;
+                rank_difference = Math.Abs(rank_difference);
             }
         }
 
