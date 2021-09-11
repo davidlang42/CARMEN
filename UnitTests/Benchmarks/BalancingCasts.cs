@@ -157,7 +157,7 @@ namespace UnitTests.Benchmarks
                 for (var i = 0; i < CAST_COUNT; i++)
                     h += CastRow.ToHeader(i.ToString());
                 h += $"{DifferenceRow.ToHeader("Δ")}Rank difference\tCast rank order\t";
-                h += $"{DifferenceRow.ToHeader("Top10-Δ")}Rank difference(Top5)\tCast rank order(Top5)\t";
+                h += $"{DifferenceRow.ToHeader("Top5-Δ")}Rank difference(Top5)\tCast rank order(Top5)\t";
                 return h;
             }
 
