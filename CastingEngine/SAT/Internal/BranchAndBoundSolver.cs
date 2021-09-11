@@ -58,10 +58,9 @@ namespace Carmen.CastingEngine.SAT.Internal
                     else
                     {
                         Branch(optimalSolution, queue);
-                        queue.Enqueue(solution);
-                        optimalLower = double.MaxValue;
-                        optimalUpper = double.MaxValue;
-                        optimalSolution = Solution.Unsolveable;
+                        optimalLower = lower;
+                        optimalUpper = upper;
+                        optimalSolution = solution;
                     }
                 }
                 if (!queue.Any())
@@ -71,7 +70,6 @@ namespace Carmen.CastingEngine.SAT.Internal
                     else if (optimalUpper != optimalLower)
                     {
                         Branch(optimalSolution, queue);
-                        queue.Enqueue(solution);
                         optimalLower = double.MaxValue;
                         optimalUpper = double.MaxValue;
                         optimalSolution = Solution.Unsolveable;
