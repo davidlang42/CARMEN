@@ -57,7 +57,7 @@ namespace UnitTests.Benchmarks
             return new DbContextOptionsBuilder<ShowContext>().UseSqlite($"Filename={file_name}").Options;
         }
 
-        [Test]
+        [Test] // 5.2min
         public void Random()
         {
             Console.WriteLine(SummaryRow.ToHeader());
@@ -68,7 +68,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [Test]
+        [Test] // 5.5min
         public void Random_Quantized()
         {
             Console.WriteLine(SummaryRow.ToHeader());
