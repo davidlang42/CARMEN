@@ -17,8 +17,9 @@ namespace Carmen.CastingEngine.SAT.Internal
         public delegate (double lower, double upper) CostFunction(Solution partial_solution);
 
         private CostFunction costFunction; //LATER probably faster to split this into separate functions for lower and upper bounds, to reduce needless calculations of upper bound
-        private double optimalCost;
-        private readonly List<Solution> optimalSolutions = new();
+        private double optimalUpper;
+        private double optimalLower;
+        private Solution optimalSolution;
         private bool inProgress = false;
 
         /// <summary>Finds the SAT solution which minimizes the given cost function</summary>
@@ -33,8 +34,9 @@ namespace Carmen.CastingEngine.SAT.Internal
             if (inProgress)
                 throw new ApplicationException("Solve() already in progress");
             inProgress = true;
-            optimalCost = double.MaxValue;
-            optimalSolutions.Clear();
+            optimalUpper = double.MaxValue;
+            optimalLower = double.MaxValue;
+            optimalSolution = Solution.Unsolveable;
             var queue = new Queue<Solution>();
             foreach (var raw_solution in base.Solve(expression))
             {
@@ -43,42 +45,50 @@ namespace Carmen.CastingEngine.SAT.Internal
                 {
                     var solution = queue.Dequeue();
                     var (lower, upper) = costFunction(solution);
-                    if (lower == upper)
+                    if (upper < optimalLower)
                     {
-                        if (lower == optimalCost)
-                            optimalSolutions.Add(solution);
-                        else if (lower < optimalCost)
-                        {
-                            optimalCost = lower;
-                            optimalSolutions.Clear();
-                            optimalSolutions.Add(solution);
-                        }
+                        optimalLower = lower;
+                        optimalUpper = upper;
+                        optimalSolution = solution;
                     }
-                    else
+                    else if (lower < optimalUpper)
                     {
-                        var first_unassigned = -1;
-                        for (var i = 0; i < solution.Assignments.Length; i++)
+                        if (upper - lower > optimalUpper - optimalLower)
+                            Branch(solution, queue);
+                        else
                         {
-                            if (solution.Assignments[i] == null)
-                            {
-                                first_unassigned = i;
-                                break;
-                            }
+                            Branch(optimalSolution, queue);
+                            optimalLower = lower;
+                            optimalUpper = upper;
+                            optimalSolution = solution;
                         }
-                        if (first_unassigned == -1)
-                            throw new ApplicationException($"Cost function did not return an exact value for a fully assigned solution: {solution}");
-                        var new_solution = solution.Clone();
-                        new_solution.Assignments[first_unassigned] = false;
-                        queue.Enqueue(new_solution);
-                        new_solution = solution.Clone();
-                        new_solution.Assignments[first_unassigned] = true;
-                        queue.Enqueue(new_solution);
                     }
                 }
             }
             inProgress = false;
-            foreach (var optimal_solution in optimalSolutions)
-                yield return optimal_solution;
+            if (!optimalSolution.IsUnsolvable)
+                yield return optimalSolution;
+        }
+
+        private void Branch(Solution solution, Queue<Solution> queue)
+        {
+            var first_unassigned = -1;
+            for (var i = 0; i < solution.Assignments.Length; i++)
+            {
+                if (solution.Assignments[i] == null)
+                {
+                    first_unassigned = i;
+                    break;
+                }
+            }
+            if (first_unassigned == -1)
+                throw new ApplicationException($"Cannot branch a fully assigned solution: {solution}");
+            var new_solution = solution.Clone();
+            new_solution.Assignments[first_unassigned] = false;
+            queue.Enqueue(new_solution);
+            new_solution = solution.Clone();
+            new_solution.Assignments[first_unassigned] = true;
+            queue.Enqueue(new_solution);
         }
 
         protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
@@ -86,7 +96,7 @@ namespace Carmen.CastingEngine.SAT.Internal
             var (lower, upper) = costFunction(partial_solution);
             if (upper < lower)
                 throw new ApplicationException($"Cost function returned an upper bound less than the lower bound for partial solution: {partial_solution}");
-            if (lower > optimalCost)
+            if (lower > optimalUpper)
                 return Enumerable.Empty<Solution>();
             return base.PartialSolve(expression, partial_solution);
         }
