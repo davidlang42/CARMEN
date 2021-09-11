@@ -19,6 +19,9 @@ using System.Threading.Tasks;
 
 namespace UnitTests.Benchmarks
 {
+#if !BENCHMARK
+    [Ignore("Used only for Benchmarking")]
+#endif
     public class BalancingCasts
     {
         static string testDataPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
@@ -57,7 +60,7 @@ namespace UnitTests.Benchmarks
             return new DbContextOptionsBuilder<ShowContext>().UseSqlite($"Filename={file_name}").Options;
         }
 
-        [Test] // 5.2min
+        [Test]
         public void Random()
         {
             Console.WriteLine(SummaryRow.ToHeader());
@@ -68,7 +71,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [Test] // 5.5min
+        [Test]
         public void Random_Quantized()
         {
             Console.WriteLine(SummaryRow.ToHeader());

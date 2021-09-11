@@ -370,6 +370,8 @@ namespace Carmen.ShowModel
         {
             var cast_groups = Context.CastGroups.ToArray();
             var requirements = Context.Requirements.Where(r => r.Primary).ToArray();
+            if (requirements.Length == 0)
+                requirements = Context.Requirements.ToArray();
             var applicants = Context.Applicants.ToArray();
             foreach (var item in Context.ShowRoot.ItemsInOrder())
             {
@@ -386,7 +388,7 @@ namespace Carmen.ShowModel
                         role.CountByGroups.Add(count_by_group);
                         role.Cast.Add(random.NextOf(applicants));
                     }
-                    if (include_requirements)
+                    if (include_requirements && requirements.Any())
                         role.Requirements.Add(requirements[random.Next(requirements.Length)]);
                     item.Roles.Add(role);
                 }

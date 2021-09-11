@@ -8,6 +8,7 @@
     <AssemblyName>UnitTests</AssemblyName>
     <RootNamespace>UnitTests</RootNamespace>
     <Authors>David Lang</Authors>
+    <Configurations>Debug;Release;Benchmark</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
