@@ -48,14 +48,18 @@ namespace Carmen.CastingEngine.SAT
             // Initialise() the starting conditions, then Simplify() until the SAT solver succeeds
             sat = new DpllSolver<Applicant>(applicants_needing_alternative_cast.SelectMany(p => p.Item2));
             Solution solution = Solution.Unsolveable;
+            var solved_clauses = new HashSet<Clause<Applicant>>();
+            solved_clauses.AddRange(existing_assignments);
+            solved_clauses.AddRange(same_cast_clauses); //LATER these clauses should probably be solved first to prove they are consistent
             Results.Clear();
-            Initialise(applicants_needing_alternative_cast.Select(p => p.Item2.Count), out int chunk_size, out int max_chunks);
+            Initialise(out int chunk_size, out int max_chunks);
             do //LATER probably need some way of communicating progress back to the main program, especially as chunk size increases in ChunkedPairsSatEngine
             {
+                // cap max_chunk to the highest possible number of chunks
+                max_chunks = Math.Min(max_chunks, applicants_needing_alternative_cast.Select(p => p.Item2.Count).Max() / chunk_size); // at this value, the limit will not be hit before all applicants have been chunked
                 // compile clauses
                 var clauses = new HashSet<Clause<Applicant>>();
-                clauses.AddRange(existing_assignments);
-                clauses.AddRange(same_cast_clauses);
+                clauses.AddRange(solved_clauses);
                 bool any_chunk_clause = false;
                 foreach (var (cg, hs) in applicants_needing_alternative_cast)
                     any_chunk_clause |= clauses.AddRange(BuildChunkClauses(hs, chunk_size, max_chunks, same_cast_lookup));
@@ -73,7 +77,12 @@ namespace Carmen.CastingEngine.SAT
                     Solved = !solution.IsUnsolvable
                 });
                 if (!solution.IsUnsolvable)
-                    break; // solved
+                {
+                    if (Improve(ref chunk_size, ref max_chunks))
+                        solved_clauses.AddRange(clauses);
+                    else
+                        break; // solved, and no further improvements
+                }
                 if (!any_chunk_clause)
                     break; // we didn't have any chunk clauses, if this didn't solve, nothing will
             } while (Simplify(ref chunk_size, ref max_chunks));
@@ -84,16 +93,22 @@ namespace Carmen.CastingEngine.SAT
         /// The default implementation is to start by chunking the whole list of applicants into pairs.
         /// It may be helpful to override this if your Simplify() method uses state which needs to be
         /// reset between runs.</summary>
-        protected virtual void Initialise(IEnumerable<int> applicants_per_cast_group, out int chunk_size, out int max_chunks)
+        protected virtual void Initialise(out int chunk_size, out int max_chunks)
         {
             chunk_size = 2;
-            max_chunks = applicants_per_cast_group.Max() / chunk_size; // at this value, the limit will not be hit before all applicants have been chunked
+            max_chunks = int.MaxValue;
         }
 
         /// <summary>If the current SAT problem is unsolvable, this is called to modify the chunking parameters to make
         /// it a simplier SAT problem to solve. If there is no simplier option, return false to stop trying.
         /// As a failsafe, if the chunking parameters fail to create any chunks, iteration will terminate.</summary>
         protected abstract bool Simplify(ref int chunk_size, ref int max_chunks);
+
+        /// <summary>If the current SAT problem is solveable, this is called to modify the chunking parameters to make
+        /// it a harder SAT problem to solve, that is, one which would produce a better outcome. In this case, the
+        /// existing clauses are kept in addition to any new clauses created. If there is no harder option, return false
+        /// to accept the current solution. The default implementation always accepts the current solution.</summary>
+        protected virtual bool Improve(ref int chunk_size, ref int max_chunks) => false;
 
         /// <summary>Creates clauses for chunks of applicants within one cast group, for each primary criteria</summary>
         private IEnumerable<Clause<Applicant>> BuildChunkClauses(IEnumerable<Applicant> applicants, int chunk_size, int max_chunks, Dictionary<Applicant, SameCastSet> same_cast_lookup)
