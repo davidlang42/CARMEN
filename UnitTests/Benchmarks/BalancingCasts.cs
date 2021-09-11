@@ -62,7 +62,10 @@ namespace UnitTests.Benchmarks
         {
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("random"))
-                RunTestCase(file_name, false);
+            {
+                using var context = new ShowContext(OptionsFor(file_name));
+                RunTestCase(context, Path.GetFileNameWithoutExtension(file_name), false);
+            }
         }
 
         [Test]
@@ -71,7 +74,10 @@ namespace UnitTests.Benchmarks
             //TODO
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("random"))
-                RunTestCase(file_name, false);
+            {
+                using var context = new ShowContext(OptionsFor(file_name));
+                RunTestCase(context, Path.GetFileNameWithoutExtension(file_name) + "_quantized", false);
+            }
         }
 
         [Test]
@@ -79,7 +85,10 @@ namespace UnitTests.Benchmarks
         {
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("converted"))
-                RunTestCase(file_name, true);
+            {
+                using var context = new ShowContext(OptionsFor(file_name));
+                RunTestCase(context, Path.GetFileNameWithoutExtension(file_name), true);
+            }
         }
 
         [Test]
@@ -88,13 +97,14 @@ namespace UnitTests.Benchmarks
             //TODO
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("converted"))
-                RunTestCase(file_name, true);
+            {
+                using var context = new ShowContext(OptionsFor(file_name));
+                RunTestCase(context, Path.GetFileNameWithoutExtension(file_name) + "_quantized", true);
+            }
         }
 
-        internal void RunTestCase(string file_name, bool analyse_existing)
+        internal void RunTestCase(ShowContext context, string test_case, bool analyse_existing)
         {
-            using var context = new ShowContext(OptionsFor(file_name));
-            var test_case = Path.GetFileNameWithoutExtension(file_name);
             var applicants = context.Applicants.ToArray();
             var cast_groups = context.CastGroups.ToArray();
             var criterias = context.Criterias.ToArray();
