@@ -57,11 +57,14 @@ namespace UnitTests.Benchmarks
             var cast_groups = context.CastGroups.ToArray();
             var criterias = context.Criterias.ToArray();
             var same_cast_sets = context.SameCastSets.ToArray();
+            DisplaySummary("Existing", cast_groups, criterias);
             foreach (var engine in CreateEngines(context))
             {
+                if (engine is HeuristicSelectionEngine)
+                    continue; //TODO fix heuristic selection engine
                 ClearAlternativeCasts(applicants);
                 engine.BalanceAlternativeCasts(applicants, same_cast_sets);
-                DisplaySummary(engine, cast_groups, criterias);
+                DisplaySummary(engine.GetType().Name, cast_groups, criterias);
             }
         }
 
@@ -73,7 +76,7 @@ namespace UnitTests.Benchmarks
 
         private struct SummaryRow
         {
-            public ISelectionEngine Engine;
+            public string Engine;
             public CastGroup CastGroup;
             public Criteria Criteria;
             public AlternativeCast AlternativeCast;
@@ -86,14 +89,14 @@ namespace UnitTests.Benchmarks
                 + $"Sorted marks";
 
             public override string ToString()
-                => $"{Engine.GetType().Name}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t{AlternativeCast.Initial}\t"
-                + $"{Distribution.Min}\t{Distribution.Max}\t{Distribution.Mean}\t{Distribution.Median}\t{Distribution.StandardDeviation}\t"
+                => $"{Engine}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t{AlternativeCast.Initial}\t"
+                + $"{Distribution.Min}\t{Distribution.Max}\t{Distribution.Mean:#.#}\t{Distribution.Median:#.#}\t{Distribution.StandardDeviation:#.#}\t"
                 + $"{string.Join(",", Marks.OrderByDescending(m => m))}";
         }
 
-        private void DisplaySummary(ISelectionEngine engine, IEnumerable<CastGroup> cast_groups, IEnumerable<Criteria> criterias)
+        private void DisplaySummary(string engine_name, IEnumerable<CastGroup> cast_groups, IEnumerable<Criteria> criterias)
         {
-            var summary = new SummaryRow { Engine = engine };
+            var summary = new SummaryRow { Engine = engine_name };
             foreach (var cg in cast_groups)
             {
                 if (cg.Members.Count == 0)
