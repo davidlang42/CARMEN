@@ -60,7 +60,7 @@ namespace UnitTests.Benchmarks
             return new DbContextOptionsBuilder<ShowContext>().UseSqlite($"Filename={file_name}").Options;
         }
 
-        [Test]
+        [Test] // ~5min
         public void Random()
         {
             Console.WriteLine(SummaryRow.ToHeader());
@@ -71,7 +71,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [Test]
+        [Test] // ~5min
         public void Random_Quantized()
         {
             Console.WriteLine(SummaryRow.ToHeader());
@@ -83,7 +83,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [Test]
+        [Test] // ~5min
         public void Converted()
         {
             Console.WriteLine(SummaryRow.ToHeader());
@@ -94,7 +94,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [Test]
+        [Test] // ~5min
         public void Converted_Quantized()
         {
             Console.WriteLine(SummaryRow.ToHeader());
@@ -121,14 +121,16 @@ namespace UnitTests.Benchmarks
             var criterias = context.Criterias.ToArray();
             var same_cast_sets = context.SameCastSets.ToArray();
             if (analyse_existing)
-                DisplaySummary(test_case, "Existing", cast_groups, criterias);
+                DisplaySummary(test_case, "Existing", 0, cast_groups, criterias);
             foreach (var engine in CreateEngines(context))
             {
                 if (engine is HeuristicSelectionEngine)
                     continue; //TODO fix heuristic selection engine
                 ClearAlternativeCasts(applicants);
-                engine.BalanceAlternativeCasts(applicants, same_cast_sets); //TODO benchmark how long each engine takes as well
-                DisplaySummary(test_case, engine.GetType().Name, cast_groups, criterias);
+                var start_time = DateTime.Now;
+                engine.BalanceAlternativeCasts(applicants, same_cast_sets);
+                var duration = DateTime.Now - start_time;
+                DisplaySummary(test_case, engine.GetType().Name, duration.TotalSeconds, cast_groups, criterias);
             }
         }
 
@@ -142,6 +144,7 @@ namespace UnitTests.Benchmarks
         {
             public string TestCase;
             public string Engine;
+            public double TotalSeconds;
             public CastGroup CastGroup;
             public Criteria Criteria;
             public AlternativeCast AlternativeCast;
@@ -149,22 +152,23 @@ namespace UnitTests.Benchmarks
             public MarkDistribution Distribution;
 
             public static string ToHeader()
-                => $"Test case\tEngine\tCast group\tCriteria\tAlternative cast\t"
+                => $"Test case\tEngine\tTotal seconds\tCast group\tCriteria\tAlternative cast\t"
                 + $"Min\tMax\tMean\tMedian\tStd-Dev\t"
                 + $"Sorted marks";
 
             public override string ToString()
-                => $"{TestCase}\t{Engine}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t{AlternativeCast.Initial}\t"
+                => $"{TestCase}\t{Engine}\t{TotalSeconds:#.#}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t{AlternativeCast.Initial}\t"
                 + $"{Distribution.Min}\t{Distribution.Max}\t{Distribution.Mean:#.#}\t{Distribution.Median:#.#}\t{Distribution.StandardDeviation:#.#}\t"
                 + $"{string.Join(",", Marks.OrderByDescending(m => m))}";
         }
 
-        private void DisplaySummary(string test_case, string engine_name, IEnumerable<CastGroup> cast_groups, IEnumerable<Criteria> criterias)
+        private void DisplaySummary(string test_case, string engine_name, double total_seconds, IEnumerable<CastGroup> cast_groups, IEnumerable<Criteria> criterias)
         {
             var summary = new SummaryRow
             {
                 TestCase = test_case,
-                Engine = engine_name
+                Engine = engine_name,
+                TotalSeconds = total_seconds
             };
             foreach (var cg in cast_groups)
             {
