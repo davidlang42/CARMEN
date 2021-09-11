@@ -154,10 +154,10 @@ namespace UnitTests.Benchmarks
             public static string ToHeader()
             {
                 var h = "Test case\tEngine\tTotal seconds\tCast group\tCriteria\t";
-                for(var i=0; i<CAST_COUNT; i++)
-                    h += $"Cast({i})\tSorted marks({i})\t{CastRow.ToHeader(i.ToString())}";
-                h += $"{CastRow.ToHeader("Δ")}Rank difference\tCast rank order\t";
-                h += $"{CastRow.ToHeader("Top10-Δ")}Rank difference(Top5)\tCast rank order(Top5)\t";
+                for (var i = 0; i < CAST_COUNT; i++)
+                    h += CastRow.ToHeader(i.ToString());
+                h += $"{DifferenceRow.ToHeader("Δ")}Rank difference\tCast rank order\t";
+                h += $"{DifferenceRow.ToHeader("Top10-Δ")}Rank difference(Top5)\tCast rank order(Top5)\t";
                 return h;
             }
 
@@ -167,7 +167,7 @@ namespace UnitTests.Benchmarks
                     throw new Exception($"Expected {CAST_COUNT} cast rows but found {CastRows.Count}.");
                 var s = $"{TestCase}\t{Engine}\t{TotalSeconds:0.0}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t";
                 foreach (var cr in CastRows)
-                    s += $"{cr.AlternativeCast.Initial}\t{string.Join(", ",cr.SortedMarks.OrderByDescending(m => m))}\t{cr}";
+                    s += cr.ToString();
                 var a = CastRows[0];
                 var b = CastRows[1];
                 s += CastRow.Difference(a, b).ToString();
@@ -231,41 +231,55 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        private struct CastRow
+        private class DifferenceRow
         {
-            public AlternativeCast AlternativeCast;
-            public uint[] SortedMarks; // descending
             public MarkDistribution Distribution;
+
+            public DifferenceRow(MarkDistribution distribution)
+            {
+                Distribution = distribution;
+            }
 
             public static string ToHeader(string label)
                 => $"Min({label})\tMax({label})\tMean({label})\tMedian({label})\tStd-dev({label})\t";
 
             public override string ToString()
                 => $"{Distribution.Min}\t{Distribution.Max}\t{Distribution.Mean:0.0}\t{Distribution.Median:0.0}\t{Distribution.StandardDeviation:0.0}\t";
+        }
 
-            public static CastRow Difference(CastRow a, CastRow b)
-                => new()
-                {
-                    Distribution = new()
-                    {
-                        Max = (uint)Math.Abs(a.Distribution.Max - b.Distribution.Max),
-                        Min = (uint)Math.Abs(a.Distribution.Min - b.Distribution.Min),
-                        Mean = (uint)Math.Abs(a.Distribution.Mean - b.Distribution.Mean),
-                        Median = (uint)Math.Abs(a.Distribution.Median - b.Distribution.Median),
-                        StandardDeviation = (uint)Math.Abs(a.Distribution.StandardDeviation - b.Distribution.StandardDeviation),
-                    }
-                };
+        private class CastRow : DifferenceRow
+        {
+            public AlternativeCast AlternativeCast;
+            public uint[] SortedMarks; // descending
+
+            public CastRow(AlternativeCast alternative_cast, IEnumerable<uint> marks, MarkDistribution? distribution = null)
+                : this(alternative_cast, marks.OrderByDescending(m => m).ToArray(), distribution)
+            { }
+
+            public CastRow(AlternativeCast alternative_cast, uint[] sorted_marks, MarkDistribution? distribution = null)
+                : base(distribution ?? MarkDistribution.Analyse(sorted_marks))
+            {
+                AlternativeCast = alternative_cast;
+                SortedMarks = sorted_marks;
+            }
+
+            public new static string ToHeader(string label)
+                => $"Cast({label})\tSorted marks({label})\t{DifferenceRow.ToHeader(label)}";
+
+            public override string ToString()
+                => $"{AlternativeCast.Initial}\t{string.Join(", ", SortedMarks.OrderByDescending(m => m))}\t{base.ToString()}";
+
+            public static DifferenceRow Difference(CastRow a, CastRow b)
+                => new(new() {
+                    Max = (uint)Math.Abs(a.Distribution.Max - b.Distribution.Max),
+                    Min = (uint)Math.Abs(a.Distribution.Min - b.Distribution.Min),
+                    Mean = (uint)Math.Abs(a.Distribution.Mean - b.Distribution.Mean),
+                    Median = (uint)Math.Abs(a.Distribution.Median - b.Distribution.Median),
+                    StandardDeviation = (uint)Math.Abs(a.Distribution.StandardDeviation - b.Distribution.StandardDeviation),
+                });
 
             public CastRow Top(int count)
-            {
-                var row = new CastRow
-                {
-                    AlternativeCast = AlternativeCast,
-                    SortedMarks = SortedMarks.Take(count).ToArray()
-                };
-                row.Distribution = MarkDistribution.Analyse(row.SortedMarks);
-                return row;
-            }
+                => new CastRow(AlternativeCast, SortedMarks.Take(count));
         }
 
         private void DisplaySummary(string test_case, string engine_name, double total_seconds, IEnumerable<CastGroup> cast_groups, IEnumerable<Criteria> criterias)
@@ -291,13 +305,7 @@ namespace UnitTests.Benchmarks
                     {
                         if (group.Key == null)
                             throw new Exception($"Missing alternative cast for {group.Count().Plural("applicant")}");
-                        var marks = group.Select(a => a.MarkFor(c)).OrderByDescending(m => m).ToArray();
-                        summary.CastRows.Add(new()
-                        {
-                            AlternativeCast = group.Key,
-                            SortedMarks = marks,
-                            Distribution = MarkDistribution.Analyse(marks),
-                        });
+                        summary.CastRows.Add(new(group.Key, group.Select(a => a.MarkFor(c))));
                     }
                     Console.WriteLine(summary.ToString());
                 }
