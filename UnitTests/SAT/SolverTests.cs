@@ -58,6 +58,28 @@ namespace UnitTests.SAT
             }
         }
 
+        protected bool TestSolveMinimum(Solver<int> sat, Expression<int> expression, BranchAndBoundSolver<int>.CostFunction cost_function)
+        {
+            var solution = sat.Solve(expression).FirstOrDefault();
+            if (!solution.IsUnsolvable)
+            {
+                var all_sat = new DpllAllSolver<int>();
+                all_sat.Introduce(expression);
+                var true_minimum_cost = all_sat.Solve(expression).Min(s => cost_function(s).lower);
+                var first_solution = solution.Enumerate().First();
+                sat.Evaluate(expression, first_solution).Should().BeTrue();
+                cost_function(first_solution).lower.Should().Be(true_minimum_cost);
+                var last_solution = solution.Enumerate().Last();
+                sat.Evaluate(expression, last_solution).Should().BeTrue();
+                cost_function(last_solution).lower.Should().Be(true_minimum_cost);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         protected Expression<T> GenerateExpression<T>(int random_seed, T[] variables, int j_clauses, int k_literals_per_clause)
             where T : notnull
         {
