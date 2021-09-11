@@ -117,15 +117,16 @@ namespace Carmen.CastingEngine.Heuristic
                             cast_index = Array.IndexOf(alternativeCasts, alternative_cast);
                         else
                             cast_index = MinimumIndex(cast_counts);
-                        foreach (var unset_cast in same_cast_set.Applicants.Where(a => a.CastGroup == cast_group).Where(a => a.AlternativeCast == null))
+                        foreach (var unset_cast in same_cast_set.Applicants.Where(a => applicants_needing_cast.Contains(a)))
                         {
                             unset_cast.AlternativeCast = alternativeCasts[cast_index];
                             cast_counts[cast_index]++;
+                            applicants_needing_cast.Remove(unset_cast);
                         }
                     }
                     // allocate remaining alternative casts
                     int next_cast = 0;
-                    foreach (var applicant in CastNumberingOrder(applicants_group.Where(a => a.AlternativeCast == null)))
+                    foreach (var applicant in CastNumberingOrder(applicants_needing_cast))
                     {
                         applicant.AlternativeCast = alternativeCasts[next_cast++];
                         if (next_cast == alternativeCasts.Length)
