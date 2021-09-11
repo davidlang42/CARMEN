@@ -53,7 +53,7 @@ namespace Carmen.CastingEngine.SAT.Internal
                 }
                 else if (lower < optimalUpper)
                 {
-                    if (upper - lower > optimalUpper - optimalLower)
+                    if (upper - lower >= optimalUpper - optimalLower)
                         Branch(solution, queue);
                     else
                     {

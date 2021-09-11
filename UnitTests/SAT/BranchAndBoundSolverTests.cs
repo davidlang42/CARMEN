@@ -106,13 +106,14 @@ namespace UnitTests.SAT
 
         [Test]
         [TestCase(100, 10, 10, 3, TestName = "Speed10")] // 30ms
-        [TestCase(100, 15, 15, 3, TestName = "Speed15")] // 110ms
-        [TestCase(100, 20, 20, 3, TestName = "Speed20")] // 300ms
-        [TestCase(100, 25, 25, 3, TestName = "Speed25")] // 650ms
-        [TestCase(100, 30, 30, 3, TestName = "Speed30")] // 1.7s
-        [TestCase(100, 35, 35, 3, TestName = "Speed35")] // 5.3s
-        //[TestCase(100, 40, 40, 3, TestName = "Speed40")] // 21s
-        //[TestCase(100, 45, 45, 3, TestName = "Speed45")] // 1.4m
+        [TestCase(100, 15, 15, 3, TestName = "Speed15")] // 80ms
+        [TestCase(100, 20, 20, 3, TestName = "Speed20")] // 250ms
+        [TestCase(100, 25, 25, 3, TestName = "Speed25")] // 630ms
+        [TestCase(100, 30, 30, 3, TestName = "Speed30")] // 1.5s
+        [TestCase(100, 35, 35, 3, TestName = "Speed35")] // 4s
+        //[TestCase(100, 40, 40, 3, TestName = "Speed40")] // 12s
+        //[TestCase(100, 45, 45, 3, TestName = "Speed45")] // 36s
+        //[TestCase(100, 50, 50, 3, TestName = "Speed50")] // ?
         public void SpeedTest(int test_cases, int n_variables, int j_clauses, int k_literals)
         {
             var vars = Enumerable.Range(1, n_variables).ToArray();
