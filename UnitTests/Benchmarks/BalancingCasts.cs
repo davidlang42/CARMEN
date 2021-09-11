@@ -19,10 +19,20 @@ using System.Threading.Tasks;
 
 namespace UnitTests.Benchmarks
 {
-    public class SelectionEngineBenchmarks
+    public class BalancingCasts
     {
         static string testDataPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)
             + @"\..\..\..\Benchmarks\Test data\";
+
+        private static IEnumerable<string> TestFiles(string containing)
+        {
+            foreach (var file_name in Directory.GetFiles(testDataPath))
+            {
+                if (Path.GetExtension(file_name).ToLower() == ".db"
+                    && Path.GetFileNameWithoutExtension(file_name).ToLower().Contains(containing.ToLower()))
+                    yield return file_name;
+            }
+        }
 
         private static IEnumerable<ISelectionEngine> CreateEngines(ShowContext context)
         {
@@ -47,24 +57,57 @@ namespace UnitTests.Benchmarks
             return new DbContextOptionsBuilder<ShowContext>().UseSqlite($"Filename={file_name}").Options;
         }
 
-        [TestCase("random2021.db")]
         [Test]
-        public void BalanceAlternativeCasts(string file)
+        public void Random()
         {
             Console.WriteLine(SummaryRow.ToHeader());
-            using var context = new ShowContext(OptionsFor(testDataPath + file));
+            foreach (var file_name in TestFiles("random"))
+                RunTestCase(file_name, false);
+        }
+
+        [Test]
+        public void Random_Quantized()
+        {
+            //TODO
+            Console.WriteLine(SummaryRow.ToHeader());
+            foreach (var file_name in TestFiles("random"))
+                RunTestCase(file_name, false);
+        }
+
+        [Test]
+        public void Converted()
+        {
+            Console.WriteLine(SummaryRow.ToHeader());
+            foreach (var file_name in TestFiles("converted"))
+                RunTestCase(file_name, true);
+        }
+
+        [Test]
+        public void Converted_Quantized()
+        {
+            //TODO
+            Console.WriteLine(SummaryRow.ToHeader());
+            foreach (var file_name in TestFiles("converted"))
+                RunTestCase(file_name, true);
+        }
+
+        internal void RunTestCase(string file_name, bool analyse_existing)
+        {
+            using var context = new ShowContext(OptionsFor(file_name));
+            var test_case = Path.GetFileNameWithoutExtension(file_name);
             var applicants = context.Applicants.ToArray();
             var cast_groups = context.CastGroups.ToArray();
             var criterias = context.Criterias.ToArray();
             var same_cast_sets = context.SameCastSets.ToArray();
-            DisplaySummary("Existing", cast_groups, criterias);
+            if (analyse_existing)
+                DisplaySummary(test_case, "Existing", cast_groups, criterias);
             foreach (var engine in CreateEngines(context))
             {
                 if (engine is HeuristicSelectionEngine)
                     continue; //TODO fix heuristic selection engine
                 ClearAlternativeCasts(applicants);
                 engine.BalanceAlternativeCasts(applicants, same_cast_sets);
-                DisplaySummary(engine.GetType().Name, cast_groups, criterias);
+                DisplaySummary(test_case, engine.GetType().Name, cast_groups, criterias);
             }
         }
 
@@ -76,6 +119,7 @@ namespace UnitTests.Benchmarks
 
         private struct SummaryRow
         {
+            public string TestCase;
             public string Engine;
             public CastGroup CastGroup;
             public Criteria Criteria;
@@ -84,19 +128,23 @@ namespace UnitTests.Benchmarks
             public MarkDistribution Distribution;
 
             public static string ToHeader()
-                => $"Engine\tCast group\tCriteria\tAlternative cast\t"
+                => $"Test case\tEngine\tCast group\tCriteria\tAlternative cast\t"
                 + $"Min\tMax\tMean\tMedian\tStd-Dev\t"
                 + $"Sorted marks";
 
             public override string ToString()
-                => $"{Engine}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t{AlternativeCast.Initial}\t"
+                => $"{TestCase}\t{Engine}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t{AlternativeCast.Initial}\t"
                 + $"{Distribution.Min}\t{Distribution.Max}\t{Distribution.Mean:#.#}\t{Distribution.Median:#.#}\t{Distribution.StandardDeviation:#.#}\t"
                 + $"{string.Join(",", Marks.OrderByDescending(m => m))}";
         }
 
-        private void DisplaySummary(string engine_name, IEnumerable<CastGroup> cast_groups, IEnumerable<Criteria> criterias)
+        private void DisplaySummary(string test_case, string engine_name, IEnumerable<CastGroup> cast_groups, IEnumerable<Criteria> criterias)
         {
-            var summary = new SummaryRow { Engine = engine_name };
+            var summary = new SummaryRow
+            {
+                TestCase = test_case,
+                Engine = engine_name
+            };
             foreach (var cg in cast_groups)
             {
                 if (cg.Members.Count == 0)
@@ -115,6 +163,14 @@ namespace UnitTests.Benchmarks
                         summary.Marks = group.Select(a => a.MarkFor(c)).ToArray();
                         summary.Distribution = MarkDistribution.Analyse(summary.Marks);
                         Console.WriteLine(summary.ToString());
+                        //TODO make each row a comparison between 2 casts (but keep check for null ac), including:
+                        //- mean difference
+                        //- median difference
+                        //- std dev difference
+                        //- ranking difference
+                        //- all of those for top10
+                        //- min threshold for top10 difference
+                        //- count of marks above 70 difference
                     }
                 }
             }
