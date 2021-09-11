@@ -66,14 +66,16 @@ namespace Carmen.CastingEngine.SAT
             return true;
         }
 
-        protected override Solution FindSatSolution(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
-            List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup,
-            out Solver<Applicant> sat)
+        protected override Solver<Applicant> BuildSatSolver(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast)
         {
-            // define sat, variables, and validation theory
             var all_applicants = applicants_needing_alternative_cast.SelectMany(p => p.Item2).ToArray();
             var applicant_cast_groups = all_applicants.Select(a => a.CastGroup!).ToArray();
-            sat = new DpllTheorySolver<Applicant>(soln => AlternativeCastsAreEqual(soln.Assignments, applicant_cast_groups), all_applicants);
+            return new DpllTheorySolver<Applicant>(soln => AlternativeCastsAreEqual(soln.Assignments, applicant_cast_groups), all_applicants);
+        }
+
+        protected override Solution FindSatSolution(Solver<Applicant> sat, List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
+            List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup)
+        {
             Solution solution = Solution.Unsolveable;
             // Initialise() the starting conditions, then Simplify() until the SAT solver succeeds
             Results.Clear();

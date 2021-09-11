@@ -94,9 +94,10 @@ namespace Carmen.CastingEngine.SAT
             return null;
         }
 
-        protected abstract Solution FindSatSolution(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
-            List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup,
-            out Solver<Applicant> sat);
+        protected abstract Solver<Applicant> BuildSatSolver(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast);
+
+        protected abstract Solution FindSatSolution(Solver<Applicant> sat, List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
+            List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup);
 
         public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets)
         {
@@ -136,7 +137,8 @@ namespace Carmen.CastingEngine.SAT
                 same_cast_clauses.AddRange(KeepTogether(same_cast_set.Applicants.Where(a => applicants_needing_alternative_cast.Any(p => p.Item2.Contains(a))).ToArray()));
             }
             // run approach-specific SAT solving
-            var solution = FindSatSolution(applicants_needing_alternative_cast, existing_assignments, same_cast_clauses, same_cast_lookup, out var sat);
+            var sat = BuildSatSolver(applicants_needing_alternative_cast);
+            var solution = FindSatSolution(sat, applicants_needing_alternative_cast, existing_assignments, same_cast_clauses, same_cast_lookup);
             // set alternative casts
             List<IEnumerable<Assignment<Applicant>>> grouped_assignments;
             if (!solution.IsUnsolvable)

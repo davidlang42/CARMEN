@@ -41,12 +41,13 @@ namespace Carmen.CastingEngine.SAT
             : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
         { }
 
-        protected override Solution FindSatSolution(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
-            List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup,
-            out Solver<Applicant> sat)
+        protected override Solver<Applicant> BuildSatSolver(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast)
+            => new DpllSolver<Applicant>(applicants_needing_alternative_cast.SelectMany(p => p.Item2));
+
+        protected override Solution FindSatSolution(Solver<Applicant> sat, List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
+            List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup)
         {
             // Initialise() the starting conditions, then Simplify() until the SAT solver succeeds
-            sat = new DpllSolver<Applicant>(applicants_needing_alternative_cast.SelectMany(p => p.Item2));
             Solution solution = Solution.Unsolveable;
             var solved_clauses = new HashSet<Clause<Applicant>>();
             solved_clauses.AddRange(existing_assignments);

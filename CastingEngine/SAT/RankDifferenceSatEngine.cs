@@ -23,24 +23,27 @@ namespace Carmen.CastingEngine.SAT
         int[][] applicantRanks = new int[0][]; // [criteria][applicant variable]
         int[] castGroupIndexFromVariableIndex = new int[0];
         CastGroup[] castGroups = new CastGroup[0];
-        Solver<Applicant>? _sat;
-
-        Solver<Applicant> sat => _sat ?? throw new ApplicationException($"Tried to access {nameof(sat)} before it has been initialized");
 
         public RankDifferenceSatEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
             : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
         { }
 
-        protected override Solution FindSatSolution(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
-            List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup,
-            out Solver<Applicant> sat)
+        protected override Solver<Applicant> BuildSatSolver(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast)
+        {
+            var termination_threshold = RANK_INCREMENT * primaryCriterias.Length * castGroups.Length; // 1 rank difference per criteria per cast group
+            //LATER try this without the termination threshold, or even consider a time based threshold
+            return new BranchAndBoundSolver<Applicant>(CostFunction, termination_threshold, applicants_needing_alternative_cast.SelectMany(p => p.Item2).ToArray());
+        }
+
+        protected override Solution FindSatSolution(Solver<Applicant> sat, List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
+            List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup)
         {
             if (inProgress)
                 throw new ApplicationException("FindSatSolution() already in progress");
             inProgress = true;
             // calculate and cache applicant ranks
             applicantRanks = new int[primaryCriterias.Length][];
-            Applicant[] applicant_variables = applicants_needing_alternative_cast.SelectMany(p => p.Item2).ToArray();
+            Applicant[] applicant_variables = sat.Variables.ToArray();
             castGroupIndexFromVariableIndex = new int[applicant_variables.Length];
             castGroups = applicant_variables.Select(a => a.CastGroup!).Distinct().ToArray();
             for (var c = 0; c < primaryCriterias.Length; c++)
@@ -66,14 +69,10 @@ namespace Carmen.CastingEngine.SAT
                     }
                 }
             }
-            // build the sat
-            var termination_threshold = RANK_INCREMENT * primaryCriterias.Length * castGroups.Length; // 1 rank difference per criteria per cast group
-            //LATER try this without the termination threshold, or even consider a time based threshold
-            this._sat = sat = new BranchAndBoundSolver<Applicant>(CostFunction, termination_threshold, applicant_variables);
+            // solve the sat
             var clauses = new HashSet<Clause<Applicant>>();
             clauses.AddRange(existing_assignments);
             clauses.AddRange(same_cast_clauses);
-            // solve the sat
             var solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
             inProgress = false;
             return solution;
