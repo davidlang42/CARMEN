@@ -37,13 +37,13 @@ namespace Carmen.CastingEngine.SAT.Internal
             optimalUpper = double.MaxValue;
             optimalLower = double.MaxValue;
             optimalSolution = Solution.Unsolveable;
-            var queue = new Queue<Solution>();
+            var stack = new Stack<Solution>();
             var base_solutions = base.Solve(expression).GetEnumerator();
             if (base_solutions.MoveNext())
-                queue.Enqueue(base_solutions.Current);
-            while (queue.Any())
+                stack.Push(base_solutions.Current);
+            while (stack.Any())
             {
-                var solution = queue.Dequeue();
+                var solution = stack.Pop();
                 var (lower, upper) = costFunction(solution);
                 if (upper <= optimalLower)
                 {
@@ -54,22 +54,22 @@ namespace Carmen.CastingEngine.SAT.Internal
                 else if (lower < optimalUpper)
                 {
                     if (upper - lower >= optimalUpper - optimalLower)
-                        Branch(solution, queue);
+                        Branch(solution, stack);
                     else
                     {
-                        Branch(optimalSolution, queue);
+                        Branch(optimalSolution, stack);
                         optimalLower = lower;
                         optimalUpper = upper;
                         optimalSolution = solution;
                     }
                 }
-                if (!queue.Any())
+                if (!stack.Any())
                 {
                     if (base_solutions.MoveNext())
-                        queue.Enqueue(base_solutions.Current);
+                        stack.Push(base_solutions.Current);
                     else if (optimalUpper != optimalLower)
                     {
-                        Branch(optimalSolution, queue);
+                        Branch(optimalSolution, stack);
                         optimalLower = double.MaxValue;
                         optimalUpper = double.MaxValue;
                         optimalSolution = Solution.Unsolveable;
@@ -81,7 +81,7 @@ namespace Carmen.CastingEngine.SAT.Internal
                 yield return optimalSolution;
         }
 
-        private void Branch(Solution solution, Queue<Solution> queue)
+        private void Branch(Solution solution, Stack<Solution> stack)
         {
             var first_unassigned = -1;
             for (var i = 0; i < solution.Assignments.Length; i++)
@@ -96,10 +96,10 @@ namespace Carmen.CastingEngine.SAT.Internal
                 throw new ApplicationException($"Cannot branch a fully assigned solution: {solution}");
             var new_solution = solution.Clone();
             new_solution.Assignments[first_unassigned] = false;
-            queue.Enqueue(new_solution);
+            stack.Push(new_solution);
             new_solution = solution.Clone();
             new_solution.Assignments[first_unassigned] = true;
-            queue.Enqueue(new_solution);
+            stack.Push(new_solution);
         }
 
         protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
