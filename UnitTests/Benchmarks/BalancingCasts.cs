@@ -108,6 +108,19 @@ namespace UnitTests.Benchmarks
             }
         }
 
+        [TestCase("random1993")] // ~30s
+        public void Individual(string test_case_name_containing, double quantize_to_nearest = 1)
+        {
+            Console.WriteLine(SummaryRow.ToHeader());
+            foreach (var file_name in TestFiles(test_case_name_containing))
+            {
+                using var context = new ShowContext(OptionsFor(file_name));
+                if (quantize_to_nearest != 1)
+                    QuantizePrimaryAbilities(context.Applicants, quantize_to_nearest);
+                RunTestCase(context, Path.GetFileNameWithoutExtension(file_name), false);
+            }
+        }
+
         private void QuantizePrimaryAbilities(IEnumerable<Applicant> applicants, double quantize_to_nearest)
         {
             foreach (var applicant in applicants)

@@ -57,7 +57,9 @@ namespace Carmen.CastingEngine.SAT
                 }
             }
             // build the sat
-            this._sat = sat = new BranchAndBoundSolver<Applicant>(CostFunction, applicants_needing_alternative_cast.SelectMany(p => p.Item2));
+            var termination_threshold = primaryCriterias.Length * applicants_needing_alternative_cast.SelectMany(p => p.Item2).Select(a => a.CastGroup).Distinct().Count(); // 1 rank difference per criteria per cast group
+            //LATER try this without the termination threshold, or even consider a time based threshold
+            this._sat = sat = new BranchAndBoundSolver<Applicant>(CostFunction, termination_threshold, applicants_needing_alternative_cast.SelectMany(p => p.Item2));
             var clauses = new HashSet<Clause<Applicant>>();
             clauses.AddRange(existing_assignments);
             clauses.AddRange(same_cast_clauses);
