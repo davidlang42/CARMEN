@@ -51,18 +51,26 @@ namespace Carmen.CastingEngine.SAT
             var solved_clauses = new HashSet<Clause<Applicant>>();
             solved_clauses.AddRange(existing_assignments);
             solved_clauses.AddRange(same_cast_clauses); //LATER these clauses should probably be solved first to prove they are consistent
+            int previously_chunked_applicants = 0;
             Results.Clear();
             Initialise(out int chunk_size, out int max_chunks);
             do //LATER probably need some way of communicating progress back to the main program, especially as chunk size increases in ChunkedPairsSatEngine
             {
                 // cap max_chunk to the highest possible number of chunks
-                max_chunks = Math.Min(max_chunks, applicants_needing_alternative_cast.Select(p => p.Item2.Count).Max() / chunk_size); // at this value, the limit will not be hit before all applicants have been chunked
+                var max_possible_chunks = MaximumPossibleChunks(chunk_size, previously_chunked_applicants, applicants_needing_alternative_cast.Select(p => p.Item2.Count));
+                if (max_chunks > max_possible_chunks)
+                    max_chunks = max_possible_chunks;
                 // compile clauses
                 var clauses = new HashSet<Clause<Applicant>>();
                 clauses.AddRange(solved_clauses);
-                bool any_chunk_clause = false;
+                var max_actual_chunks = 0;
                 foreach (var (cg, hs) in applicants_needing_alternative_cast)
-                    any_chunk_clause |= clauses.AddRange(BuildChunkClauses(hs, chunk_size, max_chunks, same_cast_lookup));
+                {
+                    clauses.AddRange(BuildChunkClauses(hs, previously_chunked_applicants, chunk_size, max_chunks, same_cast_lookup, out var actual_chunks));
+                    if (actual_chunks > max_actual_chunks)
+                        max_actual_chunks = actual_chunks;
+                }
+                    
                 if (clauses.Count == 0)
                     break; // no clauses to solve
                 // run sat solver
@@ -78,12 +86,13 @@ namespace Carmen.CastingEngine.SAT
                 });
                 if (!solution.IsUnsolvable)
                 {
+                    previously_chunked_applicants += chunk_size * max_actual_chunks; // using the maximum number of actual chunks across all cast groups only works if chunk_size is only ever increased
                     if (Improve(ref chunk_size, ref max_chunks))
                         solved_clauses.AddRange(clauses);
                     else
                         break; // solved, and no further improvements
                 }
-                if (!any_chunk_clause)
+                if (max_actual_chunks == 0)
                     break; // we didn't have any chunk clauses, if this didn't solve, nothing will
             } while (Simplify(ref chunk_size, ref max_chunks));
             return solution;
@@ -110,25 +119,36 @@ namespace Carmen.CastingEngine.SAT
         /// to accept the current solution. The default implementation always accepts the current solution.</summary>
         protected virtual bool Improve(ref int chunk_size, ref int max_chunks) => false;
 
+        /// <summary>Find the value of max_chunks at which the limit will not be hit before all applicants have been chunked</summary>
+        private int MaximumPossibleChunks(int chunk_size, int previously_chunked, IEnumerable<int> applicants_per_cast_group)
+            => (applicants_per_cast_group.Max() - previously_chunked) / chunk_size;
+
         /// <summary>Creates clauses for chunks of applicants within one cast group, for each primary criteria</summary>
-        private IEnumerable<Clause<Applicant>> BuildChunkClauses(IEnumerable<Applicant> applicants, int chunk_size, int max_chunks, Dictionary<Applicant, SameCastSet> same_cast_lookup)
+        private HashSet<Clause<Applicant>> BuildChunkClauses(IEnumerable<Applicant> applicants, int skip_applicants, int chunk_size, int max_chunks,
+            Dictionary<Applicant, SameCastSet> same_cast_lookup, out int max_chunk_count)
         {
+            max_chunk_count = 0;
+            var clauses = new HashSet<Clause<Applicant>>();
             foreach (var criteria in primaryCriterias)
             {
                 int chunk_count = 0;
                 var sorted_applicants = new Stack<Applicant>(applicants.OrderBy(a => a.MarkFor(criteria))); // order by marks ascending so that the lowest mark is at the bottom of the stack
+                while (skip_applicants-- > 0)
+                    sorted_applicants.Pop();
                 while (sorted_applicants.Count >= chunk_size && chunk_count < max_chunks)
                 {
                     if (TakeChunk(sorted_applicants, chunk_size, same_cast_lookup) is Applicant[] chunk)
-                        foreach (var clause in KeepSeparate(chunk))
-                            yield return clause;
+                        clauses.AddRange(KeepSeparate(chunk));
                     else
                         // TakeChunk may fail, even though there are technically enough applicants,
                         // if the remaining applicants are in a SameCastSet
                         break;
                     chunk_count++;
                 }
+                if (chunk_count > max_chunk_count)
+                    max_chunk_count = chunk_count;
             }
+            return clauses;
         }
 
         /// <summary>Creates a clause specifying that exactly half of the given applicants are in each alternative cast</summary>

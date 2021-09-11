@@ -14,7 +14,6 @@ namespace Carmen.CastingEngine.SAT
     /// A concrete approach for balancing alternative casts with a combination of the TopPairs and ChunkedPairs approaches.
     /// Initially the full list of aplicants are paired off in order, reducing the number of pairs each iteration until success.
     /// The remaining applicants are then chunked, increasing the chunk size until it succeeds.
-    /// NOTE: this approach may cause uneven alternative cast counts
     /// </summary>
     public class HybridPairsSatEngine : PairsSatEngine
     {
