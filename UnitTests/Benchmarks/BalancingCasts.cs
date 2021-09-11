@@ -178,9 +178,6 @@ namespace UnitTests.Benchmarks
                 s += CastRow.Difference(a, b).ToString();
                 CalculateRankings(a, b, out rank_letter_order, out rank_difference);
                 s += $"{rank_difference}\t{rank_letter_order}\t";
-                //TODO add to cast comparisons:
-                //- min threshold for top10 difference
-                //- count of marks above 70 difference
                 return s;
             }
 
@@ -233,18 +230,22 @@ namespace UnitTests.Benchmarks
 
         private class DifferenceRow
         {
-            public MarkDistribution Distribution;
+            public const uint THRESHOLD = 70;
 
-            public DifferenceRow(MarkDistribution distribution)
+            public MarkDistribution Distribution;
+            public uint CountAboveThreshold;
+
+            public DifferenceRow(MarkDistribution distribution, uint count_above_threshold)
             {
                 Distribution = distribution;
+                CountAboveThreshold = count_above_threshold;
             }
 
             public static string ToHeader(string label)
-                => $"Min({label})\tMax({label})\tMean({label})\tMedian({label})\tStd-dev({label})\t";
+                => $"Min({label})\tMax({label})\tMean({label})\tMedian({label})\tStd-dev({label})\tAbove threshold({label})";
 
             public override string ToString()
-                => $"{Distribution.Min}\t{Distribution.Max}\t{Distribution.Mean:0.0}\t{Distribution.Median:0.0}\t{Distribution.StandardDeviation:0.0}\t";
+                => $"{Distribution.Min}\t{Distribution.Max}\t{Distribution.Mean:0.0}\t{Distribution.Median:0.0}\t{Distribution.StandardDeviation:0.0}\t{CountAboveThreshold}\t";
         }
 
         private class CastRow : DifferenceRow
@@ -257,7 +258,7 @@ namespace UnitTests.Benchmarks
             { }
 
             public CastRow(AlternativeCast alternative_cast, uint[] sorted_marks, MarkDistribution? distribution = null)
-                : base(distribution ?? MarkDistribution.Analyse(sorted_marks))
+                : base(distribution ?? MarkDistribution.Analyse(sorted_marks), (uint)sorted_marks.Where(m => m > THRESHOLD).Count())
             {
                 AlternativeCast = alternative_cast;
                 SortedMarks = sorted_marks;
@@ -276,7 +277,7 @@ namespace UnitTests.Benchmarks
                     Mean = (uint)Math.Abs(a.Distribution.Mean - b.Distribution.Mean),
                     Median = (uint)Math.Abs(a.Distribution.Median - b.Distribution.Median),
                     StandardDeviation = (uint)Math.Abs(a.Distribution.StandardDeviation - b.Distribution.StandardDeviation),
-                });
+                }, (uint)Math.Abs(a.CountAboveThreshold - b.CountAboveThreshold));
 
             public CastRow Top(int count)
                 => new CastRow(AlternativeCast, SortedMarks.Take(count));
