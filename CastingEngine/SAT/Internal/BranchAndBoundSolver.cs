@@ -35,35 +35,44 @@ namespace Carmen.CastingEngine.SAT.Internal
             inProgress = true;
             optimalCost = double.MaxValue;
             optimalSolutions.Clear();
-            foreach (var solution in base.Solve(expression))
+            var queue = new Queue<Solution>();
+            foreach (var raw_solution in base.Solve(expression))
             {
-                var (lower, upper) = costFunction(solution);
-                if (lower == upper)
+                queue.Enqueue(raw_solution);
+                while (queue.Any())
                 {
-                    if (lower == optimalCost)
-                        optimalSolutions.Add(solution);
-                    else if (lower < optimalCost)
+                    var solution = queue.Dequeue();
+                    var (lower, upper) = costFunction(solution);
+                    if (lower == upper)
                     {
-                        optimalCost = lower;
-                        optimalSolutions.Clear();
-                        optimalSolutions.Add(solution);
-                    }
-                }
-                else
-                {
-                    foreach (var enumerated_solution in solution.Enumerate())
-                    {
-                        var (exact, confirm_exact) = costFunction(enumerated_solution);
-                        if (exact != confirm_exact)
-                            throw new ApplicationException($"Cost function did not return an exact value for a fully assigned solution: {enumerated_solution}");
-                        if (exact == optimalCost)
-                            optimalSolutions.Add(enumerated_solution);
-                        else if (exact < optimalCost)
+                        if (lower == optimalCost)
+                            optimalSolutions.Add(solution);
+                        else if (lower < optimalCost)
                         {
                             optimalCost = lower;
                             optimalSolutions.Clear();
-                            optimalSolutions.Add(enumerated_solution);
+                            optimalSolutions.Add(solution);
                         }
+                    }
+                    else
+                    {
+                        var first_unassigned = -1;
+                        for (var i = 0; i < solution.Assignments.Length; i++)
+                        {
+                            if (solution.Assignments[i] == null)
+                            {
+                                first_unassigned = i;
+                                break;
+                            }
+                        }
+                        if (first_unassigned == -1)
+                            throw new ApplicationException($"Cost function did not return an exact value for a fully assigned solution: {solution}");
+                        var new_solution = solution.Clone();
+                        new_solution.Assignments[first_unassigned] = false;
+                        queue.Enqueue(new_solution);
+                        new_solution = solution.Clone();
+                        new_solution.Assignments[first_unassigned] = true;
+                        queue.Enqueue(new_solution);
                     }
                 }
             }
