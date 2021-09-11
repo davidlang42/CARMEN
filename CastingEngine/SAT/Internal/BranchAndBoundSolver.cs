@@ -38,30 +38,43 @@ namespace Carmen.CastingEngine.SAT.Internal
             optimalLower = double.MaxValue;
             optimalSolution = Solution.Unsolveable;
             var queue = new Queue<Solution>();
-            foreach (var raw_solution in base.Solve(expression))
+            var base_solutions = base.Solve(expression).GetEnumerator();
+            if (base_solutions.MoveNext())
+                queue.Enqueue(base_solutions.Current);
+            while (queue.Any())
             {
-                queue.Enqueue(raw_solution);
-                while (queue.Any())
+                var solution = queue.Dequeue();
+                var (lower, upper) = costFunction(solution);
+                if (upper <= optimalLower)
                 {
-                    var solution = queue.Dequeue();
-                    var (lower, upper) = costFunction(solution);
-                    if (upper < optimalLower)
+                    optimalLower = lower;
+                    optimalUpper = upper;
+                    optimalSolution = solution;
+                }
+                else if (lower < optimalUpper)
+                {
+                    if (upper - lower > optimalUpper - optimalLower)
+                        Branch(solution, queue);
+                    else
                     {
-                        optimalLower = lower;
-                        optimalUpper = upper;
-                        optimalSolution = solution;
+                        Branch(optimalSolution, queue);
+                        queue.Enqueue(solution);
+                        optimalLower = double.MaxValue;
+                        optimalUpper = double.MaxValue;
+                        optimalSolution = Solution.Unsolveable;
                     }
-                    else if (lower < optimalUpper)
+                }
+                if (!queue.Any())
+                {
+                    if (base_solutions.MoveNext())
+                        queue.Enqueue(base_solutions.Current);
+                    else if (optimalUpper != optimalLower)
                     {
-                        if (upper - lower > optimalUpper - optimalLower)
-                            Branch(solution, queue);
-                        else
-                        {
-                            Branch(optimalSolution, queue);
-                            optimalLower = lower;
-                            optimalUpper = upper;
-                            optimalSolution = solution;
-                        }
+                        Branch(optimalSolution, queue);
+                        queue.Enqueue(solution);
+                        optimalLower = double.MaxValue;
+                        optimalUpper = double.MaxValue;
+                        optimalSolution = Solution.Unsolveable;
                     }
                 }
             }
