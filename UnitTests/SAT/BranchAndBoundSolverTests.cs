@@ -103,5 +103,26 @@ namespace UnitTests.SAT
             var percent_solved = solved * 100 / test_cases;
             percent_solved.Should().BeInRange(40, 60);
         }
+
+        [Test]
+        [TestCase(100, 10, 10, 3, TestName = "Speed10")] // 30ms
+        [TestCase(100, 15, 15, 3, TestName = "Speed15")] // 120ms
+        [TestCase(100, 20, 20, 3, TestName = "Speed20")] // 0.9s
+        [TestCase(100, 25, 25, 3, TestName = "Speed25")] // 5.3s
+        //[TestCase(100, 50, 50, 3, TestName = "Speed50")] // ?
+        public void SpeedTest(int test_cases, int n_variables, int j_clauses, int k_literals)
+        {
+            var vars = Enumerable.Range(1, n_variables).ToArray();
+            var sat = new BranchAndBoundSolver<int>(CostFunction, vars);
+            var solved = 0;
+            for (var seed = 0; seed < test_cases; seed++)
+            {
+                var expression = GenerateExpression(seed, vars, j_clauses, k_literals);
+                if (TestSolve(sat, expression))
+                    solved++;
+            }
+            var percent_solved = solved * 100 / test_cases;
+            Console.WriteLine($"Percent solved: {percent_solved:0}%");
+        }
     }
 }
