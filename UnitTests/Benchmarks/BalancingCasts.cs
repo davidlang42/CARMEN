@@ -155,8 +155,9 @@ namespace UnitTests.Benchmarks
             {
                 var h = "Test case\tEngine\tTotal seconds\tCast group\tCriteria\t";
                 for(var i=0; i<CAST_COUNT; i++)
-                    h += $"Cast({i})\tMin({i})\tMax({i})\tMean({i})\tMedian({i})\tStd-dev({i})\tSorted marks({i})\t";
-                h += $"Mean difference\tMedian difference\tStd-dev difference\tRank difference\tCast rank order";
+                    h += $"Cast({i})\tSorted marks({i})\t{CastRow.ToHeader(i.ToString())}";
+                h += $"{CastRow.ToHeader("Δ")}Rank difference\tCast rank order\t";
+                h += $"{CastRow.ToHeader("Top10-Δ")}Rank difference(Top5)\tCast rank order(Top5)\t";
                 return h;
             }
 
@@ -166,17 +167,18 @@ namespace UnitTests.Benchmarks
                     throw new Exception($"Expected {CAST_COUNT} cast rows but found {CastRows.Count}.");
                 var s = $"{TestCase}\t{Engine}\t{TotalSeconds:0.0}\t{CastGroup.Abbreviation}\t{Criteria.Name}\t";
                 foreach (var cr in CastRows)
-                    s += $"{cr.AlternativeCast.Initial}\t{cr.Distribution.Min}\t{cr.Distribution.Max}\t{cr.Distribution.Mean:0.0}\t{cr.Distribution.Median:0.0}\t{cr.Distribution.StandardDeviation:0.0}\t{string.Join(", ",cr.SortedMarks.OrderByDescending(m => m))}\t";
+                    s += $"{cr.AlternativeCast.Initial}\t{string.Join(", ",cr.SortedMarks.OrderByDescending(m => m))}\t{cr}";
                 var a = CastRows[0];
                 var b = CastRows[1];
-                s += $"{Math.Abs(a.Distribution.Mean-b.Distribution.Mean):0.0}\t{Math.Abs(a.Distribution.Median-b.Distribution.Median):0.0}\t{Math.Abs(a.Distribution.StandardDeviation-b.Distribution.StandardDeviation):0.0}\t";
+                s += CastRow.Difference(a, b).ToString();
                 CalculateRankings(a, b, out var rank_letter_order, out var rank_difference);
                 s += $"{rank_difference}\t{rank_letter_order}\t";
+                a = a.Top(5);
+                b = b.Top(5);
+                s += CastRow.Difference(a, b).ToString();
+                CalculateRankings(a, b, out rank_letter_order, out rank_difference);
+                s += $"{rank_difference}\t{rank_letter_order}\t";
                 //TODO add to cast comparisons:
-                //- ranking difference for top10
-                //- mean difference for top10
-                //- median difference for top10
-                //- std dev difference for top10
                 //- min threshold for top10 difference
                 //- count of marks above 70 difference
                 return s;
@@ -234,6 +236,36 @@ namespace UnitTests.Benchmarks
             public AlternativeCast AlternativeCast;
             public uint[] SortedMarks; // descending
             public MarkDistribution Distribution;
+
+            public static string ToHeader(string label)
+                => $"Min({label})\tMax({label})\tMean({label})\tMedian({label})\tStd-dev({label})\t";
+
+            public override string ToString()
+                => $"{Distribution.Min}\t{Distribution.Max}\t{Distribution.Mean:0.0}\t{Distribution.Median:0.0}\t{Distribution.StandardDeviation:0.0}\t";
+
+            public static CastRow Difference(CastRow a, CastRow b)
+                => new()
+                {
+                    Distribution = new()
+                    {
+                        Max = (uint)Math.Abs(a.Distribution.Max - b.Distribution.Max),
+                        Min = (uint)Math.Abs(a.Distribution.Min - b.Distribution.Min),
+                        Mean = (uint)Math.Abs(a.Distribution.Mean - b.Distribution.Mean),
+                        Median = (uint)Math.Abs(a.Distribution.Median - b.Distribution.Median),
+                        StandardDeviation = (uint)Math.Abs(a.Distribution.StandardDeviation - b.Distribution.StandardDeviation),
+                    }
+                };
+
+            public CastRow Top(int count)
+            {
+                var row = new CastRow
+                {
+                    AlternativeCast = AlternativeCast,
+                    SortedMarks = SortedMarks.Take(count).ToArray()
+                };
+                row.Distribution = MarkDistribution.Analyse(row.SortedMarks);
+                return row;
+            }
         }
 
         private void DisplaySummary(string test_case, string engine_name, double total_seconds, IEnumerable<CastGroup> cast_groups, IEnumerable<Criteria> criterias)
