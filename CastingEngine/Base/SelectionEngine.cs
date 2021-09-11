@@ -186,5 +186,27 @@ namespace Carmen.CastingEngine.Base
                 (null, ListSortDirection.Descending) => applicants.OrderByDescending(a => ApplicantEngine.OverallAbility(a)),
                 _ => throw new ApplicationException($"Sort type not handled: {castNumberOrderBy} / {castNumberOrderDirection}")
             };
+
+        /// <summary>Detects families by matching last name</summary>
+        public void DetectFamilies(IEnumerable<Applicant> applicants)
+        {
+            var siblings = applicants
+                .Where(a => !string.IsNullOrEmpty(a.LastName))
+                .OrderBy(a => a.LastName).ThenBy(a => a.FirstName)
+                .GroupBy(a => a.LastName)
+                .Select(g => g.ToArray())
+                .ToArray();
+            foreach (var family in siblings.Where(f => f.Length > 1))
+            {
+                var set = family.Select(a => a.SameCastSet).OfType<SameCastSet>().FirstOrDefault()
+                    ?? new SameCastSet();
+                foreach (var applicant in family)
+                    if (applicant.SameCastSet == null)
+                    {
+                        applicant.SameCastSet = set;
+                        set.Applicants.Add(applicant);
+                    }
+            }
+        }
     }
 }

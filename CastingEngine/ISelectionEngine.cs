@@ -29,6 +29,9 @@ namespace Carmen.CastingEngine
         /// different to <see cref="IApplicantEngine.SuitabilityOf(Applicant, Requirement)"/>.</summary>
         double SuitabilityOf(Applicant applicant, Tag tag);
 
+        /// <summary>Set same cast sets for family groups within the applicants provided.</summary>
+        void DetectFamilies(IEnumerable<Applicant> applicants);
+
         /// <summary>Select applicants into cast groups, respecting those already placed
         /// NOTE: CastGroup requirements may not depend on Tags</summary>
         void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups);
