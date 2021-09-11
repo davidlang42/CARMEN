@@ -124,6 +124,7 @@ namespace CarmenUI.Pages
                     nameof(TopPairsSatEngine) => new TopPairsSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
                     nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
                     nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
                     _ => throw new ArgumentException($"Allocation engine not handled: {ParseSelectionEngine()}")
                 };
             }
