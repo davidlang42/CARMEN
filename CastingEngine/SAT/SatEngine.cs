@@ -124,6 +124,8 @@ namespace Carmen.CastingEngine.SAT
                             existing_assignments.Add(Clause<Applicant>.Unit(applicant, applicant.AlternativeCast == alternativeCasts[1]));
                 }
             }
+            if (applicants_needing_alternative_cast.Count == 0)
+                return; // nothing to do
             // create clauses for same cast sets
             var same_cast_clauses = new List<Clause<Applicant>>();
             var same_cast_lookup = new Dictionary<Applicant, SameCastSet>();
