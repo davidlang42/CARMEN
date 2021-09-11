@@ -9,7 +9,7 @@ namespace Carmen.CastingEngine.SAT.Internal
     /// <summary>
     /// An SMT solver based on the DPLL(T) algorithm, extending DPLL with a domain specific validity test
     /// </summary>
-    public class DpllTheorySolver<T> : DpllSolver<T> //LATER add unit tests
+    public class DpllTheorySolver<T> : DpllAllSolver<T> //LATER add unit tests
         where T : notnull
     {
         /// <summary>Tests the validity of a proposed solution, returning true if valid (for all possible
@@ -23,7 +23,6 @@ namespace Carmen.CastingEngine.SAT.Internal
             : base(variables)
         {
             validityTest = validity_test;
-            propogatePureLiterals = false; //LATER if I want to keep pure literals and have all solutions, could possibly back-check the inverse pure literal when returning solutions
         }
 
         public override IEnumerable<Solution> Solve(Expression<T> expression)
