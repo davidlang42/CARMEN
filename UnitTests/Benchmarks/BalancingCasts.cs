@@ -71,11 +71,11 @@ namespace UnitTests.Benchmarks
         [Test]
         public void Random_Quantized()
         {
-            //TODO
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("random"))
             {
                 using var context = new ShowContext(OptionsFor(file_name));
+                QuantizePrimaryAbilities(context.Applicants, 5);
                 RunTestCase(context, Path.GetFileNameWithoutExtension(file_name) + "_quantized", false);
             }
         }
@@ -94,13 +94,21 @@ namespace UnitTests.Benchmarks
         [Test]
         public void Converted_Quantized()
         {
-            //TODO
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("converted"))
             {
                 using var context = new ShowContext(OptionsFor(file_name));
+                QuantizePrimaryAbilities(context.Applicants, 5);
                 RunTestCase(context, Path.GetFileNameWithoutExtension(file_name) + "_quantized", true);
             }
+        }
+
+        private void QuantizePrimaryAbilities(IEnumerable<Applicant> applicants, double quantize_to_nearest)
+        {
+            foreach (var applicant in applicants)
+                foreach (var ability in applicant.Abilities)
+                    if (ability.Criteria.Primary)
+                        ability.Mark = (uint)(Math.Round(ability.Mark / quantize_to_nearest) * quantize_to_nearest);
         }
 
         internal void RunTestCase(ShowContext context, string test_case, bool analyse_existing)
@@ -116,7 +124,7 @@ namespace UnitTests.Benchmarks
                 if (engine is HeuristicSelectionEngine)
                     continue; //TODO fix heuristic selection engine
                 ClearAlternativeCasts(applicants);
-                engine.BalanceAlternativeCasts(applicants, same_cast_sets);
+                engine.BalanceAlternativeCasts(applicants, same_cast_sets); //TODO benchmark how long each engine takes as well
                 DisplaySummary(test_case, engine.GetType().Name, cast_groups, criterias);
             }
         }
