@@ -274,9 +274,9 @@ namespace UnitTests.Benchmarks
                 => new(new() {
                     Max = (uint)Math.Abs(a.Distribution.Max - b.Distribution.Max),
                     Min = (uint)Math.Abs(a.Distribution.Min - b.Distribution.Min),
-                    Mean = (uint)Math.Abs(a.Distribution.Mean - b.Distribution.Mean),
-                    Median = (uint)Math.Abs(a.Distribution.Median - b.Distribution.Median),
-                    StandardDeviation = (uint)Math.Abs(a.Distribution.StandardDeviation - b.Distribution.StandardDeviation),
+                    Mean = Math.Abs(a.Distribution.Mean - b.Distribution.Mean),
+                    Median = Math.Abs(a.Distribution.Median - b.Distribution.Median),
+                    StandardDeviation = Math.Abs(a.Distribution.StandardDeviation - b.Distribution.StandardDeviation),
                 }, (uint)Math.Abs(a.CountAboveThreshold - b.CountAboveThreshold));
 
             public CastRow Top(int count)
