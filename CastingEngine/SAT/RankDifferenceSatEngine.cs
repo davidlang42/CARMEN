@@ -105,14 +105,20 @@ namespace Carmen.CastingEngine.SAT
                 }
                 var best_criteria = 0;
                 var worst_criteria = 0;
+                var not_assigned_ranks_by_cg = not_assigned_ranks.OrderByDescending(p => p.Item2).GroupBy(p => p.Item1).ToDictionary(g => g.Key, g => g.Select(p => p.Item2).ToArray());
                 foreach (var (cg, total) in count_total)
                 {
                     int max = (total + 1) / 2;
                     if (count_true[cg] > max || count_false[cg] > max)
                         return (double.MaxValue, double.MaxValue); // invalid solution, casts are not even
-                    var assignable_true = not_assigned_ranks.Where(p => p.Item1 == cg).Select(p => p.Item2).OrderByDescending(p => p).Take(max - count_true[cg]).Sum();
-                    var assignable_false = not_assigned_ranks.Where(p => p.Item1 == cg).Select(p => p.Item2).OrderByDescending(p => p).Take(max - count_false[cg]).Sum();
-                    var (best_cg, worst_cg) = FindBestAndWorstCases(assigned_rank_difference[cg], assignable_true, assignable_false); //TODO improve best/worst algorithm
+                    int assignable_true = 0;
+                    int assignable_false = 0;
+                    if (not_assigned_ranks_by_cg.TryGetValue(cg, out var ranks))
+                    {
+                        assignable_true = ranks.Take(max - count_true[cg]).Sum();
+                        assignable_false = ranks.Take(max - count_false[cg]).Sum();
+                    }
+                    var (best_cg, worst_cg) = FindBestAndWorstCases(assigned_rank_difference[cg], assignable_true, assignable_false);
                     best_criteria += best_cg;
                     worst_criteria += worst_cg;
                 }

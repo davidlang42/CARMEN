@@ -140,7 +140,7 @@ namespace UnitTests.Benchmarks
             foreach (var engine in CreateEngines(context))
             {
                 if (engine is HeuristicSelectionEngine)
-                    continue; //TODO fix heuristic selection engine
+                    continue; //TODO (HEURISTIC) fix heuristic selection engine
                 ClearAlternativeCasts(applicants);
                 var start_time = DateTime.Now;
                 engine.BalanceAlternativeCasts(applicants, same_cast_sets);
