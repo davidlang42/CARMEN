@@ -242,7 +242,7 @@ namespace UnitTests.Benchmarks
             }
 
             public static string ToHeader(string label)
-                => $"Min({label})\tMax({label})\tMean({label})\tMedian({label})\tStd-dev({label})\tAbove threshold({label})";
+                => $"Min({label})\tMax({label})\tMean({label})\tMedian({label})\tStd-dev({label})\tAbove threshold({label})\t";
 
             public override string ToString()
                 => $"{Distribution.Min}\t{Distribution.Max}\t{Distribution.Mean:0.0}\t{Distribution.Median:0.0}\t{Distribution.StandardDeviation:0.0}\t{CountAboveThreshold}\t";
@@ -272,12 +272,12 @@ namespace UnitTests.Benchmarks
 
             public static DifferenceRow Difference(CastRow a, CastRow b)
                 => new(new() {
-                    Max = (uint)Math.Abs(a.Distribution.Max - b.Distribution.Max),
-                    Min = (uint)Math.Abs(a.Distribution.Min - b.Distribution.Min),
+                    Max = (uint)Math.Abs((int)a.Distribution.Max - b.Distribution.Max),
+                    Min = (uint)Math.Abs((int)a.Distribution.Min - b.Distribution.Min),
                     Mean = Math.Abs(a.Distribution.Mean - b.Distribution.Mean),
                     Median = Math.Abs(a.Distribution.Median - b.Distribution.Median),
                     StandardDeviation = Math.Abs(a.Distribution.StandardDeviation - b.Distribution.StandardDeviation),
-                }, (uint)Math.Abs(a.CountAboveThreshold - b.CountAboveThreshold));
+                }, (uint)Math.Abs((int)a.CountAboveThreshold - b.CountAboveThreshold));
 
             public CastRow Top(int count)
                 => new CastRow(AlternativeCast, SortedMarks.Take(count));
