@@ -41,7 +41,7 @@ namespace Carmen.CastingEngine.SAT.Internal
             var base_solutions = base.Solve(expression).GetEnumerator();
             if (base_solutions.MoveNext())
                 stack.Push(base_solutions.Current);
-            while (stack.Any())
+            while (stack.Any())//TODO add threshold (got to 3)
             {
                 var solution = stack.Pop();
                 var (lower, upper) = costFunction(solution);

@@ -19,6 +19,8 @@ namespace Carmen.CastingEngine.SAT
     {
         bool inProgress = false;
         Dictionary<(Applicant, Criteria), int> applicantRanks = new();
+        Applicant[] applicantsByVariableIndex = new Applicant[0];
+        CastGroup[] castGroupsByVariableIndex = new CastGroup[0];
         Solver<Applicant>? _sat;
 
         Solver<Applicant> sat => _sat ?? throw new ApplicationException($"Tried to access {nameof(sat)} before it has been initialized");
@@ -54,11 +56,15 @@ namespace Carmen.CastingEngine.SAT
                     }
                 }
             }
-            // solve the sat
+            // build the sat
             this._sat = sat = new BranchAndBoundSolver<Applicant>(CostFunction, applicants_needing_alternative_cast.SelectMany(p => p.Item2));
             var clauses = new HashSet<Clause<Applicant>>();
             clauses.AddRange(existing_assignments);
             clauses.AddRange(same_cast_clauses);
+            // cache variable mapping to applicant & cast group
+            applicantsByVariableIndex = sat.Variables.ToArray();
+            castGroupsByVariableIndex = applicantsByVariableIndex.Select(a => a.CastGroup!).ToArray();
+            // solve the sat
             var solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
             inProgress = false;
             return solution;
@@ -74,14 +80,13 @@ namespace Carmen.CastingEngine.SAT
             {
                 var assigned_rank_difference = new OmnificentDictionary<CastGroup, int>();
                 var not_assigned_ranks = new List<(CastGroup, int)>();
-                var count_true = new OmnificentDictionary<CastGroup, int>();
-                var count_false = new OmnificentDictionary<CastGroup, int>();
-                var count_total = new OmnificentDictionary<CastGroup, int>();
+                var count_true = new OmnificentDictionary<CastGroup, int>(); //TODO speed up by using arrays instead of dictionaries
+                var count_false = new OmnificentDictionary<CastGroup, int>(); //TODO speed up by using arrays instead of dictionaries
+                var count_total = new OmnificentDictionary<CastGroup, int>(); //TODO speed up by using arrays instead of dictionaries
                 for (var i = 0; i < partial_solution.Assignments.Length; i++)
                 {
-                    var applicant = sat.Variables.ElementAt(i);
-                    var cg = applicant.CastGroup!;
-                    var rank = applicantRanks[(applicant, criteria)];
+                    var cg = castGroupsByVariableIndex[i];
+                    var rank = applicantRanks[(applicantsByVariableIndex[i], criteria)]; //TODO speed up by using arrays instead of dictionaries
                     if (partial_solution.Assignments[i] is not bool value)
                         not_assigned_ranks.Add((cg, rank));
                     else if (value)
@@ -105,7 +110,7 @@ namespace Carmen.CastingEngine.SAT
                         return (double.MaxValue, double.MaxValue); // invalid solution, casts are not even
                     var assignable_true = not_assigned_ranks.Where(p => p.Item1 == cg).Select(p => p.Item2).OrderByDescending(p => p).Take(max - count_true[cg]).Sum();
                     var assignable_false = not_assigned_ranks.Where(p => p.Item1 == cg).Select(p => p.Item2).OrderByDescending(p => p).Take(max - count_false[cg]).Sum();
-                    var (best_cg, worst_cg) = FindBestAndWorstCases(assigned_rank_difference[cg], assignable_true, assignable_false);
+                    var (best_cg, worst_cg) = FindBestAndWorstCases(assigned_rank_difference[cg], assignable_true, assignable_false); //TODO improve best/worst algorithm
                     best_criteria += best_cg;
                     worst_criteria += worst_cg;
                 }
