@@ -134,7 +134,7 @@ namespace Carmen.CastingEngine.SAT
             {
                 int chunk_count = 0;
                 var sorted_applicants = new Stack<Applicant>(applicants.OrderBy(a => a.MarkFor(criteria))); // order by marks ascending so that the lowest mark is at the bottom of the stack
-                while (skip_applicants-- > 0)
+                while (skip_applicants-- > 0 && sorted_applicants.Any())
                     sorted_applicants.Pop();
                 while (sorted_applicants.Count >= chunk_size && chunk_count < max_chunks)
                 {

@@ -85,7 +85,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [Test] // ~1min
+        [Test] // ~6min
         public void Converted()
         {
             Console.WriteLine(SummaryRow.ToHeader());
@@ -96,7 +96,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [Test] // ~1min
+        [Test] // ~8min
         public void Converted_Quantized()
         {
             Console.WriteLine(SummaryRow.ToHeader());
@@ -108,7 +108,7 @@ namespace UnitTests.Benchmarks
             }
         }
 
-        [TestCase("random1993")] // ~12s
+        [TestCase("random1993")] // ~10s
         public void Individual(string test_case_name_containing, double quantize_to_nearest = 1)
         {
             Console.WriteLine(SummaryRow.ToHeader());
