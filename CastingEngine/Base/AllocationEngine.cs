@@ -126,6 +126,7 @@ namespace Carmen.CastingEngine.Base
                             AdjacentTo = previous,
                             NonConsecutiveSection = non_consecutive_node
                         };
+                    previous = e.Current;
                 }
             }
         }

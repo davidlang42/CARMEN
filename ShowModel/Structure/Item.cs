@@ -104,7 +104,8 @@ namespace Carmen.ShowModel.Structure
                     .Where(r => !item_roles.Contains(r)) // a role is allowed to be in 2 consecutive items
                     .SelectMany(r => r.Cast).ToHashSet();
                 previous_cast.IntersectWith(item_cast); // result in previous_cast
-                yield return new ConsecutiveItemCast { Cast = previous_cast, Item1 = previous, Item2 = this };
+                if (previous_cast.Any())
+                    yield return new ConsecutiveItemCast { Cast = previous_cast, Item1 = previous, Item2 = this };
             }
             if (NextItem() is Item next && CommonParents(this, next).Any(p => !p.AllowConsecutiveItems))
             {
@@ -112,7 +113,8 @@ namespace Carmen.ShowModel.Structure
                     .Where(r => !item_roles.Contains(r)) // a role is allowed to be in 2 consecutive items
                     .SelectMany(r => r.Cast).ToHashSet();
                 next_cast.IntersectWith(item_cast); // result in next_cast
-                yield return new ConsecutiveItemCast { Cast = next_cast, Item1 = this, Item2 = next };
+                if (next_cast.Any())
+                    yield return new ConsecutiveItemCast { Cast = next_cast, Item1 = this, Item2 = next };
             }
         }
 
