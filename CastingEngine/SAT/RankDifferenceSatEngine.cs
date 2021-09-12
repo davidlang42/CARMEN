@@ -42,6 +42,19 @@ namespace Carmen.CastingEngine.SAT
             var clauses = new HashSet<Clause<Applicant>>();
             clauses.AddRange(existing_assignments);
             clauses.AddRange(same_cast_clauses);
+            if (clauses.Count == 0)
+            {
+                if (sat.Variables.Count == 0)
+                    return Solution.Unsolveable;
+                var first_var = sat.Variables.First();
+                clauses.Add(new()
+                {
+                    Literals = new[] {
+                        Literal<Applicant>.Positive(first_var),
+                        Literal<Applicant>.Negative(first_var)
+                    }.ToHashSet()
+                });
+            }
             var solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
             return solution;
         }
