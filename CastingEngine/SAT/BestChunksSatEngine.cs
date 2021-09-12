@@ -11,17 +11,17 @@ using System.Threading.Tasks;
 namespace Carmen.CastingEngine.SAT
 {
     /// <summary>
-    /// A concrete approach for balancing alternative casts based on TopPairsSatEngine, but using a Branch & Bound algorithm
+    /// A concrete approach for balancing alternative casts based on ChunkedPairsSatEngine, but using a Branch & Bound algorithm
     /// to minimize the rank difference.
     /// </summary>
-    public class BestPairsSatEngine : TopPairsSatEngine
+    public class BestChunksSatEngine : ChunkedPairsSatEngine
     {
         int[][] applicantRanks = Array.Empty<int[]>(); // [criteria][applicant variable]
         Applicant[] applicantVariables = Array.Empty<Applicant>();
         int[] castGroupIndexFromVariableIndex = Array.Empty<int>();
         CastGroup[] castGroups = Array.Empty<CastGroup>();
 
-        public BestPairsSatEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
+        public BestChunksSatEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
             : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
         { }
 
