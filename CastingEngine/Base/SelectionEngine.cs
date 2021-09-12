@@ -21,8 +21,8 @@ namespace Carmen.CastingEngine.Base
     {
         /// <summary>A list of available selection engines</summary>
         public static readonly Type[] Implementations = new[] {
-            typeof(HeuristicSelectionEngine),
             typeof(ChunkedPairsSatEngine),
+            typeof(HeuristicSelectionEngine),
             typeof(TopPairsSatEngine),
             typeof(ThreesACrowdSatEngine),
             typeof(HybridPairsSatEngine),
