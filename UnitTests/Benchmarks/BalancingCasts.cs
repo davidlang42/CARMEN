@@ -51,6 +51,7 @@ namespace UnitTests.Benchmarks
                     nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
                     nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
                     nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
+                    nameof(BestPairsSatEngine) => new HybridPairsSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
                     _ => throw new NotImplementedException($"Selection engine not handled: {type.Name}")
                 };
         }

@@ -17,12 +17,12 @@ namespace Carmen.CastingEngine.SAT
     /// </summary>
     public class RankDifferenceSatEngine : SatEngine
     {
-        const int RANK_INCREMENT = 2;
+        public const int RANK_INCREMENT = 2;
 
-        bool inProgress = false;
-        int[][] applicantRanks = new int[0][]; // [criteria][applicant variable]
-        int[] castGroupIndexFromVariableIndex = new int[0];
-        CastGroup[] castGroups = new CastGroup[0];
+        int[][] applicantRanks = Array.Empty<int[]>(); // [criteria][applicant variable]
+        Applicant[] applicantVariables = Array.Empty<Applicant>();
+        int[] castGroupIndexFromVariableIndex = Array.Empty<int>();
+        CastGroup[] castGroups = Array.Empty<CastGroup>();
 
         public RankDifferenceSatEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
             : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
@@ -30,25 +30,32 @@ namespace Carmen.CastingEngine.SAT
 
         protected override Solver<Applicant> BuildSatSolver(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast)
         {
+            CalculateRankings(primaryCriterias, applicants_needing_alternative_cast, out applicantVariables, out castGroups, out applicantRanks, out castGroupIndexFromVariableIndex);
             var termination_threshold = RANK_INCREMENT * primaryCriterias.Length * castGroups.Length; // 1 rank difference per criteria per cast group
             //LATER try this without the termination threshold, or even consider a time based threshold
-            return new BranchAndBoundSolver<Applicant>(CostFunction, termination_threshold, applicants_needing_alternative_cast.SelectMany(p => p.Item2).ToArray());
+            return new BranchAndBoundSolver<Applicant>(CostFunction, termination_threshold, applicantVariables);
         }
 
         protected override Solution FindSatSolution(Solver<Applicant> sat, List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
             List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup)
         {
-            if (inProgress)
-                throw new ApplicationException("FindSatSolution() already in progress");
-            inProgress = true;
-            // calculate and cache applicant ranks
+            var clauses = new HashSet<Clause<Applicant>>();
+            clauses.AddRange(existing_assignments);
+            clauses.AddRange(same_cast_clauses);
+            var solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
+            return solution;
+        }
+
+        internal static void CalculateRankings(Criteria[] primaryCriterias, List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast, 
+            out Applicant[] applicantVariables, out CastGroup[] castGroups, out int[][] applicantRanks, out int[] castGroupIndexFromVariableIndex)
+        {
+            applicantVariables = applicants_needing_alternative_cast.SelectMany(p => p.Item2).ToArray();
+            castGroups = applicantVariables.Select(a => a.CastGroup!).Distinct().ToArray();
             applicantRanks = new int[primaryCriterias.Length][];
-            Applicant[] applicant_variables = sat.Variables.ToArray();
-            castGroupIndexFromVariableIndex = new int[applicant_variables.Length];
-            castGroups = applicant_variables.Select(a => a.CastGroup!).Distinct().ToArray();
+            castGroupIndexFromVariableIndex = new int[applicantVariables.Length];
             for (var c = 0; c < primaryCriterias.Length; c++)
             {
-                applicantRanks[c] = new int[applicant_variables.Length];
+                applicantRanks[c] = new int[applicantVariables.Length];
                 foreach (var (cast_group, applicants) in applicants_needing_alternative_cast)
                 {
                     var cg = Array.IndexOf(castGroups, cast_group);
@@ -56,7 +63,7 @@ namespace Carmen.CastingEngine.SAT
                     uint? previous = null;
                     foreach (var (applicant, mark) in applicants.Select(a => (a, a.MarkFor(primaryCriterias[c]))).OrderBy(p => p.Item2))
                     {
-                        var av = Array.IndexOf(applicant_variables, applicant);
+                        var av = Array.IndexOf(applicantVariables, applicant);
                         castGroupIndexFromVariableIndex[av] = cg;
                         if (mark != previous)
                         {
@@ -69,18 +76,14 @@ namespace Carmen.CastingEngine.SAT
                     }
                 }
             }
-            // solve the sat
-            var clauses = new HashSet<Clause<Applicant>>();
-            clauses.AddRange(existing_assignments);
-            clauses.AddRange(same_cast_clauses);
-            var solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
-            inProgress = false;
-            return solution;
         }
 
-        /// <summary>Calculates the rank difference for a given partial solution.
-        /// Must also return double.MaxValue for solutions which don't have even casts.</summary>
         private (double lower, double upper) CostFunction(Solution partial_solution)
+            => RankDifference(partial_solution, primaryCriterias, castGroups, applicantRanks, castGroupIndexFromVariableIndex);
+
+        /// <summary>Calculates the bounds of the rank difference for a given partial solution.
+        /// Returns double.MaxValue for both if the solution will not have even casts.</summary>
+        internal static (double lower, double upper) RankDifference(Solution partial_solution, Criteria[] primaryCriterias, CastGroup[] castGroups, int[][] applicantRanks, int[] castGroupIndexFromVariableIndex)
         {
             var best_total = 0;
             var worst_total = 0;
@@ -131,7 +134,7 @@ namespace Carmen.CastingEngine.SAT
             return (best_total, worst_total);
         }
 
-        private (int best, int worst) FindBestAndWorstCases(int current, int max_add, int max_subtract)
+        private static (int best, int worst) FindBestAndWorstCases(int current, int max_add, int max_subtract)
         {
             int best_case;
             if (current > 0 && max_subtract < current)
