@@ -118,7 +118,6 @@ namespace CarmenUI.Pages
                 applicantDescription.ApplicantEngine = applicant_engine;
                 _engine = ParseSelectionEngine() switch
                 {
-                    nameof(DummySelectionEngine) => new DummySelectionEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
                     nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
                     nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
                     nameof(TopPairsSatEngine) => new TopPairsSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),

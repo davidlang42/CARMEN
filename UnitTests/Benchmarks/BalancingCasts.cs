@@ -45,7 +45,6 @@ namespace UnitTests.Benchmarks
                 yield return type.Name switch
                 {
                     nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection),
-                    nameof(DummySelectionEngine) => new DummySelectionEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection),
                     nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
                     nameof(TopPairsSatEngine) => new TopPairsSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
                     nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
@@ -133,15 +132,13 @@ namespace UnitTests.Benchmarks
         internal void RunTestCase(ShowContext context, string test_case, bool analyse_existing)
         {
             var applicants = context.Applicants.ToArray();
-            var cast_groups = context.CastGroups.ToArray();
+            var cast_groups = context.CastGroups.Include(cg => cg.Members).ToArray();
             var criterias = context.Criterias.ToArray();
             var same_cast_sets = context.SameCastSets.ToArray();
             if (analyse_existing)
                 DisplaySummary(test_case, "Existing", 0, cast_groups, criterias);
             foreach (var engine in CreateEngines(context))
             {
-                if (engine is HeuristicSelectionEngine)
-                    continue; //TODO (HEURISTIC) fix heuristic selection engine
                 ClearAlternativeCasts(applicants);
                 var start_time = DateTime.Now;
                 engine.BalanceAlternativeCasts(applicants, same_cast_sets);
