@@ -28,7 +28,10 @@ namespace Carmen.CastingEngine.SAT
         protected override Solver<Applicant> BuildSatSolver(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast)
         {
             RankDifferenceSatEngine.CalculateRankings(primaryCriterias, applicants_needing_alternative_cast, out applicantVariables, out castGroups, out applicantRanks, out castGroupIndexFromVariableIndex);
-            return new BranchAndBoundSolver<Applicant>(CostFunction, applicantVariables);
+            return new BranchAndBoundSolver<Applicant>(CostFunction, applicantVariables)
+            {
+                StagnantTimeout = RankDifferenceSatEngine.TIMEOUT_MS
+            };
         }
 
         private (double lower, double upper) CostFunction(Solution partial_solution)

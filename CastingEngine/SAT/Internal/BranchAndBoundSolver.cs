@@ -20,21 +20,24 @@ namespace Carmen.CastingEngine.SAT.Internal
         private double optimalUpper;
         private double optimalLower;
         private Solution optimalSolution;
+        private DateTime optimalLastUpdated;
         private bool inProgress = false;
-        private double? terminationThreshold;
+
+        /// <summary>If set, and the solver finds a complete solution with a cost function value below
+        /// this threshold, it will immediately terminate without checking the remaining solutions.
+        /// This is good for problems without difficult conditions to meet.</summary>
+        public double? SuccessThreshold { get; set; }
+
+        /// <summary>If set, and the solver runs for longer than the provided milliseconds without
+        /// improving on the currently optimal complete solution, it will terminate without checking
+        /// the remaining solutions. This is a good failsafe for usability.</summary>
+        public int? StagnantTimeout { get; set; }
 
         /// <summary>Finds the SAT solution which minimizes the given cost function</summary>
         public BranchAndBoundSolver(CostFunction cost_function, IEnumerable<T>? variables = null)
             : base(variables)
         {
             costFunction = cost_function;
-        }
-
-        /// <summary>Finds the SAT solution which minimizes the given cost function, terminating at a threshold cost level</summary>
-        public BranchAndBoundSolver(CostFunction cost_function, double? termination_threshold = null, IEnumerable<T>? variables = null)
-            : this(cost_function, variables)
-        {
-            terminationThreshold = termination_threshold;
         }
 
         public override IEnumerable<Solution> Solve(Expression<T> expression)
@@ -49,6 +52,7 @@ namespace Carmen.CastingEngine.SAT.Internal
             var base_solutions = base.Solve(expression).GetEnumerator();
             if (base_solutions.MoveNext())
                 stack.Push(base_solutions.Current);
+            optimalLastUpdated = DateTime.Now;
             while (stack.Any() && !AbleToTerminate())
             {
                 var solution = stack.Pop();
@@ -56,6 +60,8 @@ namespace Carmen.CastingEngine.SAT.Internal
                 if (upper <= optimalLower)
                 {
                     optimalLower = lower;
+                    if (optimalUpper != upper)
+                        optimalLastUpdated = DateTime.Now;
                     optimalUpper = upper;
                     optimalSolution = solution;
                 }
@@ -69,6 +75,7 @@ namespace Carmen.CastingEngine.SAT.Internal
                         optimalLower = lower;
                         optimalUpper = upper;
                         optimalSolution = solution;
+                        optimalLastUpdated = DateTime.Now;
                     }
                 }
                 if (!stack.Any())
@@ -89,8 +96,10 @@ namespace Carmen.CastingEngine.SAT.Internal
                 yield return optimalSolution;
         }
 
-        private bool AbleToTerminate() //LATER implement some sort of time threshold, maybe if no improvement in more than X seconds, terminate
-            => terminationThreshold.HasValue && optimalLower == optimalUpper && optimalLower <= terminationThreshold.Value && !optimalSolution.IsUnsolvable;
+        private bool AbleToTerminate()
+            => !optimalSolution.IsUnsolvable && optimalLower == optimalUpper
+            && (SuccessThreshold.HasValue && optimalLower <= SuccessThreshold.Value
+            || StagnantTimeout.HasValue && (DateTime.Now - optimalLastUpdated).TotalMilliseconds > StagnantTimeout.Value);
 
         private void Branch(Solution solution, Stack<Solution> stack)
         {

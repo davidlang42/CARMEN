@@ -18,6 +18,7 @@ namespace Carmen.CastingEngine.SAT
     public class RankDifferenceSatEngine : SatEngine
     {
         public const int RANK_INCREMENT = 2;
+        public const int TIMEOUT_MS = 5000;
 
         int[][] applicantRanks = Array.Empty<int[]>(); // [criteria][applicant variable]
         Applicant[] applicantVariables = Array.Empty<Applicant>();
@@ -31,9 +32,12 @@ namespace Carmen.CastingEngine.SAT
         protected override Solver<Applicant> BuildSatSolver(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast)
         {
             CalculateRankings(primaryCriterias, applicants_needing_alternative_cast, out applicantVariables, out castGroups, out applicantRanks, out castGroupIndexFromVariableIndex);
-            var termination_threshold = RANK_INCREMENT * primaryCriterias.Length * castGroups.Length; // 1 rank difference per criteria per cast group
-            //LATER try this without the termination threshold, or even consider a time based threshold
-            return new BranchAndBoundSolver<Applicant>(CostFunction, termination_threshold, applicantVariables);
+            var success_threshold = RANK_INCREMENT * primaryCriterias.Length * castGroups.Length; // 1 rank difference per criteria per cast group
+            return new BranchAndBoundSolver<Applicant>(CostFunction, applicantVariables)
+            {
+                SuccessThreshold = success_threshold,
+                StagnantTimeout = TIMEOUT_MS
+            };
         }
 
         protected override Solution FindSatSolution(Solver<Applicant> sat, List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
