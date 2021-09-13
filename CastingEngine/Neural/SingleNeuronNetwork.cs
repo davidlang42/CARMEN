@@ -8,16 +8,13 @@ namespace Carmen.CastingEngine.Neural
     {
         IActivationFunction activation = new Sigmoid();
         ILossFunction loss = new MeanSquaredError();
-        public Neuron Neuron = new Neuron
-        {
-            Inputs = new[]
-            {
-                new InputFeature { Weight = 0.1 },
-                new InputFeature { Weight = 0.2 }
-            },
-            Bias = 0.3
-        };
+        public Neuron Neuron;
         double learningRate = 0.05;
+
+        public SingleNeuronNetwork(int n_inputs)
+        {
+            Neuron = new Neuron(n_inputs);
+        }
 
         public void Train(double[] inputs, double expected_output)
         {

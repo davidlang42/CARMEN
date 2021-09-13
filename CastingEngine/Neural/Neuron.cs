@@ -3,10 +3,20 @@ using System.Linq;
 
 namespace Carmen.CastingEngine.Neural
 {
-    public struct Neuron
+    public class Neuron
     {
         public InputFeature[] Inputs { get; set; }
         public double Bias { get; set; }
+
+        public Neuron(int n_inputs)
+        {
+            Inputs = new InputFeature[n_inputs];
+            for (var i = 0; i < Inputs.Length; i++)
+                Inputs[i] = new InputFeature
+                {
+                    Weight = new Random().NextDouble()
+                };
+        }
 
         public double Calculate(double[] values)
         {
