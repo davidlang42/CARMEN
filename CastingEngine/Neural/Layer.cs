@@ -8,11 +8,12 @@ namespace Carmen.CastingEngine.Neural
 {
     public class Layer
     {
-        IActivationFunction activation = new Sigmoid();
+        IActivationFunction activation;
         public Neuron[] Neurons;
 
-        public Layer(int n_inputs, int n_outputs)
+        public Layer(int n_inputs, int n_outputs, IActivationFunction activation)
         {
+            this.activation = activation;
             Neurons = new Neuron[n_outputs];
             for (var n = 0; n < Neurons.Length; n++)
                 Neurons[n] = new Neuron(n_inputs);

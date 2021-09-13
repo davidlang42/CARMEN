@@ -20,6 +20,15 @@ namespace Carmen.CastingEngine.Neural
             => Calculate(input) * (1 - Calculate(input)); //TODO shortcut recalculation
     }
 
+    public class Tanh : IActivationFunction
+    {
+        public double Calculate(double input)
+            => Math.Tanh(input);
+
+        public double Derivative(double input)
+            => 1 - Math.Pow(Calculate(input), 2);//TODO better way to do this?
+    }
+
     public interface ILossFunction
     {
         public double Calculate(double[] outputs, double[] expected_outputs);

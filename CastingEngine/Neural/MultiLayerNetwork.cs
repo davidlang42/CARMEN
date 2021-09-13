@@ -14,8 +14,8 @@ namespace Carmen.CastingEngine.Neural
 
         public MultiLayerPerceptron(int n_inputs, int n_hidden_layer_neurons, int n_outputs)
         {
-            hidden = new Layer(n_inputs, n_hidden_layer_neurons);
-            output = new Layer(n_hidden_layer_neurons, n_outputs);
+            hidden = new Layer(n_inputs, n_hidden_layer_neurons, new Tanh());
+            output = new Layer(n_hidden_layer_neurons, n_outputs, new Sigmoid());
         }
 
         public void Train(double[] inputs, double[] expected_outputs)

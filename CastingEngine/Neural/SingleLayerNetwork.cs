@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.Neural
 
         public SingleLayerNetwork(int n_inputs, int n_outputs)
         {
-            layer = new Layer(n_inputs, n_outputs);
+            layer = new Layer(n_inputs, n_outputs, new Sigmoid());
         }
 
         public void Train(double[] inputs, double[] expected_outputs)
