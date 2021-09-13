@@ -9,7 +9,7 @@ namespace Carmen.CastingEngine.Neural
     public class SingleNeuronNetwork
     {
         IActivationFunction activation = new Sigmoid();
-        IErrorFunction error = new MeanSquaredError();
+        ILossFunction loss = new MeanSquaredError();
         public Neuron Neuron = new Neuron
         {
             Inputs = new[]
@@ -25,19 +25,18 @@ namespace Carmen.CastingEngine.Neural
         {
             // Calculation
             var out_o = Predict(inputs);
-            // Back propogation (gradient descent)
-            //TODO var mse = error.Calculate(out_o, expected_output);
-            var derror_douto = error.Derivative(out_o, expected_output);
+            // Back propogation (stochastic gradient descent)
+            var dloss_douto = loss.Derivative(out_o, expected_output);
             var douto_dino = activation.Derivative(out_o);
-            var derror_dino = derror_douto * douto_dino;
+            var dloss_dino = dloss_douto * douto_dino;
             for (var i = 0; i < inputs.Length; i++)
             {
                 var dino_dweight = inputs[i]; // because weighted sum: dino = i0*w0 + i1*w1 + bias
-                var derror_dweight = derror_dino * dino_dweight;
-                Neuron.Inputs[i].Weight -= learningRate * derror_dweight;
+                var dloss_dweight = dloss_dino * dino_dweight;
+                Neuron.Inputs[i].Weight -= learningRate * dloss_dweight;
             }
             var dino_dbias = 1; // because weighted sum: dino = i0*w0 + i1*w1 + bias
-            Neuron.Bias -= learningRate * derror_dino * dino_dbias;
+            Neuron.Bias -= learningRate * dloss_dino * dino_dbias;
         }
 
         public double Predict(double[] inputs)

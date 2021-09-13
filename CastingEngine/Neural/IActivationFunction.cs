@@ -20,7 +20,7 @@ namespace Carmen.CastingEngine.Neural
             => Calculate(input) * (1 - Calculate(input));
     }
 
-    public interface IErrorFunction
+    public interface ILossFunction
     {
         public double Calculate(double[] outputs, double[] expected_outputs);
         public double Derivative(double[] outputs, double[] expected_outputs);
@@ -31,7 +31,7 @@ namespace Carmen.CastingEngine.Neural
             => Derivative(new[] { output }, new[] { expected_output });
     }
 
-    public class MeanSquaredError : IErrorFunction
+    public class MeanSquaredError : ILossFunction
     {
         public double Calculate(double[] outputs, double[] expected_outputs)
         {
