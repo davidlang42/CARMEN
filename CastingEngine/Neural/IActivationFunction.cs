@@ -17,7 +17,7 @@ namespace Carmen.CastingEngine.Neural
         public double Calculate(double input)
             => 1 / (1 + Math.Exp(-input));
         public double Derivative(double input)
-            => Calculate(input) * (1 - Calculate(input));
+            => Calculate(input) * (1 - Calculate(input)); //TODO shortcut recalculation
     }
 
     public interface ILossFunction

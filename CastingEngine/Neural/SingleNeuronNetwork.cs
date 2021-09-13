@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,27 +43,7 @@ namespace Carmen.CastingEngine.Neural
             var out_o = activation.Calculate(in_o);
             return out_o;
         }
-    }
 
-    public struct Neuron
-    {
-        public InputFeature[] Inputs { get; set; }
-        public double Bias { get; set; }
-
-        public double Calculate(double[] values)
-        {
-            var result = Bias;
-            if (Inputs.Length != values.Length)
-                throw new ArgumentException($"{nameof(values)} [{values.Length}] must have the same length as {nameof(Inputs)} [{Inputs.Length}]");
-            for (var i = 0; i < values.Length; i++)
-                result += Inputs[i].Calculate(values[i]);
-            return result;
-        }
-    }
-
-    public class InputFeature
-    {
-        public double Calculate(double input) => input * Weight;
-        public double Weight { get; set; }
+        public override string ToString() => $"Output: {Neuron}";
     }
 }
