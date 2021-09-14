@@ -6,7 +6,7 @@ namespace Carmen.CastingEngine.Neural
 {
     public class SingleNeuronNetwork
     {
-        IActivationFunction activation = new Sigmoid();
+        IVectorActivationFunction activation = new Sigmoid();
         ILossFunction loss = new MeanSquaredError();
         public Neuron Neuron;
         double learningRate = 0.05;
@@ -28,7 +28,7 @@ namespace Carmen.CastingEngine.Neural
             {
                 var dino_dweight = inputs[i]; // because weighted sum: dino = i0*w0 + i1*w1 + bias
                 var dloss_dweight = dloss_dino * dino_dweight;
-                Neuron.Inputs[i].Weight -= learningRate * dloss_dweight;
+                Neuron.Weights[i] -= learningRate * dloss_dweight;
             }
             var dino_dbias = 1; // because weighted sum: dino = i0*w0 + i1*w1 + bias
             Neuron.Bias -= learningRate * dloss_dino * dino_dbias;
@@ -36,7 +36,7 @@ namespace Carmen.CastingEngine.Neural
 
         public double Predict(double[] inputs)
         {
-            var in_o = Neuron.Calculate(inputs);
+            var in_o = Neuron.WeightedSum(inputs);
             var out_o = activation.Calculate(in_o);
             return out_o;
         }

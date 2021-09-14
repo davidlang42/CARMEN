@@ -8,30 +8,46 @@ namespace Carmen.CastingEngine.Neural
 {
     public class Layer
     {
-        IActivationFunction activation;
-        public Neuron[] Neurons;
+        IVectorActivationFunction activation;
 
-        public Layer(int n_inputs, int n_outputs, IActivationFunction activation)
+        public Neuron[] Neurons { get; init; } // only the array size is readonly
+
+        public int NeuronCount => Neurons.Length;
+
+        /// <summary>Create a layer of neurons, each with random weights and biases,
+        /// utilising a common activation function</summary>
+        public Layer(int n_inputs, int n_outputs, IVectorActivationFunction activation, Random? random = null)
         {
             this.activation = activation;
             Neurons = new Neuron[n_outputs];
             for (var n = 0; n < Neurons.Length; n++)
-                Neurons[n] = new Neuron(n_inputs);
+                Neurons[n] = new Neuron(n_inputs, random);
+        }
+
+        /// <summary>Load a layer of neurons, each with existings weights and biases,
+        /// utilising a common activation function</summary>
+        public Layer(double[][] neuron_weights, double[] neuron_biases, IVectorActivationFunction activation)
+        {
+            if (neuron_weights.Length != neuron_biases.Length)
+                throw new ArgumentException($"{nameof(neuron_weights)}[{neuron_weights.Length}] must have the same length as {nameof(neuron_biases)}[{neuron_biases.Length}]");
+            this.activation = activation;
+            Neurons = new Neuron[neuron_weights.Length];
+            for (var n = 0; n < Neurons.Length; n++)
+                Neurons[n] = new Neuron(neuron_weights[n], neuron_biases[n]);
         }
 
         public void Train(double[] inputs, double[] out_o, double[] dloss_douto, double learningRate)
         {
-            var douto_dino = new double[Neurons.Length];
+            var douto_dino = activation.Derivative(out_o);//TODO make this one array function call
             var dloss_dino = new double[Neurons.Length];
             for (var n = 0; n < Neurons.Length; n++)
             {
-                douto_dino[n] = activation.Derivative(out_o[n]);//TODO make this one array function call
                 dloss_dino[n] = dloss_douto[n] * douto_dino[n];
                 for (var i = 0; i < inputs.Length; i++)
                 {
                     var dino_dweight = inputs[i]; // because weighted sum: dino = i0*w0 + i1*w1 + bias
                     var dloss_dweight = dloss_dino[n] * dino_dweight;
-                    Neurons[n].Inputs[i].Weight -= learningRate * dloss_dweight;
+                    Neurons[n].Weights[i] -= learningRate * dloss_dweight;
                 }
                 var dino_dbias = 1; // because weighted sum: dino = i0*w0 + i1*w1 + bias
                 Neurons[n].Bias -= learningRate * dloss_dino[n] * dino_dbias;
@@ -40,14 +56,10 @@ namespace Carmen.CastingEngine.Neural
 
         public double[] Predict(double[] inputs)
         {
-            var result = new double[Neurons.Length];
-            for (var i = 0; i < result.Length; i++)
-            {
-                var in_o = Neurons[i].Calculate(inputs);
-                var out_o = activation.Calculate(in_o);
-                result[i] = out_o;
-            }
-            return result;
+            var in_o = new double[Neurons.Length];
+            for (var i = 0; i < in_o.Length; i++)
+                in_o[i] = Neurons[i].WeightedSum(inputs);
+            return activation.Calculate(in_o);
         }
 
         public override string ToString() => string.Join(" / ", Neurons.Select(n => n.ToString()));

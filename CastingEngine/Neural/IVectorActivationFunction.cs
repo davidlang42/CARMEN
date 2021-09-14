@@ -6,26 +6,54 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Neural
 {
-    public interface IActivationFunction
+    /// <summary>
+    /// A derivable function which operates on a vector of weighted sums
+    /// </summary>
+    public interface IVectorActivationFunction
     {
-        public double Calculate(double input);
-        public double Derivative(double input);
+        /// <summary>Calculates a vector of out_o from a vector of in_o</summary>
+        public double[] Calculate(double[] weighted_sums);
+
+        /// <summary>Calculates a vector of douto_dino from a vector of out_o</summary>
+        public double[] Derivative(double[] outputs);
     }
 
-    public class Sigmoid : IActivationFunction
+    public abstract class ScalarActivationFunction : IVectorActivationFunction
     {
-        public double Calculate(double input)
+        public double[] Calculate(double[] weighted_sums)
+        {
+            var result = new double[weighted_sums.Length];
+            for (var i = 0; i < result.Length; i++)
+                result[i] = Calculate(weighted_sums[i]);
+            return result;
+        }
+
+        public double[] Derivative(double[] outputs)
+        {
+            var result = new double[outputs.Length];
+            for (var i = 0; i < result.Length; i++)
+                result[i] = Derivative(outputs[i]);
+            return result;
+        }
+
+        public abstract double Calculate(double input);
+        public abstract double Derivative(double input);
+    }
+
+    public class Sigmoid : ScalarActivationFunction
+    {
+        public override double Calculate(double input)
             => 1 / (1 + Math.Exp(-input));
-        public double Derivative(double input)
+        public override double Derivative(double input)
             => Calculate(input) * (1 - Calculate(input)); //TODO shortcut recalculation
     }
 
-    public class Tanh : IActivationFunction
+    public class Tanh : ScalarActivationFunction
     {
-        public double Calculate(double input)
+        public override double Calculate(double input)
             => Math.Tanh(input);
 
-        public double Derivative(double input)
+        public override double Derivative(double input)
             => 1 - Math.Pow(Calculate(input), 2);//TODO better way to do this?
     }
 
