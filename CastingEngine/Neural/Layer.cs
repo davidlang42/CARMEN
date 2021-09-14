@@ -36,12 +36,11 @@ namespace Carmen.CastingEngine.Neural
                 Neurons[n] = new Neuron(neuron_weights[n], neuron_biases[n]);
         }
 
-        /// <summary>Train this layer of the model with a single set of inputs and expected outputs.
-        /// Returns the total loss prior to back propogation.</summary>
-        public void Train(double[] inputs, double[] out_o, double[] dloss_douto, double learningRate) //TODO make Layer.Train() return error
+        /// <summary>Train this layer of the model</summary>
+        public void Train(double[] inputs, double[] out_o, double[] dloss_douto, double learningRate, out double[] dloss_dino) //TODO make Layer.Train() return error
         {
             var douto_dino = activation.Derivative(out_o);
-            var dloss_dino = new double[Neurons.Length];
+            dloss_dino = new double[Neurons.Length];
             for (var n = 0; n < Neurons.Length; n++)
             {
                 dloss_dino[n] = dloss_douto[n] * douto_dino[n];

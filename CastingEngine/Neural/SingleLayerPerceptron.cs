@@ -29,7 +29,7 @@ namespace Carmen.CastingEngine.Neural
             var out_o = Predict(inputs);
             // Back propogation (stochastic gradient descent)
             var dloss_douto = loss.Derivative(out_o, expected_outputs);
-            layer.Train(inputs, out_o, dloss_douto, learningRate);
+            layer.Train(inputs, out_o, dloss_douto, learningRate, out _);
             return loss.Calculate(out_o, expected_outputs);
         }
 

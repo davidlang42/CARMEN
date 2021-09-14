@@ -27,18 +27,18 @@ namespace Carmen.CastingEngine.Neural
         public double Train(double[] inputs, double[] expected_outputs)
         {
             // Calculation
-            var out_o_hidden = hidden.Predict(inputs);
-            var out_o = output.Predict(out_o_hidden);
+            var out_o1 = hidden.Predict(inputs);
+            var out_o2 = output.Predict(out_o1);
             // Back propogation (stochastic gradient descent)
-            var dloss_douto = loss.Derivative(out_o, expected_outputs);
-            output.Train(inputs, out_o, dloss_douto, learningRate);
+            var dloss_douto2 = loss.Derivative(out_o2, expected_outputs);
+            output.Train(out_o1, out_o2, dloss_douto2, learningRate, out var dloss_dino2);
             // Next layer
-            var dloss_douto_hidden = new double[hidden.Neurons.Length];
+            var dloss_douto1 = new double[hidden.Neurons.Length];
             for (var h = 0; h < hidden.Neurons.Length; h++)
                 for (var n = 0; n < output.Neurons.Length; n++)
-                    dloss_douto_hidden[h] += dloss_douto[n] * output.Neurons[n].Weights[h];
-            hidden.Train(inputs, out_o_hidden, dloss_douto_hidden, learningRate);
-            return loss.Calculate(out_o, expected_outputs);
+                    dloss_douto1[h] += dloss_dino2[n] * output.Neurons[n].Weights[h];
+            hidden.Train(inputs, out_o1, dloss_douto1, learningRate, out _);
+            return loss.Calculate(out_o2, expected_outputs);
         }
 
         public double[] Predict(double[] inputs)
