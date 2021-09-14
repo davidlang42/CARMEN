@@ -16,7 +16,9 @@ namespace Carmen.CastingEngine.Neural
             Neuron = new Neuron(n_inputs);
         }
 
-        public void Train(double[] inputs, double expected_output)
+        /// <summary>Train the model with a single set of inputs and expected output.
+        /// Returns the total loss prior to back propogation.</summary>
+        public double Train(double[] inputs, double expected_output)
         {
             // Calculation
             var out_o = Predict(inputs);
@@ -32,6 +34,7 @@ namespace Carmen.CastingEngine.Neural
             }
             var dino_dbias = 1; // because weighted sum: dino = i0*w0 + i1*w1 + bias
             Neuron.Bias -= learningRate * dloss_dino * dino_dbias;
+            return loss.Calculate(new[] { out_o }, new[] { expected_output });
         }
 
         public double Predict(double[] inputs)

@@ -18,7 +18,9 @@ namespace Carmen.CastingEngine.Neural
             output = new Layer(n_hidden_layer_neurons, n_outputs, new Sigmoid());
         }
 
-        public void Train(double[] inputs, double[] expected_outputs)//TODO return loss before training
+        /// <summary>Train the model with a single set of inputs and expected output.
+        /// Returns the total loss prior to back propogation.</summary>
+        public double Train(double[] inputs, double[] expected_outputs)
         {
             // Calculation
             var out_o_hidden = hidden.Predict(inputs);
@@ -32,6 +34,7 @@ namespace Carmen.CastingEngine.Neural
                 for (var n = 0; n < output.Neurons.Length; n++)
                     dloss_douto_hidden[h] += dloss_douto[n] * output.Neurons[n].Weights[h];
             hidden.Train(inputs, out_o_hidden, dloss_douto_hidden, learningRate);
+            return loss.Calculate(out_o, expected_outputs);
         }
 
         public double[] Predict(double[] inputs)
