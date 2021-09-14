@@ -10,7 +10,7 @@ namespace Carmen.CastingEngine.Neural
     /// A neural network similar to a SingleLayerPerceptron, except with exactly 1 hidden layer between inputs and outputs.
     /// The hidden layer allows prediction of non-linearly separable data.
     /// </summary>
-    public class MultiLayerPerceptron //TODO make FeedforwardNetwork with an arbitrary number of hidden layers
+    public class MultiLayerPerceptron
     {
         ILossFunction loss = new MeanSquaredError();
         Layer hidden, output;
