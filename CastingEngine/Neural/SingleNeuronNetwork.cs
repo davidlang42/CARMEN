@@ -6,7 +6,7 @@ namespace Carmen.CastingEngine.Neural
 {
     public class SingleNeuronNetwork
     {
-        IVectorActivationFunction activation = new Sigmoid();
+        IScalarActivationFunction activation = new Sigmoid();
         ILossFunction loss = new MeanSquaredError();
         public Neuron Neuron;
         double learningRate = 0.05;

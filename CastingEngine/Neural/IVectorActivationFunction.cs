@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Carmen.CastingEngine.Neural
 {
     /// <summary>
-    /// A derivable function which operates on a vector of weighted sums
+    /// A derivable activation function which operates on a vector of weighted sums
     /// </summary>
     public interface IVectorActivationFunction
     {
@@ -18,7 +18,19 @@ namespace Carmen.CastingEngine.Neural
         public double[] Derivative(double[] outputs);
     }
 
-    public abstract class ScalarActivationFunction : IVectorActivationFunction
+    /// <summary>
+    /// A derivable activation function which operates on a single weighted sum
+    /// </summary>
+    public interface IScalarActivationFunction
+    {
+        /// <summary>Calculates out_o from in_o</summary>
+        public double Calculate(double weighted_sum);
+
+        /// <summary>Calculates douto_dino from out_o</summary>
+        public double Derivative(double output);
+    }
+
+    public abstract class ScalarActivationFunction : IScalarActivationFunction, IVectorActivationFunction
     {
         public double[] Calculate(double[] weighted_sums)
         {
