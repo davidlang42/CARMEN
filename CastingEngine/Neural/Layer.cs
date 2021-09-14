@@ -37,7 +37,7 @@ namespace Carmen.CastingEngine.Neural
         }
 
         /// <summary>Train this layer of the model</summary>
-        public void Train(double[] inputs, double[] out_o, double[] dloss_douto, double learningRate, out double[] dloss_dino) //TODO make Layer.Train() return error
+        public void Train(double[] inputs, double[] out_o, double[] dloss_douto, double learningRate, out double[] dloss_dino)
         {
             var douto_dino = activation.Derivative(out_o);
             dloss_dino = new double[Neurons.Length];

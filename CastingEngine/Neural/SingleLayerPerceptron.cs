@@ -30,7 +30,7 @@ namespace Carmen.CastingEngine.Neural
             // Back propogation (stochastic gradient descent)
             var dloss_douto = loss.Derivative(out_o, expected_outputs);
             layer.Train(inputs, out_o, dloss_douto, learningRate, out _);
-            return loss.Calculate(out_o, expected_outputs);
+            return loss.Calculate(dloss_douto);
         }
 
         public double[] Predict(double[] inputs) => layer.Predict(inputs);
