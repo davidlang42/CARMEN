@@ -57,7 +57,7 @@ namespace Carmen.CastingEngine.Neural
         public override double Calculate(double input)
             => 1 / (1 + Math.Exp(-input));
         public override double Derivative(double input)
-            => Calculate(input) * (1 - Calculate(input)); //TODO shortcut recalculation
+            => Calculate(input) * (1 - Calculate(input)); //LATER speed up by re-using previous calculation passed in as an argument
     }
 
     public class Tanh : ScalarActivationFunction
@@ -66,7 +66,7 @@ namespace Carmen.CastingEngine.Neural
             => Math.Tanh(input);
 
         public override double Derivative(double input)
-            => 1 - Math.Pow(Calculate(input), 2);//TODO better way to do this? shortcut?
+            => 1 - Math.Pow(Calculate(input), 2); //LATER speed up by re-using previous calculation passed in as an argument
     }
 
     public interface ILossFunction
@@ -81,7 +81,7 @@ namespace Carmen.CastingEngine.Neural
     public class MeanSquaredError : ILossFunction
     {
         /// <summary>1/n * sum( (y-y0)^2 )</summary>
-        public double Calculate(double[] outputs, double[] expected_outputs)//TODO shortcut recalculation?
+        public double Calculate(double[] outputs, double[] expected_outputs) //LATER speed up by re-using previously calculated derivative passed in as an argument
         {
             if (outputs.Length != expected_outputs.Length)
                 throw new ArgumentException($"{nameof(outputs)} [{outputs.Length}] must have the same length as {nameof(expected_outputs)} [{expected_outputs.Length}]");
