@@ -24,9 +24,7 @@ namespace Carmen.CastingEngine.Neural
             var out_o_hidden = hidden.Predict(inputs);
             var out_o = output.Predict(out_o_hidden);
             // Back propogation (stochastic gradient descent)
-            var dloss_douto = new double[output.Neurons.Length];
-            for (var n = 0; n < output.Neurons.Length; n++)
-                dloss_douto[n] = loss.Derivative(out_o[n], expected_outputs[n]);//TODO make this a single array call
+            var dloss_douto = loss.Derivative(out_o, expected_outputs);
             output.Train(inputs, out_o, dloss_douto, learningRate);
             // Next layer
             var dloss_douto_hidden = new double[hidden.Neurons.Length];

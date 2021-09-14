@@ -66,24 +66,22 @@ namespace Carmen.CastingEngine.Neural
             => Math.Tanh(input);
 
         public override double Derivative(double input)
-            => 1 - Math.Pow(Calculate(input), 2);//TODO better way to do this?
+            => 1 - Math.Pow(Calculate(input), 2);//TODO better way to do this? shortcut?
     }
 
     public interface ILossFunction
     {
+        /// <summary>Calculates the total error across all outputs</summary>
         public double Calculate(double[] outputs, double[] expected_outputs);
-        public double Derivative(double[] outputs, double[] expected_outputs);
 
-        public double Calculate(double output, double expected_output)
-            => Calculate(new[] { output }, new[] { expected_output });
-        public double Derivative(double output, double expected_output)
-            => Derivative(new[] { output }, new[] { expected_output });
+        /// <summary>Calculates the partial derivative of the error in respect to each output</summary>
+        public double[] Derivative(double[] outputs, double[] expected_outputs);
     }
 
     public class MeanSquaredError : ILossFunction
     {
         /// <summary>1/n * sum( (y-y0)^2 )</summary>
-        public double Calculate(double[] outputs, double[] expected_outputs)
+        public double Calculate(double[] outputs, double[] expected_outputs)//TODO shortcut recalculation?
         {
             if (outputs.Length != expected_outputs.Length)
                 throw new ArgumentException($"{nameof(outputs)} [{outputs.Length}] must have the same length as {nameof(expected_outputs)} [{expected_outputs.Length}]");
@@ -95,17 +93,17 @@ namespace Carmen.CastingEngine.Neural
             return result / outputs.Length;
         }
 
-        /// <summary>2/n * sum( y-y0 )</summary>
-        public double Derivative(double[] outputs, double[] expected_outputs)
+        /// <summary>2/n * ( y-y0 )</summary>
+        public double[] Derivative(double[] outputs, double[] expected_outputs)
         {
             if (outputs.Length != expected_outputs.Length)
                 throw new ArgumentException($"{nameof(outputs)} [{outputs.Length}] must have the same length as {nameof(expected_outputs)} [{expected_outputs.Length}]");
             if (outputs.Length == 0)
                 throw new ArgumentException($"Cannot calculate loss derivative for 0 outputs");
-            var result = 0.0;
+            var result = new double[outputs.Length];
             for (var i = 0; i < outputs.Length; i++)
-                result += outputs[i] - expected_outputs[i];
-            return 2 * result / outputs.Length;
+                result[i] += 2 / outputs.Length * (outputs[i] - expected_outputs[i]);
+            return result;
         }
     }
 }
