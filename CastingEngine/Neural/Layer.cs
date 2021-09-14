@@ -36,6 +36,8 @@ namespace Carmen.CastingEngine.Neural
                 Neurons[n] = new Neuron(neuron_weights[n], neuron_biases[n]);
         }
 
+        /// <summary>Train this layer of the model with a single set of inputs and expected outputs.
+        /// Returns the total loss prior to back propogation.</summary>
         public void Train(double[] inputs, double[] out_o, double[] dloss_douto, double learningRate) //TODO make Layer.Train() return error
         {
             var douto_dino = activation.Derivative(out_o);
@@ -49,6 +51,7 @@ namespace Carmen.CastingEngine.Neural
                     var dloss_dweight = dloss_dino[n] * dino_dweight;
                     Neurons[n].Weights[i] -= learningRate * dloss_dweight;
                 }
+                //LATER is it faster to make this 1 a constant rather than variable? or leave it out completely?
                 var dino_dbias = 1; // because weighted sum: dino = i0*w0 + i1*w1 + bias
                 Neurons[n].Bias -= learningRate * dloss_dino[n] * dino_dbias;
             }
