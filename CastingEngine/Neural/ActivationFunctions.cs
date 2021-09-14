@@ -76,4 +76,15 @@ namespace Carmen.CastingEngine.Neural
         public override double Derivative(double output)
             => 1 - Math.Pow(output, 2); //LATER is x * x faster than Math.Pow(x, 2)?
     }
+
+    public class ReLu : ScalarActivationFunction
+    {
+        /// <summary>Calculates out_o from in_o</summary>
+        public override double Calculate(double weighted_sum)
+            => weighted_sum > 0 ? weighted_sum : 0;
+
+        /// <summary>Calculates douto_dino from out_o</summary>
+        public override double Derivative(double output)
+            => output > 0 ? 1 : 0;
+    }
 }

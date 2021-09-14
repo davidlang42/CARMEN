@@ -9,14 +9,21 @@ namespace Carmen.CastingEngine.Neural
     /// </summary>
     public struct InputFeatureMap<T>//TODO rename file?
     {
-        Func<T, double>[] GetValues;
-        Func<T, string>[] GetNames;
+        public Func<T, double>[] GetValues;
+        public Func<T, string>[] GetNames;
     }
 
     public struct InputFeature<T>//TODO needed?
     {
-        Func<T, double> GetValue;
-        Func<T, string> GetName;
+        public Func<T, double> GetValue;
+        public Func<T, string> GetName;
+    }
+
+    public struct OutputFeature<T>//TODO : InputFeature<T>//TODO needed?
+    {
+        public Action<T, double> SetValue;
+        public Func<T, double> GetValue;
+        public Func<T, string> GetName;
     }
 
     //public class InputFeature
@@ -37,18 +44,33 @@ namespace Carmen.CastingEngine.Neural
     //    }
     //}
 
-    //public interface IInputFeatureSet
-    //{
-    //    public int Size { get; init; }
-    //    public string[] GetNames();
-    //    public double[] GetValues();
-    //    public static int GetCount<T>()
-    //        where T : struct, IInputFeatureSet
-    //    {
-    //        var blank = default(T);
-    //        return blank.GetNames().Length;
-    //    }
-    //}
+    public interface IInputFeatureSet
+    {
+        /// <summary>The number of elements in this feature set.
+        /// Must be a fixed value for any instance of this type.</summary>
+        public int FixedSize { get; }
+
+        /// <summary>Get a static array containing names for each value in a feature
+        /// set of this type. Length must be <see cref="FixedSize"/>.</summary>
+        public string[] GetNames();
+
+        /// <summary>Get an array containing the values for this instance.
+        /// Length must be <see cref="FixedSize"/>.</summary>
+        public double[] GetValues();
+
+        public static int GetSize<T>()
+            where T : struct, IInputFeatureSet
+        {
+            var blank = default(T);
+            return blank.FixedSize;
+        }
+    }
+
+    public interface IOutputFeatureSet : IInputFeatureSet
+    {
+        /// <summary>Sets this instance's fields to those in an array of length <see cref="FixedSize"/>.</summary>
+        public void SetValues(double[] values);
+    }
 
     //public record Blah
     //{
