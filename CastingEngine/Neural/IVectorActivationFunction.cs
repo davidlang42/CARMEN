@@ -57,7 +57,7 @@ namespace Carmen.CastingEngine.Neural
         public override double Calculate(double input)
             => 1 / (1 + Math.Exp(-input));
         public override double Derivative(double input)
-            => Calculate(input) * (1 - Calculate(input)); //LATER speed up by re-using previous calculation passed in as an argument
+            => Calculate(input) * (1 - Calculate(input)); //TODO speed up by re-using previous calculation passed in as an argument
     }
 
     public class Tanh : ScalarActivationFunction
@@ -66,7 +66,7 @@ namespace Carmen.CastingEngine.Neural
             => Math.Tanh(input);
 
         public override double Derivative(double input)
-            => 1 - Math.Pow(Calculate(input), 2); //LATER speed up by re-using previous calculation passed in as an argument
+            => 1 - Math.Pow(Calculate(input), 2); //TODO speed up by re-using previous calculation passed in as an argument
     }
 
     public interface ILossFunction

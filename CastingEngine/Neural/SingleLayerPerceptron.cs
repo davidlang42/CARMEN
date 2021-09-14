@@ -6,13 +6,17 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Neural
 {
-    public class SingleLayerNetwork
+    /// <summary>
+    /// A neural network consisting of a single layer of neurons from inputs to outputs.
+    /// This is a very simple type of network, which is only capable of predicting data which is linearly separable.
+    /// </summary>
+    public class SingleLayerPerceptron
     {
         ILossFunction loss = new MeanSquaredError();
         public Layer layer;
         double learningRate = 0.05;
 
-        public SingleLayerNetwork(int n_inputs, int n_outputs)
+        public SingleLayerPerceptron(int n_inputs, int n_outputs)
         {
             layer = new Layer(n_inputs, n_outputs, new Sigmoid());
         }
