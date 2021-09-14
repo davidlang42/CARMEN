@@ -82,29 +82,30 @@ namespace Carmen.CastingEngine.Neural
 
     public class MeanSquaredError : ILossFunction
     {
+        /// <summary>1/n * sum( (y-y0)^2 )</summary>
         public double Calculate(double[] outputs, double[] expected_outputs)
         {
-            throw new Exception("Currently the derivative doesn't match this function!?");
             if (outputs.Length != expected_outputs.Length)
                 throw new ArgumentException($"{nameof(outputs)} [{outputs.Length}] must have the same length as {nameof(expected_outputs)} [{expected_outputs.Length}]");
             if (outputs.Length == 0)
-                return 0;
-            var result = 0.0;
+                throw new ArgumentException($"Cannot calculate loss for 0 outputs");
+            double result = 0;
             for (var i = 0; i < outputs.Length; i++)
                 result += Math.Pow(outputs[i] - expected_outputs[i], 2);
             return result / outputs.Length;
         }
 
+        /// <summary>2/n * sum( y-y0 )</summary>
         public double Derivative(double[] outputs, double[] expected_outputs)
         {
             if (outputs.Length != expected_outputs.Length)
                 throw new ArgumentException($"{nameof(outputs)} [{outputs.Length}] must have the same length as {nameof(expected_outputs)} [{expected_outputs.Length}]");
             if (outputs.Length == 0)
-                return 0;
+                throw new ArgumentException($"Cannot calculate loss derivative for 0 outputs");
             var result = 0.0;
             for (var i = 0; i < outputs.Length; i++)
                 result += outputs[i] - expected_outputs[i];
-            return result / outputs.Length;
+            return 2 * result / outputs.Length;
         }
     }
 }
