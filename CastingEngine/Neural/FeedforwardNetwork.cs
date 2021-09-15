@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.Neural
     {
         ILossFunction loss = new MeanSquaredError();
         Layer[] layers;
-        double learningRate = 0.0001;
+        double learningRate = 0.05;
 
         /// <summary>Create a feedforward neural network, with initially random weights and biases, based on the structural
         /// parameters provided</summary>
