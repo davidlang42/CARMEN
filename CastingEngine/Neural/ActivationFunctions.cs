@@ -88,14 +88,38 @@ namespace Carmen.CastingEngine.Neural
             => output > 0 ? 1 : 0;
     }
 
-    public class LeakyReLu : ScalarActivationFunction
+    public class ParametricReLu : ScalarActivationFunction
     {
+        private readonly double alpha;
+
+        public ParametricReLu(double alpha)
+        {
+            this.alpha = alpha;
+        }
+
         /// <summary>Calculates out_o from in_o</summary>
         public override double Calculate(double weighted_sum)
-            => weighted_sum > 0 ? weighted_sum : weighted_sum * 0.01;
+            => weighted_sum > 0 ? weighted_sum : weighted_sum * alpha;
 
         /// <summary>Calculates douto_dino from out_o</summary>
         public override double Derivative(double output)
-            => output > 0 ? 1 : 0.01;
+            => output > 0 ? 1 : alpha;
+    }
+
+    public class LeakyReLu : ParametricReLu
+    {
+        public LeakyReLu() : base(0.01)
+        { }
+    }
+
+    public class ExponentialLu : ScalarActivationFunction
+    {
+        /// <summary>Calculates out_o from in_o</summary>
+        public override double Calculate(double weighted_sum)
+            => weighted_sum > 0 ? weighted_sum : Math.Exp(weighted_sum) - 1;
+
+        /// <summary>Calculates douto_dino from out_o</summary>
+        public override double Derivative(double output)
+            => output > 0 ? 1 : output + 1;
     }
 }
