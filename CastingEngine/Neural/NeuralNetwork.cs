@@ -25,6 +25,13 @@ namespace Carmen.CastingEngine.Neural
         /// <summary>The threshold of change in loss at which any lower value is considered a failure to change</summary>
         public double? ChangeThreshold { get; set; } = 1e-10;
 
+        /// <summary>The speed at which the neural network learns, smaller is safer</summary>
+        public double LearningRate
+        {
+            get => network.LearningRate;
+            set => network.LearningRate = value;
+        }
+
         public NeuralNetwork(int n_hidden_layers, int n_neurons_per_hidden_layer,
             IVectorActivationFunction? hidden_layer_activation = null,
             IVectorActivationFunction? output_layer_activation = null)
@@ -48,7 +55,7 @@ namespace Carmen.CastingEngine.Neural
             var no_change = false;
             var too_many_repeats = false;
             var descriptions = new List<string>();
-            while(!success && !no_change && !too_many_repeats)
+            while(!success && !no_change && !too_many_repeats)//TODO maybe reduce the learning rate when no change detected
             {
                 descriptions.Add(network.ToString());
                 success = true;

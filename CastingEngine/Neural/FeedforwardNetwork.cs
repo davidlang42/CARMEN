@@ -14,7 +14,8 @@ namespace Carmen.CastingEngine.Neural
     {
         ILossFunction loss = new MeanSquaredError();
         Layer[] layers;
-        double learningRate = 0.05;
+
+        public double LearningRate { get; set; } = 0.05;
 
         /// <summary>Create a feedforward neural network, with initially random weights and biases, based on the structural
         /// parameters provided</summary>
@@ -68,14 +69,14 @@ namespace Carmen.CastingEngine.Neural
             var total_loss = loss.Calculate(dloss_douto);
             for (var i = out_o.Length - 1; i > 0; i--)
             {
-                layers[i].Train(out_o[i - 1], out_o[i], dloss_douto, learningRate, out var dloss_dino);
+                layers[i].Train(out_o[i - 1], out_o[i], dloss_douto, LearningRate, out var dloss_dino);
                 // Prep for next layer
                 dloss_douto = new double[layers[i - 1].Neurons.Length];
                 for (var h = 0; h < dloss_douto.Length; h++)
                     for (var n = 0; n < layers[i].Neurons.Length; n++)
                         dloss_douto[h] += dloss_dino[n] * layers[i].Neurons[n].Weights[h];
             }
-            layers[0].Train(inputs, out_o[0], dloss_douto, learningRate, out _);
+            layers[0].Train(inputs, out_o[0], dloss_douto, LearningRate, out _);
             return total_loss;
         }
 
