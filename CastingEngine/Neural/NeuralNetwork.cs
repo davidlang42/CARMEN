@@ -47,8 +47,10 @@ namespace Carmen.CastingEngine.Neural
             var success = false;
             var no_change = false;
             var too_many_repeats = false;
+            var descriptions = new List<string>();
             while(!success && !no_change && !too_many_repeats)
             {
+                descriptions.Add(network.ToString());
                 success = true;
                 no_change = true;
                 for (var i = 0; i < training_inputs.Length; i++)
@@ -66,7 +68,8 @@ namespace Carmen.CastingEngine.Neural
                 ReachedMaxIterations = too_many_repeats,
                 ReachedStableLoss = no_change,
                 Iterations = repeat,
-                FinalLoss = previous_loss
+                FinalLoss = previous_loss,
+                Descriptions = descriptions
             };
         }
 
@@ -87,6 +90,7 @@ namespace Carmen.CastingEngine.Neural
         public bool ReachedStableLoss;
         public double[] FinalLoss;
         public int Iterations;
+        public List<string> Descriptions;
 
         public double AverageLoss => FinalLoss.Average();
     }
@@ -124,8 +128,10 @@ namespace Carmen.CastingEngine.Neural
             var success = false;
             var no_change = false;
             var too_many_repeats = false;
+            var descriptions = new List<string>();
             while (!success && !no_change && !too_many_repeats)
             {
+                descriptions.Add(network.ToString());
                 success = true;
                 no_change = true;
                 for (var i = 0; i < training_inputs.Length; i++)
@@ -143,7 +149,8 @@ namespace Carmen.CastingEngine.Neural
                 ReachedMaxIterations = too_many_repeats,
                 ReachedStableLoss = no_change,
                 Iterations = repeat,
-                FinalLoss = previous_loss
+                FinalLoss = previous_loss,
+                Descriptions = descriptions
             };
         }
 
