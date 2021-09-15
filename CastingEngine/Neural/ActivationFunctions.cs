@@ -87,4 +87,15 @@ namespace Carmen.CastingEngine.Neural
         public override double Derivative(double output)
             => output > 0 ? 1 : 0;
     }
+
+    public class LeakyReLu : ScalarActivationFunction
+    {
+        /// <summary>Calculates out_o from in_o</summary>
+        public override double Calculate(double weighted_sum)
+            => weighted_sum > 0 ? weighted_sum : weighted_sum * 0.01;
+
+        /// <summary>Calculates douto_dino from out_o</summary>
+        public override double Derivative(double output)
+            => output > 0 ? 1 : 0.01;
+    }
 }
