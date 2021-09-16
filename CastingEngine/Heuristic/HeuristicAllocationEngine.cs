@@ -39,8 +39,7 @@ namespace Carmen.CastingEngine.Heuristic
         }
 
         /// <summary>Return a list of the best cast to pick for the role, based on suitability.
-        /// If a role has no requirements, select other alternative casts by matching cast number, if possible.
-        /// NOTE: This does not respect existing casting, and expects it to be cleared before calling</summary>
+        /// If a role has no requirements, select other alternative casts by matching cast number, if possible.</summary>
         public override IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role)
         {
             // list existing cast by cast group
@@ -57,11 +56,11 @@ namespace Carmen.CastingEngine.Heuristic
                 {
                     var already_allocated = existing_cast_in_this_group.Count;
                     if (cbg.CastGroup.AlternateCasts)
-                        already_allocated /= alternativeCasts.Length;
+                        already_allocated /= alternativeCasts.Length; //LATER this assumes the existing casting has the same number of each alternative cast
                     required -= already_allocated;
                 }
                 if (required > 0)
-                    required_cast_groups.Add(cbg.CastGroup, cbg.Count);
+                    required_cast_groups.Add(cbg.CastGroup, (uint)required);
             }
             // list available cast in priority order, grouped by cast group
             var potential_cast_by_group = applicants
