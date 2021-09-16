@@ -80,7 +80,7 @@ namespace UnitTests.SAT
             }
         }
 
-        protected Expression<T> GenerateExpression<T>(int random_seed, T[] variables, int j_clauses, int k_literals_per_clause)
+        public static Expression<T> GenerateExpression<T>(int random_seed, T[] variables, int j_clauses, int k_literals_per_clause)
             where T : notnull
         {
             var random = new Random(random_seed);
