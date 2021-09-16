@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine.Neural
+namespace Carmen.CastingEngine.Neural.Internal
 {
     /// <summary>
     /// A derivable loss function which operates on vectors of outputs and expected outputs

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine.Neural
+namespace Carmen.CastingEngine.Neural.Internal
 {
     /// <summary>
     /// A derivable activation function which operates on a vector of weighted sums

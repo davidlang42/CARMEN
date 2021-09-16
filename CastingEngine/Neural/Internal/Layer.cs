@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine.Neural
+namespace Carmen.CastingEngine.Neural.Internal
 {
     public class Layer
     {

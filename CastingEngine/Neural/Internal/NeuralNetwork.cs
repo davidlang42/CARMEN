@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine.Neural
+namespace Carmen.CastingEngine.Neural.Internal
 {
     /// <summary>
     /// An artificial neural network which takes input features from an object of type <typeparamref name="T"/>

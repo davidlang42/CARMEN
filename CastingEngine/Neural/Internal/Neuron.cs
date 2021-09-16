@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace Carmen.CastingEngine.Neural
+namespace Carmen.CastingEngine.Neural.Internal
 {
     /// <summary>
     /// Represents a single neuron in an artificial neural network.

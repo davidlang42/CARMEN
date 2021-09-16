@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Carmen.CastingEngine.Neural
+namespace Carmen.CastingEngine.Neural.Internal
 {
 
     /// <summary>

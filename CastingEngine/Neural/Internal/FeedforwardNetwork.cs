@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.CastingEngine.Neural
+namespace Carmen.CastingEngine.Neural.Internal
 {
     /// <summary>
     /// A neural network similar to a MultiLayerPerceptron, except with an arbitrary number of hidden layers between inputs and outputs.
