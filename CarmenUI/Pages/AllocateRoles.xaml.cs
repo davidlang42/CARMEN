@@ -28,6 +28,7 @@ using System.Windows.Shapes;
 using CarmenUI.Bindings;
 using Carmen.CastingEngine.Heuristic;
 using Carmen.CastingEngine.Dummy;
+using Carmen.CastingEngine.Neural;
 
 namespace CarmenUI.Pages
 {
@@ -41,6 +42,7 @@ namespace CarmenUI.Pages
         private Applicant[]? _applicantsInCast;
         private Criteria[]? _primaryCriterias;
         private Criteria[]? _criterias;
+        private Requirement[]? _requirements;
         private NodeView? _rootNodeView;
         private uint? _totalCast;
         private IAllocationEngine? _engine;
@@ -62,6 +64,9 @@ namespace CarmenUI.Pages
 
         private Criteria[] primaryCriterias => _primaryCriterias
             ?? throw new ApplicationException($"Tried to used {nameof(primaryCriterias)} before it was loaded.");
+
+        private Requirement[] requirements => _requirements
+            ?? throw new ApplicationException($"Tried to used {nameof(requirements)} before it was loaded.");
 
         private NodeView rootNodeView => _rootNodeView
             ?? throw new ApplicationException($"Tried to used {nameof(rootNodeView)} before it was loaded.");
@@ -94,6 +99,8 @@ namespace CarmenUI.Pages
                     _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
                     await context.Nodes.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
+                    _requirements = await context.Requirements.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Requirements) + nameof(AbilityExactRequirement) + nameof(AbilityExactRequirement.Criteria), "Requirements"))
                     await context.Requirements.OfType<AbilityExactRequirement>().Include(cr => cr.Criteria).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Requirements) + nameof(AbilityRangeRequirement) + nameof(AbilityRangeRequirement.Criteria), "Requirements"))
@@ -116,6 +123,7 @@ namespace CarmenUI.Pages
                     {
                         nameof(DummyAllocationEngine) => new DummyAllocationEngine(applicant_engine, alternativeCasts),
                         nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine, alternativeCasts, criterias),
+                        nameof(NeuralAllocationEngine) => new NeuralAllocationEngine(applicant_engine, alternativeCasts, criterias, requirements),
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }
@@ -135,7 +143,10 @@ namespace CarmenUI.Pages
             if (SaveChanges())
             {
                 if (applicantsPanel.Content is EditableRoleWithApplicantsView editable_view)
+                {
                     rootNodeView.FindRoleView(editable_view.Role)?.UpdateAsync();
+                    engine.UserPickedCast(editable_view.Role.Cast, editable_view.Role);
+                }
                 ChangeToViewMode();
             }
         }

@@ -2,24 +2,25 @@
 
 namespace Carmen.CastingEngine.Neural.Internal
 {
+    //LATER remove this whole file
 
     /// <summary>
     /// Represents a set of features which are the input to a neural network,
     /// mapped from a domain specific object of type <typeparamref name="T"/>.
     /// </summary>
-    public struct InputFeatureMap<T>//TODO rename file?
+    public struct InputFeatureMap<T>
     {
         public Func<T, double>[] GetValues;
         public Func<T, string>[] GetNames;
     }
 
-    public struct InputFeature<T>//TODO needed?
+    public struct InputFeature<T>
     {
         public Func<T, double> GetValue;
         public Func<T, string> GetName;
     }
 
-    public struct OutputFeature<T>//TODO : InputFeature<T>//TODO needed?
+    public struct OutputFeature<T>
     {
         public Action<T, double> SetValue;
         public Func<T, double> GetValue;

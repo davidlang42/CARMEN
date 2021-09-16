@@ -10,6 +10,7 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// An artificial neural network which takes input features from an object of type <typeparamref name="T"/>
     /// and predicts output features as an object of type <typeparamref name="U"/>.
     /// </summary>
+    //LATER remove NeuralNetwork<T, U>
     public class NeuralNetwork<T, U>
         where T : struct, IInputFeatureSet
         where U: struct, IOutputFeatureSet

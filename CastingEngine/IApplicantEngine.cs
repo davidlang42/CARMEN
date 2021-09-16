@@ -25,5 +25,10 @@ namespace Carmen.CastingEngine
         /// <summary>Calculate the suitability of an applicant against a single requirement.
         /// Value returned will be between 0 and 1 (inclusive).</summary>
         double SuitabilityOf(Applicant applicant, Requirement requirement);
+
+        /// <summary>Calculate the overall ability of an applicant as a suitability
+        /// value between 0 and 1 (inclusive).</summary>
+        double OverallSuitability(Applicant applicant)
+            => (OverallAbility(applicant) - MinOverallAbility) / (double)(MaxOverallAbility - MinOverallAbility);
     }
 }

@@ -25,7 +25,7 @@ namespace Carmen.CastingEngine.Heuristic
 
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
-            double score = (ApplicantEngine.OverallAbility(applicant) + ApplicantEngine.MinOverallAbility) / (double)ApplicantEngine.MaxOverallAbility; // between 0 and 1 inclusive
+            double score = ApplicantEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
             var max = 1;
             foreach (var requirement in role.Requirements)
             {

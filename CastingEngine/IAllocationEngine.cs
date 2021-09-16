@@ -41,6 +41,10 @@ namespace Carmen.CastingEngine
         /// <summary>Pick the best cast for a role</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
 
+        /// <summary>A callback for when the user allocates cast to a role, providing
+        /// information to the engine which can be used to improve future recommendations.</summary>
+        void UserPickedCast(IEnumerable<Applicant> applicants, Role role);
+
         /// <summary>Pick the best cast for one or more roles, balancing talent between them</summary>
         IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
 
