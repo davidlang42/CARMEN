@@ -10,16 +10,22 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// A neural network similar to a SingleLayerPerceptron, except with exactly 1 hidden layer between inputs and outputs.
     /// The hidden layer allows prediction of non-linearly separable data.
     /// </summary>
-    public class MultiLayerPerceptron
+    public class MultiLayerPerceptron : INeuralNetwork
     {
         ILossFunction loss = new MeanSquaredError();
         Layer hidden, output;
-        double learningRate = 0.05;
 
-        public MultiLayerPerceptron(int n_inputs, int n_hidden_layer_neurons, int n_outputs)
+        public int InputCount { get; init; }
+        public int OutputCount { get; init; }
+        public double LearningRate { get; set; } = 0.05;
+
+        public MultiLayerPerceptron(int n_inputs, int n_hidden_layer_neurons, int n_outputs,
+            IVectorActivationFunction? hidden_layer_activation = null, IVectorActivationFunction? output_layer_activation = null)
         {
-            hidden = new Layer(n_inputs, n_hidden_layer_neurons, new Tanh());
-            output = new Layer(n_hidden_layer_neurons, n_outputs, new Sigmoid());
+            InputCount = n_inputs;
+            OutputCount = n_outputs;
+            hidden = new Layer(n_inputs, n_hidden_layer_neurons, hidden_layer_activation ?? new Tanh());
+            output = new Layer(n_hidden_layer_neurons, n_outputs, output_layer_activation ?? new Sigmoid());
         }
 
         /// <summary>Train the model with a single set of inputs and expected output.
@@ -31,13 +37,13 @@ namespace Carmen.CastingEngine.Neural.Internal
             var out_o2 = output.Predict(out_o1);
             // Back propogation (stochastic gradient descent)
             var dloss_douto2 = loss.Derivative(out_o2, expected_outputs);
-            output.Train(out_o1, out_o2, dloss_douto2, learningRate, out var dloss_dino2);
+            output.Train(out_o1, out_o2, dloss_douto2, LearningRate, out var dloss_dino2);
             // Next layer
             var dloss_douto1 = new double[hidden.Neurons.Length];
             for (var h = 0; h < hidden.Neurons.Length; h++)
                 for (var n = 0; n < output.Neurons.Length; n++)
                     dloss_douto1[h] += dloss_dino2[n] * output.Neurons[n].Weights[h];
-            hidden.Train(inputs, out_o1, dloss_douto1, learningRate, out _);
+            hidden.Train(inputs, out_o1, dloss_douto1, LearningRate, out _);
             return loss.Calculate(dloss_douto2);
         }
 

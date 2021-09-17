@@ -10,8 +10,8 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// An artificial neural network which takes input features from an object of type <typeparamref name="T"/>
     /// and predicts output features as an object of type <typeparamref name="U"/>.
     /// </summary>
-    //LATER remove NeuralNetwork<T, U>
-    public class NeuralNetwork<T, U>
+    //LATER remove DeprecatedNeuralNetwork<T, U>
+    public class DeprecatedNeuralNetwork<T, U>
         where T : struct, IInputFeatureSet
         where U: struct, IOutputFeatureSet
     {
@@ -33,7 +33,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             set => network.LearningRate = value;
         }
 
-        public NeuralNetwork(int n_hidden_layers, int n_neurons_per_hidden_layer,
+        public DeprecatedNeuralNetwork(int n_hidden_layers, int n_neurons_per_hidden_layer,
             IVectorActivationFunction? hidden_layer_activation = null,
             IVectorActivationFunction? output_layer_activation = null)
         {
@@ -103,9 +103,9 @@ namespace Carmen.CastingEngine.Neural.Internal
         public double AverageLoss => FinalLoss.Average();
     }
 
-    public class NeuralNetwork//TODO is this better?
+    public class ModelTrainer
     {
-        FeedforwardNetwork network;
+        INeuralNetwork model;
 
         /// <summary>The maximum number of training iterations per data point</summary>
         public int? MaxIterations { get; set; } = 10000;
@@ -116,17 +116,9 @@ namespace Carmen.CastingEngine.Neural.Internal
         /// <summary>The threshold of change in loss at which any lower value is considered a failure to change</summary>
         public double? ChangeThreshold { get; set; } = 1e-10;
 
-        /// <summary>The speed at which the neural network learns, smaller is safer</summary>
-        public double LearningRate
+        public ModelTrainer(INeuralNetwork model)
         {
-            get => network.LearningRate;
-            set => network.LearningRate = value;
-        }
-
-        public NeuralNetwork(int n_inputs, int n_hidden_layers, int n_neurons_per_hidden_layer, int n_outputs,
-            IVectorActivationFunction? hidden_layer_activation = null, IVectorActivationFunction? output_layer_activation = null)
-        {
-            network = new FeedforwardNetwork(n_inputs, n_hidden_layers, n_neurons_per_hidden_layer, n_outputs, hidden_layer_activation, output_layer_activation);
+            this.model = model;
         }
 
         /// <summary>Train the model with a set of inputs and outputs, using stochastic gradient decent</summary>
@@ -146,12 +138,12 @@ namespace Carmen.CastingEngine.Neural.Internal
             var descriptions = new List<string>();
             while (!success && !no_change && !too_many_repeats)
             {
-                descriptions.Add(network.ToString());
+                descriptions.Add(model.ToString());
                 success = true;
                 no_change = true;
                 for (var i = 0; i < training_inputs.Length; i++)
                 {
-                    var new_loss = network.Train(training_inputs[i], training_outputs[i]);
+                    var new_loss = model.Train(training_inputs[i], training_outputs[i]);
                     no_change &= ChangeThreshold.HasValue && Math.Abs(new_loss - previous_loss[i]) < ChangeThreshold;
                     previous_loss[i] = new_loss;
                     success &= LossThreshold.HasValue && new_loss < LossThreshold;
@@ -168,9 +160,5 @@ namespace Carmen.CastingEngine.Neural.Internal
                 Descriptions = descriptions
             };
         }
-
-        public double[] Predict(double[] input) => network.Predict(input);
-
-        public override string ToString() => network.ToString();
     }
 }

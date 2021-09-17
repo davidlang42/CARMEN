@@ -10,11 +10,13 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// A neural network similar to a MultiLayerPerceptron, except with an arbitrary number of hidden layers between inputs and outputs.
     /// Increasing the number and width of hidden layers allows for modelling more complex data, but beware of overfitting.
     /// </summary>
-    public class FeedforwardNetwork
+    public class FeedforwardNetwork : INeuralNetwork
     {
         ILossFunction loss = new MeanSquaredError();
         Layer[] layers;
 
+        public int InputCount { get; init; }
+        public int OutputCount { get; init; }
         public double LearningRate { get; set; } = 0.05;
 
         /// <summary>Create a feedforward neural network, with initially random weights and biases, based on the structural
@@ -28,6 +30,8 @@ namespace Carmen.CastingEngine.Neural.Internal
         public FeedforwardNetwork(int n_inputs, int n_hidden_layers, Func<int,int> n_neurons_per_hidden_layer, int n_outputs,
             IVectorActivationFunction? hidden_layer_activation = null, IVectorActivationFunction? output_layer_activation = null)
         {
+            InputCount = n_inputs;
+            OutputCount = n_outputs;
             if (n_hidden_layers < 0)
                 throw new ArgumentException($"{nameof(n_hidden_layers)} must be greater than or equal to 0");
             hidden_layer_activation ??= new Tanh();
