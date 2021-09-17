@@ -116,6 +116,13 @@ namespace Carmen.CastingEngine.Neural.Internal
         /// <summary>The threshold of change in loss at which any lower value is considered a failure to change</summary>
         public double? ChangeThreshold { get; set; } = 1e-10;
 
+        /// <summary>The speed at which the neural network learns, smaller is safer</summary>
+        public double LearningRate
+        {
+            get => network.LearningRate;
+            set => network.LearningRate = value;
+        }
+
         public NeuralNetwork(int n_inputs, int n_hidden_layers, int n_neurons_per_hidden_layer, int n_outputs,
             IVectorActivationFunction? hidden_layer_activation = null, IVectorActivationFunction? output_layer_activation = null)
         {
