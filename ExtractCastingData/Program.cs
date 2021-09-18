@@ -30,6 +30,7 @@ namespace ExtractCastingData
             ClearCasting(temp);
             temp.SaveChanges();
             RecastPreviousCasting(user_chosen, temp, f, pairwise);
+            Console.WriteLine("########## COMPLETE ##########");
         }
 
         private static DbContextOptions<ShowContext> OptionsFor(string filename)
@@ -102,8 +103,10 @@ namespace ExtractCastingData
             var applicants_in_cast_by_id = context.Applicants.Where(a => a.IsAccepted).ToDictionary(a => a.ApplicantId);
             foreach (var role in casting_order)
             {
+                var item = role.Items.First();
+                var role_description = $"{item.Name}/{role.Name}";
                 var picked_applicants_by_castgroup_and_cast = previously_cast // in the database containing the original user choices
-                    .Nodes.OfType<Item>().Where(i => i.NodeId == role.Items.First().NodeId).Single() // find the item this role is in
+                    .Nodes.OfType<Item>().Where(i => i.NodeId == item.NodeId).Single() // find the item this role is in
                     .Roles.Where(r => r.RoleId == role.RoleId).Single() // find this role
                     .Cast.Select(a => a.ApplicantId) // see who was previous cast
                     .Select(id => applicants_in_cast_by_id[id]) // find them in this database
@@ -116,10 +119,19 @@ namespace ExtractCastingData
                         .Where(a => al_engine.AvailabilityOf(a, role).IsAvailable) // which were (probably) available at the time the user cast this role (assuming the show was cast in the expected order)
                         .Where(a => !picked_applicants.Contains(a)) // which weren't picked
                         .ToArray();
+                    var group_description = cast_group.Abbreviation;
+                    if (alternative_cast != null)
+                        group_description += "/" + alternative_cast.Initial;
                     if (pairwise)
+                    {
                         PairwiseExtract(f, picked_applicants, not_picked_applicants, role, criterias, ap_engine, al_engine);
+                        Console.WriteLine($"Extracted {picked_applicants.Count*not_picked_applicants.Length} unique pairs of {group_description} for {role_description}");
+                    }
                     else
+                    {
                         PointwiseExtract(f, picked_applicants, not_picked_applicants, role, criterias, ap_engine, al_engine);
+                        Console.WriteLine($"Extracted {picked_applicants.Count} picked and {not_picked_applicants.Length} not picked {group_description} for {role_description}");
+                    }
                     foreach (var applicant in picked_applicants)
                     {
                         applicant.Roles.Add(role);
