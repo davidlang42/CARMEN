@@ -88,6 +88,9 @@ namespace ExtractCastingData
             var roles = context.Nodes.OfType<Item>().SelectMany(i => i.Roles).ToHashSet();
             foreach (var role in roles)
                 role.Cast.Clear();
+            var applicants = context.Applicants.ToArray();
+            foreach (var applicant in applicants)
+                applicant.Roles.Clear();
         }
 
         private static void RecastPreviousCasting(ShowContext previously_cast, ShowContext context, StreamWriter f, bool pairwise)
@@ -103,7 +106,28 @@ namespace ExtractCastingData
             var casting_order = al_engine.IdealCastingOrder(context.ShowRoot.ItemsInOrder()).SelectMany(roles => roles).Distinct().ToArray();
             if (casting_order.Distinct().Count() != casting_order.Length)
                 throw new ApplicationException("IdealCastingOrder returned duplicate roles.");
-            var applicants_in_cast_by_id = context.Applicants.Where(a => a.CastGroup != null).ToDictionary(a => a.ApplicantId);
+            var applicants_in_cast_by_id = new Dictionary<int, Applicant>();
+            foreach (var applicant in context.Applicants.Where(a => a.CastGroup != null))
+            {
+                if (applicant.HasAuditioned(criterias))
+                {
+                    var valid = true;
+                    for (var i = 0; i < criterias.Length; i++)
+                    {
+                        if (criterias[i].MaxMark == 100 && applicant.MarkFor(criterias[i]) < 10)
+                        {
+                            Console.WriteLine($"Skipped \"{applicant.FirstName} {applicant.LastName}\" because they had a {criterias[i].Name} mark less than 10");
+                            valid = false;
+                            break;
+                        }
+                    }
+                    if (valid)
+                        applicants_in_cast_by_id.Add(applicant.ApplicantId, applicant);
+                }
+                else
+                    Console.WriteLine($"Skipped \"{applicant.FirstName} {applicant.LastName}\" because they haven't auditioned");
+            }
+            Console.WriteLine($"Found {applicants_in_cast_by_id.Count} valid applicants");
             foreach (var role in casting_order)
             {
                 var item = role.Items.First();
@@ -117,7 +141,8 @@ namespace ExtractCastingData
                     .Nodes.OfType<Item>().Where(i => i.NodeId == item.NodeId).Single() // find the item this role is in
                     .Roles.Where(r => r.RoleId == role.RoleId).Single() // find this role
                     .Cast.Select(a => a.ApplicantId) // see who was previous cast
-                    .Select(id => applicants_in_cast_by_id[id]) // find them in this database
+                    .Select(id => applicants_in_cast_by_id.TryGetValue(id, out var a) ? a : null) // find them in this database
+                    .OfType<Applicant>() // skip if not found (ie. they were invalid for some reason)
                     .GroupBy(a => (a.CastGroup, a.AlternativeCast)) // grouped by cast group & cast
                     .ToDictionary(g => g.Key, g => g.ToHashSet());
                 foreach (var ((cast_group, alternative_cast), picked_applicants) in picked_applicants_by_castgroup_and_cast)
