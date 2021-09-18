@@ -23,12 +23,15 @@ namespace ExtractCastingData
             var output_csv = PromptFile("File to save extracted data?", args.Skip(1).FirstOrDefault() ?? Path.GetFileNameWithoutExtension(input_db) + ".csv", false);
             var pairwise = PromptBool("Should each data point be a comparison of 2 applicants?", false);
             var temp_db = Path.GetTempFileName();
+            Console.WriteLine($"Copying database to {temp_db}");
             File.Copy(input_db, temp_db, true);
             using var user_chosen = new ShowContext(OptionsFor(input_db));
             using var temp = new ShowContext(OptionsFor(temp_db));
-            using var f = new StreamWriter(output_csv);
+            Console.WriteLine($"Clearing casting in copied database");
             ClearCasting(temp);
             temp.SaveChanges();
+            Console.WriteLine($"Re-casting to record previously made decisions");
+            using var f = new StreamWriter(output_csv);
             RecastPreviousCasting(user_chosen, temp, f, pairwise);
             Console.WriteLine("########## COMPLETE ##########");
         }
@@ -82,7 +85,7 @@ namespace ExtractCastingData
 
         private static void ClearCasting(ShowContext context)
         {
-            var roles = context.Nodes.OfType<Item>().SelectMany(i => i.Roles).Distinct().ToArray();
+            var roles = context.Nodes.OfType<Item>().SelectMany(i => i.Roles).ToHashSet();
             foreach (var role in roles)
                 role.Cast.Clear();
         }
@@ -100,11 +103,16 @@ namespace ExtractCastingData
             var casting_order = al_engine.IdealCastingOrder(context.ShowRoot.ItemsInOrder()).SelectMany(roles => roles).Distinct().ToArray();
             if (casting_order.Distinct().Count() != casting_order.Length)
                 throw new ApplicationException("IdealCastingOrder returned duplicate roles.");
-            var applicants_in_cast_by_id = context.Applicants.Where(a => a.IsAccepted).ToDictionary(a => a.ApplicantId);
+            var applicants_in_cast_by_id = context.Applicants.Where(a => a.CastGroup != null).ToDictionary(a => a.ApplicantId);
             foreach (var role in casting_order)
             {
                 var item = role.Items.First();
                 var role_description = $"{item.Name}/{role.Name}";
+                if (!role.Requirements.OfType<AbilityRangeRequirement>().Any())
+                {
+                    Console.WriteLine($"Skipping {role_description} because it has no criteria requirements");
+                    continue;
+                }
                 var picked_applicants_by_castgroup_and_cast = previously_cast // in the database containing the original user choices
                     .Nodes.OfType<Item>().Where(i => i.NodeId == item.NodeId).Single() // find the item this role is in
                     .Roles.Where(r => r.RoleId == role.RoleId).Single() // find this role
