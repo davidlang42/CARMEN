@@ -8,7 +8,7 @@ namespace SatTimePredictor
 {
     class Program
     {
-        const int MAX_VARS = 100;
+        const int MAX_VARS = 200;
         const int MAX_CLAUSES = 1000;
         const int MAX_LITERALS = 100;
 
@@ -35,7 +35,7 @@ namespace SatTimePredictor
                 {
                     f.WriteLine(result.ToString());
                     percent += percent_delta;
-                    Console.WriteLine($"[{percent:0.00}%] ({result.NVariables}n, {result.JClauses}j, {result.KLiterals}k) => {result.SecondsTaken:0.000}s ({result.Solutions} solutions)");
+                    Console.WriteLine($"[{percent:0.00}%] #{seed} ({result.NVariables}n, {result.JClauses}j, {result.KLiterals}k) => {result.SecondsTaken:0.000}s ({result.Solutions} solutions)");
                 }
             }
             Console.WriteLine("########## COMPLETE ##########");
