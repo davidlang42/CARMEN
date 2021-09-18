@@ -20,7 +20,6 @@ namespace ExtractSelectionData
             using var f = new StreamWriter(output_csv);
             var criterias = context.Criterias.InOrder().ToArray();
             var cast_groups = context.CastGroups.ToArray();
-            var engine = new HeuristicSelectionEngine(new WeightedSumEngine(criterias), context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection);
             f.WriteLine($"Accepted,CastGroup,{string.Join(",", criterias.Select(c => c.Name))}");
             var extracted = new int[2];
             foreach (var applicant in context.Applicants)
