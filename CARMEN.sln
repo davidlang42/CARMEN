@@ -22,9 +22,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CarmenUI", "CarmenUI\Carmen
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExpertConverter", "ExpertConverter\ExpertConverter.csproj", "{C0981284-0A77-4EA1-9CD6-2901632378D2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SatTimePredictor", "SatTimePredictor\SatTimePredictor.csproj", "{9CF40981-D242-427E-B063-7E1380A7A118}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SatTimePredictor", "SatTimePredictor\SatTimePredictor.csproj", "{9CF40981-D242-427E-B063-7E1380A7A118}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractSelectionData", "ExtractSelectionData\ExtractSelectionData.csproj", "{DEFBEDAC-B95D-41B2-9051-E70C97BA4A99}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtractSelectionData", "ExtractSelectionData\ExtractSelectionData.csproj", "{DEFBEDAC-B95D-41B2-9051-E70C97BA4A99}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractCastingData", "ExtractCastingData\ExtractCastingData.csproj", "{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -98,6 +100,14 @@ Global
 		{DEFBEDAC-B95D-41B2-9051-E70C97BA4A99}.Release|Any CPU.Build.0 = Release|Any CPU
 		{DEFBEDAC-B95D-41B2-9051-E70C97BA4A99}.Slow DB|Any CPU.ActiveCfg = Debug|Any CPU
 		{DEFBEDAC-B95D-41B2-9051-E70C97BA4A99}.Slow DB|Any CPU.Build.0 = Debug|Any CPU
+		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Benchmark|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Benchmark|Any CPU.Build.0 = Debug|Any CPU
+		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Slow DB|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Slow DB|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
