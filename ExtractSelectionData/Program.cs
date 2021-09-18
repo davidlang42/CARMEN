@@ -51,9 +51,9 @@ namespace ExtractSelectionData
             {
                 Console.Write($"{prompt} [{(default_value ? "Y" : "N")}] ");
                 var input = Console.ReadKey();
+                Console.WriteLine("");
                 if (input.Key == ConsoleKey.Enter)
                     return default_value;
-                Console.WriteLine("");
                 bool? result = input.Key switch
                 {
                     ConsoleKey.Y => true,
