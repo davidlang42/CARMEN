@@ -25,32 +25,38 @@ namespace SatTimePredictor
 
         public IEnumerable<SatResult> Run(int random_seed)
         {
+            for (var n = nStart; n <= nEnd; n++)
+                for (var j = jStart; j <= jEnd; j++)
+                    for (var k = kStart; k <= kEnd; k++)
+                        yield return TimeToSolve(random_seed, n, j, k);
+        }
+
+        public IEnumerable<SatResult> RunReverse(int random_seed)
+        {
             for (var n = nEnd; n >= nStart; n--)
                 for (var j = jEnd; j >= jStart; j--)
                     for (var k = kEnd; k >= kStart; k--)
-                    {
-                        var result = new SatResult
-                        {
-                            RandomSeed = random_seed,
-                            NVariables = n,
-                            JClauses = j,
-                            KLiterals = k,
-                            SecondsTaken = TimeToSolve(random_seed, n, j, k, out var solutions)
-                        };
-                        result.Solutions = solutions.Length;
-                        yield return result;
-                    }
+                        yield return TimeToSolve(random_seed, n, j, k);
         }
 
-        private double TimeToSolve(int random_seed, int n_variables, int j_clauses, int k_literals_per_clause, out Solution[] solution)
+        private SatResult TimeToSolve(int random_seed, int n_variables, int j_clauses, int k_literals_per_clause)
         {
+            var result = new SatResult
+            {
+                RandomSeed = random_seed,
+                NVariables = n_variables,
+                JClauses = j_clauses,
+                KLiterals = k_literals_per_clause,
+            };
             var vars = Enumerable.Range(1, n_variables).ToArray();
             var sat = new DpllAllSolver<int>(vars);
             var expression = GenerateExpression(random_seed, vars, j_clauses, k_literals_per_clause);
             var start = DateTime.Now;
-            solution = sat.Solve(expression).ToArray();
+            var solutions = sat.Solve(expression).ToArray();
             var duration = DateTime.Now - start;
-            return duration.TotalSeconds;
+            result.SecondsTaken = duration.TotalSeconds;
+            result.Solutions = solutions.Length;
+            return result;
         }
 
         public static Expression<T> GenerateExpression<T>(int random_seed, T[] variables, int j_clauses, int k_literals_per_clause)

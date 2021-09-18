@@ -23,6 +23,7 @@ namespace SatTimePredictor
             var end_j_clauses = PromptInt("Ending at J clauses?", Math.Min(start_j_clauses + 99, MAX_CLAUSES), start_j_clauses, MAX_CLAUSES);
             var start_k_literals = PromptInt("Starting at K literals per clause?", 1, 1, MAX_LITERALS);
             var end_k_literals = PromptInt("Ending at K literals per clause?", Math.Min(start_k_literals + 9, MAX_LITERALS), start_k_literals, MAX_LITERALS);
+            var forwards = PromptBool("Should iteration occur in increasing order?", true);
             var timer = new SatTimer(start_n_vars, end_n_vars, start_j_clauses, end_j_clauses, start_k_literals, end_k_literals);
             var percent_delta = 100.0 / timer.TotalCombinations;
             using var f = new StreamWriter(filename);
@@ -31,7 +32,8 @@ namespace SatTimePredictor
             {
                 var percent = 0.0;
                 Console.WriteLine($"########## Starting pass for seed: {seed}/{end_seed} ##########");
-                foreach (var result in timer.Run(seed))
+                var results = forwards ? timer.Run(seed) : timer.RunReverse(seed);
+                foreach (var result in results)
                 {
                     f.WriteLine(result.ToString());
                     percent += percent_delta;
@@ -74,6 +76,30 @@ namespace SatTimePredictor
                     Console.WriteLine($"Input cannot be more than {max}.");
                 else
                     return result;
+            }
+        }
+
+        private static bool PromptBool(string prompt, bool default_value)
+        {
+            while (true)
+            {
+                Console.Write($"{prompt} [{(default_value ? "Y" : "N")}] ");
+                var input = Console.ReadKey();
+                if (input.Key == ConsoleKey.Enter)
+                    return default_value;
+                Console.WriteLine("");
+                bool? result = input.Key switch
+                {
+                    ConsoleKey.Y => true,
+                    ConsoleKey.N => false,
+                    ConsoleKey.T => true,
+                    ConsoleKey.F => false,
+                    _ => null
+                };
+                if (result.HasValue)
+                    return result.Value;
+                else
+                    Console.WriteLine("Please press Y or T for yes/true, or N or F for no/false.");
             }
         }
     }
