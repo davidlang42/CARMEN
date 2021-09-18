@@ -134,7 +134,7 @@ namespace Carmen.CastingEngine.Heuristic
             if (inner.Children.OfType<Item>().Any())
                 yield return inner;
             else
-                foreach (var child in inner.Children.Cast<InnerNode>())
+                foreach (var child in inner.Children.InOrder().Cast<InnerNode>())
                     foreach (var section in ItemContainingSections(child))
                         yield return section;
         }
