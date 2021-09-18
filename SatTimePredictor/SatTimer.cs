@@ -25,9 +25,9 @@ namespace SatTimePredictor
 
         public IEnumerable<SatResult> Run(int random_seed)
         {
-            for (var n = nStart; n <= nEnd; n++)
-                for (var j = jStart; j <= jEnd; j++)
-                    for (var k = kStart; k <= kEnd; k++)
+            for (var n = nEnd; n >= nStart; n--)
+                for (var j = jEnd; j >= jStart; j--)
+                    for (var k = kEnd; k >= kStart; k--)
                     {
                         var result = new SatResult
                         {
