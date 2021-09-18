@@ -102,32 +102,36 @@ namespace ExtractCastingData
             var applicants_in_cast_by_id = context.Applicants.Where(a => a.IsAccepted).ToDictionary(a => a.ApplicantId);
             foreach (var role in casting_order)
             {
-                //TODO process separately by cast_group and alternative cast
-                var picked_applicants = previously_cast // in the database containing the original user choices
+                var picked_applicants_by_castgroup_and_cast = previously_cast // in the database containing the original user choices
                     .Nodes.OfType<Item>().Where(i => i.NodeId == role.Items.First().NodeId).Single() // find the item this role is in
                     .Roles.Where(r => r.RoleId == role.RoleId).Single() // find this role
                     .Cast.Select(a => a.ApplicantId) // see who was previous cast
                     .Select(id => applicants_in_cast_by_id[id]) // find them in this database
-                    .ToHashSet();
-                var not_picked_applicants = applicants_in_cast_by_id.Values // applicants in this database
-                    .Where(a => al_engine.AvailabilityOf(a, role).IsAvailable) // which were (probably) available at the time the user cast this role
-                    .Where(a => !picked_applicants.Contains(a)) // which weren't picked
-                    .ToArray();
-                if (pairwise)
-                    PairwiseExtract(f, picked_applicants, not_picked_applicants, role, criterias, ap_engine, al_engine);
-                else
-                    PointwiseExtract(f, picked_applicants, not_picked_applicants, role, criterias, ap_engine, al_engine);
-                foreach (var applicant in picked_applicants)
+                    .GroupBy(a => (a.CastGroup, a.AlternativeCast)) // grouped by cast group & cast
+                    .ToDictionary(g => g.Key, g => g.ToHashSet());
+                foreach (var ((cast_group, alternative_cast), picked_applicants) in picked_applicants_by_castgroup_and_cast)
                 {
-                    applicant.Roles.Add(role);
-                    role.Cast.Add(applicant);
+                    var not_picked_applicants = applicants_in_cast_by_id.Values // applicants in this database
+                        .Where(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast) // of the same cast group & cast
+                        .Where(a => al_engine.AvailabilityOf(a, role).IsAvailable) // which were (probably) available at the time the user cast this role (assuming the show was cast in the expected order)
+                        .Where(a => !picked_applicants.Contains(a)) // which weren't picked
+                        .ToArray();
+                    if (pairwise)
+                        PairwiseExtract(f, picked_applicants, not_picked_applicants, role, criterias, ap_engine, al_engine);
+                    else
+                        PointwiseExtract(f, picked_applicants, not_picked_applicants, role, criterias, ap_engine, al_engine);
+                    foreach (var applicant in picked_applicants)
+                    {
+                        applicant.Roles.Add(role);
+                        role.Cast.Add(applicant);
+                    }
                 }
             }
         }
 
         private static void PointwiseHeader(StreamWriter f, Criteria[] criterias)
         {
-            f.WriteLine($"Picked,CastGroup,RequiredCount,OverallAbility,{string.Join(",", criterias.Select(c => $"Requires_{c.Name},Mark_{c.Name},ExistingCount_{c.Name}"))}");
+            f.WriteLine($"Picked,CastGroup,AlternativeCast,RequiredCount,OverallAbility,{string.Join(",", criterias.Select(c => $"Requires_{c.Name},Mark_{c.Name},ExistingCount_{c.Name}"))}");
         }
 
         private static void PointwiseExtract(StreamWriter f, IEnumerable<Applicant> picked, IEnumerable<Applicant> not_picked, Role role, Criteria[] criterias, IApplicantEngine ap_engine, IAllocationEngine al_engine)
@@ -141,13 +145,13 @@ namespace ExtractCastingData
         private static void PointwiseRow(StreamWriter f, bool picked, Applicant a, Role r, Criteria[] criterias, IApplicantEngine ap_engine, IAllocationEngine al_engine)
         {
             var cast_group = a.CastGroup;
-            f.WriteLine($"{(picked ? 1 : 0)},{cast_group.Name},{r.CountFor(cast_group)},{ap_engine.OverallAbility(a)}," +
+            f.WriteLine($"{(picked ? 1 : 0)},{cast_group.Name},{a.AlternativeCast?.Name},{r.CountFor(cast_group)},{ap_engine.OverallAbility(a)}," +
                 $"{string.Join(",", criterias.Select(c => $"{(r.Requirements.OfType<AbilityRangeRequirement>().Where(arr => arr.Criteria == c).Any() ? 1 : 0)},{a.MarkFor(c)},{al_engine.CountRoles(a, c, r)}"))}");
         }
 
         private static void PairwiseHeader(StreamWriter f, Criteria[] criterias)
         {
-            f.WriteLine($"BestCandidate,CastGroup,RequiredCount,{string.Join(",",criterias.Select(c => $"Requires_{c.Name}"))}," +
+            f.WriteLine($"BestCandidate,CastGroup,AlternativeCast,RequiredCount,{string.Join(",",criterias.Select(c => $"Requires_{c.Name}"))}," +
                 $"A_OverallAbility,{string.Join(",", criterias.Select(c => $"A_Mark_{c.Name},A_ExistingCount_{c.Name}"))}" +
                 $"B_OverallAbility,{string.Join(",", criterias.Select(c => $"B_Mark_{c.Name},B_ExistingCount_{c.Name}"))}");
         }
@@ -165,7 +169,7 @@ namespace ExtractCastingData
         private static void PairwiseRow(StreamWriter f, string best_candidate, Applicant a, Applicant b, Role r, Criteria[] criterias, IApplicantEngine ap_engine, IAllocationEngine al_engine)
         {
             var cast_group = a.CastGroup;
-            f.WriteLine($"{best_candidate},{cast_group.Name},{r.CountFor(cast_group)},{string.Join(",", criterias.Select(c => r.Requirements.OfType<AbilityRangeRequirement>().Where(arr => arr.Criteria == c).Any() ? 1 : 0))}," +
+            f.WriteLine($"{best_candidate},{cast_group.Name},{a.AlternativeCast?.Name},{r.CountFor(cast_group)},{string.Join(",", criterias.Select(c => r.Requirements.OfType<AbilityRangeRequirement>().Where(arr => arr.Criteria == c).Any() ? 1 : 0))}," +
                 $"{ap_engine.OverallAbility(a)},{string.Join(",", criterias.Select(c => $"{a.MarkFor(c)},{al_engine.CountRoles(a, c, r)}"))}" +
                 $"{ap_engine.OverallAbility(b)},{string.Join(",", criterias.Select(c => $"{b.MarkFor(c)},{al_engine.CountRoles(b, c, r)}"))}");
         }
