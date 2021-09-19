@@ -157,7 +157,7 @@ namespace ExtractSelectionData
                 else
                     Console.WriteLine($"Skipped \"{applicant.FirstName} {applicant.LastName}\" because they haven't auditioned");
             }
-            f.WriteLine($"BestCandidate,CastGroup,{string.Join(",", criterias.Select(c => "A_" + c.Name))},{string.Join(",", criterias.Select(c => "B_" + c.Name))}");
+            f.WriteLine($"A_BetterThan_B,CastGroup,{string.Join(",", criterias.Select(c => "A_" + c.Name))},{string.Join(",", criterias.Select(c => "B_" + c.Name))}");
             var extracted_pairs = 0;
             for (var i = 0; i < cast_groups.Length; i++)
             {
@@ -165,17 +165,17 @@ namespace ExtractSelectionData
                 foreach (var accepted_applicant in accepted_applicants[i])
                     foreach (var rejected_applicant in rejected_applicants[i])
                     {
-                        f.WriteLine(ComparisonRow("A", cast_groups[i], accepted_applicant, rejected_applicant, criterias));
-                        f.WriteLine(ComparisonRow("B", cast_groups[i], rejected_applicant, accepted_applicant, criterias));
+                        f.WriteLine(ComparisonRow(true, cast_groups[i], accepted_applicant, rejected_applicant, criterias));
+                        f.WriteLine(ComparisonRow(false, cast_groups[i], rejected_applicant, accepted_applicant, criterias));
                         extracted_pairs++;
                     }
             }
             Console.WriteLine($"Extracted {extracted_applicants} applicants forming {extracted_pairs} unique pairs ({extracted_pairs*2} data rows)");
         }
 
-        private static string ComparisonRow(string best_candidate, CastGroup cast_group, Applicant a, Applicant b, Criteria[] criterias)
+        private static string ComparisonRow(bool a_better_than_b, CastGroup cast_group, Applicant a, Applicant b, Criteria[] criterias)
         {
-            return $"{best_candidate},{cast_group.Name},{string.Join(",", criterias.Select(c => a.MarkFor(c)))},{string.Join(",", criterias.Select(c => b.MarkFor(c)))}";
+            return $"{(a_better_than_b ? 1 : 0)},{cast_group.Name},{string.Join(",", criterias.Select(c => a.MarkFor(c)))},{string.Join(",", criterias.Select(c => b.MarkFor(c)))}";
         }
     }
 }
