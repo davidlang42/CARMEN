@@ -197,7 +197,7 @@ namespace ExtractCastingData
         private static void PairwiseHeader(StreamWriter f, Criteria[] criterias)
         {
             f.WriteLine($"BestCandidate,CastGroup,AlternativeCast,RequiredCount,{string.Join(",",criterias.Select(c => $"Requires_{c.Name}"))}," +
-                $"A_OverallAbility,{string.Join(",", criterias.Select(c => $"A_Mark_{c.Name},A_ExistingCount_{c.Name}"))}" +
+                $"A_OverallAbility,{string.Join(",", criterias.Select(c => $"A_Mark_{c.Name},A_ExistingCount_{c.Name}"))}," +
                 $"B_OverallAbility,{string.Join(",", criterias.Select(c => $"B_Mark_{c.Name},B_ExistingCount_{c.Name}"))}");
         }
 
@@ -215,7 +215,7 @@ namespace ExtractCastingData
         {
             var cast_group = a.CastGroup;
             f.WriteLine($"{best_candidate},{cast_group.Name},{a.AlternativeCast?.Name},{r.CountFor(cast_group)},{string.Join(",", criterias.Select(c => r.Requirements.OfType<AbilityRangeRequirement>().Where(arr => arr.Criteria == c).Any() ? 1 : 0))}," +
-                $"{ap_engine.OverallAbility(a)},{string.Join(",", criterias.Select(c => $"{a.MarkFor(c)},{al_engine.CountRoles(a, c, r)}"))}" +
+                $"{ap_engine.OverallAbility(a)},{string.Join(",", criterias.Select(c => $"{a.MarkFor(c)},{al_engine.CountRoles(a, c, r)}"))}," +
                 $"{ap_engine.OverallAbility(b)},{string.Join(",", criterias.Select(c => $"{b.MarkFor(c)},{al_engine.CountRoles(b, c, r)}"))}");
         }
     }
