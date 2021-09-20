@@ -28,6 +28,14 @@ namespace Carmen.CastingEngine.Base
 
         public IApplicantEngine ApplicantEngine { get; init; }
 
+        /// <summary>If true, a role requiring multiple criteria will be counted as a fractical role for each criteria,
+        /// equal to 1/SQRT(CriteriasRequired). If false, a role will be counted as 1 whole role for each criteria required.</summary>
+        public bool CountRolesByGeometricMean { get; set; } = true; //LATER add a setting for users to change this
+
+        /// <summary>If true, a role requiring one criteria or another will be counted as a fractional role for each criteria,
+        /// equal to 1/CriteriaOptions. If false, criteria required as SubRequirements of an OrRequirement will be ignored.</summary>
+        public bool CountRolesIncludingPartialRequirements { get; set; } = true; //LATER add a setting for users to change this
+
         protected AlternativeCast[] alternativeCasts { get; init; }
 
         public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
@@ -53,7 +61,52 @@ namespace Carmen.CastingEngine.Base
                 yield return (role, PickCast(applicants, role));
         }
 
-        public abstract double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role);
+        /// <summary>Counts an applicants existing roles requiring the specificed Criteria, either directly or as SubRequirements of an AndRequirement.
+        /// If <see cref="CountRolesByGeometricMean"/> is true, a role requiring multiple criteria will be counted as a fractical role for each criteria.
+        /// If <see cref="CountRolesIncludingPartialRequirements"/> is true, criteria required as SubRequirements of an OrRequirement will be included.</summary>
+        /// Any NOT requirements or non-criteria requirements will be ignored.</summary>
+        public double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)
+        {
+            double role_count = 0;
+            foreach (var role in applicant.Roles.Where(r => r != excluding_role))
+            {
+                var counts = CriteriaCounts(role.Requirements);
+                if (counts.TryGetValue(criteria, out var count))
+                {
+                    if (CountRolesByGeometricMean)
+                        count /= Math.Sqrt(counts.Values.Sum());
+                    role_count += count;
+                }
+            }
+            return role_count;
+        }
+
+        private Dictionary<Criteria, double> CriteriaCounts(IEnumerable<Requirement> requirements)
+        {
+            var counts = new Dictionary<Criteria, double>();
+            foreach (var requirement in requirements)
+            {
+                if (requirement is ICriteriaRequirement criteria_requirement)
+                    counts[criteria_requirement.Criteria] = 1; // referencing the same criteria twice doesn't count as more
+                else if (requirement is CombinedRequirement combined && (CountRolesIncludingPartialRequirements || combined is AndRequirement)) // treat AND sub-requirements as if they were direct requirements
+                {
+                    var sub_counts = CriteriaCounts(combined.SubRequirements);
+                    if (combined is not AndRequirement)
+                        ArithmeticMeanInPlace(sub_counts);
+                    foreach (var (sub_criteria, sub_count) in sub_counts)
+                        if (!counts.TryGetValue(sub_criteria, out var existing_count) || existing_count < sub_count)
+                            counts[sub_criteria] = sub_count; // only keep the max value, referencing twice doesn't count as more
+                }
+            }
+            return counts;
+        }
+
+        private void ArithmeticMeanInPlace(Dictionary<Criteria, double> values)
+        {
+            var total_sum = values.Values.Sum();
+            foreach (var key in values.Keys)
+                values[key] /= total_sum;
+        }
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>

@@ -26,12 +26,6 @@ namespace Carmen.CastingEngine.Dummy
             return sub_suitabilities.Average();
         }
 
-        /// <summary>Dummy value counts top level AbilityExact/AbilityRange requirements only</summary>
-        public override double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)
-            => applicant.Roles.Where(r => r != excluding_role)
-            .Where(r => r.Requirements.Any(req => req is ICriteriaRequirement cr && cr.Criteria == criteria))
-            .Count();
-
         /// <summary>Dummy selection picks the number of required applicants of each type from the list of applicants, ignoring availability and eligibility.
         /// This does not take into account people already cast in the role.</summary>
         public override IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role)

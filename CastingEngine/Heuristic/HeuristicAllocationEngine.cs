@@ -20,14 +20,10 @@ namespace Carmen.CastingEngine.Heuristic
         public HeuristicAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria[] criterias)
             : base(applicant_engine, alternative_casts)
         {
+            CountRolesByGeometricMean = false;
+            CountRolesIncludingPartialRequirements = false;
             this.criterias = criterias;
         }
-
-        /// <summary>Counts roles based on top level AbilityExact/AbilityRange requirements only</summary>
-        public override double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)
-            => applicant.Roles.Where(r => r != excluding_role)
-            .Where(r => r.Requirements.Any(req => req is ICriteriaRequirement cr && cr.Criteria == criteria))
-            .Count();
 
         public override double SuitabilityOf(Applicant applicant, Role role)
         {

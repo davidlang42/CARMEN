@@ -23,6 +23,8 @@ namespace Carmen.CastingEngine.Neural
         public NeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria[] criterias, Requirement[] requirements)
             : base(applicant_engine, alternative_casts, criterias)
         {
+            CountRolesByGeometricMean = true; //LATER shouldn't need to set these once this doesn't extend HeuristicAllocationEngine (they should be true by default)
+            CountRolesIncludingPartialRequirements = true; //LATER shouldn't need to set these once this doesn't extend HeuristicAllocationEngine (they should be true by default)
             this.primaryCriterias = criterias.InOrder().Where(c => c.Primary).ToArray();
             this.requirements = requirements.InOrder().ToArray();
             //TODO needs some way to persist neural network model
@@ -30,47 +32,6 @@ namespace Carmen.CastingEngine.Neural
             var n_hidden_layers = Math.Max(primaryCriterias.Length, requirements.Length);
             var n_neurons_per_hidden_layer = (primaryCriterias.Length + 1) * (requirements.Length + 1);
             model = new FeedforwardNetwork(nInputs, n_hidden_layers, n_neurons_per_hidden_layer, 1, new Tanh(), new Sigmoid()); //TODO try different hidden activation functions
-        }
-
-        /// <summary>Counts roles based on the geometric mean of AND requirements and the arithmetic mean of OR requirements.
-        /// Any NOT requirements or non-criteria requirements will be ignored.</summary>
-        public override double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)
-        {
-            double role_count = 0;
-            foreach (var role in applicant.Roles.Where(r => r != excluding_role))
-            {
-                var counts = CriteriaCounts(role.Requirements);
-                if (counts.TryGetValue(criteria, out var count))
-                    role_count += count / Math.Sqrt(counts.Values.Sum()); // geometric mean
-            }
-            return role_count;
-        }
-
-        private Dictionary<Criteria, double> CriteriaCounts(IEnumerable<Requirement> requirements)
-        {
-            var counts = new Dictionary<Criteria, double>();
-            foreach (var requirement in requirements)
-            {
-                if (requirement is ICriteriaRequirement criteria_requirement)
-                    counts[criteria_requirement.Criteria] = 1; // referencing the same criteria twice doesn't count as more
-                else if (requirement is CombinedRequirement combined)
-                {
-                    var sub_counts = CriteriaCounts(combined.SubRequirements);
-                    if (combined is not AndRequirement)
-                        ArithmeticMeanInPlace(sub_counts);
-                    foreach (var (sub_criteria, sub_count) in sub_counts)
-                        if (!counts.TryGetValue(sub_criteria, out var existing_count) || existing_count < sub_count)
-                            counts[sub_criteria] = sub_count; // only keep the max value, referencing twice doesn't count as more
-                }
-            }
-            return counts;
-        }
-
-        private void ArithmeticMeanInPlace(Dictionary<Criteria, double> values)
-        {
-            var total_sum = values.Values.Sum();
-            foreach (var key in values.Keys)
-                values[key] /= total_sum;
         }
 
         public override double SuitabilityOf(Applicant applicant, Role role)
