@@ -53,11 +53,7 @@ namespace Carmen.CastingEngine.Base
                 yield return (role, PickCast(applicants, role));
         }
 
-        /// <summary>Default implementation counts roles based on top level AbilityExact/AbilityRange requirements only</summary>
-        public virtual double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)
-            => applicant.Roles.Where(r => r != excluding_role)
-            .Where(r => r.Requirements.Any(req => req is ICriteriaRequirement cr && cr.Criteria == criteria))
-            .Count();
+        public abstract double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role);
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>

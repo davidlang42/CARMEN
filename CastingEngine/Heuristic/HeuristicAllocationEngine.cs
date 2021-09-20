@@ -23,6 +23,12 @@ namespace Carmen.CastingEngine.Heuristic
             this.criterias = criterias;
         }
 
+        /// <summary>Counts roles based on top level AbilityExact/AbilityRange requirements only</summary>
+        public override double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)
+            => applicant.Roles.Where(r => r != excluding_role)
+            .Where(r => r.Requirements.Any(req => req is ICriteriaRequirement cr && cr.Criteria == criteria))
+            .Count();
+
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
             double score = ApplicantEngine.OverallSuitability(applicant); // between 0 and 1 inclusive

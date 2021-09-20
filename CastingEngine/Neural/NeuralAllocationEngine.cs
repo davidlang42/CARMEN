@@ -32,6 +32,55 @@ namespace Carmen.CastingEngine.Neural
             model = new FeedforwardNetwork(nInputs, n_hidden_layers, n_neurons_per_hidden_layer, 1, new Tanh(), new Sigmoid()); //TODO try different hidden activation functions
         }
 
+        /// <summary>Counts roles based on the geometric mean of AND requirements and the arithmetic mean of OR requirements.
+        /// Any NOT requirements, or non-criteria requirements will be ignored.</summary>
+        public override double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role)
+        {
+            double role_count = 0;
+            foreach (var role in applicant.Roles.Where(r => r != excluding_role))
+            {
+                var weights = CriteriaWeights(role.Requirements);
+                if (weights.TryGetValue(criteria, out var weight))
+                    role_count += weight;
+            }
+            return role_count;
+        }
+
+        private Dictionary<Criteria, double> CriteriaWeights(IEnumerable<Requirement> requirements)
+        {
+            var weights = new Dictionary<Criteria, double>();
+            foreach (var requirement in requirements)
+            {
+                if (requirement is ICriteriaRequirement criteria_requirement)
+                    weights[criteria_requirement.Criteria] = 1; // referencing the same criteria twice doesn't count as more
+                else if (requirement is CombinedRequirement combined)
+                {
+                    var sub_weights = CriteriaWeights(combined.SubRequirements);
+                    if (combined is not AndRequirement)
+                        ArithmeticMeanInPlace(sub_weights);
+                    foreach (var (sub_criteria, sub_weight) in sub_weights)
+                        if (!weights.TryGetValue(sub_criteria, out var existing_weight) || existing_weight < sub_weight)
+                            weights[sub_criteria] = sub_weight; // only keep the max value, referencing twice doesn't count as more
+                }
+            }
+            GeometricMeanInPlace(weights);
+            return weights;
+        }
+
+        private void ArithmeticMeanInPlace(Dictionary<Criteria, double> values)
+        {
+            var total_sum = values.Values.Sum();
+            foreach (var key in values.Keys)
+                values[key] /= total_sum;
+        }
+
+        private void GeometricMeanInPlace(Dictionary<Criteria, double> values)
+        {
+            var sqrt_total_sum = Math.Sqrt(values.Values.Sum());
+            foreach (var key in values.Keys)
+                values[key] /= sqrt_total_sum;
+        }
+
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
             if (!role.Requirements.Any())
