@@ -18,12 +18,13 @@ namespace ExtractSelectionData
             var input_db = PromptFile("CARMEN database file to extract from?", args.FirstOrDefault() ?? "", true);
             var output_csv = PromptFile("File to save extracted data?", args.Skip(1).FirstOrDefault() ?? Path.GetFileNameWithoutExtension(input_db) + ".csv", false);
             var pairwise = PromptBool("Should each data point be a comparison of 2 applicants?", false);
+            var polarised = pairwise && PromptBool("Should A_BetterThan_B be polarised?", false);
             var connection = new SqliteConnectionStringBuilder { DataSource = input_db };
             var options = new DbContextOptionsBuilder<ShowContext>().UseSqlite(connection.ConnectionString).Options;
             using var context = new ShowContext(options);
             using var f = new StreamWriter(output_csv);
             if (pairwise)
-                PairwiseExtract(context, f);
+                PairwiseExtract(context, f, polarised);
             else
                 PointwiseExtract(context, f);
         }
@@ -110,7 +111,7 @@ namespace ExtractSelectionData
             Console.WriteLine($"Extracted {extracted[1]} accepted applicants and {extracted[0]} rejected applicants");
         }
 
-        private static void PairwiseExtract(ShowContext context, StreamWriter f)
+        private static void PairwiseExtract(ShowContext context, StreamWriter f, bool polarised)
         {
             var criterias = context.Criterias.InOrder().ToArray();
             var cast_groups = context.CastGroups.ToArray();
@@ -165,17 +166,17 @@ namespace ExtractSelectionData
                 foreach (var accepted_applicant in accepted_applicants[i])
                     foreach (var rejected_applicant in rejected_applicants[i])
                     {
-                        f.WriteLine(ComparisonRow(true, cast_groups[i], accepted_applicant, rejected_applicant, criterias));
-                        f.WriteLine(ComparisonRow(false, cast_groups[i], rejected_applicant, accepted_applicant, criterias));
+                        f.WriteLine(ComparisonRow(1, cast_groups[i], accepted_applicant, rejected_applicant, criterias));
+                        f.WriteLine(ComparisonRow(polarised ? -1 : 0, cast_groups[i], rejected_applicant, accepted_applicant, criterias));
                         extracted_pairs++;
                     }
             }
             Console.WriteLine($"Extracted {extracted_applicants} applicants forming {extracted_pairs} unique pairs ({extracted_pairs*2} data rows)");
         }
 
-        private static string ComparisonRow(bool a_better_than_b, CastGroup cast_group, Applicant a, Applicant b, Criteria[] criterias)
+        private static string ComparisonRow(int a_better_than_b, CastGroup cast_group, Applicant a, Applicant b, Criteria[] criterias)
         {
-            return $"{(a_better_than_b ? 1 : 0)},{cast_group.Name},{string.Join(",", criterias.Select(c => a.MarkFor(c)))},{string.Join(",", criterias.Select(c => b.MarkFor(c)))}";
+            return $"{a_better_than_b},{cast_group.Name},{string.Join(",", criterias.Select(c => a.MarkFor(c)))},{string.Join(",", criterias.Select(c => b.MarkFor(c)))}";
         }
     }
 }

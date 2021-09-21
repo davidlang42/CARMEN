@@ -22,6 +22,7 @@ namespace ExtractCastingData
             var input_db = PromptFile("CARMEN database file to extract from?", args.FirstOrDefault() ?? "", true);
             var output_csv = PromptFile("File to save extracted data?", args.Skip(1).FirstOrDefault() ?? Path.GetFileNameWithoutExtension(input_db) + ".csv", false);
             var pairwise = PromptBool("Should each data point be a comparison of 2 applicants?", false);
+            var polarised = pairwise && PromptBool("Should A_BetterThan_B be polarised?", false);
             var temp_db = Path.GetTempFileName();
             Console.WriteLine($"Copying database to {temp_db}");
             File.Copy(input_db, temp_db, true);
@@ -32,7 +33,7 @@ namespace ExtractCastingData
             temp.SaveChanges();
             Console.WriteLine($"Re-casting to record previously made decisions");
             using var f = new StreamWriter(output_csv);
-            RecastPreviousCasting(user_chosen, temp, f, pairwise);
+            RecastPreviousCasting(user_chosen, temp, f, pairwise, polarised);
             Console.WriteLine("########## COMPLETE ##########");
         }
 
@@ -93,7 +94,7 @@ namespace ExtractCastingData
                 applicant.Roles.Clear();
         }
 
-        private static void RecastPreviousCasting(ShowContext previously_cast, ShowContext context, StreamWriter f, bool pairwise)
+        private static void RecastPreviousCasting(ShowContext previously_cast, ShowContext context, StreamWriter f, bool pairwise, bool polarised)
         {
             var criterias = context.Criterias.InOrder().ToArray();
             if (pairwise)
@@ -157,7 +158,7 @@ namespace ExtractCastingData
                         group_description += "/" + alternative_cast.Initial;
                     if (pairwise)
                     {
-                        PairwiseExtract(f, picked_applicants, not_picked_applicants, role, criterias, ap_engine, al_engine);
+                        PairwiseExtract(f, picked_applicants, not_picked_applicants, role, criterias, ap_engine, al_engine, polarised);
                         Console.WriteLine($"Extracted {picked_applicants.Count*not_picked_applicants.Length} unique pairs of {group_description} for {role_description}");
                     }
                     else
@@ -201,20 +202,20 @@ namespace ExtractCastingData
                 $"B_OverallAbility,{string.Join(",", criterias.Select(c => $"B_Mark_{c.Name},B_ExistingCount_{c.Name}"))}");
         }
 
-        private static void PairwiseExtract(StreamWriter f, IEnumerable<Applicant> picked, IEnumerable<Applicant> not_picked, Role role, Criteria[] criterias, IApplicantEngine ap_engine, IAllocationEngine al_engine)
+        private static void PairwiseExtract(StreamWriter f, IEnumerable<Applicant> picked, IEnumerable<Applicant> not_picked, Role role, Criteria[] criterias, IApplicantEngine ap_engine, IAllocationEngine al_engine, bool polarised)
         {
             foreach (var picked_applicant in picked)
                 foreach (var not_picked_applicant in not_picked)
                 {
-                    PairwiseRow(f, true, picked_applicant, not_picked_applicant, role, criterias, ap_engine, al_engine);
-                    PairwiseRow(f, false, not_picked_applicant, picked_applicant, role, criterias, ap_engine, al_engine);
+                    PairwiseRow(f, 1, picked_applicant, not_picked_applicant, role, criterias, ap_engine, al_engine);
+                    PairwiseRow(f, polarised ? -1 : 0, not_picked_applicant, picked_applicant, role, criterias, ap_engine, al_engine);
                 }
         }
 
-        private static void PairwiseRow(StreamWriter f, bool a_better_than_b, Applicant a, Applicant b, Role r, Criteria[] criterias, IApplicantEngine ap_engine, IAllocationEngine al_engine)
+        private static void PairwiseRow(StreamWriter f, int a_better_than_b, Applicant a, Applicant b, Role r, Criteria[] criterias, IApplicantEngine ap_engine, IAllocationEngine al_engine)
         {
             var cast_group = a.CastGroup;
-            f.WriteLine($"{(a_better_than_b ? 1 : 0)},{cast_group.Name},{a.AlternativeCast?.Name},{r.CountFor(cast_group)},{string.Join(",", criterias.Select(c => r.Requirements.OfType<AbilityRangeRequirement>().Where(arr => arr.Criteria == c).Any() ? 1 : 0))}," +
+            f.WriteLine($"{a_better_than_b},{cast_group.Name},{a.AlternativeCast?.Name},{r.CountFor(cast_group)},{string.Join(",", criterias.Select(c => r.Requirements.OfType<AbilityRangeRequirement>().Where(arr => arr.Criteria == c).Any() ? 1 : 0))}," +
                 $"{ap_engine.OverallAbility(a)},{string.Join(",", criterias.Select(c => $"{a.MarkFor(c)},{al_engine.CountRoles(a, c, r)}"))}," +
                 $"{ap_engine.OverallAbility(b)},{string.Join(",", criterias.Select(c => $"{b.MarkFor(c)},{al_engine.CountRoles(b, c, r)}"))}");
         }
