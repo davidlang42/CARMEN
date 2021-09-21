@@ -114,9 +114,9 @@ namespace ExtractCastingData
                     var valid = true;
                     for (var i = 0; i < criterias.Length; i++)
                     {
-                        if (criterias[i].MaxMark == 100 && applicant.MarkFor(criterias[i]) < 10)
+                        if (criterias[i].MaxMark == 100 && applicant.MarkFor(criterias[i]) == 1)
                         {
-                            Console.WriteLine($"Skipped \"{applicant.FirstName} {applicant.LastName}\" because they had a {criterias[i].Name} mark less than 10");
+                            Console.WriteLine($"Skipped \"{applicant.FirstName} {applicant.LastName}\" because they had a {criterias[i].Name} mark of 1");
                             valid = false;
                             break;
                         }

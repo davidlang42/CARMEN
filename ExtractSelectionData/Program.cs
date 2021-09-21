@@ -88,9 +88,9 @@ namespace ExtractSelectionData
                         for (var i = 0; i < marks.Length; i++)
                         {
                             marks[i] = applicant.MarkFor(criterias[i]);
-                            if (criterias[i].MaxMark == 100 && marks[i] < 10)
+                            if (criterias[i].MaxMark == 100 && marks[i] == 1)
                             {
-                                Console.WriteLine($"Skipped \"{applicant.FirstName} {applicant.LastName}\" because they had a {criterias[i].Name} mark less than 10");
+                                Console.WriteLine($"Skipped \"{applicant.FirstName} {applicant.LastName}\" because they had a {criterias[i].Name} mark of 1");
                                 valid = false;
                                 break;
                             }
