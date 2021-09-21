@@ -2,6 +2,7 @@
 using Carmen.CastingEngine.Dummy;
 using Carmen.CastingEngine.Heuristic;
 using Carmen.CastingEngine.Neural;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Requirements;
@@ -37,6 +38,8 @@ namespace Carmen.CastingEngine.Base
         public bool CountRolesIncludingPartialRequirements { get; set; } = true; //LATER add a setting for users to change this
 
         protected AlternativeCast[] alternativeCasts { get; init; }
+        private Requirement[] requirementsInOrder { get; init; }
+        private Applicant[] allApplicants { get; init; }
 
         public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
         public abstract double SuitabilityOf(Applicant applicant, Role role);
@@ -44,10 +47,12 @@ namespace Carmen.CastingEngine.Base
         public virtual void UserPickedCast(IEnumerable<Applicant> applicants, Role role)
         { }
 
-        public AllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts)
+        public AllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, IEnumerable<Requirement> requirements, Applicant[] all_applicants)
         {
             ApplicantEngine = applicant_engine;
             alternativeCasts = alternative_casts;
+            requirementsInOrder = requirements.InOrder().ToArray();
+            allApplicants = all_applicants;
         }
 
         /// <summary>If true, IdealCastingOrder() will enumerate roles grouped by non-multi section, in show order.
@@ -85,7 +90,7 @@ namespace Carmen.CastingEngine.Base
                 var segment_roles = segment.ItemsInOrder().SelectMany(i => i.Roles).Where(r => remaining_roles.Contains(r)).ToHashSet();
                 remaining_roles.RemoveRange(segment_roles);
                 // Group segment roles based on requirement priority
-                var requirement_tiers = PrioritiseByRequirements(segment_roles, CastingOrderByPriority, requirements_in_order).ToArray();
+                var requirement_tiers = PrioritiseByRequirements(segment_roles, CastingOrderByPriority, requirementsInOrder).ToArray();
                 foreach (var tier_roles in requirement_tiers)
                 {
                     // Group tier roles based on required count (lowest first)
@@ -100,7 +105,7 @@ namespace Carmen.CastingEngine.Base
                             // Cast roles with the least eligible applicants first
                             while (roles.Any())
                             {
-                                var next_role = RoleWithLeastEligibleApplicantsAvailable(roles);
+                                var next_role = RoleWithLeastEligibleApplicantsAvailable(roles, allApplicants);
                                 roles.Remove(next_role);
                                 yield return new[] { next_role }; // cast role individually
                             }
@@ -159,16 +164,16 @@ namespace Carmen.CastingEngine.Base
             return tiers.Reverse();
         }
 
-        private Role RoleWithLeastEligibleApplicantsAvailable(IEnumerable<Role> roles)
+        private Role RoleWithLeastEligibleApplicantsAvailable(IEnumerable<Role> roles, Applicant[] applicants)
         {
             var e = roles.GetEnumerator();
             if (!e.MoveNext())
                 throw new ArgumentException("Sequence was empty.");
             Role min_role = e.Current;
-            int min_count = CountEligibleApplicantsAvailable(min_role);
+            int min_count = CountEligibleApplicantsAvailable(min_role, applicants);
             while (e.MoveNext())
             {
-                var current_count = CountEligibleApplicantsAvailable(e.Current);
+                var current_count = CountEligibleApplicantsAvailable(e.Current, applicants);
                 if (current_count < min_count)
                 {
                     min_role = e.Current;
@@ -179,13 +184,7 @@ namespace Carmen.CastingEngine.Base
         }
 
         private int CountEligibleApplicantsAvailable(Role role, IEnumerable<Applicant> applicants)
-        {
-            int count = 0;
-            foreach (var applicant in applicants)
-                if (IsEligible(applicant, role) && IsAvailable(applicant, role))
-                    count++;
-            return count;
-        }
+            => applicants.Count(a => IsEligible(a, role) && IsAvailable(a, role));
 
         /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
         public virtual IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
