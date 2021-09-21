@@ -85,7 +85,7 @@ namespace Carmen.CastingEngine.Base
                 var segment_roles = segment.ItemsInOrder().SelectMany(i => i.Roles).Where(r => remaining_roles.Contains(r)).ToHashSet();
                 remaining_roles.RemoveRange(segment_roles);
                 // Group segment roles based on requirement priority
-                var requirement_tiers = PrioritiseByRequirements(segment_roles, CastingOrderByPriority).ToArray();
+                var requirement_tiers = PrioritiseByRequirements(segment_roles, CastingOrderByPriority, requirements_in_order).ToArray();
                 foreach (var tier_roles in requirement_tiers)
                 {
                     // Group tier roles based on required count (lowest first)
@@ -128,15 +128,63 @@ namespace Carmen.CastingEngine.Base
             }
         }
 
-        private IEnumerable<Role[]> PrioritiseByRequirements(IEnumerable<Role> roles, RequirementsPriority priority)
+        private IEnumerable<List<Role>> PrioritiseByRequirements(IEnumerable<Role> roles, RequirementsPriority priority, Requirement[] requirements_in_order)
         {
-            var remaining_roles = roles.ToHashSet();
-
+            var tier_count = priority switch
+            {
+                RequirementsPriority.AllRequirementsAtOnce => 2,
+                RequirementsPriority.PrimaryRequirementsFirst => 3,
+                RequirementsPriority.IndividualRequirementsInOrder => requirements_in_order.Length + 1,
+                _ => throw new NotImplementedException($"Enum not handled: {priority}")
+            };
+            var tiers = new List<Role>[tier_count];
+            foreach (var role in roles)
+            {
+                if (role.Requirements.Count == 0)
+                    tiers[0].Add(role); // no requirements tier
+                else if (priority == RequirementsPriority.IndividualRequirementsInOrder)
+                    for (var r = 0; r < requirements_in_order.Length; r++)
+                    {
+                        if (role.Requirements.Contains(requirements_in_order[r]))
+                        {
+                            tiers[requirements_in_order.Length - r].Add(role);
+                            break;
+                        }
+                    }
+                else if (priority == RequirementsPriority.PrimaryRequirementsFirst && role.Requirements.Any(r => r.Primary))
+                    tiers[2].Add(role);
+                else
+                    tiers[1].Add(role);
+            }
+            return tiers.Reverse();
         }
 
         private Role RoleWithLeastEligibleApplicantsAvailable(IEnumerable<Role> roles)
         {
+            var e = roles.GetEnumerator();
+            if (!e.MoveNext())
+                throw new ArgumentException("Sequence was empty.");
+            Role min_role = e.Current;
+            int min_count = CountEligibleApplicantsAvailable(min_role);
+            while (e.MoveNext())
+            {
+                var current_count = CountEligibleApplicantsAvailable(e.Current);
+                if (current_count < min_count)
+                {
+                    min_role = e.Current;
+                    min_count = current_count;
+                }
+            }
+            return min_role;
+        }
 
+        private int CountEligibleApplicantsAvailable(Role role, IEnumerable<Applicant> applicants)
+        {
+            int count = 0;
+            foreach (var applicant in applicants)
+                if (IsEligible(applicant, role) && IsAvailable(applicant, role))
+                    count++;
+            return count;
         }
 
         /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
@@ -206,6 +254,10 @@ namespace Carmen.CastingEngine.Base
             };
         }
 
+        /// <summary>Same logic as <see cref="EligibilityOf"/> but shortcut to boolean result</summary>
+        public bool IsEligible(Applicant applicant, Role role)
+            => role.Requirements.All(req => req.IsSatisfiedBy(applicant));
+
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
         public Availability AvailabilityOf(Applicant applicant, Role role) //LATER thoroughly unit test
@@ -218,6 +270,16 @@ namespace Carmen.CastingEngine.Base
                 AlreadyInNonMultiSections = FindCommonNonMultiSections(applicant_items, role_items).ToArray(),
                 InAdjacentItems = FindAdjacentItems(applicant_items, role_items).ToArray()
             };
+        }
+
+        /// <summary>Same logic as <see cref="AvailabilityOf"/> but shortcut to boolean result</summary>
+        public bool IsAvailable(Applicant applicant, Role role)
+        {
+            var applicant_items = applicant.Roles.Where(r => r != role).SelectMany(r => r.Items).ToHashSet();
+            var role_items = role.Items.ToHashSet();
+            return !applicant_items.Intersect(role_items).Any()
+                && !FindCommonNonMultiSections(applicant_items, role_items).Any()
+                && !FindAdjacentItems(applicant_items, role_items).Any();
         }
 
         private IEnumerable<NonMultiSectionItem> FindCommonNonMultiSections(HashSet<Item> applicant_items, HashSet<Item> role_items)
