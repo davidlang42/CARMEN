@@ -239,7 +239,7 @@ namespace CarmenUI.Pages
                 throw new ApplicationException("Called next role while already selecting a role programatically.");
             selectingRoleProgrammatically = true;
             if (recommendedCastingOrder == null)
-                recommendedCastingOrder = engine.IdealCastingOrder(context.ShowRoot.ItemsInOrder()).GetEnumerator();
+                recommendedCastingOrder = engine.IdealCastingOrder(context.ShowRoot, applicantsInCast).GetEnumerator();
             while (recommendedCastingOrder.MoveNext())
                 if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
                 {

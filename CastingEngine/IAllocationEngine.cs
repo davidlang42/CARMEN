@@ -23,9 +23,9 @@ namespace Carmen.CastingEngine
         /// Each array in the sequence should be cast as one step, ie. a single element array recommends
         /// a call to <see cref="PickCast(IEnumerable{Applicant}, Role)"/>, whereas a multi-element array
         /// recommends a call to <see cref="BalanceCast(IEnumerable{Applicant}, IEnumerable{Role})"/>.
-        /// This should return all roles found within the specified set of items exactly once, regardless
-        /// of whether or not they are already cast.</summary>
-        IEnumerable<Role[]> IdealCastingOrder(IEnumerable<Item> items_in_order);
+        /// This should return all roles in the show exactly once, regardless of whether or not they
+        /// are already cast.</summary>
+        IEnumerable<Role[]> IdealCastingOrder(ShowRoot show_root, Applicant[] applicants_in_cast);
 
         /// <summary>Calculate the suitability of an applicant for a role, regardless of availability and eligibility.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to roles, and is therefore

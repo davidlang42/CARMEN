@@ -38,8 +38,6 @@ namespace Carmen.CastingEngine.Base
         public bool CountRolesIncludingPartialRequirements { get; set; } = true; //LATER add a setting for users to change this
 
         protected AlternativeCast[] alternativeCasts { get; init; }
-        private Requirement[] requirementsInOrder { get; init; }
-        private Applicant[] allApplicants { get; init; }
 
         public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
         public abstract double SuitabilityOf(Applicant applicant, Role role);
@@ -47,12 +45,10 @@ namespace Carmen.CastingEngine.Base
         public virtual void UserPickedCast(IEnumerable<Applicant> applicants, Role role)
         { }
 
-        public AllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, IEnumerable<Requirement> requirements, Applicant[] all_applicants)
+        public AllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts)
         {
             ApplicantEngine = applicant_engine;
             alternativeCasts = alternative_casts;
-            requirementsInOrder = requirements.InOrder().ToArray();
-            allApplicants = all_applicants;
         }
 
         /// <summary>If true, IdealCastingOrder() will enumerate roles grouped by non-multi section, in show order.
@@ -75,12 +71,10 @@ namespace Carmen.CastingEngine.Base
         /// Within each tier, roles are ordered by the least required cast first, then by the smallest number of eligible cast available.
         /// Roles requiring more than <see cref="CastingOrderGroupThreshold"/> cast per Cast Group are grouped together and balance cast
         /// as one operation at the end of the tier.</summary>
-        public virtual IEnumerable<Role[]> IdealCastingOrder(IEnumerable<Item> items_in_order) //LATER should this take ShowRoot instead of Items?
+        public virtual IEnumerable<Role[]> IdealCastingOrder(ShowRoot show_root, Applicant[] applicants_in_cast)
         {
-            if (items_in_order.FirstOrDefault()?.Parents().Last() is not ShowRoot show_root)
-                yield break; // no items, or broken structure
             // List all roles once
-            var remaining_roles = items_in_order.SelectMany(i => i.Roles).ToHashSet();
+            var remaining_roles = show_root.ItemsInOrder().SelectMany(i => i.Roles).ToHashSet();
             // Separate show into segments based on setting
             Node[] segments = CastingOrderByNonMultiSection ? NonMultiSegments(show_root).ToArray() : new[] { show_root };
             // Cast each segment in order
@@ -90,7 +84,7 @@ namespace Carmen.CastingEngine.Base
                 var segment_roles = segment.ItemsInOrder().SelectMany(i => i.Roles).Where(r => remaining_roles.Contains(r)).ToHashSet();
                 remaining_roles.RemoveRange(segment_roles);
                 // Group segment roles based on requirement priority
-                var requirement_tiers = PrioritiseByRequirements(segment_roles, CastingOrderByPriority, requirementsInOrder).ToArray();
+                var requirement_tiers = PrioritiseByRequirements(segment_roles, CastingOrderByPriority).ToArray();
                 foreach (var tier_roles in requirement_tiers)
                 {
                     // Group tier roles based on required count (lowest first)
@@ -105,7 +99,7 @@ namespace Carmen.CastingEngine.Base
                             // Cast roles with the least eligible applicants first
                             while (roles.Any())
                             {
-                                var next_role = RoleWithLeastEligibleApplicantsAvailable(roles, allApplicants);
+                                var next_role = RoleWithLeastEligibleApplicantsAvailable(roles, applicants_in_cast);
                                 roles.Remove(next_role);
                                 yield return new[] { next_role }; // cast role individually
                             }
@@ -133,35 +127,47 @@ namespace Carmen.CastingEngine.Base
             }
         }
 
-        private IEnumerable<List<Role>> PrioritiseByRequirements(IEnumerable<Role> roles, RequirementsPriority priority, Requirement[] requirements_in_order)
+        private IEnumerable<List<Role>> PrioritiseByRequirements(IEnumerable<Role> roles, RequirementsPriority priority)
         {
-            var tier_count = priority switch
+            if (priority == RequirementsPriority.IndividualRequirementsInOrder)
             {
-                RequirementsPriority.AllRequirementsAtOnce => 2,
-                RequirementsPriority.PrimaryRequirementsFirst => 3,
-                RequirementsPriority.IndividualRequirementsInOrder => requirements_in_order.Length + 1,
-                _ => throw new NotImplementedException($"Enum not handled: {priority}")
-            };
-            var tiers = new List<Role>[tier_count];
-            foreach (var role in roles)
-            {
-                if (role.Requirements.Count == 0)
-                    tiers[0].Add(role); // no requirements tier
-                else if (priority == RequirementsPriority.IndividualRequirementsInOrder)
-                    for (var r = 0; r < requirements_in_order.Length; r++)
+                var tiers = new Dictionary<int, List<Role>>();
+                var no_requirements = new List<Role>();
+                foreach (var role in roles)
+                {
+                    if (role.Requirements.Count == 0)
+                        no_requirements.Add(role);
+                    else
                     {
-                        if (role.Requirements.Contains(requirements_in_order[r]))
-                        {
-                            tiers[requirements_in_order.Length - r].Add(role);
-                            break;
-                        }
+                        var lowest_order_requirement = role.Requirements.Min(req => req.Order);
+                        if (tiers.TryGetValue(lowest_order_requirement, out var existing_list))
+                            existing_list.Add(role);
+                        else
+                            tiers.Add(lowest_order_requirement, new() { role });
                     }
-                else if (priority == RequirementsPriority.PrimaryRequirementsFirst && role.Requirements.Any(r => r.Primary))
-                    tiers[2].Add(role);
-                else
-                    tiers[1].Add(role);
+                }
+                return tiers.OrderBy(kvp => kvp.Key).Select(kvp => kvp.Value).Concat(no_requirements.Yield());
             }
-            return tiers.Reverse();
+            else
+            {
+                var tier_count = priority switch
+                {
+                    RequirementsPriority.AllRequirementsAtOnce => 2,
+                    RequirementsPriority.PrimaryRequirementsFirst => 3,
+                    _ => throw new NotImplementedException($"Enum not handled: {priority}")
+                };
+                var tiers = new List<Role>[tier_count];
+                foreach (var role in roles)
+                {
+                    if (role.Requirements.Count == 0)
+                        tiers[0].Add(role); // no requirements tier
+                    else if (priority == RequirementsPriority.PrimaryRequirementsFirst && role.Requirements.Any(r => r.Primary))
+                        tiers[2].Add(role);
+                    else
+                        tiers[1].Add(role);
+                }
+                return tiers.Reverse();
+            }
         }
 
         private Role RoleWithLeastEligibleApplicantsAvailable(IEnumerable<Role> roles, Applicant[] applicants)
