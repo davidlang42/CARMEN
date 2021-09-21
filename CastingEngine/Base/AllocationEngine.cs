@@ -53,25 +53,18 @@ namespace Carmen.CastingEngine.Base
 
         /// <summary>If true, IdealCastingOrder() will enumerate roles grouped by non-multi section, in show order.
         /// If false, roles are considered across the entire show as one group.</summary>
-        public bool CastingOrderByNonMultiSection { get; set; } = false;
+        public bool CastingOrderByNonMultiSection { get; set; } = false; //LATER add a setting for users to change this
 
         /// <summary>Determines how roles are prioritised based on their requirements</summary>
-        public RequirementsPriority CastingOrderByPriority { get; set; } = RequirementsPriority.AllRequirementsAtOnce;
+        public RequirementsPriority CastingOrderByPriority { get; set; } = RequirementsPriority.AllRequirementsAtOnce; //LATER add a setting for users to change this
 
-        public enum RequirementsPriority
-        {
-            AllRequirementsAtOnce,
-            PrimaryRequirementsFirst,
-            IndividualRequirementsInOrder
-        }
-
-        public uint CastingOrderGroupThreshold { get; set; } = 8;
+        public uint CastingOrderGroupThreshold { get; set; } = 8; //LATER add a setting for users to change this
 
         /// <summary>Enumerate roles by structural segments of the show, tiered based on the priority of their requirements.
         /// Within each tier, roles are ordered by the least required cast first, then by the smallest number of eligible cast available.
         /// Roles requiring more than <see cref="CastingOrderGroupThreshold"/> cast per Cast Group are grouped together and balance cast
         /// as one operation at the end of the tier.</summary>
-        public virtual IEnumerable<Role[]> IdealCastingOrder(ShowRoot show_root, Applicant[] applicants_in_cast)
+        public IEnumerable<Role[]> IdealCastingOrder(ShowRoot show_root, Applicant[] applicants_in_cast)
         {
             // List all roles once
             var remaining_roles = show_root.ItemsInOrder().SelectMany(i => i.Roles).ToHashSet();

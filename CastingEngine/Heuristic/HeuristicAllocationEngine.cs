@@ -111,16 +111,7 @@ namespace Carmen.CastingEngine.Heuristic
         /// - then cast all the remaining roles within the section as one balanced set
         /// (*roles count as requiring a criteria if one of their direct requirements is an Ability based requirement)
         /// </summary>
-        public override IEnumerable<Role[]> IdealCastingOrder(ShowRoot show_root, Applicant[] _)
-            => IdealCastingOrder(show_root);
-
-        /// <summary>Recommend casting section by section (for sections that directly contain items). Within each section:
-        /// - first individually cast roles which require* the first primary criteria, in item order within the section
-        /// - repeat for subsequent primary criterias in order
-        /// - then cast all the remaining roles within the section as one balanced set
-        /// (*roles count as requiring a criteria if one of their direct requirements is an Ability based requirement)
-        /// </summary>
-        public IEnumerable<Role[]> IdealCastingOrder(ShowRoot show_root)
+        public IEnumerable<Role[]> SimpleCastingOrder(ShowRoot show_root)
         {
             foreach (var section in ItemContainingSections(show_root))
             {

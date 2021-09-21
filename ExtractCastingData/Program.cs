@@ -104,7 +104,7 @@ namespace ExtractCastingData
             var alternative_casts = context.AlternativeCasts.ToArray();
             var ap_engine = new WeightedSumEngine(criterias);
             var al_engine = new HeuristicAllocationEngine(ap_engine, alternative_casts, criterias);
-            var casting_order = al_engine.IdealCastingOrder(context.ShowRoot).SelectMany(roles => roles).Distinct().ToArray();
+            var casting_order = al_engine.SimpleCastingOrder(context.ShowRoot).SelectMany(roles => roles).Distinct().ToArray();
             if (casting_order.Distinct().Count() != casting_order.Length)
                 throw new ApplicationException("IdealCastingOrder returned duplicate roles.");
             var applicants_in_cast_by_id = new Dictionary<int, Applicant>();
