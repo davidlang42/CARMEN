@@ -75,8 +75,17 @@ namespace Carmen.CastingEngine
             foreach (var item in collection)
                 added |= set.Add(item);
             return added;
-        }  
-        
+        }
+
+        /// <summary>Returns true if any values are removed</summary>
+        public static bool RemoveRange<T>(this HashSet<T> set, IEnumerable<T> collection)
+        {
+            bool removed = false;
+            foreach (var item in collection)
+                removed |= set.Remove(item);
+            return removed;
+        }
+
         public static T? FindAndRemove<T>(this Stack<T> stack, Predicate<T> predicate)
             where T : class
         {

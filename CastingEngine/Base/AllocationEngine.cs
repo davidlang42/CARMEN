@@ -50,9 +50,94 @@ namespace Carmen.CastingEngine.Base
             alternativeCasts = alternative_casts;
         }
 
-        /// <summary>Default implementation enumerates roles singularly in item order, then by name, removing duplicates</summary>
-        public virtual IEnumerable<Role[]> IdealCastingOrder(IEnumerable<Item> items_in_order) //LATER implement a better approach
-            => items_in_order.SelectMany(i => i.Roles.OrderBy(r => r.Name)).Distinct().Select(r => new[] { r });
+        /// <summary>If true, IdealCastingOrder() will enumerate roles grouped by non-multi section, in show order.
+        /// If false, roles are considered across the entire show as one group.</summary>
+        public bool CastingOrderByNonMultiSection { get; set; } = false;
+
+        /// <summary>Determines how roles are prioritised based on their requirements</summary>
+        public RequirementsPriority CastingOrderByPriority { get; set; } = RequirementsPriority.AllRequirementsAtOnce;
+
+        public enum RequirementsPriority
+        {
+            AllRequirementsAtOnce,
+            PrimaryRequirementsFirst,
+            IndividualRequirementsInOrder
+        }
+
+        public uint CastingOrderGroupThreshold { get; set; } = 8;
+
+        /// <summary>Enumerate roles by structural segments of the show, tiered based on the priority of their requirements.
+        /// Within each tier, roles are ordered by the least required cast first, then by the smallest number of eligible cast available.
+        /// Roles requiring more than <see cref="CastingOrderGroupThreshold"/> cast per Cast Group are grouped together and balance cast
+        /// as one operation at the end of the tier.</summary>
+        public virtual IEnumerable<Role[]> IdealCastingOrder(IEnumerable<Item> items_in_order) //LATER should this take ShowRoot instead of Items?
+        {
+            if (items_in_order.FirstOrDefault()?.Parents().Last() is not ShowRoot show_root)
+                yield break; // no items, or broken structure
+            // List all roles once
+            var remaining_roles = items_in_order.SelectMany(i => i.Roles).ToHashSet();
+            // Separate show into segments based on setting
+            Node[] segments = CastingOrderByNonMultiSection ? NonMultiSegments(show_root).ToArray() : new[] { show_root };
+            // Cast each segment in order
+            foreach (var segment in segments)
+            {
+                // List remaining roles in this segment
+                var segment_roles = segment.ItemsInOrder().SelectMany(i => i.Roles).Where(r => remaining_roles.Contains(r)).ToHashSet();
+                remaining_roles.RemoveRange(segment_roles);
+                // Group segment roles based on requirement priority
+                var requirement_tiers = PrioritiseByRequirements(segment_roles, CastingOrderByPriority).ToArray();
+                foreach (var tier_roles in requirement_tiers)
+                {
+                    // Group tier roles based on required count (lowest first)
+                    var roles_by_required_count = tier_roles.GroupBy(r => r.CountByGroups.Select(cbg => cbg.Count).DefaultIfEmpty().Min())
+                        .OrderBy(g => g.Key)
+                        .Select(g => (g.Key, g.ToHashSet()))
+                        .ToArray();
+                    var balance_cast_between_roles = new HashSet<Role>();
+                    foreach (var (required_count, roles) in roles_by_required_count)
+                    {
+                        if (required_count < CastingOrderGroupThreshold)
+                            // Cast roles with the least eligible applicants first
+                            while (roles.Any())
+                            {
+                                var next_role = RoleWithLeastEligibleApplicantsAvailable(roles);
+                                roles.Remove(next_role);
+                                yield return new[] { next_role }; // cast role individually
+                            }
+                        else
+                            // Batch roles requiring groups of people together to be balance cast as one operation
+                            balance_cast_between_roles.AddRange(roles);
+                    }
+                    if (balance_cast_between_roles.Any())
+                        yield return balance_cast_between_roles.ToArray(); // balance cast roles
+                }
+            }
+        }
+
+        private IEnumerable<Node> NonMultiSegments(InnerNode inner)
+        {
+            foreach (var child in inner.Children)
+            {
+                if (child is Item)
+                    yield return child; // items are non-multi
+                else if (child is Section section && !section.SectionType.AllowMultipleRoles)
+                    yield return child; // some sections are non-multi
+                else
+                    foreach (var child_of_child in NonMultiSegments((InnerNode)child)) // go deeper into sections which allow multi
+                        yield return child_of_child;
+            }
+        }
+
+        private IEnumerable<Role[]> PrioritiseByRequirements(IEnumerable<Role> roles, RequirementsPriority priority)
+        {
+            var remaining_roles = roles.ToHashSet();
+
+        }
+
+        private Role RoleWithLeastEligibleApplicantsAvailable(IEnumerable<Role> roles)
+        {
+
+        }
 
         /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
         public virtual IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
