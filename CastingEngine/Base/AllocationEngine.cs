@@ -58,7 +58,16 @@ namespace Carmen.CastingEngine.Base
         /// <summary>Determines how roles are prioritised based on their requirements</summary>
         public RequirementsPriority CastingOrderByPriority { get; set; } = RequirementsPriority.AllRequirementsAtOnce; //LATER add a setting for users to change this
 
+        /// <summary>Roles requiring more than this number of cast are considered group roles and may be balanced cast
+        /// with other groups as one operation.</summary>
         public uint CastingOrderGroupThreshold { get; set; } = 8; //LATER add a setting for users to change this
+
+        /// <summary>If true, the availability of cast (ie. whether they are already cast) will be considered when counting
+        /// the eligible cast for a role. This will cause variations in the <see cref="IdealCastingOrder(ShowRoot, Applicant[])"/>
+        /// depending on previously made casting decisions.
+        /// If false, only the eligibility is considered, which makes the <see cref="IdealCastingOrder(ShowRoot, Applicant[])"/>
+        /// deterministic based on the roles, irrespective of previous casting decisions.</summary>
+        public bool CastingOrderConsiderAvailability { get; set; } = true; //LATER add a setting for users to change this
 
         /// <summary>Enumerate roles by structural segments of the show, tiered based on the priority of their requirements.
         /// Within each tier, roles are ordered by the least required cast first, then by the smallest number of eligible cast available.
@@ -74,14 +83,14 @@ namespace Carmen.CastingEngine.Base
             foreach (var segment in segments)
             {
                 // List remaining roles in this segment
-                var segment_roles = segment.ItemsInOrder().SelectMany(i => i.Roles).Where(r => remaining_roles.Contains(r)).ToHashSet();
+                var segment_roles = segment.ItemsInOrder().SelectMany(i => i.Roles.InNameOrder()).Distinct().Where(r => remaining_roles.Contains(r)).ToArray();
                 remaining_roles.RemoveRange(segment_roles);
                 // Group segment roles based on requirement priority
                 var requirement_tiers = PrioritiseByRequirements(segment_roles, CastingOrderByPriority).ToArray();
                 foreach (var tier_roles in requirement_tiers)
                 {
                     // Group tier roles based on required count (lowest first)
-                    var roles_by_required_count = tier_roles.GroupBy(r => r.CountByGroups.Select(cbg => cbg.Count).DefaultIfEmpty().Min())
+                    var roles_by_required_count = tier_roles.GroupBy(r => r.CountByGroups.Select(cbg => cbg.Count).Sum())
                         .OrderBy(g => g.Key)
                         .Select(g => (g.Key, g.ToHashSet()))
                         .ToArray();
@@ -101,7 +110,27 @@ namespace Carmen.CastingEngine.Base
                             balance_cast_between_roles.AddRange(roles);
                     }
                     if (balance_cast_between_roles.Any())
-                        yield return balance_cast_between_roles.ToArray(); // balance cast roles
+                    {
+                        // Must return roles which have a common section (other than ShowRoot)
+                        var balance_roles_common_sections = balance_cast_between_roles.ToDictionary(r => r, r => r.ItemsAndSections());
+                        while (balance_roles_common_sections.Any())
+                        {
+                            var e = balance_roles_common_sections.GetEnumerator();
+                            e.MoveNext();
+                            HashSet<Role> roles_with_common_section = new() { e.Current.Key };
+                            HashSet<Node> common_sections = new(e.Current.Value);
+                            while (e.MoveNext())
+                            {
+                                if (e.Current.Value.Any(s => common_sections.Contains(s)))
+                                {
+                                    roles_with_common_section.Add(e.Current.Key);
+                                    common_sections.IntersectWith(e.Current.Value);
+                                }
+                            }
+                            yield return roles_with_common_section.ToArray(); // balance cast roles
+                            balance_roles_common_sections.RemoveRange(roles_with_common_section);
+                        }
+                    }
                 }
             }
         }
@@ -150,6 +179,8 @@ namespace Carmen.CastingEngine.Base
                     _ => throw new NotImplementedException($"Enum not handled: {priority}")
                 };
                 var tiers = new List<Role>[tier_count];
+                for (var t = 0; t < tier_count; t++)
+                    tiers[t] = new List<Role>();
                 foreach (var role in roles)
                 {
                     if (role.Requirements.Count == 0)
@@ -159,7 +190,7 @@ namespace Carmen.CastingEngine.Base
                     else
                         tiers[1].Add(role);
                 }
-                return tiers.Reverse();
+                return tiers.Where(t => t.Any()).Reverse();
             }
         }
 
@@ -183,7 +214,7 @@ namespace Carmen.CastingEngine.Base
         }
 
         private int CountEligibleApplicantsAvailable(Role role, IEnumerable<Applicant> applicants)
-            => applicants.Count(a => IsEligible(a, role) && IsAvailable(a, role));
+            => CastingOrderConsiderAvailability ? applicants.Count(a => IsEligible(a, role) && IsAvailable(a, role)) : applicants.Count(a => IsEligible(a, role));
 
         /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
         public virtual IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)

@@ -50,6 +50,9 @@ namespace Carmen.CastingEngine
             return result;
         }
 
+        public static uint Sum(this IEnumerable<uint> list)
+            => (uint)list.Select(u => (int)u).Sum();
+
         /// <summary>Similar to SingleOrDefault(), except if the sequence contains more than 1 element,
         /// the default is returned rather than throwing an exception.</summary>
         public static T? SingleOrDefaultSafe<T>(this IEnumerable<T> list)
@@ -83,6 +86,16 @@ namespace Carmen.CastingEngine
             bool removed = false;
             foreach (var item in collection)
                 removed |= set.Remove(item);
+            return removed;
+        }
+
+        /// <summary>Returns true if any values are removed</summary>
+        public static bool RemoveRange<T, U>(this Dictionary<T, U> dict, IEnumerable<T> collection)
+            where T : notnull
+        {
+            bool removed = false;
+            foreach (var item in collection)
+                removed |= dict.Remove(item);
             return removed;
         }
 

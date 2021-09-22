@@ -240,6 +240,7 @@ namespace CarmenUI.Pages
             selectingRoleProgrammatically = true;
             if (recommendedCastingOrder == null)
                 recommendedCastingOrder = engine.IdealCastingOrder(context.ShowRoot, applicantsInCast).GetEnumerator();
+            //LATER add a loading overlay (if all roles are cast, this can take up to 10 seconds to process through the entire list)
             while (recommendedCastingOrder.MoveNext())
                 if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
                 {
