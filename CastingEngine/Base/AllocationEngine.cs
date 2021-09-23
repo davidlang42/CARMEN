@@ -217,74 +217,47 @@ namespace Carmen.CastingEngine.Base
             => CastingOrderConsiderAvailability ? applicants.Count(a => IsEligible(a, role) && IsAvailable(a, role)) : applicants.Count(a => IsEligible(a, role));
 
         /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
-        public virtual IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
+        public void BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
         {
             var applicants_by_group = applicants.GroupBy(a => (a.CastGroup, a.AlternativeCast)).ToDictionary(g => g.Key, g => g.ToArray());
-            var remaining_roles = roles.ToHashSet();
-            var show_root = (ShowRoot)remaining_roles.First().Items.First().Parents().Last(); //TODO should this be an argument?
-            foreach (var non_multi_node in NonMultiNodes(show_root))
+            var roles_array = roles.ToArray();
+            var cast_groups = roles_array.SelectMany(r => r.CountByGroups.Select(cbg => cbg.CastGroup)).ToHashSet();
+            foreach (var cast_group in cast_groups)
             {
-                var node_roles = remaining_roles.Where(r => r.Items.Any(i => i.Parents().Contains(non_multi_node))).ToArray();
-                var cast_groups = node_roles.SelectMany(r => r.CountByGroups.Select(cbg => cbg.CastGroup)).ToHashSet();
-                foreach (var cast_group in cast_groups)
-                {
-                    var alternative_casts = cast_group.AlternateCasts ? alternativeCasts : new AlternativeCast?[] { null };
-                    foreach (var alternative_cast in alternative_casts)
-                    {
-                        var required_cast = node_roles.Select(r => r.CountFor(cast_group)
-                            - r.Cast.Count(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast)).ToArray();
-                        var available_cast = node_roles.Select(r => new Queue<Applicant>(
-                            applicants_by_group[(cast_group, alternative_cast)]
-                            .Where(a => IsEligible(a, r) && IsAvailable(a, r))
-                            .OrderByDescending(a => SuitabilityOf(a, r)))
-                            ).ToArray();
-                        
-                    }
-                }
-            }
-
-
-
-
-
-
-
-            // Sort roles into non-multi sections (or items)
-            var non_multi_nodes = new Dictionary<Node, HashSet<Role>>();
-            var unassigned_roles = roles_array.ToHashSet();
-            int maximum_item_count = 1;
-            while (unassigned_roles.Any())
-            {
-                foreach (var role in unassigned_roles)
-                {
-                    if (role.Items.Count <= maximum_item_count)
-                    {
-
-                    }
-                }
-            }
-
-
-            //var non_multi_node = HighestNonMultiNode(common_node);
-            Node[] non_multi_nodes;//TODO
-            foreach (var non_multi_node in non_multi_nodes)
-            {
-                roles
+                var alternative_casts = cast_group.AlternateCasts ? alternativeCasts : new AlternativeCast?[] { null };
+                foreach (var alternative_cast in alternative_casts)
+                    BalanceCastForOneCastGroupAndCast(applicants_by_group[(cast_group, alternative_cast)], roles_array, cast_group, alternative_cast);
             }
         }
 
-        private IEnumerable<Node> NonMultiNodes(InnerNode node)
+        private void BalanceCastForOneCastGroupAndCast(Applicant[] applicants, Role[] roles, CastGroup cast_group, AlternativeCast? alternative_cast)
         {
-            foreach (var child in node.Children.InOrder())
+            var required_cast = roles.Select(r => r.CountFor(cast_group) - r.Cast.Count(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast)).ToArray();
+            var available_cast = roles.Select(r => new Queue<Applicant>(
+                applicants.Where(a => IsEligible(a, r) && IsAvailable(a, r))
+                .OrderByDescending(a => SuitabilityOf(a, r)))
+                ).ToArray();
+            bool changes = true;
+            while (changes)
             {
-                if (child is Item)
-                    yield return child;
-                else if (child is Section section && !section.SectionType.AllowMultipleRoles)
-                    yield return child;
-                else
-                    foreach (var non_multi_node in NonMultiNodes((InnerNode)child))
-                        yield return non_multi_node;
+                changes = false;
+                for (var i = 0; i < roles.Length; i++)
+                    if (required_cast[i] > 0 && available_cast[i].TryDequeue(out var next_available))
+                    {
+                        roles[i].Cast.Add(next_available);
+                        next_available.Roles.Add(roles[i]);
+                        required_cast[i]--;
+                        RemoveIfNotAvailable(next_available, available_cast);
+                        changes = true;
+                    }
             }
+        }
+
+        private void RemoveIfNotAvailable(Applicant applicant, Role[] roles, Queue<Applicant>[] available_cast)
+        {
+            for (var i = 0; i < roles.Length; i++)
+                if (available_cast[i].Contains(applicant) && !IsAvailable(applicant, roles[i]))
+                    available_cast[i].Remove(applicant);
         }
 
         /// <summary>Counts an applicants existing roles requiring the specificed Criteria, either directly or as SubRequirements of an AndRequirement.
@@ -427,8 +400,5 @@ namespace Carmen.CastingEngine.Base
 
         private InnerNode? HighestNonConsecutiveNode(Item item)
             => item.Parents().Where(n => !n.AllowConsecutiveItems).LastOrDefault();
-
-        private Section? HighestNonMultiSection(Node node)
-            => node.Parents().OfType<Section>().Where(s => !s.SectionType.AllowMultipleRoles).LastOrDefault();//TODO remove if not used
     }
 }
