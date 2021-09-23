@@ -237,19 +237,19 @@ namespace Carmen.CastingEngine.Base
                 applicants.Where(a => IsEligible(a, r) && IsAvailable(a, r))
                 .OrderByDescending(a => SuitabilityOf(a, r)))
                 ).ToArray();
-            bool changes = true;
-            while (changes)
+            int next_role = 0;
+            bool roles_need_allocating = true;
+            while (roles_need_allocating)
             {
-                changes = false;
-                for (var i = 0; i < roles.Length; i++)
-                    if (required_cast[i] > 0 && available_cast[i].TryDequeue(out var next_available))
-                    {
-                        roles[i].Cast.Add(next_available);
-                        next_available.Roles.Add(roles[i]);
-                        required_cast[i]--;
-                        RemoveIfNotAvailable(next_available, available_cast);
-                        changes = true;
-                    }
+                if (required_cast[next_role] > 0 && available_cast[next_role].TryDequeue(out var next_available))
+                {
+                    roles[next_role].Cast.Add(next_available);
+                    next_available.Roles.Add(roles[next_role]);
+                    required_cast[next_role]--;
+                    RemoveIfNotAvailable(next_available, available_cast);
+                    changes = true;
+                }
+                next_role++;
             }
         }
 
