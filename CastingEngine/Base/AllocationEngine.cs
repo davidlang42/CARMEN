@@ -219,8 +219,72 @@ namespace Carmen.CastingEngine.Base
         /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
         public virtual IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
         {
-            foreach (var role in roles)
-                yield return (role, PickCast(applicants, role));
+            var applicants_by_group = applicants.GroupBy(a => (a.CastGroup, a.AlternativeCast)).ToDictionary(g => g.Key, g => g.ToArray());
+            var remaining_roles = roles.ToHashSet();
+            var show_root = (ShowRoot)remaining_roles.First().Items.First().Parents().Last(); //TODO should this be an argument?
+            foreach (var non_multi_node in NonMultiNodes(show_root))
+            {
+                var node_roles = remaining_roles.Where(r => r.Items.Any(i => i.Parents().Contains(non_multi_node))).ToArray();
+                var cast_groups = node_roles.SelectMany(r => r.CountByGroups.Select(cbg => cbg.CastGroup)).ToHashSet();
+                foreach (var cast_group in cast_groups)
+                {
+                    var alternative_casts = cast_group.AlternateCasts ? alternativeCasts : new AlternativeCast?[] { null };
+                    foreach (var alternative_cast in alternative_casts)
+                    {
+                        var required_cast = node_roles.Select(r => r.CountFor(cast_group)
+                            - r.Cast.Count(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast)).ToArray();
+                        var available_cast = node_roles.Select(r => new Queue<Applicant>(
+                            applicants_by_group[(cast_group, alternative_cast)]
+                            .Where(a => IsEligible(a, r) && IsAvailable(a, r))
+                            .OrderByDescending(a => SuitabilityOf(a, r)))
+                            ).ToArray();
+                        
+                    }
+                }
+            }
+
+
+
+
+
+
+
+            // Sort roles into non-multi sections (or items)
+            var non_multi_nodes = new Dictionary<Node, HashSet<Role>>();
+            var unassigned_roles = roles_array.ToHashSet();
+            int maximum_item_count = 1;
+            while (unassigned_roles.Any())
+            {
+                foreach (var role in unassigned_roles)
+                {
+                    if (role.Items.Count <= maximum_item_count)
+                    {
+
+                    }
+                }
+            }
+
+
+            //var non_multi_node = HighestNonMultiNode(common_node);
+            Node[] non_multi_nodes;//TODO
+            foreach (var non_multi_node in non_multi_nodes)
+            {
+                roles
+            }
+        }
+
+        private IEnumerable<Node> NonMultiNodes(InnerNode node)
+        {
+            foreach (var child in node.Children.InOrder())
+            {
+                if (child is Item)
+                    yield return child;
+                else if (child is Section section && !section.SectionType.AllowMultipleRoles)
+                    yield return child;
+                else
+                    foreach (var non_multi_node in NonMultiNodes((InnerNode)child))
+                        yield return non_multi_node;
+            }
         }
 
         /// <summary>Counts an applicants existing roles requiring the specificed Criteria, either directly or as SubRequirements of an AndRequirement.
@@ -363,5 +427,8 @@ namespace Carmen.CastingEngine.Base
 
         private InnerNode? HighestNonConsecutiveNode(Item item)
             => item.Parents().Where(n => !n.AllowConsecutiveItems).LastOrDefault();
+
+        private Section? HighestNonMultiSection(Node node)
+            => node.Parents().OfType<Section>().Where(s => !s.SectionType.AllowMultipleRoles).LastOrDefault();//TODO remove if not used
     }
 }
