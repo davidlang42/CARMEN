@@ -45,5 +45,20 @@ namespace Carmen.CastingEngine.Dummy
                 }
             }
         }
+
+        /// <summary>Dummy implementation of Balance Cast calls PickCast on the roles in order, then allocates the cast, 
+        /// performing no balancing and may fail to fully cast some roles</summary>
+        public override void BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
+        {
+            foreach (var role in roles)
+            {
+                var cast = PickCast(applicants, role).ToArray();
+                foreach (var applicant in cast)
+                {
+                    applicant.Roles.Add(role);
+                    role.Cast.Add(applicant);
+                }
+            }
+        }
     }
 }

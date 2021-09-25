@@ -392,10 +392,7 @@ namespace CarmenUI.Pages
             if (selected_roles.Count == 1 && MessageBox.Show("Only 1 role is selected, so no balancing will occur."
                 + "\nDo you still want to automatically cast this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
-            var new_role_applicants = engine.BalanceCast(applicantsInCast, selected_roles);
-            foreach (var (role, applicants) in new_role_applicants)
-                foreach (var applicant in applicants)
-                    role.Cast.Add(applicant);
+            engine.BalanceCast(applicantsInCast, selected_roles);
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, totalCast);
         }
 

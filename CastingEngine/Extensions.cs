@@ -99,6 +99,9 @@ namespace Carmen.CastingEngine
             return removed;
         }
 
+        /// <summary>Finds and removes the first item on the stack which matches the given predicate.
+        /// NOTE: Only call this if you are sure you need to, because it requires popping and re-pushing every item
+        /// prior to the one it finds.</summary>
         public static T? FindAndRemove<T>(this Stack<T> stack, Predicate<T> predicate)
             where T : class
         {
@@ -117,6 +120,21 @@ namespace Carmen.CastingEngine
             while (skipped.Count > 0)
                 stack.Push(skipped.Pop());
             return found;
+        }
+
+        /// <summary>Removes all instances of the given object from the queue, returning the number of instances removed.
+        /// NOTE: Only call this if you are sure you need to, because it requires re-writing the entire queue.</summary>
+        public static int Remove<T>(this Queue<T> queue, T obj)
+            where T : class
+        {
+            var original_count = queue.Count;
+            for (var i = 0; i < original_count; i++)
+            {
+                var next = queue.Dequeue();
+                if (next != obj)
+                    queue.Enqueue(next);
+            }
+            return original_count - queue.Count;
         }
     }
 }

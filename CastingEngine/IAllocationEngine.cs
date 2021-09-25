@@ -38,15 +38,17 @@ namespace Carmen.CastingEngine
         /// the specified criteria to each role.</summary>
         double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role);
 
-        /// <summary>Pick the best cast for a role</summary>
+        /// <summary>Pick the best cast for a role, returning the chosen cast without casting them.</summary>
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
 
         /// <summary>A callback for when the user allocates cast to a role, providing
         /// information to the engine which can be used to improve future recommendations.</summary>
         void UserPickedCast(IEnumerable<Applicant> applicants, Role role);
 
-        /// <summary>Pick the best cast for one or more roles, balancing talent between them</summary>
-        IEnumerable<(Role, IEnumerable<Applicant>)> BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
+        /// <summary>Allocate the best cast to one or more roles, balancing talent between them.
+        /// NOTE: Unlike <see cref="PickCast(IEnumerable{Applicant}, Role)"/> this directly allocates
+        /// cast to the role rather than returning the chosen cast.</summary>
+        void BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>

@@ -216,12 +216,21 @@ namespace Carmen.CastingEngine.Base
         private int CountEligibleApplicantsAvailable(Role role, IEnumerable<Applicant> applicants)
             => CastingOrderConsiderAvailability ? applicants.Count(a => IsEligible(a, role) && IsAvailable(a, role)) : applicants.Count(a => IsEligible(a, role));
 
-        /// <summary>Default implementation of Balance Cast calls PickCast on the roles in order, performing no balancing</summary>
-        public void BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
+        /// <summary>Attempts to balance talent between roles by listing all eligible applicants for each role in order of suitability,
+        /// then iterating through the roles, allowing each to take their next available applicant, removing that applicant from other
+        /// role's lists if required, until all roles are fully cast. If at any point the number of available applicants left in a list
+        /// is less than or equal to the number of cast still required for that role, then that role will cast its entire remaining list.
+        /// This is not a bullet-proof approach, but *should* be good enough to balance general cast between roles/items and handle
+        /// the edge cases caused by consecutive item clashes on the edge of non-multi sections.</summary>
+        public virtual void BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles) //LATER make this not virtual when DummyAllocationEngine is removed
         {
-            var applicants_by_group = applicants.GroupBy(a => (a.CastGroup, a.AlternativeCast)).ToDictionary(g => g.Key, g => g.ToArray());
+            // Make roles an array to avoid re-enumeration
             var roles_array = roles.ToArray();
+            // Group applicants by cast group and cast
+            var applicants_by_group = applicants.GroupBy(a => (a.CastGroup, a.AlternativeCast)).ToDictionary(g => g.Key, g => g.ToArray());
+            // Determine which cast groups are required by these roles
             var cast_groups = roles_array.SelectMany(r => r.CountByGroups.Select(cbg => cbg.CastGroup)).ToHashSet();
+            // BalanceCast one cast group and cast at a time
             foreach (var cast_group in cast_groups)
             {
                 var alternative_casts = cast_group.AlternateCasts ? alternativeCasts : new AlternativeCast?[] { null };
@@ -232,24 +241,42 @@ namespace Carmen.CastingEngine.Base
 
         private void BalanceCastForOneCastGroupAndCast(Applicant[] applicants, Role[] roles, CastGroup cast_group, AlternativeCast? alternative_cast)
         {
-            var required_cast = roles.Select(r => r.CountFor(cast_group) - r.Cast.Count(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast)).ToArray();
-            var available_cast = roles.Select(r => new Queue<Applicant>(
+            // Count the remaining required cast for each role
+            var required_cast = roles.Select(r => (int)r.CountFor(cast_group) - r.Cast.Count(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast)).ToArray();
+            // List the available applicants for each role
+            var available_cast = roles.Select(r => new Queue<Applicant>( //LATER due to the remove operation, it might be faster to use a Stack, requires investigation
                 applicants.Where(a => IsEligible(a, r) && IsAvailable(a, r))
                 .OrderByDescending(a => SuitabilityOf(a, r)))
                 ).ToArray();
-            int next_role = 0;
-            bool roles_need_allocating = true;
-            while (roles_need_allocating)
+            // Check for a role which must be immediately cast, otherwise start at the first uncast role
+            int role;
+            if (RoleNeedsImmediateCasting(required_cast, available_cast) is int first_immediate_role)
+                role = first_immediate_role;
+            else if (FirstIndexToCast(required_cast, available_cast, 0, required_cast.Length - 1) is int first_uncast_role)
+                role = first_uncast_role;
+            else
+                return; // nothing to do
+            // Iteratively cast applicants to roles, until no more casting can be done
+            while (true)
             {
-                if (required_cast[next_role] > 0 && available_cast[next_role].TryDequeue(out var next_available))
+                if (required_cast[role] > 0 && available_cast[role].TryDequeue(out var next_available))
                 {
-                    roles[next_role].Cast.Add(next_available);
-                    next_available.Roles.Add(roles[next_role]);
-                    required_cast[next_role]--;
-                    RemoveIfNotAvailable(next_available, available_cast);
-                    changes = true;
+                    // Cast the next available applicant to this role
+                    roles[role].Cast.Add(next_available);
+                    next_available.Roles.Add(roles[role]);
+                    required_cast[role]--;
+                    // Remove the cast applicant from other available_cast lists
+                    RemoveIfNotAvailable(next_available, roles, available_cast);
+                    if (RoleNeedsImmediateCasting(required_cast, available_cast) is int immediate_role)
+                    {
+                        // If any roles now have available_cast <= required_cast, cast them now
+                        role = immediate_role;
+                        continue;
+                    }
                 }
-                next_role++;
+                // Move to the next role that needs casting
+                if (!IncrementRoleToCast(required_cast, available_cast, ref role))
+                    break; // If no more roles need casting, we are done
             }
         }
 
@@ -258,6 +285,34 @@ namespace Carmen.CastingEngine.Base
             for (var i = 0; i < roles.Length; i++)
                 if (available_cast[i].Contains(applicant) && !IsAvailable(applicant, roles[i]))
                     available_cast[i].Remove(applicant);
+        }
+
+        private static int? RoleNeedsImmediateCasting(int[] required_cast, Queue<Applicant>[] available_cast)
+        {
+            for (var i = 0; i < required_cast.Length; i++)
+                if (required_cast[i] > 0 && available_cast[i].Count <= required_cast[i])
+                    return i;
+            return null;
+        }
+
+        private static bool IncrementRoleToCast(int[] required_cast, Queue<Applicant>[] available_cast, ref int role)
+        {
+            var next_role = FirstIndexToCast(required_cast, available_cast, role + 1, required_cast.Length - 1)
+                ?? FirstIndexToCast(required_cast, available_cast, 0, role);
+            if (next_role.HasValue)
+            {
+                role = next_role.Value;
+                return true;
+            }
+            return false;
+        }
+
+        private static int? FirstIndexToCast(int[] required_cast, Queue<Applicant>[] available_cast, int start, int end)
+        {
+            for (var i = start; i <= end; i++)
+                if (required_cast[i] > 0 && available_cast[i].Count > 0)
+                    return i;
+            return null;
         }
 
         /// <summary>Counts an applicants existing roles requiring the specificed Criteria, either directly or as SubRequirements of an AndRequirement.
