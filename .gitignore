@@ -389,3 +389,4 @@ FodyWeavers.xsd
 
 /ExpertConverter/Properties/launchSettings.json
 /UnitTests/Benchmarks/Test data/converted*
+/UnitTests/Neural/Test data/*
