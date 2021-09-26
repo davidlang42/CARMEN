@@ -45,6 +45,6 @@ namespace Carmen.CastingEngine.Neural.Internal
             return result;
         }
 
-        public override string ToString() => $"[{string.Join(", ", Weights)}] + {Bias}";
+        public override string ToString() => $"[{string.Join(", ", Weights.Select(w => $"{w:0.000}"))}] + {Bias:0.000}";
     }
 }
