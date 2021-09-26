@@ -22,6 +22,10 @@ namespace Carmen.CastingEngine
         /// <summary>Calculate the overall ability of an applicant</summary>
         int OverallAbility(Applicant applicant);
 
+        /// <summary>A callback for when the user selects cast into cast groups manually, providing
+        /// information to the engine which can be used to improve future recommendations.</summary>
+        void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected); //LATER logically this belongs in ISelectionEngine, but the technical implementation requires it in IApplicantEngine
+
         /// <summary>Calculate the suitability of an applicant against a single requirement.
         /// Value returned will be between 0 and 1 (inclusive).</summary>
         double SuitabilityOf(Applicant applicant, Requirement requirement);

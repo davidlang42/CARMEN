@@ -13,7 +13,7 @@ namespace Carmen.CastingEngine.Neural.Internal
     public class SingleLayerPerceptron : INeuralNetwork
     {
         ILossFunction loss = new MeanSquaredError();
-        public Layer layer;
+        public Layer Layer;
 
         public int InputCount { get; init; }
         public int OutputCount { get; init; }
@@ -23,7 +23,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         {
             InputCount = n_inputs;
             OutputCount = n_outputs;
-            layer = new Layer(n_inputs, n_outputs, activation ?? new Sigmoid());
+            Layer = new Layer(n_inputs, n_outputs, activation ?? new Sigmoid());
         }
 
         /// <summary>Train the model with a single set of inputs and expected outputs.
@@ -34,12 +34,12 @@ namespace Carmen.CastingEngine.Neural.Internal
             var out_o = Predict(inputs);
             // Back propogation (stochastic gradient descent)
             var dloss_douto = loss.Derivative(out_o, expected_outputs);
-            layer.Train(inputs, out_o, dloss_douto, LearningRate, out _);
+            Layer.Train(inputs, out_o, dloss_douto, LearningRate, out _);
             return loss.Calculate(dloss_douto);
         }
 
-        public double[] Predict(double[] inputs) => layer.Predict(inputs);
+        public double[] Predict(double[] inputs) => Layer.Predict(inputs);
 
-        public override string ToString() => $"Outputs: {layer}";
+        public override string ToString() => $"Outputs: {Layer}";
     }
 }

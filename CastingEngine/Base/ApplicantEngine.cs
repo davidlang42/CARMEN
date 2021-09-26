@@ -1,5 +1,6 @@
 ﻿using Carmen.CastingEngine.Dummy;
 using Carmen.CastingEngine.Heuristic;
+using Carmen.CastingEngine.Neural;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 using System;
@@ -18,6 +19,7 @@ namespace Carmen.CastingEngine.Base
         /// <summary>A list of available applicant engines</summary>
         public static readonly Type[] Implementations = new[] {
             typeof(WeightedSumEngine),
+            typeof(NeuralApplicantEngine),
             typeof(DummyApplicantEngine) //LATER remove
         };
 
@@ -25,6 +27,9 @@ namespace Carmen.CastingEngine.Base
         public abstract int MinOverallAbility { get; }
 
         public abstract int OverallAbility(Applicant applicant);
+
+        public virtual void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
+        { }
 
         /// <summary>Assumes no circular references between requirements</summary>
         public virtual double SuitabilityOf(Applicant applicant, Requirement requirement)
