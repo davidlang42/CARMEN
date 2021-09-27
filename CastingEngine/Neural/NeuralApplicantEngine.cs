@@ -151,7 +151,7 @@ namespace Carmen.CastingEngine.Neural
             }
         }
 
-        private IEnumerable<(Applicant accepted, Applicant rejected)> ComparablePairs(IEnumerable<Applicant> applicants_accepted, Applicant[] applicants_rejected)
+        public static IEnumerable<(Applicant accepted, Applicant rejected)> ComparablePairs(IEnumerable<Applicant> applicants_accepted, Applicant[] applicants_rejected)
         {
             var accepted_by_group = applicants_accepted.GroupBy(a => a.CastGroup).ToDictionary(g => g.Key!, g => g.ToArray());
             var rejected_by_group = new Dictionary<CastGroup, Applicant[]>();
