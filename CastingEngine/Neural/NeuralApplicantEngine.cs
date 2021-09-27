@@ -149,6 +149,7 @@ namespace Carmen.CastingEngine.Neural
                     criterias[i].Weight = new_weights[i];
                 UpdateRange();
             }
+            LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
         }
 
         public static IEnumerable<(Applicant accepted, Applicant rejected)> ComparablePairs(IEnumerable<Applicant> applicants_accepted, Applicant[] applicants_rejected)
