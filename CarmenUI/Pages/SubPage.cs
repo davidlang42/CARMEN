@@ -171,6 +171,9 @@ namespace CarmenUI.Pages
             return AllocationEngine.Implementations.First().Name;
         }
 
+        protected bool NeuralEngineConfirm(string message)
+            => MessageBox.Show(message, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+
         protected bool Confirm(string msg)
             => MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 

@@ -41,8 +41,15 @@ namespace Carmen.CastingEngine.Neural
 
         public NeuralApplicantEngine(Criteria[] criterias, UserConfirmation confirm)
         {
-            this.criterias = criterias.Where(c => c.Weight != 0).ToArray(); //TODO exclude criterias with zero weight, unless all zero, in which set them to 1? (or add randomness?) or make it default to out of 100?
-            //if (this.criterias.Length == 0)
+            this.criterias = criterias.Where(c => c.Weight != 0).ToArray(); // exclude criterias with zero weight
+            if (this.criterias.Length == 0 && criterias.Length != 0)
+            {
+                // if all have zero weight, initialise them to equal parts of 100
+                this.criterias = criterias;
+                var equal_weight = 100.0 / criterias.Length;
+                foreach (var criteria in this.criterias)
+                    criteria.Weight = equal_weight;
+            }
             this.confirm = confirm;
             this.model = new SingleLayerPerceptron(this.criterias.Length * 2, 1, new Sigmoid(), new ClassificationError { Threshold = 0.25 });
             LoadWeights();
