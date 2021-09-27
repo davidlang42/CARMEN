@@ -109,7 +109,7 @@ namespace Carmen.CastingEngine.Neural
             if (training_pairs.Count == 0)
                 return; // nothing to do
             // Train the model
-            model.LearningRate = 0.05; //TODO does this need to vary with weight magnitude?
+            model.LearningRate = 0.01 * MaxOverallAbility;
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
