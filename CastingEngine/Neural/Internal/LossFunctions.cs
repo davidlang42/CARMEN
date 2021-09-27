@@ -45,6 +45,10 @@ namespace Carmen.CastingEngine.Neural.Internal
 
     public class ClassificationError : ILossFunction
     {
+        /// <summary>The threshold for correctness.
+        /// A value greater than 0.5 allows errors to be counted as correct.</summary>
+        public double Threshold { get; set; } = 0.5;
+
         /// <summary>count(incorrect prediction)</summary>
         public double Calculate(double[] dloss_douto)
         {
@@ -54,7 +58,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             // output: [0.5, 1], expected: 1, dloss_douto: [-0.5, 0], result: correct
             int incorrect = 0;
             for (var i = 0; i < dloss_douto.Length; i++)
-                if (Math.Abs(dloss_douto[i]) > 0.5)
+                if (Math.Abs(dloss_douto[i]) > Threshold)
                     incorrect++;
             return incorrect;
         }

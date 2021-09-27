@@ -36,7 +36,7 @@ namespace Carmen.CastingEngine.Neural
             this.criterias = criterias.Where(c => c.Weight != 0).ToArray(); //TODO exclude criterias with zero weight, unless all zero, in which set them to 1? (or add randomness?) or make it default to out of 100?
             //if (this.criterias.Length == 0)
             this.confirm = confirm;
-            this.model = new SingleLayerPerceptron(this.criterias.Length * 2, 1, new Sigmoid(), new ClassificationError());
+            this.model = new SingleLayerPerceptron(this.criterias.Length * 2, 1, new Sigmoid(), new ClassificationError { Threshold = 0.5 }); //TODO change threshold
             LoadWeights();
             UpdateRange();
         }
