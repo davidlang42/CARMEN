@@ -12,15 +12,16 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// </summary>
     public class SingleLayerPerceptron : INeuralNetwork
     {
-        ILossFunction loss = new MeanSquaredError();
+        ILossFunction loss;
         public Layer Layer;
 
         public int InputCount { get; init; }
         public int OutputCount { get; init; }
         public double LearningRate { get; set; } = 0.05;
 
-        public SingleLayerPerceptron(int n_inputs, int n_outputs, IVectorActivationFunction? activation = null)
+        public SingleLayerPerceptron(int n_inputs, int n_outputs, IVectorActivationFunction? activation = null, ILossFunction? loss = null)
         {
+            this.loss = loss ?? new MeanSquaredError();
             InputCount = n_inputs;
             OutputCount = n_outputs;
             Layer = new Layer(n_inputs, n_outputs, activation ?? new Sigmoid());
