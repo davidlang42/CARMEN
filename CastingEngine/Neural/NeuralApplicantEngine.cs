@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.Neural
     {
         public delegate bool UserConfirmation(string message);
 
-        const int TRAINING_ITERATIONS = 1000; //TODO is this the right total number?
+        const int MAX_ITERATIONS = 1000; //TODO is this the right total number?
         const double MINIMUM_CHANGE = 0.1;
 
         SingleLayerPerceptron model;
@@ -36,7 +36,7 @@ namespace Carmen.CastingEngine.Neural
             this.criterias = criterias.Where(c => c.Weight != 0).ToArray(); //TODO exclude criterias with zero weight, unless all zero, in which set them to 1? (or add randomness?) or make it default to out of 100?
             //if (this.criterias.Length == 0)
             this.confirm = confirm;
-            this.model = new SingleLayerPerceptron(this.criterias.Length * 2, 1);
+            this.model = new SingleLayerPerceptron(this.criterias.Length * 2, 1, new Sigmoid(), new ClassificationError());
             LoadWeights();
             UpdateRange();
         }
@@ -110,9 +110,9 @@ namespace Carmen.CastingEngine.Neural
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
-                MaxIterations = TRAINING_ITERATIONS
+                MaxIterations = MAX_ITERATIONS
             };
-            trainer.Train(training_pairs.Keys, training_pairs.Values);
+            var m = trainer.Train(training_pairs.Keys, training_pairs.Values);
             UpdateWeights();
         }
 
