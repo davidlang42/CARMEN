@@ -42,4 +42,32 @@ namespace Carmen.CastingEngine.Neural.Internal
             return result;
         }
     }
+
+    public class ClassificationError : ILossFunction
+    {
+        /// <summary>count(incorrect prediction)</summary>
+        public double Calculate(double[] dloss_douto)
+        {
+            // output: [0, 0.5], expected: 0, dloss_douto: [0, 0.5], result: correct
+            // output: [0.5, 1], expected: 0, dloss_douto: [0.5, 1], result: incorrect
+            // output: [0, 0.5], expected: 1, dloss_douto: [-1, -0.5], result: incorrect
+            // output: [0.5, 1], expected: 1, dloss_douto: [-0.5, 0], result: correct
+            int incorrect = 0;
+            for (var i = 0; i < dloss_douto.Length; i++)
+                if (Math.Abs(dloss_douto[i]) > 0.5)
+                    incorrect++;
+            return incorrect;
+        }
+
+        /// <summary>y'-y</summary>
+        public double[] Derivative(double[] outputs, double[] expected_outputs)
+        {
+            if (outputs.Length != expected_outputs.Length)
+                throw new ArgumentException($"{nameof(outputs)} [{outputs.Length}] must have the same length as {nameof(expected_outputs)} [{expected_outputs.Length}]");
+            var result = new double[outputs.Length];
+            for (var i = 0; i < outputs.Length; i++)
+                result[i] = outputs[i] - expected_outputs[i];
+            return result;
+        }
+    }
 }
