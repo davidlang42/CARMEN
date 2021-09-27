@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.Neural
     {
         public delegate bool UserConfirmation(string message);
 
-        const int TRAINING_ITERATIONS = 10000; //TODO is this the right total number?
+        const int TRAINING_ITERATIONS = 1000; //TODO is this the right total number?
         const double MINIMUM_CHANGE = 0.1;
 
         SingleLayerPerceptron model;
@@ -33,9 +33,10 @@ namespace Carmen.CastingEngine.Neural
 
         public NeuralApplicantEngine(Criteria[] criterias, UserConfirmation confirm)
         {
-            this.criterias = criterias; //TODO exclude criterias with zero weight, unless all zero, in which set them to 1? (or add randomness?) or make it default to out of 100?
+            this.criterias = criterias.Where(c => c.Weight != 0).ToArray(); //TODO exclude criterias with zero weight, unless all zero, in which set them to 1? (or add randomness?) or make it default to out of 100?
+            //if (this.criterias.Length == 0)
             this.confirm = confirm;
-            this.model = new SingleLayerPerceptron(criterias.Length * 2, 1);
+            this.model = new SingleLayerPerceptron(this.criterias.Length * 2, 1);
             LoadWeights();
             UpdateRange();
         }
