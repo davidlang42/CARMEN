@@ -14,7 +14,6 @@ namespace Carmen.CastingEngine.Neural
     {
         public delegate bool UserConfirmation(string message);
 
-        const int MAX_ITERATIONS = 1000; //TODO is this the right total number?
         const double MINIMUM_CHANGE = 0.1;
 
         SingleLayerPerceptron model;
@@ -26,6 +25,10 @@ namespace Carmen.CastingEngine.Neural
 
         int minOverallAbility;
         public override int MinOverallAbility => minOverallAbility;
+
+        /// <summary>The maximum number of training iterations run per invocation of
+        /// <see cref="UserSelectedCast(IEnumerable{Applicant}, IEnumerable{Applicant})"/></summary>
+        public int MaxTrainingIterations { get; set; } = 10; //LATER make this a user setting
 
         /// Calculate the overall ability of an Applicant as a simple weighted sum of their Abilities</summary>
         public override int OverallAbility(Applicant applicant)
@@ -110,7 +113,7 @@ namespace Carmen.CastingEngine.Neural
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
-                MaxIterations = MAX_ITERATIONS
+                MaxIterations = MaxTrainingIterations
             };
             var m = trainer.Train(training_pairs.Keys, training_pairs.Values);
             UpdateWeights();
