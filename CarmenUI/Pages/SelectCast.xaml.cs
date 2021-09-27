@@ -189,6 +189,7 @@ namespace CarmenUI.Pages
                         applicant.CastGroup = null;
                 }
             }
+            engine.ApplicantEngine.UserSelectedCast(context.Applicants.Local.Where(a => a.IsAccepted), context.Applicants.Local.Where(a => !a.IsAccepted));
             return true;
         }
 
