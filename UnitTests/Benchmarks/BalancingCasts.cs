@@ -55,7 +55,7 @@ namespace UnitTests.Benchmarks
                 };
         }
 
-        private static DbContextOptions<ShowContext> OptionsFor(string file_name)
+        public static DbContextOptions<ShowContext> OptionsFor(string file_name)
         {
             if (!File.Exists(file_name))
                 throw new Exception($"File not found: {file_name}");
