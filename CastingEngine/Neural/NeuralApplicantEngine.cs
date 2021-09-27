@@ -30,6 +30,11 @@ namespace Carmen.CastingEngine.Neural
         /// <see cref="UserSelectedCast(IEnumerable{Applicant}, IEnumerable{Applicant})"/></summary>
         public int MaxTrainingIterations { get; set; } = 10; //LATER make this a user setting
 
+        /// <summary>The speed at which the neural network learns from results, as a fraction of
+        /// <see cref="MaxOverallAbility"/>. Reasonable values are between 0.001 and 0.01.
+        /// WARNING: Changing this can have crazy consequences, slower is generally safer but be careful.</summary>
+        public double NeuralLearningRate { get; set; } = 0.005; //LATER make this a user setting
+
         /// Calculate the overall ability of an Applicant as a simple weighted sum of their Abilities</summary>
         public override int OverallAbility(Applicant applicant)
             => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
@@ -109,7 +114,7 @@ namespace Carmen.CastingEngine.Neural
             if (training_pairs.Count == 0)
                 return; // nothing to do
             // Train the model
-            model.LearningRate = 0.005 * MaxOverallAbility;
+            model.LearningRate = NeuralLearningRate * MaxOverallAbility;
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
