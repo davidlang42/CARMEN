@@ -10,9 +10,9 @@ namespace Carmen.ShowModel.Requirements
     /// <summary>
     /// Indicates that requirement is based on a certain Criteria
     /// </summary>
-    public interface ICriteriaRequirement
+    public interface ICriteriaRequirement : IOrdered, INamed
     {
         public Criteria Criteria { get; }
-        public double ExistingRoleWeight { get; set; }
+        public double ExistingRoleCost { get; set; }
     }
 }

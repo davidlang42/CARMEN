@@ -15,6 +15,8 @@ namespace Carmen.CastingEngine.Neural
 {
     public class NeuralAllocationEngine : HeuristicAllocationEngine, IComparer<(Applicant, Role)> //LATER don't extend HeuristicAllocationEngine
     {
+        const double MINIMUM_CHANGE = 0.1;
+
         readonly Requirement[] suitabilityRequirements;
         readonly ICriteriaRequirement[] existingRoleRequirements;
         readonly SingleLayerPerceptron model;
@@ -22,13 +24,13 @@ namespace Carmen.CastingEngine.Neural
         readonly int nInputs;
 
         //LATER should these be abstracted into an interface maybe? something to enable arbitrary user settings to be set for an engine?
-        #region Common with NeuralApplicantEngine
+        #region Common with NeuralApplicantEngine (except for comments)
         /// <summary>The maximum number of training iterations run per invocation of
-        /// <see cref="UserSelectedCast(IEnumerable{Applicant}, IEnumerable{Applicant})"/></summary>
+        /// <see cref="UserPickedCast(IEnumerable{Applicant}, IEnumerable{Applicant}, Role)"/></summary>
         public int MaxTrainingIterations { get; set; } = 10; //LATER make this a user setting
 
-        /// <summary>The speed at which the neural network learns from results, as a fraction of
-        /// <see cref="MaxOverallAbility"/>. Reasonable values are between 0.001 and 0.01.
+        /// <summary>The speed at which the neural network learns from results, as a fraction of the sum of
+        /// <see cref="Requirement.SuitabilityWeight"/>. Reasonable values are between 0.001 and 0.01.
         /// WARNING: Changing this can have crazy consequences, slower is generally safer but be careful.</summary>
         public double NeuralLearningRate { get; set; } = 0.005; //LATER make this a user setting
         #endregion
@@ -45,16 +47,16 @@ namespace Carmen.CastingEngine.Neural
                 // if all have zero weight, initialise them to 1
                 suitabilityRequirements = requirements;
                 foreach (var requirement in suitabilityRequirements)
-                    requirement.SuitabilityWeight = 1;
+                    requirement.SuitabilityWeight = 1; // equal weighting to overall suitability
             }
             // Find the requirements which will detract based on existing roles
-            existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().Where(r => r.ExistingRoleWeight != 0).ToArray(); // exclude requirements with zero weight
+            existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().Where(r => r.ExistingRoleCost != 0).ToArray(); // exclude requirements with zero weight
             if (existingRoleRequirements.Length == 0 && requirements.OfType<ICriteriaRequirement>().Any())//TODO ?
             {
                 // if all have zero weight, initialise them to -0.01
                 existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().ToArray();
                 foreach (var requirement in existingRoleRequirements)
-                    requirement.ExistingRoleWeight = -0.01;
+                    requirement.ExistingRoleCost = 1; // each role subtracts 1% suitability
             }
             // Construct the model
             this.confirm = confirm;
@@ -79,8 +81,8 @@ namespace Carmen.CastingEngine.Neural
             }
             foreach (var requirement in existingRoleRequirements)
             {
-                neuron.Weights[i] = requirement.ExistingRoleWeight;
-                neuron.Weights[i + offset] = -requirement.ExistingRoleWeight;
+                neuron.Weights[i] = -requirement.ExistingRoleCost / 100;
+                neuron.Weights[i + offset] = requirement.ExistingRoleCost / 100;
                 i++;
             }
         }
@@ -125,7 +127,7 @@ namespace Carmen.CastingEngine.Neural
                 }
             foreach (var requirement in existingRoleRequirements)
                 if (role.Requirements.Contains((Requirement)requirement))
-                    score += requirement.ExistingRoleWeight * CountRoles(applicant, requirement.Criteria, role);
+                    score -= requirement.ExistingRoleCost / 100 * CountRoles(applicant, requirement.Criteria, role);
             return score / max;
         }
 
@@ -169,7 +171,7 @@ namespace Carmen.CastingEngine.Neural
             if (training_pairs.Count == 0)
                 return; // nothing to do
             // Train the model
-            model.LearningRate = NeuralLearningRate * MaxOverallAbility; //TODO
+            model.LearningRate = NeuralLearningRate * suitabilityRequirements.Sum(r => r.SuitabilityWeight);
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
@@ -179,40 +181,77 @@ namespace Carmen.CastingEngine.Neural
             UpdateWeights();
         }
 
-        private void UpdateWeights() //TODO
+        private void UpdateWeights()
         {
             var neuron = model.Layer.Neurons[0];
-            var new_raw = new double[criterias.Length];
-            double old_sum = 0;
-            double new_sum = 0;
-            for (var i = 0; i < criterias.Length; i++)
-            {
-                new_sum += new_raw[i] = (neuron.Weights[i] + -neuron.Weights[i + criterias.Length]) / 2;
-                old_sum += criterias[i].Weight;
-            }
-            var weight_ratio = old_sum / new_sum;
-            var new_weights = new double[criterias.Length];
+            var new_raw = new double[nInputs / 2];
+            for (var n = 0; n < new_raw.Length; n++)
+                new_raw[n] = (neuron.Weights[n] + -neuron.Weights[n + new_raw.Length]) / 2;
             var any_change = false;
-            var msg = "CARMEN's neural network has detected an improvement to the Criteria weights. Would you like to update them?";
-            for (var i = 0; i < criterias.Length; i++)
+            var i = 1;
+            var changes = new List<WeightChange>();
+            foreach (var requirement in suitabilityRequirements)
             {
-                new_weights[i] = new_raw[i] * weight_ratio;
-                msg += $"\n{criterias[i].Name}: ";
-                if (Math.Abs(new_weights[i] - criterias[i].Weight) > MINIMUM_CHANGE)
+                var new_weight = new_raw[i] / new_raw[0]; // normalise compared to an overall mark of 1
+                if (new_weight < 0)
+                    new_weight = 0;
+                string description;
+                if (Math.Abs(new_weight - requirement.SuitabilityWeight) > MINIMUM_CHANGE)
                 {
-                    msg += $"{new_weights[i]:0.0} (previously {criterias[i].Weight:0.0})";
+                    description = $"\n{requirement.Name}: {new_weight:0.0} (previously {requirement.SuitabilityWeight:0.0})";
                     any_change = true;
                 }
                 else
-                    msg += $"{criterias[i].Weight:0.0}";
+                    description = $"\n{requirement.Name}: {requirement.SuitabilityWeight:0.0}";
+                changes.Add(new()
+                {
+                    Requirement = requirement,
+                    Description = description,
+                    Accept = () => requirement.SuitabilityWeight = new_weight
+                });
+                i++;
             }
-            if (any_change && confirm(msg))
+            foreach (var requirement in existingRoleRequirements)
             {
-                for (var i = 0; i < criterias.Length; i++)
-                    criterias[i].Weight = new_weights[i];
-                UpdateRange();
+                var new_cost = -100 * new_raw[i] / new_raw[0]; // normalise compared to an overall mark of 1
+                if (new_cost < 0)
+                    new_cost = 0;
+                if (new_cost > 100)
+                    new_cost = 100;
+                string description;
+                if (Math.Abs(new_cost - requirement.ExistingRoleCost) > MINIMUM_CHANGE)
+                {
+                    description = $"\nEach '{requirement.Name}' role reduces suitability by: {new_cost:0.0}% (previously {requirement.ExistingRoleCost:0.0}%)";
+                    any_change = true;
+                }
+                else
+                    description = $"\nEach '{requirement.Name}' role reduces suitability by: {requirement.ExistingRoleCost:0.0}%";
+                changes.Add(new()
+                {
+                    Requirement = requirement,
+                    Description = description,
+                    Accept = () => requirement.ExistingRoleCost = new_cost
+                });
+                i++;
+            }
+            if (any_change)
+            {
+                var msg = "CARMEN's neural network has detected an improvement to the Requirement weights. Would you like to update them?";
+                msg += "\nOverall Ability: 1.0";
+                foreach (var change in changes.OrderBy(c => c.Requirement.Order))
+                    msg += "\n" + change.Description;
+                if (confirm(msg))
+                    foreach (var change in changes)
+                        change.Accept();
             }
             LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
+        }
+
+        private struct WeightChange
+        {
+            public IOrdered Requirement;
+            public string Description;
+            public Action Accept;
         }
     }
 }

@@ -59,15 +59,17 @@ namespace Carmen.ShowModel.Requirements
             }
         }
 
-        private double existingRoleWeight;
-        public double ExistingRoleWeight//TODO probably only need this on ICrtieriaRequirement, maybe express as percentage points and cap between 0 and 100
+        private double existingRoleCost;
+        /// <summary>The number of percentage points which each existing role subtracts
+        /// from an applicant's suitability. Must be between 0 and 100 inclusive.</summary>
+        public double ExistingRoleCost //TODO probably only need this on ICrtieriaRequirement, cap between 0 and 100
         {
-            get => existingRoleWeight;
+            get => existingRoleCost;
             set
             {
-                if (existingRoleWeight == value)
+                if (existingRoleCost == value)
                     return;
-                existingRoleWeight = value;
+                existingRoleCost = value;
                 OnPropertyChanged();
             }
         }

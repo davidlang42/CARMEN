@@ -124,7 +124,7 @@ namespace CarmenUI.Pages
                     {
                         nameof(DummyAllocationEngine) => new DummyAllocationEngine(applicant_engine, alternativeCasts),
                         nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine, alternativeCasts, criterias),
-                        nameof(NeuralAllocationEngine) => new NeuralAllocationEngine(applicant_engine, alternativeCasts, criterias, requirements),
+                        nameof(NeuralAllocationEngine) => new NeuralAllocationEngine(applicant_engine, alternativeCasts, criterias, requirements, NeuralEngineConfirm),
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }
@@ -146,7 +146,12 @@ namespace CarmenUI.Pages
                 if (applicantsPanel.Content is EditableRoleWithApplicantsView editable_view)
                 {
                     rootNodeView.FindRoleView(editable_view.Role)?.UpdateAsync();
-                    engine.UserPickedCast(editable_view.Role.Cast, editable_view.Role);
+                    var applicants_not_picked = editable_view.Applicants
+                        .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
+                        .Where(afr => !afr.IsSelected)
+                        .Select(afr => afr.Applicant);
+                    engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
+                    //LATER if the user accepts weight changes, they should really be saved here
                 }
                 ChangeToViewMode();
             }
