@@ -56,7 +56,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             var no_change = false;
             var too_many_repeats = false;
             var descriptions = new List<string>();
-            while(!success && !no_change && !too_many_repeats)//TODO maybe reduce the learning rate when no change detected
+            while(!success && !no_change && !too_many_repeats) //LATER maybe reduce the learning rate when no change detected
             {
                 descriptions.Add(network.ToString());
                 success = true;
