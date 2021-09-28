@@ -20,6 +20,25 @@ namespace Carmen.ShowModel.Requirements
             }
         }
 
+        private double existingRoleCost;
+        /// <summary>The number of percentage points which each existing role subtracts
+        /// from an applicant's suitability. Must be between 0 and 100 inclusive.</summary>
+        public double ExistingRoleCost
+        {
+            get => existingRoleCost;
+            set
+            {
+                if (value < 0)
+                    value = 0;
+                if (value > 100)
+                    value = 100;
+                if (existingRoleCost == value)
+                    return;
+                existingRoleCost = value;
+                OnPropertyChanged();
+            }
+        }
+
         public override bool IsSatisfiedBy(Applicant applicant)
             => applicant.MarkFor(Criteria) == RequiredValue;
     }
