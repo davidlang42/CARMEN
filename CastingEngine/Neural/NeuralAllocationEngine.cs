@@ -42,7 +42,7 @@ namespace Carmen.CastingEngine.Neural
             CountRolesIncludingPartialRequirements = true; //LATER shouldn't need to set these once this doesn't extend HeuristicAllocationEngine (they should be true by default)
             // Find the requirements which will be used for role suitability
             suitabilityRequirements = requirements.Where(r => r.SuitabilityWeight != 0).ToArray(); // exclude requirements with zero weight
-            if (suitabilityRequirements.Length == 0 && requirements.Length != 0)//TODO ?
+            if (suitabilityRequirements.Length == 0 && requirements.Length != 0)
             {
                 // if all have zero weight, initialise them to 1
                 suitabilityRequirements = requirements;
@@ -51,9 +51,9 @@ namespace Carmen.CastingEngine.Neural
             }
             // Find the requirements which will detract based on existing roles
             existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().Where(r => r.ExistingRoleCost != 0).ToArray(); // exclude requirements with zero weight
-            if (existingRoleRequirements.Length == 0 && requirements.OfType<ICriteriaRequirement>().Any())//TODO ?
+            if (existingRoleRequirements.Length == 0 && requirements.OfType<ICriteriaRequirement>().Any())
             {
-                // if all have zero weight, initialise them to -0.01
+                // if all have zero weight, initialise them to 1%
                 existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().ToArray();
                 foreach (var requirement in existingRoleRequirements)
                     requirement.ExistingRoleCost = 1; // each role subtracts 1% suitability
