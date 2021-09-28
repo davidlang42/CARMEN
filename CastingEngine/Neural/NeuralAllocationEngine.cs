@@ -75,15 +75,15 @@ namespace Carmen.CastingEngine.Neural
             neuron.Weights[i + offset] = -1;
             foreach (var requirement in suitabilityRequirements)
             {
+                i++;
                 neuron.Weights[i] = requirement.SuitabilityWeight;
                 neuron.Weights[i + offset] = -requirement.SuitabilityWeight;
-                i++;
             }
             foreach (var requirement in existingRoleRequirements)
             {
+                i++;
                 neuron.Weights[i] = -requirement.ExistingRoleCost / 100;
                 neuron.Weights[i + offset] = requirement.ExistingRoleCost / 100;
-                i++;
             }
         }
 
@@ -96,21 +96,21 @@ namespace Carmen.CastingEngine.Neural
             values[i + offset] = ApplicantEngine.OverallAbility(b);
             foreach (var requirement in suitabilityRequirements)
             {
+                i++;
                 if (role.Requirements.Contains(requirement))
                 {
                     values[i] = ApplicantEngine.SuitabilityOf(a, requirement);
                     values[i + offset] = ApplicantEngine.SuitabilityOf(b, requirement);
                 }
-                i++;
             }
             foreach (var requirement in existingRoleRequirements)
             {
+                i++;
                 if (role.Requirements.Contains((Requirement)requirement))
                 {
                     values[i] = CountRoles(a, requirement.Criteria, role);
                     values[i + offset] = CountRoles(b, requirement.Criteria, role);
                 }
-                i++;
             }
             return values;
         }
