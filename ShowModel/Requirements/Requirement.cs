@@ -47,7 +47,7 @@ namespace Carmen.ShowModel.Requirements
         }
 
         private double suitabilityWeight;
-        public double SuitabilityWeight
+        public double SuitabilityWeight //TODO possibly cap to positive only?
         {
             get => suitabilityWeight;
             set
@@ -60,7 +60,7 @@ namespace Carmen.ShowModel.Requirements
         }
 
         private double existingRoleWeight;
-        public double ExistingRoleWeight//TODO probably only need this on ICrtieriaRequirement
+        public double ExistingRoleWeight//TODO probably only need this on ICrtieriaRequirement, maybe express as percentage points and cap between 0 and 100
         {
             get => existingRoleWeight;
             set

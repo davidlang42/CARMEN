@@ -152,24 +152,24 @@ namespace Carmen.CastingEngine.Neural
                 return 0; // A == B
         }
 
-        public override void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)//TODO
+        public override void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
         {
             if (nInputs == 2) // no requirements, only overall suitability
                 return; // nothing to do
             // Generate training data
-            var rejected_array = applicants_rejected.ToArray();
-            if (rejected_array.Length == 0)
+            var not_picked_array = applicants_not_picked.ToArray();
+            if (not_picked_array.Length == 0)
                 return; // nothing to do
             var training_pairs = new Dictionary<double[], double[]>();
-            foreach (var (accepted, rejected) in ComparablePairs(applicants_accepted, rejected_array))
+            foreach (var (picked, not_picked) in NeuralApplicantEngine.ComparablePairs(applicants_picked, not_picked_array))
             {
-                training_pairs.Add(InputValues(accepted, rejected), new[] { 1.0 });
-                training_pairs.Add(InputValues(rejected, accepted), new[] { 0.0 });
+                training_pairs.Add(InputValues(picked, not_picked, role), new[] { 1.0 });
+                training_pairs.Add(InputValues(not_picked, picked, role), new[] { 0.0 });
             }
             if (training_pairs.Count == 0)
                 return; // nothing to do
             // Train the model
-            model.LearningRate = NeuralLearningRate * MaxOverallAbility;
+            model.LearningRate = NeuralLearningRate * MaxOverallAbility; //TODO
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
@@ -179,7 +179,7 @@ namespace Carmen.CastingEngine.Neural
             UpdateWeights();
         }
 
-        private void UpdateWeights()
+        private void UpdateWeights() //TODO
         {
             var neuron = model.Layer.Neurons[0];
             var new_raw = new double[criterias.Length];
@@ -213,20 +213,6 @@ namespace Carmen.CastingEngine.Neural
                 UpdateRange();
             }
             LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
-        }
-
-        public static IEnumerable<(Applicant accepted, Applicant rejected)> ComparablePairs(IEnumerable<Applicant> applicants_accepted, Applicant[] applicants_rejected)
-        {
-            var accepted_by_group = applicants_accepted.GroupBy(a => a.CastGroup).ToDictionary(g => g.Key!, g => g.ToArray());
-            var rejected_by_group = new Dictionary<CastGroup, Applicant[]>();
-            foreach (var cast_group in accepted_by_group.Keys)
-                rejected_by_group.Add(cast_group, applicants_rejected
-                    .Where(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)))
-                    .ToArray());
-            foreach (var cg in accepted_by_group.Keys)
-                foreach (var accepted in accepted_by_group[cg])
-                    foreach (var rejected in rejected_by_group[cg])
-                        yield return (accepted, rejected);
         }
     }
 }

@@ -43,7 +43,7 @@ namespace Carmen.CastingEngine
 
         /// <summary>A callback for when the user allocates cast to a role, providing
         /// information to the engine which can be used to improve future recommendations.</summary>
-        void UserPickedCast(IEnumerable<Applicant> applicants, Role role);
+        void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role);
 
         /// <summary>Allocate the best cast to one or more roles, balancing talent between them.
         /// NOTE: Unlike <see cref="PickCast(IEnumerable{Applicant}, Role)"/> this directly allocates
