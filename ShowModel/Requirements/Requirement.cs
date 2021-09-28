@@ -46,6 +46,32 @@ namespace Carmen.ShowModel.Requirements
             }
         }
 
+        private double suitabilityWeight;
+        public double SuitabilityWeight
+        {
+            get => suitabilityWeight;
+            set
+            {
+                if (suitabilityWeight == value)
+                    return;
+                suitabilityWeight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double existingRoleWeight;
+        public double ExistingRoleWeight//TODO probably only need this on ICrtieriaRequirement
+        {
+            get => existingRoleWeight;
+            set
+            {
+                if (existingRoleWeight == value)
+                    return;
+                existingRoleWeight = value;
+                OnPropertyChanged();
+            }
+        }
+
         private bool primary;
         public bool Primary
         {

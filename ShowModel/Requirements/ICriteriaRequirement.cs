@@ -13,5 +13,6 @@ namespace Carmen.ShowModel.Requirements
     public interface ICriteriaRequirement
     {
         public Criteria Criteria { get; }
+        public double ExistingRoleWeight { get; set; }
     }
 }

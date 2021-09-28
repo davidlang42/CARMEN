@@ -12,13 +12,11 @@ namespace Carmen.CastingEngine.Neural
 {
     public class NeuralApplicantEngine : ApplicantEngine, IComparer<Applicant>
     {
-        public delegate bool UserConfirmation(string message);
-
         const double MINIMUM_CHANGE = 0.1;
 
-        SingleLayerPerceptron model;
-        Criteria[] criterias;
-        UserConfirmation confirm;
+        readonly SingleLayerPerceptron model;
+        readonly Criteria[] criterias;
+        readonly UserConfirmation confirm;
 
         int maxOverallAbility;
         public override int MaxOverallAbility => maxOverallAbility;
@@ -108,6 +106,8 @@ namespace Carmen.CastingEngine.Neural
 
         public override void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
         {
+            if (criterias.Length == 0)
+                return; // nothing to do
             // Generate training data
             var rejected_array = applicants_rejected.ToArray();
             if (rejected_array.Length == 0)
@@ -167,18 +167,18 @@ namespace Carmen.CastingEngine.Neural
             LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
         }
 
-        public static IEnumerable<(Applicant accepted, Applicant rejected)> ComparablePairs(IEnumerable<Applicant> applicants_accepted, Applicant[] applicants_rejected)
+        public static IEnumerable<(Applicant good, Applicant bad)> ComparablePairs(IEnumerable<Applicant> good_applicants, Applicant[] bad_applicants)
         {
-            var accepted_by_group = applicants_accepted.GroupBy(a => a.CastGroup).ToDictionary(g => g.Key!, g => g.ToArray());
-            var rejected_by_group = new Dictionary<CastGroup, Applicant[]>();
-            foreach (var cast_group in accepted_by_group.Keys)
-                rejected_by_group.Add(cast_group, applicants_rejected
+            var good_by_group = good_applicants.GroupBy(a => a.CastGroup).ToDictionary(g => g.Key!, g => g.ToArray());
+            var bad_by_group = new Dictionary<CastGroup, Applicant[]>();
+            foreach (var cast_group in good_by_group.Keys)
+                bad_by_group.Add(cast_group, bad_applicants
                     .Where(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)))
                     .ToArray());
-            foreach (var cg in accepted_by_group.Keys)
-                foreach (var accepted in accepted_by_group[cg])
-                    foreach (var rejected in rejected_by_group[cg])
-                        yield return (accepted, rejected);
+            foreach (var cg in good_by_group.Keys)
+                foreach (var good in good_by_group[cg])
+                    foreach (var bad in bad_by_group[cg])
+                        yield return (good, bad);
         }
     }
 }
