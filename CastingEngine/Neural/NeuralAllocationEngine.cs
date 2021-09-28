@@ -60,7 +60,7 @@ namespace Carmen.CastingEngine.Neural
             }
             // Construct the model
             this.confirm = confirm;
-            nInputs = (suitabilityRequirements.Length + existingRoleRequirements.Length + 1) * 2;
+            nInputs = (suitabilityRequirements.Length + existingRoleRequirements.Length) * 2;
             model = new SingleLayerPerceptron(nInputs, 1, new Sigmoid(), new ClassificationError { Threshold = 0.25 }); //TODO vary classification error threshold if required
             LoadWeights();
         }
@@ -71,19 +71,17 @@ namespace Carmen.CastingEngine.Neural
             neuron.Bias = 0;
             var offset = nInputs / 2;
             var i = 0;
-            neuron.Weights[i] = 1;
-            neuron.Weights[i + offset] = -1;
             foreach (var requirement in suitabilityRequirements)
             {
-                i++;
                 neuron.Weights[i] = requirement.SuitabilityWeight;
                 neuron.Weights[i + offset] = -requirement.SuitabilityWeight;
+                i++;
             }
             foreach (var requirement in existingRoleRequirements)
             {
-                i++;
                 neuron.Weights[i] = -requirement.ExistingRoleCost / 100;
                 neuron.Weights[i + offset] = requirement.ExistingRoleCost / 100;
+                i++;
             }
         }
 
@@ -92,25 +90,23 @@ namespace Carmen.CastingEngine.Neural
             var values = new double[nInputs];
             var offset = nInputs / 2;
             var i = 0;
-            values[i] = ApplicantEngine.OverallAbility(a);
-            values[i + offset] = ApplicantEngine.OverallAbility(b);
             foreach (var requirement in suitabilityRequirements)
             {
-                i++;
                 if (role.Requirements.Contains(requirement))
                 {
                     values[i] = ApplicantEngine.SuitabilityOf(a, requirement);
                     values[i + offset] = ApplicantEngine.SuitabilityOf(b, requirement);
                 }
+                i++;
             }
             foreach (var requirement in existingRoleRequirements)
             {
-                i++;
                 if (role.Requirements.Contains((Requirement)requirement))
                 {
                     values[i] = CountRoles(a, requirement.Criteria, role);
                     values[i + offset] = CountRoles(b, requirement.Criteria, role);
                 }
+                i++;
             }
             return values;
         }
@@ -118,7 +114,7 @@ namespace Carmen.CastingEngine.Neural
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
             double score = ApplicantEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
-            double max = 1;
+            double max = 1;//TODO should this still include overal suitability?
             foreach (var requirement in suitabilityRequirements)
                 if (role.Requirements.Contains(requirement))
                 {
@@ -156,7 +152,7 @@ namespace Carmen.CastingEngine.Neural
 
         public override void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
         {
-            if (nInputs == 2) // no requirements, only overall suitability
+            if (nInputs == 0)
                 return; // nothing to do
             // Generate training data
             var not_picked_array = applicants_not_picked.ToArray();
@@ -188,11 +184,11 @@ namespace Carmen.CastingEngine.Neural
             for (var n = 0; n < new_raw.Length; n++)
                 new_raw[n] = (neuron.Weights[n] + -neuron.Weights[n + new_raw.Length]) / 2;
             var any_change = false;
-            var i = 1;
+            var i = 0;
             var changes = new List<WeightChange>();
             foreach (var requirement in suitabilityRequirements)
             {
-                var new_weight = new_raw[i] / new_raw[0]; // normalise compared to an overall mark of 1
+                var new_weight = new_raw[i];
                 if (new_weight < 0)
                     new_weight = 0;
                 string description;
@@ -213,7 +209,7 @@ namespace Carmen.CastingEngine.Neural
             }
             foreach (var requirement in existingRoleRequirements)
             {
-                var new_cost = -100 * new_raw[i] / new_raw[0]; // normalise compared to an overall mark of 1
+                var new_cost = -100 * new_raw[i];
                 if (new_cost < 0)
                     new_cost = 0;
                 if (new_cost > 100)
@@ -237,7 +233,6 @@ namespace Carmen.CastingEngine.Neural
             if (any_change)
             {
                 var msg = "CARMEN's neural network has detected an improvement to the Requirement weights. Would you like to update them?";
-                msg += "\nOverall Ability: 1.0";
                 foreach (var change in changes.OrderBy(c => c.Requirement.Order))
                     msg += "\n" + change.Description;
                 if (confirm(msg))
