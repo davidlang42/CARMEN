@@ -154,6 +154,8 @@ namespace Carmen.CastingEngine.Neural
         {
             if (nInputs == 0)
                 return; // nothing to do
+            if (role.Requirements.Count(r => suitabilityRequirements.Contains(r)) == 0)
+                return; // nothing to do
             // Generate training data
             var not_picked_array = applicants_not_picked.ToArray();
             if (not_picked_array.Length == 0)
@@ -174,24 +176,24 @@ namespace Carmen.CastingEngine.Neural
                 MaxIterations = MaxTrainingIterations
             };
             var m = trainer.Train(training_pairs.Keys, training_pairs.Values);
-            UpdateWeights();
+            UpdateWeights(role);
         }
 
-        private void UpdateWeights()
+        private void UpdateWeights(Role role)
         {
             var neuron = model.Layer.Neurons[0];
             var new_raw = new double[nInputs / 2];
             for (var n = 0; n < new_raw.Length; n++)
                 new_raw[n] = (neuron.Weights[n] + -neuron.Weights[n + new_raw.Length]) / 2;
-            var old_sum = suitabilityRequirements.Sum(r => r.SuitabilityWeight);
-            var new_sum = new_raw.Take(suitabilityRequirements.Length).Sum();
+            var old_sum = suitabilityRequirements.Where(r => role.Requirements.Contains(r)).Sum(r => r.SuitabilityWeight);
+            var new_sum = new_raw.Zip(suitabilityRequirements).Where(p => role.Requirements.Contains(p.Second)).Sum(p => p.First);
             var weight_ratio = old_sum / new_sum;
             var any_change = false;
             var i = 0;
             var changes = new List<WeightChange>();
             foreach (var requirement in suitabilityRequirements)
             {
-                var new_weight = new_raw[i] * weight_ratio;
+                var new_weight = role.Requirements.Contains(requirement) ? new_raw[i] * weight_ratio : requirement.SuitabilityWeight;
                 if (new_weight < 0)
                     new_weight = 0;
                 string description;
@@ -212,7 +214,7 @@ namespace Carmen.CastingEngine.Neural
             }
             foreach (var requirement in existingRoleRequirements)
             {
-                var new_cost = -100 * new_raw[i];
+                var new_cost = role.Requirements.Contains((Requirement)requirement) ? -100 * new_raw[i] : requirement.ExistingRoleCost;
                 if (new_cost < 0)
                     new_cost = 0;
                 if (new_cost > 100)
