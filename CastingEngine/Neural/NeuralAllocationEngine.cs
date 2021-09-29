@@ -61,7 +61,7 @@ namespace Carmen.CastingEngine.Neural
             // Construct the model
             this.confirm = confirm;
             nInputs = (suitabilityRequirements.Length + existingRoleRequirements.Length + 1) * 2;
-            model = new SingleLayerPerceptron(nInputs, 1, new Sigmoid(), new ClassificationError { Threshold = 0.25 }); //TODO vary classification error threshold if required
+            model = new SingleLayerPerceptron(nInputs, 1, new Sigmoid(), new ClassificationError { Threshold = 0.5 }); //TODO vary classification error threshold if required
             LoadWeights();
         }
 
@@ -92,8 +92,9 @@ namespace Carmen.CastingEngine.Neural
             var values = new double[nInputs];
             var offset = nInputs / 2;
             var i = 0;
-            values[i] = ApplicantEngine.OverallSuitability(a);
-            values[i + offset] = ApplicantEngine.OverallSuitability(b);
+            var excluding_criterias = role.Requirements.OfType<ICriteriaRequirement>().Select(r => r.Criteria).ToHashSet();
+            values[i] = OverallSuitabilityHack(a, excluding_criterias);
+            values[i + offset] = OverallSuitabilityHack(b, excluding_criterias);
             foreach (var requirement in suitabilityRequirements)
             {
                 i++;
@@ -113,6 +114,25 @@ namespace Carmen.CastingEngine.Neural
                 }
             }
             return values;
+        }
+
+        private double OverallSuitabilityHack(Applicant applicant, HashSet<Criteria> excluding_criterias)
+        {
+            double max = ApplicantEngine.MaxOverallAbility;
+            double min = ApplicantEngine.MinOverallAbility;
+            double sum = 0;
+            foreach (var a in applicant.Abilities)
+            {
+                if (!excluding_criterias.Contains(a.Criteria))
+                    sum += (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight;
+                else if (a.Criteria.Weight > 0)
+                    max -= a.Criteria.Weight;
+                else if (a.Criteria.Weight < 0)
+                    min -= a.Criteria.Weight;
+            }
+            if (sum == 0)
+                return 0; // if sum is 0, (max-min) might be 0
+            return (sum - min) / (max - min);
         }
 
         public override double SuitabilityOf(Applicant applicant, Role role)
