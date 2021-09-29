@@ -211,13 +211,15 @@ namespace Carmen.CastingEngine.Neural
                 new_raw[n] = (neuron.Weights[n] + -neuron.Weights[n + new_raw.Length]) / 2;
             var old_sum = suitabilityRequirements.Where(r => role.Requirements.Contains(r)).Sum(r => r.SuitabilityWeight);
             var new_sum = new_raw.Skip(1).Zip(suitabilityRequirements).Where(p => role.Requirements.Contains(p.Second)).Sum(p => p.First);
-            var weight_ratio = old_sum / new_sum;
+            var weight_ratio = new_sum / old_sum;
             var any_change = false;
+            if (new_raw[0] <= 0)
+                new_raw[0] = 1;
             var i = 1;
             var changes = new List<WeightChange>();
             foreach (var requirement in suitabilityRequirements)
             {
-                var new_weight = (role.Requirements.Contains(requirement) ? new_raw[i] : requirement.SuitabilityWeight / weight_ratio) / new_raw[0]; // normalise compared to an overall mark of 1
+                var new_weight = (role.Requirements.Contains(requirement) ? new_raw[i] : requirement.SuitabilityWeight * weight_ratio) / new_raw[0]; // normalise compared to an overall mark of 1
                 if (new_weight <= 0)
                     new_weight = 0.01;
                 string description;
@@ -236,9 +238,12 @@ namespace Carmen.CastingEngine.Neural
                 });
                 i++;
             }
+            old_sum = existingRoleRequirements.Where(r => role.Requirements.Contains((Requirement)r)).Sum(r => r.ExistingRoleCost);
+            new_sum = new_raw.Skip(1).Skip(suitabilityRequirements.Length).Zip(existingRoleRequirements).Where(p => role.Requirements.Contains((Requirement)p.Second)).Select(p => -100 * p.First).Where(c => c > 0).Sum();
+            var cost_ratio = new_sum / old_sum;
             foreach (var requirement in existingRoleRequirements)
             {
-                var new_cost = role.Requirements.Contains((Requirement)requirement) ? -100 * new_raw[i] : requirement.ExistingRoleCost;
+                var new_cost = (role.Requirements.Contains((Requirement)requirement) ? -100 * new_raw[i] : requirement.ExistingRoleCost * cost_ratio) / weight_ratio / new_raw[0];
                 if (new_cost <= 0)
                     new_cost = 0.01;
                 if (new_cost > 100)
