@@ -61,7 +61,7 @@ namespace Carmen.CastingEngine.Neural
             // Construct the model
             this.confirm = confirm;
             nInputs = (suitabilityRequirements.Length + existingRoleRequirements.Length) * 2;
-            model = new SingleLayerPerceptron(nInputs, 1, new Sigmoid(), new MeanSquaredError());
+            model = new SingleLayerPerceptron(nInputs, 1, new Sigmoid(), new ClassificationError { Threshold = 0.5 });
             LoadWeights();
         }
 
