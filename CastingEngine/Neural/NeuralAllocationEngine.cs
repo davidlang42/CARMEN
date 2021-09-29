@@ -218,8 +218,8 @@ namespace Carmen.CastingEngine.Neural
             foreach (var requirement in suitabilityRequirements)
             {
                 var new_weight = role.Requirements.Contains(requirement) ? new_raw[i] / new_raw[0] : requirement.SuitabilityWeight; // normalise compared to an overall mark of 1
-                if (new_weight < 0)
-                    new_weight = 0;
+                if (new_weight <= 0)
+                    new_weight = 0.01;
                 string description;
                 if (Math.Abs(new_weight - requirement.SuitabilityWeight) > MINIMUM_CHANGE)
                 {
@@ -238,9 +238,9 @@ namespace Carmen.CastingEngine.Neural
             }
             foreach (var requirement in existingRoleRequirements)
             {
-                var new_cost = role.Requirements.Contains((Requirement)requirement) ? -100 * new_raw[i] / new_raw[0] : requirement.ExistingRoleCost; // normalise compared to an overall mark of 1
-                if (new_cost < 0)
-                    new_cost = 0;
+                var new_cost = role.Requirements.Contains((Requirement)requirement) ? -100 * new_raw[i] : requirement.ExistingRoleCost;
+                if (new_cost <= 0)
+                    new_cost = 0.01;
                 if (new_cost > 100)
                     new_cost = 100;
                 string description;
