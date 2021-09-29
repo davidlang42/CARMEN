@@ -210,14 +210,14 @@ namespace Carmen.CastingEngine.Neural
             for (var n = 0; n < new_raw.Length; n++)
                 new_raw[n] = (neuron.Weights[n] + -neuron.Weights[n + new_raw.Length]) / 2;
             var old_sum = suitabilityRequirements.Where(r => role.Requirements.Contains(r)).Sum(r => r.SuitabilityWeight);
-            var new_sum = new_raw.Zip(suitabilityRequirements).Where(p => role.Requirements.Contains(p.Second)).Sum(p => p.First);
+            var new_sum = new_raw.Skip(1).Zip(suitabilityRequirements).Where(p => role.Requirements.Contains(p.Second)).Sum(p => p.First);
             var weight_ratio = old_sum / new_sum;
             var any_change = false;
             var i = 1;
             var changes = new List<WeightChange>();
             foreach (var requirement in suitabilityRequirements)
             {
-                var new_weight = role.Requirements.Contains(requirement) ? new_raw[i] / new_raw[0] : requirement.SuitabilityWeight; // normalise compared to an overall mark of 1
+                var new_weight = (role.Requirements.Contains(requirement) ? new_raw[i] : requirement.SuitabilityWeight / weight_ratio) / new_raw[0]; // normalise compared to an overall mark of 1
                 if (new_weight <= 0)
                     new_weight = 0.01;
                 string description;
