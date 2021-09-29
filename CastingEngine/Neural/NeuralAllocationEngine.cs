@@ -92,8 +92,8 @@ namespace Carmen.CastingEngine.Neural
             var values = new double[nInputs];
             var offset = nInputs / 2;
             var i = 0;
-            values[i] = ApplicantEngine.OverallAbility(a);
-            values[i + offset] = ApplicantEngine.OverallAbility(b);
+            values[i] = ApplicantEngine.OverallSuitability(a);
+            values[i + offset] = ApplicantEngine.OverallSuitability(b);
             foreach (var requirement in suitabilityRequirements)
             {
                 i++;
