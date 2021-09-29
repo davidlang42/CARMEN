@@ -243,7 +243,7 @@ namespace Carmen.CastingEngine.Neural
             var cost_ratio = new_sum / old_sum;
             foreach (var requirement in existingRoleRequirements)
             {
-                var new_cost = (role.Requirements.Contains((Requirement)requirement) ? -100 * new_raw[i] : requirement.ExistingRoleCost * cost_ratio) / weight_ratio / new_raw[0];
+                var new_cost = (role.Requirements.Contains((Requirement)requirement) ? -100 * new_raw[i] : requirement.ExistingRoleCost * weight_ratio) / new_raw[0];
                 if (new_cost <= 0)
                     new_cost = 0.01;
                 if (new_cost > 100)
