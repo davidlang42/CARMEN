@@ -15,6 +15,9 @@ namespace Carmen.CastingEngine.Neural
 {
     public class NeuralAllocationEngine : HeuristicAllocationEngine, IComparer<(Applicant, Role)> //LATER don't extend HeuristicAllocationEngine
     {
+        //TODO should these be settings?
+        const int MAXIMUM_OVERALL_FACTOR_CHANGE = 10; // don't let the overall weight change by more than this factor in either direction
+
         const double MINIMUM_CHANGE = 0.1;
 
         readonly Requirement[] suitabilityRequirements;
@@ -203,23 +206,72 @@ namespace Carmen.CastingEngine.Neural
             UpdateWeights(role);
         }
 
+        /// <summary>Find the average of the matching pairs between the first half of the
+        /// Neuron weights and the second half. Returned array will have half the length.</summary>
+        private static double[] AverageOfPairedWeights(Neuron neuron)
+        {
+            var averages = new double[neuron.Weights.Length / 2];
+            for (var n = 0; n < averages.Length; n++)
+                averages[n] = (neuron.Weights[n] + -neuron.Weights[n + averages.Length]) / 2;
+            return averages;
+        }
+
+        private (double, double[], double[]) SplitWeights(double[] weights)
+        {
+            var results = weights.Split(new[] { 1, suitabilityRequirements.Length, existingRoleRequirements.Length });
+            return (results[0][0], results[1], results[2]);
+        }
+
+        private static void LimitValue(ref double value, double min, double max)
+        {
+            if (value <= 0)
+                value = 1;
+            return;
+            //TODO this case didn't exist before, test and make sure its okay
+            if (value < min)
+                value = min;
+            else if (value > max)
+                value = max;
+        }
+
+        private double RelevantWeightIncreaseFactor(double[] raw_suitability_weights, Role role)
+        {
+            double old_sum = 0;
+            double new_sum = 0;
+            for (var i = 0; i < suitabilityRequirements.Length; i++)
+            {
+                if (role.Requirements.Contains(suitabilityRequirements[i]))
+                {
+                    // relevant requirement
+                    old_sum += suitabilityRequirements[i].SuitabilityWeight;
+                    new_sum += raw_suitability_weights[i];
+                }
+                else
+                {
+                    // irrelevant requirement
+                    //TODO might need to do something here to include irrelavnt weights and/or overall weight of 1 (or new value?)
+                }
+            }
+            return new_sum / old_sum;
+        }
+
         private void UpdateWeights(Role role)
         {
-            var neuron = model.Layer.Neurons[0];
-            var new_raw = new double[nInputs / 2];
-            for (var n = 0; n < new_raw.Length; n++)
-                new_raw[n] = (neuron.Weights[n] + -neuron.Weights[n + new_raw.Length]) / 2;
-            var old_sum = suitabilityRequirements.Where(r => role.Requirements.Contains(r)).Sum(r => r.SuitabilityWeight);
-            var new_sum = new_raw.Skip(1).Zip(suitabilityRequirements).Where(p => role.Requirements.Contains(p.Second)).Sum(p => p.First);
-            var weight_ratio = new_sum / old_sum;
+            var raw_weights = AverageOfPairedWeights(model.Layer.Neurons[0]);
+
+            var (raw_overall_weight, raw_suitability_weights, raw_role_costs) = SplitWeights(raw_weights);
+
+            LimitValue(ref raw_overall_weight, 1 / MAXIMUM_OVERALL_FACTOR_CHANGE, MAXIMUM_OVERALL_FACTOR_CHANGE); //TODO what if the suitability weights also changed by a lot?
+
+            var weight_ratio = RelevantWeightIncreaseFactor(raw_suitability_weights, role);
+            
             var any_change = false;
-            if (new_raw[0] <= 0)
-                new_raw[0] = 1;
-            var i = 1;
+
             var changes = new List<WeightChange>();
-            foreach (var requirement in suitabilityRequirements)
+            for (var i = 0; i < suitabilityRequirements.Length; i++)
             {
-                var new_weight = (role.Requirements.Contains(requirement) ? new_raw[i] : requirement.SuitabilityWeight * weight_ratio) / new_raw[0]; // normalise compared to an overall mark of 1
+                var requirement = suitabilityRequirements[i];
+                var new_weight = (role.Requirements.Contains(requirement) ? raw_suitability_weights[i] : requirement.SuitabilityWeight * weight_ratio) / raw_overall_weight; // normalise compared to an overall mark of 1
                 if (new_weight <= 0)
                     new_weight = 0.01;
                 string description;
@@ -236,17 +288,15 @@ namespace Carmen.CastingEngine.Neural
                     Description = description,
                     Accept = () => requirement.SuitabilityWeight = new_weight
                 });
-                i++;
             }
-            old_sum = existingRoleRequirements.Where(r => role.Requirements.Contains((Requirement)r)).Sum(r => r.ExistingRoleCost);
-            new_sum = new_raw.Skip(1).Skip(suitabilityRequirements.Length).Zip(existingRoleRequirements).Where(p => role.Requirements.Contains((Requirement)p.Second)).Select(p => -100 * p.First).Where(c => c > 0).Sum();
-            var cost_ratio = new_sum / old_sum;
-            foreach (var requirement in existingRoleRequirements)
+
+            for (var i = 0; i < existingRoleRequirements.Length; i++)
             {
+                var requirement = existingRoleRequirements[i];
                 //TODO is the cost effectively the number of percetnage points TIMES the weight for that requirement? or TIMES the total weight? maybe thats why they look so high sometimes
                 // - the cases that are failing in unit tests (accuracy goes backwards) seem to be when a cost maxes out at 100
                 // - the math confirms: actual "cost of each role" in suitability (between 0 and 1) is -C/(1+W)
-                var new_cost = (role.Requirements.Contains((Requirement)requirement) ? -100 * new_raw[i] : requirement.ExistingRoleCost * weight_ratio) / new_raw[0];
+                var new_cost = (role.Requirements.Contains((Requirement)requirement) ? -100 * raw_role_costs[i] : requirement.ExistingRoleCost * weight_ratio) / raw_overall_weight;
                 if (new_cost <= 0)
                     new_cost = 0.01;
                 if (new_cost > 100)
@@ -265,7 +315,6 @@ namespace Carmen.CastingEngine.Neural
                     Description = description,
                     Accept = () => requirement.ExistingRoleCost = new_cost
                 });
-                i++;
             }
             if (any_change)
             {

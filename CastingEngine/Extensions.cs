@@ -136,5 +136,36 @@ namespace Carmen.CastingEngine
             }
             return original_count - queue.Count;
         }
+
+        public static T[][] Split<T>(this IEnumerable<T> sequence, int[] output_array_lengths)
+        {
+            var e = sequence.GetEnumerator();
+            var results = new T[output_array_lengths.Length][];
+            for (var r = 0; r < output_array_lengths.Length; r++)
+            {
+                results[r] = new T[output_array_lengths[r]];
+                for (var i = 0; i < output_array_lengths[r]; i++)
+                {
+                    if (!e.MoveNext())
+                        throw new ArgumentException($"Sequence was shorter than the sum of {nameof(output_array_lengths)}");
+                    results[r][i] = e.Current;
+                }
+            }
+            if (e.MoveNext())
+                throw new ArgumentException($"Sequence was longer than the sum of {nameof(output_array_lengths)}");
+            return results;
+        }
+
+        public static (T[], T[]) Split<T>(this IEnumerable<T> sequence, int array1_length, int array2_length)
+        {
+            var results = Split(sequence, new[] { array1_length, array2_length });
+            return (results[0], results[1]);
+        }
+
+        public static (T[], T[], T[]) Split<T>(this IEnumerable<T> sequence, int array1_length, int array2_length, int array3_length)
+        {
+            var results = Split(sequence, new[] { array1_length, array2_length, array3_length });
+            return (results[0], results[1], results[2]);
+        }
     }
 }
