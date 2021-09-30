@@ -258,6 +258,9 @@ namespace Carmen.CastingEngine.Neural
         private double[] NormaliseWeights(double[] raw_weights, double overall_weight)
             => raw_weights.Select(w => w / overall_weight).ToArray();
 
+        private double[] MultiplyWeights(double[] weights, double factor)
+            => weights.Select(w => w * factor).ToArray();
+
         private void UpdateWeights(Role role)
         {
             var raw_weights = AverageOfPairedWeights(model.Layer.Neurons[0]);
@@ -295,13 +298,16 @@ namespace Carmen.CastingEngine.Neural
                 });
             }
 
+            var multiplied_role_costs = MultiplyWeights(raw_role_costs, -100); //TODO currently has to be done before normalisation otherwise results change wildly (see 1996)
+            var normalised_role_costs = NormaliseWeights(multiplied_role_costs, raw_overall_weight);
+
             for (var i = 0; i < existingRoleRequirements.Length; i++)
             {
                 var requirement = existingRoleRequirements[i];
                 //TODO is the cost effectively the number of percetnage points TIMES the weight for that requirement? or TIMES the total weight? maybe thats why they look so high sometimes
                 // - the cases that are failing in unit tests (accuracy goes backwards) seem to be when a cost maxes out at 100
                 // - the math confirms: actual "cost of each role" in suitability (between 0 and 1) is -C/(1+W)
-                var new_cost = (role.Requirements.Contains((Requirement)requirement) ? -100 * raw_role_costs[i] : requirement.ExistingRoleCost * weight_ratio) / raw_overall_weight;
+                var new_cost = role.Requirements.Contains((Requirement)requirement) ? normalised_role_costs[i] : (requirement.ExistingRoleCost * weight_ratio / raw_overall_weight);
                 if (new_cost <= 0)
                     new_cost = 0.01;
                 if (new_cost > 100)
