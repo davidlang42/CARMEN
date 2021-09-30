@@ -222,16 +222,26 @@ namespace Carmen.CastingEngine.Neural
             return (results[0][0], results[1], results[2]);
         }
 
-        private static void LimitValue(ref double value, double min, double max)
+        private static void LimitValue(ref double value, double min, double? max = null)
         {
-            if (value <= 0)
-                value = 1;
-            return;
-            //TODO this case didn't exist before, test and make sure its okay
             if (value < min)
                 value = min;
-            else if (value > max)
-                value = max;
+            else if (max.HasValue && value > max)
+                value = max.Value;
+        }
+
+        private static void DeprecatedLimitOverall(ref double overall, double _, double __) //TODO remove this (replace with LimitValue)
+        {
+            if (overall <= 0)
+                overall = 1;
+        }
+
+        private static void DeprecatedLimitFromZero(ref double value, double min, double? max = null) //TODO remove this (replace with LimitValue)
+        {
+            if (value <= 0)
+                value = min;
+            else if (max.HasValue && value > max)
+                value = max.Value;
         }
 
         private double RelevantWeightIncreaseFactor(double[] raw_suitability_weights, Role role)
@@ -267,7 +277,7 @@ namespace Carmen.CastingEngine.Neural
 
             var (raw_overall_weight, raw_suitability_weights, raw_role_costs) = SplitWeights(raw_weights);
 
-            LimitValue(ref raw_overall_weight, 1 / MAXIMUM_OVERALL_FACTOR_CHANGE, MAXIMUM_OVERALL_FACTOR_CHANGE); //TODO what if the suitability weights also changed by a lot?
+            DeprecatedLimitOverall(ref raw_overall_weight, 1 / MAXIMUM_OVERALL_FACTOR_CHANGE, MAXIMUM_OVERALL_FACTOR_CHANGE); //TODO what if the suitability weights also changed by a lot?
 
             var normalised_suitability_weights = NormaliseWeights(raw_suitability_weights, raw_overall_weight);
 
@@ -280,8 +290,7 @@ namespace Carmen.CastingEngine.Neural
             {
                 var requirement = suitabilityRequirements[i];
                 var new_weight = role.Requirements.Contains(requirement) ? normalised_suitability_weights[i] : (requirement.SuitabilityWeight * weight_ratio / raw_overall_weight); // normalise compared to an overall mark of 1
-                if (new_weight <= 0)
-                    new_weight = 0.01;
+                DeprecatedLimitFromZero(ref new_weight, 0.01);
                 string description;
                 if (Math.Abs(new_weight - requirement.SuitabilityWeight) > MINIMUM_CHANGE)
                 {
@@ -308,10 +317,7 @@ namespace Carmen.CastingEngine.Neural
                 // - the cases that are failing in unit tests (accuracy goes backwards) seem to be when a cost maxes out at 100
                 // - the math confirms: actual "cost of each role" in suitability (between 0 and 1) is -C/(1+W)
                 var new_cost = role.Requirements.Contains((Requirement)requirement) ? normalised_role_costs[i] : (requirement.ExistingRoleCost * weight_ratio / raw_overall_weight);
-                if (new_cost <= 0)
-                    new_cost = 0.01;
-                if (new_cost > 100)
-                    new_cost = 100;
+                DeprecatedLimitFromZero(ref new_cost, 0.01, 100);
                 string description;
                 if (Math.Abs(new_cost - requirement.ExistingRoleCost) > MINIMUM_CHANGE)
                 {
