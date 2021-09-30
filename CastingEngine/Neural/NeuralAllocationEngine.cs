@@ -300,9 +300,6 @@ namespace Carmen.CastingEngine.Neural
             for (var i = 0; i < existingRoleRequirements.Length; i++)
             {
                 var requirement = existingRoleRequirements[i];
-                //TODO is the cost effectively the number of percetnage points TIMES the weight for that requirement? or TIMES the total weight? maybe thats why they look so high sometimes
-                // - the cases that are failing in unit tests (accuracy goes backwards) seem to be when a cost maxes out at 100
-                // - the math confirms: actual "cost of each role" in suitability (between 0 and 1) is -C/(1+W)
                 var new_cost = role.Requirements.Contains((Requirement)requirement) ? NeuronWeightToCost(normalised_role_weights[i], new_suitability_weight_sum)
                     : (NeuronWeightToCost(CostToNeuronWeight(requirement.ExistingRoleCost, old_suitability_weight_sum) * weight_ratio, new_suitability_weight_sum));
                 DeprecatedLimitFromZero(ref new_cost, 0.01, 100);
