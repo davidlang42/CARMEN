@@ -262,9 +262,6 @@ namespace Carmen.CastingEngine.Neural
         private double[] NormaliseWeights(double[] raw_weights, double overall_weight)
             => raw_weights.Select(w => w / overall_weight).ToArray();
 
-        private double[] NeuronWeightsToCosts(double[] weights)
-            => weights.Select(w => NeuronWeightToCost(w)).ToArray();
-
         private static double CostToNeuronWeight(double cost)
             => -cost / 100;
 
@@ -275,7 +272,7 @@ namespace Carmen.CastingEngine.Neural
         {
             var raw_weights = AverageOfPairedWeights(model.Layer.Neurons[0]);
 
-            var (raw_overall_weight, raw_suitability_weights, raw_existing_role_weights) = SplitWeights(raw_weights);
+            var (raw_overall_weight, raw_suitability_weights, raw_role_weights) = SplitWeights(raw_weights);
 
             DeprecatedLimitOverall(ref raw_overall_weight, 1 / MAXIMUM_OVERALL_FACTOR_CHANGE, MAXIMUM_OVERALL_FACTOR_CHANGE); //TODO what if the suitability weights also changed by a lot?
 
@@ -292,8 +289,7 @@ namespace Carmen.CastingEngine.Neural
                 changes.Add(new SuitabilityWeightChange(requirement, new_weight));
             }
 
-            var role_costs = NeuronWeightsToCosts(raw_existing_role_weights); //TODO currently has to be done before normalisation otherwise results change wildly (see 1996)
-            var normalised_role_costs = NormaliseWeights(role_costs, raw_overall_weight);
+            var normalised_role_weights = NormaliseWeights(raw_role_weights, raw_overall_weight);
 
             for (var i = 0; i < existingRoleRequirements.Length; i++)
             {
@@ -301,7 +297,7 @@ namespace Carmen.CastingEngine.Neural
                 //TODO is the cost effectively the number of percetnage points TIMES the weight for that requirement? or TIMES the total weight? maybe thats why they look so high sometimes
                 // - the cases that are failing in unit tests (accuracy goes backwards) seem to be when a cost maxes out at 100
                 // - the math confirms: actual "cost of each role" in suitability (between 0 and 1) is -C/(1+W)
-                var new_cost = role.Requirements.Contains((Requirement)requirement) ? normalised_role_costs[i] : (requirement.ExistingRoleCost * weight_ratio);
+                var new_cost = role.Requirements.Contains((Requirement)requirement) ? NeuronWeightToCost(normalised_role_weights[i]) : (requirement.ExistingRoleCost * weight_ratio);
                 DeprecatedLimitFromZero(ref new_cost, 0.01, 100);
                 changes.Add(new ExistingRoleCostChange(requirement, new_cost));
             }
