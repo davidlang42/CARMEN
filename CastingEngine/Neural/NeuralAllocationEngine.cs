@@ -74,7 +74,7 @@ namespace Carmen.CastingEngine.Neural
             var i = 0;
             neuron.Weights[i] = 1;
             neuron.Weights[i + offset] = -1;
-            double suitability_weight_sum = 0;
+            double suitability_weight_sum = 1;
             foreach (var requirement in suitabilityRequirements)
             {
                 i++;
@@ -247,9 +247,8 @@ namespace Carmen.CastingEngine.Neural
 
         private double RelevantWeightIncreaseFactor(double[] normalised_suitability_weights, Role role)
         {
-            //TODO these need to take into account overall
-            double old_sum = 0;
-            double new_sum = 0;
+            double old_sum = 1;
+            double new_sum = 1;
             for (var i = 0; i < suitabilityRequirements.Length; i++)
             {
                 if (role.Requirements.Contains(suitabilityRequirements[i])) // requirement is relevant to this role
