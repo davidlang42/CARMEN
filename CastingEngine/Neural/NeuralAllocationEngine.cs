@@ -18,8 +18,6 @@ namespace Carmen.CastingEngine.Neural
         //TODO should these be settings?
         const int MAXIMUM_OVERALL_FACTOR_CHANGE = 10; // don't let the overall weight change by more than this factor in either direction
 
-        const double MINIMUM_CHANGE = 0.1;
-
         readonly Requirement[] suitabilityRequirements;
         readonly ICriteriaRequirement[] existingRoleRequirements;
         readonly SingleLayerPerceptron model;
@@ -282,29 +280,14 @@ namespace Carmen.CastingEngine.Neural
             var normalised_suitability_weights = NormaliseWeights(raw_suitability_weights, raw_overall_weight);
 
             var weight_ratio = RelevantWeightIncreaseFactor(raw_suitability_weights, role);
-            
-            var any_change = false;
 
-            var changes = new List<WeightChange>();
+            var changes = new List<IWeightChange>();
             for (var i = 0; i < suitabilityRequirements.Length; i++)
             {
                 var requirement = suitabilityRequirements[i];
-                var new_weight = role.Requirements.Contains(requirement) ? normalised_suitability_weights[i] : (requirement.SuitabilityWeight * weight_ratio / raw_overall_weight); // normalise compared to an overall mark of 1
+                var new_weight = role.Requirements.Contains(requirement) ? normalised_suitability_weights[i] : (requirement.SuitabilityWeight * weight_ratio / raw_overall_weight);
                 DeprecatedLimitFromZero(ref new_weight, 0.01);
-                string description;
-                if (Math.Abs(new_weight - requirement.SuitabilityWeight) > MINIMUM_CHANGE)
-                {
-                    description = $"\n{requirement.Name}: {new_weight:0.0} (previously {requirement.SuitabilityWeight:0.0})";
-                    any_change = true;
-                }
-                else
-                    description = $"\n{requirement.Name}: {requirement.SuitabilityWeight:0.0}";
-                changes.Add(new()
-                {
-                    Requirement = requirement,
-                    Description = description,
-                    Accept = () => requirement.SuitabilityWeight = new_weight
-                });
+                changes.Add(new SuitabilityWeightChange(requirement, new_weight));
             }
 
             var multiplied_role_costs = MultiplyWeights(raw_role_costs, -100); //TODO currently has to be done before normalisation otherwise results change wildly (see 1996)
@@ -318,22 +301,9 @@ namespace Carmen.CastingEngine.Neural
                 // - the math confirms: actual "cost of each role" in suitability (between 0 and 1) is -C/(1+W)
                 var new_cost = role.Requirements.Contains((Requirement)requirement) ? normalised_role_costs[i] : (requirement.ExistingRoleCost * weight_ratio / raw_overall_weight);
                 DeprecatedLimitFromZero(ref new_cost, 0.01, 100);
-                string description;
-                if (Math.Abs(new_cost - requirement.ExistingRoleCost) > MINIMUM_CHANGE)
-                {
-                    description = $"\nEach '{requirement.Name}' role reduces suitability by: {new_cost:0.0}% (previously {requirement.ExistingRoleCost:0.0}%)";
-                    any_change = true;
-                }
-                else
-                    description = $"\nEach '{requirement.Name}' role reduces suitability by: {requirement.ExistingRoleCost:0.0}%";
-                changes.Add(new()
-                {
-                    Requirement = requirement,
-                    Description = description,
-                    Accept = () => requirement.ExistingRoleCost = new_cost
-                });
+                changes.Add(new ExistingRoleCostChange(requirement, new_cost));
             }
-            if (any_change)
+            if (changes.Any(c => c.Significant))
             {
                 var msg = "CARMEN's neural network has detected an improvement to the Requirement weights. Would you like to update them?";
                 msg += "\nOverall Ability: 1.0";
@@ -346,11 +316,62 @@ namespace Carmen.CastingEngine.Neural
             LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
         }
 
-        private struct WeightChange
+        private interface IWeightChange
         {
-            public IOrdered Requirement;
-            public string Description;
-            public Action Accept;
+            protected const double MINIMUM_CHANGE = 0.1;
+
+            public IOrdered Requirement { get; }
+            public string Description { get; }
+            public bool Significant { get; }
+            public void Accept();
+        }
+
+        public class SuitabilityWeightChange : IWeightChange
+        {
+            readonly Requirement requirement;
+            readonly double newWeight;
+
+            public IOrdered Requirement => requirement;
+            public string Description => Significant
+                ? $"\n{requirement.Name}: {newWeight:0.0} (previously {requirement.SuitabilityWeight:0.0})"
+                : $"\n{requirement.Name}: {requirement.SuitabilityWeight:0.0}";
+            public bool Significant { get; init; }
+
+            public SuitabilityWeightChange(Requirement requirement, double new_weight)
+            {
+                this.requirement = requirement;
+                newWeight = new_weight;
+                Significant = Math.Abs(newWeight - requirement.SuitabilityWeight) > IWeightChange.MINIMUM_CHANGE;
+            }
+
+            public void Accept()
+            {
+                requirement.SuitabilityWeight = newWeight;
+            }
+        }
+
+        public class ExistingRoleCostChange : IWeightChange
+        {
+            readonly ICriteriaRequirement requirement;
+            readonly double newCost;
+
+            public IOrdered Requirement => requirement;
+            public string Description => Significant
+                ? $"\nEach '{requirement.Name}' role reduces suitability by: {newCost:0.0}% (previously {requirement.ExistingRoleCost:0.0}%)"
+                : $"\nEach '{requirement.Name}' role reduces suitability by: {requirement.ExistingRoleCost:0.0}%";
+            public bool Significant { get; init; }
+
+            public ExistingRoleCostChange(ICriteriaRequirement requirement, double new_cost)
+            {
+                this.requirement = requirement;
+                newCost = new_cost;
+                Significant = Math.Abs(newCost - requirement.ExistingRoleCost) > IWeightChange.MINIMUM_CHANGE;
+            }
+
+            public void Accept()
+            {
+                requirement.ExistingRoleCost = newCost;
+            }
         }
     }
 }
