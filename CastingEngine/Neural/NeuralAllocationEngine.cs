@@ -243,7 +243,7 @@ namespace Carmen.CastingEngine.Neural
                 value = max.Value;
         }
 
-        private double RelevantWeightIncreaseFactor(double[] raw_suitability_weights, Role role)
+        private double RelevantWeightIncreaseFactor(double[] normalised_suitability_weights, Role role)
         {
             //TODO these need to take into account overall
             double old_sum = 0;
@@ -253,7 +253,7 @@ namespace Carmen.CastingEngine.Neural
                 if (role.Requirements.Contains(suitabilityRequirements[i])) // requirement is relevant to this role
                 {
                     old_sum += suitabilityRequirements[i].SuitabilityWeight;
-                    new_sum += raw_suitability_weights[i];
+                    new_sum += normalised_suitability_weights[i];
                 }
             }
             return new_sum / old_sum;
@@ -281,15 +281,13 @@ namespace Carmen.CastingEngine.Neural
 
             var normalised_suitability_weights = NormaliseWeights(raw_suitability_weights, raw_overall_weight);
 
-            //TODO use normalised_suitability_weights (once raw_overall_weight is divided in this call)
-            var weight_ratio = RelevantWeightIncreaseFactor(raw_suitability_weights, role);
+            var weight_ratio = RelevantWeightIncreaseFactor(normalised_suitability_weights, role);
 
             var changes = new List<IWeightChange>();
             for (var i = 0; i < suitabilityRequirements.Length; i++)
             {
                 var requirement = suitabilityRequirements[i];
-                //TODO move raw_overall_weight into weight_ratio
-                var new_weight = role.Requirements.Contains(requirement) ? normalised_suitability_weights[i] : (requirement.SuitabilityWeight * weight_ratio / raw_overall_weight);
+                var new_weight = role.Requirements.Contains(requirement) ? normalised_suitability_weights[i] : (requirement.SuitabilityWeight * weight_ratio);
                 DeprecatedLimitFromZero(ref new_weight, 0.01);
                 changes.Add(new SuitabilityWeightChange(requirement, new_weight));
             }
@@ -303,9 +301,7 @@ namespace Carmen.CastingEngine.Neural
                 //TODO is the cost effectively the number of percetnage points TIMES the weight for that requirement? or TIMES the total weight? maybe thats why they look so high sometimes
                 // - the cases that are failing in unit tests (accuracy goes backwards) seem to be when a cost maxes out at 100
                 // - the math confirms: actual "cost of each role" in suitability (between 0 and 1) is -C/(1+W)
-
-                //TODO move raw_overall_weight into weight_ratio (once this line isn't so flimsy)
-                var new_cost = role.Requirements.Contains((Requirement)requirement) ? normalised_role_costs[i] : (requirement.ExistingRoleCost * weight_ratio / raw_overall_weight);
+                var new_cost = role.Requirements.Contains((Requirement)requirement) ? normalised_role_costs[i] : (requirement.ExistingRoleCost * weight_ratio);
                 DeprecatedLimitFromZero(ref new_cost, 0.01, 100);
                 changes.Add(new ExistingRoleCostChange(requirement, new_cost));
             }
