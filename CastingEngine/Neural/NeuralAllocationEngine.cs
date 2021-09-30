@@ -83,8 +83,9 @@ namespace Carmen.CastingEngine.Neural
             foreach (var requirement in existingRoleRequirements)
             {
                 i++;
-                neuron.Weights[i] = -requirement.ExistingRoleCost / 100;
-                neuron.Weights[i + offset] = requirement.ExistingRoleCost / 100;
+                var weight = CostToNeuronWeight(requirement.ExistingRoleCost);
+                neuron.Weights[i] = weight;
+                neuron.Weights[i + offset] = -weight;
             }
         }
 
@@ -261,14 +262,20 @@ namespace Carmen.CastingEngine.Neural
         private double[] NormaliseWeights(double[] raw_weights, double overall_weight)
             => raw_weights.Select(w => w / overall_weight).ToArray();
 
-        private double[] MultiplyWeights(double[] weights, double factor)
-            => weights.Select(w => w * factor).ToArray();
+        private double[] NeuronWeightsToCosts(double[] weights)
+            => weights.Select(w => NeuronWeightToCost(w)).ToArray();
+
+        private static double CostToNeuronWeight(double cost)
+            => -cost / 100;
+
+        private static double NeuronWeightToCost(double neuron_weight)
+            => -neuron_weight * 100;
 
         private void UpdateWeights(Role role)
         {
             var raw_weights = AverageOfPairedWeights(model.Layer.Neurons[0]);
 
-            var (raw_overall_weight, raw_suitability_weights, raw_role_costs) = SplitWeights(raw_weights);
+            var (raw_overall_weight, raw_suitability_weights, raw_existing_role_weights) = SplitWeights(raw_weights);
 
             DeprecatedLimitOverall(ref raw_overall_weight, 1 / MAXIMUM_OVERALL_FACTOR_CHANGE, MAXIMUM_OVERALL_FACTOR_CHANGE); //TODO what if the suitability weights also changed by a lot?
 
@@ -287,8 +294,8 @@ namespace Carmen.CastingEngine.Neural
                 changes.Add(new SuitabilityWeightChange(requirement, new_weight));
             }
 
-            var multiplied_role_costs = MultiplyWeights(raw_role_costs, -100); //TODO currently has to be done before normalisation otherwise results change wildly (see 1996)
-            var normalised_role_costs = NormaliseWeights(multiplied_role_costs, raw_overall_weight);
+            var role_costs = NeuronWeightsToCosts(raw_existing_role_weights); //TODO currently has to be done before normalisation otherwise results change wildly (see 1996)
+            var normalised_role_costs = NormaliseWeights(role_costs, raw_overall_weight);
 
             for (var i = 0; i < existingRoleRequirements.Length; i++)
             {
