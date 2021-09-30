@@ -237,14 +237,6 @@ namespace Carmen.CastingEngine.Neural
                 overall = 1;
         }
 
-        private static void DeprecatedLimitFromZero(ref double value, double min, double? max = null) //TODO remove this (replace with LimitValue)
-        {
-            if (value <= 0)
-                value = min;
-            else if (max.HasValue && value > max)
-                value = max.Value;
-        }
-
         private double RelevantWeightIncreaseFactor(double[] normalised_suitability_weights, Role role)
         {
             double old_sum = 1;
@@ -291,7 +283,7 @@ namespace Carmen.CastingEngine.Neural
                 var new_weight = role.Requirements.Contains(requirement) ? normalised_suitability_weights[i]
                     : (requirement.SuitabilityWeight * weight_ratio);
                 new_suitability_weight_sum += new_weight;
-                DeprecatedLimitFromZero(ref new_weight, 0.01);
+                LimitValue(ref new_weight, 0.01);
                 changes.Add(new SuitabilityWeightChange(requirement, new_weight));
             }
 
@@ -302,7 +294,7 @@ namespace Carmen.CastingEngine.Neural
                 var requirement = existingRoleRequirements[i];
                 var new_cost = role.Requirements.Contains((Requirement)requirement) ? NeuronWeightToCost(normalised_role_weights[i], new_suitability_weight_sum)
                     : (NeuronWeightToCost(CostToNeuronWeight(requirement.ExistingRoleCost, old_suitability_weight_sum) * weight_ratio, new_suitability_weight_sum));
-                DeprecatedLimitFromZero(ref new_cost, 0.01, 100);
+                LimitValue(ref new_cost, 0.01, 100);
                 changes.Add(new ExistingRoleCostChange(requirement, new_cost));
             }
 
