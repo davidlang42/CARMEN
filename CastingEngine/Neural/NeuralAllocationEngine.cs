@@ -333,8 +333,8 @@ namespace Carmen.CastingEngine.Neural
 
             public IOrdered Requirement => requirement;
             public string Description => Significant
-                ? $"\n{requirement.Name}: {newWeight:0.0} (previously {requirement.SuitabilityWeight:0.0})"
-                : $"\n{requirement.Name}: {requirement.SuitabilityWeight:0.0}";
+                ? $"{requirement.Name}: {newWeight:0.0} (previously {requirement.SuitabilityWeight:0.0})"
+                : $"{requirement.Name}: {requirement.SuitabilityWeight:0.0}";
             public bool Significant { get; init; }
 
             public SuitabilityWeightChange(Requirement requirement, double new_weight)
@@ -357,8 +357,8 @@ namespace Carmen.CastingEngine.Neural
 
             public IOrdered Requirement => requirement;
             public string Description => Significant
-                ? $"\nEach '{requirement.Name}' role reduces suitability by: {newCost:0.0}% (previously {requirement.ExistingRoleCost:0.0}%)"
-                : $"\nEach '{requirement.Name}' role reduces suitability by: {requirement.ExistingRoleCost:0.0}%";
+                ? $"Each '{requirement.Name}' role reduces suitability by: {newCost:0.0}% (previously {requirement.ExistingRoleCost:0.0}%)"
+                : $"Each '{requirement.Name}' role reduces suitability by: {requirement.ExistingRoleCost:0.0}%";
             public bool Significant { get; init; }
 
             public ExistingRoleCostChange(ICriteriaRequirement requirement, double new_cost)
