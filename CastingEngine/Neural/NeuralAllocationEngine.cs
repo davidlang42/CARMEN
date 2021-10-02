@@ -74,18 +74,16 @@ namespace Carmen.CastingEngine.Neural
             var i = 0;
             neuron.Weights[i] = 1;
             neuron.Weights[i + offset] = -1;
-            double suitability_weight_sum = 1;
             foreach (var requirement in suitabilityRequirements)
             {
                 i++;
-                suitability_weight_sum += requirement.SuitabilityWeight;
                 neuron.Weights[i] = requirement.SuitabilityWeight;
                 neuron.Weights[i + offset] = -requirement.SuitabilityWeight;
             }
             foreach (var requirement in existingRoleRequirements)
             {
                 i++;
-                var weight = CostToNeuronWeight(requirement.ExistingRoleCost, suitability_weight_sum);
+                var weight = CostToNeuronWeight(requirement.ExistingRoleCost, ((Requirement)requirement).SuitabilityWeight);
                 neuron.Weights[i] = weight;
                 neuron.Weights[i + offset] = -weight;
             }
@@ -131,7 +129,7 @@ namespace Carmen.CastingEngine.Neural
                 }
             foreach (var requirement in existingRoleRequirements)
                 if (role.Requirements.Contains((Requirement)requirement))
-                    score -= requirement.ExistingRoleCost / 100 * CountRoles(applicant, requirement.Criteria, role);
+                    score -= requirement.ExistingRoleCost / 100 * CountRoles(applicant, requirement.Criteria, role); //TODO measure cost out of requirement suitability
             return score / max;
         }
 
@@ -235,11 +233,11 @@ namespace Carmen.CastingEngine.Neural
         private double[] NormaliseWeights(double[] raw_weights, double overall_weight)
             => raw_weights.Select(w => w / overall_weight).ToArray();
 
-        private static double CostToNeuronWeight(double cost, double suitability_weight_sum)
-            => -cost * suitability_weight_sum / 100;
+        private static double CostToNeuronWeight(double cost, double suitability_weight)
+            => -cost * suitability_weight / 100;
 
-        private static double NeuronWeightToCost(double neuron_weight, double suitability_weight_sum)
-            => -neuron_weight / suitability_weight_sum * 100;
+        private static double NeuronWeightToCost(double neuron_weight, double suitability_weight)
+            => -neuron_weight / suitability_weight * 100;
 
         private void UpdateWeights(Role role)
         {
@@ -253,8 +251,7 @@ namespace Carmen.CastingEngine.Neural
 
             var weight_ratio = RelevantWeightIncreaseFactor(normalised_suitability_weights, role);
 
-            var old_suitability_weight_sum = 1 + suitabilityRequirements.Sum(r => r.SuitabilityWeight);
-            double new_suitability_weight_sum = 1;
+            var new_weights = new Dictionary<ICriteriaRequirement, double>();
 
             var changes = new List<IWeightChange>();
             for (var i = 0; i < suitabilityRequirements.Length; i++)
@@ -262,7 +259,8 @@ namespace Carmen.CastingEngine.Neural
                 var requirement = suitabilityRequirements[i];
                 var new_weight = role.Requirements.Contains(requirement) ? normalised_suitability_weights[i]
                     : (requirement.SuitabilityWeight * weight_ratio);
-                new_suitability_weight_sum += new_weight;
+                if (requirement is ICriteriaRequirement criteria_requirement)
+                    new_weights.Add(criteria_requirement, new_weight);
                 LimitValue(ref new_weight, 0.01);
                 changes.Add(new SuitabilityWeightChange(requirement, new_weight));
             }
@@ -272,8 +270,8 @@ namespace Carmen.CastingEngine.Neural
             for (var i = 0; i < existingRoleRequirements.Length; i++)
             {
                 var requirement = existingRoleRequirements[i];
-                var new_cost = role.Requirements.Contains((Requirement)requirement) ? NeuronWeightToCost(normalised_role_weights[i], new_suitability_weight_sum)
-                    : (NeuronWeightToCost(CostToNeuronWeight(requirement.ExistingRoleCost, old_suitability_weight_sum) * weight_ratio, new_suitability_weight_sum));
+                var new_cost = role.Requirements.Contains((Requirement)requirement) ? NeuronWeightToCost(normalised_role_weights[i], new_weights[requirement])
+                    : (NeuronWeightToCost(CostToNeuronWeight(requirement.ExistingRoleCost, ((Requirement)requirement).SuitabilityWeight) * weight_ratio, new_weights[requirement]));
                 LimitValue(ref new_cost, 0.01, 100);
                 changes.Add(new ExistingRoleCostChange(requirement, new_cost));
             }
