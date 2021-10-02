@@ -248,16 +248,16 @@ namespace Carmen.CastingEngine.Neural
                 EnsurePositive(ref neuron.Weights[i]);
                 EnsureNegative(ref neuron.Weights[i + offset]);
             }
-            //foreach (var requirement in existingRoleRequirements)
-            //{
-            //    i++;
-            //    EnsureNegative(ref neuron.Weights[i]);
-            //    EnsurePositive(ref neuron.Weights[i + offset]);
-            //}
+            foreach (var requirement in existingRoleRequirements)
+            {
+                i++;
+                EnsureNegative(ref neuron.Weights[i], 0.001);
+                EnsurePositive(ref neuron.Weights[i + offset], 0.001);
+            }
         }
 
-        private void EnsurePositive(ref double value) => LimitValue(ref value, min: 0.01);
-        private void EnsureNegative(ref double value) => LimitValue(ref value, max: -0.01);
+        private void EnsurePositive(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, min: minimum_magnitude);
+        private void EnsureNegative(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, max: -minimum_magnitude);
 
         private void UpdateWeights(Role role)
         {
