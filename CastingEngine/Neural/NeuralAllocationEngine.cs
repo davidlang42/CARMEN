@@ -201,10 +201,10 @@ namespace Carmen.CastingEngine.Neural
             return (results[0][0], results[1], results[2]);
         }
 
-        private static void LimitValue(ref double value, double min, double? max = null)
+        private static void LimitValue(ref double value, double? min = null, double? max = null)
         {
-            if (value < min)
-                value = min;
+            if (min.HasValue && value < min)
+                value = min.Value;
             else if (max.HasValue && value > max)
                 value = max.Value;
         }
@@ -241,15 +241,36 @@ namespace Carmen.CastingEngine.Neural
 
         public double OverallWeight { get; set; } = 1; //TODO persist this in show model
 
+        private void EnsureCorrectPolarities(Neuron neuron)
+        {
+            neuron.Bias = 0;
+            var offset = nInputs / 2;
+            var i = 0;
+            EnsurePositive(ref neuron.Weights[i]);
+            EnsureNegative(ref neuron.Weights[i + offset]);
+            foreach (var requirement in suitabilityRequirements)
+            {
+                i++;
+                EnsurePositive(ref neuron.Weights[i]);
+                EnsureNegative(ref neuron.Weights[i + offset]);
+            }
+            //foreach (var requirement in existingRoleRequirements)
+            //{
+            //    i++;
+            //    EnsureNegative(ref neuron.Weights[i]);
+            //    EnsurePositive(ref neuron.Weights[i + offset]);
+            //}
+        }
+
+        private void EnsurePositive(ref double value) => LimitValue(ref value, min: 0.01);
+        private void EnsureNegative(ref double value) => LimitValue(ref value, max: -0.01);
+
         private void UpdateWeights(Role role)
         {
+            EnsureCorrectPolarities(model.Layer.Neurons[0]);
             var raw_weights = AverageOfPairedWeights(model.Layer.Neurons[0]);
 
             var (raw_overall_weight, raw_suitability_weights, raw_role_weights) = SplitWeights(raw_weights);
-
-            //TODO what if the suitability weights also changed by a lot?
-            //DeprecatedLimitOverall(ref raw_overall_weight, 1 / MAXIMUM_OVERALL_FACTOR_CHANGE, MAXIMUM_OVERALL_FACTOR_CHANGE);
-            LimitValue(ref raw_overall_weight, 0.01);
 
             var weight_ratio = RelevantWeightIncreaseFactor(raw_suitability_weights, raw_overall_weight, role);
 
@@ -269,7 +290,6 @@ namespace Carmen.CastingEngine.Neural
                     : requirement.SuitabilityWeight;
                 if (requirement is ICriteriaRequirement criteria_requirement)
                     new_weights.Add(criteria_requirement, new_weight);
-                LimitValue(ref new_weight, 0.01);
                 changes.Add(new SuitabilityWeightChange(requirement, new_weight));
             }
 
