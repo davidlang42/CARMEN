@@ -209,12 +209,6 @@ namespace Carmen.CastingEngine.Neural
                 value = max.Value;
         }
 
-        private static void DeprecatedLimitOverall(ref double overall, double _, double __) //TODO remove this (replace with LimitValue)
-        {
-            if (overall <= 0)
-                overall = 1;
-        }
-
         private double RelevantWeightIncreaseFactor(double[] raw_suitability_weights, double raw_overall_weight, Role role)
         {
             double old_sum = OverallWeight;
