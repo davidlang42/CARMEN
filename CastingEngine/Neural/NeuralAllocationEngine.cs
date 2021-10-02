@@ -40,6 +40,9 @@ namespace Carmen.CastingEngine.Neural
         public NeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria[] criterias, Requirement[] requirements, UserConfirmation confirm)
             : base(applicant_engine, alternative_casts, criterias)
         {
+            //TODO figure out how initialize it with reasonable defaults
+            //TODO figure out how to extend / reduce an existing model for more / less requirements / etc
+            //TODO make sure that learning is slow enough that values don't flip flop on every role change
             CountRolesByGeometricMean = true; //LATER shouldn't need to set these once this doesn't extend HeuristicAllocationEngine (they should be true by default)
             CountRolesIncludingPartialRequirements = true; //LATER shouldn't need to set these once this doesn't extend HeuristicAllocationEngine (they should be true by default)
             // Find the requirements which will be used for role suitability
