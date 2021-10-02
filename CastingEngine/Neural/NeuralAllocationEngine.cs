@@ -23,12 +23,13 @@ namespace Carmen.CastingEngine.Neural
         readonly SingleLayerPerceptron model;
         readonly UserConfirmation confirm;
         readonly int nInputs;
+        readonly Dictionary<double[], double[]> trainingPairs = new();
 
         //LATER should these be abstracted into an interface maybe? something to enable arbitrary user settings to be set for an engine?
         #region Common with NeuralApplicantEngine (except for comments)
         /// <summary>The maximum number of training iterations run per invocation of
         /// <see cref="UserPickedCast(IEnumerable{Applicant}, IEnumerable{Applicant}, Role)"/></summary>
-        public int MaxTrainingIterations { get; set; } = 10; //LATER make this a user setting
+        public int MaxTrainingIterations { get; set; } = 100; //LATER make this a user setting
 
         /// <summary>The speed at which the neural network learns from results, as a fraction of the sum of
         /// <see cref="Requirement.SuitabilityWeight"/>. Reasonable values are between 0.001 and 0.01.
@@ -166,23 +167,37 @@ namespace Carmen.CastingEngine.Neural
             var not_picked_array = applicants_not_picked.ToArray();
             if (not_picked_array.Length == 0)
                 return; // nothing to do
-            var training_pairs = new Dictionary<double[], double[]>();
             foreach (var (picked, not_picked) in NeuralApplicantEngine.ComparablePairs(applicants_picked, not_picked_array))
             {
-                training_pairs.Add(InputValues(picked, not_picked, role), new[] { 1.0 });
-                training_pairs.Add(InputValues(not_picked, picked, role), new[] { 0.0 });
+                trainingPairs.Add(InputValues(picked, not_picked, role), new[] { 1.0 });
+                trainingPairs.Add(InputValues(not_picked, picked, role), new[] { 0.0 });
             }
-            if (training_pairs.Count == 0)
+            if (TrainImmediately)
+                TrainModel();
+        }
+
+        /// <summary>If true, <see cref="TrainModel"/> will be called whenever
+        /// <see cref="UserPickedCast(IEnumerable{Applicant}, IEnumerable{Applicant}, Role)"/> is called</summary>
+        public bool TrainImmediately { get; set; } = false; //LATER setting
+
+        /// <summary>If true, training data will kept after calling <see cref="TrainModel"/>
+        /// to be used again in future training</summary>
+        public bool StockpileTrainingData { get; set; } = true; //LATER setting
+
+        public void TrainModel() //TODO make CarmenUI call TrainModel() at some point, or Dispose or something
+        {
+            if (trainingPairs.Count == 0)
                 return; // nothing to do
-            // Train the model
             model.LearningRate = NeuralLearningRate * suitabilityRequirements.Sum(r => r.SuitabilityWeight);
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
                 MaxIterations = MaxTrainingIterations
             };
-            var m = trainer.Train(training_pairs.Keys, training_pairs.Values);
-            UpdateWeights(role);
+            var m = trainer.Train(trainingPairs.Keys, trainingPairs.Values);
+            UpdateWeights();
+            if (!StockpileTrainingData)
+                trainingPairs.Clear();
         }
 
         /// <summary>Find the average of the matching pairs between the first half of the
@@ -207,21 +222,6 @@ namespace Carmen.CastingEngine.Neural
                 value = min.Value;
             else if (max.HasValue && value > max)
                 value = max.Value;
-        }
-
-        private double RelevantWeightIncreaseFactor(double[] raw_suitability_weights, double raw_overall_weight, Role role)
-        {
-            double old_sum = OverallWeight;
-            double new_sum = raw_overall_weight;
-            for (var i = 0; i < suitabilityRequirements.Length; i++)
-            {
-                if (role.Requirements.Contains(suitabilityRequirements[i])) // requirement is relevant to this role
-                {
-                    old_sum += suitabilityRequirements[i].SuitabilityWeight;
-                    new_sum += raw_suitability_weights[i];
-                }
-            }
-            return new_sum / old_sum;
         }
 
         private double[] NormaliseWeights(double[] raw_weights, double weight_ratio)
@@ -259,14 +259,16 @@ namespace Carmen.CastingEngine.Neural
         private void EnsurePositive(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, min: minimum_magnitude);
         private void EnsureNegative(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, max: -minimum_magnitude);
 
-        private void UpdateWeights(Role role)
+        private void UpdateWeights()
         {
             EnsureCorrectPolarities(model.Layer.Neurons[0]);
             var raw_weights = AverageOfPairedWeights(model.Layer.Neurons[0]);
 
             var (raw_overall_weight, raw_suitability_weights, raw_role_weights) = SplitWeights(raw_weights);
 
-            var weight_ratio = RelevantWeightIncreaseFactor(raw_suitability_weights, raw_overall_weight, role);
+            var new_sum = raw_overall_weight + raw_suitability_weights.Sum();
+            var old_sum = OverallWeight + suitabilityRequirements.Sum(r => r.SuitabilityWeight);
+            var weight_ratio = new_sum / old_sum;
 
             var normalised_suitability_weights = NormaliseWeights(raw_suitability_weights, weight_ratio);
             var normalised_overall_weight = raw_overall_weight / weight_ratio;
@@ -280,8 +282,7 @@ namespace Carmen.CastingEngine.Neural
             for (var i = 0; i < suitabilityRequirements.Length; i++)
             {
                 var requirement = suitabilityRequirements[i];
-                var new_weight = role.Requirements.Contains(requirement) ? normalised_suitability_weights[i]
-                    : requirement.SuitabilityWeight;
+                var new_weight = normalised_suitability_weights[i];
                 if (requirement is ICriteriaRequirement criteria_requirement)
                     new_weights.Add(criteria_requirement, new_weight);
                 changes.Add(new SuitabilityWeightChange(requirement, new_weight));
@@ -292,8 +293,7 @@ namespace Carmen.CastingEngine.Neural
             for (var i = 0; i < existingRoleRequirements.Length; i++)
             {
                 var requirement = existingRoleRequirements[i];
-                var new_cost = role.Requirements.Contains((Requirement)requirement) ? NeuronWeightToCost(normalised_role_weights[i], new_weights[requirement])
-                    : requirement.ExistingRoleCost;
+                var new_cost = NeuronWeightToCost(normalised_role_weights[i], new_weights[requirement]);
                 LimitValue(ref new_cost, 0.01, 100);
                 changes.Add(new ExistingRoleCostChange(requirement, new_cost));
             }
