@@ -125,16 +125,18 @@ namespace Carmen.CastingEngine.Neural
             var i = 0;
             neuron.Weights[i] = showRoot.OverallSuitabilityWeight;
             neuron.Weights[i + offset] = -showRoot.OverallSuitabilityWeight;
+            double weight_sum = showRoot.OverallSuitabilityWeight;
             foreach (var requirement in suitabilityRequirements)
             {
                 i++;
                 neuron.Weights[i] = requirement.SuitabilityWeight;
                 neuron.Weights[i + offset] = -requirement.SuitabilityWeight;
+                weight_sum += requirement.SuitabilityWeight;
             }
             foreach (var requirement in existingRoleRequirements)
             {
                 i++;
-                var weight = CostToWeight(requirement.ExistingRoleCost, ((Requirement)requirement).SuitabilityWeight);
+                var weight = CostToWeight(requirement.ExistingRoleCost, requirement.SuitabilityWeight, weight_sum);
                 neuron.Weights[i] = weight;
                 neuron.Weights[i + offset] = -weight;
             }
@@ -156,13 +158,13 @@ namespace Carmen.CastingEngine.Neural
                     values[i + offset] = ApplicantEngine.SuitabilityOf(b, requirement);
                 }
             }
-            foreach (var requirement in existingRoleRequirements)
+            foreach (var cr in existingRoleRequirements)
             {
                 i++;
-                if (role.Requirements.Contains((Requirement)requirement))
+                if (role.Requirements.Contains((Requirement)cr))
                 {
-                    values[i] = CountRoles(a, requirement.Criteria, role);
-                    values[i + offset] = CountRoles(b, requirement.Criteria, role);
+                    values[i] = CountRoles(a, cr.Criteria, role);
+                    values[i + offset] = CountRoles(b, cr.Criteria, role);
                 }
             }
             return values;
@@ -181,9 +183,9 @@ namespace Carmen.CastingEngine.Neural
 
             var normalised_suitability_weights = NormaliseWeights(raw_suitability_weights, weight_ratio);
             var normalised_overall_weight = raw_overall_weight / weight_ratio;
-            
-            var new_weights = new Dictionary<ICriteriaRequirement, double>();
+            var normalised_role_weights = NormaliseWeights(raw_role_weights, weight_ratio);
 
+            var new_weights = new Dictionary<ICriteriaRequirement, double>();
             var changes = new List<IWeightChange>
             {
                 new OverallWeightChange(showRoot, normalised_overall_weight)
@@ -196,13 +198,10 @@ namespace Carmen.CastingEngine.Neural
                     new_weights.Add(criteria_requirement, new_weight);
                 changes.Add(new SuitabilityWeightChange(requirement, new_weight));
             }
-
-            var normalised_role_weights = NormaliseWeights(raw_role_weights, weight_ratio);
-
             for (var i = 0; i < existingRoleRequirements.Length; i++)
             {
                 var requirement = existingRoleRequirements[i];
-                var new_cost = WeightToCost(normalised_role_weights[i], new_weights[requirement]);
+                var new_cost = WeightToCost(normalised_role_weights[i], new_weights[requirement], old_sum); // after normalisation, the sum of weights will be the same as it was before
                 LimitValue(ref new_cost, 0.01, 100);
                 changes.Add(new ExistingRoleCostChange(requirement, new_cost));
             }
