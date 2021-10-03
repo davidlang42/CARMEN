@@ -42,8 +42,9 @@ namespace Carmen.CastingEngine.Base
         public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
         public abstract double SuitabilityOf(Applicant applicant, Role role);
 
-        public virtual void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
-        { }
+        public virtual bool UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role) => false;
+
+        public virtual bool Finalise() => false;
 
         public AllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts)
         {

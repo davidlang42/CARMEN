@@ -156,23 +156,25 @@ namespace Carmen.CastingEngine.Neural
                 return 0; // A == B
         }
 
-        public override void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
+        public override bool UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
         {
             if (nInputs == 2) // no requirements, only overall suitability
-                return; // nothing to do
+                return false; // nothing to do
             if (role.Requirements.Count(r => suitabilityRequirements.Contains(r)) == 0)
-                return; // nothing to do
+                return false; // nothing to do
             // Generate training data
             var not_picked_array = applicants_not_picked.ToArray();
             if (not_picked_array.Length == 0)
-                return; // nothing to do
+                return false; // nothing to do
             foreach (var (picked, not_picked) in NeuralApplicantEngine.ComparablePairs(applicants_picked, not_picked_array))
             {
                 trainingPairs.Add(InputValues(picked, not_picked, role), new[] { 1.0 });
                 trainingPairs.Add(InputValues(not_picked, picked, role), new[] { 0.0 });
             }
             if (TrainImmediately)
-                TrainModel();
+                return TrainModel();
+            else
+                return false;
         }
 
         /// <summary>If true, <see cref="TrainModel"/> will be called whenever
@@ -185,10 +187,13 @@ namespace Carmen.CastingEngine.Neural
 
         public ReloadWeights ReloadWeights { get; set; } = ReloadWeights.OnlyWhenRefused; //LATER setting
 
-        public void TrainModel() //TODO make CarmenUI call TrainModel() at some point, or Dispose or something
+        public override bool Finalise() => TrainModel();
+
+        /// <summary>Returns true if any changes are made to ShowModel objects</summary>
+        public bool TrainModel()
         {
             if (trainingPairs.Count == 0)
-                return; // nothing to do
+                return false; // nothing to do
             model.LearningRate = NeuralLearningRate * (showRoot.OverallSuitabilityWeight + suitabilityRequirements.Sum(r => r.SuitabilityWeight));
             var trainer = new ModelTrainer(model)
             {
@@ -196,9 +201,9 @@ namespace Carmen.CastingEngine.Neural
                 MaxIterations = MaxTrainingIterations
             };
             var m = trainer.Train(trainingPairs.Keys, trainingPairs.Values);
-            UpdateWeights();
             if (!StockpileTrainingData)
                 trainingPairs.Clear();
+            return UpdateWeights();
         }
 
         /// <summary>Find the average of the matching pairs between the first half of the
@@ -258,7 +263,7 @@ namespace Carmen.CastingEngine.Neural
         private void EnsurePositive(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, min: minimum_magnitude);
         private void EnsureNegative(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, max: -minimum_magnitude);
 
-        private void UpdateWeights()
+        private bool UpdateWeights()
         {
             EnsureCorrectPolarities(model.Layer.Neurons[0]);
             var raw_weights = AverageOfPairedWeights(model.Layer.Neurons[0]);
@@ -297,14 +302,19 @@ namespace Carmen.CastingEngine.Neural
                 changes.Add(new ExistingRoleCostChange(requirement, new_cost));
             }
 
+            bool show_model_updated = false;
+
             if (changes.Any(c => c.Significant))
             {
                 var msg = "CARMEN's neural network has detected an improvement to the Requirement weights. Would you like to update them?";
                 foreach (var change in changes.OrderBy(c => c.Requirement.Order))
                     msg += "\n" + change.Description;
                 if (confirm(msg))
+                {
                     foreach (var change in changes)
                         change.Accept();
+                    show_model_updated = true;
+                }
                 else if (ReloadWeights == ReloadWeights.OnlyWhenRefused)
                     LoadWeights(); // revert refused changes
                 if (ReloadWeights == ReloadWeights.OnChange)
@@ -312,6 +322,8 @@ namespace Carmen.CastingEngine.Neural
             }
             if (ReloadWeights == ReloadWeights.Always)
                 LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
+
+            return show_model_updated;
         }
 
         private interface IWeightChange

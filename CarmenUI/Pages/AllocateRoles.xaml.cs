@@ -150,11 +150,32 @@ namespace CarmenUI.Pages
                         .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
                         .Where(afr => !afr.IsSelected)
                         .Select(afr => afr.Applicant);
-                    engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
-                    //LATER if the user accepts weight changes, they should really be saved here
+                    if (engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role))
+                        SaveChanges(false);
                 }
                 ChangeToViewMode();
             }
+        }
+
+        protected override void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (e.Key == Key.S && Properties.Settings.Default.SaveOnCtrlS)
+                {
+                    if (applicantsPanel.Content is EditableRoleWithApplicantsView)
+                        SaveButton_Click(sender, e);
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Enter && Properties.Settings.Default.SaveAndExitOnCtrlEnter)
+                {
+                    SaveButton_Click(sender, e);
+                    MainMenuButton_Click(sender, e);
+                    e.Handled = true;
+                }
+            }
+            if (!e.Handled)
+                base.Window_KeyDown(sender, e);
         }
 
         private void AutoCastButton_Click(object sender, RoutedEventArgs e)
@@ -280,7 +301,12 @@ namespace CarmenUI.Pages
         }
 
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
-            => CancelChangesAndReturn();
+        {
+            if (engine.Finalise())
+                SaveChangesAndReturn();
+            else
+                CancelChangesAndReturn();
+        } 
 
         private void showApplicants_Changed(object sender, RoutedEventArgs e)
         {
@@ -335,20 +361,23 @@ namespace CarmenUI.Pages
 
         private void ListView_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.T) // Toggle
+            if (Keyboard.Modifiers == ModifierKeys.None)
             {
-                e.Handled = true;
-                PickSelectedApplicants((ListView)sender, null);
-            }
-            else if (e.Key == Key.S) // Select
-            {
-                e.Handled = true;
-                PickSelectedApplicants((ListView)sender, true);
-            }
-            else if (e.Key == Key.U) // Unselect
-            {
-                e.Handled = true;
-                PickSelectedApplicants((ListView)sender, false);
+                if (e.Key == Key.T) // Toggle
+                {
+                    e.Handled = true;
+                    PickSelectedApplicants((ListView)sender, null);
+                }
+                else if (e.Key == Key.S) // Select
+                {
+                    e.Handled = true;
+                    PickSelectedApplicants((ListView)sender, true);
+                }
+                else if (e.Key == Key.U) // Unselect
+                {
+                    e.Handled = true;
+                    PickSelectedApplicants((ListView)sender, false);
+                }
             }
         }
 
