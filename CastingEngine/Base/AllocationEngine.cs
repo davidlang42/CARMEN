@@ -23,7 +23,8 @@ namespace Carmen.CastingEngine.Base
         /// <summary>A list of available selection engines</summary>
         public static readonly Type[] Implementations = new[] {
             typeof(HeuristicAllocationEngine),
-            typeof(NeuralAllocationEngine),
+            typeof(RoleLearningAllocationEngine),
+            typeof(SessionLearningAllocationEngine),
             typeof(WeightedAverageEngine),
             typeof(DummyAllocationEngine), //LATER remove
         };
