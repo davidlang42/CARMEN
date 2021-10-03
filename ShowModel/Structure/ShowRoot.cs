@@ -81,7 +81,22 @@ namespace Carmen.ShowModel.Structure
                 OnPropertyChanged();
             }
         }
-        
+
+        private double overallSuitabilityWeight = 1;
+        /// <summary>The weighting of the OverallAbility compared to other requirement weights in
+        /// calculating the suitability of an applicant for a role.</summary>
+        public double OverallSuitabilityWeight
+        {
+            get => overallSuitabilityWeight;
+            set
+            {
+                if (overallSuitabilityWeight == value)
+                    return;
+                overallSuitabilityWeight = value;
+                OnPropertyChanged();
+            }
+        }
+
         public override InnerNode? Parent
         {
             get => null;

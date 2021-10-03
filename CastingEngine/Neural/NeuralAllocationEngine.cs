@@ -17,6 +17,7 @@ namespace Carmen.CastingEngine.Neural
     {
         readonly Requirement[] suitabilityRequirements;
         readonly ICriteriaRequirement[] existingRoleRequirements;
+        readonly ShowRoot showRoot;
         readonly SingleLayerPerceptron model;
         readonly UserConfirmation confirm;
         readonly int nInputs;
@@ -34,14 +35,12 @@ namespace Carmen.CastingEngine.Neural
         public double NeuralLearningRate { get; set; } = 0.005; //LATER make this a user setting
         #endregion
 
-        public NeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria[] criterias, Requirement[] requirements, UserConfirmation confirm)
+        public NeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria[] criterias, Requirement[] requirements, ShowRoot showRoot, UserConfirmation confirm)
             : base(applicant_engine, alternative_casts, criterias)
         {
-            //TODO figure out how initialize it with reasonable defaults
-            //TODO figure out how to extend / reduce an existing model for more / less requirements / etc
-            //TODO make sure that learning is slow enough that values don't flip flop on every role change
             CountRolesByGeometricMean = true; //LATER shouldn't need to set these once this doesn't extend HeuristicAllocationEngine (they should be true by default)
             CountRolesIncludingPartialRequirements = true; //LATER shouldn't need to set these once this doesn't extend HeuristicAllocationEngine (they should be true by default)
+            this.showRoot = showRoot;
             // Find the requirements which will be used for role suitability
             suitabilityRequirements = requirements.Where(r => r.SuitabilityWeight != 0).ToArray(); // exclude requirements with zero weight
             if (suitabilityRequirements.Length == 0 && requirements.Length != 0)
@@ -73,8 +72,8 @@ namespace Carmen.CastingEngine.Neural
             neuron.Bias = 0;
             var offset = nInputs / 2;
             var i = 0;
-            neuron.Weights[i] = OverallWeight;
-            neuron.Weights[i + offset] = -OverallWeight;
+            neuron.Weights[i] = showRoot.OverallSuitabilityWeight;
+            neuron.Weights[i + offset] = -showRoot.OverallSuitabilityWeight;
             foreach (var requirement in suitabilityRequirements)
             {
                 i++;
@@ -235,8 +234,6 @@ namespace Carmen.CastingEngine.Neural
         private static double NeuronWeightToCost(double neuron_weight, double suitability_weight)
             => -neuron_weight / suitability_weight * 100;
 
-        public double OverallWeight { get; set; } = 1; //TODO persist this in show model
-
         private void EnsureCorrectPolarities(Neuron neuron)
         {
             neuron.Bias = 0;
@@ -269,7 +266,7 @@ namespace Carmen.CastingEngine.Neural
             var (raw_overall_weight, raw_suitability_weights, raw_role_weights) = SplitWeights(raw_weights);
 
             var new_sum = raw_overall_weight + raw_suitability_weights.Sum();
-            var old_sum = OverallWeight + suitabilityRequirements.Sum(r => r.SuitabilityWeight);
+            var old_sum = showRoot.OverallSuitabilityWeight + suitabilityRequirements.Sum(r => r.SuitabilityWeight);
             var weight_ratio = new_sum / old_sum;
 
             var normalised_suitability_weights = NormaliseWeights(raw_suitability_weights, weight_ratio);
@@ -279,7 +276,7 @@ namespace Carmen.CastingEngine.Neural
 
             var changes = new List<IWeightChange>
             {
-                new OverallWeightChange(this, normalised_overall_weight)
+                new OverallWeightChange(showRoot, normalised_overall_weight)
             };
             for (var i = 0; i < suitabilityRequirements.Length; i++)
             {
@@ -329,14 +326,14 @@ namespace Carmen.CastingEngine.Neural
 
         public class OverallWeightChange : IWeightChange, IOrdered
         {
-            readonly NeuralAllocationEngine engine;
+            readonly ShowRoot showRoot;
             readonly double newWeight;
 
             public IOrdered Requirement { get; init; }
 
             public string Description => Significant
-                ? $"Overall Ability: {newWeight:0.0} (previously {engine.OverallWeight:0.0})"
-                : $"Overall Ability: {engine.OverallWeight:0.0}";
+                ? $"Overall Ability: {newWeight:0.0} (previously {showRoot.OverallSuitabilityWeight:0.0})"
+                : $"Overall Ability: {showRoot.OverallSuitabilityWeight:0.0}";
 
             public bool Significant { get; init; }
 
@@ -348,15 +345,15 @@ namespace Carmen.CastingEngine.Neural
 
             public void Accept()
             {
-                engine.OverallWeight = newWeight;
+                showRoot.OverallSuitabilityWeight = newWeight;
             }
 
-            public OverallWeightChange(NeuralAllocationEngine engine, double new_weight)
+            public OverallWeightChange(ShowRoot show_root, double new_weight)
             {
                 Requirement = this;
-                this.engine = engine;
+                showRoot = show_root;
                 newWeight = new_weight;
-                Significant = Math.Abs(newWeight - engine.OverallWeight) > IWeightChange.MINIMUM_CHANGE;
+                Significant = Math.Abs(newWeight - show_root.OverallSuitabilityWeight) > IWeightChange.MINIMUM_CHANGE;
             }
         }
 
