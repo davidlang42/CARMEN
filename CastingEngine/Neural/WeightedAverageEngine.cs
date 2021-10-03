@@ -38,6 +38,8 @@ namespace Carmen.CastingEngine.Neural
             }
             foreach (var cr in role.Requirements.OfType<ICriteriaRequirement>())
                 score -= CostToWeight(cr.ExistingRoleCost, cr.SuitabilityWeight, max) * CountRoles(applicant, cr.Criteria, role);
+            if (score <= 0)
+                return 0;
             return score / max;
         }
 
