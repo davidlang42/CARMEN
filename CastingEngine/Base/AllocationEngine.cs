@@ -71,7 +71,7 @@ namespace Carmen.CastingEngine.Base
 
         public virtual bool UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role) => false;
 
-        public virtual bool Finalise() => false;
+        public virtual bool ExportChanges() => false;
 
         /// <summary>Return a list of the best cast to pick for the role, based on suitability. If a role has no requirements,
         /// the default implementation selects other alternative casts by matching cast number, if possible.

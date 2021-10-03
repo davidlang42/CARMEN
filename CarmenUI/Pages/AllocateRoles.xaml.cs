@@ -303,7 +303,7 @@ namespace CarmenUI.Pages
 
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            if (engine.Finalise())
+            if (engine.ExportChanges())
                 SaveChangesAndReturn();
             else
                 CancelChangesAndReturn();

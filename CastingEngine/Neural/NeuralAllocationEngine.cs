@@ -50,7 +50,7 @@ namespace Carmen.CastingEngine.Neural
         {
             // Find the requirements which will be used for role suitability
             suitabilityRequirements = requirements.Where(r => r.SuitabilityWeight != 0).ToArray(); // exclude requirements with zero weight
-            if (suitabilityRequirements.Length == 0 && requirements.Length != 0)
+            if (suitabilityRequirements.Length == 0 && requirements.Length != 0) //TODO i'm not sure modifying is a good idea, unless maybe we confirm first?
             {
                 // if all have zero weight, initialise them to 1
                 suitabilityRequirements = requirements;
@@ -62,7 +62,7 @@ namespace Carmen.CastingEngine.Neural
             if (existingRoleRequirements.Length == 0 && requirements.OfType<ICriteriaRequirement>().Any())
             {
                 // if all have zero weight, initialise them to 1%
-                existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().ToArray();
+                existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().ToArray(); //TODO i'm not sure modifying is a good idea, unless maybe we confirm first?
                 foreach (var requirement in existingRoleRequirements)
                     requirement.ExistingRoleCost = 1; // each role subtracts 1% suitability
             }
@@ -95,8 +95,9 @@ namespace Carmen.CastingEngine.Neural
                 return false;
         }
 
-        /// <summary>Returns true if any changes are made to ShowModel objects</summary>
-        public override bool Finalise() => TrainModel();
+        /// <summary>Trains the model with any test data which has been supplied.
+        /// Returns true if any changes are made to ShowModel objects</summary>
+        public override bool ExportChanges() => TrainModel();
 
         /// <summary>Returns true if any changes are made to ShowModel objects</summary>
         public bool TrainModel()
