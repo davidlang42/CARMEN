@@ -184,6 +184,8 @@ namespace Carmen.CastingEngine.Neural
         /// to be used again in future training</summary>
         public bool StockpileTrainingData { get; set; } = true; //LATER setting
 
+        public ReloadWeights ReloadWeights { get; set; } = ReloadWeights.OnlyWhenRefused; //LATER setting
+
         public void TrainModel() //TODO make CarmenUI call TrainModel() at some point, or Dispose or something
         {
             if (trainingPairs.Count == 0)
@@ -306,9 +308,13 @@ namespace Carmen.CastingEngine.Neural
                 if (confirm(msg))
                     foreach (var change in changes)
                         change.Accept();
+                else if (ReloadWeights == ReloadWeights.OnlyWhenRefused)
+                    LoadWeights(); // revert refused changes
+                if (ReloadWeights == ReloadWeights.OnChange)
+                    LoadWeights(); // revert refused changes, update neurons with normalised weights
             }
-
-            LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
+            if (ReloadWeights == ReloadWeights.Always)
+                LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
         }
 
         private interface IWeightChange
