@@ -71,6 +71,8 @@ namespace Carmen.CastingEngine.Neural
                 training_pairs.Add(InputValues(picked, not_picked, role), new[] { 1.0 });
                 training_pairs.Add(InputValues(not_picked, picked, role), new[] { 0.0 });
             }
+            if (!training_pairs.Any())
+                return false; // nothing to do
             var changes = TrainingPairsAdded(training_pairs, role);
             if (changes.Any())
                 return UpdateWeights(changes);

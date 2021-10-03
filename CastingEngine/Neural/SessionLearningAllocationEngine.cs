@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Neural
 {
-    public class SessionLearningNeuralAllocationEngine : NeuralAllocationEngine
+    public class SessionLearningAllocationEngine : NeuralAllocationEngine
     {
         readonly Dictionary<double[], double[]> trainingPairs = new();
 
@@ -22,7 +22,7 @@ namespace Carmen.CastingEngine.Neural
         public bool StockpileTrainingData { get; set; } = true;
         #endregion
 
-        public SessionLearningNeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
+        public SessionLearningAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
             : base(applicant_engine, alternative_casts, show_root, requirements, confirm)
         { }
 
@@ -34,16 +34,20 @@ namespace Carmen.CastingEngine.Neural
             if (TrainImmediately)
                 return TrainModel();
             else
-                return Enumerable.Empty<IWeightChange>();
+                return Enumerable.Empty<IWeightChange>(); // do it later
         }
 
-        protected override IEnumerable<IWeightChange> FinaliseTraining() => TrainModel();
+        protected override IEnumerable<IWeightChange> FinaliseTraining()
+        {
+            if (trainingPairs.Any())
+                return TrainModel();
+            else
+                return Enumerable.Empty<IWeightChange>(); // nothing to do
+        }
 
         /// <summary>Returns true if any changes are made to ShowModel objects</summary>
         private IEnumerable<IWeightChange> TrainModel()
         {
-            if (trainingPairs.Count == 0)
-                return Enumerable.Empty<IWeightChange>(); // nothing to do
             //LATER learning rate and loss function should probably be part of the trainer rather than the network
             model.LearningRate = NeuralLearningRate * (showRoot.OverallSuitabilityWeight + suitabilityRequirements.Sum(r => r.SuitabilityWeight));
             model.LossFunction = NeuralLossFunction switch
