@@ -120,7 +120,7 @@ namespace Carmen.CastingEngine.Neural
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
             double score = ApplicantEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
-            double max = 1;//TODO use overall weight
+            double max = showRoot.OverallSuitabilityWeight;
             foreach (var requirement in suitabilityRequirements)
                 if (role.Requirements.Contains(requirement))
                 {
@@ -129,7 +129,7 @@ namespace Carmen.CastingEngine.Neural
                 }
             foreach (var requirement in existingRoleRequirements)
                 if (role.Requirements.Contains((Requirement)requirement))
-                    score -= requirement.ExistingRoleCost / 100 * CountRoles(applicant, requirement.Criteria, role); //TODO measure cost out of requirement suitability
+                    score -= requirement.ExistingRoleCost / 100 * CountRoles(applicant, requirement.Criteria, role) * ((Requirement)requirement).SuitabilityWeight;
             return score / max;
         }
 
