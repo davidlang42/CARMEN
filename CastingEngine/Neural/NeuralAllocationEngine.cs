@@ -15,6 +15,7 @@ namespace Carmen.CastingEngine.Neural
 {
     public class NeuralAllocationEngine : WeightedAverageEngine, IComparer<(Applicant, Role)>
     {
+        readonly bool includeOverall;
         readonly Requirement[] suitabilityRequirements;
         readonly ICriteriaRequirement[] existingRoleRequirements;
         readonly SingleLayerPerceptron model;
@@ -43,41 +44,30 @@ namespace Carmen.CastingEngine.Neural
 
         /// <summary>Determines when the updated weights are reloaded into the neural network.</summary>
         public ReloadWeights ReloadWeights { get; set; } = ReloadWeights.OnlyWhenRefused;
+
+        /// <summary>Determines which loss function is used when training the neural network.</summary>
+        public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_4;
         #endregion
 
         public NeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
             : base(applicant_engine, alternative_casts, show_root)
         {
+            // Determine if overall suitability will be used
+            includeOverall = show_root.OverallSuitabilityWeight != 0; // zero means disabled
             // Find the requirements which will be used for role suitability
-            suitabilityRequirements = requirements.Where(r => r.SuitabilityWeight != 0).ToArray(); // exclude requirements with zero weight
-            if (suitabilityRequirements.Length == 0 && requirements.Length != 0) //TODO i'm not sure modifying is a good idea, unless maybe we confirm first?
-            {
-                // if all have zero weight, initialise them to 1
-                suitabilityRequirements = requirements;
-                foreach (var requirement in suitabilityRequirements)
-                    requirement.SuitabilityWeight = 1; // equal weighting to overall suitability
-            }
+            suitabilityRequirements = requirements.Where(r => r.SuitabilityWeight != 0).ToArray(); // zero means disabled
             // Find the requirements which will detract based on existing roles
-            existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().Where(r => r.ExistingRoleCost != 0).ToArray(); // exclude requirements with zero weight
-            if (existingRoleRequirements.Length == 0 && requirements.OfType<ICriteriaRequirement>().Any())
-            {
-                // if all have zero weight, initialise them to 1%
-                existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().ToArray(); //TODO i'm not sure modifying is a good idea, unless maybe we confirm first?
-                foreach (var requirement in existingRoleRequirements)
-                    requirement.ExistingRoleCost = 1; // each role subtracts 1% suitability
-            }
+            existingRoleRequirements = requirements.OfType<ICriteriaRequirement>().Where(r => r.SuitabilityWeight != 0 && r.ExistingRoleCost != 0).ToArray(); // zero means disabled
             // Construct the model
             this.confirm = confirm;
-            nInputs = (suitabilityRequirements.Length + existingRoleRequirements.Length + 1) * 2;
-            model = new SingleLayerPerceptron(nInputs, 1, new Sigmoid(), new ClassificationError { Threshold = 0.4 });
+            nInputs = (suitabilityRequirements.Length + existingRoleRequirements.Length + (includeOverall ? 1 : 0)) * 2;
+            model = new SingleLayerPerceptron(nInputs, 1, new Sigmoid()); // sigmoid output is between 0 and 1, crossing at 0.5
             LoadWeights();
         }
 
         #region Business logic
         public override bool UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
         {
-            if (nInputs == 2) // no requirements, only overall suitability
-                return false; // nothing to do
             if (role.Requirements.Count(r => suitabilityRequirements.Contains(r)) == 0)
                 return false; // nothing to do
             // Generate training data
@@ -104,7 +94,18 @@ namespace Carmen.CastingEngine.Neural
         {
             if (trainingPairs.Count == 0)
                 return false; // nothing to do
+            //LATER learning rate and loss function should probably be part of the trainer rather than the network
             model.LearningRate = NeuralLearningRate * (showRoot.OverallSuitabilityWeight + suitabilityRequirements.Sum(r => r.SuitabilityWeight));
+            model.LossFunction = NeuralLossFunction switch
+            {
+                LossFunctionChoice.MeanSquaredError => new MeanSquaredError(),
+                LossFunctionChoice.Classification0_5 => new ClassificationError { Threshold = 0.5 },
+                LossFunctionChoice.Classification0_4 => new ClassificationError { Threshold = 0.4 },
+                LossFunctionChoice.Classification0_3 => new ClassificationError { Threshold = 0.3 },
+                LossFunctionChoice.Classification0_2 => new ClassificationError { Threshold = 0.2 },
+                LossFunctionChoice.Classification0_1 => new ClassificationError { Threshold = 0.1 },
+                _ => throw new NotImplementedException($"Enum not implemented: {NeuralLossFunction}")
+            };
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
@@ -124,22 +125,27 @@ namespace Carmen.CastingEngine.Neural
             neuron.Bias = 0;
             var offset = nInputs / 2;
             var i = 0;
-            neuron.Weights[i] = showRoot.OverallSuitabilityWeight;
-            neuron.Weights[i + offset] = -showRoot.OverallSuitabilityWeight;
-            double weight_sum = showRoot.OverallSuitabilityWeight;
+            double weight_sum = 0;
+            if (includeOverall)
+            {
+                neuron.Weights[i] = showRoot.OverallSuitabilityWeight;
+                neuron.Weights[i + offset] = -showRoot.OverallSuitabilityWeight;
+                weight_sum += showRoot.OverallSuitabilityWeight;
+                i++;
+            }
             foreach (var requirement in suitabilityRequirements)
             {
-                i++;
                 neuron.Weights[i] = requirement.SuitabilityWeight;
                 neuron.Weights[i + offset] = -requirement.SuitabilityWeight;
                 weight_sum += requirement.SuitabilityWeight;
+                i++;
             }
             foreach (var requirement in existingRoleRequirements)
             {
-                i++;
                 var weight = CostToWeight(requirement.ExistingRoleCost, requirement.SuitabilityWeight, weight_sum);
                 neuron.Weights[i] = weight;
                 neuron.Weights[i + offset] = -weight;
+                i++;
             }
         }
 
@@ -148,25 +154,29 @@ namespace Carmen.CastingEngine.Neural
             var values = new double[nInputs];
             var offset = nInputs / 2;
             var i = 0;
-            values[i] = ApplicantEngine.OverallSuitability(a);
-            values[i + offset] = ApplicantEngine.OverallSuitability(b);
+            if (includeOverall)
+            {
+                values[i] = ApplicantEngine.OverallSuitability(a);
+                values[i + offset] = ApplicantEngine.OverallSuitability(b);
+                i++;
+            }
             foreach (var requirement in suitabilityRequirements)
             {
-                i++;
                 if (role.Requirements.Contains(requirement))
                 {
                     values[i] = ApplicantEngine.SuitabilityOf(a, requirement);
                     values[i + offset] = ApplicantEngine.SuitabilityOf(b, requirement);
                 }
+                i++;
             }
             foreach (var cr in existingRoleRequirements)
             {
-                i++;
                 if (role.Requirements.Contains((Requirement)cr))
                 {
                     values[i] = CountRoles(a, cr.Criteria, role);
                     values[i + offset] = CountRoles(b, cr.Criteria, role);
                 }
+                i++;
             }
             return values;
         }
@@ -183,14 +193,15 @@ namespace Carmen.CastingEngine.Neural
             var weight_ratio = new_sum / old_sum;
 
             var normalised_suitability_weights = NormaliseWeights(raw_suitability_weights, weight_ratio);
-            var normalised_overall_weight = raw_overall_weight / weight_ratio;
             var normalised_role_weights = NormaliseWeights(raw_role_weights, weight_ratio);
 
             var new_weights = new Dictionary<ICriteriaRequirement, double>();
-            var changes = new List<IWeightChange>
+            var changes = new List<IWeightChange>();
+            if (includeOverall)
             {
-                new OverallWeightChange(showRoot, normalised_overall_weight)
-            };
+                var normalised_overall_weight = raw_overall_weight / weight_ratio;
+                changes.Add(new OverallWeightChange(showRoot, normalised_overall_weight));
+            }
             for (var i = 0; i < suitabilityRequirements.Length; i++)
             {
                 var requirement = suitabilityRequirements[i];
@@ -284,8 +295,9 @@ namespace Carmen.CastingEngine.Neural
 
         private (double, double[], double[]) SplitWeights(double[] weights)
         {
-            var results = weights.Split(new[] { 1, suitabilityRequirements.Length, existingRoleRequirements.Length });
-            return (results[0][0], results[1], results[2]);
+            var results = weights.Split(new[] { includeOverall ? 1 : 0, suitabilityRequirements.Length, existingRoleRequirements.Length });
+            var overall = includeOverall ? results[0][0] : 0;
+            return (overall, results[1], results[2]);
         }
 
         private void EnsureCorrectPolarities(Neuron neuron)
