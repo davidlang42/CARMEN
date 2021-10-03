@@ -15,9 +15,6 @@ namespace Carmen.CastingEngine.Neural
 {
     public class NeuralAllocationEngine : HeuristicAllocationEngine, IComparer<(Applicant, Role)> //LATER don't extend HeuristicAllocationEngine
     {
-        //TODO should these be settings?
-        const int MAXIMUM_OVERALL_FACTOR_CHANGE = 10; // don't let the overall weight change by more than this factor in either direction
-
         readonly Requirement[] suitabilityRequirements;
         readonly ICriteriaRequirement[] existingRoleRequirements;
         readonly SingleLayerPerceptron model;
