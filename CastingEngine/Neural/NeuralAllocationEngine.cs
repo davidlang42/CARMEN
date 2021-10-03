@@ -189,7 +189,7 @@ namespace Carmen.CastingEngine.Neural
         {
             if (trainingPairs.Count == 0)
                 return; // nothing to do
-            model.LearningRate = NeuralLearningRate * suitabilityRequirements.Sum(r => r.SuitabilityWeight);
+            model.LearningRate = NeuralLearningRate * (showRoot.OverallSuitabilityWeight + suitabilityRequirements.Sum(r => r.SuitabilityWeight));
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
