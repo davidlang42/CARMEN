@@ -125,7 +125,7 @@ namespace CarmenUI.Pages
                         nameof(DummyAllocationEngine) => new DummyAllocationEngine(applicant_engine, alternativeCasts),
                         nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine, alternativeCasts, criterias),
                         nameof(WeightedAverageEngine) => new WeightedAverageEngine(applicant_engine, alternativeCasts, context.ShowRoot),
-                        nameof(NeuralAllocationEngine) => new NeuralAllocationEngine(applicant_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
+                        nameof(SessionLearningNeuralAllocationEngine) => new SessionLearningNeuralAllocationEngine(applicant_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }

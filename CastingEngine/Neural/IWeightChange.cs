@@ -2,7 +2,7 @@
 
 namespace Carmen.CastingEngine.Neural
 {
-    internal interface IWeightChange
+    public interface IWeightChange
     {
         protected const double MINIMUM_CHANGE = 0.1;
 
