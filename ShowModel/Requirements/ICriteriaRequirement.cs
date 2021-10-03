@@ -14,5 +14,6 @@ namespace Carmen.ShowModel.Requirements
     {
         public Criteria Criteria { get; }
         public double ExistingRoleCost { get; set; }
+        public double SuitabilityWeight { get; set; }
     }
 }

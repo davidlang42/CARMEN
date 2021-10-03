@@ -24,27 +24,42 @@ namespace Carmen.CastingEngine.Base
         public static readonly Type[] Implementations = new[] {
             typeof(HeuristicAllocationEngine),
             typeof(NeuralAllocationEngine),
+            typeof(WeightedAverageEngine),
             typeof(DummyAllocationEngine), //LATER remove
         };
 
         public IApplicantEngine ApplicantEngine { get; init; }
 
+        protected readonly AlternativeCast[] alternativeCasts;
+
+        //LATER allow users to change these settings
+        #region Engine parameters
         /// <summary>If true, a role requiring multiple criteria will be counted as a fractical role for each criteria,
         /// equal to 1/SQRT(CriteriasRequired). If false, a role will be counted as 1 whole role for each criteria required.</summary>
-        public bool CountRolesByGeometricMean { get; set; } = true; //LATER add a setting for users to change this
+        public bool CountRolesByGeometricMean { get; set; } = true;
 
         /// <summary>If true, a role requiring one criteria or another will be counted as a fractional role for each criteria,
         /// equal to 1/CriteriaOptions. If false, criteria required as SubRequirements of an OrRequirement will be ignored.</summary>
-        public bool CountRolesIncludingPartialRequirements { get; set; } = true; //LATER add a setting for users to change this
+        public bool CountRolesIncludingPartialRequirements { get; set; } = true;
 
-        protected AlternativeCast[] alternativeCasts { get; init; }
+        /// <summary>If true, <see cref="IdealCastingOrder(ShowRoot, Applicant[])"/> will enumerate roles grouped
+        /// by non-multi section, in show order. If false, roles are considered across the entire show as one group.</summary>
+        public bool CastingOrderByNonMultiSection { get; set; } = false;
 
-        public abstract IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
-        public abstract double SuitabilityOf(Applicant applicant, Role role);
+        /// <summary>Determines how roles are prioritised based on their requirements</summary>
+        public RequirementsPriority CastingOrderByPriority { get; set; } = RequirementsPriority.AllRequirementsAtOnce;
 
-        public virtual bool UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role) => false;
+        /// <summary>Roles requiring more than this number of cast are considered group roles and may be balanced cast
+        /// with other groups as one operation.</summary>
+        public uint CastingOrderGroupThreshold { get; set; } = 8;
 
-        public virtual bool Finalise() => false;
+        /// <summary>If true, the availability of cast (ie. whether they are already cast) will be considered when counting
+        /// the eligible cast for a role. This will cause variations in the <see cref="IdealCastingOrder(ShowRoot, Applicant[])"/>
+        /// depending on previously made casting decisions.
+        /// If false, only the eligibility is considered, which makes the <see cref="IdealCastingOrder(ShowRoot, Applicant[])"/>
+        /// deterministic based on the roles, irrespective of previous casting decisions.</summary>
+        public bool CastingOrderConsiderAvailability { get; set; } = true;
+        #endregion
 
         public AllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts)
         {
@@ -52,23 +67,77 @@ namespace Carmen.CastingEngine.Base
             alternativeCasts = alternative_casts;
         }
 
-        /// <summary>If true, IdealCastingOrder() will enumerate roles grouped by non-multi section, in show order.
-        /// If false, roles are considered across the entire show as one group.</summary>
-        public bool CastingOrderByNonMultiSection { get; set; } = false; //LATER add a setting for users to change this
+        public abstract double SuitabilityOf(Applicant applicant, Role role);
 
-        /// <summary>Determines how roles are prioritised based on their requirements</summary>
-        public RequirementsPriority CastingOrderByPriority { get; set; } = RequirementsPriority.AllRequirementsAtOnce; //LATER add a setting for users to change this
+        public virtual bool UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role) => false;
 
-        /// <summary>Roles requiring more than this number of cast are considered group roles and may be balanced cast
-        /// with other groups as one operation.</summary>
-        public uint CastingOrderGroupThreshold { get; set; } = 8; //LATER add a setting for users to change this
+        public virtual bool Finalise() => false;
 
-        /// <summary>If true, the availability of cast (ie. whether they are already cast) will be considered when counting
-        /// the eligible cast for a role. This will cause variations in the <see cref="IdealCastingOrder(ShowRoot, Applicant[])"/>
-        /// depending on previously made casting decisions.
-        /// If false, only the eligibility is considered, which makes the <see cref="IdealCastingOrder(ShowRoot, Applicant[])"/>
-        /// deterministic based on the roles, irrespective of previous casting decisions.</summary>
-        public bool CastingOrderConsiderAvailability { get; set; } = true; //LATER add a setting for users to change this
+        /// <summary>Return a list of the best cast to pick for the role, based on suitability. If a role has no requirements,
+        /// the default implementation selects other alternative casts by matching cast number, if possible.
+        /// NOTE: If the default behaviour is changed, this version should be grandfathered in HeuristicAllocationEngine</summary>
+        public virtual IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role)
+        {
+            // list existing cast by cast group
+            var existing_cast = new Dictionary<CastGroup, HashSet<Applicant>>();
+            foreach (var group in role.Cast.GroupBy(a => a.CastGroup))
+                if (group.Key is CastGroup cast_group)
+                    existing_cast.Add(cast_group, group.ToHashSet());
+            // calculate how many of each cast group we need to pick
+            var required_cast_groups = new Dictionary<CastGroup, uint>();
+            foreach (var cbg in role.CountByGroups)
+            {
+                var required = (int)cbg.Count;
+                if (existing_cast.TryGetValue(cbg.CastGroup, out var existing_cast_in_this_group))
+                {
+                    var already_allocated = existing_cast_in_this_group.Count;
+                    if (cbg.CastGroup.AlternateCasts)
+                        already_allocated /= alternativeCasts.Length; //LATER this assumes the existing casting has the same number of each alternative cast
+                    required -= already_allocated;
+                }
+                if (required > 0)
+                    required_cast_groups.Add(cbg.CastGroup, (uint)required);
+            }
+            // list available cast in priority order, grouped by cast group
+            var potential_cast_by_group = applicants
+                .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
+                .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
+                .Where(a => AvailabilityOf(a, role).IsAvailable)
+                .Where(a => EligibilityOf(a, role).IsEligible)
+                .OrderBy(a => SuitabilityOf(a, role)) // order by suitability ascending so that the lowest suitability is at the bottom of the stack
+                .ThenBy(a => ApplicantEngine.OverallAbility(a)) // then by overall ability ascending so that the lowest ability is at the bottom of the stack
+                .GroupBy(a => a.CastGroup!)
+                .ToDictionary(g => g.Key, g => new Stack<Applicant>(g));
+            // select the required number of cast in the priority order, adding alternative cast buddies as required
+            foreach (var (cast_group, potential_cast) in potential_cast_by_group)
+            {
+                var required = required_cast_groups[cast_group];
+                for (var i = 0; i < required; i++)
+                {
+                    if (!potential_cast.TryPop(out var next_cast))
+                        break; // no more available applicants
+                    yield return next_cast;
+                    if (cast_group.AlternateCasts)
+                    {
+                        var need_alternative_casts = alternativeCasts.Where(ac => ac != next_cast.AlternativeCast).ToHashSet();
+                        if (role.Requirements.Count == 0)
+                        {
+                            // if not a special role, take the cast number buddies, if possible
+                            while (potential_cast.FindAndRemove(a => a.CastNumber == next_cast.CastNumber) is Applicant buddy)
+                            {
+                                if (buddy.AlternativeCast == null || !need_alternative_casts.Remove(buddy.AlternativeCast))
+                                    throw new ApplicationException($"Cast Number / Alternative Cast not set correctly for {buddy}.");
+                                yield return buddy;
+                            }
+                        }
+                        // otherwise, take the next best applicant in the other casts
+                        foreach (var need_alternative_cast in need_alternative_casts)
+                            if (potential_cast.FindAndRemove(a => a.AlternativeCast == need_alternative_cast) is Applicant other_cast)
+                                yield return other_cast;
+                    }
+                }
+            }
+        }
 
         /// <summary>Enumerate roles by structural segments of the show, tiered based on the priority of their requirements.
         /// Within each tier, roles are ordered by the least required cast first, then by the smallest number of eligible cast available.
