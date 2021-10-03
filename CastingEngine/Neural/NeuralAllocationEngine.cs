@@ -13,13 +13,16 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Neural
 {
+    /// <summary>
+    /// The base class of all Neural Network based allocation engines
+    /// </summary>
     public abstract class NeuralAllocationEngine : WeightedAverageEngine, IComparer<(Applicant, Role)>
     {
-        protected readonly bool includeOverall;
-        protected readonly Requirement[] suitabilityRequirements;
-        protected readonly ICriteriaRequirement[] existingRoleRequirements;
-        protected readonly SingleLayerPerceptron model;
-        protected readonly int nInputs;
+        readonly bool includeOverall;
+        readonly Requirement[] suitabilityRequirements;
+        readonly ICriteriaRequirement[] existingRoleRequirements;
+        readonly SingleLayerPerceptron model;
+        readonly int nInputs;
         readonly UserConfirmation confirm;
 
         //LATER allow users to change these parameters
@@ -89,11 +92,34 @@ namespace Carmen.CastingEngine.Neural
                 return false;
         }
 
-        /// <summary>Handle the addition of new training pairs, returning suggested weight changes, if any.</summary>
+        /// <summary>Handle the addition of new training pairs, returning suggested weight changes, if any</summary>
         protected abstract IEnumerable<IWeightChange> TrainingPairsAdded(Dictionary<double[], double[]> pairs, Role role);
 
-        /// <summary>Handle any remaining training, returning suggested weight changes, if any.</summary>
+        /// <summary>Handle any remaining training, returning suggested weight changes, if any</summary>
         protected abstract IEnumerable<IWeightChange> FinaliseTraining();
+
+        /// <summary>Performs a training operation, but doesn't update any weights outside the model</summary>
+        protected void TrainModel(Dictionary<double[], double[]> pairs)
+        {
+            //LATER learning rate and loss function should probably be part of the trainer rather than the network
+            model.LearningRate = NeuralLearningRate * (showRoot.OverallSuitabilityWeight + suitabilityRequirements.Sum(r => r.SuitabilityWeight));
+            model.LossFunction = NeuralLossFunction switch
+            {
+                LossFunctionChoice.MeanSquaredError => new MeanSquaredError(),
+                LossFunctionChoice.Classification0_5 => new ClassificationError { Threshold = 0.5 },
+                LossFunctionChoice.Classification0_4 => new ClassificationError { Threshold = 0.4 },
+                LossFunctionChoice.Classification0_3 => new ClassificationError { Threshold = 0.3 },
+                LossFunctionChoice.Classification0_2 => new ClassificationError { Threshold = 0.2 },
+                LossFunctionChoice.Classification0_1 => new ClassificationError { Threshold = 0.1 },
+                _ => throw new NotImplementedException($"Enum not implemented: {NeuralLossFunction}")
+            };
+            var trainer = new ModelTrainer(model)
+            {
+                LossThreshold = 0.005,
+                MaxIterations = MaxTrainingIterations
+            };
+            var m = trainer.Train(pairs.Keys, pairs.Values);
+        }
         #endregion
 
         #region Neural structure
@@ -159,6 +185,46 @@ namespace Carmen.CastingEngine.Neural
             return values;
         }
 
+        protected IEnumerable<IWeightChange> CalculateChanges(Func<Requirement, bool> is_relevant)
+        {
+            EnsureCorrectPolarities(model.Layer.Neurons[0]);
+            var raw_weights = AverageOfPairedWeights(model.Layer.Neurons[0]);
+
+            var (raw_overall_weight, raw_suitability_weights, raw_role_weights) = SplitWeights(raw_weights);
+
+            var relevant_weight_ratio = WeightIncreaseFactor(raw_suitability_weights, raw_overall_weight, is_relevant);
+            var total_weight_sum = showRoot.OverallSuitabilityWeight + suitabilityRequirements.Sum(r => r.SuitabilityWeight);
+
+            var normalised_suitability_weights = NormaliseWeights(raw_suitability_weights, relevant_weight_ratio);
+            var normalised_role_weights = NormaliseWeights(raw_role_weights, relevant_weight_ratio);
+
+            var new_weights = new Dictionary<ICriteriaRequirement, double>();
+            var changes = new List<IWeightChange>();
+            if (includeOverall)
+            {
+                var normalised_overall_weight = raw_overall_weight / relevant_weight_ratio;
+                changes.Add(new OverallWeightChange(showRoot, normalised_overall_weight));
+            }
+            for (var i = 0; i < suitabilityRequirements.Length; i++)
+            {
+                var requirement = suitabilityRequirements[i];
+                var new_weight = is_relevant(requirement) ? normalised_suitability_weights[i] : requirement.SuitabilityWeight;
+                if (requirement is ICriteriaRequirement criteria_requirement)
+                    new_weights.Add(criteria_requirement, new_weight);
+                changes.Add(new SuitabilityWeightChange(requirement, new_weight));
+            }
+            for (var i = 0; i < existingRoleRequirements.Length; i++)
+            {
+                var requirement = existingRoleRequirements[i];
+                var new_cost = is_relevant((Requirement)requirement) ?
+                    WeightToCost(normalised_role_weights[i], new_weights[requirement], total_weight_sum) : requirement.ExistingRoleCost;
+                LimitValue(ref new_cost, 0.01, 100);
+                changes.Add(new ExistingRoleCostChange(requirement, new_cost));
+            }
+
+            return changes;
+        }
+
         private bool UpdateWeights(IEnumerable<IWeightChange> changes)
         {
             bool show_model_updated = false;
@@ -212,10 +278,10 @@ namespace Carmen.CastingEngine.Neural
         #endregion
 
         #region Helper methods
-        protected static void EnsurePositive(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, min: minimum_magnitude);
-        protected static void EnsureNegative(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, max: -minimum_magnitude);
+        private static void EnsurePositive(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, min: minimum_magnitude);
+        private static void EnsureNegative(ref double value, double minimum_magnitude = 0.01) => LimitValue(ref value, max: -minimum_magnitude);
 
-        protected static void LimitValue(ref double value, double? min = null, double? max = null)//TODO make sure this is used from both implementations (session and role)
+        private static void LimitValue(ref double value, double? min = null, double? max = null)
         {
             if (min.HasValue && value < min)
                 value = min.Value;
@@ -223,12 +289,12 @@ namespace Carmen.CastingEngine.Neural
                 value = max.Value;
         }
 
-        protected static double[] NormaliseWeights(double[] raw_weights, double weight_ratio)//TODO make sure this is used at least twice
+        private static double[] NormaliseWeights(double[] raw_weights, double weight_ratio)
             => raw_weights.Select(w => w / weight_ratio).ToArray();
 
         /// <summary>Find the average of the matching pairs between the first half of the
         /// Neuron weights and the second half. Returned array will have half the length.</summary>
-        protected static double[] AverageOfPairedWeights(Neuron neuron)//TODO make sure this is used at least twice
+        private static double[] AverageOfPairedWeights(Neuron neuron)
         {
             var averages = new double[neuron.Weights.Length / 2];
             for (var n = 0; n < averages.Length; n++)
@@ -236,14 +302,14 @@ namespace Carmen.CastingEngine.Neural
             return averages;
         }
 
-        protected (double, double[], double[]) SplitWeights(double[] weights)//TODO make sure this is used at least twice
+        private (double, double[], double[]) SplitWeights(double[] weights)
         {
             var results = weights.Split(new[] { includeOverall ? 1 : 0, suitabilityRequirements.Length, existingRoleRequirements.Length });
             var overall = includeOverall ? results[0][0] : 0;
             return (overall, results[1], results[2]);
         }
 
-        protected void EnsureCorrectPolarities(Neuron neuron)//TODO make sure this is used at least twice
+        private void EnsureCorrectPolarities(Neuron neuron)
         {
             neuron.Bias = 0;
             var offset = nInputs / 2;
@@ -262,6 +328,21 @@ namespace Carmen.CastingEngine.Neural
                 EnsureNegative(ref neuron.Weights[i], 0.001);
                 EnsurePositive(ref neuron.Weights[i + offset], 0.001);
             }
+        }
+
+        private double WeightIncreaseFactor(double[] raw_suitability_weights, double raw_overall_weight, Func<Requirement, bool> include_requirement)
+        {
+            double old_sum = showRoot.OverallSuitabilityWeight;
+            double new_sum = raw_overall_weight;
+            for (var i = 0; i < suitabilityRequirements.Length; i++)
+            {
+                if (include_requirement(suitabilityRequirements[i]))
+                {
+                    old_sum += suitabilityRequirements[i].SuitabilityWeight;
+                    new_sum += raw_suitability_weights[i];
+                }
+            }
+            return new_sum / old_sum;
         }
         #endregion
     }

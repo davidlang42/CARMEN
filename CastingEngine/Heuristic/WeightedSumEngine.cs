@@ -9,6 +9,9 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Heuristic
 {
+    /// <summary>
+    /// A basic ApplicantEngine which calculates an Applicant's overall ability as a weighted sum of their abilities.
+    /// </summary>
     public class WeightedSumEngine : ApplicantEngine
     {
         readonly int maxOverallAbility;

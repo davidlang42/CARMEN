@@ -12,6 +12,10 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Neural
 {
+    /// <summary>
+    /// A basic AllocationEngine which calculates an Applicant's suitability for a role as a weighted average of the
+    /// suitabilities for each requirement of the role.
+    /// </summary>
     public class WeightedAverageEngine : AllocationEngine
     {
         protected readonly ShowRoot showRoot;
