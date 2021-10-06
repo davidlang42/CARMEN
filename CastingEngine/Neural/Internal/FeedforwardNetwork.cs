@@ -12,12 +12,12 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// </summary>
     public class FeedforwardNetwork : INeuralNetwork
     {
-        ILossFunction loss = new MeanSquaredError();
         Layer[] layers;
 
         public int InputCount { get; init; }
         public int OutputCount { get; init; }
         public double LearningRate { get; set; } = 0.05;
+        public ILossFunction LossFunction { get; set; }
 
         /// <summary>Create a feedforward neural network, with initially random weights and biases, based on the structural
         /// parameters provided</summary>
@@ -30,6 +30,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         public FeedforwardNetwork(int n_inputs, int n_hidden_layers, Func<int,int> n_neurons_per_hidden_layer, int n_outputs,
             IVectorActivationFunction? hidden_layer_activation = null, IVectorActivationFunction? output_layer_activation = null)
         {
+            LossFunction = new MeanSquaredError();
             InputCount = n_inputs;
             OutputCount = n_outputs;
             if (n_hidden_layers < 0)
@@ -69,8 +70,8 @@ namespace Carmen.CastingEngine.Neural.Internal
             for (var i = 1; i < layers.Length; i++)
                 out_o[i] = layers[i].Predict(out_o[i - 1]);
             // Back propogation (stochastic gradient descent)
-            var dloss_douto = loss.Derivative(out_o[out_o.Length - 1], expected_outputs);
-            var total_loss = loss.Calculate(dloss_douto);
+            var dloss_douto = LossFunction.Derivative(out_o[out_o.Length - 1], expected_outputs);
+            var total_loss = LossFunction.Calculate(dloss_douto);
             for (var i = out_o.Length - 1; i > 0; i--)
             {
                 layers[i].Train(out_o[i - 1], out_o[i], dloss_douto, LearningRate, out var dloss_dino);

@@ -12,16 +12,17 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// </summary>
     public class MultiLayerPerceptron : INeuralNetwork
     {
-        ILossFunction loss = new MeanSquaredError();
         Layer hidden, output;
 
         public int InputCount { get; init; }
         public int OutputCount { get; init; }
         public double LearningRate { get; set; } = 0.05;
+        public ILossFunction LossFunction { get; set; }
 
         public MultiLayerPerceptron(int n_inputs, int n_hidden_layer_neurons, int n_outputs,
             IVectorActivationFunction? hidden_layer_activation = null, IVectorActivationFunction? output_layer_activation = null)
         {
+            LossFunction = new MeanSquaredError();
             InputCount = n_inputs;
             OutputCount = n_outputs;
             hidden = new Layer(n_inputs, n_hidden_layer_neurons, hidden_layer_activation ?? new Tanh());
@@ -36,7 +37,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             var out_o1 = hidden.Predict(inputs);
             var out_o2 = output.Predict(out_o1);
             // Back propogation (stochastic gradient descent)
-            var dloss_douto2 = loss.Derivative(out_o2, expected_outputs);
+            var dloss_douto2 = LossFunction.Derivative(out_o2, expected_outputs);
             output.Train(out_o1, out_o2, dloss_douto2, LearningRate, out var dloss_dino2);
             // Next layer
             var dloss_douto1 = new double[hidden.Neurons.Length];
@@ -44,7 +45,7 @@ namespace Carmen.CastingEngine.Neural.Internal
                 for (var n = 0; n < output.Neurons.Length; n++)
                     dloss_douto1[h] += dloss_dino2[n] * output.Neurons[n].Weights[h];
             hidden.Train(inputs, out_o1, dloss_douto1, LearningRate, out _);
-            return loss.Calculate(dloss_douto2);
+            return LossFunction.Calculate(dloss_douto2);
         }
 
         public double[] Predict(double[] inputs)
