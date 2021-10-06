@@ -47,6 +47,8 @@ namespace Carmen.ShowModel.Requirements
         }
 
         private double suitabilityWeight;
+        /// <summary>The weighting of this requirement's suitability in the weighted average calculation of the
+        /// suitability of an applicant for a role, compared to the OverallWeight and other requirements.</summary>
         public double SuitabilityWeight
         {
             get => suitabilityWeight;
@@ -57,6 +59,28 @@ namespace Carmen.ShowModel.Requirements
                 if (suitabilityWeight == value)
                     return;
                 suitabilityWeight = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private double overallWeight;
+        /// <summary>The weighting of the OverallAbility compared to this requirement's SuitabilityWeight,
+        /// used in calculating the suitability of an applicant for a role.
+        /// NOTE: If the ShowRoot's CommonOverallWeight is set, this value will be ignored, instead weighting the
+        /// OverallAbility by the CommonOverallWeight once in the weighted average calculation, regardless of how
+        /// many other requirements are involved.
+        /// NOTE: This means that having a CommonOverallWeight is different to each requirement having the same value
+        /// for OverallWeight if there is more than one requirement for a role.</summary>
+        public double OverallWeight
+        {
+            get => overallWeight;
+            set
+            {
+                if (value < 0)
+                    value = 0;
+                if (overallWeight == value)
+                    return;
+                overallWeight = value;
                 OnPropertyChanged();
             }
         }
