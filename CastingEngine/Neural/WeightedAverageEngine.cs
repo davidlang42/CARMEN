@@ -33,17 +33,28 @@ namespace Carmen.CastingEngine.Neural
 
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
-            double score = ApplicantEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
-            double max = showRoot.OverallSuitabilityWeight;
+            var overall_suitability = ApplicantEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
+            double score = 0;
+            double max = 0;
             foreach (var requirement in role.Requirements)
             {
                 score += requirement.SuitabilityWeight * ApplicantEngine.SuitabilityOf(applicant, requirement);
                 max += requirement.SuitabilityWeight;
+                if (!showRoot.CommonOverallWeight.HasValue)
+                {
+                    score += requirement.OverallWeight * overall_suitability;
+                    max += requirement.OverallWeight;
+                }
             }
+            var overall_weight = showRoot.CommonOverallWeight ?? 0;
+            if (max == 0 && overall_weight == 0)
+                overall_weight = 1; // if no requirements with non-zero weight, we should apply a non-zero weight to overall
+            score += overall_weight * overall_suitability;
+            max += overall_weight;
             foreach (var cr in role.Requirements.OfType<ICriteriaRequirement>())
                 score -= CostToWeight(cr.ExistingRoleCost, cr.SuitabilityWeight, max) * CountRoles(applicant, cr.Criteria, role);
-            if (score <= 0 || max == 0)
-                return 0;
+            if (score <= 0)
+                return 0; // never return a negative suitability
             return score / max;
         }
 
