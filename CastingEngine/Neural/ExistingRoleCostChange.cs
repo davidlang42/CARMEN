@@ -9,11 +9,17 @@ namespace Carmen.CastingEngine.Neural
         readonly ICriteriaRequirement requirement;
         readonly double newCost;
 
-        public IOrdered Requirement => requirement;
         public string Description => Significant
             ? $"Each '{requirement.Name}' role reduces suitability by: {newCost:0.0}% (previously {requirement.ExistingRoleCost:0.0}%)"
             : $"Each '{requirement.Name}' role reduces suitability by: {requirement.ExistingRoleCost:0.0}%";
+
         public bool Significant { get; init; }
+
+        public int Order
+        {
+            get => requirement.Order;
+            set => throw new NotImplementedException();
+        }
 
         public ExistingRoleCostChange(ICriteriaRequirement requirement, double new_cost)
         {

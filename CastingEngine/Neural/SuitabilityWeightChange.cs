@@ -9,11 +9,17 @@ namespace Carmen.CastingEngine.Neural
         readonly Requirement requirement;
         readonly double newWeight;
 
-        public IOrdered Requirement => requirement;
         public string Description => Significant
             ? $"{requirement.Name}: {newWeight:0.0} (previously {requirement.SuitabilityWeight:0.0})"
             : $"{requirement.Name}: {requirement.SuitabilityWeight:0.0}";
+
         public bool Significant { get; init; }
+
+        public int Order
+        {
+            get => requirement.Order;
+            set => throw new NotImplementedException();
+        }
 
         public SuitabilityWeightChange(Requirement requirement, double new_weight)
         {

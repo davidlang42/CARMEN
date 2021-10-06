@@ -1,39 +1,41 @@
 ﻿using Carmen.ShowModel;
+using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
 using System;
 
 namespace Carmen.CastingEngine.Neural
 {
-    internal class OverallWeightChange : IWeightChange, IOrdered
+    internal class OverallWeightChange : IWeightChange
     {
-        readonly ShowRoot showRoot;
+        readonly IOverallWeighting overallWeighting;
         readonly double newWeight;
-
-        public IOrdered Requirement { get; init; }
+        readonly string descriptiveName;
 
         public string Description => Significant
-            ? $"Overall Ability: {newWeight:0.0} (previously {showRoot.OverallSuitabilityWeight:0.0})"
-            : $"Overall Ability: {showRoot.OverallSuitabilityWeight:0.0}";
+            ? $"{descriptiveName}: {newWeight:0.0} (previously {overallWeighting.OverallWeight:0.0})"
+            : $"{descriptiveName}: {overallWeighting.OverallWeight:0.0}";
 
         public bool Significant { get; init; }
 
-        int IOrdered.Order
+        public int Order
         {
-            get => int.MinValue;
+            get => (overallWeighting as IOrdered)?.Order ?? int.MinValue;
             set => throw new NotImplementedException();
         }
 
         public void Accept()
         {
-            showRoot.OverallSuitabilityWeight = newWeight;
+            overallWeighting.OverallWeight = newWeight;
         }
 
-        public OverallWeightChange(ShowRoot show_root, double new_weight)
+        public OverallWeightChange(IOverallWeighting overall_weighting, double new_weight)
         {
-            Requirement = this;
-            showRoot = show_root;
             newWeight = new_weight;
-            Significant = Math.Abs(newWeight - show_root.OverallSuitabilityWeight) > IWeightChange.MINIMUM_CHANGE;
+            overallWeighting = overall_weighting;
+            descriptiveName = "Overall Ability";
+            if (overall_weighting is Requirement requirement)
+                descriptiveName += $" (for {requirement.Name})";
+            Significant = Math.Abs(newWeight - overallWeighting.OverallWeight) > IWeightChange.MINIMUM_CHANGE;
         }
     }
 }

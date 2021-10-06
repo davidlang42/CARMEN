@@ -10,7 +10,7 @@ namespace Carmen.CastingEngine.Neural
     /// A sort method which works on an imperfect comparison function, that is one where A > B > C does not always mean A > C.
     /// This sorter implements IComparer<typeparamref name="T"/> using the cached results of calling the provided imperfect comparer.
     /// </summary>
-    public class DisagreementSort<T> : IComparer<T>
+    public class DisagreementSort<T> : IComparer<T> //LATER remove if not used
         where T : class
     {
         IComparer<T> imperfectComparer;

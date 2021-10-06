@@ -13,7 +13,7 @@ namespace Carmen.ShowModel.Requirements
     /// <summary>
     /// A requirement which can be satisfied by an Applicant
     /// </summary>
-    public abstract class Requirement : IOrdered, IValidatable, INamed, INotifyPropertyChanged
+    public abstract class Requirement : IOverallWeighting, IOrdered, IValidatable, INamed, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 

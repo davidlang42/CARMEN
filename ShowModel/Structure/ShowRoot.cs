@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -11,7 +12,7 @@ namespace Carmen.ShowModel.Structure
     /// <summary>
     /// The (singular) root node of the item tree, including various details about the show
     /// </summary>
-    public class ShowRoot : InnerNode
+    public class ShowRoot : InnerNode, IOverallWeighting
     {
         private DateTime? showDate;
         public DateTime? ShowDate
@@ -112,6 +113,17 @@ namespace Carmen.ShowModel.Structure
             {
                 if (value != null)
                     throw new InvalidOperationException("Parent of ShowRoot must be null.");
+            }
+        }
+
+        double IOverallWeighting.OverallWeight
+        {
+            get => CommonOverallWeight ?? throw new InvalidOperationException("Cannot use ShowRoot as IOverallWeighting if CommonOverallWeight is not set");
+            set
+            {
+                if (!CommonOverallWeight.HasValue)
+                    throw new InvalidOperationException("Cannot use ShowRoot as IOverallWeighting if CommonOverallWeight is not set");
+                CommonOverallWeight = value;
             }
         }
     }
