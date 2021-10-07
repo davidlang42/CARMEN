@@ -8,9 +8,11 @@ using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace Carmen.CastingEngine.Neural
 {
@@ -48,9 +50,11 @@ namespace Carmen.CastingEngine.Neural
 
         /// <summary>If true, training data will kept to be used again in future training</summary>
         public bool StockpileTrainingData { get; set; } = true;
+
+        public string ModelFileName { get; private init; } //LATER make this editable?
         #endregion
 
-        public ComplexNeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
+        public ComplexNeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm, string model_file_name)
             : base(applicant_engine, alternative_casts)
         {
             // Find out what (and how many) things will have overall ability weights
@@ -62,9 +66,36 @@ namespace Carmen.CastingEngine.Neural
             // Construct the model
             this.confirm = confirm;
             nInputs = (overallWeightings.Length + suitabilityRequirements.Length + existingRoleRequirements.Length) * 2;
+            ModelFileName = model_file_name;
+            model = LoadModelFromDisk(nInputs, model_file_name);
             //TODO allow parameters to be configured (layers, neurons, hidden activation functions)
-            model = new FeedforwardNetwork(nInputs, 2, nInputs * 2, 1, new Tanh(), new Sigmoid()); // sigmoid output is between 0 and 1, crossing at 0.5
-            //TODO load network from file, or create fresh if required
+        }
+
+        private static FeedforwardNetwork LoadModelFromDisk(int n_inputs, string file_name)
+        {
+            if (!string.IsNullOrEmpty(file_name) && File.Exists(file_name))
+            {
+                var reader = new XmlSerializer(typeof(FeedforwardNetwork));
+                try
+                {
+                    using var file = new StreamReader(file_name);
+                    if (reader.Deserialize(file) is FeedforwardNetwork model && model.InputCount == n_inputs)
+                        return model;
+                }
+                catch (Exception ex)
+                {
+                    //LATER log exception or otherwise tell user, there are many cases that can get here: file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
+                }
+            }
+            return new FeedforwardNetwork(n_inputs, 2, n_inputs * 2, 1, new Tanh(), new Sigmoid()); // sigmoid output is between 0 and 1, crossing at 0.5
+        }
+
+        private static void SaveModelToDisk(string file_name, FeedforwardNetwork model)
+        {
+            var writer = new XmlSerializer(typeof(FeedforwardNetwork));
+            //LATER handle exceptions
+            using var file = new StreamWriter(file_name);
+            writer.Serialize(file, model);
         }
 
         #region Business logic
@@ -91,7 +122,7 @@ namespace Carmen.CastingEngine.Neural
         public override bool ExportChanges()
         {
             FinaliseTraining();
-            //TODO persist model to disk
+            SaveModelToDisk(ModelFileName, model);
             return false;
         }
 
