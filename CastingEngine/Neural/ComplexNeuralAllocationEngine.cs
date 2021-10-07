@@ -89,7 +89,7 @@ namespace Carmen.CastingEngine.Neural
             }
             var new_model = new FeedforwardNetwork(n_inputs, 2, n_inputs, 1); // sigmoid output is between 0 and 1, crossing at 0.5
             foreach (var layer in new_model.Layers)
-                foreach (var neuron in layer.Neurons)
+                foreach (var neuron in layer.Neurons) //TODO Fix polarity of starting weights AGAIN
                 {
                     for (var i = neuron.Weights.Length / 2; i < neuron.Weights.Length; i++)
                         neuron.Weights[i] *= -1; // 2nd half of all weights should be negative
