@@ -19,7 +19,7 @@ namespace Carmen.CastingEngine.Neural.Internal
 
         /// <summary>Parameterless constructor for serialisation</summary>
         private Neuron()
-        { }
+            => Weights = Array.Empty<double>();
 
         /// <summary>Create a neuron with random weights and bias</summary>
         public Neuron(int n_inputs, Random? random = null)

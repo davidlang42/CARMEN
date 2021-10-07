@@ -30,7 +30,7 @@ namespace Carmen.CastingEngine.Neural.Internal
 
         /// <summary>Parameterless constructor for serialisation</summary>
         private Layer()
-        { }
+            => Neurons = Array.Empty<Neuron>();
 
         /// <summary>Create a layer of neurons, each with random weights and biases,
         /// utilising a common activation function</summary>

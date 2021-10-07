@@ -37,7 +37,7 @@ namespace Carmen.CastingEngine.Neural.Internal
 
         /// <summary>Parameterless constructor for serialisation</summary>
         private FeedforwardNetwork()
-        { }
+            => Layers = Array.Empty<Layer>();
 
         /// <summary>Create a feedforward neural network, with initially random weights and biases, based on the structural
         /// parameters provided</summary>
