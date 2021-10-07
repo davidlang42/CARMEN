@@ -12,21 +12,35 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// </summary>
     public class MultiLayerPerceptron : INeuralNetwork
     {
-        Layer hidden, output;
+        public Layer Hidden;
+        public Layer Output;
 
-        public int InputCount { get; init; }
-        public int OutputCount { get; init; }
+        public int InputCount => Hidden.Neurons.First().InputCount;
+        public int OutputCount => Output.NeuronCount;
         public double LearningRate { get; set; } = 0.05;
-        public ILossFunction LossFunction { get; set; }
+
+        private LossFunctionChoice lossFunction = LossFunctionChoice.MeanSquaredError;
+        public LossFunctionChoice LossFunction
+        {
+            get => lossFunction;
+            set
+            {
+                if (lossFunction == value)
+                    return;
+                lossFunction = value;
+                loss = null;
+            }
+        }
+
+        private ILossFunction? loss = null;
+        private ILossFunction Loss => loss ??= LossFunction.Create();
 
         public MultiLayerPerceptron(int n_inputs, int n_hidden_layer_neurons, int n_outputs,
-            IVectorActivationFunction? hidden_layer_activation = null, IVectorActivationFunction? output_layer_activation = null)
+            ActivationFunctionChoice hidden_layer_activation = ActivationFunctionChoice.Tanh,
+            ActivationFunctionChoice output_layer_activation = ActivationFunctionChoice.Sigmoid)
         {
-            LossFunction = new MeanSquaredError();
-            InputCount = n_inputs;
-            OutputCount = n_outputs;
-            hidden = new Layer(n_inputs, n_hidden_layer_neurons, hidden_layer_activation ?? new Tanh());
-            output = new Layer(n_hidden_layer_neurons, n_outputs, output_layer_activation ?? new Sigmoid());
+            Hidden = new Layer(n_inputs, n_hidden_layer_neurons, hidden_layer_activation);
+            Output = new Layer(n_hidden_layer_neurons, n_outputs, output_layer_activation);
         }
 
         /// <summary>Train the model with a single set of inputs and expected output.
@@ -34,27 +48,27 @@ namespace Carmen.CastingEngine.Neural.Internal
         public double Train(double[] inputs, double[] expected_outputs)
         {
             // Calculation
-            var out_o1 = hidden.Predict(inputs);
-            var out_o2 = output.Predict(out_o1);
+            var out_o1 = Hidden.Predict(inputs);
+            var out_o2 = Output.Predict(out_o1);
             // Back propogation (stochastic gradient descent)
-            var dloss_douto2 = LossFunction.Derivative(out_o2, expected_outputs);
-            output.Train(out_o1, out_o2, dloss_douto2, LearningRate, out var dloss_dino2);
+            var dloss_douto2 = Loss.Derivative(out_o2, expected_outputs);
+            Output.Train(out_o1, out_o2, dloss_douto2, LearningRate, out var dloss_dino2);
             // Next layer
-            var dloss_douto1 = new double[hidden.Neurons.Length];
-            for (var h = 0; h < hidden.Neurons.Length; h++)
-                for (var n = 0; n < output.Neurons.Length; n++)
-                    dloss_douto1[h] += dloss_dino2[n] * output.Neurons[n].Weights[h];
-            hidden.Train(inputs, out_o1, dloss_douto1, LearningRate, out _);
-            return LossFunction.Calculate(dloss_douto2);
+            var dloss_douto1 = new double[Hidden.Neurons.Length];
+            for (var h = 0; h < Hidden.Neurons.Length; h++)
+                for (var n = 0; n < Output.Neurons.Length; n++)
+                    dloss_douto1[h] += dloss_dino2[n] * Output.Neurons[n].Weights[h];
+            Hidden.Train(inputs, out_o1, dloss_douto1, LearningRate, out _);
+            return Loss.Calculate(dloss_douto2);
         }
 
         public double[] Predict(double[] inputs)
         {
-            var result = hidden.Predict(inputs);
-            result = output.Predict(result);
+            var result = Hidden.Predict(inputs);
+            result = Output.Predict(result);
             return result;
         }
 
-        public override string ToString() => $"Hidden: {string.Join(" / ", hidden)}; Output: {string.Join(" / ", output)};";
+        public override string ToString() => $"Hidden: {string.Join(" / ", Hidden)}; Output: {string.Join(" / ", Output)};";
     }
 }

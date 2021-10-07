@@ -13,17 +13,29 @@ namespace Carmen.CastingEngine.Neural.Internal
     public class SingleLayerPerceptron : INeuralNetwork
     {
         public Layer Layer { get; init; }
-        public int InputCount { get; init; }
-        public int OutputCount { get; init; }
+        public int InputCount => Layer.Neurons.First().InputCount;
+        public int OutputCount => Layer.NeuronCount;
         public double LearningRate { get; set; } = 0.05;
-        public ILossFunction LossFunction { get; set; }
 
-        public SingleLayerPerceptron(int n_inputs, int n_outputs, IVectorActivationFunction? activation = null, ILossFunction? loss = null)
+        private LossFunctionChoice lossFunction = LossFunctionChoice.MeanSquaredError;
+        public LossFunctionChoice LossFunction
         {
-            LossFunction = loss ?? new MeanSquaredError();
-            InputCount = n_inputs;
-            OutputCount = n_outputs;
-            Layer = new Layer(n_inputs, n_outputs, activation ?? new Sigmoid());
+            get => lossFunction;
+            set
+            {
+                if (lossFunction == value)
+                    return;
+                lossFunction = value;
+                loss = null;
+            }
+        }
+
+        private ILossFunction? loss = null;
+        private ILossFunction Loss => loss ??= LossFunction.Create();
+
+        public SingleLayerPerceptron(int n_inputs, int n_outputs, ActivationFunctionChoice activation = ActivationFunctionChoice.Sigmoid)
+        {
+            Layer = new Layer(n_inputs, n_outputs, activation);
         }
 
         /// <summary>Train the model with a single set of inputs and expected outputs.
@@ -33,9 +45,9 @@ namespace Carmen.CastingEngine.Neural.Internal
             // Calculation
             var out_o = Predict(inputs);
             // Back propogation (stochastic gradient descent)
-            var dloss_douto = LossFunction.Derivative(out_o, expected_outputs);
+            var dloss_douto = Loss.Derivative(out_o, expected_outputs);
             Layer.Train(inputs, out_o, dloss_douto, LearningRate, out _);
-            return LossFunction.Calculate(dloss_douto);
+            return Loss.Calculate(dloss_douto);
         }
 
         public double[] Predict(double[] inputs) => Layer.Predict(inputs);

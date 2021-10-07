@@ -11,7 +11,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         public int InputCount { get; }
         public int OutputCount { get; }
         public double LearningRate { get; set; }
-        public ILossFunction LossFunction { get; set; }
+        public LossFunctionChoice LossFunction { get; set; }
 
         public double Train(double[] inputs, double[] expected_outputs);
 
