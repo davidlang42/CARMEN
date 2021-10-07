@@ -33,6 +33,9 @@ namespace Carmen.CastingEngine.Neural
         /// WARNING: Changing this can have crazy consequences, slower is generally safer but be careful.</summary>
         public double NeuralLearningRate { get; set; } = 0.005; //LATER make this a user setting
 
+        /// <summary>Determines which loss function is used when training the neural network.</summary>
+        public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_3; //LATER make this a user setting
+
         /// Calculate the overall ability of an Applicant as a simple weighted sum of their Abilities</summary>
         public override int OverallAbility(Applicant applicant)
             => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
@@ -49,7 +52,7 @@ namespace Carmen.CastingEngine.Neural
                     criteria.Weight = equal_weight;
             }
             this.confirm = confirm;
-            this.model = new SingleLayerPerceptron(this.criterias.Length * 2, 1, new Sigmoid(), new ClassificationError { Threshold = 0.25 });
+            this.model = new SingleLayerPerceptron(this.criterias.Length * 2, 1);
             LoadWeights();
             UpdateRange();
         }
@@ -122,10 +125,11 @@ namespace Carmen.CastingEngine.Neural
                 return; // nothing to do
             // Train the model
             model.LearningRate = NeuralLearningRate * MaxOverallAbility;
+            model.LossFunction = NeuralLossFunction;
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
-                MaxIterations = MaxTrainingIterations
+                MaxIterations = MaxTrainingIterations,
             };
             var m = trainer.Train(training_pairs.Keys, training_pairs.Values);
             UpdateWeights();

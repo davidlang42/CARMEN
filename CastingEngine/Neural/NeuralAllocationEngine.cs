@@ -56,7 +56,7 @@ namespace Carmen.CastingEngine.Neural
             // Construct the model
             this.confirm = confirm;
             nInputs = (overallWeightings.Length + suitabilityRequirements.Length + existingRoleRequirements.Length) * 2;
-            model = new SingleLayerPerceptron(nInputs, 1, new Sigmoid()); // sigmoid output is between 0 and 1, crossing at 0.5
+            model = new SingleLayerPerceptron(nInputs, 1); // sigmoid output is between 0 and 1, crossing at 0.5
             LoadWeights();
         }
 
@@ -104,16 +104,7 @@ namespace Carmen.CastingEngine.Neural
         {
             //LATER learning rate and loss function should probably be part of the trainer rather than the network
             model.LearningRate = NeuralLearningRate * (overallWeightings.Sum(o => o.OverallWeight) + suitabilityRequirements.Sum(r => r.SuitabilityWeight));
-            model.LossFunction = NeuralLossFunction switch
-            {
-                LossFunctionChoice.MeanSquaredError => new MeanSquaredError(),
-                LossFunctionChoice.Classification0_5 => new ClassificationError { Threshold = 0.5 },
-                LossFunctionChoice.Classification0_4 => new ClassificationError { Threshold = 0.4 },
-                LossFunctionChoice.Classification0_3 => new ClassificationError { Threshold = 0.3 },
-                LossFunctionChoice.Classification0_2 => new ClassificationError { Threshold = 0.2 },
-                LossFunctionChoice.Classification0_1 => new ClassificationError { Threshold = 0.1 },
-                _ => throw new NotImplementedException($"Enum not implemented: {NeuralLossFunction}")
-            };
+            model.LossFunction = NeuralLossFunction;
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
