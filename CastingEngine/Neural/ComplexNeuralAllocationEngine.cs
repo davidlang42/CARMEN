@@ -46,7 +46,6 @@ namespace Carmen.CastingEngine.Neural
         {
             ModelFileName = model_file_name;
             model = LoadModelFromDisk(nInputs, model_file_name);
-            //TODO allow parameters to be configured (layers, neurons, hidden activation functions)
         }
 
         #region Business logic
@@ -79,6 +78,10 @@ namespace Carmen.CastingEngine.Neural
 
         private FeedforwardNetwork LoadModelFromDisk(int n_inputs, string file_name)
         {
+            //LATER handle changes in requirements
+            // - store associated to requirement names, if names change it counts as a new requirement
+            // - any new requirements get initialised with random weights of the correct polarity
+            // - existing requirements may be re-ordered, but this just involves updating the first layer weights
             if (!string.IsNullOrEmpty(file_name) && File.Exists(file_name))
             {
                 var reader = new XmlSerializer(typeof(FeedforwardNetwork));
@@ -93,6 +96,7 @@ namespace Carmen.CastingEngine.Neural
                     //LATER log exception or otherwise tell user, there are many cases that can get here: file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
                 }
             }
+            //TODO allow parameters to be configured (layers, neurons, hidden activation functions) -- these will need to be passed into the constructor
             var new_model = new FeedforwardNetwork(n_inputs, 2, n_inputs, 1); // sigmoid output is between 0 and 1, crossing at 0.5
             foreach (var neuron in new_model.Layers.First().Neurons)
                 FlipPolarities(neuron);
@@ -109,7 +113,8 @@ namespace Carmen.CastingEngine.Neural
         #endregion
 
         #region Applicant comparison
-        public override double SuitabilityOf(Applicant applicant, Role role) => throw new NotImplementedException(); //TODO how will this work?
+        //TODO how will suitability be calculated? or do we just adjust ordering to used Disagreement sort instead of suitability?
+        public override double SuitabilityOf(Applicant applicant, Role role) => throw new NotImplementedException();
         #endregion
 
         #region Helper methods

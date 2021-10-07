@@ -17,6 +17,8 @@ namespace Carmen.CastingEngine.Neural.Internal
 
         public double[] Predict(double[] inputs);
 
+        public double AverageInputWeightMagnitude();
+
         public string ToString();
     }
 }

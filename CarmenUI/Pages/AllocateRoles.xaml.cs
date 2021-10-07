@@ -127,6 +127,7 @@ namespace CarmenUI.Pages
                         nameof(WeightedAverageEngine) => new WeightedAverageEngine(applicant_engine, alternativeCasts, context.ShowRoot),
                         nameof(SessionLearningAllocationEngine) => new SessionLearningAllocationEngine(applicant_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
                         nameof(RoleLearningAllocationEngine) => new RoleLearningAllocationEngine(applicant_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
+                        nameof(ComplexNeuralAllocationEngine) => new ComplexNeuralAllocationEngine(applicant_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm, "ComplexNeuralModel.xml"), //LATER allow customisation of the neural model filename
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }

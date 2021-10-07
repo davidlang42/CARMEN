@@ -26,6 +26,7 @@ namespace Carmen.CastingEngine.Base
             typeof(RoleLearningAllocationEngine),
             typeof(SessionLearningAllocationEngine),
             typeof(WeightedAverageEngine),
+            typeof(ComplexNeuralAllocationEngine),
             typeof(DummyAllocationEngine), //LATER remove
         };
 

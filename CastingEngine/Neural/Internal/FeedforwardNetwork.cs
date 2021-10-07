@@ -110,6 +110,9 @@ namespace Carmen.CastingEngine.Neural.Internal
             return out_o;
         }
 
+        public double AverageInputWeightMagnitude()
+            => Layers.First().Neurons.SelectMany(n => n.Weights.Select(w => Math.Abs(w))).Average();
+
         public override string ToString()
         {
             var s = "";

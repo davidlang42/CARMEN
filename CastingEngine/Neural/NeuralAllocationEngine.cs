@@ -59,7 +59,7 @@ namespace Carmen.CastingEngine.Neural
         #region Business logic
         public override void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
         {
-            if (role.Requirements.Count(r => suitabilityRequirements.Contains(r)) == 0)//TODO think about this
+            if (role.Requirements.Count(r => suitabilityRequirements.Contains(r)) == 0)
                 return; // nothing to do
             // Generate training data
             var not_picked_array = applicants_not_picked.ToArray();
@@ -126,8 +126,7 @@ namespace Carmen.CastingEngine.Neural
         protected void TrainModel(Dictionary<double[], double[]> pairs)
         {
             //LATER learning rate and loss function should probably be part of the trainer rather than the network
-            Model.LearningRate = NeuralLearningRate * (overallWeightings.Sum(o => o.OverallWeight) + suitabilityRequirements.Sum(r => r.SuitabilityWeight));
-            //TODO set the learning rate differently for complex
+            Model.LearningRate = NeuralLearningRate * Model.AverageInputWeightMagnitude() * Model.InputCount;
             Model.LossFunction = NeuralLossFunction;
             var trainer = new ModelTrainer(Model)
             {
