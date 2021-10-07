@@ -34,8 +34,8 @@ namespace Carmen.CastingEngine.Neural.Internal
         }
 
         public DeprecatedNeuralNetwork(int n_hidden_layers, int n_neurons_per_hidden_layer,
-            IVectorActivationFunction? hidden_layer_activation = null,
-            IVectorActivationFunction? output_layer_activation = null)
+            ActivationFunctionChoice hidden_layer_activation = ActivationFunctionChoice.Tanh,
+            ActivationFunctionChoice output_layer_activation = ActivationFunctionChoice.Sigmoid)
         {
             network = new FeedforwardNetwork(IInputFeatureSet.GetSize<T>(), n_hidden_layers, n_neurons_per_hidden_layer,
                 IInputFeatureSet.GetSize<U>(), hidden_layer_activation, output_layer_activation);
