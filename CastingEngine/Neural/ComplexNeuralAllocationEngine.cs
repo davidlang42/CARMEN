@@ -71,7 +71,7 @@ namespace Carmen.CastingEngine.Neural
             //TODO allow parameters to be configured (layers, neurons, hidden activation functions)
         }
 
-        private static FeedforwardNetwork LoadModelFromDisk(int n_inputs, string file_name)
+        private FeedforwardNetwork LoadModelFromDisk(int n_inputs, string file_name)
         {
             if (!string.IsNullOrEmpty(file_name) && File.Exists(file_name))
             {
@@ -88,13 +88,8 @@ namespace Carmen.CastingEngine.Neural
                 }
             }
             var new_model = new FeedforwardNetwork(n_inputs, 2, n_inputs, 1); // sigmoid output is between 0 and 1, crossing at 0.5
-            foreach (var layer in new_model.Layers)
-                foreach (var neuron in layer.Neurons) //TODO Fix polarity of starting weights AGAIN
-                {
-                    for (var i = neuron.Weights.Length / 2; i < neuron.Weights.Length; i++)
-                        neuron.Weights[i] *= -1; // 2nd half of all weights should be negative
-                    neuron.Bias = 0; // bias should be 0
-                }
+            foreach (var neuron in new_model.Layers.First().Neurons)
+                FlipPolarities(neuron);
             return new_model;
         }
 
@@ -284,6 +279,28 @@ namespace Carmen.CastingEngine.Neural
             {
                 EnsureNegative(ref neuron.Weights[i], 0.001);
                 EnsurePositive(ref neuron.Weights[i + offset], 0.001);
+                i++;
+            }
+        }
+
+        private void FlipPolarities(Neuron neuron)
+        {
+            neuron.Bias = 0;
+            var offset = nInputs / 2;
+            var i = 0;
+            foreach (var ow in overallWeightings)
+            {
+                neuron.Weights[i + offset] *= -1;
+                i++;
+            }
+            foreach (var requirement in suitabilityRequirements)
+            {
+                neuron.Weights[i + offset] *= -1;
+                i++;
+            }
+            foreach (var requirement in existingRoleRequirements)
+            {
+                neuron.Weights[i] *= -1;
                 i++;
             }
         }
