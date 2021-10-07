@@ -51,7 +51,10 @@ namespace Carmen.CastingEngine.Neural
         /// <summary>If true, training data will kept to be used again in future training</summary>
         public bool StockpileTrainingData { get; set; } = true;
 
-        public string ModelFileName { get; private init; } //LATER make this editable?
+        /// <summary>If false, the model will only be used for predictions, but not updated</summary>
+        public bool AllowTraining { get; set; } = true;
+
+        public string ModelFileName { get; private init; } //LATER make this a setting, editable by user
         #endregion
 
         public ComplexNeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm, string model_file_name)
@@ -104,6 +107,8 @@ namespace Carmen.CastingEngine.Neural
         #region Business logic
         public override bool UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
         {
+            if (!AllowTraining)
+                return false; // nothing to do
             if (role.Requirements.Count(r => suitabilityRequirements.Contains(r)) == 0)//TODO think about this
                 return false; // nothing to do
             // Generate training data
@@ -124,8 +129,11 @@ namespace Carmen.CastingEngine.Neural
 
         public override bool ExportChanges()
         {
-            FinaliseTraining();
-            SaveModelToDisk(ModelFileName, model);
+            if (AllowTraining)
+            {
+                FinaliseTraining();
+                SaveModelToDisk(ModelFileName, model);
+            }
             return false;
         }
 
