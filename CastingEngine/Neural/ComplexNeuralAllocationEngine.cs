@@ -82,12 +82,20 @@ namespace Carmen.CastingEngine.Neural
                     if (reader.Deserialize(file) is FeedforwardNetwork model && model.InputCount == n_inputs)
                         return model;
                 }
-                catch (Exception ex)
+                catch
                 {
                     //LATER log exception or otherwise tell user, there are many cases that can get here: file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
                 }
             }
-            return new FeedforwardNetwork(n_inputs, 2, n_inputs * 2, 1, new Tanh(), new Sigmoid()); // sigmoid output is between 0 and 1, crossing at 0.5
+            var new_model = new FeedforwardNetwork(n_inputs, 2, n_inputs, 1); // sigmoid output is between 0 and 1, crossing at 0.5
+            foreach (var layer in new_model.Layers)
+                foreach (var neuron in layer.Neurons)
+                {
+                    for (var i = neuron.Weights.Length / 2; i < neuron.Weights.Length; i++)
+                        neuron.Weights[i] *= -1; // 2nd half of all weights should be negative
+                    neuron.Bias = 0; // bias should be 0
+                }
+            return new_model;
         }
 
         private static void SaveModelToDisk(string file_name, FeedforwardNetwork model)
@@ -150,16 +158,7 @@ namespace Carmen.CastingEngine.Neural
         {
             //LATER learning rate and loss function should probably be part of the trainer rather than the network
             model.LearningRate = NeuralLearningRate * (overallWeightings.Sum(o => o.OverallWeight) + suitabilityRequirements.Sum(r => r.SuitabilityWeight));
-            model.LossFunction = NeuralLossFunction switch
-            {
-                LossFunctionChoice.MeanSquaredError => new MeanSquaredError(),
-                LossFunctionChoice.Classification0_5 => new ClassificationError { Threshold = 0.5 },
-                LossFunctionChoice.Classification0_4 => new ClassificationError { Threshold = 0.4 },
-                LossFunctionChoice.Classification0_3 => new ClassificationError { Threshold = 0.3 },
-                LossFunctionChoice.Classification0_2 => new ClassificationError { Threshold = 0.2 },
-                LossFunctionChoice.Classification0_1 => new ClassificationError { Threshold = 0.1 },
-                _ => throw new NotImplementedException($"Enum not implemented: {NeuralLossFunction}")
-            };
+            model.LossFunction = NeuralLossFunction;
             var trainer = new ModelTrainer(model)
             {
                 LossThreshold = 0.005,
