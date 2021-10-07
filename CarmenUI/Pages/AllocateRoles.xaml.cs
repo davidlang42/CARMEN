@@ -152,8 +152,8 @@ namespace CarmenUI.Pages
                         .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
                         .Where(afr => !afr.IsSelected)
                         .Select(afr => afr.Applicant);
-                    if (engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role))
-                        SaveChanges(false);
+                    engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
+                    SaveChanges(false); // to save any weights updated by the engine
                 }
                 ChangeToViewMode();
             }
@@ -304,10 +304,8 @@ namespace CarmenUI.Pages
 
         private void MainMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            if (engine.ExportChanges())
-                SaveChangesAndReturn();
-            else
-                CancelChangesAndReturn();
+            engine.ExportChanges();
+            SaveChangesAndReturn(false); // to save any weights updated by the engine
         } 
 
         private void showApplicants_Changed(object sender, RoutedEventArgs e)

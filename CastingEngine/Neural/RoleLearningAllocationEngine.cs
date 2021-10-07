@@ -14,19 +14,20 @@ namespace Carmen.CastingEngine.Neural
     /// A concrete approach for learning the user's casting choices, by training the Neural Network one role at a time,
     /// when it is selected.
     /// </summary>
-    public class RoleLearningAllocationEngine : NeuralAllocationEngine
+    public class RoleLearningAllocationEngine : SimpleNeuralAllocationEngine
     {
         public RoleLearningAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
             : base(applicant_engine, alternative_casts, show_root, requirements, confirm)
         { }
 
-        /// <summary>Returns an empty sequence because training is always processed immediately</summary>
-        protected override IEnumerable<IWeightChange> FinaliseTraining() => Enumerable.Empty<IWeightChange>();
-
-        protected override IEnumerable<IWeightChange> TrainingPairsAdded(Dictionary<double[], double[]> pairs, Role role)
+        protected override void AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role)
         {
             TrainModel(pairs); // always train immediately
-            return CalculateChanges(role.Requirements.Contains);
+            PropogateChangesToShowModel(role.Requirements.Contains);
         }
+
+        /// <summary>Empty implementation because training is always processed immediately</summary>
+        protected override void FinaliseTraining()
+        { }
     }
 }

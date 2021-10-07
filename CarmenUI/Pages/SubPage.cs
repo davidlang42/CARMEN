@@ -87,9 +87,9 @@ namespace CarmenUI.Pages
         }
 
         /// <summary>Save changes and exit to main menu if succeeded</summary>
-        protected void SaveChangesAndReturn()
+        protected void SaveChangesAndReturn(bool user_initiated = true)
         {
-            if (SaveChanges())
+            if (SaveChanges(user_initiated))
                 OnReturn(new ReturnEventArgs<DataObjects>(saved_changes));
         }
 

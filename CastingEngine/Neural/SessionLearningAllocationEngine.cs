@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.Neural
     /// A concrete approach for learning the user's casting choices, by training the Neural Network with many roles at once,
     /// at the end of a casting session.
     /// </summary>
-    public class SessionLearningAllocationEngine : NeuralAllocationEngine
+    public class SessionLearningAllocationEngine : SimpleNeuralAllocationEngine
     {
         readonly Dictionary<double[], double[]> trainingPairs = new();
 
@@ -31,23 +31,23 @@ namespace Carmen.CastingEngine.Neural
         { }
 
         #region Business logic
-        protected override IEnumerable<IWeightChange> TrainingPairsAdded(Dictionary<double[], double[]> pairs, Role role)
+        protected override void AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role)
         {
             foreach (var pair in pairs)
                 trainingPairs.Add(pair.Key, pair.Value);
             if (!TrainImmediately)
-                return Enumerable.Empty<IWeightChange>(); // do it later
-            return FinaliseTraining();
+                return; // do it later
+            FinaliseTraining();
         }
 
-        protected override IEnumerable<IWeightChange> FinaliseTraining()
+        protected override void FinaliseTraining()
         {
             if (!trainingPairs.Any())
-                return Enumerable.Empty<IWeightChange>(); // nothing to do
+                return; // nothing to do
             TrainModel(trainingPairs);
             if (!StockpileTrainingData)
                 trainingPairs.Clear();
-            return CalculateChanges(r => true);   
+            PropogateChangesToShowModel(r => true);
         }
         #endregion
     }

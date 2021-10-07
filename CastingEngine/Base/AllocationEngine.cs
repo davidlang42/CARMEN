@@ -70,9 +70,13 @@ namespace Carmen.CastingEngine.Base
 
         public abstract double SuitabilityOf(Applicant applicant, Role role);
 
-        public virtual bool UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role) => false;
+        /// <summary>Default implementation does nothing</summary>
+        public virtual void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
+        { }
 
-        public virtual bool ExportChanges() => false;
+        /// <summary>Default implementation does nothing</summary>
+        public virtual void ExportChanges()
+        { }
 
         /// <summary>Return a list of the best cast to pick for the role, based on suitability. If a role has no requirements,
         /// the default implementation selects other alternative casts by matching cast number, if possible.

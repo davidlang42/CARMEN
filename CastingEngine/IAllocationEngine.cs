@@ -42,13 +42,12 @@ namespace Carmen.CastingEngine
         IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
 
         /// <summary>A callback for when the user allocates cast to a role, providing
-        /// information to the engine which can be used to improve future recommendations.
-        /// Returns true if changes are made to any ShowModel objects and should be saved.</summary>
-        bool UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role);
+        /// information to the engine which can be used to improve future recommendations.</summary>
+        void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role);
 
-        /// <summary>Saves any changes made in the engine back to the ShowModel and returns true
-        /// if any are made. This should be called whenever the engine's job is finished.</summary>
-        bool ExportChanges();
+        /// <summary>Saves any changes made in the engine back to the ShowModel or otherwise.
+        /// This should be called whenever the engine's job is finished.</summary>
+        void ExportChanges();
 
         /// <summary>Allocate the best cast to one or more roles, balancing talent between them.
         /// NOTE: Unlike <see cref="PickCast(IEnumerable{Applicant}, Role)"/> this directly allocates
