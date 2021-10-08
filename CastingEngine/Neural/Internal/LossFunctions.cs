@@ -43,6 +43,29 @@ namespace Carmen.CastingEngine.Neural.Internal
         }
     }
 
+    public class MeanAbsoluteError : ILossFunction
+    {
+        /// <summary>average(y-y')</summary>
+        public double Calculate(double[] dloss_douto)
+        {
+            double result = 0;
+            for (var i = 0; i < dloss_douto.Length; i++)
+                result += Math.Abs(dloss_douto[i]);
+            return result / dloss_douto.Length;
+        }
+
+        /// <summary>y'-y</summary>
+        public double[] Derivative(double[] outputs, double[] expected_outputs)
+        {
+            if (outputs.Length != expected_outputs.Length)
+                throw new ArgumentException($"{nameof(outputs)} [{outputs.Length}] must have the same length as {nameof(expected_outputs)} [{expected_outputs.Length}]");
+            var result = new double[outputs.Length];
+            for (var i = 0; i < outputs.Length; i++)
+                result[i] = outputs[i] - expected_outputs[i];
+            return result;
+        }
+    }
+
     public class ClassificationError : ILossFunction
     {
         /// <summary>The threshold for correctness.
