@@ -78,7 +78,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         { }
 
         /// <summary>Train the model with a single set of inputs and expected output.
-        /// Returns the total loss prior to back propogation.</summary>
+        /// Returns the loss prior to back propogation.</summary>
         public double Train(double[] inputs, double[] expected_outputs)
         {
             // Calculation
@@ -88,7 +88,7 @@ namespace Carmen.CastingEngine.Neural.Internal
                 out_o[i] = Layers[i].Predict(out_o[i - 1]);
             // Back propogation (stochastic gradient descent)
             var dloss_douto = Loss.Derivative(out_o[out_o.Length - 1], expected_outputs);
-            var total_loss = Loss.Calculate(dloss_douto, out_o[out_o.Length - 1], expected_outputs);
+            var average_loss = Loss.Calculate(dloss_douto, out_o[out_o.Length - 1], expected_outputs);
             for (var i = out_o.Length - 1; i > 0; i--)
             {
                 Layers[i].Train(out_o[i - 1], out_o[i], dloss_douto, LearningRate, out var dloss_dino);
@@ -99,7 +99,7 @@ namespace Carmen.CastingEngine.Neural.Internal
                         dloss_douto[h] += dloss_dino[n] * Layers[i].Neurons[n].Weights[h];
             }
             Layers[0].Train(inputs, out_o[0], dloss_douto, LearningRate, out _);
-            return total_loss;
+            return average_loss;
         }
 
         public double[] Predict(double[] inputs)

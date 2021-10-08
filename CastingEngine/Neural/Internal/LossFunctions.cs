@@ -12,7 +12,7 @@ namespace Carmen.CastingEngine.Neural.Internal
     public interface ILossFunction
     {
         /// <summary>Calculates the average error across all outputs using the
-        /// already calculated partial derivatives, or raw values</summary>
+        /// already calculated partial derivatives, or raw outputs/expected outputs</summary>
         public double Calculate(double[] dloss_douto, double[] outputs, double[] expected_outputs);
 
         /// <summary>Calculates the partial derivative of the error with respect
@@ -43,7 +43,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             double result = 0;
             for (var i = 0; i < dloss_douto.Length; i++)
                 result += Math.Pow(dloss_douto[i], 2); //LATER is x * x faster than Math.Pow(x, 2)?
-            return result / (2 * dloss_douto.Length); //LATER I still feel like this should be average loss, therefore divide by dloss_douto.Length, this may not have mattered because I was almost always predicting 1 output
+            return result / (2 * dloss_douto.Length);
         }
 
         /// <summary>y'-y</summary>
@@ -87,7 +87,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         /// A value greater than 0.5 allows errors to be counted as correct.</summary>
         public double Threshold { get; set; } = 0.5;
 
-        /// <summary>count(incorrect prediction)</summary>
+        /// <summary>count(incorrect predictions) / count(predictions)</summary>
         public override double Calculate(double[] dloss_douto)
         {
             // output: [0, 0.5], expected: 0, dloss_douto: [0, 0.5], result: correct
@@ -98,7 +98,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             for (var i = 0; i < dloss_douto.Length; i++)
                 if (Math.Abs(dloss_douto[i]) > Threshold)
                     incorrect++;
-            return incorrect;
+            return incorrect / dloss_douto.Length;
         }
 
         /// <summary>y'-y</summary>
