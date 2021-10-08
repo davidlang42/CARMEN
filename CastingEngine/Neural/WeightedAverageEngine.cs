@@ -23,7 +23,7 @@ namespace Carmen.CastingEngine.Neural
         /// <summary>If true, the costs of existing roles are subtracted from the suitability for that requirement, before
         /// the weighted average applies between requirements. If false, the weighted average is calculated first,
         /// then the costs of existing roles are subtracted from the final suitability.</summary>
-        public bool WeightExistingRoleCosts { get; set; } = true;
+        public bool WeightExistingRoleCosts { get; set; } = false; //TODO this should probably be persisted in the ShowModel
 
         public WeightedAverageEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root)
             : base(applicant_engine, alternative_casts)
