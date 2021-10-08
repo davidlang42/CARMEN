@@ -28,7 +28,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             double result = 0;
             for (var i = 0; i < dloss_douto.Length; i++)
                 result += Math.Pow(dloss_douto[i], 2); //LATER is x * x faster than Math.Pow(x, 2)?
-            return result / 2;
+            return result / 2; //LATER I still feel like this should be average loss, therefore divide by dloss_douto.Length, this may not have mattered because I was almost always predicting 1 output
         }
 
         /// <summary>y'-y</summary>

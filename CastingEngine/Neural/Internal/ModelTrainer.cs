@@ -144,7 +144,7 @@ namespace Carmen.CastingEngine.Neural.Internal
                 for (var i = 0; i < training_inputs.Length; i++)
                 {
                     var new_loss = model.Train(training_inputs[i], training_outputs[i]);
-                    no_change &= ChangeThreshold.HasValue && Math.Abs(new_loss - previous_loss[i]) < ChangeThreshold;
+                    no_change &= ChangeThreshold.HasValue && Math.Abs(new_loss - previous_loss[i]) < ChangeThreshold; //LATER is this logic even right? shouldn't it be average loss?
                     previous_loss[i] = new_loss;
                     success &= LossThreshold.HasValue && new_loss < LossThreshold;
                 }
