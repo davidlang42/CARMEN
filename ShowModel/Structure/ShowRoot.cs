@@ -106,6 +106,22 @@ namespace Carmen.ShowModel.Structure
             }
         }
 
+        private bool weightExistingRoleCosts = false;
+        /// <summary>If true, the costs of existing roles are subtracted from the suitability for that requirement, before
+        /// the weighted average applies between requirements. If false, the weighted average is calculated first,
+        /// then the costs of existing roles are subtracted from the final suitability.</summary>
+        public bool WeightExistingRoleCosts
+        {
+            get => weightExistingRoleCosts;
+            set
+            {
+                if (weightExistingRoleCosts == value)
+                    return;
+                weightExistingRoleCosts = value;
+                OnPropertyChanged();
+            }
+        }
+
         public override InnerNode? Parent
         {
             get => null;

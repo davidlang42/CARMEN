@@ -20,11 +20,6 @@ namespace Carmen.CastingEngine.Neural
     {
         protected readonly ShowRoot showRoot;
 
-        /// <summary>If true, the costs of existing roles are subtracted from the suitability for that requirement, before
-        /// the weighted average applies between requirements. If false, the weighted average is calculated first,
-        /// then the costs of existing roles are subtracted from the final suitability.</summary>
-        public bool WeightExistingRoleCosts { get; set; } = false; //TODO this should probably be persisted in the ShowModel
-
         public WeightedAverageEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root)
             : base(applicant_engine, alternative_casts)
         {
@@ -60,10 +55,10 @@ namespace Carmen.CastingEngine.Neural
 
         /// <summary>Must be the inverse of <see cref="WeightToCost(double, double)"/></summary>
         protected double CostToWeight(double cost, double suitability_weight, double suitability_weight_sum)
-            => -cost * (WeightExistingRoleCosts ? suitability_weight : suitability_weight_sum) / 100;
+            => -cost * (showRoot.WeightExistingRoleCosts ? suitability_weight : suitability_weight_sum) / 100;
 
         /// <summary>Must be the inverse of <see cref="CostToWeight(double, double)"/></summary>
         protected double WeightToCost(double neuron_weight, double suitability_weight, double suitability_weight_sum)
-            => -neuron_weight / (WeightExistingRoleCosts ? suitability_weight : suitability_weight_sum) * 100;
+            => -neuron_weight / (showRoot.WeightExistingRoleCosts ? suitability_weight : suitability_weight_sum) * 100;
     }
 }
