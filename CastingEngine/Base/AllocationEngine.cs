@@ -71,6 +71,11 @@ namespace Carmen.CastingEngine.Base
 
         public abstract double SuitabilityOf(Applicant applicant, Role role);
 
+        /// <summary>Default implementation orders by <see cref="SuitabilityOf(Applicant, Role)"/> descending (ascending if reversed)</summary>
+        public virtual IEnumerable<Applicant> InPreferredOrder(IEnumerable<Applicant> applicants, Role role, bool reverse = false)
+            => reverse ? applicants.OrderBy(a => SuitabilityOf(a, role)).ThenBy(a => ApplicantEngine.OverallAbility(a))
+            : applicants.OrderByDescending(a => SuitabilityOf(a, role)).ThenByDescending(a => ApplicantEngine.OverallAbility(a));
+
         /// <summary>Default implementation does nothing</summary>
         public virtual void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
         { }
@@ -105,13 +110,13 @@ namespace Carmen.CastingEngine.Base
                     required_cast_groups.Add(cbg.CastGroup, (uint)required);
             }
             // list available cast in priority order, grouped by cast group
-            var potential_cast_by_group = applicants
-                .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
-                .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
-                .Where(a => AvailabilityOf(a, role).IsAvailable)
-                .Where(a => EligibilityOf(a, role).IsEligible)
-                .OrderBy(a => SuitabilityOf(a, role)) // order by suitability ascending so that the lowest suitability is at the bottom of the stack
-                .ThenBy(a => ApplicantEngine.OverallAbility(a)) // then by overall ability ascending so that the lowest ability is at the bottom of the stack
+            var potential_cast_by_group =
+                InPreferredOrder(applicants
+                    .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
+                    .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
+                    .Where(a => AvailabilityOf(a, role).IsAvailable)
+                    .Where(a => EligibilityOf(a, role).IsEligible),
+                    role, reverse: true) // order in reverse so the lowest suitability is at the bottom of the stack
                 .GroupBy(a => a.CastGroup!)
                 .ToDictionary(g => g.Key, g => new Stack<Applicant>(g));
             // select the required number of cast in the priority order, adding alternative cast buddies as required
@@ -321,8 +326,7 @@ namespace Carmen.CastingEngine.Base
             var required_cast = roles.Select(r => (int)r.CountFor(cast_group) - r.Cast.Count(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast)).ToArray();
             // List the available applicants for each role
             var available_cast = roles.Select(r => new Queue<Applicant>( //LATER due to the remove operation, it might be faster to use a Stack, requires investigation
-                applicants.Where(a => IsEligible(a, r) && IsAvailable(a, r))
-                .OrderByDescending(a => SuitabilityOf(a, r)))
+                InPreferredOrder(applicants.Where(a => IsEligible(a, r) && IsAvailable(a, r)), r))
                 ).ToArray();
             // Check for a role which must be immediately cast, otherwise start at the first uncast role
             int role;

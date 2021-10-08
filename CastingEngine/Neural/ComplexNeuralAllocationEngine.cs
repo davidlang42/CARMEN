@@ -57,6 +57,7 @@ namespace Carmen.CastingEngine.Neural
             : base(applicant_engine, alternative_casts, show_root, show_root.Yield().ToArray(), requirements, requirements.OfType<ICriteriaRequirement>().ToArray(), confirm)
         {
             model = new Lazy<FeedforwardNetwork>(LoadModelFromDisk);
+            SortAlgorithm = SortAlgorithm.DisagreementSort;
         }
 
         #region Business logic
@@ -132,11 +133,6 @@ namespace Carmen.CastingEngine.Neural
             using var file = new StreamWriter(ModelFileName);
             writer.Serialize(file, model.Value);
         }
-        #endregion
-
-        #region Applicant comparison
-        //TODO how will suitability be calculated? or do we just adjust ordering to used Disagreement sort instead of suitability?
-        public override double SuitabilityOf(Applicant applicant, Role role) => throw new NotImplementedException();
         #endregion
 
         #region Helper methods

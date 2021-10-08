@@ -39,6 +39,9 @@ namespace Carmen.CastingEngine.Neural
 
         /// <summary>Determines which loss function is used when training the neural network.</summary>
         public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_4;
+
+        /// <summary>The sorting algorithm used for ordering the applicants with the neural network</summary>
+        public SortAlgorithm SortAlgorithm { get; set; } = SortAlgorithm.OrderBySuitability;
         #endregion
 
         /// <param name="overall_weightings">The things which will provide overall ability weights</param>
@@ -177,6 +180,31 @@ namespace Carmen.CastingEngine.Neural
                 return -1; // A < B
             else // a_better_than_b == 0.5
                 return 0; // A == B
+        }
+
+        /// <summary>Use the neural network to order the applicants, based on the chosen SortingAlgorithm</summary>
+        public override IEnumerable<Applicant> InPreferredOrder(IEnumerable<Applicant> applicants, Role role, bool reverse = false)
+            => SortAlgorithm switch
+            {
+                SortAlgorithm.OrderBySuitability => base.InPreferredOrder(applicants, role, reverse),
+                SortAlgorithm.OrderByComparer when reverse => applicants.OrderByDescending(a => a, ComparerFor(role)),
+                SortAlgorithm.OrderByComparer => applicants.OrderBy(a => a, ComparerFor(role)),
+                SortAlgorithm.OrderByCached when reverse => applicants.OrderByDescending(a => a, new CachedComparer<Applicant>(ComparerFor(role))),
+                SortAlgorithm.OrderByCached => applicants.OrderBy(a => a, new CachedComparer<Applicant>(ComparerFor(role))),
+                SortAlgorithm.QuickSortComparer when reverse => QuickSort(applicants, ComparerFor(role)).Reverse(),
+                SortAlgorithm.QuickSortComparer => QuickSort(applicants, ComparerFor(role)),
+                SortAlgorithm.QuickSortCached when reverse => QuickSort(applicants, new CachedComparer<Applicant>(ComparerFor(role))).Reverse(),
+                SortAlgorithm.QuickSortCached => QuickSort(applicants, new CachedComparer<Applicant>(ComparerFor(role))),
+                SortAlgorithm.DisagreementSort when reverse => new DisagreementSort<Applicant>(ComparerFor(role)).Sort(applicants).Reverse(),
+                SortAlgorithm.DisagreementSort => new DisagreementSort<Applicant>(ComparerFor(role)).Sort(applicants),
+                _ => throw new NotImplementedException($"Enum not implemented: {SortAlgorithm}")
+            };
+
+        private IEnumerable<T> QuickSort<T>(IEnumerable<T> items, IComparer<T> comparer)
+        {
+            var list = new List<T>(items);
+            list.Sort(comparer);
+            return list;
         }
         #endregion
     }

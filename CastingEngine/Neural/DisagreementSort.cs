@@ -8,18 +8,13 @@ namespace Carmen.CastingEngine.Neural
 {
     /// <summary>
     /// A sort method which works on an imperfect comparison function, that is one where A > B > C does not always mean A > C.
-    /// This sorter implements IComparer<typeparamref name="T"/> using the cached results of calling the provided imperfect comparer.
     /// </summary>
-    public class DisagreementSort<T> : IComparer<T> //LATER remove if not used
+    public class DisagreementSort<T> : CachedComparer<T>
         where T : class
     {
-        IComparer<T> imperfectComparer;
-        Dictionary<(T, T), int> comparisonCache = new();
-
         public DisagreementSort(IComparer<T> imperfect_comparer)
-        {
-            imperfectComparer = imperfect_comparer;
-        }
+            : base(imperfect_comparer)
+        { }
 
         public IEnumerable<T> Sort(IEnumerable<T> items)
         {
@@ -119,16 +114,5 @@ namespace Carmen.CastingEngine.Neural
 
         private bool LessThan(T item, T less_than_item)
             => Compare(item, less_than_item) < 0;
-
-        public int Compare(T? a, T? b)
-        {
-            if (a == null || b == null)
-                throw new ArgumentNullException();
-            if (comparisonCache.TryGetValue((a, b), out var cached_result))
-                return cached_result;
-            var result = imperfectComparer.Compare(a, b);
-            comparisonCache.Add((a, b), result);
-            return result;
-        }
     }
 }
