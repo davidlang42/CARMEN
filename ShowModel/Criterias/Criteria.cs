@@ -84,7 +84,7 @@ namespace Carmen.ShowModel.Criterias
             }
         }
 
-        private double weight;
+        private double weight = 1;
         public double Weight
         {
             get => weight;

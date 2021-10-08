@@ -83,7 +83,7 @@ namespace Carmen.ShowModel.Structure
             }
         }
 
-        private double? commonOverallWeight = 1;
+        private double? commonOverallWeight = 0.1;
         /// <summary>If set, this is the common weighting of the OverallAbility compared to the requirement weights,
         /// used in calculating the suitability of an applicant for a role. This weighting will be applied to the
         /// OverallSuitability only once in the weighted average calculation, regardless of how many other requirements
