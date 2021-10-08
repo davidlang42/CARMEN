@@ -52,9 +52,6 @@ namespace Carmen.CastingEngine.Neural.Internal
 
         public double[] Predict(double[] inputs) => Layer.Predict(inputs);
 
-        public double AverageInputWeightMagnitude()
-            => Layer.Neurons.SelectMany(n => n.Weights.Select(w => Math.Abs(w))).Average();
-
         public override string ToString() => $"Outputs: {Layer}";
     }
 }

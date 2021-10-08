@@ -143,6 +143,9 @@ namespace Carmen.CastingEngine.Neural
 
             return show_model_updated;
         }
+
+        protected override double CalculateLearningRate()
+            => NeuralLearningRate * (overallWeightings.Sum(o => o.OverallWeight) + suitabilityRequirements.Sum(r => r.SuitabilityWeight));
         #endregion
 
         #region Helper methods

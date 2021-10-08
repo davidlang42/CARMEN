@@ -126,7 +126,7 @@ namespace Carmen.CastingEngine.Neural
         protected void TrainModel(Dictionary<double[], double[]> pairs)
         {
             //LATER learning rate and loss function should probably be part of the trainer rather than the network
-            Model.LearningRate = NeuralLearningRate * Model.AverageInputWeightMagnitude() * Model.InputCount;
+            Model.LearningRate = CalculateLearningRate();
             Model.LossFunction = NeuralLossFunction;
             var trainer = new ModelTrainer(Model)
             {
@@ -135,6 +135,8 @@ namespace Carmen.CastingEngine.Neural
             };
             var m = trainer.Train(pairs.Keys, pairs.Values);
         }
+
+        protected virtual double CalculateLearningRate() => NeuralLearningRate;
         #endregion
 
         #region Applicant comparison

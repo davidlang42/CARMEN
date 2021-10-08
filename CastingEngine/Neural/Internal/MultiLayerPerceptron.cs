@@ -69,9 +69,6 @@ namespace Carmen.CastingEngine.Neural.Internal
             return result;
         }
 
-        public double AverageInputWeightMagnitude()
-            => Hidden.Neurons.SelectMany(n => n.Weights.Select(w => Math.Abs(w))).Average();
-
         public override string ToString() => $"Hidden: {string.Join(" / ", Hidden)}; Output: {string.Join(" / ", Output)};";
     }
 }
