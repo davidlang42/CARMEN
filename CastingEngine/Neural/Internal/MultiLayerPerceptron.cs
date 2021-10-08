@@ -59,7 +59,7 @@ namespace Carmen.CastingEngine.Neural.Internal
                 for (var n = 0; n < Output.Neurons.Length; n++)
                     dloss_douto1[h] += dloss_dino2[n] * Output.Neurons[n].Weights[h];
             Hidden.Train(inputs, out_o1, dloss_douto1, LearningRate, out _);
-            return Loss.Calculate(dloss_douto2);
+            return Loss.Calculate(dloss_douto2, out_o2, expected_outputs);
         }
 
         public double[] Predict(double[] inputs)

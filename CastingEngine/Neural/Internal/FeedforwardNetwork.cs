@@ -88,7 +88,7 @@ namespace Carmen.CastingEngine.Neural.Internal
                 out_o[i] = Layers[i].Predict(out_o[i - 1]);
             // Back propogation (stochastic gradient descent)
             var dloss_douto = Loss.Derivative(out_o[out_o.Length - 1], expected_outputs);
-            var total_loss = Loss.Calculate(dloss_douto);
+            var total_loss = Loss.Calculate(dloss_douto, out_o[out_o.Length - 1], expected_outputs);
             for (var i = out_o.Length - 1; i > 0; i--)
             {
                 Layers[i].Train(out_o[i - 1], out_o[i], dloss_douto, LearningRate, out var dloss_dino);
