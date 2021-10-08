@@ -41,7 +41,7 @@ namespace Carmen.CastingEngine.Neural
         public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_4;
 
         /// <summary>The sorting algorithm used for ordering the applicants with the neural network</summary>
-        public SortAlgorithm SortAlgorithm { get; set; } = SortAlgorithm.OrderBySuitability;
+        public virtual SortAlgorithm SortAlgorithm { get; set; } = SortAlgorithm.OrderBySuitability;
         #endregion
 
         /// <param name="overall_weightings">The things which will provide overall ability weights</param>

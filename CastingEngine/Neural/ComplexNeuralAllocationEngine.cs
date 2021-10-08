@@ -51,6 +51,17 @@ namespace Carmen.CastingEngine.Neural
         /// <summary>The number of neurons per input to be created in a new model layer (does not affect loaded models)
         /// NOTE: This is used in conjunction with <see cref="ModelLayerNeuronsConstant"/></summary>
         public uint ModelLayerNeuronsPerInput { get; set; } = 1; //LATER set a better default based on experimental data
+
+        public override SortAlgorithm SortAlgorithm
+        {
+            get => base.SortAlgorithm;
+            set
+            {
+                if (value == SortAlgorithm.OrderBySuitability)
+                    throw new ArgumentException($"{nameof(ComplexNeuralAllocationEngine)} cannot use Sort Algorithm {value}");
+                base.SortAlgorithm = value;
+            }
+        }
         #endregion
 
         public ComplexNeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
