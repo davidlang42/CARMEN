@@ -54,9 +54,25 @@ namespace Carmen.CastingEngine.Neural
             existingRoleRequirements = existing_role_requirements;
             this.confirm = confirm;
             nInputs = (overallWeightings.Length + suitabilityRequirements.Length + existingRoleRequirements.Length) * 2;
+            if (overallWeightings.Length + suitabilityRequirements.Length < 2 && !ConfirmEngineCantLearn())
+                throw new ApplicationException("Not enough weights are enabled for the NeuralAllocationEngine to learn from."
+                    + "\nPlease enable more Suitability and Overall weights on Requirements on the Configuring Show page."
+                    + "\nThis error can be avoided by choosing a non-learning AllocationEngine in the Advanced settings."); //LATER make sure that when this is thrown, the user is taken cleanly back to the main menu
         }
 
         #region Business logic
+        private bool ConfirmEngineCantLearn()
+        {
+            var msg = "There ";
+            if (overallWeightings.Length + suitabilityRequirements.Length == 1)
+                msg += "is currently only 1 Requirement";
+            else
+                msg += "are currently no Requirements";
+            msg += " with 'Weight' enabled. This will not allow the CARMEN engine to learn from your casting choices.";
+            msg += "\nWould you like to continue?";
+            return confirm(msg);
+        }
+
         public override void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
         {
             if (role.Requirements.Count(r => suitabilityRequirements.Contains(r)) == 0)
