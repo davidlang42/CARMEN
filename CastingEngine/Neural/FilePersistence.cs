@@ -16,8 +16,8 @@ namespace Carmen.CastingEngine.Neural
             fileName = file_name;
         }
 
-        public StreamReader Load() => new StreamReader(fileName);
+        public TextReader Load() => new StreamReader(fileName);
 
-        public StreamWriter Save() => new StreamWriter(fileName);
+        public TextWriter Save() => new StreamWriter(fileName);
     }
 }

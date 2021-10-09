@@ -9,8 +9,8 @@ namespace Carmen.CastingEngine.Neural
 {
     public interface IDataPersistence
     {
-        public StreamWriter Save();
+        public TextWriter Save();
 
-        public StreamReader Load();
+        public TextReader Load();
     }
 }
