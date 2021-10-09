@@ -42,15 +42,18 @@ namespace Carmen.CastingEngine.Neural
         public string ModelFileName { get; set; } = "";
 
         /// <summary>The number of hidden layers to be created in a new model (does not affect loaded models)</summary>
-        public uint ModelHiddenLayers { get; set; } = 2; //LATER set a better default based on experimental data
+        public int NeuralHiddenLayers { get; set; } = 2; //LATER set a better default based on experimental data
 
         /// <summary>The constant number of neurons to be created in a new model layer (does not affect loaded models)
-        /// NOTE: This is used in conjunction with <see cref="ModelLayerNeuronsPerInput"/></summary>
-        public uint ModelLayerNeuronsConstant { get; set; } = 0; //LATER set a better default based on experimental data
+        /// NOTE: This is used in conjunction with <see cref="NeuralLayerNeuronsPerInput"/></summary>
+        public int NeuralLayerNeuronsConstant { get; set; } = 0; //LATER set a better default based on experimental data
 
         /// <summary>The number of neurons per input to be created in a new model layer (does not affect loaded models)
-        /// NOTE: This is used in conjunction with <see cref="ModelLayerNeuronsConstant"/></summary>
-        public uint ModelLayerNeuronsPerInput { get; set; } = 1; //LATER set a better default based on experimental data
+        /// NOTE: This is used in conjunction with <see cref="NeuralLayerNeuronsConstant"/></summary>
+        public double NeuralLayerNeuronsPerInput { get; set; } = 1; //LATER set a better default based on experimental data
+
+        /// <summary>Determines which activation function is used for the hidden layers of a new model (does not affect loaded models)</summary>
+        public ActivationFunctionChoice NeuralHiddenActivationFunction { get; set; } = ActivationFunctionChoice.Tanh;
 
         public override SortAlgorithm SortAlgorithm
         {
@@ -124,18 +127,18 @@ namespace Carmen.CastingEngine.Neural
 
         private FeedforwardNetwork BuildNewModel()
         {
-            var neurons_per_layer = (int)ModelLayerNeuronsConstant + (int)ModelLayerNeuronsPerInput * nInputs;
-            if (ModelHiddenLayers < 1)
+            var neurons_per_layer = Convert.ToInt32(Math.Ceiling(NeuralLayerNeuronsConstant + NeuralLayerNeuronsPerInput * nInputs));
+            if (NeuralHiddenLayers < 1)
                 throw new ApplicationException("The number of hidden layers must be at least 1");
             if (neurons_per_layer < 2)
                 throw new ApplicationException("The number of neurons per layer must be at least 2");
-            var new_model = new FeedforwardNetwork(nInputs, (int)ModelHiddenLayers, neurons_per_layer, 1); // sigmoid output is between 0 and 1, crossing at 0.5
+            var new_model = new FeedforwardNetwork(nInputs, NeuralHiddenLayers, neurons_per_layer, 1, NeuralHiddenActivationFunction, ActivationFunctionChoice.Sigmoid); // sigmoid output is between 0 and 1, crossing at 0.5
             foreach (var neuron in new_model.Layers.First().Neurons)
                 FlipPolarities(neuron);
             return new_model;
         }
 
-        private void SaveModelToDisk()
+        private void SaveModelToDisk()//TODO make persistence a Stream/callback rather than direct file access
         {
             if (!model.IsValueCreated)
                 return; // no need to save if we haven't even loaded it
