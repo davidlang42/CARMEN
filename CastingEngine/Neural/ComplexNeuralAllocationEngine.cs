@@ -38,8 +38,8 @@ namespace Carmen.CastingEngine.Neural
         /// <summary>If false, the model will only be used for predictions, but not updated</summary>
         public bool AllowTraining { get; set; } = true;
 
-        /// <summary>The file name of where the model should be loaded from (if existing) and stored</summary>
-        public string ModelFileName { get; set; } = "";
+        /// <summary>The method used to save and load the neural network model</summary>
+        public IDataPersistence ModelPersistence { get; set; }
 
         /// <summary>The number of hidden layers to be created in a new model (does not affect loaded models)</summary>
         public int NeuralHiddenLayers { get; set; } = 2; //LATER set a better default based on experimental data
@@ -67,11 +67,12 @@ namespace Carmen.CastingEngine.Neural
         }
         #endregion
 
-        public ComplexNeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
+        public ComplexNeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm, IDataPersistence model_persistence)
             : base(applicant_engine, alternative_casts, show_root, show_root.Yield().ToArray(), requirements, requirements.OfType<ICriteriaRequirement>().ToArray(), confirm)
         {
             model = new Lazy<FeedforwardNetwork>(LoadModelFromDisk);
             SortAlgorithm = SortAlgorithm.DisagreementSort;
+            ModelPersistence = model_persistence;
         }
 
         #region Business logic
@@ -108,19 +109,16 @@ namespace Carmen.CastingEngine.Neural
             // - store associated to requirement names, if names change it counts as a new requirement
             // - any new requirements get initialised with random weights of the correct polarity
             // - existing requirements may be re-ordered, but this just involves updating the first layer weights
-            if (!string.IsNullOrEmpty(ModelFileName) && File.Exists(ModelFileName))
+            var reader = new XmlSerializer(typeof(FeedforwardNetwork));
+            try
             {
-                var reader = new XmlSerializer(typeof(FeedforwardNetwork));
-                try
-                {
-                    using var file = new StreamReader(ModelFileName);
-                    if (reader.Deserialize(file) is FeedforwardNetwork model && model.InputCount == nInputs)
-                        return model;
-                }
-                catch
-                {
-                    //LATER log exception or otherwise tell user, there are many cases that can get here: file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
-                }
+                using var stream = ModelPersistence.Load();
+                if (reader.Deserialize(stream) is FeedforwardNetwork model && model.InputCount == nInputs)
+                    return model;
+            }
+            catch
+            {
+                //LATER log exception or otherwise tell user, there are many cases that can get here: file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
             }
             return BuildNewModel();
         }
@@ -138,14 +136,14 @@ namespace Carmen.CastingEngine.Neural
             return new_model;
         }
 
-        private void SaveModelToDisk()//TODO make persistence a Stream/callback rather than direct file access
+        private void SaveModelToDisk()
         {
             if (!model.IsValueCreated)
                 return; // no need to save if we haven't even loaded it
             var writer = new XmlSerializer(typeof(FeedforwardNetwork));
             //LATER handle exceptions (and check for filename not being empty) and offer to save to temp as a fallback
-            using var file = new StreamWriter(ModelFileName);
-            writer.Serialize(file, model.Value);
+            using var stream = ModelPersistence.Save();
+            writer.Serialize(stream, model.Value);
         }
         #endregion
 
