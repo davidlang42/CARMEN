@@ -26,6 +26,8 @@ namespace Carmen.CastingEngine.Neural
 
         protected abstract INeuralNetwork Model { get; }
 
+        public Montage LastTrainingMontage { get; private set; }
+
         //LATER allow users to change these parameters
         #region Engine parameters
         /// <summary>The maximum number of training iterations run per invocation of
@@ -152,7 +154,7 @@ namespace Carmen.CastingEngine.Neural
                 LossThreshold = 0.005,
                 MaxIterations = MaxTrainingIterations
             };
-            var m = trainer.Train(pairs.Keys, pairs.Values);
+            LastTrainingMontage = trainer.Train(pairs.Keys, pairs.Values);
         }
 
         protected virtual double CalculateLearningRate() => NeuralLearningRate;

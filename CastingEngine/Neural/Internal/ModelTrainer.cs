@@ -96,10 +96,12 @@ namespace Carmen.CastingEngine.Neural.Internal
         public bool Success;
         public bool ReachedMaxIterations;
         public bool ReachedStableLoss;
+        public double[] InitialLoss;
         public double[] FinalLoss;
         public int Iterations;
         public List<string> Descriptions;
 
+        public double InitialAverageLoss => InitialLoss.Average();
         public double AverageLoss => FinalLoss.Average();
     }
 
@@ -131,6 +133,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             if (training_inputs.Length != training_outputs.Length)
                 throw new ArgumentException($"Length of {nameof(inputs)}[{training_inputs.Length}] must equal the length of {nameof(expected_outputs)}[{training_outputs.Length}].");
             var repeat = 0;
+            double[]? initial_loss = null;
             var previous_loss = new double[training_inputs.Length];
             var success = false;
             var no_change = false;
@@ -148,10 +151,12 @@ namespace Carmen.CastingEngine.Neural.Internal
                     previous_loss[i] = new_loss;
                     success &= LossThreshold.HasValue && new_loss < LossThreshold;
                 }
+                initial_loss ??= previous_loss.ToArray();
                 too_many_repeats = ++repeat >= MaxIterations && MaxIterations.HasValue;
             }
             return new Montage
             {
+                InitialLoss = initial_loss,
                 Success = success,
                 ReachedMaxIterations = too_many_repeats,
                 ReachedStableLoss = no_change,
