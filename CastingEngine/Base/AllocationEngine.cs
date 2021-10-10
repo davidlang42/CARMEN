@@ -18,7 +18,7 @@ namespace Carmen.CastingEngine.Base
     /// <summary>
     /// The abstract base class of most IAllocationEngine based engines
     /// </summary>
-    public abstract class AllocationEngine : IAllocationEngine
+    public abstract class AllocationEngine : IAllocationEngine, IComparer<(Applicant, Role)>
     {
         /// <summary>A list of available selection engines</summary>
         public static readonly Type[] Implementations = new[] {
@@ -535,5 +535,32 @@ namespace Carmen.CastingEngine.Base
 
         private InnerNode? HighestNonConsecutiveNode(Item item)
             => item.Parents().Where(n => !n.AllowConsecutiveItems).LastOrDefault();
+
+        #region Applicant comparison
+        public ApplicantForRoleComparer ComparerFor(Role role)
+            => new ApplicantForRoleComparer(this, role);
+
+        int IComparer<(Applicant, Role)>.Compare((Applicant, Role) x, (Applicant, Role) y)
+        {
+            if (x.Item2 != y.Item2)
+                throw new ArgumentException("Role must be common between the 2 values.");
+            return Compare(x.Item1, y.Item1, x.Item2);
+        }
+
+        /// <summary>Default implementation compares applicants by calling <see cref="SuitabilityOf(Applicant, Role)"/></summary>
+        public virtual int Compare(Applicant a, Applicant b, Role for_role)
+        {
+            if (a == null || b == null)
+                throw new ArgumentNullException();
+            var suit_a = SuitabilityOf(a, for_role);
+            var suit_b = SuitabilityOf(b, for_role);
+            if (suit_a > suit_b)
+                return 1; // A > B
+            else if (suit_a < suit_b)
+                return -1; // A < B
+            else // suit_a == suit_b
+                return 0; // A == B
+        }
+        #endregion
     }
 }

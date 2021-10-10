@@ -16,7 +16,7 @@ namespace Carmen.CastingEngine.Neural
     /// <summary>
     /// The base class of all Neural Network based allocation engines
     /// </summary>
-    public abstract class NeuralAllocationEngine : WeightedAverageEngine, IComparer<(Applicant, Role)>
+    public abstract class NeuralAllocationEngine : WeightedAverageEngine
     {
         protected readonly IOverallWeighting[] overallWeightings;
         protected readonly Requirement[] suitabilityRequirements;
@@ -161,17 +161,7 @@ namespace Carmen.CastingEngine.Neural
         #endregion
 
         #region Applicant comparison
-        public ApplicantForRoleComparer ComparerFor(Role role)
-            => new ApplicantForRoleComparer(this, role);
-
-        int IComparer<(Applicant, Role)>.Compare((Applicant, Role) x, (Applicant, Role) y)
-        {
-            if (x.Item2 != y.Item2)
-                throw new ArgumentException("Role must be common between the 2 values.");
-            return Compare(x.Item1, y.Item1, x.Item2);
-        }
-
-        public int Compare(Applicant a, Applicant b, Role for_role)
+        public override int Compare(Applicant a, Applicant b, Role for_role)
         {
             if (a == null || b == null)
                 throw new ArgumentNullException();
