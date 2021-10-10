@@ -102,7 +102,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         public List<string> Descriptions;
 
         public double InitialAverageLoss => InitialLoss.Average();
-        public double AverageLoss => FinalLoss.Average();
+        public double FinalAverageLoss => FinalLoss.Average();
     }
 
     public class ModelTrainer
