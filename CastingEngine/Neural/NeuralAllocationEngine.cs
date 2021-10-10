@@ -26,7 +26,7 @@ namespace Carmen.CastingEngine.Neural
 
         protected abstract INeuralNetwork Model { get; }
 
-        public Montage LastTrainingMontage { get; private set; }
+        public Montage? LastTrainingMontage { get; set; } = null;
 
         //LATER allow users to change these parameters
         #region Engine parameters
