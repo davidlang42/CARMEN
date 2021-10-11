@@ -36,13 +36,6 @@ namespace Carmen.CastingEngine.Neural.Internal
         private ILossFunction? loss = null;
         private ILossFunction Loss => loss ??= LossFunction.Create();
 
-        int INeuralNetwork.InputCount => throw new NotImplementedException();
-
-        int INeuralNetwork.OutputCount => throw new NotImplementedException();
-
-        double INeuralNetwork.LearningRate { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        LossFunctionChoice INeuralNetwork.LossFunction { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-
         /// <summary>Parameterless constructor for serialisation</summary>
         private FeedforwardNetwork()
             => Layers = Array.Empty<Layer>();
@@ -129,9 +122,5 @@ namespace Carmen.CastingEngine.Neural.Internal
             s += $"Output: {string.Join(" / ", Layers[Layers.Length - 1])};";
             return s;
         }
-
-        double INeuralNetwork.Train(double[] inputs, double[] expected_outputs) => throw new NotImplementedException();
-        double[] INeuralNetwork.Predict(double[] inputs) => throw new NotImplementedException();
-        string INeuralNetwork.ToString() => throw new NotImplementedException();
     }
 }
