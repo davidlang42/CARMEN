@@ -139,7 +139,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             double[]? initial_loss = null;
             var previous_loss = new double[training_inputs.Length];
             var success = false;
-            var contains_nan = false;
+            var contains_nan = ContainsNaN(model);
             var no_change = false;
             var too_many_repeats = false;
             var descriptions = new List<string>();
@@ -155,13 +155,13 @@ namespace Carmen.CastingEngine.Neural.Internal
                     previous_loss[i] = new_loss;
                     success &= LossThreshold.HasValue && new_loss < LossThreshold;
                 }
-                contains_nan = model.Layers.Any(l => l.Neurons.Any(n => double.IsNaN(n.Bias) || n.Weights.Any(w => double.IsNaN(w))));
+                contains_nan = ContainsNaN(model);
                 initial_loss ??= previous_loss.ToArray();
                 too_many_repeats = ++repeat >= MaxIterations && MaxIterations.HasValue;
             }
             return new Montage
             {
-                InitialLoss = initial_loss!,
+                InitialLoss = initial_loss ?? new double[0],
                 Success = success,
                 ReachedMaxIterations = too_many_repeats,
                 ReachedStableLoss = no_change,
@@ -171,5 +171,8 @@ namespace Carmen.CastingEngine.Neural.Internal
                 Descriptions = descriptions
             };
         }
+
+        private static bool ContainsNaN(INeuralNetwork model)
+            => model.Layers.Any(l => l.Neurons.Any(n => double.IsNaN(n.Bias) || n.Weights.Any(w => double.IsNaN(w))));
     }
 }
