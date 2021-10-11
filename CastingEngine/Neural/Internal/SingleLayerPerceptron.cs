@@ -13,6 +13,7 @@ namespace Carmen.CastingEngine.Neural.Internal
     public class SingleLayerPerceptron : INeuralNetwork
     {
         public Layer Layer { get; init; }
+        IEnumerable<Layer> INeuralNetwork.Layers => Layer.Yield();
         public int InputCount => Layer.Neurons.First().InputCount;
         public int OutputCount => Layer.NeuronCount;
         public double LearningRate { get; set; } = 0.05;

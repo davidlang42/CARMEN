@@ -8,6 +8,7 @@ namespace Carmen.CastingEngine.Neural.Internal
 {
     public interface INeuralNetwork
     {
+        public IEnumerable<Layer> Layers { get; }
         public int InputCount { get; }
         public int OutputCount { get; }
         public double LearningRate { get; set; }

@@ -96,6 +96,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         public bool Success;
         public bool ReachedMaxIterations;
         public bool ReachedStableLoss;
+        public bool ContainsNaN;
         public double[] InitialLoss;
         public double[] FinalLoss;
         public int Iterations;
@@ -128,6 +129,8 @@ namespace Carmen.CastingEngine.Neural.Internal
         {
             if (MaxIterations == null && LossThreshold == null && ChangeThreshold == null)
                 throw new ApplicationException($"At least one of ({nameof(MaxIterations)}, {nameof(LossThreshold)}, {nameof(ChangeThreshold)}) must be set.");
+            if (MaxIterations.HasValue && MaxIterations.Value < 1)
+                throw new ApplicationException($"{nameof(MaxIterations)} must be greater than 0.");
             var training_inputs = inputs.ToArray();
             var training_outputs = expected_outputs.ToArray();
             if (training_inputs.Length != training_outputs.Length)
@@ -136,10 +139,11 @@ namespace Carmen.CastingEngine.Neural.Internal
             double[]? initial_loss = null;
             var previous_loss = new double[training_inputs.Length];
             var success = false;
+            var contains_nan = false;
             var no_change = false;
             var too_many_repeats = false;
             var descriptions = new List<string>();
-            while (!success && !no_change && !too_many_repeats)
+            while (!success && !no_change && !too_many_repeats && !contains_nan)
             {
                 descriptions.Add(model.ToString());
                 success = true;
@@ -151,15 +155,17 @@ namespace Carmen.CastingEngine.Neural.Internal
                     previous_loss[i] = new_loss;
                     success &= LossThreshold.HasValue && new_loss < LossThreshold;
                 }
+                contains_nan = model.Layers.Any(l => l.Neurons.Any(n => double.IsNaN(n.Bias) || n.Weights.Any(w => double.IsNaN(w))));
                 initial_loss ??= previous_loss.ToArray();
                 too_many_repeats = ++repeat >= MaxIterations && MaxIterations.HasValue;
             }
             return new Montage
             {
-                InitialLoss = initial_loss,
+                InitialLoss = initial_loss!,
                 Success = success,
                 ReachedMaxIterations = too_many_repeats,
                 ReachedStableLoss = no_change,
+                ContainsNaN = contains_nan,
                 Iterations = repeat,
                 FinalLoss = previous_loss,
                 Descriptions = descriptions

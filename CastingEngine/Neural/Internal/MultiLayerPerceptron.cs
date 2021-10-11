@@ -15,6 +15,15 @@ namespace Carmen.CastingEngine.Neural.Internal
         public Layer Hidden;
         public Layer Output;
 
+        IEnumerable<Layer> INeuralNetwork.Layers
+        {
+            get
+            {
+                yield return Hidden;
+                yield return Output;
+            }
+        }
+
         public int InputCount => Hidden.Neurons.First().InputCount;
         public int OutputCount => Output.NeuronCount;
         public double LearningRate { get; set; } = 0.05;
