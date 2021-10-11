@@ -102,7 +102,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         public int Iterations;
         public List<string> Descriptions;
 
-        public double InitialAverageLoss => InitialLoss.Average();
+        public double InitialAverageLoss => InitialLoss.DefaultIfEmpty().Average();
         public double FinalAverageLoss => FinalLoss.Average();
     }
 
@@ -135,6 +135,8 @@ namespace Carmen.CastingEngine.Neural.Internal
             var training_outputs = expected_outputs.ToArray();
             if (training_inputs.Length != training_outputs.Length)
                 throw new ArgumentException($"Length of {nameof(inputs)}[{training_inputs.Length}] must equal the length of {nameof(expected_outputs)}[{training_outputs.Length}].");
+            if (training_inputs.Length == 0)
+                throw new ArgumentException($"{nameof(inputs)} cannot be empty");
             var repeat = 0;
             double[]? initial_loss = null;
             var previous_loss = new double[training_inputs.Length];
