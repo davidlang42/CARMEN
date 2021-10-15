@@ -55,7 +55,7 @@ namespace Carmen.CastingEngine.Heuristic
         {
             foreach (var section in ItemContainingSections(show_root))
             {
-                var section_roles = section.ItemsInOrder().SelectMany(i => i.Roles).ToHashSet();
+                var section_roles = ItemsInOrderFast(section).SelectMany(i => i.Roles).ToHashSet();
                 foreach (var primary_criteria in criterias.InOrder().Where(c => c.Primary))
                 {
                     var criteria_roles = section_roles.Where(r => r.Requirements.OfType<ICriteriaRequirement>().Any(cr => cr.Criteria == primary_criteria)).ToArray();

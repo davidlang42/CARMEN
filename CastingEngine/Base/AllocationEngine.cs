@@ -150,6 +150,10 @@ namespace Carmen.CastingEngine.Base
             }
         }
 
+        readonly FunctionCache<Node, Item[]> itemsInOrderCache = new();
+        protected IEnumerable<Item> ItemsInOrderFast(Node node) => itemsInOrderCache.Get(node, node
+            => node is Item item ? new[] { item } : ((InnerNode)node).Children.InOrder().SelectMany(n => ItemsInOrderFast(n)).ToArray());
+
         /// <summary>Enumerate roles by structural segments of the show, tiered based on the priority of their requirements.
         /// Within each tier, roles are ordered by the least required cast first, then by the smallest number of eligible cast available.
         /// Roles requiring more than <see cref="CastingOrderGroupThreshold"/> cast per Cast Group are grouped together and balance cast
@@ -157,14 +161,14 @@ namespace Carmen.CastingEngine.Base
         public IEnumerable<Role[]> IdealCastingOrder(ShowRoot show_root, Applicant[] applicants_in_cast)
         {
             // List all roles once
-            var remaining_roles = show_root.ItemsInOrder().SelectMany(i => i.Roles).ToHashSet();
+            var remaining_roles = ItemsInOrderFast(show_root).SelectMany(i => i.Roles).ToHashSet();
             // Separate show into segments based on setting
             Node[] segments = CastingOrderByNonMultiSection ? NonMultiSegments(show_root).ToArray() : new[] { show_root };
             // Cast each segment in order
             foreach (var segment in segments)
             {
                 // List remaining roles in this segment
-                var segment_roles = segment.ItemsInOrder().SelectMany(i => i.Roles.InNameOrder()).Distinct().Where(r => remaining_roles.Contains(r)).ToArray();
+                var segment_roles = ItemsInOrderFast(segment).SelectMany(i => i.Roles.InNameOrder()).Distinct().Where(r => remaining_roles.Contains(r)).ToArray();
                 remaining_roles.RemoveRange(segment_roles);
                 // Group segment roles based on requirement priority
                 var requirement_tiers = PrioritiseByRequirements(segment_roles, CastingOrderByPriority).ToArray();
@@ -415,8 +419,8 @@ namespace Carmen.CastingEngine.Base
             return role_count;
         }
 
-        readonly FunctionCache<IEnumerable<Requirement>, Dictionary<Criteria, double>> criteriaCounts = new();
-        private Dictionary<Criteria, double> CriteriaCounts(IEnumerable<Requirement> requirements) => criteriaCounts.Get(requirements, requirements =>
+        readonly FunctionCache<IEnumerable<Requirement>, Dictionary<Criteria, double>> criteriaCountsCache = new();
+        private Dictionary<Criteria, double> CriteriaCounts(IEnumerable<Requirement> requirements) => criteriaCountsCache.Get(requirements, requirements =>
         {
             var counts = new Dictionary<Criteria, double>();
             foreach (var requirement in requirements)
@@ -507,7 +511,7 @@ namespace Carmen.CastingEngine.Base
             var non_consecutive_nodes_to_check = applicant_non_consecutive_nodes.Intersect(role_non_consecutive_nodes);
             foreach (var non_consecutive_node in non_consecutive_nodes_to_check)
             {
-                var e = non_consecutive_node.ItemsInOrder().GetEnumerator();
+                var e = ItemsInOrderFast(non_consecutive_node).GetEnumerator(); //LATER could rewrite this loop with array indicies
                 if (!e.MoveNext())
                     yield break;
                 var previous = e.Current;
