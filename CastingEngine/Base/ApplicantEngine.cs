@@ -26,13 +26,12 @@ namespace Carmen.CastingEngine.Base
         public abstract int MaxOverallAbility { get; }
         public abstract int MinOverallAbility { get; }
 
-        readonly FunctionCache<Applicant, int> overallAbility = new(CalculateOverallAbility);
+        readonly FunctionCache<Applicant, int> overallAbility = new(applicant
+            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)));
+
         /// <summary>Calculate the overall ability of an Applicant as a weighted sum of their Abilities.
         /// NOTE: This is cached for speed, as an Applicant's abilities shouldn't change over the lifetime of an ApplicantEngine</summary>
         public int OverallAbility(Applicant applicant) => overallAbility[applicant];
-
-        private static int CalculateOverallAbility(Applicant applicant)
-            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
 
         public virtual void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
         { }
