@@ -329,8 +329,8 @@ namespace Carmen.CastingEngine.Base
             // Count the remaining required cast for each role
             var required_cast = roles.Select(r => (int)r.CountFor(cast_group) - r.Cast.Count(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast)).ToArray();
             // List the available applicants for each role
-            var available_cast = roles.Select(r => new Stack<Applicant>( //LATER due to the remove operation, it might be faster to use a Stack, requires investigation
-                InPreferredOrder(applicants.Where(a => IsEligible(a, r) && IsAvailable(a, r)), r, reverse: true))
+            var available_cast = roles.Select(r => new Queue<Applicant>( //LATER due to the remove operation, it might be faster to use a Stack, requires investigation
+                InPreferredOrder(applicants.Where(a => IsEligible(a, r) && IsAvailable(a, r)), r))
                 ).ToArray();
             // Check for a role which must be immediately cast, otherwise start at the first uncast role
             int role;
@@ -343,7 +343,7 @@ namespace Carmen.CastingEngine.Base
             // Iteratively cast applicants to roles, until no more casting can be done
             while (true)
             {
-                if (required_cast[role] > 0 && available_cast[role].TryPop(out var next_available))
+                if (required_cast[role] > 0 && available_cast[role].TryDequeue(out var next_available))
                 {
                     // Cast the next available applicant to this role
                     roles[role].Cast.Add(next_available);
@@ -364,14 +364,14 @@ namespace Carmen.CastingEngine.Base
             }
         }
 
-        private void RemoveIfNotAvailable(Applicant applicant, Role[] roles, Stack<Applicant>[] available_cast)
+        private void RemoveIfNotAvailable(Applicant applicant, Role[] roles, Queue<Applicant>[] available_cast)
         {
             for (var i = 0; i < roles.Length; i++)
                 if (available_cast[i].Contains(applicant) && !IsAvailable(applicant, roles[i]))
-                    available_cast[i].FindAndRemove(a => a == applicant);
+                    available_cast[i].Remove(applicant);
         }
 
-        private static int? RoleNeedsImmediateCasting(int[] required_cast, Stack<Applicant>[] available_cast)
+        private static int? RoleNeedsImmediateCasting(int[] required_cast, Queue<Applicant>[] available_cast)
         {
             for (var i = 0; i < required_cast.Length; i++)
                 if (required_cast[i] > 0 && available_cast[i].Count <= required_cast[i])
@@ -379,7 +379,7 @@ namespace Carmen.CastingEngine.Base
             return null;
         }
 
-        private static bool IncrementRoleToCast(int[] required_cast, Stack<Applicant>[] available_cast, ref int role)
+        private static bool IncrementRoleToCast(int[] required_cast, Queue<Applicant>[] available_cast, ref int role)
         {
             var next_role = FirstIndexToCast(required_cast, available_cast, role + 1, required_cast.Length - 1)
                 ?? FirstIndexToCast(required_cast, available_cast, 0, role);
@@ -391,7 +391,7 @@ namespace Carmen.CastingEngine.Base
             return false;
         }
 
-        private static int? FirstIndexToCast(int[] required_cast, Stack<Applicant>[] available_cast, int start, int end)
+        private static int? FirstIndexToCast(int[] required_cast, Queue<Applicant>[] available_cast, int start, int end)
         {
             for (var i = start; i <= end; i++)
                 if (required_cast[i] > 0 && available_cast[i].Count > 0)
