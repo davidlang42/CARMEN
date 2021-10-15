@@ -114,8 +114,8 @@ namespace Carmen.CastingEngine.Base
                 InPreferredOrder(applicants
                     .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
                     .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
-                    .Where(a => AvailabilityOf(a, role).IsAvailable)
-                    .Where(a => EligibilityOf(a, role).IsEligible),
+                    .Where(a => IsAvailable(a, role))
+                    .Where(a => IsEligible(a, role)),
                     role, reverse: true) // order in reverse so the lowest suitability is at the bottom of the stack
                 .GroupBy(a => a.CastGroup!)
                 .ToDictionary(g => g.Key, g => new Stack<Applicant>(g));

@@ -151,7 +151,7 @@ namespace ExtractCastingData
                 {
                     var not_picked_applicants = applicants_in_cast_by_id.Values // applicants in this database
                         .Where(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast) // of the same cast group & cast
-                        .Where(a => al_engine.AvailabilityOf(a, role).IsAvailable) // which were (probably) available at the time the user cast this role (assuming the show was cast in the expected order)
+                        .Where(a => al_engine.IsAvailable(a, role)) // which were (probably) available at the time the user cast this role (assuming the show was cast in the expected order)
                         .Where(a => !picked_applicants.Contains(a)) // which weren't picked
                         .ToArray();
                     var group_description = cast_group.Abbreviation;
