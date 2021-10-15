@@ -329,7 +329,7 @@ namespace Carmen.CastingEngine.Base
             // Count the remaining required cast for each role
             var required_cast = roles.Select(r => (int)r.CountFor(cast_group) - r.Cast.Count(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast)).ToArray();
             // List the available applicants for each role
-            var available_cast = roles.Select(r => new Queue<Applicant>( //LATER due to the remove operation, it might be faster to use a Stack, requires investigation
+            var available_cast = roles.Select(r => new Queue<Applicant>(
                 InPreferredOrder(applicants.Where(a => IsEligible(a, r) && IsAvailable(a, r)), r))
                 ).ToArray();
             // Check for a role which must be immediately cast, otherwise start at the first uncast role
