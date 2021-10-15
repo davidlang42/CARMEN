@@ -53,10 +53,11 @@ namespace Carmen.CastingEngine.Heuristic
         /// </summary>
         public IEnumerable<Role[]> SimpleCastingOrder(ShowRoot show_root)
         {
+            var primary_criterias = criterias.InOrder().Where(c => c.Primary).ToArray();
             foreach (var section in ItemContainingSections(show_root))
             {
                 var section_roles = ItemsInOrderFast(section).SelectMany(i => i.Roles).ToHashSet();
-                foreach (var primary_criteria in criterias.InOrder().Where(c => c.Primary))
+                foreach (var primary_criteria in primary_criterias)
                 {
                     var criteria_roles = section_roles.Where(r => r.Requirements.OfType<ICriteriaRequirement>().Any(cr => cr.Criteria == primary_criteria)).ToArray();
                     foreach (var criteria_role in criteria_roles)
