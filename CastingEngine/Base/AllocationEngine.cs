@@ -151,7 +151,7 @@ namespace Carmen.CastingEngine.Base
         }
 
         readonly FunctionCache<Node, Item[]> itemsInOrderCache = new();
-        protected IEnumerable<Item> ItemsInOrderFast(Node node) => itemsInOrderCache.Get(node, node
+        protected Item[] ItemsInOrderFast(Node node) => itemsInOrderCache.Get(node, node
             => node is Item item ? new[] { item } : ((InnerNode)node).Children.InOrder().SelectMany(n => ItemsInOrderFast(n)).ToArray());
 
         /// <summary>Enumerate roles by structural segments of the show, tiered based on the priority of their requirements.
@@ -511,30 +511,24 @@ namespace Carmen.CastingEngine.Base
             var non_consecutive_nodes_to_check = applicant_non_consecutive_nodes.Intersect(role_non_consecutive_nodes);
             foreach (var non_consecutive_node in non_consecutive_nodes_to_check)
             {
-                var e = ItemsInOrderFast(non_consecutive_node).GetEnumerator(); //LATER could rewrite this loop with array indicies
-                if (!e.MoveNext())
-                    yield break;
-                var previous = e.Current;
-                while (e.MoveNext())
-                {
-                    if (applicant_items.Contains(previous) && role_items.Contains(e.Current))
+                var items = ItemsInOrderFast(non_consecutive_node);
+                for (var i = 1; i < items.Length; i++)
+                    if (applicant_items.Contains(items[i - 1]) && role_items.Contains(items[i]))
                         yield return new AdjacentItem
                         {
-                            AlreadyInItem = previous,
+                            AlreadyInItem = items[i - 1],
                             Adjacency = Adjacency.Previous,
-                            AdjacentTo = e.Current,
+                            AdjacentTo = items[i],
                             NonConsecutiveSection = non_consecutive_node
                         };
-                    else if (role_items.Contains(previous) && applicant_items.Contains(e.Current))
+                    else if (role_items.Contains(items[i - 1]) && applicant_items.Contains(items[i]))
                         yield return new AdjacentItem
                         {
-                            AlreadyInItem = e.Current,
+                            AlreadyInItem = items[i],
                             Adjacency = Adjacency.Next,
-                            AdjacentTo = previous,
+                            AdjacentTo = items[i - 1],
                             NonConsecutiveSection = non_consecutive_node
                         };
-                    previous = e.Current;
-                }
             }
         }
 
