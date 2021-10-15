@@ -37,24 +37,22 @@ namespace Carmen.CastingEngine.Base
         public virtual void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
         { }
 
-        readonly FunctionCache<Applicant, Requirement, double> suitabilityOf = new(CalculateSuitabilityOf);
+        readonly FunctionCache<Applicant, Requirement, double> suitabilityOf = new();
         /// <summary>Assumes no circular references between requirements
         /// NOTE: This is cached for speed, as an Applicant's abilities and Requirement specifications shouldn't change over the lifetime of an ApplicantEngine</summary>
-        public double SuitabilityOf(Applicant applicant, Requirement requirement) => suitabilityOf[(applicant, requirement)];
-
-        public static double CalculateSuitabilityOf(Applicant applicant, Requirement requirement)
+        public double SuitabilityOf(Applicant applicant, Requirement requirement) => suitabilityOf.Get(applicant, requirement, (applicant, requirement)
             => requirement switch
             {
                 AbilityRangeRequirement arr when arr.ScaleSuitability => applicant.MarkFor(arr.Criteria) / (double)arr.Criteria.MaxMark,
-                NotRequirement nr => 1 - CalculateSuitabilityOf(applicant, nr.SubRequirement),
+                NotRequirement nr => 1 - SuitabilityOf(applicant, nr.SubRequirement),
                 AndRequirement ar => ar.AverageSuitability
-                    ? ar.SubRequirements.Select(r => CalculateSuitabilityOf(applicant, r)).Average()
-                    : ar.SubRequirements.Select(r => CalculateSuitabilityOf(applicant, r)).Product(),
+                    ? ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
+                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(),
                 OrRequirement or => or.AverageSuitability
-                    ? or.SubRequirements.Select(r => CalculateSuitabilityOf(applicant, r)).Average()
-                    : or.SubRequirements.Select(r => CalculateSuitabilityOf(applicant, r)).Max(),
-                XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? CalculateSuitabilityOf(applicant, req) : 0,
+                    ? or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
+                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(),
+                XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? SuitabilityOf(applicant, req) : 0,
                 Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
-            }; //LATER ideally the sub requirements would use the cache too
+            });
     }
 }

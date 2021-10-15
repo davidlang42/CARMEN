@@ -9,19 +9,21 @@ namespace Carmen.CastingEngine
     public class FunctionCache<T, U>
         where T : notnull
     {
-        readonly Func<T, U> calculate;
         readonly Dictionary<T, U> cache = new();
 
-        public FunctionCache(Func<T, U> calculate)
+        public Func<T, U>? Function { get; set; }
+
+        public FunctionCache(Func<T, U>? function = null)
         {
-            this.calculate = calculate;
+            Function = function;
         }
 
-        public U Get(T input)
+        public U Get(T input, Func<T, U>? function_override = null)
         {
             if (!cache.TryGetValue(input, out var value))
             {
-                value = calculate(input);
+                var function = Function ?? function_override ?? throw new ArgumentException("Function not set");
+                value = function(input);
                 cache.Add(input, value);
             }
             return value;
@@ -32,19 +34,21 @@ namespace Carmen.CastingEngine
 
     public class FunctionCache<T1, T2, U>
     {
-        readonly Func<T1, T2, U> calculate;
         readonly Dictionary<(T1, T2), U> cache = new();
 
-        public FunctionCache(Func<T1, T2, U> calculate)
+        public Func<T1, T2, U> Function { get; set; }
+
+        public FunctionCache(Func<T1, T2, U>? function = null)
         {
-            this.calculate = calculate;
+            Function = function;
         }
 
-        public U Get(T1 input1, T2 input2)
+        public U Get(T1 input1, T2 input2, Func<T1, T2, U>? function_override = null)
         {
             if (!cache.TryGetValue((input1, input2), out var value))
             {
-                value = calculate(input1, input2);
+                var function = Function ?? function_override ?? throw new ArgumentException("Function not set");
+                value = function(input1, input2);
                 cache.Add((input1, input2), value);
             }
             return value;

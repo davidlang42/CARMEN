@@ -53,7 +53,7 @@ namespace Carmen.CastingEngine.Neural
             UpdateRange();
         }
 
-        private void UpdateRange()
+        private void UpdateRange() //LATER really this is common with WeightedSumEngine and NeuralApplicantEngine should extend that
         {
             var max = criterias.Select(c => c.Weight).Where(w => w > 0).Sum();
             if (max > int.MaxValue)
