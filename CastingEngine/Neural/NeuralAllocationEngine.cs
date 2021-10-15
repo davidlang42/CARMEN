@@ -19,8 +19,11 @@ namespace Carmen.CastingEngine.Neural
     public abstract class NeuralAllocationEngine : WeightedAverageEngine
     {
         protected readonly IOverallWeighting[] overallWeightings;
+        private Dictionary<Requirement, int> overallWeightingsLookup;
         protected readonly Requirement[] suitabilityRequirements;
+        private Dictionary<Requirement, int> suitabilityRequirementsLookup;
         protected readonly ICriteriaRequirement[] existingRoleRequirements;
+        private Dictionary<Requirement, int> existingRoleRequirementsLookup;
         protected readonly int nInputs;
         protected readonly UserConfirmation confirm;
 
@@ -55,14 +58,26 @@ namespace Carmen.CastingEngine.Neural
             : base(applicant_engine, alternative_casts, show_root)
         {
             overallWeightings = overall_weightings;
+            overallWeightingsLookup = ArrayLookup(0, overallWeightings);
             suitabilityRequirements = suitability_requirements;
+            suitabilityRequirementsLookup = ArrayLookup(overallWeightings.Length, suitabilityRequirements);
             existingRoleRequirements = existing_role_requirements;
+            existingRoleRequirementsLookup = ArrayLookup(overallWeightings.Length + suitabilityRequirements.Length, existingRoleRequirements);
             this.confirm = confirm;
             nInputs = (overallWeightings.Length + suitabilityRequirements.Length + existingRoleRequirements.Length) * 2;
             if (overallWeightings.Length + suitabilityRequirements.Length < 2 && !ConfirmEngineCantLearn())
                 throw new ApplicationException("Not enough weights are enabled for the NeuralAllocationEngine to learn from."
                     + "\nPlease enable more Suitability and Overall weights on Requirements on the Configuring Show page."
                     + "\nThis error can be avoided by choosing a non-learning AllocationEngine in the Advanced settings."); //LATER make sure that when this is thrown, the user is taken cleanly back to the main menu
+        }
+
+        private static Dictionary<Requirement, int> ArrayLookup<T>(int offset, T[] array)
+        {
+            Dictionary<Requirement, int> dict = new();
+            for (var i = 0; i < array.Length; i++)
+                if (array[i] is Requirement key)
+                    dict.Add(key, i + offset);
+            return dict;
         }
 
         #region Business logic
@@ -124,33 +139,31 @@ namespace Carmen.CastingEngine.Neural
         {
             var values = new double[nInputs];
             var offset = nInputs / 2;
-            var i = 0;
-            foreach (var ow in overallWeightings)
-            {
-                if (ow is not Requirement requirement || role.Requirements.Contains(requirement))
+            double? overall_a = null;
+            double? overall_b = null;
+            for (var i = 0; i < overallWeightings.Length; i++)
+                if (overallWeightings[i] is not Requirement)
                 {
-                    values[i] = ApplicantEngine.OverallSuitability(a);
-                    values[i + offset] = ApplicantEngine.OverallSuitability(b);
+                    values[i] = overall_a ??= ApplicantEngine.OverallSuitability(a);
+                    values[i + offset] = overall_b ??= ApplicantEngine.OverallSuitability(b);
                 }
-                i++;
-            }
-            foreach (var requirement in suitabilityRequirements)
+            foreach (var requirement in role.Requirements)
             {
-                if (role.Requirements.Contains(requirement))
+                if (overallWeightingsLookup.TryGetValue(requirement, out int overall_index))
                 {
-                    values[i] = ApplicantEngine.SuitabilityOf(a, requirement);
-                    values[i + offset] = ApplicantEngine.SuitabilityOf(b, requirement);
+                    values[overall_index] = overall_a ??= ApplicantEngine.OverallSuitability(a);
+                    values[overall_index + offset] = overall_b ??= ApplicantEngine.OverallSuitability(b);
                 }
-                i++;
-            }
-            foreach (var cr in existingRoleRequirements)
-            {
-                if (role.Requirements.Contains((Requirement)cr))
+                if (suitabilityRequirementsLookup.TryGetValue(requirement, out var suitability_index))
                 {
-                    values[i] = CountRoles(a, cr.Criteria, role);
-                    values[i + offset] = CountRoles(b, cr.Criteria, role);
+                    values[suitability_index] = ApplicantEngine.SuitabilityOf(a, requirement);
+                    values[suitability_index + offset] = ApplicantEngine.SuitabilityOf(b, requirement);
                 }
-                i++;
+                if (existingRoleRequirementsLookup.TryGetValue(requirement, out var existing_role_index))
+                {
+                    values[existing_role_index] = CountRoles(a, ((ICriteriaRequirement)requirement).Criteria, role);
+                    values[existing_role_index + offset] = CountRoles(b, ((ICriteriaRequirement)requirement).Criteria, role);
+                }
             }
             return values;
         }
