@@ -36,10 +36,6 @@ namespace Carmen.CastingEngine.Neural
         /// <summary>Determines which loss function is used when training the neural network.</summary>
         public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_3; //LATER make this a user setting
 
-        /// Calculate the overall ability of an Applicant as a simple weighted sum of their Abilities</summary>
-        public override int OverallAbility(Applicant applicant)
-            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
-
         public NeuralApplicantEngine(Criteria[] criterias, UserConfirmation confirm)
         {
             this.criterias = criterias.Where(c => c.Weight != 0).ToArray(); // exclude criterias with zero weight

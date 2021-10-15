@@ -19,10 +19,6 @@ namespace Carmen.CastingEngine.Heuristic
 
         readonly int minOverallAbility;
         public override int MinOverallAbility => minOverallAbility;
-
-        /// Calculate the overall ability of an Applicant as a simple weighted sum of their Abilities</summary>
-        public override int OverallAbility(Applicant applicant)
-            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
         
         public WeightedSumEngine(Criteria[] criterias)
         {

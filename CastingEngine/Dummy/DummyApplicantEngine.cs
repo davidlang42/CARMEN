@@ -17,9 +17,5 @@ namespace Carmen.CastingEngine.Dummy
 
         /// <summary>Dummy value is always 0</summary>
         public override int MinOverallAbility => 0;
-
-        /// <summary>Dummy value is the weighted average of abilities, not checking for any missing values</summary>
-        public override int OverallAbility(Applicant applicant)
-            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
     }
 }

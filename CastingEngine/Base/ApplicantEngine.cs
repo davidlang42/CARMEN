@@ -26,25 +26,35 @@ namespace Carmen.CastingEngine.Base
         public abstract int MaxOverallAbility { get; }
         public abstract int MinOverallAbility { get; }
 
-        public abstract int OverallAbility(Applicant applicant);
+        readonly FunctionCache<Applicant, int> overallAbility = new(CalculateOverallAbility);
+        /// <summary>Calculate the overall ability of an Applicant as a weighted sum of their Abilities.
+        /// NOTE: This is cached for speed, as an Applicant's abilities shouldn't change over the lifetime of an ApplicantEngine</summary>
+        public int OverallAbility(Applicant applicant) => overallAbility[applicant];
+
+        private static int CalculateOverallAbility(Applicant applicant)
+            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
 
         public virtual void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
         { }
 
-        /// <summary>Assumes no circular references between requirements</summary>
-        public virtual double SuitabilityOf(Applicant applicant, Requirement requirement)
+        readonly FunctionCache<Applicant, Requirement, double> suitabilityOf = new(CalculateSuitabilityOf);
+        /// <summary>Assumes no circular references between requirements
+        /// NOTE: This is cached for speed, as an Applicant's abilities and Requirement specifications shouldn't change over the lifetime of an ApplicantEngine</summary>
+        public double SuitabilityOf(Applicant applicant, Requirement requirement) => suitabilityOf[(applicant, requirement)];
+
+        public static double CalculateSuitabilityOf(Applicant applicant, Requirement requirement)
             => requirement switch
             {
                 AbilityRangeRequirement arr when arr.ScaleSuitability => applicant.MarkFor(arr.Criteria) / (double)arr.Criteria.MaxMark,
-                NotRequirement nr => 1 - SuitabilityOf(applicant, nr.SubRequirement),
+                NotRequirement nr => 1 - CalculateSuitabilityOf(applicant, nr.SubRequirement),
                 AndRequirement ar => ar.AverageSuitability
-                    ? ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : ar.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Product(),
+                    ? ar.SubRequirements.Select(r => CalculateSuitabilityOf(applicant, r)).Average()
+                    : ar.SubRequirements.Select(r => CalculateSuitabilityOf(applicant, r)).Product(),
                 OrRequirement or => or.AverageSuitability
-                    ? or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Average()
-                    : or.SubRequirements.Select(r => SuitabilityOf(applicant, r)).Max(),
-                XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? SuitabilityOf(applicant, req) : 0,
+                    ? or.SubRequirements.Select(r => CalculateSuitabilityOf(applicant, r)).Average()
+                    : or.SubRequirements.Select(r => CalculateSuitabilityOf(applicant, r)).Max(),
+                XorRequirement xr => xr.SubRequirements.Where(r => r.IsSatisfiedBy(applicant)).SingleOrDefaultSafe() is Requirement req ? CalculateSuitabilityOf(applicant, req) : 0,
                 Requirement req => req.IsSatisfiedBy(applicant) ? 1 : 0
-            };
+            }; //LATER ideally the sub requirements would use the cache too
     }
 }
