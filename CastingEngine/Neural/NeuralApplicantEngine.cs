@@ -167,6 +167,7 @@ namespace Carmen.CastingEngine.Neural
             LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
         }
 
+        /// <summary>Finds pairs of good and bad applicants, where the bad applicant is eligible for the cast group of the good</summary>
         public static IEnumerable<(Applicant good, Applicant bad)> ComparablePairs(IEnumerable<Applicant> good_applicants, Applicant[] bad_applicants)
         {
             var good_by_group = good_applicants.GroupBy(a => a.CastGroup).ToDictionary(g => g.Key!, g => g.ToArray());

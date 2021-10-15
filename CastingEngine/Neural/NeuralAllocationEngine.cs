@@ -87,7 +87,7 @@ namespace Carmen.CastingEngine.Neural
             if (not_picked_array.Length == 0)
                 return; // nothing to do
             var training_pairs = new Dictionary<double[], double[]>();
-            foreach (var (picked, not_picked) in NeuralApplicantEngine.ComparablePairs(applicants_picked, not_picked_array))
+            foreach (var (picked, not_picked) in ComparablePairs(applicants_picked, not_picked_array))
             {
                 training_pairs.Add(InputValues(picked, not_picked, role), new[] { 1.0 });
                 training_pairs.Add(InputValues(not_picked, picked, role), new[] { 0.0 });
@@ -96,6 +96,18 @@ namespace Carmen.CastingEngine.Neural
                 return; // nothing to do
             // Process training data
             AddTrainingPairs(training_pairs, role);
+        }
+
+        /// <summary>Finds pairs of good and bad applicants with matching cast groups</summary>
+        public static IEnumerable<(Applicant good, Applicant bad)> ComparablePairs(IEnumerable<Applicant> good_applicants, IEnumerable<Applicant> bad_applicants)
+        {
+            var good_by_group = good_applicants.GroupBy(a => a.CastGroup).ToDictionary(g => g.Key!, g => g.ToArray());
+            var bad_by_group = bad_applicants.GroupBy(a => a.CastGroup).ToDictionary(g => g.Key!, g => g.ToArray());
+            foreach (var cg in good_by_group.Keys)
+                foreach (var good in good_by_group[cg])
+                    if (bad_by_group.TryGetValue(cg, out var bad_of_this_group))
+                        foreach (var bad in bad_of_this_group)
+                            yield return (good, bad);
         }
 
         public override void ExportChanges() => FinaliseTraining();
