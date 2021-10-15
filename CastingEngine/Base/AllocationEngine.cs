@@ -486,9 +486,9 @@ namespace Carmen.CastingEngine.Base
 
         private IEnumerable<NonMultiSectionItem> FindCommonNonMultiSections(HashSet<Item> applicant_items, HashSet<Item> role_items)
         {
-            var role_non_multi_sections = role_items.SelectMany(i => NonMultiSections(i)).ToHashSet();
+            var role_non_multi_sections = role_items.SelectMany(i => nonMultiSections[i]).ToHashSet();
             foreach (var applicant_item in applicant_items)
-                foreach (var applicant_non_multi_section in NonMultiSections(applicant_item))
+                foreach (var applicant_non_multi_section in nonMultiSections[applicant_item])
                     if (role_non_multi_sections.Contains(applicant_non_multi_section))
                         yield return new NonMultiSectionItem
                         {
@@ -497,13 +497,13 @@ namespace Carmen.CastingEngine.Base
                         };
         }
 
-        private IEnumerable<Section> NonMultiSections(Item item)
-            => item.Parents().OfType<Section>().Where(s => !s.SectionType.AllowMultipleRoles);
+        readonly FunctionCache<Item, Section[]> nonMultiSections = new(item
+            => item.Parents().OfType<Section>().Where(s => !s.SectionType.AllowMultipleRoles).ToArray());
 
         private IEnumerable<AdjacentItem> FindAdjacentItems(HashSet<Item> applicant_items, HashSet<Item> role_items)
         {
-            var applicant_non_consecutive_nodes = applicant_items.Select(i => HighestNonConsecutiveNode(i)).OfType<InnerNode>();
-            var role_non_consecutive_nodes = role_items.Select(i => HighestNonConsecutiveNode(i)).OfType<InnerNode>();
+            var applicant_non_consecutive_nodes = applicant_items.Select(i => highestNonConsecutiveNode[i]).OfType<InnerNode>();
+            var role_non_consecutive_nodes = role_items.Select(i => highestNonConsecutiveNode[i]).OfType<InnerNode>();
             var non_consecutive_nodes_to_check = applicant_non_consecutive_nodes.Intersect(role_non_consecutive_nodes);
             foreach (var non_consecutive_node in non_consecutive_nodes_to_check)
             {
@@ -534,8 +534,8 @@ namespace Carmen.CastingEngine.Base
             }
         }
 
-        private InnerNode? HighestNonConsecutiveNode(Item item)
-            => item.Parents().Where(n => !n.AllowConsecutiveItems).LastOrDefault();
+        readonly FunctionCache<Item, InnerNode?> highestNonConsecutiveNode = new(item
+            => item.Parents().Where(n => !n.AllowConsecutiveItems).LastOrDefault());
 
         #region Applicant comparison
         public ApplicantForRoleComparer ComparerFor(Role role)
