@@ -408,7 +408,7 @@ namespace Carmen.CastingEngine.Base
             double role_count = 0;
             foreach (var role in applicant.Roles.Where(r => r != excluding_role))
             {
-                var counts = CriteriaCounts(role.Requirements);
+                var counts = CriteriaCounts(role);
                 if (counts.TryGetValue(criteria, out var count))
                 {
                     if (CountRolesByGeometricMean)
@@ -419,25 +419,29 @@ namespace Carmen.CastingEngine.Base
             return role_count;
         }
 
-        readonly FunctionCache<IEnumerable<Requirement>, Dictionary<Criteria, double>> criteriaCountsCache = new();
-        private Dictionary<Criteria, double> CriteriaCounts(IEnumerable<Requirement> requirements) => criteriaCountsCache.Get(requirements, requirements =>
+        readonly FunctionCache<Role, Dictionary<Criteria, double>> criteriaCountsCache = new();
+        private Dictionary<Criteria, double> CriteriaCounts(Role role) => criteriaCountsCache.Get(role, role => 
         {
-            var counts = new Dictionary<Criteria, double>();
-            foreach (var requirement in requirements)
+            Dictionary<Criteria, double> calculate_counts(IEnumerable<Requirement> requirements)
             {
-                if (requirement is ICriteriaRequirement criteria_requirement)
-                    counts[criteria_requirement.Criteria] = 1; // referencing the same criteria twice doesn't count as more
-                else if (requirement is CombinedRequirement combined && (CountRolesIncludingPartialRequirements || combined is AndRequirement)) // treat AND sub-requirements as if they were direct requirements
+                var counts = new Dictionary<Criteria, double>();
+                foreach (var requirement in role.Requirements)
                 {
-                    var sub_counts = CriteriaCounts(combined.SubRequirements);
-                    if (combined is not AndRequirement)
-                        ArithmeticMeanInPlace(sub_counts);
-                    foreach (var (sub_criteria, sub_count) in sub_counts)
-                        if (!counts.TryGetValue(sub_criteria, out var existing_count) || existing_count < sub_count)
-                            counts[sub_criteria] = sub_count; // only keep the max value, referencing twice doesn't count as more
+                    if (requirement is ICriteriaRequirement criteria_requirement)
+                        counts[criteria_requirement.Criteria] = 1; // referencing the same criteria twice doesn't count as more
+                    else if (requirement is CombinedRequirement combined && (CountRolesIncludingPartialRequirements || combined is AndRequirement)) // treat AND sub-requirements as if they were direct requirements
+                    {
+                        var sub_counts = calculate_counts(combined.SubRequirements);
+                        if (combined is not AndRequirement)
+                            ArithmeticMeanInPlace(sub_counts);
+                        foreach (var (sub_criteria, sub_count) in sub_counts)
+                            if (!counts.TryGetValue(sub_criteria, out var existing_count) || existing_count < sub_count)
+                                counts[sub_criteria] = sub_count; // only keep the max value, referencing twice doesn't count as more
+                    }
                 }
+                return counts;
             }
-            return counts;
+            return calculate_counts(role.Requirements);
         });
 
         private static void ArithmeticMeanInPlace(Dictionary<Criteria, double> values)
