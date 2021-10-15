@@ -415,7 +415,8 @@ namespace Carmen.CastingEngine.Base
             return role_count;
         }
 
-        private Dictionary<Criteria, double> CriteriaCounts(IEnumerable<Requirement> requirements)
+        readonly FunctionCache<IEnumerable<Requirement>, Dictionary<Criteria, double>> criteriaCounts = new();
+        private Dictionary<Criteria, double> CriteriaCounts(IEnumerable<Requirement> requirements) => criteriaCounts.Get(requirements, requirements =>
         {
             var counts = new Dictionary<Criteria, double>();
             foreach (var requirement in requirements)
@@ -433,9 +434,9 @@ namespace Carmen.CastingEngine.Base
                 }
             }
             return counts;
-        }
+        });
 
-        private void ArithmeticMeanInPlace(Dictionary<Criteria, double> values)
+        private static void ArithmeticMeanInPlace(Dictionary<Criteria, double> values)
         {
             var total_sum = values.Values.Sum();
             foreach (var key in values.Keys)
