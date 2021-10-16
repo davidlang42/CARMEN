@@ -110,15 +110,14 @@ namespace Carmen.CastingEngine.Base
                     required_cast_groups.Add(cbg.CastGroup, (uint)required);
             }
             // list available cast in priority order, grouped by cast group
-            var potential_cast_by_group =
-                InPreferredOrder(applicants
-                    .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
-                    .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
-                    .Where(a => IsEligible(a, role))
-                    .Where(a => IsAvailable(a, role)),
-                    role, reverse: true) // order in reverse so the lowest suitability is at the bottom of the stack
+            var potential_cast_by_group = applicants
+                .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
+                .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
+                .Where(a => IsEligible(a, role))
+                .Where(a => IsAvailable(a, role))
                 .GroupBy(a => a.CastGroup!)
-                .ToDictionary(g => g.Key, g => new Stack<Applicant>(g));
+                .ToDictionary(g => g.Key,
+                g => new Stack<Applicant>(InPreferredOrder(g, role, reverse: true))); // order in reverse so the lowest suitability is at the bottom of the stack
             // select the required number of cast in the priority order, adding alternative cast buddies as required
             foreach (var (cast_group, potential_cast) in potential_cast_by_group)
             {
