@@ -17,12 +17,11 @@ namespace Carmen.CastingEngine.Neural.Internal
                 if (activationFunction == value)
                     return;
                 activationFunction = value;
-                activation = null;
+                activation = activationFunction.Create();
             }
         }
 
-        private IVectorActivationFunction? activation = null;
-        private IVectorActivationFunction Activation => activation ??= ActivationFunction.Create();
+        private IVectorActivationFunction activation;
 
         readonly public Neuron[] Neurons; // only the array size is readonly
 
@@ -30,13 +29,17 @@ namespace Carmen.CastingEngine.Neural.Internal
 
         /// <summary>Parameterless constructor for serialisation</summary>
         private Layer()
-            => Neurons = Array.Empty<Neuron>();
+        {
+            activation = activationFunction.Create();
+            Neurons = Array.Empty<Neuron>();
+        }
 
         /// <summary>Create a layer of neurons, each with random weights and biases,
         /// utilising a common activation function</summary>
         public Layer(int n_inputs, int n_outputs, ActivationFunctionChoice activation_function = ActivationFunctionChoice.Sigmoid, Random? random = null)
         {
-            ActivationFunction = activation_function;
+            activationFunction = activation_function;
+            activation = activationFunction.Create();
             Neurons = new Neuron[n_outputs];
             for (var n = 0; n < Neurons.Length; n++)
                 Neurons[n] = new Neuron(n_inputs, random);
@@ -48,7 +51,8 @@ namespace Carmen.CastingEngine.Neural.Internal
         {
             if (neuron_weights.Length != neuron_biases.Length)
                 throw new ArgumentException($"{nameof(neuron_weights)}[{neuron_weights.Length}] must have the same length as {nameof(neuron_biases)}[{neuron_biases.Length}]");
-            ActivationFunction = activation_function;
+            activationFunction = activation_function;
+            activation = activationFunction.Create();
             Neurons = new Neuron[neuron_weights.Length];
             for (var n = 0; n < Neurons.Length; n++)
                 Neurons[n] = new Neuron(neuron_weights[n], neuron_biases[n]);
@@ -57,7 +61,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         /// <summary>Train this layer of the model</summary>
         public void Train(double[] inputs, double[] out_o, double[] dloss_douto, double learningRate, out double[] dloss_dino)
         {
-            var douto_dino = Activation.Derivative(out_o);
+            var douto_dino = activation.Derivative(out_o);
             dloss_dino = new double[Neurons.Length];
             for (var n = 0; n < Neurons.Length; n++)
             {
@@ -69,7 +73,7 @@ namespace Carmen.CastingEngine.Neural.Internal
                     var dloss_dweight = dloss_dino[n] * dino_dweight;
                     neuron.Weights[i] -= learningRate * dloss_dweight;
                 }
-                //LATER is it faster to make this 1 a constant rather than variable? or leave it out completely?
+                //TODO is it faster to make this 1 a constant rather than variable? or leave it out completely?
                 var dino_dbias = 1; // because weighted sum: dino = i0*w0 + i1*w1 + bias
                 neuron.Bias -= learningRate * dloss_dino[n] * dino_dbias;
             }
@@ -80,7 +84,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             var in_o = new double[Neurons.Length];
             for (var i = 0; i < in_o.Length; i++)
                 in_o[i] = Neurons[i].WeightedSum(inputs);
-            return Activation.Calculate(in_o);
+            return activation.Calculate(in_o);
         }
 
         public override string ToString() => string.Join(" / ", Neurons.Select(n => n.ToString()));

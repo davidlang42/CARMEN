@@ -32,15 +32,15 @@ namespace Carmen.CastingEngine.Neural.Internal
                 if (lossFunction == value)
                     return;
                 lossFunction = value;
-                loss = null;
+                loss = lossFunction.Create();
             }
         }
 
-        private ILossFunction? loss = null;
-        private ILossFunction Loss => loss ??= LossFunction.Create();
+        private ILossFunction loss;
 
         public SingleLayerPerceptron(int n_inputs, int n_outputs, ActivationFunctionChoice activation = ActivationFunctionChoice.Sigmoid)
         {
+            loss = lossFunction.Create();
             Layer = new Layer(n_inputs, n_outputs, activation);
         }
 
@@ -51,9 +51,9 @@ namespace Carmen.CastingEngine.Neural.Internal
             // Calculation
             var out_o = Predict(inputs);
             // Back propogation (stochastic gradient descent)
-            var dloss_douto = Loss.Derivative(out_o, expected_outputs);
-            Layer.Train(inputs, out_o, dloss_douto, LearningRate, out _);
-            return Loss.Calculate(dloss_douto, out_o, expected_outputs);
+            var dloss_douto = loss.Derivative(out_o, expected_outputs);
+            Layer.Train(inputs, out_o, dloss_douto, learningRate, out _);
+            return loss.Calculate(dloss_douto, out_o, expected_outputs);
         }
 
         public double[] Predict(double[] inputs) => Layer.Predict(inputs);

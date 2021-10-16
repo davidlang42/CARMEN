@@ -13,12 +13,17 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// </summary>
     public class FeedforwardNetwork : INeuralNetwork
     {
-        public Layer[] Layers { get; init; } // only the array size is readonly
+        readonly public Layer[] Layers; // only the array size is readonly
         IEnumerable<Layer> INeuralNetwork.Layers => Layers;
 
         public int InputCount => Layers.First().Neurons.First().InputCount;
         public int OutputCount => Layers.Last().NeuronCount;
-        public double LearningRate { get; set; } = 0.05;
+        private double learningRate = 0.05;
+        public double LearningRate
+        {
+            get => learningRate;
+            set => learningRate = value;
+        }
 
         private LossFunctionChoice lossFunction = LossFunctionChoice.MeanSquaredError;
         public LossFunctionChoice LossFunction
@@ -29,16 +34,18 @@ namespace Carmen.CastingEngine.Neural.Internal
                 if (lossFunction == value)
                     return;
                 lossFunction = value;
-                loss = null;
+                loss = LossFunction.Create();
             }
         }
 
-        private ILossFunction? loss = null;
-        private ILossFunction Loss => loss ??= LossFunction.Create();
+        private ILossFunction loss;
 
         /// <summary>Parameterless constructor for serialisation</summary>
         private FeedforwardNetwork()
-            => Layers = Array.Empty<Layer>();
+        {
+            loss = LossFunction.Create();
+            Layers = Array.Empty<Layer>();
+        }
 
         /// <summary>Create a feedforward neural network, with initially random weights and biases, based on the structural
         /// parameters provided</summary>
@@ -52,6 +59,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             ActivationFunctionChoice hidden_layer_activation = ActivationFunctionChoice.Tanh,
             ActivationFunctionChoice output_layer_activation = ActivationFunctionChoice.Sigmoid)
         {
+            loss = LossFunction.Create();
             if (n_hidden_layers < 0)
                 throw new ArgumentException($"{nameof(n_hidden_layers)} must be greater than or equal to 0");
             Layers = new Layer[n_hidden_layers + 1];
@@ -88,18 +96,18 @@ namespace Carmen.CastingEngine.Neural.Internal
             for (var i = 1; i < Layers.Length; i++)
                 out_o[i] = Layers[i].Predict(out_o[i - 1]);
             // Back propogation (stochastic gradient descent)
-            var dloss_douto = Loss.Derivative(out_o[out_o.Length - 1], expected_outputs);
-            var average_loss = Loss.Calculate(dloss_douto, out_o[out_o.Length - 1], expected_outputs);
+            var dloss_douto = loss.Derivative(out_o[out_o.Length - 1], expected_outputs);
+            var average_loss = loss.Calculate(dloss_douto, out_o[out_o.Length - 1], expected_outputs);
             for (var i = out_o.Length - 1; i > 0; i--)
             {
-                Layers[i].Train(out_o[i - 1], out_o[i], dloss_douto, LearningRate, out var dloss_dino);
+                Layers[i].Train(out_o[i - 1], out_o[i], dloss_douto, learningRate, out var dloss_dino);
                 // Prep for next layer
                 dloss_douto = new double[Layers[i - 1].Neurons.Length];
                 for (var h = 0; h < dloss_douto.Length; h++)
                     for (var n = 0; n < Layers[i].Neurons.Length; n++)
                         dloss_douto[h] += dloss_dino[n] * Layers[i].Neurons[n].Weights[h];
             }
-            Layers[0].Train(inputs, out_o[0], dloss_douto, LearningRate, out _);
+            Layers[0].Train(inputs, out_o[0], dloss_douto, learningRate, out _);
             return average_loss;
         }
 
