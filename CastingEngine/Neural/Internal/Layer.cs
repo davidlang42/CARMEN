@@ -61,21 +61,16 @@ namespace Carmen.CastingEngine.Neural.Internal
         /// <summary>Train this layer of the model</summary>
         public void Train(double[] inputs, double[] out_o, double[] dloss_douto, double learningRate, out double[] dloss_dino)
         {
-            var douto_dino = activation.Derivative(out_o);
-            dloss_dino = new double[Neurons.Length];
+            dloss_dino = activation.Derivative(out_o); // really douto_dino at this point
             for (var n = 0; n < Neurons.Length; n++)
             {
                 var neuron = Neurons[n];
-                dloss_dino[n] = dloss_douto[n] * douto_dino[n];
+                dloss_dino[n] *= dloss_douto[n]; // now actually dloss_dino
+                var learning_rate_dloss_dino = learningRate * dloss_dino[n];
                 for (var i = 0; i < inputs.Length; i++)
-                {
-                    var dino_dweight = inputs[i]; // because weighted sum: dino = i0*w0 + i1*w1 + bias
-                    var dloss_dweight = dloss_dino[n] * dino_dweight;
-                    neuron.Weights[i] -= learningRate * dloss_dweight;
-                }
-                //TODO is it faster to make this 1 a constant rather than variable? or leave it out completely?
-                var dino_dbias = 1; // because weighted sum: dino = i0*w0 + i1*w1 + bias
-                neuron.Bias -= learningRate * dloss_dino[n] * dino_dbias;
+                    // inputs[i] is dino_dweight, because weighted sum: dino = i0*w0 + i1*w1 + bias
+                    neuron.Weights[i] -= learning_rate_dloss_dino * inputs[i]; // aka dloss_dweight
+                neuron.Bias -= learning_rate_dloss_dino; // * dino_dbias = 1, because weighted sum: dino = i0*w0 + i1*w1 + bias
             }
         }
 
