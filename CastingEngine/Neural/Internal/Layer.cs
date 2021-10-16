@@ -74,6 +74,21 @@ namespace Carmen.CastingEngine.Neural.Internal
             }
         }
 
+        /// <summary>Train this layer of the model, shortcut to avoid overhead if dloss_dino is not required as an output</summary>
+        public void Train(double[] inputs, double[] out_o, double[] dloss_douto, double learningRate)
+        {
+            var douto_dino = activation.Derivative(out_o);
+            for (var n = 0; n < Neurons.Length; n++)
+            {
+                var neuron = Neurons[n];
+                var learning_rate_dloss_dino = learningRate * douto_dino[n] * dloss_douto[n];
+                for (var i = 0; i < inputs.Length; i++)
+                    // inputs[i] is dino_dweight, because weighted sum: dino = i0*w0 + i1*w1 + bias
+                    neuron.Weights[i] -= learning_rate_dloss_dino * inputs[i]; // aka dloss_dweight
+                neuron.Bias -= learning_rate_dloss_dino; // * dino_dbias = 1, because weighted sum: dino = i0*w0 + i1*w1 + bias
+            }
+        }
+
         public double[] Predict(double[] inputs)
         {
             var in_o = new double[Neurons.Length];
