@@ -145,6 +145,7 @@ namespace Carmen.CastingEngine.Neural.Internal
             var no_change = false;
             var too_many_repeats = false;
             var descriptions = new List<string>();
+            var change_threshold = ChangeThreshold;
             while (!success && !no_change && !too_many_repeats && !contains_nan)
             {
                 descriptions.Add(model.ToString());
@@ -152,7 +153,8 @@ namespace Carmen.CastingEngine.Neural.Internal
                 for (var i = 0; i < training_inputs.Length; i++)
                 {
                     var new_loss = model.Train(training_inputs[i], training_outputs[i]);
-                    no_change &= ChangeThreshold.HasValue && Math.Abs(new_loss - previous_loss[i]) < ChangeThreshold; //LATER is this logic even right? shouldn't it be average loss?
+                    if (no_change && change_threshold.HasValue)
+                        no_change = Math.Abs(new_loss - previous_loss[i]) < change_threshold.Value; //LATER is this logic even right? shouldn't it be average loss?
                     previous_loss[i] = new_loss;
                 }
                 if (LossThreshold is double loss_threshold)
