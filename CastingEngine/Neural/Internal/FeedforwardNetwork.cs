@@ -104,8 +104,8 @@ namespace Carmen.CastingEngine.Neural.Internal
                 layer.Train(out_o[i - 1], out_o[i], dloss_douto, learningRate, out var dloss_dino);
                 // Prep for next layer
                 dloss_douto = new double[Layers[i - 1].Neurons.Length];
-                for (var h = 0; h < dloss_douto.Length; h++)
-                    for (var n = 0; n < layer.Neurons.Length; n++)
+                for (var n = 0; n < layer.Neurons.Length; n++)
+                    for (var h = 0; h < dloss_douto.Length; h++)
                         dloss_douto[h] += dloss_dino[n] * layer.Neurons[n].Weights[h];
             }
             Layers[0].Train(inputs, out_o[0], dloss_douto, learningRate);
