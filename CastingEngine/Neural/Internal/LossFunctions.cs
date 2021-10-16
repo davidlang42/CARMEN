@@ -42,7 +42,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         {
             double result = 0;
             for (var i = 0; i < dloss_douto.Length; i++)
-                result += Math.Pow(dloss_douto[i], 2); //LATER is x * x faster than Math.Pow(x, 2)?
+                result += dloss_douto[i] * dloss_douto[i];
             return result / (2 * dloss_douto.Length);
         }
 
