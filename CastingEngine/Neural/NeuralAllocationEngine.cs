@@ -201,21 +201,19 @@ namespace Carmen.CastingEngine.Neural
 
         /// <summary>Use the neural network to order the applicants, based on the chosen SortingAlgorithm</summary>
         protected override List<Applicant> InPreferredOrder(IEnumerable<Applicant> applicants, Role role, bool reverse = false)
-            => SortAlgorithm switch
+        {
+            return SortAlgorithm switch
             {
                 SortAlgorithm.OrderBySuitability => base.InPreferredOrder(applicants, role, reverse),
-                SortAlgorithm.OrderByComparer when reverse => applicants.OrderByDescending(a => a, ComparerFor(role)).ToList(),
-                SortAlgorithm.OrderByComparer => applicants.OrderBy(a => a, ComparerFor(role)).ToList(),
                 SortAlgorithm.OrderByCached when reverse => applicants.OrderByDescending(a => a, new CachedComparer<Applicant>(ComparerFor(role))).ToList(),
                 SortAlgorithm.OrderByCached => applicants.OrderBy(a => a, new CachedComparer<Applicant>(ComparerFor(role))).ToList(),
-                SortAlgorithm.QuickSortComparer when reverse => QuickSort(applicants, ComparerFor(role)).AsEnumerable().Reverse().ToList(),
-                SortAlgorithm.QuickSortComparer => QuickSort(applicants, ComparerFor(role)).ToList(),
                 SortAlgorithm.QuickSortCached when reverse => QuickSort(applicants, new CachedComparer<Applicant>(ComparerFor(role))).AsEnumerable().Reverse().ToList(),
                 SortAlgorithm.QuickSortCached => QuickSort(applicants, new CachedComparer<Applicant>(ComparerFor(role))).ToList(),
                 SortAlgorithm.DisagreementSort when reverse => new DisagreementSort<Applicant>(ComparerFor(role)).Sort(applicants).Reverse().ToList(),
                 SortAlgorithm.DisagreementSort => new DisagreementSort<Applicant>(ComparerFor(role)).Sort(applicants).ToList(),
                 _ => throw new NotImplementedException($"Enum not implemented: {SortAlgorithm}")
             };
+        }
 
         private List<T> QuickSort<T>(IEnumerable<T> items, IComparer<T> comparer)
         {

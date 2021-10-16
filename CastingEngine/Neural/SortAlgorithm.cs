@@ -3,9 +3,7 @@
     public enum SortAlgorithm
     {
         OrderBySuitability,
-        OrderByComparer,
         OrderByCached,
-        QuickSortComparer,
         QuickSortCached,
         DisagreementSort
     }
