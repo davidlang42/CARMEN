@@ -88,7 +88,7 @@ namespace Carmen.CastingEngine.Neural.Internal
 
         /// <summary>Train the model with a single set of inputs and expected output.
         /// Returns the loss prior to back propogation.</summary>
-        public double Train(double[] inputs, double[] expected_outputs) //LATER Feedforward.Train needs optimising, also MLP.Train
+        public double Train(double[] inputs, double[] expected_outputs) //TODO Feedforward.Train needs optimising, also MLP.Train
         {
             // Calculation
             var out_o = new double[Layers.Length][];
@@ -100,12 +100,13 @@ namespace Carmen.CastingEngine.Neural.Internal
             var average_loss = loss.Calculate(dloss_douto, out_o[out_o.Length - 1], expected_outputs);
             for (var i = out_o.Length - 1; i > 0; i--)
             {
-                Layers[i].Train(out_o[i - 1], out_o[i], dloss_douto, learningRate, out var dloss_dino);
+                var layer = Layers[i];
+                layer.Train(out_o[i - 1], out_o[i], dloss_douto, learningRate, out var dloss_dino);
                 // Prep for next layer
                 dloss_douto = new double[Layers[i - 1].Neurons.Length];
                 for (var h = 0; h < dloss_douto.Length; h++)
-                    for (var n = 0; n < Layers[i].Neurons.Length; n++)
-                        dloss_douto[h] += dloss_dino[n] * Layers[i].Neurons[n].Weights[h];
+                    for (var n = 0; n < layer.Neurons.Length; n++)
+                        dloss_douto[h] += dloss_dino[n] * layer.Neurons[n].Weights[h];
             }
             Layers[0].Train(inputs, out_o[0], dloss_douto, learningRate);
             return average_loss;
