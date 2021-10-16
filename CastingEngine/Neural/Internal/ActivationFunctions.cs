@@ -14,8 +14,14 @@ namespace Carmen.CastingEngine.Neural.Internal
         /// <summary>Calculates a vector of out_o from a vector of in_o</summary>
         public double[] Calculate(double[] weighted_sums);
 
+        /// <summary>Calculates a vector of out_o from a vector of in_o, replacing values in place</summary>
+        public void CalculateInPlace(double[] weighted_sums);
+
         /// <summary>Calculates a vector of douto_dino from a vector of out_o</summary>
         public double[] Derivative(double[] outputs);
+
+        /// <summary>Calculates a vector of douto_dino from a vector of out_o, replacing values in place</summary>
+        public void DerivativeInPlace(double[] outputs);
     }
 
     /// <summary>
@@ -40,12 +46,24 @@ namespace Carmen.CastingEngine.Neural.Internal
             return result;
         }
 
+        public void CalculateInPlace(double[] weighted_sums)
+        {
+            for (var i = 0; i < weighted_sums.Length; i++)
+                weighted_sums[i] = Calculate(weighted_sums[i]);
+        }
+
         public double[] Derivative(double[] outputs)
         {
             var result = new double[outputs.Length];
             for (var i = 0; i < result.Length; i++)
                 result[i] = Derivative(outputs[i]);
             return result;
+        }
+
+        public void DerivativeInPlace(double[] outputs)
+        {
+            for (var i = 0; i < outputs.Length; i++)
+                outputs[i] = Derivative(outputs[i]);
         }
 
         /// <summary>Calculates out_o from in_o</summary>

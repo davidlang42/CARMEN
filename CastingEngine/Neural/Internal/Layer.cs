@@ -94,7 +94,8 @@ namespace Carmen.CastingEngine.Neural.Internal
             var in_o = new double[Neurons.Length];
             for (var i = 0; i < in_o.Length; i++)
                 in_o[i] = Neurons[i].WeightedSum(inputs);
-            return activation.Calculate(in_o);
+            activation.CalculateInPlace(in_o);
+            return in_o; // now out_o
         }
 
         public override string ToString() => string.Join(" / ", Neurons.Select(n => n.ToString()));
