@@ -200,7 +200,7 @@ namespace Carmen.CastingEngine.Neural
         }
 
         /// <summary>Use the neural network to order the applicants, based on the chosen SortingAlgorithm</summary>
-        public override IEnumerable<Applicant> InPreferredOrder(IEnumerable<Applicant> applicants, Role role, bool reverse = false)
+        protected override IEnumerable<Applicant> InPreferredOrder(IEnumerable<Applicant> applicants, Role role, bool reverse = false)
             => SortAlgorithm switch
             {
                 SortAlgorithm.OrderBySuitability => base.InPreferredOrder(applicants, role, reverse),

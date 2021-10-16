@@ -72,7 +72,7 @@ namespace Carmen.CastingEngine.Base
         public abstract double SuitabilityOf(Applicant applicant, Role role);
 
         /// <summary>Default implementation orders by <see cref="SuitabilityOf(Applicant, Role)"/> descending (ascending if reversed)</summary>
-        public virtual IEnumerable<Applicant> InPreferredOrder(IEnumerable<Applicant> applicants, Role role, bool reverse = false)
+        protected virtual IEnumerable<Applicant> InPreferredOrder(IEnumerable<Applicant> applicants, Role role, bool reverse = false)
             => reverse ? applicants.OrderBy(a => SuitabilityOf(a, role)).ThenBy(a => ApplicantEngine.OverallAbility(a))
             : applicants.OrderByDescending(a => SuitabilityOf(a, role)).ThenByDescending(a => ApplicantEngine.OverallAbility(a));
 
