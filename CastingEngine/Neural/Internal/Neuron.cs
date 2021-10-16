@@ -12,8 +12,8 @@ namespace Carmen.CastingEngine.Neural.Internal
         public const double MINIMUM_SEED = 0.2;
         public const double MAXIMUM_SEED = 0.8;
 
-        public double[] Weights { get; init; } // only the array size is readonly
-        public double Bias { get; set; }
+        readonly public  double[] Weights; // only the array size is readonly
+        public double Bias;
 
         public int InputCount => Weights.Length;
 

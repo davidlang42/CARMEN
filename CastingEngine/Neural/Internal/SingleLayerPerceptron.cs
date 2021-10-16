@@ -12,11 +12,16 @@ namespace Carmen.CastingEngine.Neural.Internal
     /// </summary>
     public class SingleLayerPerceptron : INeuralNetwork
     {
-        public Layer Layer { get; init; }
+        readonly public Layer Layer;
         IEnumerable<Layer> INeuralNetwork.Layers => Layer.Yield();
         public int InputCount => Layer.Neurons.First().InputCount;
         public int OutputCount => Layer.NeuronCount;
-        public double LearningRate { get; set; } = 0.05;
+        private double learningRate = 0.05;
+        public double LearningRate
+        {
+            get => learningRate;
+            set => learningRate = value;
+        }
 
         private LossFunctionChoice lossFunction = LossFunctionChoice.MeanSquaredError;
         public LossFunctionChoice LossFunction

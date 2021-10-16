@@ -24,7 +24,7 @@ namespace Carmen.CastingEngine.Neural.Internal
         private IVectorActivationFunction? activation = null;
         private IVectorActivationFunction Activation => activation ??= ActivationFunction.Create();
 
-        public Neuron[] Neurons { get; init; } // only the array size is readonly
+        readonly public Neuron[] Neurons; // only the array size is readonly
 
         public int NeuronCount => Neurons.Length;
 
