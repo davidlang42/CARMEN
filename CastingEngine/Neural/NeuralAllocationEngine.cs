@@ -205,28 +205,22 @@ namespace Carmen.CastingEngine.Neural
             if (SortAlgorithm == SortAlgorithm.OrderBySuitability)
                 return base.InPreferredOrder(applicants, role, reverse);
             var sorter = new DisagreementSort<Applicant>(ComparerFor(role));
-            var list = applicants.ToList();
-            try
+            var list = SortAlgorithm switch
             {
-                if (SortAlgorithm == SortAlgorithm.OrderByCached)
-                    list = list.OrderBy(a => a, sorter).ToList();
-                else if (SortAlgorithm == SortAlgorithm.QuickSortCached)
-                    list.Sort(sorter);
-                else if (SortAlgorithm == SortAlgorithm.DisagreementSort)
-                    list = sorter.Sort(list).ToList();
-                else
-                    throw new NotImplementedException($"Enum not implemented: {SortAlgorithm}");
-            }
-            catch (ArgumentException ex)
-            {
-                if (ex.Message.Contains("IComparer.Compare"))
-                    // Only DisagreementSort is guarenteed to work with an imperfect comparer
-                    list = sorter.Sort(list).ToList();
-                else
-                    throw;
-            }
+                SortAlgorithm.OrderByCached => applicants.OrderBy(a => a, sorter).ToList(),
+                SortAlgorithm.QuickSortCached => QuickSort(applicants, sorter),
+                SortAlgorithm.DisagreementSort => sorter.Sort(applicants).ToList(),
+                _ => throw new NotImplementedException($"Enum not implemented: {SortAlgorithm}")
+            };
             if (reverse)
                 list.Reverse();
+            return list;
+        }
+
+        private List<T> QuickSort<T>(IEnumerable<T> items, IComparer<T> comparer)
+        {
+            var list = new List<T>(items);
+            list.Sort(comparer);
             return list;
         }
         #endregion
