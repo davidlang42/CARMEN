@@ -16,7 +16,7 @@ namespace CarmenUI.ViewModels
         {
             StartLoad();
             var applicants = await c.Applicants.ToArrayAsync();
-            Rows.Add(new Row { Success = $"{c.Applicants.Local.Count} Applicants Registered" });
+            Rows.Add(new Row { Success = $"{c.Applicants.Local.Count.Plural("Applicant")} Registered" });
             var cast_groups = await c.CastGroups.Include(cg => cg.Requirements).ToArrayAsync();
             foreach (var cast_group in cast_groups)
             {
@@ -29,7 +29,7 @@ namespace CarmenUI.ViewModels
             await c.Criterias.LoadAsync();
             var incomplete = await applicants.CountAsync(a => !a.IsRegistered);//LATER paralleise
             if (incomplete > 0)
-                Rows.Add(new Row { Fail = $"{incomplete} Applicants are Incomplete" });
+                Rows.Add(new Row { Fail = $"{incomplete.Plural("Applicant is", "Applicants are")} Incomplete" });
             FinishLoad(cancel, applicants.Length == 0 || incomplete > 0);
         }
     }
