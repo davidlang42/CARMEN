@@ -1,4 +1,4 @@
-﻿using Carmen.CastingEngine;
+﻿using Carmen.CastingEngine.Allocation;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;

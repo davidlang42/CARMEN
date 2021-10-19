@@ -1,4 +1,4 @@
-﻿using Carmen.CastingEngine.SAT.Internal;
+﻿using Carmen.CastingEngine.SAT;
 using System;
 using System.Collections.Generic;
 using System.Linq;

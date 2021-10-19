@@ -12,9 +12,10 @@ using CarmenUI.Windows;
 using System.Windows.Input;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Carmen.CastingEngine;
-using Carmen.CastingEngine.Base;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Carmen.CastingEngine.Audition;
+using Carmen.CastingEngine.Selection;
+using Carmen.CastingEngine.Allocation;
 
 namespace CarmenUI.Pages
 {

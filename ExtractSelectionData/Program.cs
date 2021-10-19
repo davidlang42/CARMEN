@@ -1,5 +1,4 @@
-﻿using Carmen.CastingEngine.Heuristic;
-using Carmen.ShowModel;
+﻿using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Microsoft.Data.Sqlite;

@@ -1,5 +1,6 @@
-﻿using Carmen.CastingEngine;
-using Carmen.CastingEngine.Base;
+﻿using Carmen.CastingEngine.Allocation;
+using Carmen.CastingEngine.Audition;
+using Carmen.CastingEngine.Selection;
 using Carmen.ShowModel.Applicants;
 using CarmenUI.Properties;
 using System;

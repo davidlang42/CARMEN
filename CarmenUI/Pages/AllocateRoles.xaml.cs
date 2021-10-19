@@ -26,8 +26,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CarmenUI.Bindings;
-using Carmen.CastingEngine.Heuristic;
-using Carmen.CastingEngine.Neural;
+using Carmen.CastingEngine.Audition;
+using Carmen.CastingEngine.Allocation;
 
 namespace CarmenUI.Pages
 {

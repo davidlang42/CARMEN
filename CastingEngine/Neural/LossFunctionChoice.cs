@@ -1,5 +1,4 @@
-﻿using Carmen.CastingEngine.Neural.Internal;
-using System;
+﻿using System;
 
 namespace Carmen.CastingEngine.Neural
 {

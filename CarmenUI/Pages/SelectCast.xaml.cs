@@ -22,13 +22,9 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using CarmenUI.Windows;
-using Carmen.CastingEngine;
-using Carmen.CastingEngine.Heuristic;
 using Carmen.ShowModel.Criterias;
-using Carmen.CastingEngine.SAT;
 using Carmen.CastingEngine.Selection;
-using Carmen.CastingEngine.Analysis;
-using Carmen.CastingEngine.Neural;
+using Carmen.CastingEngine.Audition;
 
 namespace CarmenUI.Pages
 {

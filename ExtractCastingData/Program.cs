@@ -1,6 +1,5 @@
-﻿using Carmen.CastingEngine;
-using Carmen.CastingEngine.Allocation;
-using Carmen.CastingEngine.Heuristic;
+﻿using Carmen.CastingEngine.Allocation;
+using Carmen.CastingEngine.Audition;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;

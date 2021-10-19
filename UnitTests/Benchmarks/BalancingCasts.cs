@@ -1,8 +1,5 @@
-﻿using Carmen.CastingEngine;
-using Carmen.CastingEngine.Analysis;
-using Carmen.CastingEngine.Base;
-using Carmen.CastingEngine.Heuristic;
-using Carmen.CastingEngine.SAT;
+﻿using Carmen.CastingEngine.Audition;
+using Carmen.CastingEngine.Selection;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
@@ -39,17 +36,17 @@ namespace UnitTests.Benchmarks
         private static IEnumerable<ISelectionEngine> CreateEngines(ShowContext context)
         {
             var criterias = context.Criterias.ToArray();
-            var applicant_engine = new WeightedSumEngine(criterias);
+            var audition_engine = new WeightedSumEngine(criterias);
             foreach (var type in SelectionEngine.Implementations)
                 yield return type.Name switch
                 {
-                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection),
-                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
-                    nameof(TopPairsSatEngine) => new TopPairsSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
-                    nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
-                    nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
-                    nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
-                    nameof(BestPairsSatEngine) => new BestPairsSatEngine(applicant_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
+                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(audition_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection),
+                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(audition_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
+                    nameof(TopPairsSatEngine) => new TopPairsSatEngine(audition_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
+                    nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(audition_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
+                    nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(audition_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
+                    nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(audition_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
+                    nameof(BestPairsSatEngine) => new BestPairsSatEngine(audition_engine, context.AlternativeCasts.ToArray(), context.ShowRoot.CastNumberOrderBy, context.ShowRoot.CastNumberOrderDirection, criterias),
                     _ => throw new NotImplementedException($"Selection engine not handled: {type.Name}")
                 };
         }

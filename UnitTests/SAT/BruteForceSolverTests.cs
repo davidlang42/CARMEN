@@ -1,5 +1,4 @@
 ﻿using Carmen.CastingEngine.SAT;
-using Carmen.CastingEngine.SAT.Internal;
 using FluentAssertions;
 using NUnit.Framework;
 using System;
