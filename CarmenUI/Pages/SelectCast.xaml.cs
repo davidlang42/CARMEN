@@ -27,7 +27,6 @@ using Carmen.CastingEngine.Heuristic;
 using Carmen.ShowModel.Criterias;
 using Carmen.CastingEngine.SAT;
 using Carmen.CastingEngine.Selection;
-using Carmen.CastingEngine.Dummy;
 using Carmen.CastingEngine.Analysis;
 using Carmen.CastingEngine.Neural;
 
@@ -112,7 +111,6 @@ namespace CarmenUI.Pages
                 var show_root = context.ShowRoot;
                 IApplicantEngine applicant_engine = ParseApplicantEngine() switch
                 {
-                    nameof(DummyApplicantEngine) => new DummyApplicantEngine(),
                     nameof(NeuralApplicantEngine) => new NeuralApplicantEngine(criterias, NeuralEngineConfirm),
                     nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
                     _ => throw new ArgumentException($"Applicant engine not handled: {ParseApplicantEngine()}")

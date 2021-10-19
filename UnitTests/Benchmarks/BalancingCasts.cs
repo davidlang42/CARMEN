@@ -1,7 +1,6 @@
 ﻿using Carmen.CastingEngine;
 using Carmen.CastingEngine.Analysis;
 using Carmen.CastingEngine.Base;
-using Carmen.CastingEngine.Dummy;
 using Carmen.CastingEngine.Heuristic;
 using Carmen.CastingEngine.SAT;
 using Carmen.ShowModel;

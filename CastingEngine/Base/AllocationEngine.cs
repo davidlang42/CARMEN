@@ -1,5 +1,4 @@
 ﻿using Carmen.CastingEngine.Allocation;
-using Carmen.CastingEngine.Dummy;
 using Carmen.CastingEngine.Heuristic;
 using Carmen.CastingEngine.Neural;
 using Carmen.ShowModel;
@@ -26,8 +25,7 @@ namespace Carmen.CastingEngine.Base
             typeof(RoleLearningAllocationEngine),
             typeof(SessionLearningAllocationEngine),
             typeof(WeightedAverageEngine),
-            typeof(ComplexNeuralAllocationEngine),
-            typeof(DummyAllocationEngine), //LATER remove
+            typeof(ComplexNeuralAllocationEngine)
         };
 
         public IApplicantEngine ApplicantEngine { get; init; }
@@ -306,7 +304,7 @@ namespace Carmen.CastingEngine.Base
         /// is less than or equal to the number of cast still required for that role, then that role will cast its entire remaining list.
         /// This is not a bullet-proof approach, but *should* be good enough to balance general cast between roles/items and handle
         /// the edge cases caused by consecutive item clashes on the edge of non-multi sections.</summary>
-        public virtual void BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles) //LATER make this not virtual when DummyAllocationEngine is removed
+        public void BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
         {
             // Make roles an array to avoid re-enumeration
             var roles_array = roles.ToArray();

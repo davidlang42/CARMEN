@@ -27,7 +27,6 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CarmenUI.Bindings;
 using Carmen.CastingEngine.Heuristic;
-using Carmen.CastingEngine.Dummy;
 using Carmen.CastingEngine.Neural;
 
 namespace CarmenUI.Pages
@@ -115,14 +114,12 @@ namespace CarmenUI.Pages
                 {
                     IApplicantEngine applicant_engine = ParseApplicantEngine() switch
                     {
-                        nameof(DummyApplicantEngine) => new DummyApplicantEngine(),
                         nameof(NeuralApplicantEngine) => new NeuralApplicantEngine(criterias, NeuralEngineConfirm),
                         nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
                         _ => throw new ArgumentException($"Applicant engine not handled: {ParseApplicantEngine()}")
                     };
                     _engine = ParseAllocationEngine() switch
                     {
-                        nameof(DummyAllocationEngine) => new DummyAllocationEngine(applicant_engine, alternativeCasts),
                         nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine, alternativeCasts, criterias),
                         nameof(WeightedAverageEngine) => new WeightedAverageEngine(applicant_engine, alternativeCasts, context.ShowRoot),
                         nameof(SessionLearningAllocationEngine) => new SessionLearningAllocationEngine(applicant_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),

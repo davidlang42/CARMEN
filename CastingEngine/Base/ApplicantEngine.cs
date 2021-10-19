@@ -1,5 +1,4 @@
-﻿using Carmen.CastingEngine.Dummy;
-using Carmen.CastingEngine.Heuristic;
+﻿using Carmen.CastingEngine.Heuristic;
 using Carmen.CastingEngine.Neural;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
@@ -19,8 +18,7 @@ namespace Carmen.CastingEngine.Base
         /// <summary>A list of available applicant engines</summary>
         public static readonly Type[] Implementations = new[] {
             typeof(WeightedSumEngine),
-            typeof(NeuralApplicantEngine),
-            typeof(DummyApplicantEngine) //LATER remove
+            typeof(NeuralApplicantEngine)
         };
 
         public abstract int MaxOverallAbility { get; }

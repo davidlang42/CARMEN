@@ -1,5 +1,4 @@
-﻿using Carmen.CastingEngine.Dummy;
-using Carmen.CastingEngine.Heuristic;
+﻿using Carmen.CastingEngine.Heuristic;
 using Carmen.CastingEngine.SAT;
 using Carmen.CastingEngine.Selection;
 using Carmen.ShowModel.Applicants;
