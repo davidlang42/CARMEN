@@ -217,7 +217,7 @@ namespace Carmen.CastingEngine.Neural
             return list;
         }
 
-        private List<T> QuickSort<T>(IEnumerable<T> items, IComparer<T> comparer)
+        private static List<T> QuickSort<T>(IEnumerable<T> items, IComparer<T> comparer)
         {
             var list = new List<T>(items);
             list.Sort(comparer);
