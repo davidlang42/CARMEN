@@ -88,7 +88,7 @@ namespace Carmen.CastingEngine.Neural.Internal
 
         /// <summary>Train the model with a single set of inputs and expected output.
         /// Returns the loss prior to back propogation.</summary>
-        public double Train(double[] inputs, double[] expected_outputs) //TODO Feedforward.Train needs optimising, also MLP.Train
+        public double Train(double[] inputs, double[] expected_outputs)
         {
             // Calculation
             var out_o = new double[Layers.Length][];
