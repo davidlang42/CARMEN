@@ -17,6 +17,7 @@
     Title="Configure Show" Loaded="Page_Loaded">
     <Page.Resources>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
+        <cv:BooleanToIndex x:Key="booleanToIndex"/>
         <CollectionViewSource x:Key="alternativeCastsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="criteriasSelectionSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="castGroupsViewSource" IsLiveSortingRequested="True"/>
@@ -509,6 +510,7 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
@@ -543,8 +545,15 @@
                             <TextBlock Grid.Row="4" Text="Cast Number Direction" FontSize="14" VerticalAlignment="Center"/>
                             <ComboBox Grid.Row="4" Grid.Column="1" SelectedItem="{Binding CastNumberOrderDirection}" ItemsSource="{Binding Source={StaticResource listSortDirectionEnumSource}}" FontSize="14"/>
                             <CheckBox Grid.Row="5" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items across the entire show" VerticalContentAlignment="Center"/>
-                            <TextBlock Grid.Row="6" Text="Company Logo" FontSize="14"/>
-                            <uc:EditableImage Grid.Row="6" Grid.Column="1" Margin="5 0 0 0" HorizontalAlignment="Left"
+                            <TextBlock Grid.Row="6" Text="Existing Role Costs" FontSize="14" VerticalAlignment="Center"/>
+                            <ComboBox Grid.Row="6" Grid.Column="1" FontSize="14" SelectedIndex="{Binding WeightExistingRoleCosts, Converter={StaticResource booleanToIndex}}">
+                                <ComboBox.Items>
+                                    <sys:String>Subtract from the applicant's final suitability (after taking the weighted average of the role's requirements)</sys:String>
+                                    <sys:String>Subtract from each requirement's suitability (before taking the weighted average of the role's requirements)</sys:String>
+                                </ComboBox.Items>
+                            </ComboBox>
+                            <TextBlock Grid.Row="7" Text="Company Logo" FontSize="14"/>
+                            <uc:EditableImage Grid.Row="7" Grid.Column="1" Margin="5 0 0 0" HorizontalAlignment="Left"
                                               ImageObject="{Binding Logo, Mode=TwoWay}"
                                               x:Name="LogoImage" MinWidth="{Binding ElementName=LogoImage, Path=ActualHeight}"/>
                         </Grid>
