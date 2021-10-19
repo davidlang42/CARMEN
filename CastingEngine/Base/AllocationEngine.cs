@@ -21,11 +21,11 @@ namespace Carmen.CastingEngine.Base
     {
         /// <summary>A list of available selection engines</summary>
         public static readonly Type[] Implementations = new[] {
-            typeof(HeuristicAllocationEngine),
-            typeof(RoleLearningAllocationEngine),
             typeof(SessionLearningAllocationEngine),
+            typeof(RoleLearningAllocationEngine),
+            typeof(ComplexNeuralAllocationEngine),
             typeof(WeightedAverageEngine),
-            typeof(ComplexNeuralAllocationEngine)
+            typeof(HeuristicAllocationEngine)
         };
 
         public IApplicantEngine ApplicantEngine { get; init; }

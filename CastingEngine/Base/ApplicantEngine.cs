@@ -17,8 +17,8 @@ namespace Carmen.CastingEngine.Base
     {
         /// <summary>A list of available applicant engines</summary>
         public static readonly Type[] Implementations = new[] {
+            typeof(NeuralApplicantEngine),
             typeof(WeightedSumEngine),
-            typeof(NeuralApplicantEngine)
         };
 
         public abstract int MaxOverallAbility { get; }
