@@ -36,7 +36,7 @@ namespace Carmen.CastingEngine
     {
         readonly Dictionary<(T1, T2), U> cache = new();
 
-        public Func<T1, T2, U> Function { get; set; }
+        public Func<T1, T2, U>? Function { get; set; }
 
         public FunctionCache(Func<T1, T2, U>? function = null)
         {
