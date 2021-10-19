@@ -18,6 +18,6 @@ namespace CarmenUI.Converters
             => value is double d && d != 0;
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-            => value is bool b && b ? (parameter as double?) ?? 1d : 0d;
+            => value is bool b && b ? parameter is string s ? double.Parse(s) : parameter as double? ?? 1d : 0d;
     }
 }

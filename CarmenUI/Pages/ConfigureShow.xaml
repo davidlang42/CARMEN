@@ -34,6 +34,15 @@
         <cv:MinimumIntValue x:Key="minimumIntValue"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
         <cv:HideIfNullOrType x:Key="hideIfNullOrType"/>
+        <cv:MultiConverter x:Key="falseIfNullDefaultValue">
+            <cv:TrueIfNullDefaultValue/>
+            <cv:InvertBoolean/>
+        </cv:MultiConverter>
+        <cv:HideIfNull x:Key="hideIfNull"/>
+        <cv:MultiConverter x:Key="showIfNull">
+            <cv:TrueIfNull/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
         <cv:TrueIfNonZero x:Key="trueIfNonZero"/>
     </Page.Resources>
     <Grid Margin="5">
@@ -571,12 +580,14 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Exact Ability requirement, which means that an Applicant must have a specific Mark in the specified Criteria.
                                 If set to primary, this requirement will be shown on the role allocation screen.
-                                The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                The overall ability weight specifies the importance of the applicants overall ability in calculating the suitability for a role, and can either be specified as one value for all roles, or individually per requirement.
                                 If the existing roles cost is enabled, it determines how many percentage points will be subtracted from an applicants suitability for each role which they are already allocated requiring this criteria.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
@@ -584,20 +595,44 @@
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirement Weight" FontSize="14"/>
                             <Grid Grid.Row="4" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
                                 <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="5" Text="Criteria" FontSize="14"/>
-                            <ComboBox Grid.Row="5" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name" />
-                            <TextBlock Grid.Row="6" Text="Existing Roles Cost" FontSize="14"/>
-                            <Grid Grid.Row="6" Grid.Column="1">
+                            <TextBlock Grid.Row="5" Text="Overall Ability Weight" FontSize="14"/>
+                            <Grid Grid.Row="5" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource showIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding OverallWeight}" FontSize="14" IsEnabled="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource hideIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight}" FontSize="14" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight,
+                                    Converter={StaticResource falseIfNullDefaultValue}, ConverterParameter=0.1}" FontSize="14"  Content="Same for all"/>
+                            </Grid>
+                            <TextBlock Grid.Row="6" Text="Criteria" FontSize="14"/>
+                            <ComboBox Grid.Row="6" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name" />
+                            <TextBlock Grid.Row="7" Text="Existing Roles Cost" FontSize="14"/>
+                            <Grid Grid.Row="7" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
@@ -607,8 +642,8 @@
                                 <TextBlock Grid.Column="1" Text="% per role"/>
                                 <CheckBox Grid.Column="2" IsChecked="{Binding ExistingRoleCost, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="7" Text="Required Value" FontSize="14"/>
-                            <uc:CriteriaMarkSelector Grid.Row="7" Grid.Column="1" Mark="{Binding RequiredValue, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="8" Text="Required Value" FontSize="14"/>
+                            <uc:CriteriaMarkSelector Grid.Row="8" Grid.Column="1" Mark="{Binding RequiredValue, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AbilityRangeRequirement}">
@@ -645,12 +680,14 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Ability Range requirement, which means that an Applicant must have a Mark within a range for the specified Criteria.
                                 If set to primary, this requirement will be shown on the role allocation screen.
-                                The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                The overall ability weight specifies the importance of the applicants overall ability in calculating the suitability for a role, and can either be specified as one value for all roles, or individually per requirement.
                                 If the existing roles cost is enabled, it determines how many percentage points will be subtracted from an applicants suitability for each role which they are already allocated requiring this criteria.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
@@ -658,7 +695,7 @@
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirement Weight" FontSize="14"/>
                             <Grid Grid.Row="4" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -667,10 +704,35 @@
                                 <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="5" Text="Criteria" FontSize="14"/>
-                            <ComboBox Grid.Row="5" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name"/>
-                            <TextBlock Grid.Row="6" Text="Existing Roles Cost" FontSize="14"/>
-                            <Grid Grid.Row="6" Grid.Column="1">
+                            <TextBlock Grid.Row="5" Text="Overall Ability Weight" FontSize="14"/>
+                            <Grid Grid.Row="5" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource showIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding OverallWeight}" FontSize="14" IsEnabled="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource hideIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight}" FontSize="14" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight,
+                                    Converter={StaticResource falseIfNullDefaultValue}, ConverterParameter=0.1}" FontSize="14"  Content="Same for all"/>
+                            </Grid>
+                            <TextBlock Grid.Row="6" Text="Criteria" FontSize="14"/>
+                            <ComboBox Grid.Row="6" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name"/>
+                            <TextBlock Grid.Row="7" Text="Existing Roles Cost" FontSize="14"/>
+                            <Grid Grid.Row="7" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
@@ -680,11 +742,11 @@
                                 <TextBlock Grid.Column="1" Text="% per role"/>
                                 <CheckBox Grid.Column="2" IsChecked="{Binding ExistingRoleCost, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="7" Text="Minimum" FontSize="14"/>
-                            <uc:CriteriaMarkSelector Grid.Row="7" Grid.Column="1" Mark="{Binding Minimum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="8" Text="Maximum" FontSize="14"/>
-                            <uc:CriteriaMarkSelector Grid.Row="8" Grid.Column="1" Mark="{Binding Maximum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
-                            <CheckBox Grid.Row="9" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
+                            <TextBlock Grid.Row="8" Text="Minimum" FontSize="14"/>
+                            <uc:CriteriaMarkSelector Grid.Row="8" Grid.Column="1" Mark="{Binding Minimum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="9" Text="Maximum" FontSize="14"/>
+                            <uc:CriteriaMarkSelector Grid.Row="9" Grid.Column="1" Mark="{Binding Maximum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <CheckBox Grid.Row="10" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AgeRequirement}">
@@ -719,19 +781,21 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Age requirement, which means that an Applicant must have an age within the specified range.
                                 If set to primary, this requirement will be shown on the role allocation screen.
-                                The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                The overall ability weight specifies the importance of the applicants overall ability in calculating the suitability for a role, and can either be specified as one value for all roles, or individually per requirement.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirement Weight" FontSize="14"/>
                             <Grid Grid.Row="4" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -740,11 +804,36 @@
                                 <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="5" Text="Minimum Age" FontSize="14"/>
-                            <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Minimum, TargetNullValue=''}" FontSize="14"/>
-                            <TextBlock Grid.Row="6" Text="Maximum Age" FontSize="14"/>
-                            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding Maximum, TargetNullValue=''}" FontSize="14"/>
-                            <CheckBox Grid.Row="7" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
+                            <TextBlock Grid.Row="5" Text="Overall Ability Weight" FontSize="14"/>
+                            <Grid Grid.Row="5" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource showIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding OverallWeight}" FontSize="14" IsEnabled="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource hideIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight}" FontSize="14" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight,
+                                    Converter={StaticResource falseIfNullDefaultValue}, ConverterParameter=0.1}" FontSize="14"  Content="Same for all"/>
+                            </Grid>
+                            <TextBlock Grid.Row="6" Text="Minimum Age" FontSize="14"/>
+                            <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding Minimum, TargetNullValue=''}" FontSize="14"/>
+                            <TextBlock Grid.Row="7" Text="Maximum Age" FontSize="14"/>
+                            <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding Maximum, TargetNullValue=''}" FontSize="14"/>
+                            <CheckBox Grid.Row="8" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:GenderRequirement}">
@@ -771,19 +860,21 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a Gender requirement, which means that an Applicant must be the specified gender.
                                 If set to primary, this requirement will be shown on the role allocation screen.
-                                The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                The overall ability weight specifies the importance of the applicants overall ability in calculating the suitability for a role, and can either be specified as one value for all roles, or individually per requirement.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirement Weight" FontSize="14"/>
                             <Grid Grid.Row="4" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -792,8 +883,33 @@
                                 <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="5" Text="Gender" FontSize="14"/>
-                            <ComboBox Grid.Row="5" Grid.Column="1" SelectedIndex="{Binding RequiredValue}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}"/>
+                            <TextBlock Grid.Row="5" Text="Overall Ability Weight" FontSize="14"/>
+                            <Grid Grid.Row="5" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource showIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding OverallWeight}" FontSize="14" IsEnabled="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource hideIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight}" FontSize="14" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight,
+                                    Converter={StaticResource falseIfNullDefaultValue}, ConverterParameter=0.1}" FontSize="14"  Content="Same for all"/>
+                            </Grid>
+                            <TextBlock Grid.Row="6" Text="Gender" FontSize="14"/>
+                            <ComboBox Grid.Row="6" Grid.Column="1" SelectedIndex="{Binding RequiredValue}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:TagRequirement}">
@@ -820,19 +936,21 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a Tag requirement, which means that an Applicant must be assigned the specified tag.
                                 If set to primary, this requirement will be shown on the role allocation screen.
-                                The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                The overall ability weight specifies the importance of the applicants overall ability in calculating the suitability for a role, and can either be specified as one value for all roles, or individually per requirement.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirement Weight" FontSize="14"/>
                             <Grid Grid.Row="4" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -841,8 +959,33 @@
                                 <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="5" Text="Required Tag" FontSize="14"/>
-                            <ComboBox Grid.Row="5" Grid.Column="1" SelectedItem="{Binding RequiredTag}" ItemsSource="{Binding Source={StaticResource tagsSelectionSource}}" DisplayMemberPath="Name"/>
+                            <TextBlock Grid.Row="5" Text="Overall Ability Weight" FontSize="14"/>
+                            <Grid Grid.Row="5" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource showIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding OverallWeight}" FontSize="14" IsEnabled="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource hideIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight}" FontSize="14" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight,
+                                    Converter={StaticResource falseIfNullDefaultValue}, ConverterParameter=0.1}" FontSize="14"  Content="Same for all"/>
+                            </Grid>
+                            <TextBlock Grid.Row="6" Text="Required Tag" FontSize="14"/>
+                            <ComboBox Grid.Row="6" Grid.Column="1" SelectedItem="{Binding RequiredTag}" ItemsSource="{Binding Source={StaticResource tagsSelectionSource}}" DisplayMemberPath="Name"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:NotRequirement}">
@@ -869,19 +1012,21 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is a NOT requirement, which means that an Applicant must not meet the specified requirement.
                                 If set to primary, this requirement will be shown on the role allocation screen.
-                                The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                The overall ability weight specifies the importance of the applicants overall ability in calculating the suitability for a role, and can either be specified as one value for all roles, or individually per requirement.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirement Weight" FontSize="14"/>
                             <Grid Grid.Row="4" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -890,8 +1035,33 @@
                                 <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="5" Text="NOT" FontSize="14"/>
-                            <ComboBox Grid.Row="5" Grid.Column="1" SelectedItem="{Binding SubRequirement}" ItemsSource="{Binding Source={StaticResource requirementsSelectionSource}}" DisplayMemberPath="Name"/>
+                            <TextBlock Grid.Row="5" Text="Overall Ability Weight" FontSize="14"/>
+                            <Grid Grid.Row="5" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource showIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding OverallWeight}" FontSize="14" IsEnabled="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource hideIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight}" FontSize="14" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight,
+                                    Converter={StaticResource falseIfNullDefaultValue}, ConverterParameter=0.1}" FontSize="14"  Content="Same for all"/>
+                            </Grid>
+                            <TextBlock Grid.Row="6" Text="NOT" FontSize="14"/>
+                            <ComboBox Grid.Row="6" Grid.Column="1" SelectedItem="{Binding SubRequirement}" ItemsSource="{Binding Source={StaticResource requirementsSelectionSource}}" DisplayMemberPath="Name"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AndRequirement}">
@@ -917,20 +1087,22 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an AND requirement, which means that an Applicant must meet ALL of the specified sub-requirements.
                                 If set to primary, this requirement will be shown on the role allocation screen.
-                                The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                The overall ability weight specifies the importance of the applicants overall ability in calculating the suitability for a role, and can either be specified as one value for all roles, or individually per requirement.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirement Weight" FontSize="14"/>
                             <Grid Grid.Row="4" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -939,8 +1111,33 @@
                                 <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="5" Text="ALL of" FontSize="14"/>
-                            <ListView Grid.Row="5" Grid.Column="1" FontSize="14"
+                            <TextBlock Grid.Row="5" Text="Overall Ability Weight" FontSize="14"/>
+                            <Grid Grid.Row="5" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource showIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding OverallWeight}" FontSize="14" IsEnabled="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource hideIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight}" FontSize="14" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight,
+                                    Converter={StaticResource falseIfNullDefaultValue}, ConverterParameter=0.1}" FontSize="14"  Content="Same for all"/>
+                            </Grid>
+                            <TextBlock Grid.Row="6" Text="ALL of" FontSize="14"/>
+                            <ListView Grid.Row="6" Grid.Column="1" FontSize="14"
                                       x:Name="requirementsList"
                                       Margin="5 0 0 5"
                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -983,20 +1180,22 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an OR requirement, which means that an Applicant must meet ANY of the specified sub-requirements.
                                 If set to primary, this requirement will be shown on the role allocation screen.
-                                The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                The overall ability weight specifies the importance of the applicants overall ability in calculating the suitability for a role, and can either be specified as one value for all roles, or individually per requirement.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirement Weight" FontSize="14"/>
                             <Grid Grid.Row="4" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -1005,8 +1204,33 @@
                                 <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="5" Text="ANY of" FontSize="14"/>
-                            <ListView Grid.Row="5" Grid.Column="1" FontSize="14"
+                            <TextBlock Grid.Row="5" Text="Overall Ability Weight" FontSize="14"/>
+                            <Grid Grid.Row="5" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource showIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding OverallWeight}" FontSize="14" IsEnabled="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource hideIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight}" FontSize="14" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight,
+                                    Converter={StaticResource falseIfNullDefaultValue}, ConverterParameter=0.1}" FontSize="14"  Content="Same for all"/>
+                            </Grid>
+                            <TextBlock Grid.Row="6" Text="ANY of" FontSize="14"/>
+                            <ListView Grid.Row="6" Grid.Column="1" FontSize="14"
                                       x:Name="requirementsList"
                                       Margin="5 0 0 5"
                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -1049,20 +1273,22 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an XOR requirement, which means that an Applicant must meet EXACTLY ONE of the specified sub-requirements.
                                 If set to primary, this requirement will be shown on the role allocation screen.
-                                The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                The overall ability weight specifies the importance of the applicants overall ability in calculating the suitability for a role, and can either be specified as one value for all roles, or individually per requirement.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
                             <TextBlock Grid.Row="2" Text="Reason" FontSize="14"/>
                             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Reason}" FontSize="14"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" Content="Primary" FontSize="14"/>
-                            <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
+                            <TextBlock Grid.Row="4" Text="Requirement Weight" FontSize="14"/>
                             <Grid Grid.Row="4" Grid.Column="1">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
@@ -1071,8 +1297,33 @@
                                 <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
                                 <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
-                            <TextBlock Grid.Row="5" Text="ONE of" FontSize="14"/>
-                            <ListView Grid.Row="5" Grid.Column="1" FontSize="14"
+                            <TextBlock Grid.Row="5" Text="Overall Ability Weight" FontSize="14"/>
+                            <Grid Grid.Row="5" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource showIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding OverallWeight}" FontSize="14" IsEnabled="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding OverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <Grid Visibility="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource hideIfNull}}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBox Grid.Column="0" Text="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight}" FontSize="14" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight, Converter={StaticResource trueIfNonZero}, ConverterParameter=0.1}" Content="Enabled" FontSize="14"/>
+                                </Grid>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.CommonOverallWeight,
+                                    Converter={StaticResource falseIfNullDefaultValue}, ConverterParameter=0.1}" FontSize="14"  Content="Same for all"/>
+                            </Grid>
+                            <TextBlock Grid.Row="6" Text="ONE of" FontSize="14"/>
+                            <ListView Grid.Row="6" Grid.Column="1" FontSize="14"
                                       x:Name="requirementsList"
                                       Margin="5 0 0 5"
                                       ScrollViewer.HorizontalScrollBarVisibility="Disabled"
