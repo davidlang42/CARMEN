@@ -34,6 +34,7 @@
         <cv:MinimumIntValue x:Key="minimumIntValue"/>
         <cv:SelectableRequirementsList x:Key="selectableRequirementsList"/>
         <cv:HideIfNullOrType x:Key="hideIfNullOrType"/>
+        <cv:TrueIfNonZero x:Key="trueIfNonZero"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -588,9 +589,10 @@
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeightEnabled}"/>
-                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeightEnabled}" Content="Enabled" FontSize="14"/>
+                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="5" Text="Criteria" FontSize="14"/>
                             <ComboBox Grid.Row="5" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name" />
@@ -601,9 +603,9 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding ExistingRoleCost}" FontSize="14" IsEnabled="{Binding ExistingRoleCostEnabled}"/>
+                                <TextBox Grid.Column="0" Text="{Binding ExistingRoleCost}" FontSize="14" IsEnabled="{Binding ExistingRoleCost, Converter={StaticResource trueIfNonZero}}"/>
                                 <TextBlock Grid.Column="1" Text="% per role"/>
-                                <CheckBox Grid.Column="2" IsChecked="{Binding ExistingRoleCostEnabled}" Content="Enabled" FontSize="14"/>
+                                <CheckBox Grid.Column="2" IsChecked="{Binding ExistingRoleCost, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="7" Text="Required Value" FontSize="14"/>
                             <uc:CriteriaMarkSelector Grid.Row="7" Grid.Column="1" Mark="{Binding RequiredValue, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
@@ -662,8 +664,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeightEnabled}"/>
-                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeightEnabled}" Content="Enabled" FontSize="14"/>
+                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="5" Text="Criteria" FontSize="14"/>
                             <ComboBox Grid.Row="5" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name"/>
@@ -674,9 +676,9 @@
                                     <ColumnDefinition Width="Auto"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding ExistingRoleCost}" FontSize="14" IsEnabled="{Binding ExistingRoleCostEnabled}"/>
+                                <TextBox Grid.Column="0" Text="{Binding ExistingRoleCost}" FontSize="14" IsEnabled="{Binding ExistingRoleCost, Converter={StaticResource trueIfNonZero}}"/>
                                 <TextBlock Grid.Column="1" Text="% per role"/>
-                                <CheckBox Grid.Column="2" IsChecked="{Binding ExistingRoleCostEnabled}" Content="Enabled" FontSize="14"/>
+                                <CheckBox Grid.Column="2" IsChecked="{Binding ExistingRoleCost, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="7" Text="Minimum" FontSize="14"/>
                             <uc:CriteriaMarkSelector Grid.Row="7" Grid.Column="1" Mark="{Binding Minimum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
@@ -735,8 +737,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeightEnabled}"/>
-                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeightEnabled}" Content="Enabled" FontSize="14"/>
+                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="5" Text="Minimum Age" FontSize="14"/>
                             <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding Minimum, TargetNullValue=''}" FontSize="14"/>
@@ -787,8 +789,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeightEnabled}"/>
-                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeightEnabled}" Content="Enabled" FontSize="14"/>
+                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="5" Text="Gender" FontSize="14"/>
                             <ComboBox Grid.Row="5" Grid.Column="1" SelectedIndex="{Binding RequiredValue}" ItemsSource="{Binding Source={StaticResource genderEnumValues}}"/>
@@ -836,8 +838,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeightEnabled}"/>
-                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeightEnabled}" Content="Enabled" FontSize="14"/>
+                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="5" Text="Required Tag" FontSize="14"/>
                             <ComboBox Grid.Row="5" Grid.Column="1" SelectedItem="{Binding RequiredTag}" ItemsSource="{Binding Source={StaticResource tagsSelectionSource}}" DisplayMemberPath="Name"/>
@@ -885,8 +887,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeightEnabled}"/>
-                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeightEnabled}" Content="Enabled" FontSize="14"/>
+                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="5" Text="NOT" FontSize="14"/>
                             <ComboBox Grid.Row="5" Grid.Column="1" SelectedItem="{Binding SubRequirement}" ItemsSource="{Binding Source={StaticResource requirementsSelectionSource}}" DisplayMemberPath="Name"/>
@@ -934,8 +936,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeightEnabled}"/>
-                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeightEnabled}" Content="Enabled" FontSize="14"/>
+                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="5" Text="ALL of" FontSize="14"/>
                             <ListView Grid.Row="5" Grid.Column="1" FontSize="14"
@@ -1000,8 +1002,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeightEnabled}"/>
-                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeightEnabled}" Content="Enabled" FontSize="14"/>
+                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="5" Text="ANY of" FontSize="14"/>
                             <ListView Grid.Row="5" Grid.Column="1" FontSize="14"
@@ -1066,8 +1068,8 @@
                                     <ColumnDefinition Width="*"/>
                                     <ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeightEnabled}"/>
-                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeightEnabled}" Content="Enabled" FontSize="14"/>
+                                <TextBox Grid.Column="0" Text="{Binding SuitabilityWeight}" FontSize="14" IsEnabled="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding SuitabilityWeight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
                             </Grid>
                             <TextBlock Grid.Row="5" Text="ONE of" FontSize="14"/>
                             <ListView Grid.Row="5" Grid.Column="1" FontSize="14"

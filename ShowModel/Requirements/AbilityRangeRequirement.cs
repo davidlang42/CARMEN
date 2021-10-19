@@ -50,21 +50,6 @@ namespace Carmen.ShowModel.Requirements
                     return;
                 existingRoleCost = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(ExistingRoleCostEnabled)); //LATER not always
-            }
-        }
-
-        [NotMapped]
-        public bool ExistingRoleCostEnabled
-        {
-            get => existingRoleCost != 0;
-            set
-            {
-                if (ExistingRoleCostEnabled == value)
-                    return;
-                existingRoleCost = value ? 1 : 0;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(ExistingRoleCost));
             }
         }
 
