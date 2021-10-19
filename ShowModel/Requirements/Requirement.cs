@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -60,6 +61,21 @@ namespace Carmen.ShowModel.Requirements
                     return;
                 suitabilityWeight = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(SuitabilityWeightEnabled));
+            }
+        }
+
+        [NotMapped]
+        public bool SuitabilityWeightEnabled
+        {
+            get => suitabilityWeight != 0;
+            set
+            {
+                if (SuitabilityWeightEnabled == value)
+                    return;
+                SuitabilityWeight = value ? 1 : 0;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(SuitabilityWeight));
             }
         }
 
