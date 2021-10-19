@@ -61,7 +61,7 @@ namespace Carmen.ShowModel.Requirements
                     return;
                 suitabilityWeight = value;
                 OnPropertyChanged();
-                OnPropertyChanged(nameof(SuitabilityWeightEnabled));
+                OnPropertyChanged(nameof(SuitabilityWeightEnabled)); //LATER not always
             }
         }
 
@@ -73,7 +73,7 @@ namespace Carmen.ShowModel.Requirements
             {
                 if (SuitabilityWeightEnabled == value)
                     return;
-                SuitabilityWeight = value ? 1 : 0;
+                suitabilityWeight = value ? 1 : 0;
                 OnPropertyChanged();
                 OnPropertyChanged(nameof(SuitabilityWeight));
             }

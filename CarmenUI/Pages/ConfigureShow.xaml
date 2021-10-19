@@ -568,11 +568,14 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Exact Ability requirement, which means that an Applicant must have a specific Mark in the specified Criteria.
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                If the existing roles cost is enabled, it determines how many percentage points will be subtracted from an applicants suitability for each role which they are already allocated requiring this criteria.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -590,8 +593,19 @@
                             </Grid>
                             <TextBlock Grid.Row="5" Text="Criteria" FontSize="14"/>
                             <ComboBox Grid.Row="5" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name" />
-                            <TextBlock Grid.Row="6" Text="Required Value" FontSize="14"/>
-                            <uc:CriteriaMarkSelector Grid.Row="6" Grid.Column="1" Mark="{Binding RequiredValue, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="6" Text="Existing Roles Cost" FontSize="14"/>
+                            <Grid Grid.Row="6" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding ExistingRoleCost}" FontSize="14" IsEnabled="{Binding ExistingRoleCostEnabled}"/>
+                                <TextBlock Grid.Column="1" Text="% per role"/>
+                                <CheckBox Grid.Column="2" IsChecked="{Binding ExistingRoleCostEnabled}" Content="Enabled" FontSize="14"/>
+                            </Grid>
+                            <TextBlock Grid.Row="7" Text="Required Value" FontSize="14"/>
+                            <uc:CriteriaMarkSelector Grid.Row="7" Grid.Column="1" Mark="{Binding RequiredValue, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AbilityRangeRequirement}">
@@ -627,11 +641,14 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
                                 This is an Ability Range requirement, which means that an Applicant must have a Mark within a range for the specified Criteria.
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                If disabled, this requirement will not be used in determining the applicants suitability percentage.
+                                If the existing roles cost is enabled, it determines how many percentage points will be subtracted from an applicants suitability for each role which they are already allocated requiring this criteria.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -649,11 +666,22 @@
                             </Grid>
                             <TextBlock Grid.Row="5" Text="Criteria" FontSize="14"/>
                             <ComboBox Grid.Row="5" Grid.Column="1" FontSize="14" SelectedItem="{Binding Criteria}" ItemsSource="{Binding Source={StaticResource criteriasSelectionSource}}" DisplayMemberPath="Name"/>
-                            <TextBlock Grid.Row="6" Text="Minimum" FontSize="14"/>
-                            <uc:CriteriaMarkSelector Grid.Row="6" Grid.Column="1" Mark="{Binding Minimum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="7" Text="Maximum" FontSize="14"/>
-                            <uc:CriteriaMarkSelector Grid.Row="7" Grid.Column="1" Mark="{Binding Maximum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
-                            <CheckBox Grid.Row="8" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
+                            <TextBlock Grid.Row="6" Text="Existing Roles Cost" FontSize="14"/>
+                            <Grid Grid.Row="6" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding ExistingRoleCost}" FontSize="14" IsEnabled="{Binding ExistingRoleCostEnabled}"/>
+                                <TextBlock Grid.Column="1" Text="% per role"/>
+                                <CheckBox Grid.Column="2" IsChecked="{Binding ExistingRoleCostEnabled}" Content="Enabled" FontSize="14"/>
+                            </Grid>
+                            <TextBlock Grid.Row="7" Text="Minimum" FontSize="14"/>
+                            <uc:CriteriaMarkSelector Grid.Row="7" Grid.Column="1" Mark="{Binding Minimum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="8" Text="Maximum" FontSize="14"/>
+                            <uc:CriteriaMarkSelector Grid.Row="8" Grid.Column="1" Mark="{Binding Maximum, Mode=TwoWay}" Criteria="{Binding Criteria}" VerticalAlignment="Center"/>
+                            <CheckBox Grid.Row="9" Grid.Column="1" VerticalContentAlignment="Center" Content="Higher is better" IsChecked="{Binding ScaleSuitability}"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AgeRequirement}">
@@ -693,6 +721,7 @@
                                 This is an Age requirement, which means that an Applicant must have an age within the specified range.
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                If disabled, this requirement will not be used in determining the applicants suitability percentage.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -744,6 +773,7 @@
                                 This is a Gender requirement, which means that an Applicant must be the specified gender.
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                If disabled, this requirement will not be used in determining the applicants suitability percentage.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -792,6 +822,7 @@
                                 This is a Tag requirement, which means that an Applicant must be assigned the specified tag.
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                If disabled, this requirement will not be used in determining the applicants suitability percentage.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -840,6 +871,7 @@
                                 This is a NOT requirement, which means that an Applicant must not meet the specified requirement.
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                If disabled, this requirement will not be used in determining the applicants suitability percentage.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -888,6 +920,7 @@
                                 This is an AND requirement, which means that an Applicant must meet ALL of the specified sub-requirements.
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                If disabled, this requirement will not be used in determining the applicants suitability percentage.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -953,6 +986,7 @@
                                 This is an OR requirement, which means that an Applicant must meet ANY of the specified sub-requirements.
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                If disabled, this requirement will not be used in determining the applicants suitability percentage.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
@@ -1018,6 +1052,7 @@
                                 This is an XOR requirement, which means that an Applicant must meet EXACTLY ONE of the specified sub-requirements.
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The weight specifies the importance of this requirement in calculating applicants suitability for a role.
+                                If disabled, this requirement will not be used in determining the applicants suitability percentage.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14"/>
