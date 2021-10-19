@@ -418,7 +418,7 @@ namespace Carmen.CastingEngine.Allocation
             Dictionary<Criteria, double> calculate_counts(IEnumerable<Requirement> requirements)
             {
                 var counts = new Dictionary<Criteria, double>();
-                foreach (var requirement in role.Requirements)
+                foreach (var requirement in requirements)
                 {
                     if (requirement is ICriteriaRequirement criteria_requirement)
                         counts[criteria_requirement.Criteria] = 1; // referencing the same criteria twice doesn't count as more
