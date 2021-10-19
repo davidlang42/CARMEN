@@ -53,7 +53,7 @@ namespace CarmenUI.Pages
         };
         private readonly CollectionViewSource requirementsSelectionSource; // xaml resource loaded in constructor
         private readonly CollectionViewSource listSortDirectionEnumSource; // xaml resource loaded in constructor
-        private readonly CollectionViewSource showRootSource = new();
+        private readonly CollectionViewSource showRootSource; // xaml resource loaded in constructor
 
         private CollectionViewSource? currentViewSource;
 
@@ -69,6 +69,7 @@ namespace CarmenUI.Pages
             castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
             tagsSelectionSource = (CollectionViewSource)FindResource(nameof(tagsSelectionSource));
             tagsSelectionSource.SortDescriptions.Add(StandardSort.For<Tag>());
+            showRootSource = (CollectionViewSource)FindResource(nameof(showRootSource));
             requirementsSelectionSource = (CollectionViewSource)FindResource(nameof(requirementsSelectionSource));
             requirementsSelectionSource.SortDescriptions.Add(StandardSort.For<Requirement>());
             listSortDirectionEnumSource = (CollectionViewSource)FindResource(nameof(listSortDirectionEnumSource));

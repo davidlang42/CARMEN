@@ -22,6 +22,7 @@
         <CollectionViewSource x:Key="castGroupsViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="tagsSelectionSource"  IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="requirementsSelectionSource" IsLiveSortingRequested="True"/>
+        <CollectionViewSource x:Key="showRootSource"/>
         <cv:SparseCountByGroups x:Key="sparseCountByGroups"/>
         <cv:InvertBoolean x:Key="inverseBoolean"/>
         <ObjectDataProvider x:Key="genderEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
@@ -465,7 +466,7 @@
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
                             <CheckBox Grid.Row="2" Grid.ColumnSpan="2" IsChecked="{Binding AllowNoRoles, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Everyone must have a role" VerticalContentAlignment="Center"/>
                             <CheckBox Grid.Row="3" Grid.ColumnSpan="2" IsChecked="{Binding AllowMultipleRoles}" FontSize="14" Content="A person can have multiple roles" VerticalContentAlignment="Center"/>
-                            <CheckBox Grid.Row="4" Grid.ColumnSpan="2" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items" VerticalContentAlignment="Center"/>
+                            <CheckBox Grid.Row="4" Grid.ColumnSpan="2" IsEnabled="{Binding Source={StaticResource showRootSource}, Path=CurrentItem.AllowConsecutiveItems}" IsChecked="{Binding AllowConsecutiveItems, Converter={StaticResource inverseBoolean}}" FontSize="14" Content="Avoid roles in consecutive items" VerticalContentAlignment="Center"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelStructure:ShowRoot}">
