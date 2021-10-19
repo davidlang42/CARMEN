@@ -147,12 +147,12 @@ namespace CarmenUI.Pages
             return true;
         }
 
-        protected string ParseApplicantEngine()
+        protected string ParseAuditionEngine()
         {
-            var name = Properties.Settings.Default.ApplicantEngine;
-            if (ApplicantEngine.Implementations.Any(t => t.Name == name))
+            var name = Properties.Settings.Default.AuditionEngine;
+            if (AuditionEngine.Implementations.Any(t => t.Name == name))
                 return name;
-            return ApplicantEngine.Implementations.First().Name;
+            return AuditionEngine.Implementations.First().Name;
         }
 
         protected string ParseSelectionEngine()

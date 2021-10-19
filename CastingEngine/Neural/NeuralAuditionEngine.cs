@@ -10,7 +10,10 @@ using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Neural
 {
-    public class NeuralApplicantEngine : ApplicantEngine, IComparer<Applicant>
+    /// <summary>
+    /// An AuditionEngine which can learn from the user's choices, by training a SingleLayerPerceptron to update the criteria weights.
+    /// </summary>
+    public class NeuralAuditionEngine : AuditionEngine, IComparer<Applicant>
     {
         const double MINIMUM_CHANGE = 0.1;
 
@@ -36,7 +39,7 @@ namespace Carmen.CastingEngine.Neural
         /// <summary>Determines which loss function is used when training the neural network.</summary>
         public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_3; //LATER make this a user setting
 
-        public NeuralApplicantEngine(Criteria[] criterias, UserConfirmation confirm)
+        public NeuralAuditionEngine(Criteria[] criterias, UserConfirmation confirm)
         {
             this.criterias = criterias.Where(c => c.Weight != 0).ToArray(); // exclude criterias with zero weight
             if (this.criterias.Length == 0 && criterias.Length != 0)
@@ -53,7 +56,7 @@ namespace Carmen.CastingEngine.Neural
             UpdateRange();
         }
 
-        private void UpdateRange() //LATER really this is common with WeightedSumEngine and NeuralApplicantEngine should extend that
+        private void UpdateRange() //LATER really this is common with WeightedSumEngine and NeuralAuditionEngine should extend that
         {
             var max = criterias.Select(c => c.Weight).Where(w => w > 0).Sum();
             if (max > int.MaxValue)

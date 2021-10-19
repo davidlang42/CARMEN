@@ -16,8 +16,8 @@ namespace Carmen.CastingEngine
     /// </summary>
     public interface IAllocationEngine
     {
-        /// <summary>An accessor to the IApplicantEngine used by this allocation engine</summary>
-        IApplicantEngine ApplicantEngine { get; }
+        /// <summary>An accessor to the IAuditionEngine used by this allocation engine</summary>
+        IAuditionEngine AuditionEngine { get; }
 
         /// <summary>Determine the recommended order in which the roles should be cast.
         /// Each array in the sequence should be cast as one step, ie. a single element array recommends
@@ -29,7 +29,7 @@ namespace Carmen.CastingEngine
 
         /// <summary>Calculate the suitability of an applicant for a role, regardless of availability and eligibility.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to roles, and is therefore
-        /// different to IApplicantEngine.SuitabilityOf(Applicant, Requirement).</summary>
+        /// different to IAuditionEngine.SuitabilityOf(Applicant, Requirement).</summary>
         double SuitabilityOf(Applicant applicant, Role role);
 
         /// <summary>Count the number of roles an applicant has which require a certain criteria,

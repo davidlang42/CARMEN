@@ -25,8 +25,8 @@ namespace Carmen.CastingEngine.SAT
         // expression building is O(2^n) and will be slow for large numbers, therefore cache
         Dictionary<int, ExpressionBuilder> cachedKeepTogether = new();
 
-        public SatEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
-            : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction)
+        public SatEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
+            : base(audition_engine, alternative_casts, cast_number_order_by, cast_number_order_direction)
         {
             primaryCriterias = criterias.Where(c => c.Primary).ToArray();
         }
@@ -65,7 +65,7 @@ namespace Carmen.CastingEngine.SAT
                     remaining_groups.Add(cast_group, null);
             }
             // Allocate non-accepted applicants to cast groups, until the remaining counts are 0
-            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => ApplicantEngine.OverallAbility(a)))
+            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => AuditionEngine.OverallAbility(a)))
             {
                 if (NextAvailableCastGroup(remaining_groups, applicant) is CastGroup cg)
                 {
@@ -177,7 +177,7 @@ namespace Carmen.CastingEngine.SAT
         /// <summary>Fills any free (null) assignments, keeping the totals in each alternative cast as close to equal as possible</summary>
         private Assignment<Applicant>[] EvenlyFillAssignments(IEnumerable<Assignment<Applicant>> assignments)
         {
-            var result = assignments.OrderByDescending(a => ApplicantEngine.OverallAbility(a.Variable)).ToArray();
+            var result = assignments.OrderByDescending(a => AuditionEngine.OverallAbility(a.Variable)).ToArray();
             int count_true = 0;
             int count_false = 0;
             for (var r = 0; r < result.Length; r++)

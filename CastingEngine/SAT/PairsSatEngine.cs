@@ -37,8 +37,8 @@ namespace Carmen.CastingEngine.SAT
         // expression building is O(2^n) and will be slow for large numbers, therefore cache
         Dictionary<int, ExpressionBuilder> cachedKeepSeparate = new();
 
-        public PairsSatEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
-            : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
+        public PairsSatEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
+            : base(audition_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
         { }
 
         protected override Solver<Applicant> BuildSatSolver(List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast)

@@ -112,19 +112,19 @@ namespace CarmenUI.Pages
                     _totalCast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
                 {
-                    IApplicantEngine applicant_engine = ParseApplicantEngine() switch
+                    IAuditionEngine audition_engine = ParseAuditionEngine() switch
                     {
-                        nameof(NeuralApplicantEngine) => new NeuralApplicantEngine(criterias, NeuralEngineConfirm),
+                        nameof(NeuralAuditionEngine) => new NeuralAuditionEngine(criterias, NeuralEngineConfirm),
                         nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
-                        _ => throw new ArgumentException($"Applicant engine not handled: {ParseApplicantEngine()}")
+                        _ => throw new ArgumentException($"Audition engine not handled: {ParseAuditionEngine()}")
                     };
                     _engine = ParseAllocationEngine() switch
                     {
-                        nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(applicant_engine, alternativeCasts, criterias),
-                        nameof(WeightedAverageEngine) => new WeightedAverageEngine(applicant_engine, alternativeCasts, context.ShowRoot),
-                        nameof(SessionLearningAllocationEngine) => new SessionLearningAllocationEngine(applicant_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
-                        nameof(RoleLearningAllocationEngine) => new RoleLearningAllocationEngine(applicant_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
-                        nameof(ComplexNeuralAllocationEngine) => new ComplexNeuralAllocationEngine(applicant_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm, new FilePersistence("ComplexNeuralModel.xml")), //LATER allow customisation of the neural model filename
+                        nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(audition_engine, alternativeCasts, criterias),
+                        nameof(WeightedAverageEngine) => new WeightedAverageEngine(audition_engine, alternativeCasts, context.ShowRoot),
+                        nameof(SessionLearningAllocationEngine) => new SessionLearningAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
+                        nameof(RoleLearningAllocationEngine) => new RoleLearningAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
+                        nameof(ComplexNeuralAllocationEngine) => new ComplexNeuralAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm, new FilePersistence("ComplexNeuralModel.xml")), //LATER allow customisation of the neural model filename
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }

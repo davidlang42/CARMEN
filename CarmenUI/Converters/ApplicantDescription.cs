@@ -12,11 +12,11 @@ namespace CarmenUI.Converters
 {
     /// <summary>
     /// A converter which takes a whole Applicant object and produces a short summary.
-    /// If the ApplicantEngine property is set, it will also include the Applicant's overall mark if available.
+    /// If the AuditionEngine property is set, it will also include the Applicant's overall mark if available.
     /// </summary>
     public class ApplicantDescription : IValueConverter
     {
-        public IApplicantEngine? ApplicantEngine { get; set; } = null;
+        public IAuditionEngine? AuditionEngine { get; set; } = null;
 
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -39,7 +39,7 @@ namespace CarmenUI.Converters
                 elements.Add($"#{num}");
             if (a.AlternativeCast is AlternativeCast ac)
                 elements.Add(ac.Initial.ToString());
-            if (ApplicantEngine is IApplicantEngine engine)
+            if (AuditionEngine is IAuditionEngine engine)
                 elements.Add($"overall {engine.OverallAbility(a)}");
             return string.Join(" ", elements);
         }

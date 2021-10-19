@@ -17,8 +17,8 @@ namespace Carmen.CastingEngine.Heuristic
     {
         readonly Criteria[] criterias;
 
-        public HeuristicAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria[] criterias)
-            : base(applicant_engine, alternative_casts)
+        public HeuristicAllocationEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria[] criterias)
+            : base(audition_engine, alternative_casts)
         {
             CountRolesByGeometricMean = false;
             CountRolesIncludingPartialRequirements = false;
@@ -32,13 +32,13 @@ namespace Carmen.CastingEngine.Heuristic
         /// - Only direct criteria requirements are included</summary>
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
-            double score = ApplicantEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
+            double score = AuditionEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
             var max = 1;
             foreach (var requirement in role.Requirements)
             {
                 if (requirement is ICriteriaRequirement based_on)
                 {
-                    score += 2 * ApplicantEngine.SuitabilityOf(applicant, requirement) - 0.5 * CountRoles(applicant, based_on.Criteria, role) / 100.0;
+                    score += 2 * AuditionEngine.SuitabilityOf(applicant, requirement) - 0.5 * CountRoles(applicant, based_on.Criteria, role) / 100.0;
                     max += 2;
                 }
             }

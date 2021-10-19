@@ -71,7 +71,7 @@
     <Setting Name="MoveOnCtrlArrow" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">True</Value>
     </Setting>
-    <Setting Name="ApplicantEngine" Type="System.String" Scope="User">
+    <Setting Name="AuditionEngine" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="SelectionEngine" Type="System.String" Scope="User">

@@ -16,8 +16,8 @@ namespace Carmen.CastingEngine.SAT
     /// </summary>
     public class TopPairsSatEngine : PairsSatEngine
     {
-        public TopPairsSatEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
-            : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
+        public TopPairsSatEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
+            : base(audition_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
         { }
 
         protected override bool Simplify(ref int chunk_size, ref int max_chunks)

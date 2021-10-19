@@ -29,7 +29,7 @@ namespace Carmen.CastingEngine.Base
             typeof(BestPairsSatEngine)
         };
 
-        public IApplicantEngine ApplicantEngine { get; init; }
+        public IAuditionEngine AuditionEngine { get; init; }
 
         /// <summary>If null, order by OverallAbility</summary>
         protected Criteria? castNumberOrderBy { get; init; }
@@ -39,9 +39,9 @@ namespace Carmen.CastingEngine.Base
         public abstract void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets);
         public abstract void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups);
 
-        public SelectionEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
+        public SelectionEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
         {
-            ApplicantEngine = applicant_engine;
+            AuditionEngine = audition_engine;
             alternativeCasts = alternative_casts;
             castNumberOrderBy = cast_number_order_by;
             castNumberOrderDirection = cast_number_order_direction;
@@ -50,14 +50,14 @@ namespace Carmen.CastingEngine.Base
         /// <summary>Default implementation returns an average of the suitability for each individual requirement</summary>
         public virtual double SuitabilityOf(Applicant applicant, CastGroup cast_group)
         {
-            var sub_suitabilities = cast_group.Requirements.Select(req => ApplicantEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
+            var sub_suitabilities = cast_group.Requirements.Select(req => AuditionEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
             return sub_suitabilities.Average();
         }
 
         /// <summary>Default implementation returns an average of the suitability for each individual requirement</summary>
         public virtual double SuitabilityOf(Applicant applicant, Tag tag)
         {
-            var sub_suitabilities = tag.Requirements.Select(req => ApplicantEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
+            var sub_suitabilities = tag.Requirements.Select(req => AuditionEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
             return sub_suitabilities.Average();
         }
 
@@ -162,7 +162,7 @@ namespace Carmen.CastingEngine.Base
                 .Where(a => !a.Tags.Contains(tag))
                 .Where(a => tag.Requirements.All(r => r.IsSatisfiedBy(a)))
                 .OrderByDescending(a => SuitabilityOf(a, tag))
-                .ThenByDescending(a => ApplicantEngine.OverallAbility(a));
+                .ThenByDescending(a => AuditionEngine.OverallAbility(a));
             foreach (var applicant in prioritised_applicants) 
             {
                 var cast_group = applicant.CastGroup!; // not null because IsAccepted
@@ -183,8 +183,8 @@ namespace Carmen.CastingEngine.Base
             {
                 (Criteria c, ListSortDirection.Ascending) => applicants.OrderBy(a => a.MarkFor(c)),
                 (Criteria c, ListSortDirection.Descending) => applicants.OrderByDescending(a => a.MarkFor(c)),
-                (null, ListSortDirection.Ascending) => applicants.OrderBy(a => ApplicantEngine.OverallAbility(a)),
-                (null, ListSortDirection.Descending) => applicants.OrderByDescending(a => ApplicantEngine.OverallAbility(a)),
+                (null, ListSortDirection.Ascending) => applicants.OrderBy(a => AuditionEngine.OverallAbility(a)),
+                (null, ListSortDirection.Descending) => applicants.OrderByDescending(a => AuditionEngine.OverallAbility(a)),
                 _ => throw new ApplicationException($"Sort type not handled: {castNumberOrderBy} / {castNumberOrderDirection}")
             };
 

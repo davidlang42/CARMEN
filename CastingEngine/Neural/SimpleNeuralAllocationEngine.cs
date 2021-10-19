@@ -27,8 +27,8 @@ namespace Carmen.CastingEngine.Neural
         public ReloadWeights ReloadWeights { get; set; } = ReloadWeights.OnlyWhenRefused;
         #endregion
 
-        public SimpleNeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
-            : base(applicant_engine, alternative_casts, show_root,
+        public SimpleNeuralAllocationEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
+            : base(audition_engine, alternative_casts, show_root,
                   (show_root.CommonOverallWeight.HasValue ? show_root.Yield() : requirements.OfType<IOverallWeighting>()).Where(ow => ow.OverallWeight != 0).ToArray(), // zero means disabled
                   requirements.Where(r => r.SuitabilityWeight != 0).ToArray(), // zero means disabled
                   requirements.OfType<ICriteriaRequirement>().Where(r => r.SuitabilityWeight != 0 && r.ExistingRoleCost != 0).ToArray(), // zero means disabled

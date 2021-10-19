@@ -97,7 +97,7 @@ namespace CarmenUI.ViewModels
             this.role = role;
             PrimaryCriterias = primary_criterias;
             Suitability = engine.SuitabilityOf(applicant, role);
-            OverallAbility = engine.ApplicantEngine.OverallAbility(applicant);
+            OverallAbility = engine.AuditionEngine.OverallAbility(applicant);
             Marks = new string[PrimaryCriterias.Length];
             for (var i = 0; i < Marks.Length; i++)
                 Marks[i] = applicant.FormattedMarkFor(PrimaryCriterias[i]);

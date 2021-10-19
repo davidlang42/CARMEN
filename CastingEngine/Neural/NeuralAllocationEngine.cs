@@ -52,10 +52,10 @@ namespace Carmen.CastingEngine.Neural
         /// <param name="overall_weightings">The things which will provide overall ability weights</param>
         /// <param name="suitability_requirements">The requirements which will be used for role suitability weights</param>
         /// <param name="existing_role_requirements">The requirements which will detract based on existing roles</param>
-        public NeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root,
+        public NeuralAllocationEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, ShowRoot show_root,
             IOverallWeighting[] overall_weightings, Requirement[] suitability_requirements, ICriteriaRequirement[] existing_role_requirements,
             UserConfirmation confirm)
-            : base(applicant_engine, alternative_casts, show_root)
+            : base(audition_engine, alternative_casts, show_root)
         {
             overallWeightings = overall_weightings;
             overallWeightingsLookup = ArrayLookup(0, overallWeightings);
@@ -144,20 +144,20 @@ namespace Carmen.CastingEngine.Neural
             for (var i = 0; i < overallWeightings.Length; i++)
                 if (overallWeightings[i] is not Requirement)
                 {
-                    values[i] = overall_a ??= ApplicantEngine.OverallSuitability(a);
-                    values[i + offset] = overall_b ??= ApplicantEngine.OverallSuitability(b);
+                    values[i] = overall_a ??= AuditionEngine.OverallSuitability(a);
+                    values[i + offset] = overall_b ??= AuditionEngine.OverallSuitability(b);
                 }
             foreach (var requirement in role.Requirements)
             {
                 if (overallWeightingsLookup.TryGetValue(requirement, out int overall_index))
                 {
-                    values[overall_index] = overall_a ??= ApplicantEngine.OverallSuitability(a);
-                    values[overall_index + offset] = overall_b ??= ApplicantEngine.OverallSuitability(b);
+                    values[overall_index] = overall_a ??= AuditionEngine.OverallSuitability(a);
+                    values[overall_index + offset] = overall_b ??= AuditionEngine.OverallSuitability(b);
                 }
                 if (suitabilityRequirementsLookup.TryGetValue(requirement, out var suitability_index))
                 {
-                    values[suitability_index] = ApplicantEngine.SuitabilityOf(a, requirement);
-                    values[suitability_index + offset] = ApplicantEngine.SuitabilityOf(b, requirement);
+                    values[suitability_index] = AuditionEngine.SuitabilityOf(a, requirement);
+                    values[suitability_index + offset] = AuditionEngine.SuitabilityOf(b, requirement);
                 }
                 if (existingRoleRequirementsLookup.TryGetValue(requirement, out var existing_role_index))
                 {

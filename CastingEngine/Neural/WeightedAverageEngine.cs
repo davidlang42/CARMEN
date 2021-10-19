@@ -20,20 +20,20 @@ namespace Carmen.CastingEngine.Neural
     {
         protected readonly ShowRoot showRoot;
 
-        public WeightedAverageEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root)
-            : base(applicant_engine, alternative_casts)
+        public WeightedAverageEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, ShowRoot show_root)
+            : base(audition_engine, alternative_casts)
         {
             showRoot = show_root;
         }
 
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
-            var overall_suitability = ApplicantEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
+            var overall_suitability = AuditionEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
             double score = 0;
             double max = 0;
             foreach (var requirement in role.Requirements)
             {
-                score += requirement.SuitabilityWeight * ApplicantEngine.SuitabilityOf(applicant, requirement);
+                score += requirement.SuitabilityWeight * AuditionEngine.SuitabilityOf(applicant, requirement);
                 max += requirement.SuitabilityWeight;
                 if (!showRoot.CommonOverallWeight.HasValue)
                 {

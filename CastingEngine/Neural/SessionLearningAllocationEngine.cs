@@ -26,8 +26,8 @@ namespace Carmen.CastingEngine.Neural
         public bool StockpileTrainingData { get; set; } = true;
         #endregion
 
-        public SessionLearningAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
-            : base(applicant_engine, alternative_casts, show_root, requirements, confirm)
+        public SessionLearningAllocationEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm)
+            : base(audition_engine, alternative_casts, show_root, requirements, confirm)
         { }
 
         #region Business logic

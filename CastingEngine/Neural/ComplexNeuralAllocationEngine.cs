@@ -67,8 +67,8 @@ namespace Carmen.CastingEngine.Neural
         }
         #endregion
 
-        public ComplexNeuralAllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm, IDataPersistence model_persistence)
-            : base(applicant_engine, alternative_casts, show_root, show_root.Yield().ToArray(), requirements, requirements.OfType<ICriteriaRequirement>().ToArray(), confirm)
+        public ComplexNeuralAllocationEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm, IDataPersistence model_persistence)
+            : base(audition_engine, alternative_casts, show_root, show_root.Yield().ToArray(), requirements, requirements.OfType<ICriteriaRequirement>().ToArray(), confirm)
         {
             model = new Lazy<FeedforwardNetwork>(LoadModelFromDisk);
             SortAlgorithm = SortAlgorithm.DisagreementSort;

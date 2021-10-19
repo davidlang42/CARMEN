@@ -30,8 +30,8 @@ namespace Carmen.CastingEngine.SAT
             public bool Solved;
         }
 
-        public ThreesACrowdSatEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
-            : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
+        public ThreesACrowdSatEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction, Criteria[] criterias)
+            : base(audition_engine, alternative_casts, cast_number_order_by, cast_number_order_direction, criterias)
         { }
 
         /// <summary>Verifies that the number of cast assigned to each alternative cast is the same for all cast groups.

@@ -109,22 +109,22 @@ namespace CarmenUI.Pages
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
                 var show_root = context.ShowRoot;
-                IApplicantEngine applicant_engine = ParseApplicantEngine() switch
+                IAuditionEngine audition_engine = ParseAuditionEngine() switch
                 {
-                    nameof(NeuralApplicantEngine) => new NeuralApplicantEngine(criterias, NeuralEngineConfirm),
+                    nameof(NeuralAuditionEngine) => new NeuralAuditionEngine(criterias, NeuralEngineConfirm),
                     nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
-                    _ => throw new ArgumentException($"Applicant engine not handled: {ParseApplicantEngine()}")
+                    _ => throw new ArgumentException($"Audition engine not handled: {ParseAuditionEngine()}")
                 };
-                applicantDescription.ApplicantEngine = applicant_engine;
+                applicantDescription.AuditionEngine = audition_engine;
                 _engine = ParseSelectionEngine() switch
                 {
-                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
-                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(TopPairsSatEngine) => new TopPairsSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(BestPairsSatEngine) => new BestPairsSatEngine(applicant_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
+                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(TopPairsSatEngine) => new TopPairsSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(BestPairsSatEngine) => new BestPairsSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
                     _ => throw new ArgumentException($"Allocation engine not handled: {ParseSelectionEngine()}")
                 };
             }
@@ -187,7 +187,7 @@ namespace CarmenUI.Pages
                         applicant.CastGroup = null;
                 }
             }
-            engine.ApplicantEngine.UserSelectedCast(context.Applicants.Local.Where(a => a.IsAccepted), context.Applicants.Local.Where(a => !a.IsAccepted));
+            engine.AuditionEngine.UserSelectedCast(context.Applicants.Local.Where(a => a.IsAccepted), context.Applicants.Local.Where(a => !a.IsAccepted));
             return true;
         }
 

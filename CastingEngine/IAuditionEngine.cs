@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace Carmen.CastingEngine
 {
     /// <summary>
-    /// Interface for CastingEngine functions relating to Applicant abilities
+    /// Interface for CastingEngine functions relating to auditioning Applicants
     /// </summary>
-    public interface IApplicantEngine
+    public interface IAuditionEngine
     {
         /// <summary>The maximum value an applicant's overall ability can be</summary>
         int MaxOverallAbility { get; }
@@ -24,7 +24,7 @@ namespace Carmen.CastingEngine
 
         /// <summary>A callback for when the user selects cast into cast groups manually, providing
         /// information to the engine which can be used to improve future recommendations.</summary>
-        void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected); //LATER logically this belongs in ISelectionEngine, but the technical implementation requires it in IApplicantEngine
+        void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected); //LATER logically this belongs in ISelectionEngine, but the technical implementation requires it in IAuditionEngine
 
         /// <summary>Calculate the suitability of an applicant against a single requirement.
         /// Value returned will be between 0 and 1 (inclusive).</summary>

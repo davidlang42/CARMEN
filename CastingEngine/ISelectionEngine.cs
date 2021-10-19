@@ -16,17 +16,17 @@ namespace Carmen.CastingEngine
     /// </summary>
     public interface ISelectionEngine
     {
-        /// <summary>An accessor to the IApplicantEngine used by this selection engine</summary>
-        IApplicantEngine ApplicantEngine { get; }
+        /// <summary>An accessor to the IAuditionEngine used by this selection engine</summary>
+        IAuditionEngine AuditionEngine { get; }
 
         /// <summary>Calculate the suitability of an applicant for a cast group, regardless of whether they meet all requirements.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to cast groups, and is therefore
-        /// different to <see cref="IApplicantEngine.SuitabilityOf(Applicant, Requirement)"/>.</summary>
+        /// different to <see cref="IAuditionEngine.SuitabilityOf(Applicant, Requirement)"/>.</summary>
         double SuitabilityOf(Applicant applicant, CastGroup cast_group);
 
         /// <summary>Calculate the suitability of an applicant for a tag, regardless of whether they meet all requirements.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to tags, and is therefore
-        /// different to <see cref="IApplicantEngine.SuitabilityOf(Applicant, Requirement)"/>.</summary>
+        /// different to <see cref="IAuditionEngine.SuitabilityOf(Applicant, Requirement)"/>.</summary>
         double SuitabilityOf(Applicant applicant, Tag tag);
 
         /// <summary>Set same cast sets for family groups within the applicants provided.</summary>

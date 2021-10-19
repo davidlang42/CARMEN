@@ -11,13 +11,13 @@ using System.Threading.Tasks;
 namespace Carmen.CastingEngine.Base
 {
     /// <summary>
-    /// The abstract base class of most IApplicantEngine based engines
+    /// The abstract base class of most IAuditionEngine based engines
     /// </summary>
-    public abstract class ApplicantEngine : IApplicantEngine
+    public abstract class AuditionEngine : IAuditionEngine
     {
-        /// <summary>A list of available applicant engines</summary>
+        /// <summary>A list of available audition engines</summary>
         public static readonly Type[] Implementations = new[] {
-            typeof(NeuralApplicantEngine),
+            typeof(NeuralAuditionEngine),
             typeof(WeightedSumEngine),
         };
 
@@ -28,7 +28,7 @@ namespace Carmen.CastingEngine.Base
             => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)));
 
         /// <summary>Calculate the overall ability of an Applicant as a weighted sum of their Abilities.
-        /// NOTE: This is cached for speed, as an Applicant's abilities shouldn't change over the lifetime of an ApplicantEngine</summary>
+        /// NOTE: This is cached for speed, as an Applicant's abilities shouldn't change over the lifetime of an AuditionEngine</summary>
         public int OverallAbility(Applicant applicant) => overallAbility[applicant];
 
         public virtual void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
@@ -36,7 +36,7 @@ namespace Carmen.CastingEngine.Base
 
         readonly FunctionCache<Applicant, Requirement, double> suitabilityOf = new();
         /// <summary>Assumes no circular references between requirements
-        /// NOTE: This is cached for speed, as an Applicant's abilities and Requirement specifications shouldn't change over the lifetime of an ApplicantEngine</summary>
+        /// NOTE: This is cached for speed, as an Applicant's abilities and Requirement specifications shouldn't change over the lifetime of an AuditionEngine</summary>
         public double SuitabilityOf(Applicant applicant, Requirement requirement) => suitabilityOf.Get(applicant, requirement, (applicant, requirement)
             => requirement switch
             {

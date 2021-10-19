@@ -301,12 +301,12 @@ namespace CarmenUI.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ApplicantEngine {
+        public string AuditionEngine {
             get {
-                return ((string)(this["ApplicantEngine"]));
+                return ((string)(this["AuditionEngine"]));
             }
             set {
-                this["ApplicantEngine"] = value;
+                this["AuditionEngine"] = value;
             }
         }
         

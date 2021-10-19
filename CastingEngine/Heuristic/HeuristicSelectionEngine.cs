@@ -14,8 +14,8 @@ namespace Carmen.CastingEngine.Heuristic
 {
     public class HeuristicSelectionEngine : SelectionEngine
     {
-        public HeuristicSelectionEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
-            : base(applicant_engine, alternative_casts, cast_number_order_by, cast_number_order_direction)
+        public HeuristicSelectionEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
+            : base(audition_engine, alternative_casts, cast_number_order_by, cast_number_order_direction)
         { }
 
         /// <summary>Select applicants into Cast Groups, respecting those already selected, by calculating the remaining count for each group,
@@ -47,7 +47,7 @@ namespace Carmen.CastingEngine.Heuristic
                     remaining_groups.Add(cast_group, null);
             }
             // Allocate non-accepted applicants to cast groups, until the remaining counts are 0
-            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => ApplicantEngine.OverallAbility(a)))
+            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => AuditionEngine.OverallAbility(a)))
             {
                 if (NextAvailableCastGroup(remaining_groups, applicant) is CastGroup cg)
                 {

@@ -28,7 +28,7 @@ namespace Carmen.CastingEngine.Base
             typeof(HeuristicAllocationEngine)
         };
 
-        public IApplicantEngine ApplicantEngine { get; init; }
+        public IAuditionEngine AuditionEngine { get; init; }
 
         protected readonly AlternativeCast[] alternativeCasts;
 
@@ -61,9 +61,9 @@ namespace Carmen.CastingEngine.Base
         public bool CastingOrderConsiderAvailability { get; set; } = true;
         #endregion
 
-        public AllocationEngine(IApplicantEngine applicant_engine, AlternativeCast[] alternative_casts)
+        public AllocationEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts)
         {
-            ApplicantEngine = applicant_engine;
+            AuditionEngine = audition_engine;
             alternativeCasts = alternative_casts;
         }
 
@@ -71,8 +71,8 @@ namespace Carmen.CastingEngine.Base
 
         /// <summary>Default implementation orders by <see cref="SuitabilityOf(Applicant, Role)"/> descending (ascending if reversed)</summary>
         protected virtual List<Applicant> InPreferredOrder(IEnumerable<Applicant> applicants, Role role, bool reverse = false)
-            => reverse ? applicants.OrderBy(a => SuitabilityOf(a, role)).ThenBy(a => ApplicantEngine.OverallAbility(a)).ToList()
-            : applicants.OrderByDescending(a => SuitabilityOf(a, role)).ThenByDescending(a => ApplicantEngine.OverallAbility(a)).ToList();
+            => reverse ? applicants.OrderBy(a => SuitabilityOf(a, role)).ThenBy(a => AuditionEngine.OverallAbility(a)).ToList()
+            : applicants.OrderByDescending(a => SuitabilityOf(a, role)).ThenByDescending(a => AuditionEngine.OverallAbility(a)).ToList();
 
         /// <summary>Default implementation does nothing</summary>
         public virtual void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
