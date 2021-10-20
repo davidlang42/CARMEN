@@ -50,7 +50,7 @@ namespace Carmen.ShowModel.Applicants
 
         public SameCastSet()
         {
-            applicants.CollectionChanged += Applicants_CollectionChanged;
+            applicants.CollectionChanged += Applicants_CollectionChanged; //TODO dispose handlers
         }
 
         private void Applicants_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

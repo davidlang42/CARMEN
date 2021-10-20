@@ -24,7 +24,7 @@ namespace CarmenUI.ViewModels
             // check role statuses
             var roles = c.ShowRoot.ItemsInOrder().SelectMany(i => i.Roles).Distinct();
             var counts = roles.GroupBy(r => r.CastingStatus(alternative_casts))
-                .ToDictionary(g => g.Key, g => g.Count()); //LATER does this need await?
+                .ToDictionary(g => g.Key, g => g.Count());
             if (counts.TryGetValue(RoleStatus.FullyCast, out var roles_cast))
                 Rows.Add(new Row { Success = $"{roles_cast.Plural("Role")} cast" });
             if (counts.TryGetValue(RoleStatus.NotCast, out var roles_blank))

@@ -16,7 +16,7 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            await c.Nodes.Include(i => i.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync(); //LATER evaluate how much of this "loading" before using actually helps (in all summaries and page loads)
+            await c.Nodes.Include(i => i.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
             await c.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
             await c.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
             var items_in_order = c.ShowRoot.ItemsInOrder().ToList();
@@ -69,11 +69,11 @@ namespace CarmenUI.ViewModels
             item_count = 0;
             var without_roles = 0;
             var incorrect_sum = 0;
-            foreach (var item in items) //LATER paralleise
+            foreach (var item in items)
             {
                 if (item.Roles.Count == 0)
                     without_roles += 1;
-                else if (!item.CountMatchesSumOfRoles()) //LATER does this need await?
+                else if (!item.CountMatchesSumOfRoles())
                     incorrect_sum += 1;
                 item_count += 1;
             }
@@ -96,9 +96,9 @@ namespace CarmenUI.ViewModels
             var missing_roles = 0;
             var too_many_roles = 0;
             var incorrect_sum = 0;
-            foreach (var section in section_type.Sections) //LATER parallelise
+            foreach (var section in section_type.Sections)
             {
-                var role_match = section.RolesMatchCastMembers(cast_members); //LATER does this need await?
+                var role_match = section.RolesMatchCastMembers(cast_members);
                 if (section.Children.Count == 0)
                     without_children += 1;
                 else if (role_match == Section.RolesMatchResult.TooFewRoles)

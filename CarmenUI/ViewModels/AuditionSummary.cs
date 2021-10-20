@@ -22,7 +22,7 @@ namespace CarmenUI.ViewModels
             var cast_groups = await c.CastGroups.Include(cg => cg.Requirements).ToArrayAsync();
             foreach (var cast_group in cast_groups)
             {
-                var applicant_count = await auditioned.CountAsync(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)));//LATER paralleise
+                var applicant_count = await auditioned.CountAsync(a => cast_group.Requirements.All(r => r.IsSatisfiedBy(a)));
                 var row = new Row { Success = $"{applicant_count} eligible for {cast_group.Name}" };
                 if (applicant_count < cast_group.RequiredCount)
                     row.Fail = $"({cast_group.RequiredCount} required)";

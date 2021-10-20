@@ -16,7 +16,7 @@ namespace CarmenUI.ViewModels
 {
     public class ApplicantForRole : INotifyPropertyChanged
     {
-        public Applicant Applicant { get; init; }//LATER should really be private
+        public Applicant Applicant { get; init; }
         public Criteria[] PrimaryCriterias { get; init; }
 
         private Role role;

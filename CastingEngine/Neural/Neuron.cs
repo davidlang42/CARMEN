@@ -28,7 +28,7 @@ namespace Carmen.CastingEngine.Neural
             Weights = new double[n_inputs];
             for (var i = 0; i < Weights.Length; i++)
                 Weights[i] = random.NextDouble() * (MAXIMUM_SEED - MINIMUM_SEED) + MINIMUM_SEED;
-            Bias = random.NextDouble() * (MAXIMUM_SEED - MINIMUM_SEED) + MINIMUM_SEED; //LATER is there a better way to initialise the weights/bias?
+            Bias = random.NextDouble() * (MAXIMUM_SEED - MINIMUM_SEED) + MINIMUM_SEED;
         }
 
         /// <summary>Load a neuron with existings weights and bias</summary>

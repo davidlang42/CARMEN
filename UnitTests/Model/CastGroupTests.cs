@@ -11,8 +11,6 @@ namespace UnitTests.Model
 {
     public class CastGroupTests
     {
-        //LATER add property changed tests for completeness: AlternateCasts, Requirements, RequiredCount, Order, Icon
-
         [Test]
         public void PropertyChanged_Name()
         {

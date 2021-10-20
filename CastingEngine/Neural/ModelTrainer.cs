@@ -52,7 +52,7 @@ namespace Carmen.CastingEngine.Neural
                 {
                     var new_loss = model.Train(training_inputs[i], training_outputs[i]);
                     if (no_change && change_threshold.HasValue)
-                        no_change = Math.Abs(new_loss - previous_loss[i]) < change_threshold.Value; //LATER is this logic even right? shouldn't it be average loss?
+                        no_change = Math.Abs(new_loss - previous_loss[i]) < change_threshold.Value; // possibly use average loss in the future
                     previous_loss[i] = new_loss;
                 }
                 if (LossThreshold is double loss_threshold)

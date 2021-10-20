@@ -65,7 +65,7 @@ namespace Carmen.ShowModel.Structure
             var roles_per_cast = ItemsInOrder()
                 .SelectMany(i => i.Roles).Distinct()
                 .SelectMany(r => r.Cast).GroupBy(a => a)
-                .ToDictionary(g => g.Key, g => g.Count()); //LATER does this need await?
+                .ToDictionary(g => g.Key, g => g.Count());
             if (!SectionType.AllowNoRoles)
                 cast_with_no_roles = (int)total_cast_members - roles_per_cast.Count;
             if (!SectionType.AllowMultipleRoles)

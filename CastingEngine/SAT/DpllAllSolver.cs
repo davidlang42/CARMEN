@@ -11,7 +11,9 @@ namespace Carmen.CastingEngine.SAT
         public DpllAllSolver(IEnumerable<T>? variables = null)
             : base(variables)
         {
-            propogatePureLiterals = false; //LATER if I want to keep pure literals and have all solutions, could possibly back-check the inverse pure literal when returning solutions
+            // if I want to keep pure literals and have all solutions, could possibly
+            // back-check the inverse pure literal when returning solutions
+            propogatePureLiterals = false;
         }
     }
 }

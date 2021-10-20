@@ -246,7 +246,7 @@ namespace Carmen.ShowModel.Applicants
         {
             abilities.CollectionChanged += Abilities_CollectionChanged;
             tags.CollectionChanged += Tags_CollectionChanged;
-            roles.CollectionChanged += Roles_CollectionChanged;//LATER check any show model INotifyPropertyChanged objects for handlers that should be disposed
+            roles.CollectionChanged += Roles_CollectionChanged; //TODO dispose handlers
         }
 
         private void Abilities_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -257,7 +257,7 @@ namespace Carmen.ShowModel.Applicants
                 var new_items = e.NewItems?.Cast<Ability>().ToHashSet() ?? new HashSet<Ability>();
                 var old_items = e.OldItems?.Cast<Ability>().ToHashSet() ?? new HashSet<Ability>();
                 foreach (var added in new_items.Where(n => !old_items.Contains(n)))
-                    added.PropertyChanged += Ability_PropertyChanged;
+                    added.PropertyChanged += Ability_PropertyChanged; //TODO dispose handlers
                 foreach (var removed in old_items.Where(o => !new_items.Contains(o)))
                     removed.PropertyChanged -= Ability_PropertyChanged;
             }
@@ -272,7 +272,7 @@ namespace Carmen.ShowModel.Applicants
         private void Roles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(Roles));
 
-        public uint? AgeAt(DateTime date) //LATER handle errors more nicely, move errors to validation
+        public uint? AgeAt(DateTime date) //TODO handle errors more nicely, move errors to validation
         {
             if (DateOfBirth == null)
                 return null;
@@ -312,11 +312,5 @@ namespace Carmen.ShowModel.Applicants
         }
 
         public int CompareTo(Applicant? other) => ApplicantId.CompareTo(other?.ApplicantId);
-    }
-
-    public enum Gender
-    {
-        Male,
-        Female
     }
 }

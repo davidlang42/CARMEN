@@ -6,7 +6,7 @@ namespace Carmen.CastingEngine.SAT
     /// <summary>
     /// An SMT solver based on the DPLL(T) algorithm, extending DPLL with a domain specific validity test
     /// </summary>
-    public class DpllTheorySolver<T> : DpllAllSolver<T> //LATER add unit tests
+    public class DpllTheorySolver<T> : DpllAllSolver<T>
         where T : notnull
     {
         /// <summary>Tests the validity of a proposed solution, returning true if valid (for all possible

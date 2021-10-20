@@ -30,7 +30,7 @@ namespace CarmenUI.Windows
         public MainWindow(DbContextOptions<ShowContext> context_options, string connection_label, string default_show_name)
         {
             if (Properties.Settings.Default.SelectAllOnFocusTextBox)
-                EventManager.RegisterClassHandler(typeof(TextBox), TextBox.GotFocusEvent, new RoutedEventHandler(TextBox_GotFocus)); //LATER does this need to undo on unload?
+                EventManager.RegisterClassHandler(typeof(TextBox), GotFocusEvent, new RoutedEventHandler(TextBox_GotFocus));
             InitializeComponent();
             connectionLabel = connection_label;
             NavigationCommands.BrowseBack.InputGestures.Clear(); // otherwise the backspace key changes pages without saving or confirming

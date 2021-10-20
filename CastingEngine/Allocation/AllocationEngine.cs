@@ -28,7 +28,6 @@ namespace Carmen.CastingEngine.Allocation
 
         protected readonly AlternativeCast[] alternativeCasts;
 
-        //LATER allow users to change these settings
         #region Engine parameters
         /// <summary>If true, a role requiring multiple criteria will be counted as a fractical role for each criteria,
         /// equal to 1/SQRT(CriteriasRequired). If false, a role will be counted as 1 whole role for each criteria required.</summary>
@@ -97,7 +96,7 @@ namespace Carmen.CastingEngine.Allocation
                 {
                     var already_allocated = existing_cast_in_this_group.Count;
                     if (cbg.CastGroup.AlternateCasts)
-                        already_allocated /= alternativeCasts.Length; //LATER this assumes the existing casting has the same number of each alternative cast
+                        already_allocated /= alternativeCasts.Length;
                     required -= already_allocated;
                 }
                 if (required > 0)
@@ -463,7 +462,7 @@ namespace Carmen.CastingEngine.Allocation
 
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
-        public Availability AvailabilityOf(Applicant applicant, Role role) //LATER thoroughly unit test
+        public Availability AvailabilityOf(Applicant applicant, Role role)
         {
             var applicant_items = applicant.Roles.Where(r => r != role).SelectMany(r => r.Items).ToHashSet();
             var role_items = role.Items.ToHashSet();

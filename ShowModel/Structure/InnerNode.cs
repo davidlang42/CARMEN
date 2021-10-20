@@ -25,7 +25,7 @@ namespace Carmen.ShowModel.Structure
 
         public InnerNode()
         {
-            children.CollectionChanged += Children_CollectionChanged;
+            children.CollectionChanged += Children_CollectionChanged; //TODO dispose handlers
         }
 
         private void Children_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -36,7 +36,7 @@ namespace Carmen.ShowModel.Structure
                 var new_items = e.NewItems?.Cast<Node>().ToHashSet() ?? new HashSet<Node>();
                 var old_items = e.OldItems?.Cast<Node>().ToHashSet() ?? new HashSet<Node>();
                 foreach (var added in new_items.Where(n => !old_items.Contains(n)))
-                    added.PropertyChanged += Child_PropertyChanged;
+                    added.PropertyChanged += Child_PropertyChanged; //TODO dispose handlers
                 foreach (var removed in old_items.Where(o => !new_items.Contains(o)))
                     removed.PropertyChanged -= Child_PropertyChanged;
             }
@@ -61,11 +61,10 @@ namespace Carmen.ShowModel.Structure
             if (AllowConsecutiveItems)
                 return true; // nothing to check
             var items = ItemsInOrder().ToList();
-            //LATER possible bug: what happens if a role is in 2 consecutive items?
-            var cast_per_item = items.Select(i => i.Roles.SelectMany(r => r.Cast).ToHashSet()).ToList(); //LATER does this need await? also parallelise
+            var cast_per_item = items.Select(i => i.Roles.SelectMany(r => r.Cast).ToHashSet()).ToList();
             for (var i = 1; i < items.Count; i++)
             {
-                var cast_in_consecutive_items = cast_per_item[i].Intersect(cast_per_item[i - 1]).ToHashSet(); //LATER does this need await? also confirm that in-built Intersect() isn't slower than hashset.select(i => other_hashset.contains(i)).count()
+                var cast_in_consecutive_items = cast_per_item[i].Intersect(cast_per_item[i - 1]).ToHashSet();
                 if (cast_in_consecutive_items.Count != 0)
                 {
                     failures.Add(new ConsecutiveItemCast { Item1 = items[i - 1], Item2 = items[i], Cast = cast_in_consecutive_items });

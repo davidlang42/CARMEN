@@ -17,7 +17,7 @@ namespace Carmen.CastingEngine.Selection
     /// </summary>
     public class ThreesACrowdSatEngine : SatEngine
     {
-        public List<Result> Results { get; init; } = new(); //LATER read only
+        public List<Result> Results { get; init; } = new();
 
         public struct Result
         {
@@ -79,7 +79,7 @@ namespace Carmen.CastingEngine.Selection
             // Initialise() the starting conditions, then Simplify() until the SAT solver succeeds
             Results.Clear();
             Initialise(applicants_needing_alternative_cast.Select(p => p.Item2.Count), out int set_size, out int max_sets);
-            do //LATER probably need some way of communicating progress back to the main program
+            do
             {
                 // compile clauses
                 var clauses = new HashSet<Clause<Applicant>>();

@@ -27,7 +27,6 @@ namespace Carmen.CastingEngine.Allocation
 
         public Montage? LastTrainingMontage { get; set; } = null;
 
-        //LATER allow users to change these parameters
         #region Engine parameters
         /// <summary>The maximum number of training iterations run per invocation of
         /// <see cref="UserPickedCast(IEnumerable{Applicant}, IEnumerable{Applicant}, Role)"/></summary>
@@ -167,7 +166,6 @@ namespace Carmen.CastingEngine.Allocation
         /// <summary>Performs a training operation, but doesn't update any weights outside the model</summary>
         protected void TrainModel(Dictionary<double[], double[]> pairs)
         {
-            //LATER learning rate and loss function should probably be part of the trainer rather than the network
             Model.LearningRate = CalculateLearningRate();
             Model.LossFunction = NeuralLossFunction;
             var trainer = new ModelTrainer(Model)

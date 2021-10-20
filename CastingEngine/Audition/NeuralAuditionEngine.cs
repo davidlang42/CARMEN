@@ -26,15 +26,15 @@ namespace Carmen.CastingEngine.Audition
 
         /// <summary>The maximum number of training iterations run per invocation of
         /// <see cref="UserSelectedCast(IEnumerable{Applicant}, IEnumerable{Applicant})"/></summary>
-        public int MaxTrainingIterations { get; set; } = 10; //LATER make this a user setting
+        public int MaxTrainingIterations { get; set; } = 10;
 
         /// <summary>The speed at which the neural network learns from results, as a fraction of
         /// <see cref="MaxOverallAbility"/>. Reasonable values are between 0.001 and 0.01.
         /// WARNING: Changing this can have crazy consequences, slower is generally safer but be careful.</summary>
-        public double NeuralLearningRate { get; set; } = 0.005; //LATER make this a user setting
+        public double NeuralLearningRate { get; set; } = 0.005;
 
         /// <summary>Determines which loss function is used when training the neural network.</summary>
-        public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_3; //LATER make this a user setting
+        public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_3;
 
         public NeuralAuditionEngine(Criteria[] criterias, UserConfirmation confirm)
         {
@@ -53,7 +53,7 @@ namespace Carmen.CastingEngine.Audition
             UpdateRange();
         }
 
-        private void UpdateRange() //LATER really this is common with WeightedSumEngine and NeuralAuditionEngine should extend that
+        private void UpdateRange() //TODO really this is common with WeightedSumEngine and NeuralAuditionEngine should extend that
         {
             var max = criterias.Select(c => c.Weight).Where(w => w > 0).Sum();
             if (max > int.MaxValue)

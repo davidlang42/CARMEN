@@ -16,7 +16,6 @@ namespace CarmenUI.ViewModels
 {
     public abstract class RoleView : IDisposable, INotifyPropertyChanged
     {
-        //LATER audit the use of all converters, because I suspect some of them can be implemented more cleanly elsewhere
         bool disposed;
 
         public event PropertyChangedEventHandler? PropertyChanged;

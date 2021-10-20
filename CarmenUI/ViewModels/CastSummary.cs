@@ -85,7 +85,7 @@ namespace CarmenUI.ViewModels
             foreach (var tag in tags)
             {
                 var row = new Row { Success = $"{tag.Members.Count} tagged {tag.Name}" };
-                if (tag.Members.GroupBy(a => a.CastGroup).Any(g => g.Key == null || (tag.CountFor(g.Key) is uint required_count && required_count != g.Count()))) //LATER does this need await?
+                if (tag.Members.GroupBy(a => a.CastGroup).Any(g => g.Key == null || (tag.CountFor(g.Key) is uint required_count && required_count != g.Count())))
                     row.Fail = $"(doesn't match required)";
                 Rows.Add(row);
             }

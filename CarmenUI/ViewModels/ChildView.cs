@@ -12,12 +12,11 @@ namespace CarmenUI.ViewModels
 {
     public class ChildView : IDisposable, INotifyPropertyChanged
     {
-        //LATER this class has a lot of code copied from RoleView/RoleOnlyView, there should probably be some inheritance (similarly ShowRootOrSectionView from ItemView)
         bool disposed = false;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public Node Node { get; init; }//LATER this should probably be private
+        public Node Node { get; init; }
 
         public SectionType? SectionType
         {

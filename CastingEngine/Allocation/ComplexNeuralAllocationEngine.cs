@@ -21,7 +21,6 @@ namespace Carmen.CastingEngine.Allocation
 
         protected override INeuralNetwork Model => model.Value;
 
-        //LATER allow users to change these parameters
         #region Engine parameters
         /// <summary>If true, training will occur whenever <see cref="UserPickedCast(IEnumerable{Applicant}, IEnumerable{Applicant}, Role)"/> is called</summary>
         public bool TrainImmediately { get; set; } = false;
@@ -36,15 +35,15 @@ namespace Carmen.CastingEngine.Allocation
         public IDataPersistence ModelPersistence { get; set; }
 
         /// <summary>The number of hidden layers to be created in a new model (does not affect loaded models)</summary>
-        public int NeuralHiddenLayers { get; set; } = 2; //LATER set a better default based on experimental data
+        public int NeuralHiddenLayers { get; set; } = 2;
 
         /// <summary>The constant number of neurons to be created in a new model layer (does not affect loaded models)
         /// NOTE: This is used in conjunction with <see cref="NeuralLayerNeuronsPerInput"/></summary>
-        public int NeuralLayerNeuronsConstant { get; set; } = 0; //LATER set a better default based on experimental data
+        public int NeuralLayerNeuronsConstant { get; set; } = 0;
 
         /// <summary>The number of neurons per input to be created in a new model layer (does not affect loaded models)
         /// NOTE: This is used in conjunction with <see cref="NeuralLayerNeuronsConstant"/></summary>
-        public double NeuralLayerNeuronsPerInput { get; set; } = 1; //LATER set a better default based on experimental data
+        public double NeuralLayerNeuronsPerInput { get; set; } = 1;
 
         /// <summary>Determines which activation function is used for the hidden layers of a new model (does not affect loaded models)</summary>
         public ActivationFunctionChoice NeuralHiddenActivationFunction { get; set; } = ActivationFunctionChoice.Tanh;
@@ -99,10 +98,6 @@ namespace Carmen.CastingEngine.Allocation
 
         private FeedforwardNetwork LoadModelFromDisk()
         {
-            //LATER handle changes in requirements
-            // - store associated to requirement names, if names change it counts as a new requirement
-            // - any new requirements get initialised with random weights of the correct polarity
-            // - existing requirements may be re-ordered, but this just involves updating the first layer weights
             var reader = new XmlSerializer(typeof(FeedforwardNetwork));
             try
             {
@@ -112,7 +107,7 @@ namespace Carmen.CastingEngine.Allocation
             }
             catch
             {
-                //LATER log exception or otherwise tell user, there are many cases that can get here: file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
+                //TODO log exception or otherwise tell user, there are many cases that can get here: file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
             }
             return BuildNewModel();
         }
@@ -135,7 +130,7 @@ namespace Carmen.CastingEngine.Allocation
             if (!model.IsValueCreated)
                 return; // no need to save if we haven't even loaded it
             var writer = new XmlSerializer(typeof(FeedforwardNetwork));
-            //LATER handle exceptions (and check for filename not being empty) and offer to save to temp as a fallback
+            //TODO handle exceptions (and check for filename not being empty) and offer to save to temp as a fallback
             using var stream = ModelPersistence.Save();
             writer.Serialize(stream, model.Value);
         }

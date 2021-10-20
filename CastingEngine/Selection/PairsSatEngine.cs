@@ -15,7 +15,7 @@ namespace Carmen.CastingEngine.Selection
     /// </summary>
     public abstract class PairsSatEngine : SatEngine
     {
-        public List<Result> Results { get; init; } = new(); //LATER read only
+        public List<Result> Results { get; init; } = new();
 
         public struct Result
         {
@@ -44,11 +44,11 @@ namespace Carmen.CastingEngine.Selection
             Solution solution = Solution.Unsolveable;
             var solved_clauses = new HashSet<Clause<Applicant>>();
             solved_clauses.AddRange(existing_assignments);
-            solved_clauses.AddRange(same_cast_clauses); //LATER these clauses should probably be solved first to prove they are consistent
+            solved_clauses.AddRange(same_cast_clauses);
             int previously_chunked_applicants = 0;
             Results.Clear();
             Initialise(out int chunk_size, out int max_chunks);
-            do //LATER probably need some way of communicating progress back to the main program, especially as chunk size increases in ChunkedPairsSatEngine
+            do
             {
                 // cap max_chunk to the highest possible number of chunks
                 var max_possible_chunks = MaximumPossibleChunks(chunk_size, previously_chunked_applicants, applicants_needing_alternative_cast.Select(p => p.Item2.Count));

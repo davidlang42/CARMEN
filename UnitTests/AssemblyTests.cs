@@ -13,7 +13,7 @@ namespace UnitTests
     {
         static readonly Type[] testedTypes = new[] {
             typeof(Carmen.ShowModel.ShowContext),
-            typeof(Carmen.CastingEngine.Allocation.IAllocationEngine) //LATER this should include other projects as well
+            typeof(Carmen.CastingEngine.Allocation.IAllocationEngine) //TODO this should include other projects as well
         };
 
         [Test]

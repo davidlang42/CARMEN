@@ -61,7 +61,7 @@ namespace Carmen.CastingEngine.SAT
                 }
             }
             // Pick an unassigned literal and branch
-            var unassigned_literal = expression.Clauses.First().Literals.First(); //LATER speed this up by branching on the most common literal
+            var unassigned_literal = expression.Clauses.First().Literals.First();
             var branching_clause = new Clause<int> { Literals = unassigned_literal.Yield().ToHashSet() };
             expression.Clauses.Add(branching_clause);
             foreach (var solution in PartialSolve(expression, partial_solution))
@@ -107,7 +107,7 @@ namespace Carmen.CastingEngine.SAT
         {
             if (exp.Clauses.Count == 0)
                 return SearchResult.Solve();
-            var unique_literals = exp.Clauses.SelectMany(c => c.Literals).ToHashSet(); //LATER speed this up by grouping literals by variable and finding the first with only 1
+            var unique_literals = exp.Clauses.SelectMany(c => c.Literals).ToHashSet();
             foreach (var literal in unique_literals)
             {
                 if (!unique_literals.Contains(literal.Inverse()))

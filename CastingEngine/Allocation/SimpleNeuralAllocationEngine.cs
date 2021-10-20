@@ -20,7 +20,6 @@ namespace Carmen.CastingEngine.Allocation
 
         protected override INeuralNetwork Model => model;
 
-        //LATER allow users to change these parameters
         #region Engine parameters
         /// <summary>Determines when the updated ShowModel weights are reloaded into the neural network.</summary>
         public ReloadWeights ReloadWeights { get; set; } = ReloadWeights.OnlyWhenRefused;

@@ -18,9 +18,9 @@ namespace Carmen.ShowModel
 {
     public class ShowContext : DbContext
     {
-        //LATER add comments to DbSet properties reminding the caller what to Include()
-        //LATER also audit navigation properties, and change to internal where not required (to avoid the accidental usage from UI causing bad lazy loading)
-        //LATER consider making all IDs internal as well (this would require removing them from DatabaseExplorer)
+        //TODO add comments to DbSet properties reminding the caller what to Include()
+        //TODO also audit navigation properties, and change to internal where not required (to avoid the accidental usage from UI causing bad lazy loading)
+        //TODO consider making all IDs internal as well (this would require removing them from DatabaseExplorer)
         #region Database collections
         public DbSet<Applicant> Applicants => Set<Applicant>();
         public DbSet<AlternativeCast> AlternativeCasts => Set<AlternativeCast>();
@@ -83,7 +83,7 @@ namespace Carmen.ShowModel
         /// If deleting this alternative cast brings the total number below 2, then any CastGroup which has
         /// AlternateCasts set to true, will have it set to false, and the alternative cast of their current
         /// members also set to null.</summary>
-        public void DeleteAlternativeCast(AlternativeCast alternative_cast) //LATER unit test
+        public void DeleteAlternativeCast(AlternativeCast alternative_cast)
         {
             foreach (var member in alternative_cast.Members.ToArray())
                 member.AlternativeCast = null;
@@ -105,7 +105,7 @@ namespace Carmen.ShowModel
 
         /// <summary>Also deletes any sections currently set to this section type, any items or sections under
         /// those sections, any roles which are no longer in any items, and unsets the cast allocated to those roles.</summary>
-        public void DeleteSectionType(SectionType section_type) //LATER unit test
+        public void DeleteSectionType(SectionType section_type)
         {
             while (section_type.Sections.Any())
             {
@@ -118,7 +118,7 @@ namespace Carmen.ShowModel
 
         /// <summary>Also deletes any child nodes under this node, any roles which are no longer in any items, and unsets the
         /// cast allocated to those roles.</summary>
-        public void DeleteNode(Node node) //LATER unit test
+        public void DeleteNode(Node node)
         {
             if (node is ShowRoot)
                 throw new ArgumentException("Cannot delete ShowRoot.");
@@ -143,7 +143,7 @@ namespace Carmen.ShowModel
 
         /// <summary>Removes the role from this item only, but if the role is no longer in any items, this also
         /// deletes the roles and unallocates any cast from it.</summary>
-        public void RemoveRole(Role role, Item item) //LATER unit test
+        public void RemoveRole(Role role, Item item)
         {
             role.Items.Remove(item);
             item.Roles.Remove(role);
@@ -157,7 +157,7 @@ namespace Carmen.ShowModel
 
         /// <summary>Also deletes any NOT requirements which use this requirement, because a NOT requirement must have a
         /// sub-requirement set.</summary>
-        public void DeleteRequirement(Requirement requirement) //LATER unit test
+        public void DeleteRequirement(Requirement requirement)
         {
             var used_by_not_requirements = Requirements.Local.OfType<NotRequirement>().Where(nr => nr.SubRequirement == requirement).ToArray();
             foreach (var not_requirement in used_by_not_requirements)
@@ -265,7 +265,7 @@ namespace Carmen.ShowModel
             base.OnConfiguring(optionsBuilder);
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder) //LATER may need to use this: .UsePropertyAccessMode(PropertyAccessMode.PreferFieldDuringConstruction);
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             // Configure composite keys
             modelBuilder.Entity<Ability>()

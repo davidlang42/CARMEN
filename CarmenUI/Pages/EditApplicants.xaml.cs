@@ -30,7 +30,7 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class EditApplicants : SubPage
     {
-        const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10; //LATER why not make this a user setting? (per mode?)
+        const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10; //TODO why not make this a user setting? (per mode?)
 
         private CollectionViewSource applicantsViewSource;
         private CollectionViewSource criteriasViewSource;
@@ -80,7 +80,7 @@ namespace CarmenUI.Pages
                 criteriasViewSource.View.SortDescriptions.Add(StandardSort.For<Criteria>());
                 using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
                     await context.Applicants.LoadAsync();
-                using (loading.Segment(nameof(EditApplicants) + nameof(Applicant), "First applicant")) //LATER ideally setting the source wouldn't auto-show the first applicant (which takes time because it loads an image)
+                using (loading.Segment(nameof(EditApplicants) + nameof(Applicant), "First applicant"))
                     applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
                 using (loading.Segment(nameof(EditApplicants) + nameof(ConfigureGroupingAndSorting), "Sorting"))
                     ConfigureGroupingAndSorting();
@@ -95,9 +95,9 @@ namespace CarmenUI.Pages
         private void SaveButton_Click(object sender, RoutedEventArgs e)
             => SaveChangesAndReturn();
 
-        private void AddApplicant_Click(object sender, RoutedEventArgs e)//LATER fix names
-        {//LATER this is really slow, maybe add a loading dialog? but hang on, why the hell is it slow?
-            if (applicantsViewSource.Source is IList list)//LATER change ilist/not null view checks into hard casts (now that loading is done before showing page)
+        private void AddApplicant_Click(object sender, RoutedEventArgs e)
+        {//TODO this is really slow, maybe add a loading dialog? but hang on, why the hell is it slow?
+            if (applicantsViewSource.Source is IList list)//TODO change ilist/not null view checks into hard casts (now that loading is done before showing page)
             {
                 var applicant = new Applicant { ShowRoot = context.ShowRoot };
                 if (filterText.Text.Contains(","))

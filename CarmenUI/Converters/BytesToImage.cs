@@ -22,7 +22,7 @@ namespace CarmenUI.Converters
                     image.BeginInit();
                     image.CacheOption = BitmapCacheOption.OnLoad;
                     image.StreamSource = stream;
-                    image.EndInit(); //LATER handle crash when data is invalid
+                    image.EndInit(); //TODO handle crash when data is invalid
                     image.Freeze();
                 }
             }

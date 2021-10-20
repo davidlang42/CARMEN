@@ -16,7 +16,7 @@ namespace CarmenUI.ViewModels
         public uint[] RequiredCast { get; init; }
 
         /// <summary>First-order indicies match CastGroupsByCast</summary>
-        public Applicant[][] SelectedCast //LATER check if re-calculating this each time is too slow, maybe cache and update on each applicant change
+        public Applicant[][] SelectedCast
         {
             get
             {

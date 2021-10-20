@@ -61,13 +61,13 @@ namespace CarmenUI
             => Task.Run(() => collection.Count(predicate));
 
         public static Task<List<T>> ToListAsync<T>(this IEnumerable<T> collection)
-            => Task.Run(() => collection.ToList());//LATER remove these if they aren't actually useful, or maybe should be delegated to casting engine async functions
+            => Task.Run(() => collection.ToList());
     }
 
     internal static class WpfExtensions
     {
         /// <summary>Collapses all children of the panel, except the given child, which is made visible.</summary>
-        public static void ShowOneChild(this Panel panel, UIElement visible_child)//LATER remove if not used
+        public static void ShowOneChild(this Panel panel, UIElement visible_child)//TODO remove if not used
         {
             foreach (UIElement child in panel.Children)
                 child.Visibility = child == visible_child ? Visibility.Visible : Visibility.Collapsed;
@@ -155,7 +155,7 @@ namespace CarmenUI
         /// <returns>
         /// The TreeViewItem that contains the specified item.
         /// </returns>
-        private static TreeViewItem? GetTreeViewItem(ItemsControl container, object item) //LATER only close TreeViewItems which weren't already open
+        private static TreeViewItem? GetTreeViewItem(ItemsControl container, object item)
         {
             if (container != null)
             {

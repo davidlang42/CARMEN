@@ -228,7 +228,7 @@ namespace CarmenUI.Pages
             //column_index++;
         }
 
-        private void ChildrenDataGrid_Initialized(object sender, EventArgs e)//LATER mostly copied from RolesDataGrid_Initialized, abstract somehow
+        private void ChildrenDataGrid_Initialized(object sender, EventArgs e)
         {
             const int COLUMNS_BEFORE_CBG = 2;
             const int EXTRA_FOOTER_COLUMNS = 1; // accounts for DataGrid row header

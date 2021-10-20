@@ -68,7 +68,7 @@ namespace Carmen.ShowModel.Structure
         }
 
         private ObservableCollection<Section> sections = new();
-        public virtual ICollection<Section> Sections => sections; //LATER add this to RelationshipTests.cs
+        public virtual ICollection<Section> Sections => sections;
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {

@@ -18,7 +18,7 @@ namespace Carmen.ShowModel.Structure
 
         public Item()
         {
-            roles.CollectionChanged += Roles_CollectionChanged;
+            roles.CollectionChanged += Roles_CollectionChanged; //TODO dispose handlers
         }
 
         private void Roles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -29,7 +29,7 @@ namespace Carmen.ShowModel.Structure
                 var new_items = e.NewItems?.Cast<Role>().ToHashSet() ?? new HashSet<Role>();
                 var old_items = e.OldItems?.Cast<Role>().ToHashSet() ?? new HashSet<Role>();
                 foreach (var added in new_items.Where(n => !old_items.Contains(n)))
-                    added.PropertyChanged += Role_PropertyChanged;
+                    added.PropertyChanged += Role_PropertyChanged; //TODO dispose handlers
                 foreach (var removed in old_items.Where(o => !new_items.Contains(o)))
                     removed.PropertyChanged -= Role_PropertyChanged;
             }

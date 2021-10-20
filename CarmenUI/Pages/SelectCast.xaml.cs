@@ -128,7 +128,7 @@ namespace CarmenUI.Pages
 
         private void TriggerCastNumbersRefresh()
         {
-            //LATER this is taking considerable time to update, add loading overlay if this is unavoidable (think about where this is called)
+            //TODO this is taking considerable time to update, add loading overlay if this is unavoidable (think about where this is called)
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
             castNumbersViewSource.View.Filter = a => ((Applicant)a).CastNumber != null;
@@ -189,7 +189,7 @@ namespace CarmenUI.Pages
 
         private void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-            //LATER handle exceptions on all engine calls
+            //TODO handle exceptions on all engine calls
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
                 engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local);
@@ -200,7 +200,7 @@ namespace CarmenUI.Pages
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
                 engine.ApplyTags(context.Applicants.Local, context.Tags.Local);
             TriggerCastNumbersRefresh();
-            //LATER remove test message
+            //TODO remove test message
 #if DEBUG
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
             string msg = "";

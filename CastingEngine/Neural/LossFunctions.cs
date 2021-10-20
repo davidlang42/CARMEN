@@ -117,13 +117,13 @@ namespace Carmen.CastingEngine.Neural
             if (outputs.Length != expected_outputs.Length)
                 throw new ArgumentException($"{nameof(outputs)} [{outputs.Length}] must have the same length as {nameof(expected_outputs)} [{expected_outputs.Length}]");
             if (outputs.Length != 1)
-                throw new ArgumentException("BinaryCrossEntrophy loss function only works for binary classification with a single output."); //LATER extend to multi-classification
+                throw new ArgumentException("BinaryCrossEntrophy loss function only works for binary classification with a single output.");
             if (expected_outputs[0] == 0)
                 return -Math.Log(1 - outputs[0]);
             else if (expected_outputs[0] == 1)
                 return -Math.Log(outputs[0]);
             else
-                throw new ArgumentException("BinaryCrossEntrophy loss function only works for binary classification."); //LATER allow it to work for any case
+                throw new ArgumentException("BinaryCrossEntrophy loss function only works for binary classification.");
         }
 
         /// <summary>(y' - y) / ( y' * (1-y') )</summary>

@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.SAT
         /// For a solution which is fully assigned, the lower and upper bounds returned must be equal.</summary>
         public delegate (double lower, double upper) CostFunction(Solution partial_solution);
 
-        private CostFunction costFunction; //LATER probably faster to split this into separate functions for lower and upper bounds, to reduce needless calculations of upper bound
+        private CostFunction costFunction;
         private double optimalUpper;
         private double optimalLower;
         private Solution optimalSolution;

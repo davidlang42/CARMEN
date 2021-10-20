@@ -124,7 +124,7 @@ namespace CarmenUI.Pages
                         nameof(WeightedAverageEngine) => new WeightedAverageEngine(audition_engine, alternativeCasts, context.ShowRoot),
                         nameof(SessionLearningAllocationEngine) => new SessionLearningAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
                         nameof(RoleLearningAllocationEngine) => new RoleLearningAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
-                        nameof(ComplexNeuralAllocationEngine) => new ComplexNeuralAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm, new FilePersistence("ComplexNeuralModel.xml")), //LATER allow customisation of the neural model filename
+                        nameof(ComplexNeuralAllocationEngine) => new ComplexNeuralAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm, new FilePersistence("ComplexNeuralModel.xml")),
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }
@@ -234,7 +234,7 @@ namespace CarmenUI.Pages
 
         private bool ChangeToEditMode()
         {
-            //LATER loadingoverlay while this is created (if needed) -- due to computational time rather than db time
+            //TODO loadingoverlay while this is created (if needed) -- due to computational time rather than db time
             if (!CancelChanges())
                 return false;
             if (RevertChanges())
@@ -248,7 +248,7 @@ namespace CarmenUI.Pages
                 _ => defaultPanelContent
             };
             if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
-                check_box.IsChecked = false; //LATER it would be much better if this was a property of the view itself, but for some reason I couldn't get the binding to work properly
+                check_box.IsChecked = false;
             return true;
         }
 
@@ -267,7 +267,7 @@ namespace CarmenUI.Pages
             selectingRoleProgrammatically = true;
             if (recommendedCastingOrder == null)
                 recommendedCastingOrder = engine.IdealCastingOrder(context.ShowRoot, applicantsInCast).GetEnumerator();
-            //LATER add a loading overlay (if all roles are cast, this can take up to 10 seconds to process through the entire list)
+            //TODO add a loading overlay (if all roles are cast, this can take up to 10 seconds to process through the entire list)
             while (recommendedCastingOrder.MoveNext())
                 if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
                 {
@@ -327,7 +327,7 @@ namespace CarmenUI.Pages
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
             if (!ChangeToViewMode())
-            { } //LATER ideally change the selection back, but this causes the event to get called again and infinitely loop asking if you want to cancel, until you do -- a better way to handle this might be to disable the items tree when in edit mode
+            { } // ideally we'd change the selection back, but this causes the event to get called again and infinitely loop asking if you want to cancel, until you do
             if (!selectingRoleProgrammatically)
             {
                 // clear recommender state if user manually initiates editing a role

@@ -24,7 +24,7 @@ namespace CarmenUI.ViewModels
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public InnerNode InnerNode { get; init; } //LATER this should be private
+        public InnerNode InnerNode { get; init; }
 
         public ObservableCollection<ChildView> Children { get; init; }
 
@@ -98,7 +98,7 @@ namespace CarmenUI.ViewModels
             }
         }
 
-        public string[] CountErrorBackgroundColors//LATER when these arrays change, _get is called once for each castGroup, therefore re-calcing it ~4 times instead of 1. this should probably be a stored value, which is updated once when the current propertychanged is called, similar for all other arrays like this in ShowRootOrSectionView/ChildView / ItemView/RoleOnlyView/RoleView
+        public string[] CountErrorBackgroundColors
         {
             get
             {
@@ -106,14 +106,14 @@ namespace CarmenUI.ViewModels
                 for (var i = 0; i < colors.Length; i++)
                     if (CountByGroups[i].Count is uint required_count
                         && SumOfRolesCount[i] != required_count)
-                        colors[i] = "LightCoral";//LATER use constants, also convert to brush
+                        colors[i] = "LightCoral";//TODO use constants, also convert to brush
                     else
-                        colors[i] = "White";//LATER use constants, also convert to brush
+                        colors[i] = "White";//TODO use constants, also convert to brush
                 return colors;
             }
         }
 
-        public string NoChildrenErrorBackgroundColor => InnerNode.Children.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
+        public string NoChildrenErrorBackgroundColor => InnerNode.Children.Count == 0 ? "LightCoral" : "WhiteSmoke"; //TODO use constants, also convert to brush
 
         public ShowRootOrSectionView(InnerNode inner_node, CastGroup[] cast_groups, int alternative_casts_count, Action<Node> remove_node_action)
         {
@@ -166,7 +166,7 @@ namespace CarmenUI.ViewModels
                         }
                     ChildView_PropertyChanged(this, new PropertyChangedEventArgs(""));
                     break;
-                case NotifyCollectionChangedAction.Reset://LATER is this implementation correct? it probably isn't used
+                case NotifyCollectionChangedAction.Reset://TODO is this implementation correct? it probably isn't used
                     foreach (var cv in Children)
                     {
                         cv.PropertyChanged -= ChildView_PropertyChanged;

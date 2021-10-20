@@ -24,7 +24,7 @@ namespace CarmenUI.ViewModels
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public Item Item { get; init; } //LATER this should be private
+        public Item Item { get; init; }
 
         public ObservableCollection<RoleOnlyView> Roles { get; init; }
 
@@ -68,14 +68,14 @@ namespace CarmenUI.ViewModels
                 for (var i = 0; i < colors.Length; i++)
                     if (CountByGroups[i].Count is uint required_count
                         && SumOfRolesCount[i] != required_count)
-                        colors[i] = "LightCoral";//LATER use constants, also convert to brush
+                        colors[i] = "LightCoral";//TODO use constants, also convert to brush
                     else
-                        colors[i] = "White";//LATER use constants, also convert to brush
+                        colors[i] = "White";//TODO use constants, also convert to brush
                 return colors;
             }
         }
 
-        public string NoRolesErrorBackgroundColor => Item.Roles.Count == 0 ? "LightCoral" : "WhiteSmoke";//LATER use constants, also convert to brush
+        public string NoRolesErrorBackgroundColor => Item.Roles.Count == 0 ? "LightCoral" : "WhiteSmoke";//TODO use constants, also convert to brush
 
         public uint[] SumOfPrimaryRequirements
         {
@@ -152,7 +152,7 @@ namespace CarmenUI.ViewModels
                         }
                     RoleView_PropertyChanged(this, new PropertyChangedEventArgs(""));
                     break;
-                case NotifyCollectionChangedAction.Reset://LATER is this implementation correct? it probably isn't used
+                case NotifyCollectionChangedAction.Reset://TODO is this implementation correct? it probably isn't used
                     foreach (var rv in Roles)
                     {
                         rv.PropertyChanged -= RoleView_PropertyChanged;

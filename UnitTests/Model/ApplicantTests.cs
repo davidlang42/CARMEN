@@ -70,8 +70,6 @@ namespace UnitTests.Model
             catch { }
         }
 
-        //LATER add other property changed tests for completeness
-
         [Test]
         public void PropertyChanged_DateOfBirth()
         {

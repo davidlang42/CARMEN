@@ -109,7 +109,7 @@ namespace CarmenUI.Pages
             using var saving = new LoadingOverlay(this);
             saving.MainText = "Saving...";
             var changes = context.DataChanges();
-            context.SaveChanges(); //LATER handle db errors, could this be async?
+            context.SaveChanges(); //TODO handle db errors, could this be async?
             saved_changes |= changes;
             return true;
         }
@@ -144,7 +144,7 @@ namespace CarmenUI.Pages
                 return false; // no changes to revert
             using var reverting = new LoadingOverlay(this);
             reverting.MainText = "Reverting...";
-            RecreateContext(); //LATER there has to be a better way than this
+            RecreateContext();
             return true;
         }
 
@@ -172,7 +172,7 @@ namespace CarmenUI.Pages
             return AllocationEngine.Implementations.First().Name;
         }
 
-        protected bool NeuralEngineConfirm(string message) //LATER have a tick box for "Always accept" which sets a user setting to always accept, or maybe an "always this session" meaning until the program/show is closed and re-opened
+        protected bool NeuralEngineConfirm(string message)
             => MessageBox.Show(message, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 
         protected bool Confirm(string msg)

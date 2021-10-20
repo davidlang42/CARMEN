@@ -26,7 +26,7 @@ namespace CarmenUI.ViewModels
             if (node is Section section)
             {
                 // show section type errors and section consecutive item errors, because they aren't shown anywhere else
-                if (!section.CastingMeetsSectionTypeRules(total_cast_members, out var no_roles, out var multi_roles)) //LATER ideally show *which* applicants dont have roles or have multiple
+                if (!section.CastingMeetsSectionTypeRules(total_cast_members, out var no_roles, out var multi_roles))
                 {
                     if (no_roles > 0)
                         ValidationErrors.Add($"{no_roles.Plural("Applicant has", "Applicants have")} no role in {section.Name}");
