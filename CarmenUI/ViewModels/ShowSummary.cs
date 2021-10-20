@@ -52,7 +52,11 @@ namespace CarmenUI.ViewModels
             StartLoad();
             var show_root = c.ShowRoot;
             Heading = show_root.Name;
-            SubHeading = show_root.ShowDate.HasValue ? $"opening {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}" : "";
+            SubHeading = show_root.ShowDate switch {
+                DateTime d when d >= DateTime.Now => $"opening {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}",
+                DateTime d => $"opened {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}",
+                _ => ""
+            };
             LogoImage = show_root.Logo?.ImageData;
             if (string.IsNullOrEmpty(show_root.Name))
                 Rows.Add(new Row { Fail = "Show name is required" });
