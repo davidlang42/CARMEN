@@ -26,7 +26,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SatTimePredictor", "SatTime
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtractSelectionData", "ExtractSelectionData\ExtractSelectionData.csproj", "{DEFBEDAC-B95D-41B2-9051-E70C97BA4A99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractCastingData", "ExtractCastingData\ExtractCastingData.csproj", "{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExtractCastingData", "ExtractCastingData\ExtractCastingData.csproj", "{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{2647799D-C38B-4231-8961-B43DC22747EE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -108,6 +110,10 @@ Global
 		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Slow DB|Any CPU.ActiveCfg = Debug|Any CPU
 		{EDE8CF6F-8A03-4765-B7CC-74D855B3D51F}.Slow DB|Any CPU.Build.0 = Debug|Any CPU
+		{2647799D-C38B-4231-8961-B43DC22747EE}.Benchmark|Any CPU.ActiveCfg = Debug
+		{2647799D-C38B-4231-8961-B43DC22747EE}.Debug|Any CPU.ActiveCfg = Debug
+		{2647799D-C38B-4231-8961-B43DC22747EE}.Release|Any CPU.ActiveCfg = Release
+		{2647799D-C38B-4231-8961-B43DC22747EE}.Slow DB|Any CPU.ActiveCfg = Debug
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
