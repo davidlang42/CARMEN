@@ -15,10 +15,10 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            await c.Applicants.LoadAsync();
-            await c.Criterias.LoadAsync();
-            var auditioned = await c.Applicants.Local.Where(a => a.HasAuditioned(c.Criterias.Local)).ToListAsync();
-            Rows.Add(new Row { Success = $"{auditioned.Count} Applicants Auditioned" });
+            var applicants = await c.Applicants.ToArrayAsync();
+            var criterias = await c.Criterias.ToArrayAsync();
+            var auditioned = applicants.Where(a => a.HasAuditioned(criterias)).ToArray();
+            Rows.Add(new Row { Success = $"{auditioned.Length} Applicants Auditioned" });
             var cast_groups = await c.CastGroups.Include(cg => cg.Requirements).ToArrayAsync();
             foreach (var cast_group in cast_groups)
             {
@@ -28,10 +28,10 @@ namespace CarmenUI.ViewModels
                     row.Fail = $"({cast_group.RequiredCount} required)";
                 Rows.Add(row);
             }
-            var not_auditioned = c.Applicants.Local.Count - auditioned.Count;
+            var not_auditioned = applicants.Length - auditioned.Length;
             if (not_auditioned > 0)
                 Rows.Add(new Row { Fail = $"{not_auditioned.Plural("Appliant has","Applicants have")} not auditioned" });
-            FinishLoad(cancel, auditioned.Count == 0 || not_auditioned > 0);
+            FinishLoad(cancel, auditioned.Length == 0 || not_auditioned > 0);
         }
     }
 }
