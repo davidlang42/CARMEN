@@ -105,6 +105,8 @@ namespace Carmen.ShowModel.Requirements
             get => reason;
             set
             {
+                if (value == "")
+                    value = null;
                 if (reason == value)
                     return;
                 reason = value;
