@@ -17,12 +17,9 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            await c.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
-            await c.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
-            await c.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
             var alternative_casts = await c.AlternativeCasts.ToArrayAsync();
             // check role statuses
-            var roles = c.ShowRoot.ItemsInOrder().SelectMany(i => i.Roles).Distinct();
+            var roles = await c.Roles.Include(r => r.Cast).ToArrayAsync();
             var counts = roles.GroupBy(r => r.CastingStatus(alternative_casts))
                 .ToDictionary(g => g.Key, g => g.Count());
             if (counts.TryGetValue(RoleStatus.FullyCast, out var roles_cast))
