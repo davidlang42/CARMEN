@@ -18,20 +18,50 @@ namespace Carmen.ShowModel
 {
     public class ShowContext : DbContext
     {
-        //TODO add comments to DbSet properties reminding the caller what to Include()
         //TODO also audit navigation properties, and change to internal where not required (to avoid the accidental usage from UI causing bad lazy loading)
         //TODO consider making all IDs internal as well (this would require removing them from DatabaseExplorer)
         #region Database collections
+        /// <summary>Auto includes ShowRoot, Abilities, CastGroup, AlternativeCast, SameCastSet, Tags.
+        /// Remember to include Roles, Image.</summary>
         public DbSet<Applicant> Applicants => Set<Applicant>();
+
+        /// <summary>Remember to include Members.</summary>
         public DbSet<AlternativeCast> AlternativeCasts => Set<AlternativeCast>();
+
+        /// <summary>Remember to include Members, Requirements.</summary>
         public DbSet<CastGroup> CastGroups => Set<CastGroup>();
+
+        /// <summary>Auto includes Applicants.</summary>
         public DbSet<SameCastSet> SameCastSets => Set<SameCastSet>();
+
+        /// <summary>Auto includes CountByGroups.
+        /// Remember to include Image, Members, Requirements.</summary>
         public DbSet<Tag> Tags => Set<Tag>();
+
+        /// <summary>Remember to include Abilities.</summary>
         public DbSet<Criteria> Criterias => Set<Criteria>();
+
+        /// <summary>Auto includes TagRequirement.RequiredTag, AbilityExactRequirement.Criteria, AbilityRangeRequirement.Criteria.
+        /// Remember to include UsedByRoles, UsedByCastGroups, UsedByCombinedRequirements, UsedByTags, CombinedRequirement.SubRequirements, NotRequirement.SubRequirement.</summary>
         public DbSet<Requirement> Requirements => Set<Requirement>();
+
+        /// <summary>Auto includes CountByGroups, Section.SectionType.
+        /// Remember to include Parent, InnerNode.Children, Item.Roles, ShowRoot.Image, ShowRoot.CastNumberOrderBy.</summary>
         public DbSet<Node> Nodes => Set<Node>();
+        
+        /// <summary>Remember to include Sections.</summary>
         public DbSet<SectionType> SectionTypes => Set<SectionType>();
+
+        /// <summary>Nothing to include.</summary>
         public DbSet<Image> Images => Set<Image>();
+
+        /// <summary>Auto includes CountByGroups, Requirements.
+        /// Remember to include Items, Cast.</summary>
+        public DbSet<Role> Roles => Set<Role>();
+
+        /// <summary>Auto includes Criteria.
+        /// Remember to include Applicant.</summary>
+        public DbSet<Ability> Abilities => Set<Ability>();
         #endregion
 
         private ShowRoot? showRoot;
@@ -341,6 +371,7 @@ namespace Carmen.ShowModel
 
             // Auto-include entities for normal use cases
             modelBuilder.Entity<Ability>().Navigation(ab => ab.Criteria).AutoInclude();
+            modelBuilder.Entity<Applicant>().Navigation(a => a.ShowRoot).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.Abilities).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.CastGroup).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.AlternativeCast).AutoInclude();
