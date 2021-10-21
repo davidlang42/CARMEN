@@ -16,17 +16,13 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            await c.Nodes.Include(i => i.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
-            await c.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.CountByGroups).ThenInclude(cbg => cbg.CastGroup).LoadAsync();
-            await c.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
-            var items_in_order = c.ShowRoot.ItemsInOrder().ToList();
-            var items_row = CreateItemsRow(items_in_order, out int item_count);
+            var items = await c.Nodes.OfType<Item>().Include(i => i.Roles).ToArrayAsync();
+            var items_row = CreateItemsRow(items, out int item_count);
             bool anything_exists = item_count != 0;
             Rows.Add(items_row);
-            await c.CastGroups.Include(cg => cg.Members).LoadAsync();
             var alternative_casts_count = await c.AlternativeCasts.CountAsync();
-            var cast_members = c.CastGroups.Local.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
-            var section_types = await c.SectionTypes.Include(st => st.Sections).ThenInclude(s => s.CountByGroups).ThenInclude(cbg => cbg.CastGroup).ToArrayAsync();
+            var cast_members = await c.CastGroups.Include(cg => cg.Members).ToDictionaryAsync(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
+            var section_types = await c.SectionTypes.Include(st => st.Sections).ThenInclude(n => n.Children).ToArrayAsync();
             if (!c.ShowRoot.CountMatchesSumOfRoles())
                 Rows.Add(new Row { Fail = "Show has incorrect sum of roles" });
             foreach (var section_type in section_types)
@@ -34,7 +30,8 @@ namespace CarmenUI.ViewModels
                 Rows.Add(CreateSectionTypeRow(section_type, cast_members, out int section_count));
                 anything_exists |= section_count != 0;
             }
-            Rows.Add(CreateRolesRow(items_in_order.SelectMany(i => i.Roles).Distinct(), out int role_count));
+            var roles = items.SelectMany(i => i.Roles).Distinct();
+            Rows.Add(CreateRolesRow(roles, out int role_count));
             anything_exists |= role_count != 0;
             FinishLoad(cancel, !anything_exists);
         }
