@@ -77,8 +77,10 @@ namespace Carmen.ShowModel
             var changes = DataObjects.None;
             foreach (var entry in ChangeTracker.Entries().Where(e => e.State != EntityState.Unchanged))
             {
-                if (entry.Entity is Applicant || entry.Entity is Ability)
+                if (entry.Entity is Applicant)
                     changes |= DataObjects.Applicants;
+                else if (entry.Entity is Ability)
+                    changes |= DataObjects.Abilities;
                 else if (entry.Entity is AlternativeCast)
                     changes |= DataObjects.AlternativeCasts;
                 else if (entry.Entity is CastGroup)
@@ -91,8 +93,10 @@ namespace Carmen.ShowModel
                     changes |= DataObjects.Criterias;
                 else if (entry.Entity is Requirement)
                     changes |= DataObjects.Requirements;
-                else if (entry.Entity is Node || entry.Entity is Role)
+                else if (entry.Entity is Node)
                     changes |= DataObjects.Nodes;
+                else if (entry.Entity is Role)
+                    changes |= DataObjects.Roles;
                 else if (entry.Entity is SectionType)
                     changes |= DataObjects.SectionTypes;
                 else if (entry.Entity is Image)
@@ -101,7 +105,7 @@ namespace Carmen.ShowModel
                     changes |= entry.Metadata.DefiningEntityType.ClrType switch
                     {
                         Type t when t == typeof(Node) => DataObjects.Nodes,
-                        Type t when t == typeof(Role) => DataObjects.Nodes,
+                        Type t when t == typeof(Role) => DataObjects.Roles,
                         Type t when t == typeof(Tag) => DataObjects.Tags,
                         _ => throw new NotImplementedException($"Owner of CountByGroup not handled: {entry.Metadata.DefiningEntityType.ClrType.Name}")
                     };

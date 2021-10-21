@@ -122,6 +122,7 @@ namespace CarmenUI.Pages
                 || changes.HasFlag(DataObjects.Requirements))
                 summaries.Add(ShowSummary);
             if (changes.HasFlag(DataObjects.Applicants)
+                || changes.HasFlag(DataObjects.Abilities)
                 || changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.Requirements)
                 || changes.HasFlag(DataObjects.Criterias))
@@ -131,6 +132,7 @@ namespace CarmenUI.Pages
                 || changes.HasFlag(DataObjects.Tags))
                 summaries.Add(CastSummary);
             if (changes.HasFlag(DataObjects.Nodes)
+                || changes.HasFlag(DataObjects.Roles)
                 || changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.SectionTypes))
                 summaries.AddRange(new Summary[] { ItemsSummary, RolesSummary });

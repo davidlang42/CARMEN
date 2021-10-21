@@ -24,6 +24,8 @@ namespace Carmen.ShowModel
         Nodes = 128,
         SectionTypes = 256,
         Images = 512,
-        All = 1023
+        Roles = 1024,
+        Abilities = 2048,
+        All = 4095
     }
 }
