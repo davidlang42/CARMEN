@@ -51,7 +51,7 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            var show_root = await c.Nodes.OfType<ShowRoot>().SingleAsync();
+            var show_root = await c.Nodes.OfType<ShowRoot>().Include(sr => sr.Logo).SingleAsync();
             Heading = show_root.Name;
             SubHeading = show_root.ShowDate switch {
                 DateTime d when d >= DateTime.Now => $"opening {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}",
@@ -63,27 +63,27 @@ namespace CarmenUI.ViewModels
                 Rows.Add(new Row { Fail = "Show name is required" });
             if (!show_root.ShowDate.HasValue)
                 Rows.Add(new Row { Fail = "Show date is required" });
-            await c.Criterias.LoadAsync();
-            Rows.Add(CountRow(c.Criterias.Local.Count, 1, "Audition Criteria", true));
-            await c.CastGroups.LoadAsync();
-            Rows.Add(CountRow(c.CastGroups.Local.Count, 1, "Cast Group"));
-            await c.AlternativeCasts.LoadAsync();
-            if (c.CastGroups.Local.Any(g => g.AlternateCasts))
-                Rows.Add(CountRow(c.AlternativeCasts.Local.Count, 2, "Alternative Cast"));
-            else if (c.AlternativeCasts.Local.Count == 0)
+            var criterias = await c.Criterias.CountAsync();
+            Rows.Add(CountRow(criterias, 1, "Audition Criteria", true));
+            var cast_groups = await c.CastGroups.ToArrayAsync();
+            Rows.Add(CountRow(cast_groups.Length, 1, "Cast Group"));
+            var alternative_casts = await c.AlternativeCasts.CountAsync();
+            if (cast_groups.Any(g => g.AlternateCasts))
+                Rows.Add(CountRow(alternative_casts, 2, "Alternative Cast"));
+            else if (alternative_casts == 0)
                 Rows.Add(new Row { Success = "Alternating Casts are disabled" });
             else
                 Rows.Add(new Row
                 {
-                    Success = c.AlternativeCasts.Local.Count.Plural("Alternative Cast"),
+                    Success = alternative_casts.Plural("Alternative Cast"),
                     Fail = "(but are not enabled)"
                 });
-            await c.Tags.LoadAsync();
-            Rows.Add(CountRow(c.Tags.Local.Count, 0, "Cast Tag"));
-            await c.SectionTypes.LoadAsync();
-            Rows.Add(CountRow(c.SectionTypes.Local.Count, 1, "Section Type"));
-            await c.Requirements.LoadAsync();
-            Rows.Add(CountRow(c.Requirements.Local.Count, 0, "Requirement"));
+            var tags = await c.Tags.CountAsync();
+            Rows.Add(CountRow(tags, 0, "Cast Tag"));
+            var section_types = await c.SectionTypes.CountAsync();
+            Rows.Add(CountRow(section_types, 1, "Section Type"));
+            var requirements = await c.Requirements.CountAsync();
+            Rows.Add(CountRow(requirements, 0, "Requirement"));
             FinishLoad(cancel, c.CheckDefaultShowSettings(defaultShowName, false));
         }
 

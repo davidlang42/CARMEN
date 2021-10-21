@@ -16,7 +16,7 @@ namespace CarmenUI.ViewModels
         {
             StartLoad();
             var applicants = await c.Applicants.ToArrayAsync();
-            Rows.Add(new Row { Success = $"{c.Applicants.Local.Count.Plural("Applicant")} Registered" });
+            Rows.Add(new Row { Success = $"{applicants.Length.Plural("Applicant")} Registered" });
             var cast_groups = await c.CastGroups.Include(cg => cg.Requirements).ToArrayAsync();
             foreach (var cast_group in cast_groups)
             {

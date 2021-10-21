@@ -46,7 +46,7 @@ namespace Carmen.ShowModel
         public DbSet<Requirement> Requirements => Set<Requirement>();
 
         /// <summary>Auto includes CountByGroups, CountByGroup.CastGroup, Section.SectionType.
-        /// Remember to include Parent, InnerNode.Children, Item.Roles, ShowRoot.Image, ShowRoot.CastNumberOrderBy.</summary>
+        /// Remember to include Parent, InnerNode.Children, Item.Roles, ShowRoot.Logo, ShowRoot.CastNumberOrderBy.</summary>
         public DbSet<Node> Nodes => Set<Node>();
         
         /// <summary>Remember to include Sections.</summary>

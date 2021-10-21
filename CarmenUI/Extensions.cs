@@ -62,6 +62,10 @@ namespace CarmenUI
 
         public static Task<List<T>> ToListAsync<T>(this IEnumerable<T> collection)
             => Task.Run(() => collection.ToList());
+
+        public static Task<Dictionary<U, V>> ToDictionaryAsync<T, U, V>(this IEnumerable<T> collection, Func<T, U> key_selector, Func<T, V> value_selector)
+            where U : notnull
+            => Task.Run(() => collection.ToDictionary(key_selector, value_selector));
     }
 
     internal static class WpfExtensions
