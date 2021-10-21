@@ -31,6 +31,7 @@ namespace CarmenUI.ViewModels
             if (counts.TryGetValue(RoleStatus.OverCast, out var roles_overcast))
                 Rows.Add(new Row { Fail = $"{roles_overcast.Plural("Role")} with too many cast" });
             // check showroot consecutive items
+            await c.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
             var consecutive_item_failures = new HashSet<ConsecutiveItemCast>();
             if (!c.ShowRoot.VerifyConsecutiveItems(out var show_root_failures))
                 foreach (var failure in show_root_failures)
