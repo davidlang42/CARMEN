@@ -32,9 +32,9 @@ namespace CarmenUI.Pages
     {
         const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10; //TODO why not make this a user setting? (per mode?)
 
-        private CollectionViewSource applicantsViewSource;
-        private CollectionViewSource criteriasViewSource;
-        private BooleanLookupDictionary groupExpansionLookup;
+        readonly CollectionViewSource applicantsViewSource;
+        readonly CollectionViewSource criteriasViewSource;
+        readonly BooleanLookupDictionary groupExpansionLookup;
 
         private Criteria[]? _criterias;
         private Criteria[] criterias => _criterias ?? throw new ApplicationException($"Tried to used {nameof(criterias)} before it was loaded.");
