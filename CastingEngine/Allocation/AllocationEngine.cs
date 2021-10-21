@@ -79,65 +79,57 @@ namespace Carmen.CastingEngine.Allocation
 
         /// <summary>Return a list of the best cast to pick for the role, based on suitability. If a role has no requirements,
         /// the default implementation selects other alternative casts by matching cast number, if possible.
-        /// NOTE: If the default behaviour is changed, this version should be grandfathered in HeuristicAllocationEngine</summary>
+        /// NOTE: If this behaviour is changed, this version should be grandfathered in HeuristicAllocationEngine</summary>
         public virtual IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role)
         {
-            // list existing cast by cast group
-            var existing_cast = new Dictionary<CastGroup, HashSet<Applicant>>();
-            foreach (var group in role.Cast.GroupBy(a => a.CastGroup))
-                if (group.Key is CastGroup cast_group)
-                    existing_cast.Add(cast_group, group.ToHashSet());
+            // list existing cast by cast group and cast
+            var existing_cast = new Dictionary<(CastGroup?, AlternativeCast?), HashSet<Applicant>>();
+            foreach (var group in role.Cast.GroupBy(a => (a.CastGroup, a.AlternativeCast)))
+                existing_cast.Add(group.Key, group.ToHashSet());
             // calculate how many of each cast group we need to pick
-            var required_cast_groups = new Dictionary<CastGroup, uint>();
+            var required_cast_groups = new Dictionary<(CastGroup, AlternativeCast?), uint>();
             foreach (var cbg in role.CountByGroups)
             {
-                var required = (int)cbg.Count;
-                if (existing_cast.TryGetValue(cbg.CastGroup, out var existing_cast_in_this_group))
+                var alternative_casts = cbg.CastGroup.AlternateCasts ? alternativeCasts : new[] { (AlternativeCast?)null };
+                foreach (var alternative_cast in alternative_casts)
                 {
-                    var already_allocated = existing_cast_in_this_group.Count;
-                    if (cbg.CastGroup.AlternateCasts)
-                        already_allocated /= alternativeCasts.Length;
-                    required -= already_allocated;
+                    var required = (int)cbg.Count;
+                    if (existing_cast.TryGetValue((cbg.CastGroup, alternative_cast), out var existing_cast_in_this_group))
+                        required -= existing_cast_in_this_group.Count;
+                    if (required > 0)
+                        required_cast_groups.Add((cbg.CastGroup, alternative_cast), (uint)required);
                 }
-                if (required > 0)
-                    required_cast_groups.Add(cbg.CastGroup, (uint)required);
             }
             // list available cast in priority order, grouped by cast group
             var potential_cast_by_group = applicants
-                .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey(cg))
+                .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey((cg, a.AlternativeCast)))
                 .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
                 .Where(a => IsEligible(a, role))
                 .Where(a => IsAvailable(a, role))
-                .GroupBy(a => a.CastGroup!)
+                .GroupBy(a => (a.CastGroup!, a.AlternativeCast))
                 .ToDictionary(g => g.Key,
                 g => new Stack<Applicant>(InPreferredOrder(g, role, reverse: true))); // order in reverse so the lowest suitability is at the bottom of the stack
-            // select the required number of cast in the priority order, adding alternative cast buddies as required
-            foreach (var (cast_group, potential_cast) in potential_cast_by_group)
+            // select the required number of cast in the priority order, prioritising alternative cast buddies of those already selected
+            var buddy_numbers = existing_cast // existing cast
+                .Where(p => p.Key.Item1.AlternateCasts) // in a cast group which alternates
+                .SelectMany(p => p.Value.Select(a => a.CastNumber)) // get cast number
+                .ToHashSet();
+            foreach (var (cast_group_and_cast, potential_cast) in potential_cast_by_group)
             {
-                var required = required_cast_groups[cast_group];
+                var required = required_cast_groups[cast_group_and_cast];
                 for (var i = 0; i < required; i++)
                 {
-                    if (!potential_cast.TryPop(out var next_cast))
+                    if (potential_cast.Count == 0)
                         break; // no more available applicants
+                    Applicant? next_cast = null;
+                    if (cast_group_and_cast.Item1.AlternateCasts // if this cast group alternates
+                        && role.Requirements.Count == 0 // and not a special role
+                        && potential_cast.FindAndRemove(a => a.CastNumber != null && buddy_numbers.Contains(a.CastNumber)) is Applicant buddy) // take the cast number buddies, if possible
+                        next_cast = buddy;
+                    next_cast ??= potential_cast.Pop();
                     yield return next_cast;
-                    if (cast_group.AlternateCasts)
-                    {
-                        var need_alternative_casts = alternativeCasts.Where(ac => ac != next_cast.AlternativeCast).ToHashSet();
-                        if (role.Requirements.Count == 0)
-                        {
-                            // if not a special role, take the cast number buddies, if possible
-                            while (potential_cast.FindAndRemove(a => a.CastNumber == next_cast.CastNumber) is Applicant buddy)
-                            {
-                                if (buddy.AlternativeCast == null || !need_alternative_casts.Remove(buddy.AlternativeCast))
-                                    throw new ApplicationException($"Cast Number / Alternative Cast not set correctly for {buddy}.");
-                                yield return buddy;
-                            }
-                        }
-                        // otherwise, take the next best applicant in the other casts
-                        foreach (var need_alternative_cast in need_alternative_casts)
-                            if (potential_cast.FindAndRemove(a => a.AlternativeCast == need_alternative_cast) is Applicant other_cast)
-                                yield return other_cast;
-                    }
+                    if (cast_group_and_cast.Item1.AlternateCasts)
+                        buddy_numbers.Add(next_cast.CastNumber);
                 }
             }
         }
