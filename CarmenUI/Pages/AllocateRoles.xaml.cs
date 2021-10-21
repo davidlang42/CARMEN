@@ -89,11 +89,12 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
                     _criterias = await context.Criterias.InOrder().ToArrayAsync();
                 _primaryCriterias = _criterias.Where(c => c.Primary).ToArray();
+                CastGroup[] cast_groups;
                 using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
-                    await context.CastGroups.LoadAsync();
+                    cast_groups = await context.CastGroups.InOrder().ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
                     _alternativeCasts = await context.AlternativeCasts.InNameOrder().ToArrayAsync();
-                _castGroupsByCast = CastGroupAndCast.Enumerate(context.CastGroups.Local.InOrder(), _alternativeCasts).ToArray();
+                _castGroupsByCast = CastGroupAndCast.Enumerate(cast_groups, _alternativeCasts).ToArray();
                 using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles) + nameof(Role.Items), "Applicants"))
                     _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
@@ -109,7 +110,7 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Requirements), "Items"))
                     await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
-                    _totalCast = (uint)context.CastGroups.Local.Sum(cg => cg.FullTimeEquivalentMembers(context.AlternativeCasts.Local.Count));
+                    _totalCast = await cast_groups.SumAsync(cg => cg.FullTimeEquivalentMembers(_alternativeCasts.Length));
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
                 {
                     IAuditionEngine audition_engine = ParseAuditionEngine() switch
@@ -128,7 +129,7 @@ namespace CarmenUI.Pages
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }
-                _rootNodeView = new ShowRootNodeView(context.ShowRoot, totalCast, context.AlternativeCasts.Local.ToArray());
+                _rootNodeView = new ShowRootNodeView(context.ShowRoot, totalCast, _alternativeCasts);
                 showCompleted.IsChecked = true; // must be set after creating ShowRootNodeView because it triggers Checked event
                 rolesTreeView.ItemsSource = rootNodeView.ChildrenInOrder;
                 castingProgress.DataContext = rootNodeView;
