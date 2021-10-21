@@ -113,7 +113,8 @@ namespace CarmenUI.Pages
         {
             // Determine which summaries need updating
             HashSet<Summary> summaries = new();
-            if (changes.HasFlag(DataObjects.Criterias)
+            if (changes.HasFlag(DataObjects.Nodes)
+                || changes.HasFlag(DataObjects.Criterias)
                 || changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.AlternativeCasts)
                 || changes.HasFlag(DataObjects.Tags)
