@@ -16,8 +16,8 @@ namespace CarmenUI.ViewModels
         {
             StartLoad();
             // cast groups / alternative casts
-            var cast_groups = await c.CastGroups.Include(cg => cg.Members).ToArrayAsync();
-            var alternative_casts = await c.AlternativeCasts.ToArrayAsync();
+            var cast_groups = await RealAsync(c.CastGroups.Include(cg => cg.Members).ToArray);
+            var alternative_casts = await RealAsync(c.AlternativeCasts.ToArray);
             var sum = 0;
             foreach (var cast_group in cast_groups)
             {
@@ -70,7 +70,7 @@ namespace CarmenUI.ViewModels
             // same cast sets
             if (cast_groups.Any(cg => cg.AlternateCasts))
             {
-                var same_cast_sets = await c.SameCastSets.ToArrayAsync();
+                var same_cast_sets = await RealAsync(c.SameCastSets.ToArray);
                 var total_applicants = same_cast_sets.Sum(set => set.Applicants.Count);
                 var row = new Row { Success = $"{same_cast_sets.Length} same-cast sets including {total_applicants} applicants" };
                 var incomplete_sets = same_cast_sets.Count(set => set.Applicants.Count < 2);
@@ -81,7 +81,7 @@ namespace CarmenUI.ViewModels
                     Rows.Add(new Row { Fail = $"{failed_set.Description} are not all in the same cast" });
             }
             // tags
-            var tags = await c.Tags.Include(cg => cg.Members).ToArrayAsync();
+            var tags = await RealAsync(c.Tags.Include(cg => cg.Members).ToArray);
             foreach (var tag in tags)
             {
                 var row = new Row { Success = $"{tag.Members.Count} tagged {tag.Name}" };
@@ -111,7 +111,8 @@ namespace CarmenUI.ViewModels
             }
             int max_cast_num = cast_num - 1;
             if (max_cast_num >= min_cast_num)
-                Rows.Add(new Row {
+                Rows.Add(new Row
+                {
                     Success = $"Cast numbers assigned #{min_cast_num} to #{max_cast_num}",
                     Fail = (missing_nums.Any(), incomplete_nums.Any()) switch
                     {

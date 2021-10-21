@@ -48,5 +48,15 @@ namespace CarmenUI.ViewModels
             else
                 Status = ProcessStatus.Complete;
         }
+
+        /// <summary>Unfortunately some DB providers run async calls sychronously, making this ugly wrapper nessesary.
+        /// See: https://stackoverflow.com/questions/29016698/can-the-oracle-managed-driver-use-async-await-properly </summary>
+        protected static async Task<T> RealAsync<T>(Func<T> func)
+            => await Task.Run(() => func()); //TODO figure out if there are other places in the code which need this outside summaries, maybe I can make my own extension methods which take precendence over the EF core ones? and/or throw an application exception if an async operation is called on the ShowContext. OR can I wrap it in a Task.Run at that level?
+
+        /// <summary>Unfortunately some DB providers run async calls sychronously, making this ugly wrapper nessesary.
+        /// See: https://stackoverflow.com/questions/29016698/can-the-oracle-managed-driver-use-async-await-properly </summary>
+        protected static async Task RealAsync(Action func)
+            => await Task.Run(() => func());
     }
 }

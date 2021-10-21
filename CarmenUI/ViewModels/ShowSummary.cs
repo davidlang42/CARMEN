@@ -51,7 +51,7 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            var show_root = await c.Nodes.OfType<ShowRoot>().Include(sr => sr.Logo).SingleAsync();
+            var show_root = await RealAsync(c.Nodes.OfType<ShowRoot>().Include(sr => sr.Logo).Single);
             Heading = show_root.Name;
             SubHeading = show_root.ShowDate switch {
                 DateTime d when d >= DateTime.Now => $"opening {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}",
@@ -63,11 +63,11 @@ namespace CarmenUI.ViewModels
                 Rows.Add(new Row { Fail = "Show name is required" });
             if (!show_root.ShowDate.HasValue)
                 Rows.Add(new Row { Fail = "Show date is required" });
-            var criterias = await c.Criterias.CountAsync();
+            var criterias = await RealAsync(c.Criterias.Count);
             Rows.Add(CountRow(criterias, 1, "Audition Criteria", true));
-            var cast_groups = await c.CastGroups.ToArrayAsync();
+            var cast_groups = await RealAsync(c.CastGroups.ToArray);
             Rows.Add(CountRow(cast_groups.Length, 1, "Cast Group"));
-            var alternative_casts = await c.AlternativeCasts.CountAsync();
+            var alternative_casts = await RealAsync(c.AlternativeCasts.Count);
             if (cast_groups.Any(g => g.AlternateCasts))
                 Rows.Add(CountRow(alternative_casts, 2, "Alternative Cast"));
             else if (alternative_casts == 0)
@@ -78,11 +78,11 @@ namespace CarmenUI.ViewModels
                     Success = alternative_casts.Plural("Alternative Cast"),
                     Fail = "(but are not enabled)"
                 });
-            var tags = await c.Tags.CountAsync();
+            var tags = await RealAsync(c.Tags.Count);
             Rows.Add(CountRow(tags, 0, "Cast Tag"));
-            var section_types = await c.SectionTypes.CountAsync();
+            var section_types = await RealAsync(c.SectionTypes.Count);
             Rows.Add(CountRow(section_types, 1, "Section Type"));
-            var requirements = await c.Requirements.CountAsync();
+            var requirements = await RealAsync(c.Requirements.Count);
             Rows.Add(CountRow(requirements, 0, "Requirement"));
             FinishLoad(cancel, c.CheckDefaultShowSettings(defaultShowName, false));
         }

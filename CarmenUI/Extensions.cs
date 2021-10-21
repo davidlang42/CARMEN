@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,6 +42,12 @@ namespace CarmenUI
                 set.Add(item);
         }
 
+        public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> range)
+        {
+            foreach (var item in range)
+                collection.Add(item);
+        }
+
         public static bool AllEqual<T>(this IEnumerable<T> sequence)
             where T : notnull
         {
@@ -63,8 +70,10 @@ namespace CarmenUI
         public static Task<List<T>> ToListAsync<T>(this IEnumerable<T> collection)
             => Task.Run(() => collection.ToList());
 
-        public static Task<Dictionary<U, V>> ToDictionaryAsync<T, U, V>(this IEnumerable<T> collection, Func<T, U> key_selector, Func<T, V> value_selector)
-            where U : notnull
+        public static Task<uint> SumAsync<T>(this IEnumerable<T> collection, Func<T, uint> selector)
+            => Task.Run(() => (uint)collection.Sum(v => selector(v)));
+
+        public static Task<Dictionary<U, V>> ToDictionaryAsync<T, U, V>(this IEnumerable<T> collection, Func<T, U> key_selector, Func<T, V> value_selector) where U : notnull
             => Task.Run(() => collection.ToDictionary(key_selector, value_selector));
     }
 

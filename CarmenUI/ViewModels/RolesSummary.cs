@@ -17,9 +17,9 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            var alternative_casts = await c.AlternativeCasts.ToArrayAsync();
+            var alternative_casts = await RealAsync(c.AlternativeCasts.ToArray);
             // check role statuses
-            var roles = await c.Roles.Include(r => r.Cast).ToArrayAsync();
+            var roles = await RealAsync(c.Roles.Include(r => r.Cast).ToArray);
             var counts = await roles.GroupBy(r => r.CastingStatus(alternative_casts))
                 .ToDictionaryAsync(g => g.Key, g => g.Count());
             if (counts.TryGetValue(RoleStatus.FullyCast, out var roles_cast))
@@ -31,15 +31,15 @@ namespace CarmenUI.ViewModels
             if (counts.TryGetValue(RoleStatus.OverCast, out var roles_overcast))
                 Rows.Add(new Row { Fail = $"{roles_overcast.Plural("Role")} with too many cast" });
             // check showroot consecutive items
-            await c.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
+            await RealAsync(c.Nodes.OfType<InnerNode>().Include(n => n.Children).Load);
             var consecutive_item_failures = new HashSet<ConsecutiveItemCast>();
             if (!c.ShowRoot.VerifyConsecutiveItems(out var show_root_failures))
                 foreach (var failure in show_root_failures)
                     consecutive_item_failures.Add(failure);
             // verify section type rules
-            var cast_groups = await c.CastGroups.Include(cg => cg.Members).ToArrayAsync();
-            var total_cast = (uint)cast_groups.Sum(cg => cg.FullTimeEquivalentMembers(alternative_casts.Length));
-            var section_types = await c.SectionTypes.Include(st => st.Sections).ToArrayAsync();
+            var cast_groups = await RealAsync(c.CastGroups.Include(cg => cg.Members).ToArray);
+            var total_cast = await cast_groups.SumAsync(cg => cg.FullTimeEquivalentMembers(alternative_casts.Length));
+            var section_types = await RealAsync(c.SectionTypes.Include(st => st.Sections).ToArray);
             foreach (var section_type in section_types)
             {
                 if (section_type.AllowNoRoles && section_type.AllowMultipleRoles && section_type.AllowConsecutiveItems)
