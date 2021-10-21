@@ -34,7 +34,7 @@ namespace Carmen.ShowModel
         /// <summary>Auto includes Applicants.</summary>
         public DbSet<SameCastSet> SameCastSets => Set<SameCastSet>();
 
-        /// <summary>Auto includes CountByGroups.
+        /// <summary>Auto includes CountByGroups, CountByGroup.CastGroup.
         /// Remember to include Image, Members, Requirements.</summary>
         public DbSet<Tag> Tags => Set<Tag>();
 
@@ -45,7 +45,7 @@ namespace Carmen.ShowModel
         /// Remember to include UsedByRoles, UsedByCastGroups, UsedByCombinedRequirements, UsedByTags, CombinedRequirement.SubRequirements, NotRequirement.SubRequirement.</summary>
         public DbSet<Requirement> Requirements => Set<Requirement>();
 
-        /// <summary>Auto includes CountByGroups, Section.SectionType.
+        /// <summary>Auto includes CountByGroups, CountByGroup.CastGroup, Section.SectionType.
         /// Remember to include Parent, InnerNode.Children, Item.Roles, ShowRoot.Image, ShowRoot.CastNumberOrderBy.</summary>
         public DbSet<Node> Nodes => Set<Node>();
         
@@ -55,7 +55,7 @@ namespace Carmen.ShowModel
         /// <summary>Nothing to include.</summary>
         public DbSet<Image> Images => Set<Image>();
 
-        /// <summary>Auto includes CountByGroups, Requirements.
+        /// <summary>Auto includes CountByGroups, CountByGroup.CastGroup, Requirements.
         /// Remember to include Items, Cast.</summary>
         public DbSet<Role> Roles => Set<Role>();
 
@@ -302,15 +302,15 @@ namespace Carmen.ShowModel
                 .HasKey(nameof(Ability.Applicant.ApplicantId), nameof(Ability.Criteria.CriteriaId));
 
             // Configure owned entities
-            modelBuilder.Entity<Role>()
-                .OwnsMany(r => r.CountByGroups)
-                .WithOwnerCompositeKey(nameof(Role.RoleId), nameof(CountByGroup.CastGroup.CastGroupId));
-            modelBuilder.Entity<Node>()
-                .OwnsMany(n => n.CountByGroups)
-                .WithOwnerCompositeKey(nameof(Node.NodeId), nameof(CountByGroup.CastGroup.CastGroupId));
-            modelBuilder.Entity<Tag>()
-                .OwnsMany(r => r.CountByGroups)
-                .WithOwnerCompositeKey(nameof(Tag.TagId), nameof(CountByGroup.CastGroup.CastGroupId));
+            var role_cbg = modelBuilder.Entity<Role>().OwnsMany(r => r.CountByGroups);
+            role_cbg.WithOwnerCompositeKey(nameof(Role.RoleId), nameof(CountByGroup.CastGroup.CastGroupId));
+            role_cbg.Navigation(cbg => cbg.CastGroup).AutoInclude();
+            var node_cbg = modelBuilder.Entity<Node>().OwnsMany(n => n.CountByGroups);
+            node_cbg.WithOwnerCompositeKey(nameof(Node.NodeId), nameof(CountByGroup.CastGroup.CastGroupId));
+            node_cbg.Navigation(cbg => cbg.CastGroup).AutoInclude();
+            var tag_cbg = modelBuilder.Entity<Tag>().OwnsMany(r => r.CountByGroups);
+            tag_cbg.WithOwnerCompositeKey(nameof(Tag.TagId), nameof(CountByGroup.CastGroup.CastGroupId));
+            tag_cbg.Navigation(cbg => cbg.CastGroup).AutoInclude();
 
             // Add inheritance structure for item tree
             modelBuilder.Entity<Item>();
