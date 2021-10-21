@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using Carmen.ShowModel.Requirements;
+using Carmen.ShowModel.Structure;
 
 namespace CarmenUI.ViewModels
 {
@@ -50,7 +51,7 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            var show_root = c.ShowRoot;
+            var show_root = await c.Nodes.OfType<ShowRoot>().SingleAsync();
             Heading = show_root.Name;
             SubHeading = show_root.ShowDate switch {
                 DateTime d when d >= DateTime.Now => $"opening {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}",
