@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Carmen.ShowModel;
+﻿using Carmen.ShowModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +50,7 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            var show_root = await RealAsync(c.Nodes.OfType<ShowRoot>().Include(sr => sr.Logo).Single);
+            var show_root = await c.Nodes.OfType<ShowRoot>().Include(sr => sr.Logo).SingleAsync();
             Heading = show_root.Name;
             SubHeading = show_root.ShowDate switch {
                 DateTime d when d >= DateTime.Now => $"opening {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}",

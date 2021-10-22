@@ -1,5 +1,4 @@
 ﻿using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
@@ -10,13 +9,12 @@ namespace UnitTests.Database
 {
     public class RelationshipTests
     {
-        readonly DbContextOptions<ShowContext> contextOptions = new DbContextOptionsBuilder<ShowContext>()
-            .UseSqlite($"Filename={nameof(RelationshipTests)}.db").Options;
+        readonly ShowConnection connection = ShowConnection.FromLocalFile($"{nameof(RelationshipTests)}.db");
 
         [OneTimeSetUp]
         public void CreateDatabase()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
             using var test_data = new TestDataGenerator(context, 0);
@@ -39,7 +37,7 @@ namespace UnitTests.Database
         [Test]
         public void LoadEntities_WithoutCrash()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             context.Applicants.Load();
             context.CastGroups.Load();
             context.Nodes.Load();
@@ -55,7 +53,7 @@ namespace UnitTests.Database
         [Test]
         public void Applicant_Image_ManyToOne()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var applicant = context.Applicants.Where(a => a.Photo != null).First();
             applicant.ApplicantId.Should().NotBe(0);
             var image = applicant.Photo;
@@ -67,7 +65,7 @@ namespace UnitTests.Database
         [Test]
         public void Applicant_Ability_OneToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var applicant = context.Applicants.First();
             applicant.ApplicantId.Should().NotBe(0);
             var ability = applicant.Abilities.First();
@@ -78,7 +76,7 @@ namespace UnitTests.Database
         [Test]
         public void Applicant_CastGroup_ManyToOne()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var applicant = context.Applicants.First();
             applicant.ApplicantId.Should().NotBe(0);
             var group = applicant.CastGroup;
@@ -90,7 +88,7 @@ namespace UnitTests.Database
         [Test]
         public void Applicant_Tag_ManyToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var applicant = context.Applicants.First();
             applicant.ApplicantId.Should().NotBe(0);
             var tag = applicant.Tags.First();
@@ -101,7 +99,7 @@ namespace UnitTests.Database
         [Test]
         public void Applicant_Role_ManyToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var applicant = context.Applicants.First();
             applicant.ApplicantId.Should().NotBe(0);
             var role = applicant.Roles.First();
@@ -114,7 +112,7 @@ namespace UnitTests.Database
         [Test]
         public void Criteria_Ability_OneToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var criteria = context.Criterias.First();
             criteria.CriteriaId.Should().NotBe(0);
             var ability = criteria.Abilities.First();
@@ -127,7 +125,7 @@ namespace UnitTests.Database
         [Test]
         public void Requirement_Role_ManyToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var role = context.ShowRoot.ItemsInOrder().First().Roles.First();
             role.RoleId.Should().NotBe(0);
             var req = role.Requirements.First();
@@ -138,7 +136,7 @@ namespace UnitTests.Database
         [Test]
         public void Requirement_CastGroup_ManyToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var group = context.CastGroups.First(g => g.Requirements.Any());
             group.CastGroupId.Should().NotBe(0);
             var req = group.Requirements.First();
@@ -149,7 +147,7 @@ namespace UnitTests.Database
         [Test]
         public void Requirement_Tag_ManyToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var tag = context.Tags.First(t => t.Requirements.Any());
             tag.TagId.Should().NotBe(0);
             var req = tag.Requirements.First();
@@ -160,7 +158,7 @@ namespace UnitTests.Database
         [Test]
         public void Requirement_CombinedRequirement_ManyToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var req = context.Requirements.OfType<CombinedRequirement>().First();
             req.RequirementId.Should().NotBe(0);
             req.SubRequirements.Count.Should().BeGreaterOrEqualTo(2);
@@ -173,7 +171,7 @@ namespace UnitTests.Database
         [Test]
         public void TagRequirement_Tag_ManyToOne()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var req = context.Requirements.OfType<TagRequirement>().First();
             req.RequirementId.Should().NotBe(0);
             var tag = req.RequiredTag;
@@ -184,7 +182,7 @@ namespace UnitTests.Database
         [Test]
         public void AbilityRangeRequirement_Criteria_ManyToOne()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var req = context.Requirements.OfType<AbilityRangeRequirement>().First();
             req.RequirementId.Should().NotBe(0);
             var criteria = req.Criteria;
@@ -195,7 +193,7 @@ namespace UnitTests.Database
         [Test]
         public void AbilityExactRequirement_Criteria_ManyToOne()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var req = context.Requirements.OfType<AbilityExactRequirement>().First();
             req.RequirementId.Should().NotBe(0);
             var criteria = req.Criteria;
@@ -206,7 +204,7 @@ namespace UnitTests.Database
         [Test]
         public void NotRequirement_Requirement_ManyToOne()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var not_req = context.Requirements.OfType<NotRequirement>().First();
             not_req.RequirementId.Should().NotBe(0);
             var sub_req = not_req.SubRequirement;
@@ -221,7 +219,7 @@ namespace UnitTests.Database
         [Test]
         public void ShowRoot_Image_ManyToOne()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var show = context.ShowRoot;
             show.NodeId.Should().NotBe(0);
             var image = show.Logo;
@@ -233,7 +231,7 @@ namespace UnitTests.Database
         [Test]
         public void InnerNode_Node_OneToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var inner_node = context.Nodes.OfType<InnerNode>().First();
             inner_node.NodeId.Should().NotBe(0);
             var node = inner_node.Children.First();
@@ -244,7 +242,7 @@ namespace UnitTests.Database
         [Test]
         public void Node_CountByGroup_OneToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var node = context.ShowRoot;
             var cbg = node.CountByGroups.First();
             cbg.CastGroup.Should().NotBeNull();
@@ -254,7 +252,7 @@ namespace UnitTests.Database
         [Test]
         public void Section_SectionType_ManyToOne()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var section = context.Nodes.OfType<Section>().First();
             section.NodeId.Should().NotBe(0);
             var st = section.SectionType;
@@ -265,7 +263,7 @@ namespace UnitTests.Database
         [Test]
         public void Item_Role_ManyToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var item = context.ShowRoot.ItemsInOrder().First();
             item.NodeId.Should().NotBe(0);
             var role = item.Roles.First();
@@ -276,7 +274,7 @@ namespace UnitTests.Database
         [Test]
         public void Role_CountByGroup_OneToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var role = context.ShowRoot.ItemsInOrder().First().Roles.First();
             var cbg = role.CountByGroups.First();
             cbg.CastGroup.Should().NotBeNull();
@@ -286,7 +284,7 @@ namespace UnitTests.Database
         [Test]
         public void Tag_CountByGroup_OneToMany()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var tag = context.Tags.First(t => t.CountByGroups.Any());
             var cbg = tag.CountByGroups.First();
             cbg.CastGroup.Should().NotBeNull();
@@ -296,7 +294,7 @@ namespace UnitTests.Database
         [Test]
         public void CountByGroup_CastGroup_ManyToOne()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             var cbg = context.ShowRoot.ItemsInOrder().First().Roles.First().CountByGroups.First();
             var group = cbg.CastGroup;
             group.CastGroupId.Should().NotBe(0);

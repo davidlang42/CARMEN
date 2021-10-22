@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Linq;
 using System.Text.Json;
 using Carmen.ShowModel.Applicants;
@@ -13,6 +12,7 @@ using System.Threading.Tasks;
 using System.ComponentModel;
 using System.IO;
 using System;
+using Microsoft.EntityFrameworkCore;
 
 namespace Carmen.ShowModel
 {
@@ -68,8 +68,12 @@ namespace Carmen.ShowModel
         /// <summary>The root node of the show structure</summary>
         public ShowRoot ShowRoot => showRoot ??= Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;
 
-        public ShowContext(DbContextOptions<ShowContext> context_options) : base(context_options)
-        { }
+        public ShowConnection Connection { get; private init; }
+
+        public ShowContext(ShowConnection show_connection) : base(show_connection.ContextOptions)
+        {
+            Connection = show_connection;
+        }
 
         /// <summary>Detect which DataObjects have changed in the current context since the last save</summary>
         public DataObjects DataChanges()

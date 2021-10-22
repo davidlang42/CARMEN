@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Carmen.ShowModel;
+﻿using Carmen.ShowModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -16,6 +15,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Carmen.CastingEngine.Audition;
 using Carmen.CastingEngine.Selection;
 using Carmen.CastingEngine.Allocation;
+using CarmenUI.ViewModels;
 
 namespace CarmenUI.Pages
 {
@@ -26,25 +26,25 @@ namespace CarmenUI.Pages
     {
         bool disposed = false;
         private ShowContext? _context;
-        private DbContextOptions<ShowContext> contextOptions;
+        protected readonly RecentShow connection;
         Window? windowWithEventsAttached;
         DataObjects saved_changes = DataObjects.None;
 
         protected ShowContext context => _context
             ?? throw new ApplicationException("Tried to use context after it was disposed.");
 
-        public SubPage(DbContextOptions<ShowContext> context_options)
+        public SubPage(RecentShow connection)
         {
             this.Loaded += Page_Loaded;
             this.Unloaded += Page_Unloaded;
-            this.contextOptions = context_options;
+            this.connection = connection;
             RecreateContext();
         }
 
         private void RecreateContext()
         {
             _context?.Dispose();
-            _context = new ShowContext(contextOptions);
+            _context = new ShowContext(connection);
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)

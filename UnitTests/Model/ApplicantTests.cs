@@ -1,5 +1,4 @@
 using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using NUnit.Framework;

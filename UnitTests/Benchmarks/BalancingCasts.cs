@@ -3,7 +3,6 @@ using Carmen.CastingEngine.Selection;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
-using Microsoft.EntityFrameworkCore;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
@@ -51,11 +50,11 @@ namespace UnitTests.Benchmarks
                 };
         }
 
-        public static DbContextOptions<ShowContext> OptionsFor(string file_name)
+        public static ShowConnection ConnectionFor(string file_name)
         {
             if (!File.Exists(file_name))
                 throw new Exception($"File not found: {file_name}");
-            return new DbContextOptionsBuilder<ShowContext>().UseSqlite($"Filename={file_name}").Options;
+            return ShowConnection.FromLocalFile(file_name);
         }
 
         [Test] // ~5min
@@ -64,7 +63,7 @@ namespace UnitTests.Benchmarks
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("random"))
             {
-                using var context = new ShowContext(OptionsFor(file_name));
+                using var context = new ShowContext(ConnectionFor(file_name));
                 RunTestCase(context, Path.GetFileNameWithoutExtension(file_name), false);
             }
         }
@@ -75,7 +74,7 @@ namespace UnitTests.Benchmarks
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("random"))
             {
-                using var context = new ShowContext(OptionsFor(file_name));
+                using var context = new ShowContext(ConnectionFor(file_name));
                 QuantizePrimaryAbilities(context.Applicants, 5);
                 RunTestCase(context, Path.GetFileNameWithoutExtension(file_name) + "_quantized", false);
             }
@@ -87,7 +86,7 @@ namespace UnitTests.Benchmarks
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("converted"))
             {
-                using var context = new ShowContext(OptionsFor(file_name));
+                using var context = new ShowContext(ConnectionFor(file_name));
                 RunTestCase(context, Path.GetFileNameWithoutExtension(file_name), true);
             }
         }
@@ -98,7 +97,7 @@ namespace UnitTests.Benchmarks
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles("converted"))
             {
-                using var context = new ShowContext(OptionsFor(file_name));
+                using var context = new ShowContext(ConnectionFor(file_name));
                 QuantizePrimaryAbilities(context.Applicants, 5);
                 RunTestCase(context, Path.GetFileNameWithoutExtension(file_name) + "_quantized", true);
             }
@@ -110,7 +109,7 @@ namespace UnitTests.Benchmarks
             Console.WriteLine(SummaryRow.ToHeader());
             foreach (var file_name in TestFiles(test_case_name_containing))
             {
-                using var context = new ShowContext(OptionsFor(file_name));
+                using var context = new ShowContext(ConnectionFor(file_name));
                 if (quantize_to_nearest != 1)
                     QuantizePrimaryAbilities(context.Applicants, quantize_to_nearest);
                 RunTestCase(context, Path.GetFileNameWithoutExtension(file_name), false);

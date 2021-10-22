@@ -1,6 +1,5 @@
 ﻿using CarmenUI.ViewModels;
 using CarmenUI.Windows;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using System;
 using System.Collections.Generic;
@@ -26,9 +25,7 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class MainMenu : Page, IDisposable
     {
-        DbContextOptions<ShowContext> contextOptions;
-        string connectionLabel;
-        string defaultShowName;
+        RecentShow connection;
 
         public ShowSummary ShowSummary { get; init; }
         public RegistrationSummary RegistrationSummary { get; init; } = new();
@@ -40,12 +37,10 @@ namespace CarmenUI.Pages
         private Summary[] allSummaries => new Summary[] { ShowSummary, RegistrationSummary, AuditionSummary, CastSummary, ItemsSummary, RolesSummary };
         private CancellationTokenSource? updatingSummaries;
 
-        public MainMenu(DbContextOptions<ShowContext> context_options, string connection_label, string default_show_name)
+        public MainMenu(RecentShow connection)
         {
-            defaultShowName = default_show_name;
-            connectionLabel = connection_label;
-            ShowSummary = new(default_show_name);
-            contextOptions = context_options;
+            this.connection = connection;
+            ShowSummary = new(connection.DefaultShowName);
             InitializeComponent();
         }
 
@@ -73,17 +68,17 @@ namespace CarmenUI.Pages
         {
             if (e.AddedItems.Count > 0 && e.AddedItems[0] is ListViewItem selected) {
                 if (selected == ConfigureShow)
-                    NavigateToSubPage(new ConfigureShow(contextOptions, defaultShowName));
+                    NavigateToSubPage(new ConfigureShow(connection));
                 else if (selected == AllocateRoles)
-                    NavigateToSubPage(new AllocateRoles(contextOptions));
+                    NavigateToSubPage(new AllocateRoles(connection));
                 else if (selected == ConfigureItems)
-                    NavigateToSubPage(new ConfigureItems(contextOptions));
+                    NavigateToSubPage(new ConfigureItems(connection));
                 else if (selected == SelectCast)
-                    NavigateToSubPage(new SelectCast(contextOptions));
+                    NavigateToSubPage(new SelectCast(connection));
                 else if (selected == AuditionApplicants)
-                    NavigateToSubPage(new EditApplicants(contextOptions, EditApplicantsMode.AuditionApplicants));
+                    NavigateToSubPage(new EditApplicants(connection, EditApplicantsMode.AuditionApplicants));
                 else if (selected == RegisterApplicants)
-                    NavigateToSubPage(new EditApplicants(contextOptions, EditApplicantsMode.RegisterApplicants));
+                    NavigateToSubPage(new EditApplicants(connection, EditApplicantsMode.RegisterApplicants));
                 menuList.SelectedItem = null;
             }
         }
@@ -155,7 +150,7 @@ namespace CarmenUI.Pages
                 summary.Status = ProcessStatus.Loading;
             CastingComplete.Visibility = Visibility.Hidden;
             // Use a short-lived context
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             // Update summaries sequentially
             foreach (var summary in allSummaries.Where(s => summaries.Contains(s)))
             {
@@ -232,7 +227,7 @@ namespace CarmenUI.Pages
         {
             var settings = (SettingsWindow)sender;
             using var loading = new LoadingOverlay(settings);
-            var new_main_window = new MainWindow(contextOptions, connectionLabel, defaultShowName);
+            var new_main_window = new MainWindow(connection);
             new_main_window.Show();
         }
 

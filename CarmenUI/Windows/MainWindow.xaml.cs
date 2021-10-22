@@ -1,5 +1,4 @@
 ﻿using CarmenUI.Pages;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Structure;
 using System;
@@ -17,6 +16,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using CarmenUI.ViewModels;
 
 namespace CarmenUI.Windows
 {
@@ -25,24 +25,24 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class MainWindow : Window
     {
-        string connectionLabel;
+        RecentShow connection;
 
-        public MainWindow(DbContextOptions<ShowContext> context_options, string connection_label, string default_show_name)
+        public MainWindow(RecentShow connection)
         {
             if (Properties.Settings.Default.SelectAllOnFocusTextBox)
                 EventManager.RegisterClassHandler(typeof(TextBox), GotFocusEvent, new RoutedEventHandler(TextBox_GotFocus));
             InitializeComponent();
-            connectionLabel = connection_label;
             NavigationCommands.BrowseBack.InputGestures.Clear(); // otherwise the backspace key changes pages without saving or confirming
             NavigationCommands.BrowseForward.InputGestures.Clear();
-            var main_menu = new MainMenu(context_options, connection_label, default_show_name);
+            this.connection = connection;
+            var main_menu = new MainMenu(connection);
             MainFrame.Navigate(main_menu);
         }
 
         private void MainFrame_Navigated(object sender, NavigationEventArgs e)
         {
             if (e.Content is Page page)
-                Title = $"CARMEN: {page.Title} ({connectionLabel})";
+                Title = $"CARMEN: {page.Title} ({connection.Label})";
         }
 
         private void TextBox_GotFocus(object sender, RoutedEventArgs e)

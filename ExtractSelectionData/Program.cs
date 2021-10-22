@@ -2,7 +2,6 @@
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -18,9 +17,8 @@ namespace ExtractSelectionData
             var output_csv = PromptFile("File to save extracted data?", args.Skip(1).FirstOrDefault() ?? Path.GetFileNameWithoutExtension(input_db) + ".csv", false);
             var pairwise = PromptBool("Should each data point be a comparison of 2 applicants?", false);
             var polarised = pairwise && PromptBool("Should A_BetterThan_B be polarised?", false);
-            var connection = new SqliteConnectionStringBuilder { DataSource = input_db };
-            var options = new DbContextOptionsBuilder<ShowContext>().UseSqlite(connection.ConnectionString).Options;
-            using var context = new ShowContext(options);
+            var connection = ShowConnection.FromLocalFile(input_db);
+            using var context = new ShowContext(connection);
             using var f = new StreamWriter(output_csv);
             if (pairwise)
                 PairwiseExtract(context, f, polarised);

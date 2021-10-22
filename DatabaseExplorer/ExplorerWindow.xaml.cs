@@ -1,5 +1,4 @@
 ﻿using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Structure;
@@ -27,11 +26,10 @@ namespace DatabaseExplorer
         public ShowContext Context => _context ?? throw new Exception("Attempted to use Context before loading.");
 
         /// <summary>Create a new database context, disposing the old one if set</summary>
-        private void CreateContext(string connection_string)
+        private void CreateContext(ShowConnection connection)
         {
             _context?.Dispose();
-            var context_options = new DbContextOptionsBuilder<ShowContext>().UseSqlite(connection_string).Options;
-            _context = new ShowContext(context_options);
+            _context = new ShowContext(connection);
         }
 
         private readonly CollectionViewSource applicantsViewSource;
@@ -94,8 +92,7 @@ namespace DatabaseExplorer
 
         private void OpenDatabase(string filename)
         {
-            var connection = new SqliteConnectionStringBuilder { DataSource = filename };
-            CreateContext(connection.ToString());
+            CreateContext(ShowConnection.FromLocalFile(filename));
             foreach (var ui_element in this.AllControls<UIElement>())
                 ui_element.IsEnabled = true;
         }
@@ -154,7 +151,7 @@ namespace DatabaseExplorer
 
         private void RevertChanges()
         {
-            CreateContext(Context.Database.GetConnectionString());
+            CreateContext(Context.Connection);
             PopulateViews();
         }
 

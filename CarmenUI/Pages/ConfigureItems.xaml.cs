@@ -1,7 +1,6 @@
 ﻿using CarmenUI.Converters;
 using CarmenUI.ViewModels;
 using CarmenUI.Windows;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
@@ -53,7 +52,7 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource sectionTypesViewSource;
         private readonly CollectionViewSource castMembersDictionarySource;
 
-        public ConfigureItems(DbContextOptions<ShowContext> context_options) : base(context_options)
+        public ConfigureItems(RecentShow connection) : base(connection)
         {
             InitializeComponent();
             rootNodesViewSource = (CollectionViewSource)FindResource(nameof(rootNodesViewSource));

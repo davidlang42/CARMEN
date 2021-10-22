@@ -1,6 +1,5 @@
 ﻿using CarmenUI.Converters;
 using CarmenUI.ViewModels;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using A = Carmen.ShowModel.Applicants;
@@ -52,7 +51,7 @@ namespace CarmenUI.Pages
         private ISelectionEngine engine => _engine
             ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
 
-        public SelectCast(DbContextOptions<ShowContext> context_options) : base(context_options)
+        public SelectCast(RecentShow connection) : base(connection)
         {
             InitializeComponent();
             castNumbersViewSource = (CollectionViewSource)FindResource(nameof(castNumbersViewSource));

@@ -1,6 +1,5 @@
 ﻿using CarmenUI.ViewModels;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Win32;
 using Carmen.ShowModel;
 using System;
@@ -41,10 +40,9 @@ namespace CarmenUI.Windows
             if (dialog.ShowDialog() == true)
             {
                 var show = RecentShow.FromLocalFile(dialog.FileName);
-                var options = show.CreateOptions();
                 using (var loading = new LoadingOverlay(this))
                 {
-                    using (var context = new ShowContext(options))
+                    using (var context = new ShowContext(show))
                     {
                         //TODO handle io errors
                         context.Database.EnsureDeleted();
@@ -78,7 +76,7 @@ namespace CarmenUI.Windows
                         context.SaveChanges();
                     }
                     AddToRecentList(show);
-                    LaunchMainWindow(options, show);
+                    LaunchMainWindow(show);
                 }
             }
         }
@@ -93,19 +91,18 @@ namespace CarmenUI.Windows
             if (dialog.ShowDialog() == true)
             {
                 var show = RecentShow.FromLocalFile(dialog.FileName);
-                var options = show.CreateOptions();
                 using (var loading = new LoadingOverlay(this))
                 {
-                    CheckIntegrity(options);
+                    CheckIntegrity(show);
                     AddToRecentList(show);
-                    LaunchMainWindow(options, show);
+                    LaunchMainWindow(show);
                 }
             }
         }
 
-        private void CheckIntegrity(DbContextOptions<ShowContext> options)
+        private void CheckIntegrity(ShowConnection connection)
         {
-            using (var context = new ShowContext(options))
+            using (var context = new ShowContext(connection))
             {
                 // Accessing any model or entity related property on the context causes the model to be build, which takes ~1s synchronously.
                 // It is important to do this here, while the loading form is shown, to avoid a synchronous delay when the MainMenu is loaded.
@@ -124,9 +121,9 @@ namespace CarmenUI.Windows
                 recent.RemoveAt(recent.Count - 1);
         }
 
-        private void LaunchMainWindow(DbContextOptions<ShowContext> options, RecentShow show)
+        private void LaunchMainWindow(RecentShow show)
         {
-            var main = new MainWindow(options, show.Label, show.DefaultShowName);
+            var main = new MainWindow(show);
             main.Show();
             this.Close();
         }
@@ -137,11 +134,10 @@ namespace CarmenUI.Windows
             {
                 using (var loading = new LoadingOverlay(this))
                 {
-                    var options = show.CreateOptions();
-                    CheckIntegrity(options);
+                    CheckIntegrity(show);
                     show.LastOpened = DateTime.Now;
                     AddToRecentList(show);
-                    LaunchMainWindow(options, show);
+                    LaunchMainWindow(show);
                 }
             }
         }

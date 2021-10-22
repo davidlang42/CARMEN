@@ -1,5 +1,4 @@
 ﻿using CarmenUI.Converters;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using System;
 using System.Collections.Generic;

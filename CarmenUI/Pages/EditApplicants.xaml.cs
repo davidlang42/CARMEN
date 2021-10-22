@@ -1,7 +1,6 @@
 ﻿using CarmenUI.Converters;
 using CarmenUI.ViewModels;
 using CarmenUI.Windows;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
@@ -41,7 +40,7 @@ namespace CarmenUI.Pages
 
         public EditApplicantsMode Mode { get; init; }
 
-        public EditApplicants(DbContextOptions<ShowContext> context_options, EditApplicantsMode mode) : base(context_options)
+        public EditApplicants(RecentShow connection, EditApplicantsMode mode) : base(connection)
         {
             this.Mode = mode;
             InitializeComponent();

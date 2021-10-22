@@ -1,5 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Carmen.ShowModel.Applicants;
+﻿using Carmen.ShowModel.Applicants;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;

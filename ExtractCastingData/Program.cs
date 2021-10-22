@@ -6,7 +6,6 @@ using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -26,8 +25,8 @@ namespace ExtractCastingData
             var temp_db = Path.GetTempFileName();
             Console.WriteLine($"Copying database to {temp_db}");
             File.Copy(input_db, temp_db, true);
-            using var user_chosen = new ShowContext(OptionsFor(input_db));
-            using var temp = new ShowContext(OptionsFor(temp_db));
+            using var user_chosen = new ShowContext(ShowConnection.FromLocalFile(input_db));
+            using var temp = new ShowContext(ShowConnection.FromLocalFile(temp_db));
             Console.WriteLine($"Clearing casting in copied database");
             ClearCasting(temp);
             temp.SaveChanges();
@@ -35,12 +34,6 @@ namespace ExtractCastingData
             using var f = new StreamWriter(output_csv);
             RecastPreviousCasting(user_chosen, temp, f, pairwise, polarised, zeroed);
             Console.WriteLine("########## COMPLETE ##########");
-        }
-
-        private static DbContextOptions<ShowContext> OptionsFor(string filename)
-        {
-            var connection = new SqliteConnectionStringBuilder { DataSource = filename };
-            return new DbContextOptionsBuilder<ShowContext>().UseSqlite(connection.ConnectionString).Options;
         }
 
         private static string PromptFile(string prompt, string default_value, bool existing_file)

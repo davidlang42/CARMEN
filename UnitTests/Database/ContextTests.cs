@@ -1,23 +1,22 @@
 ﻿using FluentAssertions;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
 using NUnit.Framework;
 using System.Linq;
 using System;
+using EF = Microsoft.EntityFrameworkCore;
 
 namespace UnitTests.Database
 {
     public class ContextTests
     {
-        readonly DbContextOptions<ShowContext> contextOptions = new DbContextOptionsBuilder<ShowContext>()
-            .UseSqlite($"Filename={nameof(ContextTests)}.db").Options;
+        readonly ShowConnection connection = ShowConnection.FromLocalFile($"{nameof(ContextTests)}.db");
 
         [OneTimeSetUp]
         public void CreateDatabase()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
         }
@@ -25,7 +24,7 @@ namespace UnitTests.Database
         [Test]
         public void ShowRootAccessorCreatesOnlyOneNode()
         {
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             context.Nodes.Count().Should().Be(0);
             var show_root = context.ShowRoot;
             context.ShowRoot.Should().Be(show_root);
@@ -41,7 +40,7 @@ namespace UnitTests.Database
                 .Reverse().Skip(1).Reverse() // "All"
                 .Select(e => e.ToString()).ToArray();
             var db_sets = typeof(ShowContext).GetProperties()
-                .Where(p => p.PropertyType.Name.StartsWith(nameof(DbSet<object>)))
+                .Where(p => p.PropertyType.Name.StartsWith(nameof(EF.DbSet<object>)))
                 .Select(p => p.Name).ToArray();
             enum_names.Should().BeEquivalentTo(db_sets, "because the DataObject enum types should match the ShowContext DbSet properties");
         }
@@ -80,7 +79,7 @@ namespace UnitTests.Database
         public void CheckDefaultSettings_TrueAfterSetDefault_FalseAfterChange()
         {
             var default_show_name = "DefaultShow";
-            using var context = new ShowContext(contextOptions);
+            using var context = new ShowContext(connection);
             context.SetDefaultShowSettings(default_show_name);
             context.CheckDefaultShowSettings(default_show_name).Should().BeTrue();
             context.ShowRoot.Name = "";

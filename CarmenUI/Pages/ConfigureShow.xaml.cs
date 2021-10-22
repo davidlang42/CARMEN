@@ -1,7 +1,6 @@
 ﻿using CarmenUI.Converters;
 using CarmenUI.ViewModels;
 using CarmenUI.Windows;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
@@ -33,8 +32,6 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class ConfigureShow : SubPage
     {
-        string fileName;
-
         private readonly CollectionViewSource criteriasViewSource = new()
         {
             IsLiveSortingRequested = true,
@@ -57,9 +54,8 @@ namespace CarmenUI.Pages
 
         private CollectionViewSource? currentViewSource;
 
-        public ConfigureShow(DbContextOptions<ShowContext> context_options, string file_name) : base(context_options)
+        public ConfigureShow(RecentShow connection) : base(connection)
         {
-            fileName = file_name;
             InitializeComponent();
             alternativeCastsViewSource = (CollectionViewSource)FindResource(nameof(alternativeCastsViewSource));
             alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
@@ -305,7 +301,7 @@ namespace CarmenUI.Pages
         private void ImportShowConfiguration_Click(object sender, RoutedEventArgs e)
         {
             if (MessageBox.Show("Importing show configuration is not currently supported.\nWould you like to reset to the default configuration instead?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                context.SetDefaultShowSettings(fileName, false);
+                context.SetDefaultShowSettings(connection.DefaultShowName, false);
         }
 
         private void moveUpButton_Click(object sender, RoutedEventArgs e)

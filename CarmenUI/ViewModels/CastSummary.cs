@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Carmen.ShowModel;
+﻿using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;

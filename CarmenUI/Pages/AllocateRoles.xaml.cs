@@ -2,7 +2,6 @@
 using CarmenUI.ViewModels;
 using CarmenUI.Windows;
 using Carmen.CastingEngine;
-using Microsoft.EntityFrameworkCore;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
@@ -76,7 +75,7 @@ namespace CarmenUI.Pages
         private IAllocationEngine engine => _engine
             ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
 
-        public AllocateRoles(DbContextOptions<ShowContext> context_options) : base(context_options)
+        public AllocateRoles(RecentShow connection) : base(connection)
         {
             InitializeComponent();
             defaultPanelContent = applicantsPanel.Content;
