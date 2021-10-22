@@ -1,4 +1,5 @@
 ﻿using Carmen.ShowModel.Applicants;
+using System.Collections.Generic;
 
 namespace Carmen.ShowModel.Requirements
 {
@@ -21,5 +22,13 @@ namespace Carmen.ShowModel.Requirements
 
         public override bool IsSatisfiedBy(Applicant applicant)
             => applicant.Tags.Contains(RequiredTag);
+
+        public override IEnumerable<string> Validate()
+        {
+            if (RequiredTag == null)
+                yield return $"Requirement '{Name}' has no required tag.";
+            foreach (var base_issue in base.Validate())
+                yield return base_issue;
+        }
     }
 }

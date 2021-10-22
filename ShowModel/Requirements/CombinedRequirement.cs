@@ -26,6 +26,14 @@ namespace Carmen.ShowModel.Requirements
             path.Remove(this);
             return false;
         }
+
+        public override IEnumerable<string> Validate()
+        {
+            if (SubRequirements.Count == 0)
+                yield return $"Requirement '{Name}' has no sub requirements.";
+            foreach (var base_issue in base.Validate())
+                yield return base_issue;
+        }
     }
 
     public class AndRequirement : CombinedRequirement

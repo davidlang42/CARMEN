@@ -338,5 +338,21 @@ namespace CarmenUI.Pages
             moveUpButton.IsEnabled = selected_index != -1 && selected_index > 0;
             moveDownButton.IsEnabled = selected_index != -1 && selected_index < objectList.Items.Count - 1;
         }
+
+        protected override bool PreSaveChecks()
+        {
+            var validatable_objects = context.Requirements.Local.Cast<IValidatable>();
+            var validation_issues = validatable_objects.SelectMany(vo => vo.Validate()).ToList();
+            if (validation_issues.Count == 0)
+                return true;
+            string msg;
+            if (validation_issues.Count == 1)
+                msg = validation_issues[0];
+            else
+                msg = $"There are {validation_issues.Count} validation issues.\n\n{string.Join("\n", validation_issues)}\n";
+            msg += "\nChanges have not been saved.";
+            MessageBox.Show(msg, "CARMEN");
+            return false;
+        }
     }
 }

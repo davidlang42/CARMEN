@@ -156,12 +156,12 @@ namespace Carmen.ShowModel.Requirements
         }
 
         /// <summary>Checks if this requirement has a circular reference.</summary>
-        public IEnumerable<string> Validate()
+        public virtual IEnumerable<string> Validate()
         {
             var visited = new HashSet<Requirement>();
             var path = new HashSet<Requirement>();
             if (HasCircularReference(path, visited))
-                yield return $"Requirement has a circular reference: ({string.Join(", ", path.Select(r => r.Name))})";
+                yield return $"Requirement '{Name}' has a circular reference ({string.Join(", ", path.Select(r => r.Name))}).";
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

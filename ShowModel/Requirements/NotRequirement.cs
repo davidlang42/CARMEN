@@ -33,5 +33,13 @@ namespace Carmen.ShowModel.Requirements
             path.Remove(this);
             return false;
         }
+
+        public override IEnumerable<string> Validate()
+        {
+            if (SubRequirement == null)
+                yield return $"Requirement '{Name}' has no sub requirement.";
+            foreach (var base_issue in base.Validate())
+                yield return base_issue;
+        }
     }
 }

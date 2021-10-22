@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Carmen.ShowModel.Requirements
@@ -42,5 +43,13 @@ namespace Carmen.ShowModel.Requirements
 
         public override bool IsSatisfiedBy(Applicant applicant)
             => applicant.MarkFor(Criteria) == RequiredValue;
+
+        public override IEnumerable<string> Validate()
+        {
+            if (Criteria == null)
+                yield return $"Requirement '{Name}' has no required criteria.";
+            foreach (var base_issue in base.Validate())
+                yield return base_issue;
+        }
     }
 }
