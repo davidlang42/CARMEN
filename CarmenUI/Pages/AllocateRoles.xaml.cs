@@ -262,34 +262,35 @@ namespace CarmenUI.Pages
             selectingRoleProgrammatically = true;
             if (recommendedCastingOrder == null)
                 recommendedCastingOrder = engine.IdealCastingOrder(context.ShowRoot, applicantsInCast).GetEnumerator();
-            //TODO add a loading overlay (if all roles are cast, this can take up to 10 seconds to process through the entire list)
-            while (recommendedCastingOrder.MoveNext())
-                if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
-                {
-                    rootNodeView.ClearSelection();
-                    rootNodeView.CollapseAll();
-                    if (recommendedCastingOrder.Current.Length == 1)
+            //TODO make this async, also faster by skipping roles already cast WITHIN IdealCastingOrder (maybe?)
+            using (var loading = new LoadingOverlay(this) { MainText = "Searching...", SubText = "for next uncast role" })
+                while (recommendedCastingOrder.MoveNext())
+                    if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
                     {
-                        if (!rootNodeView.SelectRole(recommendedCastingOrder.Current[0])) // select a single role
-                            break; // if role fails to select, exit process
+                        rootNodeView.ClearSelection();
+                        rootNodeView.CollapseAll();
+                        if (recommendedCastingOrder.Current.Length == 1)
+                        {
+                            if (!rootNodeView.SelectRole(recommendedCastingOrder.Current[0])) // select a single role
+                                break; // if role fails to select, exit process
+                        }
+                        else
+                        {
+                            var node = Role.CommonItemsAndSections(recommendedCastingOrder.Current) // find nodes which contain ALL of these roles
+                                .OrderBy(n => n.ItemsInOrder().Count()) // find the node containing the minimum number of items (possibly only 1)
+                                .ThenBy(n => n.ItemsInOrder().SelectMany(i => i.Roles).Distinct().Count()) // if tied, find the node with the minimum descendent roles
+                                .FirstOrDefault(); // ShowRoot was excluded by Role.ItemsAndSections(), which is fine because its not selectable
+                            if (node == null)
+                                break; // not selectable
+                            if (!rootNodeView.SelectNode(node)) // select the node containing these roles
+                                break; // if node fails to select, exit process
+                            if (applicantsPanel.Content is not NodeRolesOverview overview)
+                                break; // if node overview not shown, exit process
+                            overview.SelectRoles(recommendedCastingOrder.Current); // pre-select the recommended roles in the incomplete roles list
+                        }
+                        selectingRoleProgrammatically = false;
+                        return; // success
                     }
-                    else
-                    {
-                        var node = Role.CommonItemsAndSections(recommendedCastingOrder.Current) // find nodes which contain ALL of these roles
-                            .OrderBy(n => n.ItemsInOrder().Count()) // find the node containing the minimum number of items (possibly only 1)
-                            .ThenBy(n => n.ItemsInOrder().SelectMany(i => i.Roles).Distinct().Count()) // if tied, find the node with the minimum descendent roles
-                            .FirstOrDefault(); // ShowRoot was excluded by Role.ItemsAndSections(), which is fine because its not selectable
-                        if (node == null)
-                            break; // not selectable
-                        if (!rootNodeView.SelectNode(node)) // select the node containing these roles
-                            break; // if node fails to select, exit process
-                        if (applicantsPanel.Content is not NodeRolesOverview overview)
-                            break; // if node overview not shown, exit process
-                        overview.SelectRoles(recommendedCastingOrder.Current); // pre-select the recommended roles in the incomplete roles list
-                    }
-                    selectingRoleProgrammatically = false;
-                    return; // success
-                }
             rootNodeView.ClearSelection(); // clear when no more roles, or another reason to stop the process
             recommendedCastingOrder = null;
             selectingRoleProgrammatically = false;
