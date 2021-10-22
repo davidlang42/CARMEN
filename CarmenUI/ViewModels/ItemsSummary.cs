@@ -15,13 +15,13 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            var items = await RealAsync(c.Nodes.OfType<Item>().Include(i => i.Roles).ToArray);
+            var items = await c.Nodes.OfType<Item>().Include(i => i.Roles).ToArrayAsync();
             var items_row = CreateItemsRow(items, out int item_count);
             bool anything_exists = item_count != 0;
             Rows.Add(items_row);
-            var alternative_casts_count = await RealAsync(c.AlternativeCasts.Count);
+            var alternative_casts_count = await c.AlternativeCasts.CountAsync();
             var cast_members = await c.CastGroups.Include(cg => cg.Members).ToDictionaryAsync(cg => cg, cg => cg.FullTimeEquivalentMembers(alternative_casts_count));
-            var section_types = await RealAsync(c.SectionTypes.Include(st => st.Sections).ThenInclude(n => n.Children).ToArray);
+            var section_types = await c.SectionTypes.Include(st => st.Sections).ThenInclude(n => n.Children).ToArrayAsync();
             if (!c.ShowRoot.CountMatchesSumOfRoles())
                 Rows.Add(new Row { Fail = "Show has incorrect sum of roles" });
             foreach (var section_type in section_types)

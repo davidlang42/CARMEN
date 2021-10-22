@@ -13,7 +13,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Carmen.ShowModel
 {
     /// <summary>
-    /// 
+    /// Unfortunately some DB providers run async calls sychronously, making these extension method overrides nessesary.
+    /// See: https://stackoverflow.com/questions/29016698/can-the-oracle-managed-driver-use-async-await-properly
     /// </summary>
     public static class EntityFrameworkQueryableExtensionsWithGuaranteedAsync
     {
@@ -237,6 +238,70 @@ namespace Carmen.ShowModel
         //     A new query with the related data included.
         public static IIncludableQueryable<TEntity, TProperty> ThenInclude<TEntity, TPreviousProperty, TProperty>([NotNullAttribute] this IIncludableQueryable<TEntity, TPreviousProperty> source, [NotNullAttribute] Expression<Func<TPreviousProperty, TProperty>> navigationPropertyPath) where TEntity : class
             => EntityFrameworkQueryableExtensions.ThenInclude(source, navigationPropertyPath);
+        //
+        // Summary:
+        //     Asynchronously returns the number of elements in a sequence.
+        //
+        // Parameters:
+        //   source:
+        //     An System.Linq.IQueryable`1 that contains the elements to be counted.
+        //
+        //   cancellationToken:
+        //     A System.Threading.CancellationToken to observe while waiting for the task to
+        //     complete.
+        //
+        // Type parameters:
+        //   TSource:
+        //     The type of the elements of source.
+        //
+        // Returns:
+        //     A task that represents the asynchronous operation. The task result contains the
+        //     number of elements in the input sequence.
+        //
+        // Exceptions:
+        //   T:System.ArgumentNullException:
+        //     source is null.
+        //
+        // Remarks:
+        //     Multiple active operations on the same context instance are not supported. Use
+        //     'await' to ensure that any asynchronous operations have completed before calling
+        //     another method on this context.
+        public static Task<int> CountAsync<TSource>([NotNullAttribute] this IQueryable<TSource> source, CancellationToken cancellationToken = default)
+            => Task.Run(() => source.Count(), cancellationToken);
+        //
+        // Summary:
+        //     Asynchronously returns the number of elements in a sequence that satisfy a condition.
+        //
+        // Parameters:
+        //   source:
+        //     An System.Linq.IQueryable`1 that contains the elements to be counted.
+        //
+        //   predicate:
+        //     A function to test each element for a condition.
+        //
+        //   cancellationToken:
+        //     A System.Threading.CancellationToken to observe while waiting for the task to
+        //     complete.
+        //
+        // Type parameters:
+        //   TSource:
+        //     The type of the elements of source.
+        //
+        // Returns:
+        //     A task that represents the asynchronous operation. The task result contains the
+        //     number of elements in the sequence that satisfy the condition in the predicate
+        //     function.
+        //
+        // Exceptions:
+        //   T:System.ArgumentNullException:
+        //     source or predicate is null.
+        //
+        // Remarks:
+        //     Multiple active operations on the same context instance are not supported. Use
+        //     'await' to ensure that any asynchronous operations have completed before calling
+        //     another method on this context.
+        public static Task<int> CountAsync<TSource>([NotNullAttribute] this IQueryable<TSource> source, [NotNullAttribute] Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default)
+            => Task.Run(() => source.Count(predicate), cancellationToken);
 
         #region Not yet implemented
         /*
@@ -1149,68 +1214,6 @@ namespace Carmen.ShowModel
         //     'await' to ensure that any asynchronous operations have completed before calling
         //     another method on this context.
         public static Task<bool> ContainsAsync<TSource>([NotNullAttribute] this IQueryable<TSource> source, [NotNullAttribute] TSource item, CancellationToken cancellationToken = default);
-        //
-        // Summary:
-        //     Asynchronously returns the number of elements in a sequence.
-        //
-        // Parameters:
-        //   source:
-        //     An System.Linq.IQueryable`1 that contains the elements to be counted.
-        //
-        //   cancellationToken:
-        //     A System.Threading.CancellationToken to observe while waiting for the task to
-        //     complete.
-        //
-        // Type parameters:
-        //   TSource:
-        //     The type of the elements of source.
-        //
-        // Returns:
-        //     A task that represents the asynchronous operation. The task result contains the
-        //     number of elements in the input sequence.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     source is null.
-        //
-        // Remarks:
-        //     Multiple active operations on the same context instance are not supported. Use
-        //     'await' to ensure that any asynchronous operations have completed before calling
-        //     another method on this context.
-        public static Task<int> CountAsync<TSource>([NotNullAttribute] this IQueryable<TSource> source, CancellationToken cancellationToken = default);
-        //
-        // Summary:
-        //     Asynchronously returns the number of elements in a sequence that satisfy a condition.
-        //
-        // Parameters:
-        //   source:
-        //     An System.Linq.IQueryable`1 that contains the elements to be counted.
-        //
-        //   predicate:
-        //     A function to test each element for a condition.
-        //
-        //   cancellationToken:
-        //     A System.Threading.CancellationToken to observe while waiting for the task to
-        //     complete.
-        //
-        // Type parameters:
-        //   TSource:
-        //     The type of the elements of source.
-        //
-        // Returns:
-        //     A task that represents the asynchronous operation. The task result contains the
-        //     number of elements in the sequence that satisfy the condition in the predicate
-        //     function.
-        //
-        // Exceptions:
-        //   T:System.ArgumentNullException:
-        //     source or predicate is null.
-        //
-        // Remarks:
-        //     Multiple active operations on the same context instance are not supported. Use
-        //     'await' to ensure that any asynchronous operations have completed before calling
-        //     another method on this context.
-        public static Task<int> CountAsync<TSource>([NotNullAttribute] this IQueryable<TSource> source, [NotNullAttribute] Expression<Func<TSource, bool>> predicate, CancellationToken cancellationToken = default);
         //
         // Summary:
         //     Asynchronously returns the first element of a sequence.

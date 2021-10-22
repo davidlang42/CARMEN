@@ -15,8 +15,8 @@ namespace CarmenUI.ViewModels
         {
             StartLoad();
             // cast groups / alternative casts
-            var cast_groups = await RealAsync(c.CastGroups.Include(cg => cg.Members).ToArray);
-            var alternative_casts = await RealAsync(c.AlternativeCasts.ToArray);
+            var cast_groups = await c.CastGroups.Include(cg => cg.Members).ToArrayAsync();
+            var alternative_casts = await c.AlternativeCasts.ToArrayAsync();
             var sum = 0;
             foreach (var cast_group in cast_groups)
             {
@@ -69,7 +69,7 @@ namespace CarmenUI.ViewModels
             // same cast sets
             if (cast_groups.Any(cg => cg.AlternateCasts))
             {
-                var same_cast_sets = await RealAsync(c.SameCastSets.ToArray);
+                var same_cast_sets = await c.SameCastSets.ToArrayAsync();
                 var total_applicants = same_cast_sets.Sum(set => set.Applicants.Count);
                 var row = new Row { Success = $"{same_cast_sets.Length} same-cast sets including {total_applicants} applicants" };
                 var incomplete_sets = same_cast_sets.Count(set => set.Applicants.Count < 2);
@@ -80,7 +80,7 @@ namespace CarmenUI.ViewModels
                     Rows.Add(new Row { Fail = $"{failed_set.Description} are not all in the same cast" });
             }
             // tags
-            var tags = await RealAsync(c.Tags.Include(cg => cg.Members).ToArray);
+            var tags = await c.Tags.Include(cg => cg.Members).ToArrayAsync();
             foreach (var tag in tags)
             {
                 var row = new Row { Success = $"{tag.Members.Count} tagged {tag.Name}" };

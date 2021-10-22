@@ -62,11 +62,11 @@ namespace CarmenUI.ViewModels
                 Rows.Add(new Row { Fail = "Show name is required" });
             if (!show_root.ShowDate.HasValue)
                 Rows.Add(new Row { Fail = "Show date is required" });
-            var criterias = await RealAsync(c.Criterias.Count);
+            var criterias = await c.Criterias.CountAsync();
             Rows.Add(CountRow(criterias, 1, "Audition Criteria", true));
-            var cast_groups = await RealAsync(c.CastGroups.ToArray);
+            var cast_groups = await c.CastGroups.ToArrayAsync();
             Rows.Add(CountRow(cast_groups.Length, 1, "Cast Group"));
-            var alternative_casts = await RealAsync(c.AlternativeCasts.Count);
+            var alternative_casts = await c.AlternativeCasts.CountAsync();
             if (cast_groups.Any(g => g.AlternateCasts))
                 Rows.Add(CountRow(alternative_casts, 2, "Alternative Cast"));
             else if (alternative_casts == 0)
@@ -77,11 +77,11 @@ namespace CarmenUI.ViewModels
                     Success = alternative_casts.Plural("Alternative Cast"),
                     Fail = "(but are not enabled)"
                 });
-            var tags = await RealAsync(c.Tags.Count);
+            var tags = await c.Tags.CountAsync();
             Rows.Add(CountRow(tags, 0, "Cast Tag"));
-            var section_types = await RealAsync(c.SectionTypes.Count);
+            var section_types = await c.SectionTypes.CountAsync();
             Rows.Add(CountRow(section_types, 1, "Section Type"));
-            var requirements = await RealAsync(c.Requirements.Count);
+            var requirements = await c.Requirements.CountAsync();
             Rows.Add(CountRow(requirements, 0, "Requirement"));
             FinishLoad(cancel, c.CheckDefaultShowSettings(defaultShowName, false));
         }
