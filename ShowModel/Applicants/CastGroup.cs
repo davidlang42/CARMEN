@@ -13,7 +13,7 @@ namespace Carmen.ShowModel.Applicants
     /// A group of people which an applicant can be selected into.
     /// Cast groups are mutually exclusive.
     /// </summary>
-    public class CastGroup : IOrdered, INamed, INotifyPropertyChanged
+    public class CastGroup : IOrdered, INamed, INotifyPropertyChanged, IValidatable
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -113,6 +113,12 @@ namespace Carmen.ShowModel.Applicants
         protected void OnPropertyChanged([CallerMemberName]string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public IEnumerable<string> Validate()
+        {
+            foreach (var tag_req in Requirements.SelectMany(r => r.References()).OfType<TagRequirement>())
+                yield return $"Cast group '{Name}' cannot have tag requirement '{tag_req.Name}' because cast groups are selected before tags are applied.";
         }
     }
 }

@@ -145,7 +145,7 @@ namespace Carmen.ShowModel.Requirements
             return false;
         }
 
-        /// <summary>Recursively enumerate all Requirements which are referenced directly or indirectly by this requirement</summary>
+        /// <summary>Recursively enumerate all Requirements which are referenced directly or indirectly by this requirement, including itself</summary>
         public IEnumerable<Requirement> References()
         {
             var visited = new HashSet<Requirement>();
