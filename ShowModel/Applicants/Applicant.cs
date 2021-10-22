@@ -224,7 +224,7 @@ namespace Carmen.ShowModel.Applicants
         }
 
         public bool IsRegistered
-            => !string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName) && Gender.HasValue && DateOfBirth.HasValue;
+            => !string.IsNullOrEmpty(FirstName) && !string.IsNullOrEmpty(LastName) && Gender.HasValue && Age.HasValue;
 
         public bool HasAuditioned(IEnumerable<Criteria> all_criterias)
             => HasAuditioned(IsRegistered, Abilities, all_criterias);
@@ -272,12 +272,10 @@ namespace Carmen.ShowModel.Applicants
         private void Roles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(Roles));
 
-        public uint? AgeAt(DateTime date) //TODO handle errors more nicely, move errors to validation
+        public uint? AgeAt(DateTime date)
         {
-            if (DateOfBirth == null)
-                return null;
-            if (DateOfBirth > date)
-                throw new ArgumentOutOfRangeException($"Date of birth is after the provided {nameof(date)}.");
+            if (DateOfBirth == null || DateOfBirth > date)
+                return null; // missing dob, or dob in the future
             return (uint)((date - DateOfBirth.Value).TotalDays / 365.2425); // correct on average, good enough
         }
 
