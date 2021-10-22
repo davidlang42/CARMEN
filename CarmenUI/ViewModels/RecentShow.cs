@@ -14,7 +14,6 @@ namespace CarmenUI.ViewModels
     /// </summary>
     public class RecentShow : ShowConnection
     {
-        
         /// <summary>The label to be shown to the user</summary>
         public string Label { get; set; } = "";
         /// <summary>The default name for the show</summary>
@@ -25,13 +24,11 @@ namespace CarmenUI.ViewModels
         public string IconPath
             => Provider == null ? @"\Icons\OpenFile.png" : @"\Icons\CloudDatabase.png";
 
-        private RecentShow(DbProvider? provider, string connection_string)
-            : base(provider, connection_string)
-        { }
-
         public static new RecentShow FromLocalFile(string filename)
-            => new RecentShow(null, new SqliteConnectionStringBuilder { DataSource = filename }.ToString())
+            => new RecentShow
             {
+                Provider = null,
+                ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString(),
                 Label = Path.GetFileName(filename),
                 DefaultShowName = Path.GetFileNameWithoutExtension(filename)
             };

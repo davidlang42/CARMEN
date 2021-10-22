@@ -21,24 +21,22 @@ namespace Carmen.ShowModel
         }
 
         /// <summary>The type of database server, or null if a local file (sqlite)</summary>
-        public DbProvider? Provider { get; private init; }
+        public DbProvider? Provider { get; init; }
         /// <summary>The db connection string</summary>
-        public string ConnectionString { get; set; } = "";
+        public string ConnectionString { get; init; } = "";
 
-        internal DbContextOptions<ShowContext> ContextOptions { get; private init; }
-
-        protected ShowConnection(DbProvider? provider, string connection_string)
+        private DbContextOptions<ShowContext>? contextOptions;
+        internal DbContextOptions<ShowContext> ContextOptions => contextOptions ??= Provider switch
         {
-            Provider = provider;
-            ConnectionString = connection_string;
-            ContextOptions = Provider switch
-            {
-                null => new DbContextOptionsBuilder<ShowContext>().UseSqlite(ConnectionString).Options,
-                _ => throw new NotImplementedException($"Database provider {Provider} not implemented.")
-            };
-        }
+            null => new DbContextOptionsBuilder<ShowContext>().UseSqlite(ConnectionString).Options,
+            _ => throw new NotImplementedException($"Database provider {Provider} not implemented.")
+        };
 
         public static ShowConnection FromLocalFile(string filename)
-            => new ShowConnection(null, new SqliteConnectionStringBuilder { DataSource = filename }.ToString());
+            => new ShowConnection
+            {
+                Provider = null,
+                ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString()
+            };
     }
 }
