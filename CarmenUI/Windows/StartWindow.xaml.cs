@@ -40,44 +40,50 @@ namespace CarmenUI.Windows
             if (dialog.ShowDialog() == true)
             {
                 var show = RecentShow.FromLocalFile(dialog.FileName);
-                using (var loading = new LoadingOverlay(this))
-                {
-                    using (var context = new ShowContext(show))
-                    {
-                        //TODO handle io errors
-                        context.Database.EnsureDeleted();
-                        context.Database.EnsureCreated();
-#if DEBUG
-                        if (MessageBox.Show("Do you want to add test data?", "DEBUG", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                        {
-                            using var test_data = new TestDataGenerator(context, 0);
-                            test_data.AddAlternativeCasts();
-                            test_data.AddCastGroups(4);
-                            context.SaveChanges();
-                            test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false); // after cast groups committed
-                            context.SaveChanges();
-                            test_data.AddCriteriaAndRequirements(); // after cast groups committed
-                            context.SaveChanges();
-                            test_data.AddTags(1); // after requirements committed
-                            context.SaveChanges();
-                            test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
-                            context.SaveChanges();
-                            test_data.AddRoles(5); // after applicants, items, cast groups, requirements committed
-                            test_data.AddImages(); // after applicants, tags committed
-                            context.SaveChanges();
-                        }
-                        else
-                        {
-                            context.SetDefaultShowSettings(show.DefaultShowName);
-                        }
-#else
-                        context.SetDefaultShowSettings(show.DefaultShowName);
-#endif
-                        context.SaveChanges();
-                    }
+                using var loading = new LoadingOverlay(this).AsSegment($"{nameof(StartWindow)}_{nameof(NewButton_Click)}");
+                using (loading.Segment($"{nameof(StartWindow)}_{nameof(CreateNewShow)}", "Creating new database"))
+                    CreateNewShow(show);
+                using (loading.Segment($"{nameof(StartWindow)}_{nameof(AddToRecentList)}", "Adding to recents list"))
                     AddToRecentList(show);
+                using (loading.Segment($"{nameof(StartWindow)}_{nameof(LaunchMainWindow)}", "Opening show"))
                     LaunchMainWindow(show);
+            }
+        }
+
+        private void CreateNewShow(RecentShow show)
+        {
+            using (var context = new ShowContext(show))
+            {
+                //TODO handle io errors
+                context.Database.EnsureDeleted();
+                context.Database.EnsureCreated();
+#if DEBUG
+                if (MessageBox.Show("Do you want to add test data?", "DEBUG", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    using var test_data = new TestDataGenerator(context, 0);
+                    test_data.AddAlternativeCasts();
+                    test_data.AddCastGroups(4);
+                    context.SaveChanges();
+                    test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false); // after cast groups committed
+                    context.SaveChanges();
+                    test_data.AddCriteriaAndRequirements(); // after cast groups committed
+                    context.SaveChanges();
+                    test_data.AddTags(1); // after requirements committed
+                    context.SaveChanges();
+                    test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
+                    context.SaveChanges();
+                    test_data.AddRoles(5); // after applicants, items, cast groups, requirements committed
+                    test_data.AddImages(); // after applicants, tags committed
+                    context.SaveChanges();
                 }
+                else
+                {
+                    context.SetDefaultShowSettings(show.DefaultShowName);
+                }
+#else
+                context.SetDefaultShowSettings(show.DefaultShowName);
+#endif
+                context.SaveChanges();
             }
         }
 
@@ -89,15 +95,18 @@ namespace CarmenUI.Windows
                 Filter = "Sqlite Database (*.db)|*.db|All Files (*.*)|*.*"
             };
             if (dialog.ShowDialog() == true)
-            {
-                var show = RecentShow.FromLocalFile(dialog.FileName);
-                using (var loading = new LoadingOverlay(this))
-                {
-                    CheckIntegrity(show);
-                    AddToRecentList(show);
-                    LaunchMainWindow(show);
-                }
-            }
+                OpenShow(RecentShow.FromLocalFile(dialog.FileName));
+        }
+
+        private void OpenShow(RecentShow show)
+        {
+            using var loading = new LoadingOverlay(this).AsSegment($"{nameof(StartWindow)}_{nameof(OpenShow)}");
+            using (loading.Segment($"{nameof(StartWindow)}_{nameof(CheckIntegrity)}", "Checking database integrity"))
+                CheckIntegrity(show);
+            using (loading.Segment($"{nameof(StartWindow)}_{nameof(AddToRecentList)}", "Adding to recents list"))
+                AddToRecentList(show);
+            using (loading.Segment($"{nameof(StartWindow)}_{nameof(LaunchMainWindow)}", "Opening show"))
+                LaunchMainWindow(show);
         }
 
         private void CheckIntegrity(ShowConnection connection)
@@ -114,6 +123,7 @@ namespace CarmenUI.Windows
 
         private void AddToRecentList(RecentShow show)
         {
+            show.LastOpened = DateTime.Now;
             var recent = Properties.Settings.Default.RecentShows;
             recent.Remove(show);
             recent.Insert(0, show);
@@ -139,13 +149,7 @@ namespace CarmenUI.Windows
             if(e.AddedItems.Count > 0 && e.AddedItems[0] is RecentShow show)
             {
                 if (show.IsAssessible)
-                    using (var loading = new LoadingOverlay(this))
-                    {
-                        CheckIntegrity(show);
-                        show.LastOpened = DateTime.Now;
-                        AddToRecentList(show);
-                        LaunchMainWindow(show);
-                    }
+                    OpenShow(show);
                 else
                 {
                     if (MessageBox.Show($"{show.Label} cannot be accessed. Would you like to remove it from the recent shows list?", "CARMEN", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
