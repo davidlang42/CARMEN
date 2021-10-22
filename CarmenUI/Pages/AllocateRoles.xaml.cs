@@ -89,25 +89,20 @@ namespace CarmenUI.Pages
                     _criterias = await context.Criterias.InOrder().ToArrayAsync();
                 _primaryCriterias = _criterias.Where(c => c.Primary).ToArray();
                 CastGroup[] cast_groups;
-                using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
-                    cast_groups = await context.CastGroups.InOrder().ToArrayAsync();
+                using (loading.Segment(nameof(ShowContext.CastGroups) + nameof(CastGroup.Members), "Cast groups"))
+                    cast_groups = await context.CastGroups.Include(cg => cg.Members).InOrder().ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
                     _alternativeCasts = await context.AlternativeCasts.InNameOrder().ToArrayAsync();
                 _castGroupsByCast = CastGroupAndCast.Enumerate(cast_groups, _alternativeCasts).ToArray();
-                using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles) + nameof(Role.Items), "Applicants"))
-                    _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ThenInclude(r => r.Items).ToArrayAsync();
+                _applicantsInCast = cast_groups.SelectMany(cg => cg.Members).ToArray();
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
                     await context.Nodes.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                     _requirements = await context.Requirements.ToArrayAsync();
-                using (loading.Segment(nameof(ShowContext.Requirements) + nameof(AbilityExactRequirement) + nameof(AbilityExactRequirement.Criteria), "Requirements"))
-                    await context.Requirements.OfType<AbilityExactRequirement>().Include(cr => cr.Criteria).LoadAsync();
-                using (loading.Segment(nameof(ShowContext.Requirements) + nameof(AbilityRangeRequirement) + nameof(AbilityRangeRequirement.Criteria), "Requirements"))
-                    await context.Requirements.OfType<AbilityRangeRequirement>().Include(cr => cr.Criteria).LoadAsync();
-                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Cast), "Items"))
-                    await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
-                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Requirements), "Items"))
-                    await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Cast), "Roles"))
+                    await context.Roles.Include(r => r.Cast).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles), "Items"))
+                    await context.Nodes.OfType<Item>().Include(i => i.Roles).LoadAsync();
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
                     _totalCast = await cast_groups.SumAsync(cg => cg.FullTimeEquivalentMembers(_alternativeCasts.Length));
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
