@@ -26,6 +26,12 @@ namespace CarmenUI.ViewModels
         public string IconPath
             => Provider == null ? @"\Icons\OpenFile.png" : @"\Icons\CloudDatabase.png";
 
+        public bool IsAssessible => Provider switch
+        {
+            null => File.Exists(Details),
+            _ => throw new NotImplementedException($"Proivder not implemented: {Provider}")
+        };
+
         public static new RecentShow FromLocalFile(string filename)
             => new RecentShow
             {

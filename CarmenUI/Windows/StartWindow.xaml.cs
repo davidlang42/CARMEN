@@ -121,6 +121,12 @@ namespace CarmenUI.Windows
                 recent.RemoveAt(recent.Count - 1);
         }
 
+        private void RemoveFromRecentList(RecentShow show)
+        {
+            var recent = Properties.Settings.Default.RecentShows;
+            recent.Remove(show);
+        }
+
         private void LaunchMainWindow(RecentShow show)
         {
             var main = new MainWindow(show);
@@ -132,12 +138,20 @@ namespace CarmenUI.Windows
         {
             if(e.AddedItems.Count > 0 && e.AddedItems[0] is RecentShow show)
             {
-                using (var loading = new LoadingOverlay(this))
+                if (show.IsAssessible)
+                    using (var loading = new LoadingOverlay(this))
+                    {
+                        CheckIntegrity(show);
+                        show.LastOpened = DateTime.Now;
+                        AddToRecentList(show);
+                        LaunchMainWindow(show);
+                    }
+                else
                 {
-                    CheckIntegrity(show);
-                    show.LastOpened = DateTime.Now;
-                    AddToRecentList(show);
-                    LaunchMainWindow(show);
+                    if (MessageBox.Show($"{show.Label} cannot be accessed. Would you like to remove it from the recent shows list?", "CARMEN", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        RemoveFromRecentList(show);
+                    RecentList.SelectedItem = null;
+                    RecentList.Items.Refresh();
                 }
             }
         }
