@@ -29,7 +29,7 @@ namespace CarmenUI.ViewModels
                 else if (extra < 0)
                     row.Fail = $"({-extra} missing)";
                 Rows.Add(row);
-                if (cast_group.AlternateCasts)
+                if (cast_group.AlternateCasts && count > 0)
                 {
                     var ac_assigned = new Dictionary<AlternativeCast, int>();
                     int not_assigned = 0;
@@ -70,14 +70,17 @@ namespace CarmenUI.ViewModels
             if (cast_groups.Any(cg => cg.AlternateCasts))
             {
                 var same_cast_sets = await c.SameCastSets.ToArrayAsync();
-                var total_applicants = same_cast_sets.Sum(set => set.Applicants.Count);
-                var row = new Row { Success = $"{same_cast_sets.Length} same-cast sets including {total_applicants} applicants" };
-                var incomplete_sets = same_cast_sets.Count(set => set.Applicants.Count < 2);
-                if (incomplete_sets > 0)
-                    row.Fail = $"({incomplete_sets} incomplete)";
-                Rows.Add(row);
-                foreach (var failed_set in same_cast_sets.Where(set => !set.VerifyAlternativeCasts(out _)))
-                    Rows.Add(new Row { Fail = $"{failed_set.Description} are not all in the same cast" });
+                if (same_cast_sets.Length > 0)
+                {
+                    var total_applicants = same_cast_sets.Sum(set => set.Applicants.Count);
+                    var row = new Row { Success = $"{same_cast_sets.Length} same-cast sets including {total_applicants} applicants" };
+                    var incomplete_sets = same_cast_sets.Count(set => set.Applicants.Count < 2);
+                    if (incomplete_sets > 0)
+                        row.Fail = $"({incomplete_sets} incomplete)";
+                    Rows.Add(row);
+                    foreach (var failed_set in same_cast_sets.Where(set => !set.VerifyAlternativeCasts(out _)))
+                        Rows.Add(new Row { Fail = $"{failed_set.Description} are not all in the same cast" });
+                }
             }
             // tags
             var tags = await c.Tags.Include(cg => cg.Members).ToArrayAsync();
