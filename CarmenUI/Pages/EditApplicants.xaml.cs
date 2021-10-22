@@ -95,7 +95,7 @@ namespace CarmenUI.Pages
             => SaveChangesAndReturn();
 
         private void AddApplicant_Click(object sender, RoutedEventArgs e)
-        {//TODO this is really slow, maybe add a loading dialog? but hang on, why the hell is it slow?
+        {
             if (applicantsViewSource.Source is IList list)//TODO change ilist/not null view checks into hard casts (now that loading is done before showing page)
             {
                 var applicant = new Applicant { ShowRoot = context.ShowRoot };

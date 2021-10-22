@@ -140,7 +140,6 @@ namespace CarmenUI.Pages
 
         private void TriggerCastNumbersRefresh()
         {
-            //TODO this is taking considerable time to update, add loading overlay if this is unavoidable (think about where this is called)
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
             castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
             castNumbersViewSource.View.Filter = a => ((Applicant)a).CastNumber != null;
