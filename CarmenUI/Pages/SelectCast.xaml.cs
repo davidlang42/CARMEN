@@ -78,6 +78,10 @@ namespace CarmenUI.Pages
         {
             using var loading = new LoadingOverlay(this).AsSegment(nameof(SelectCast));
             AlternativeCast[] alternative_casts;
+            using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
+                _criterias = await context.Criterias.ToArrayAsync();
+            using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
+                await context.Requirements.LoadAsync();
             using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
                 alternative_casts = await context.AlternativeCasts.ToArrayAsync();
             alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
@@ -97,10 +101,6 @@ namespace CarmenUI.Pages
             allApplicantsViewSource.Source = castNumbersViewSource.Source = castNumberMissingViewSource.Source
                 = context.Applicants.Local.ToObservableCollection();
             TriggerCastNumbersRefresh();
-            using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
-                await context.Requirements.LoadAsync();
-            using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
-                _criterias = await context.Criterias.ToArrayAsync();
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
                 var show_root = context.ShowRoot;
