@@ -30,7 +30,7 @@ namespace UnitTests.Model
             // r1 > r1
             var r1 = new NotRequirement { Name = "Not"};
             r1.SubRequirement = r1;
-            r1.Validate().Should().BeEquivalentTo(new[] { "Requirement has a circular reference: (Not)" });
+            r1.Validate().Should().BeEquivalentTo(new[] { "Requirement 'Not' has a circular reference (Not)." });
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace UnitTests.Model
             r1.SubRequirement = r3;
             r3.SubRequirements.Add(r2);
             r3.SubRequirements.Add(r1);
-            r3.Validate().Should().BeEquivalentTo(new[] { "Requirement has a circular reference: (Gender And Not And, Not And)" });
+            r3.Validate().Should().BeEquivalentTo(new[] { "Requirement 'Gender And Not And' has a circular reference (Gender And Not And, Not And)." });
         }
 
         [Test]
@@ -58,7 +58,7 @@ namespace UnitTests.Model
             r2.SubRequirement = r1;
             r3.SubRequirement = r2;
             r4.SubRequirement = r3;
-            r4.Validate().Should().BeEquivalentTo(new[] { "Requirement has a circular reference: (r4, r3, r2, r1)" });
+            r4.Validate().Should().BeEquivalentTo(new[] { "Requirement 'r4' has a circular reference (r4, r3, r2, r1)." });
         }
     }
 }
