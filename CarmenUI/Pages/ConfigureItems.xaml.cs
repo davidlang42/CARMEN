@@ -74,18 +74,18 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
                     _castGroups = await context.CastGroups.InOrder().ToArrayAsync();
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
-                    castMembersDictionarySource.Source = castGroups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternativeCasts.Length));
+                    castMembersDictionarySource.Source = _castGroups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternativeCasts.Length));
                 castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();//TODO audit the use of .Local throughout all code
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 {
-                    await context.Requirements.LoadAsync();
-                    nonPrimaryRequirementsViewSource.Source = context.Requirements.Local.Where(r => !r.Primary).InOrder().ToArray();
-                    _primaryRequirements = context.Requirements.Local.Where(r => r.Primary).InOrder().ToArray();
+                    var all_requirements = await context.Requirements.InOrder().ToArrayAsync();
+                    nonPrimaryRequirementsViewSource.Source = all_requirements.Where(r => !r.Primary).ToArray();
+                    _primaryRequirements = all_requirements.Where(r => r.Primary).ToArray();
                 }
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
                     await context.Nodes.LoadAsync();
-                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles) + nameof(Role.Requirements), "Items"))
-                    await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Requirements).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles), "Items"))
+                    await context.Nodes.OfType<Item>().Include(i => i.Roles).LoadAsync();
                 using (loading.Segment(nameof(ConfigureItems) + nameof(rootNodesViewSource), "Sorting"))
                 {
                     rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
