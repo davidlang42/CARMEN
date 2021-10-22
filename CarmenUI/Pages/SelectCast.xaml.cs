@@ -43,11 +43,22 @@ namespace CarmenUI.Pages
         private ApplicantDescription applicantDescription;
 
         private Criteria[]? _criterias;
-        private ISelectionEngine? _engine;
-
         private Criteria[] criterias => _criterias
             ?? throw new ApplicationException($"Tried to used {nameof(criterias)} before it was loaded.");
 
+        private Applicant[]? _applicants;
+        private Applicant[] applicants => _applicants
+            ?? throw new ApplicationException($"Tried to used {nameof(applicants)} before it was loaded.");
+
+        private CastGroup[]? _castGroups;
+        private CastGroup[] castGroups => _castGroups
+            ?? throw new ApplicationException($"Tried to used {nameof(castGroups)} before it was loaded.");
+
+        private Tag[]? _tags;
+        private Tag[] tags => _tags
+            ?? throw new ApplicationException($"Tried to used {nameof(tags)} before it was loaded.");
+
+        private ISelectionEngine? _engine;
         private ISelectionEngine engine => _engine
             ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
 
@@ -82,21 +93,23 @@ namespace CarmenUI.Pages
                 _criterias = await context.Criterias.ToArrayAsync();
             using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 await context.Requirements.LoadAsync();
-            using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
-                alternative_casts = await context.AlternativeCasts.ToArrayAsync();
-            alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
-            alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
+            using (loading.Segment(nameof(ShowContext.AlternativeCasts) + nameof(AlternativeCast.Members), "Alternative casts"))
+            {
+                alternative_casts = await context.AlternativeCasts.Include(ac => ac.Members).ToArrayAsync();
+                alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
+                alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
+            }
             using (loading.Segment(nameof(ShowContext.CastGroups) + nameof(CastGroup.Members) + nameof(CastGroup.Requirements), "Cast groups"))
-                await context.CastGroups.Include(cg => cg.Members).Include(cg => cg.Requirements).LoadAsync();
+                _castGroups = await context.CastGroups.Include(cg => cg.Members).Include(cg => cg.Requirements).ToArrayAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.SameCastSets), "Same cast sets"))
                 await context.SameCastSets.LoadAsync();
             sameCastSetsViewSource.Source = context.SameCastSets.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.Tags) + nameof(A.Tag.Members) + nameof(A.Tag.Requirements), "Tags"))
-                await context.Tags.Include(t => t.Members).Include(t => t.Requirements).LoadAsync();
+                _tags = await context.Tags.Include(t => t.Members).Include(t => t.Requirements).ToArrayAsync();
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
-                await context.Applicants.LoadAsync();
+                _applicants = await context.Applicants.ToArrayAsync();
             castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
             allApplicantsViewSource.Source = castNumbersViewSource.Source = castNumberMissingViewSource.Source
                 = context.Applicants.Local.ToObservableCollection();
@@ -142,7 +155,7 @@ namespace CarmenUI.Pages
 
         protected override bool PreSaveChecks()
         {
-            var inconsistent_applicants = context.Applicants.Local
+            var inconsistent_applicants = applicants
                 .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)))
                 .ToArray();
             if (inconsistent_applicants.Any())
@@ -163,11 +176,11 @@ namespace CarmenUI.Pages
                     using (var processing = new LoadingOverlay(this).AsSegment(nameof(PreSaveChecks), "Processing..."))
                     {
                         using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                            engine.BalanceAlternativeCasts(context.Applicants.Local, context.SameCastSets.Local);
+                            engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
                         using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                            engine.AllocateCastNumbers(context.Applicants.Local);
+                            engine.AllocateCastNumbers(applicants);
                     }
-                    var updated_inconsistent_applicants = context.Applicants.Local
+                    var updated_inconsistent_applicants = applicants
                         .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)));
                     if (updated_inconsistent_applicants.Any())
                     {
@@ -182,7 +195,7 @@ namespace CarmenUI.Pages
                         applicant.CastGroup = null;
                 }
             }
-            engine.AuditionEngine.UserSelectedCast(context.Applicants.Local.Where(a => a.IsAccepted), context.Applicants.Local.Where(a => !a.IsAccepted));
+            engine.AuditionEngine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted));
             return true;
         }
 
@@ -191,13 +204,13 @@ namespace CarmenUI.Pages
             //TODO handle exceptions on all engine calls
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
-                engine.SelectCastGroups(context.Applicants.Local, context.CastGroups.Local);
+                engine.SelectCastGroups(applicants, castGroups);
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                engine.BalanceAlternativeCasts(context.Applicants.Local, context.SameCastSets.Local);
+                engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                engine.AllocateCastNumbers(context.Applicants.Local);
+                engine.AllocateCastNumbers(applicants);
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
-                engine.ApplyTags(context.Applicants.Local, context.Tags.Local);
+                engine.ApplyTags(applicants, tags);
             TriggerCastNumbersRefresh();
             //TODO remove test message
 #if DEBUG
@@ -217,7 +230,7 @@ namespace CarmenUI.Pages
                 msg += "\n\n";
             }
             msg += "The resulting casts have the follow distributions:\n";
-            foreach (var cg in context.CastGroups.Local)
+            foreach (var cg in castGroups)
             {
                 if (cg.Members.Count == 0 || !cg.AlternateCasts)
                     continue;
@@ -498,7 +511,7 @@ namespace CarmenUI.Pages
 
         private void DetectSiblings_Click(object sender, RoutedEventArgs e)
         {
-            engine.DetectFamilies(context.Applicants.Local);
+            engine.DetectFamilies(applicants);
         }
 
         private void AddSameCastSet_Click(object sender, RoutedEventArgs e)

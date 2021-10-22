@@ -96,7 +96,7 @@ namespace CarmenUI.ViewModels
             int cast_num = min_cast_num;
             var missing_nums = new List<int>();
             var incomplete_nums = new List<int>();
-            foreach (var group in c.Applicants.Local.Where(a => a.IsAccepted).OrderBy(a => a.CastNumber).GroupBy(a => a.CastNumber))
+            foreach (var group in cast_groups.SelectMany(cg => cg.Members).OrderBy(a => a.CastNumber).GroupBy(a => a.CastNumber))
             {
                 if (group.Key == null)
                 {

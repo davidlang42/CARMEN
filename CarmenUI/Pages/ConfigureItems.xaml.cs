@@ -75,7 +75,7 @@ namespace CarmenUI.Pages
                     _castGroups = await context.CastGroups.InOrder().ToArrayAsync();
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
                     castMembersDictionarySource.Source = _castGroups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternativeCasts.Length));
-                castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();//TODO audit the use of .Local throughout all code
+                castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 {
                     var all_requirements = await context.Requirements.InOrder().ToArrayAsync();
