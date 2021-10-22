@@ -14,6 +14,12 @@ namespace Carmen.ShowModel
         public static uint Sum(this IEnumerable<uint> list)
             => (uint)list.Select(u => (int)u).Sum();
 
+        public static void AddRange<T>(this HashSet<T> set, IEnumerable<T> range)
+        {
+            foreach (var item in range)
+                set.Add(item);
+        }
+
         public static double Product(this IEnumerable<double> list)
         {
             var e = list.GetEnumerator();

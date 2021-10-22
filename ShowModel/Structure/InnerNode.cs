@@ -61,10 +61,26 @@ namespace Carmen.ShowModel.Structure
             if (AllowConsecutiveItems)
                 return true; // nothing to check
             var items = ItemsInOrder().ToList();
-            var cast_per_item = items.Select(i => i.Roles.SelectMany(r => r.Cast).ToHashSet()).ToList();
+            if (items.Count < 2)
+                return true; // failure is not an option
+            //var cast_per_item = items.Select(i => i.Roles.SelectMany(r => r.Cast).ToHashSet()).ToList();
             for (var i = 1; i < items.Count; i++)
             {
-                var cast_in_consecutive_items = cast_per_item[i].Intersect(cast_per_item[i - 1]).ToHashSet();
+                // list roles in each item
+                var previous_item_roles = items[i - 1].Roles.ToHashSet();
+                var item_roles = items[i].Roles.ToHashSet();
+                // separate the roles common to both items
+                var legitimate_consecutive_cast = previous_item_roles.Intersect(item_roles).SelectMany(r => r.Cast).ToHashSet();
+                previous_item_roles.ExceptWith(item_roles);
+                item_roles.ExceptWith(previous_item_roles);
+                // find the set of cast in each item
+                var previous_item_cast = previous_item_roles.SelectMany(r => r.Cast).ToHashSet();
+                var item_cast = item_roles.SelectMany(r => r.Cast).ToHashSet();
+                // check for overlap between item casts
+                var cast_in_consecutive_items = previous_item_cast.Intersect(item_cast).ToHashSet();
+                // if anyone legitimately cast in a role which is common to both items is ALSO in either item as another role, then they count as consecutive item cast too
+                cast_in_consecutive_items.AddRange(legitimate_consecutive_cast.Where(a => previous_item_cast.Contains(a) || item_cast.Contains(a)));
+                // report result
                 if (cast_in_consecutive_items.Count != 0)
                 {
                     failures.Add(new ConsecutiveItemCast { Item1 = items[i - 1], Item2 = items[i], Cast = cast_in_consecutive_items });
