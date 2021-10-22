@@ -94,7 +94,8 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
                     _alternativeCasts = await context.AlternativeCasts.InNameOrder().ToArrayAsync();
                 _castGroupsByCast = CastGroupAndCast.Enumerate(cast_groups, _alternativeCasts).ToArray();
-                _applicantsInCast = cast_groups.SelectMany(cg => cg.Members).ToArray();
+                using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles), "Applicants"))
+                    _applicantsInCast = await context.Applicants.Include(a => a.Roles).ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
                     await context.Nodes.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
@@ -103,6 +104,8 @@ namespace CarmenUI.Pages
                     await context.Roles.Include(r => r.Cast).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles), "Items"))
                     await context.Nodes.OfType<Item>().Include(i => i.Roles).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Items), "Items"))
+                    await context.Roles.Include(r => r.Items).LoadAsync();
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
                     _totalCast = await cast_groups.SumAsync(cg => cg.FullTimeEquivalentMembers(_alternativeCasts.Length));
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
@@ -229,7 +232,7 @@ namespace CarmenUI.Pages
 
         private bool ChangeToEditMode()
         {
-            //TODO loadingoverlay while this is created (if needed) -- due to computational time rather than db time
+            using var loading = new LoadingOverlay(this) { MainText = "Calculating...", SubText = "Applicant suitabilities" };
             if (!CancelChanges())
                 return false;
             if (RevertChanges())
