@@ -16,7 +16,7 @@ namespace Carmen.ShowModel.Applicants
     /// A group of people which an applicant can be selected into.
     /// An applicant can have many Tags.
     /// </summary>
-    public class Tag : INameOrdered, INotifyPropertyChanged
+    public class Tag : INameOrdered, INotifyPropertyChanged, IValidatable
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -77,6 +77,27 @@ namespace Carmen.ShowModel.Applicants
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        /// <summary>Recursively visit all tags which are referenced directly or indirectly
+        /// by this tag's requirements, checking for a circular reference.</summary>
+        internal bool HasCircularReference(HashSet<Tag> path, HashSet<Tag> visited)
+        {
+            visited.Add(this);
+            if (!path.Add(this))
+                return true;
+            if (Requirements.OfType<TagRequirement>().Any(sr => sr.RequiredTag.HasCircularReference(path, visited)))
+                return true;
+            path.Remove(this);
+            return false;
+        }
+
+        public IEnumerable<string> Validate()
+        {
+            var visited = new HashSet<Tag>();
+            var path = new HashSet<Tag>();
+            if (HasCircularReference(path, visited))
+                yield return $"Tag '{Name}' has a circular requirement of tags ({string.Join(", ", path.Select(r => r.Name))}).";
         }
     }
 }

@@ -341,11 +341,12 @@ namespace CarmenUI.Pages
 
         protected override bool PreSaveChecks()
         {
-            var validation_issues = context.Requirements.Local.SelectMany(vo => vo.Validate()).ToList();
+            var validation_issues = context.Requirements.Local.ToList().SelectMany(vo => vo.Validate()).ToList();
             if (validation_issues.Count == 0)
             {
-                // only validate CastGroups if Requirements are valid, otherwise there might be circular references
+                // only validate CastGroups if Requirements/Tags are valid, otherwise there might be circular references
                 validation_issues.AddRange(context.CastGroups.Local.SelectMany(vo => vo.Validate()));
+                validation_issues.AddRange(context.Tags.Local.SelectMany(vo => vo.Validate()));
             }
             if (validation_issues.Count == 0)
                 return true;
