@@ -37,6 +37,6 @@ namespace Carmen.ShowModel
             {
                 Provider = null,
                 ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString()
-            };
+            }; 
     }
 }

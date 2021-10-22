@@ -16,6 +16,8 @@ namespace CarmenUI.ViewModels
     {
         /// <summary>The label to be shown to the user</summary>
         public string Label { get; set; } = "";
+        /// <summary>The details to be shown to the user (as tooltip)</summary>
+        public string Details { get; set; } = "";
         /// <summary>The default name for the show</summary>
         public string DefaultShowName { get; set; } = "";
         /// <summary>The last time the user opened this show</summary>
@@ -30,6 +32,7 @@ namespace CarmenUI.ViewModels
                 Provider = null,
                 ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString(),
                 Label = Path.GetFileName(filename),
+                Details = filename,
                 DefaultShowName = Path.GetFileNameWithoutExtension(filename)
             };
 
