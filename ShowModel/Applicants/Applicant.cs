@@ -14,7 +14,7 @@ namespace Carmen.ShowModel.Applicants
     /// <summary>
     /// A person who has auditioned to be in a show.
     /// </summary>
-    public class Applicant : IValidatable, INotifyPropertyChanged, IComparable<Applicant>
+    public class Applicant : INotifyPropertyChanged, IComparable<Applicant>
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -289,22 +289,6 @@ namespace Carmen.ShowModel.Applicants
         /// <summary>Determines if an Applicant has been accepted into the cast.
         /// This is determined by membership in a CastGroup.</summary>
         public bool IsAccepted => CastGroup != null;
-
-        /// <summary>Checks that names are not blank, gender and date of birth are set, and all criteria have marks within range.</summary>
-        public IEnumerable<string> Validate()
-        {
-            if (string.IsNullOrEmpty(FirstName))
-                yield return "First Name cannot be blank.";
-            if (string.IsNullOrEmpty(LastName))
-                yield return "Last Name cannot be blank.";
-            if (!Gender.HasValue)
-                yield return "Gender must be set.";
-            if (!DateOfBirth.HasValue)
-                yield return "Date of Birth must be set.";
-            foreach (var ability in Abilities)
-                if (ability.Mark > ability.Criteria.MaxMark)
-                    yield return $"Mark for {ability.Criteria.Name} ({ability.Mark}) is greater than the maximum ({ability.Criteria.MaxMark}).";
-        }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {

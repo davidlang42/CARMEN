@@ -13,7 +13,7 @@ namespace Carmen.ShowModel.Structure
     /// <summary>
     /// A node in the item tree, which may or may not be able to have children.
     /// </summary>
-    public abstract class Node : IOrdered, ICounted, IValidatable, INamed, INotifyPropertyChanged
+    public abstract class Node : IOrdered, ICounted, INamed, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -133,17 +133,6 @@ namespace Carmen.ShowModel.Structure
                 }
             }
             throw new ApplicationException("Node not found in parent.");
-        }
-
-        /// <summary>Checks if this node's required counts equals the sum of the roles within it.</summary>
-        public virtual IEnumerable<string> Validate()
-        {
-            foreach (var cbg in CountByGroups)
-            {
-                var actual = ItemsInOrder().SelectMany(i => i.Roles).Distinct().Select(r => r.CountFor(cbg.CastGroup)).Sum();
-                if (cbg.Count != actual)
-                    yield return $"Actual roles for {cbg.CastGroup.Name} ({actual}) does not equal required count ({cbg.Count}).";
-            }
         }
 
         public bool CountMatchesSumOfRoles()
