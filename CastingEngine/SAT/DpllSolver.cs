@@ -142,8 +142,19 @@ namespace Carmen.CastingEngine.SAT
         {
             if (clauses.Count == 0)
                 return SearchResults.Solve();
-            //TODO try set/clear approach
-            var pure_literals = clauses.SelectMany(c => c.Literals).Distinct().GroupBy(l => l.Variable).Select(g => g.SingleOrDefaultSafe()).NotNull().ToList();
+            var pure_by_variable = new Dictionary<int, Literal<int>?>();
+            foreach (var literal in clauses.SelectMany(c => c.Literals))
+            {
+                if (pure_by_variable.TryGetValue(literal.Variable, out var existing_literal))
+                {
+                    if (existing_literal != null && existing_literal.Polarity != literal.Polarity)
+                        // variable already referenced as inverse literal, therefore not pure
+                        pure_by_variable[literal.Variable] = null;
+                }
+                else
+                    pure_by_variable.Add(literal.Variable, literal);
+            }
+            var pure_literals = pure_by_variable.Values.NotNull().ToList();
             if (pure_literals.Any())
                 return SearchResults.Find(pure_literals);
             return default;
