@@ -113,7 +113,8 @@ namespace CarmenUI.Pages
             castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
             allApplicantsViewSource.Source = castNumbersViewSource.Source = castNumberMissingViewSource.Source
                 = context.Applicants.Local.ToObservableCollection();
-            TriggerCastNumbersRefresh();
+            using (loading.Segment(nameof(TriggerCastNumbersRefresh), "Cast list"))
+                TriggerCastNumbersRefresh();
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
                 var show_root = context.ShowRoot;
@@ -331,22 +332,23 @@ namespace CarmenUI.Pages
             }
         }
 
-        private void removeButton_Click(object sender, RoutedEventArgs e)
+        private async void removeButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectedApplicantsViewSource.Source is IList list)
-                RemoveFromList(list, selectedList.SelectedItems.Cast<Applicant>().ToArray());
+                await RemoveFromList(list, selectedList.SelectedItems.Cast<Applicant>().ToArray());
             ConfigureAllApplicantsFiltering();
         }
 
-        private void removeAllButton_Click(object sender, RoutedEventArgs e)
+        private async void removeAllButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectedApplicantsViewSource.Source is IList list)
-                RemoveFromList(list, selectedList.Items.OfType<Applicant>().ToArray());
+                await RemoveFromList(list, selectedList.Items.OfType<Applicant>().ToArray());
             ConfigureAllApplicantsFiltering();
         }
 
-        private void RemoveFromList(IList list, Applicant[] applicants)
+        private async Task RemoveFromList(IList list, Applicant[] applicants)
         {
+            LoadingOverlay? overlay = null;
             if (applicants.Length == 0)
                 return;
             string description, alt_cast;
@@ -372,8 +374,13 @@ namespace CarmenUI.Pages
                     actions.Add("uncast them from any roles allocated to them");
                 if (applicants.Any(a => a.Tags.Any()))
                     actions.Add("remove any tags they have been applied");
-                if (actions.Any() && !Confirm($"Removing {description} from '{cast_group.Name}' will also {actions.JoinWithCommas()}. Do you want to continue?"))
-                    return;
+                if (actions.Any())
+                {
+                    if (!Confirm($"Removing {description} from '{cast_group.Name}' will also {actions.JoinWithCommas()}. Do you want to continue?"))
+                        return;
+                    overlay = new LoadingOverlay(this) { MainText = "Removing...", SubText = "Applicants from cast group" };
+                    await context.Roles.Include(r => r.Cast).LoadAsync();
+                }
             }
             else if (selectionList.SelectedItem is AlternativeCast alternative_cast)
             {
@@ -392,6 +399,8 @@ namespace CarmenUI.Pages
                 else
                     throw new NotImplementedException($"Selection list type not handled: {selectionList.SelectedItem.GetType().Name}");
             }
+            if (overlay != null)
+                overlay.Dispose();
         }
 
         private void availableList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
