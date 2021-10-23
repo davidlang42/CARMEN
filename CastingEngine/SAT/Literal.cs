@@ -9,8 +9,8 @@ namespace Carmen.CastingEngine.SAT
     public struct Literal<T>
         where T : notnull
     {
-        public T Variable { get; set; }
-        public bool Polarity { get; set; }
+        public T Variable;
+        public bool Polarity;
 
         public Literal<T> Inverse() => new Literal<T> { Variable = Variable, Polarity = !Polarity };
 

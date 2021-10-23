@@ -11,7 +11,7 @@ namespace Carmen.CastingEngine.SAT
     {
         public const string DISJUNCTION = "∨";
 
-        public HashSet<Literal<T>> Literals { get; set; }
+        public HashSet<Literal<T>> Literals;
 
         public bool IsEmpty() => Literals == null || Literals.Count == 0;
 
