@@ -61,12 +61,8 @@ namespace UnitTests.Model
                 DateOfBirth = new DateTime(3000, 1, 1),
                 ShowRoot = showRoot
             };
-            try
-            {
-                _ = invalid.Age;
-                Assert.Fail();
-            }
-            catch { }
+            var age = invalid.Age;
+            age.Should().BeNull();
         }
 
         [Test]
