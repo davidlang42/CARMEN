@@ -123,7 +123,7 @@ namespace Carmen.CastingEngine.Selection
             // create clauses for same cast sets
             var same_cast_clauses = new List<Clause<Applicant>>();
             var same_cast_lookup = new Dictionary<Applicant, SameCastSet>();
-            foreach (var same_cast_set in same_cast_sets)//TODO parallelise similarly to chunk clause building
+            foreach (var same_cast_set in same_cast_sets)
             {
                 foreach (var applicant in same_cast_set.Applicants)
                     same_cast_lookup.Add(applicant, same_cast_set); // Applicants can only be in one SameCastSet

@@ -2,11 +2,9 @@
 using Carmen.CastingEngine.SAT;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Selection
 {
@@ -57,17 +55,19 @@ namespace Carmen.CastingEngine.Selection
                 if (max_chunks > max_possible_chunks)
                     max_chunks = max_possible_chunks;
                 // compile clauses
-                var clauses = new ConcurrentBag<Clause<Applicant>>(solved_clauses);
-                var actual_chunk_counts = new ConcurrentBag<int>();
-                Parallel.ForEach(applicants_needing_alternative_cast, p =>
+                var clauses = new HashSet<Clause<Applicant>>();
+                clauses.AddRange(solved_clauses);
+                var max_actual_chunks = 0;
+                foreach (var (cg, hs) in applicants_needing_alternative_cast)
                 {
-                    AddChunkClauses(clauses, actual_chunk_counts, p.Item2, previously_chunked_applicants, chunk_size, max_chunks, same_cast_lookup);
-                });
-                var max_actual_chunks = actual_chunk_counts.Max();
+                    AddChunkClauses(clauses, hs, previously_chunked_applicants, chunk_size, max_chunks, same_cast_lookup, out var actual_chunks);
+                    if (actual_chunks > max_actual_chunks)
+                        max_actual_chunks = actual_chunks;
+                }
                 if (clauses.Count == 0)
                     break; // no clauses to solve
                 // run sat solver
-                solution = sat.Solve(new() { Clauses = clauses.ToHashSet() }).FirstOrDefault();
+                solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
                 Results.Add(new Result
                 {
                     ChunkSize = chunk_size,
@@ -117,10 +117,11 @@ namespace Carmen.CastingEngine.Selection
             => (applicants_per_cast_group.Max() - previously_chunked) / chunk_size;
 
         /// <summary>Creates clauses for chunks of applicants within one cast group, for each primary criteria, and add them to the supplied collection of clauses</summary>
-        private void AddChunkClauses(ConcurrentBag<Clause<Applicant>> clauses, ConcurrentBag<int> actual_chunk_counts, IEnumerable<Applicant> applicants, int skip_applicants, int chunk_size, int max_chunks,
-            Dictionary<Applicant, SameCastSet> same_cast_lookup)
+        private void AddChunkClauses(ICollection<Clause<Applicant>> clauses, IEnumerable<Applicant> applicants, int skip_applicants, int chunk_size, int max_chunks,
+            Dictionary<Applicant, SameCastSet> same_cast_lookup, out int max_chunk_count)
         {
-            Parallel.ForEach(primaryCriterias, criteria =>
+            max_chunk_count = 0;
+            foreach (var criteria in primaryCriterias)
             {
                 int chunk_count = 0;
                 var sorted_applicants = new Stack<Applicant>(applicants.OrderBy(a => a.MarkFor(criteria))); // order by marks ascending so that the lowest mark is at the bottom of the stack
@@ -137,20 +138,19 @@ namespace Carmen.CastingEngine.Selection
                         break;
                     chunk_count++;
                 }
-                actual_chunk_counts.Add(chunk_count);
-            });
+                if (chunk_count > max_chunk_count)
+                    max_chunk_count = chunk_count;
+            }
         }
 
         /// <summary>Creates a clause specifying that exactly half of the given applicants are in each alternative cast</summary>
         private IEnumerable<Clause<Applicant>> KeepSeparate(Applicant[] applicants)
         {
-            ExpressionBuilder builder;
-            lock (cachedKeepSeparate)
-                if (!cachedKeepSeparate.TryGetValue(applicants.Length, out builder))
-                {
-                    builder = new ExpressionBuilder(applicants.Length, values => values.Count(v => v) == applicants.Length / 2);
-                    cachedKeepSeparate.Add(applicants.Length, builder);
-                }
+            if (!cachedKeepSeparate.TryGetValue(applicants.Length, out var builder))
+            {
+                builder = new ExpressionBuilder(applicants.Length, values => values.Count(v => v) == applicants.Length / 2);
+                cachedKeepSeparate.Add(applicants.Length, builder);
+            }
             return builder.Apply(applicants);
         }
 
