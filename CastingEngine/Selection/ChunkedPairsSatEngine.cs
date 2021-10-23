@@ -18,7 +18,7 @@ namespace Carmen.CastingEngine.Selection
         protected override bool Simplify(ref int chunk_size, ref int max_chunks)
         {
             chunk_size += 2;
-            return true;
+            return chunk_size <= 16; // any more than 16 takes too long to process
         }
     }
 }

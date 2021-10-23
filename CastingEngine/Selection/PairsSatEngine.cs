@@ -57,8 +57,7 @@ namespace Carmen.CastingEngine.Selection
                 if (max_chunks > max_possible_chunks)
                     max_chunks = max_possible_chunks;
                 // compile clauses
-                var clauses = new HashSet<Clause<int>>();
-                clauses.AddRange(solved_clauses);
+                var clauses = new HashSet<Clause<int>>(solved_clauses);
                 var max_actual_chunks = 0;
                 foreach (var (cg, hs) in applicants_needing_alternative_cast)
                 {

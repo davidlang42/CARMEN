@@ -20,7 +20,7 @@ namespace Carmen.CastingEngine.SAT
             : base(variables)
         { }
 
-        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution) //TODO NEW APPROACH: real speed up approach would be using multi-dim arrays to store flags of whether or not that var is referenced in the clause/literal
+        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
         {
             partial_solution = partial_solution.Clone();
             var old_clauses = expression.Clauses.ToHashSet(); // clauses which haven't been modified yet (don't modify, only remove)
