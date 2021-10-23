@@ -51,7 +51,7 @@ namespace Carmen.CastingEngine.SAT
                 while (true)
                 {
                     // Find next pure literal
-                    var pure = FindPureLiteral(clauses); //TODO process many pures at once
+                    var pure = FindPureLiteral(clauses);
                     if (pure.Solved)
                         yield return partial_solution;
                     if (pure.Solved || pure.Failed)
@@ -59,9 +59,10 @@ namespace Carmen.CastingEngine.SAT
                     if (!pure.Found)
                         break;
                     // Assign pure literal value (might not be required, but is always safe)
-                    partial_solution.Assignments[pure.Literal.Variable] = pure.Literal.Polarity;
+                    foreach (var pure_literal in pure.Literals)
+                        partial_solution.Assignments[pure_literal.Variable] = pure_literal.Polarity;
                     // Remove all clauses containing the pure literal
-                    clauses.RemoveWhere(c => c.Literals.Contains(pure.Literal));
+                    clauses.RemoveWhere(c => pure.Literals.Any(pl => c.Literals.Contains(pl)));
                 }
             }
             // Pick an unassigned literal and branch
@@ -94,6 +95,22 @@ namespace Carmen.CastingEngine.SAT
             };
         }
 
+        private struct SearchResults
+        {
+            public bool Solved { get; set; }
+            public bool Failed { get; set; }
+            public bool Found { get; set; }
+            public List<Literal<int>> Literals { get; set; }
+
+            public static SearchResults Fail() => new() { Failed = true };
+            public static SearchResults Solve() => new() { Solved = true };
+            public static SearchResults Find(List<Literal<int>> literals) => new()
+            {
+                Found = true,
+                Literals = literals
+            };
+        }
+
         private static SearchResult FindUnitClause(HashSet<Clause<int>> clauses)
         {
             if (clauses.Count == 0)
@@ -108,16 +125,14 @@ namespace Carmen.CastingEngine.SAT
             return default;
         }
 
-        private static SearchResult FindPureLiteral(HashSet<Clause<int>> clauses)
+        private static SearchResults FindPureLiteral(HashSet<Clause<int>> clauses)
         {
             if (clauses.Count == 0)
-                return SearchResult.Solve();
+                return SearchResults.Solve();
             var unique_literals = clauses.SelectMany(c => c.Literals).ToHashSet();//TODO is it faster to group by variable?
-            foreach (var literal in unique_literals)
-            {
-                if (!unique_literals.Contains(literal.Inverse()))
-                    return SearchResult.Find(literal);
-            }
+            var pure_literals = unique_literals.Where(l => !unique_literals.Contains(l.Inverse())).ToList();
+            if (pure_literals.Any())
+                return SearchResults.Find(pure_literals);
             return default;
         }
     }
