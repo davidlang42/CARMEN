@@ -18,14 +18,14 @@ namespace Carmen.CastingEngine.SAT
             Expression = TruthTableExpression(n_variables, boolean_function);
         }
 
-        public Expression<T> Apply<T>(T[] variables)
+        public IEnumerable<Clause<T>> Apply<T>(T[] variables)
             where T : notnull
         {
             if (variables.Length != VariablesCount)
                 throw new ArgumentException($"Must provide exactly {VariablesCount} variables, as per constructor argument");
             int i = 0;
             var map = variables.ToDictionary(v => i++, v => v);
-            return Expression.Remap(map);
+            return Expression.Clauses.Select(c => c.Remap(map));
         }
 
         /// <summary>Enumerate all possible boolean values for the given array size, starting from a given index</summary>

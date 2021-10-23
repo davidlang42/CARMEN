@@ -163,8 +163,7 @@ namespace Carmen.CastingEngine.Selection
                 builder = new ExpressionBuilder(applicants.Length, values => values.All(v => v) || values.All(v => !v));
                 cachedKeepTogether.Add(applicants.Length, builder);
             }
-            foreach (var clause in builder.Apply(applicants).Clauses)
-                yield return clause;
+            return builder.Apply(applicants);
         }
 
         /// <summary>Fills any free (null) assignments, keeping the totals in each alternative cast as close to equal as possible</summary>
