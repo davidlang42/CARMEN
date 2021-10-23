@@ -57,8 +57,6 @@ namespace Carmen.CastingEngine.SAT
         /// <summary>Solves a boolean expression, or returns an empty sequence if it is found to be unsolveable</summary>
         public virtual IEnumerable<Solution> Solve(Expression<T> expression)
         {
-            if (!Check(expression))
-                throw new ArgumentException($"{nameof(expression)} is not a valid boolean expression");
             int i = 0;
             var map = Variables.ToDictionary(v => v, v => i++);
             var expression_int = expression.Remap(map);
