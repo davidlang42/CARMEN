@@ -129,9 +129,13 @@ namespace Carmen.CastingEngine.Selection
                     same_cast_lookup.Add(applicant, same_cast_set); // Applicants can only be in one SameCastSet
                 same_cast_clauses.AddRange(KeepTogether(same_cast_set.Applicants.Where(a => applicants_needing_alternative_cast.Any(p => p.Item2.Contains(a))).ToArray()));
             }
-            // run approach-specific SAT solving
+            // pre-test clauses to ensure they are solvable
             var sat = BuildSatSolver(applicants_needing_alternative_cast);
-            var solution = FindSatSolution(sat, applicants_needing_alternative_cast, existing_assignments, same_cast_clauses, same_cast_lookup);
+            var base_expression = new Expression<Applicant>(existing_assignments.Concat(same_cast_clauses).ToHashSet());
+            var solution = sat.Solve(base_expression).FirstOrDefault();
+            // run approach-specific SAT solving
+            if (!solution.IsUnsolvable)
+                solution = FindSatSolution(sat, applicants_needing_alternative_cast, existing_assignments, same_cast_clauses, same_cast_lookup);
             // set alternative casts
             List<IEnumerable<Assignment<Applicant>>> grouped_assignments;
             if (!solution.IsUnsolvable)

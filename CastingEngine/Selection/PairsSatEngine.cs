@@ -43,7 +43,7 @@ namespace Carmen.CastingEngine.Selection
             // Initialise() the starting conditions, then Simplify() until the SAT solver succeeds
             var i = 0;
             var applicant_variable_numbers = sat.Variables.ToDictionary(v => v, v => i++);
-            Solution solution = Solution.Unsolveable; //TODO check solved clauses are actually solvable before we start iterating
+            Solution solution = Solution.Unsolveable;
             var solved_clauses = new HashSet<Clause<int>>();
             solved_clauses.AddRange(existing_assignments.Select(c => c.Remap(applicant_variable_numbers)));
             solved_clauses.AddRange(same_cast_clauses.Select(c => c.Remap(applicant_variable_numbers)));
