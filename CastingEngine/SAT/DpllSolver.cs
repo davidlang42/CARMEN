@@ -18,8 +18,8 @@ namespace Carmen.CastingEngine.SAT
             : base(variables)
         { }
 
-        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution) //TODO 2) real speed up approach would be using multi-dim arrays to store flags of whether or not that var is referenced in the clause/literal
-        {//TODO does clause need to be a record?
+        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution) //TODO NEW APPROACH: real speed up approach would be using multi-dim arrays to store flags of whether or not that var is referenced in the clause/literal
+        {
             partial_solution = partial_solution.Clone();
             var old_clauses = expression.Clauses.ToHashSet(); // clauses which haven't been modified yet (don't modify, only remove)
             var new_clauses = new HashSet<Clause<int>>(); // clauses which have been created in this step (safe to modify)
@@ -80,11 +80,11 @@ namespace Carmen.CastingEngine.SAT
             var unassigned_literal = new_clauses.First().Literals.First();
             var branching_clause = Clause<int>.Unit(unassigned_literal);
             new_clauses.Add(branching_clause);
-            var new_expression = new Expression<int>(new_clauses); //TODO reuse expression
+            var new_expression = new Expression<int>(new_clauses);
             foreach (var solution in PartialSolve(new_expression, partial_solution))
                 yield return solution; // propogate any found solutions
             new_clauses.Remove(branching_clause);
-            branching_clause = Clause<int>.Unit(unassigned_literal.Inverse());//TODO reuse branching clause?
+            branching_clause = Clause<int>.Unit(unassigned_literal.Inverse());
             new_clauses.Add(branching_clause);
             foreach (var solution in PartialSolve(new_expression, partial_solution))
                 yield return solution; // propogate any found solutions
