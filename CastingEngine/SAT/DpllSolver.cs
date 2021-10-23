@@ -47,7 +47,9 @@ namespace Carmen.CastingEngine.SAT
                 {
                     if (old_clause.Literals.Contains(inverse_literal))
                     {
-                        new_clauses.Add(old_clause with { Literals = old_clause.Literals.Where(l => l != inverse_literal).ToHashSet() });//TODO try copy and remove
+                        var new_literals = new HashSet<Literal<int>>(old_clause.Literals);
+                        new_literals.Remove(inverse_literal);
+                        new_clauses.Add(new(new_literals));
                         return true;
                     }
                     return false;
