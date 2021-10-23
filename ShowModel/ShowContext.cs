@@ -21,8 +21,8 @@ namespace Carmen.ShowModel
         //TODO also audit navigation properties, and change to internal where not required (to avoid the accidental usage from UI causing bad lazy loading)
         //TODO consider making all IDs internal as well (this would require removing them from DatabaseExplorer)
         #region Database collections
-        /// <summary>Auto includes ShowRoot, Abilities, CastGroup, AlternativeCast, SameCastSet, Tags.
-        /// Remember to include Roles, Image.</summary>
+        /// <summary>Auto includes ShowRoot, Abilities, CastGroup, AlternativeCast, Tags.
+        /// Remember to include Roles, SameCastSet, Image.</summary>
         public DbSet<Applicant> Applicants => Set<Applicant>();
 
         /// <summary>Remember to include Members.</summary>
@@ -383,7 +383,6 @@ namespace Carmen.ShowModel
             modelBuilder.Entity<Applicant>().Navigation(a => a.Abilities).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.CastGroup).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.AlternativeCast).AutoInclude();
-            modelBuilder.Entity<Applicant>().Navigation(a => a.SameCastSet).AutoInclude();
             modelBuilder.Entity<Applicant>().Navigation(a => a.Tags).AutoInclude();
             modelBuilder.Entity<TagRequirement>().Navigation(tr => tr.RequiredTag).AutoInclude();
             modelBuilder.Entity<AbilityExactRequirement>().Navigation(aer => aer.Criteria).AutoInclude();

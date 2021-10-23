@@ -108,8 +108,8 @@ namespace CarmenUI.Pages
             using (loading.Segment(nameof(ShowContext.Tags) + nameof(A.Tag.Members) + nameof(A.Tag.Requirements), "Tags"))
                 _tags = await context.Tags.Include(t => t.Members).Include(t => t.Requirements).ToArrayAsync();
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
-            using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
-                _applicants = await context.Applicants.ToArrayAsync();
+            using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.SameCastSet), "Applicants"))
+                _applicants = await context.Applicants.Include(a => a.SameCastSet).ToArrayAsync();
             using (loading.Segment(nameof(TriggerCastNumbersRefresh) + nameof(castNumbersViewSource), "Cast numbers"))
             {
                 castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
