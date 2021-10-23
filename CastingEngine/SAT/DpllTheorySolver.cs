@@ -22,9 +22,9 @@ namespace Carmen.CastingEngine.SAT
             validityTest = validity_test;
         }
 
-        public override IEnumerable<Solution> Solve(Expression<T> expression)
+        public override IEnumerable<Solution> SolveWithoutRemap(Expression<int> expression_int)
         {
-            foreach (var solution in base.Solve(expression))
+            foreach (var solution in base.SolveWithoutRemap(expression_int))
             {
                 var validity = validityTest(solution);
                 if (validity == true)

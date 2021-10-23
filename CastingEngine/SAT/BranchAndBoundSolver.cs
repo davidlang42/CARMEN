@@ -38,7 +38,7 @@ namespace Carmen.CastingEngine.SAT
             costFunction = cost_function;
         }
 
-        public override IEnumerable<Solution> Solve(Expression<T> expression)
+        public override IEnumerable<Solution> SolveWithoutRemap(Expression<int> expression_int)
         {
             if (inProgress)
                 throw new ApplicationException("Solve() already in progress");
@@ -47,7 +47,7 @@ namespace Carmen.CastingEngine.SAT
             optimalLower = double.MaxValue;
             optimalSolution = Solution.Unsolveable;
             var stack = new Stack<Solution>();
-            var base_solutions = base.Solve(expression).GetEnumerator();
+            var base_solutions = base.SolveWithoutRemap(expression_int).GetEnumerator();
             if (base_solutions.MoveNext())
                 stack.Push(base_solutions.Current);
             optimalLastUpdated = DateTime.Now;

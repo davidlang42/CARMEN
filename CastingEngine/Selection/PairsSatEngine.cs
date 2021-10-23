@@ -41,10 +41,12 @@ namespace Carmen.CastingEngine.Selection
             List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup)
         {
             // Initialise() the starting conditions, then Simplify() until the SAT solver succeeds
-            Solution solution = Solution.Unsolveable;
-            var solved_clauses = new HashSet<Clause<Applicant>>();
-            solved_clauses.AddRange(existing_assignments);
-            solved_clauses.AddRange(same_cast_clauses);
+            var i = 0;
+            var applicant_variable_numbers = sat.Variables.ToDictionary(v => v, v => i++);
+            Solution solution = Solution.Unsolveable; //TODO check solved clauses are actually solvable before we start iterating
+            var solved_clauses = new HashSet<Clause<int>>();
+            solved_clauses.AddRange(existing_assignments.Select(c => c.Remap(applicant_variable_numbers)));
+            solved_clauses.AddRange(same_cast_clauses.Select(c => c.Remap(applicant_variable_numbers)));
             int previously_chunked_applicants = 0;
             Results.Clear();
             Initialise(out int chunk_size, out int max_chunks);
@@ -55,19 +57,19 @@ namespace Carmen.CastingEngine.Selection
                 if (max_chunks > max_possible_chunks)
                     max_chunks = max_possible_chunks;
                 // compile clauses
-                var clauses = new HashSet<Clause<Applicant>>();
+                var clauses = new HashSet<Clause<int>>();
                 clauses.AddRange(solved_clauses);
                 var max_actual_chunks = 0;
                 foreach (var (cg, hs) in applicants_needing_alternative_cast)
                 {
-                    AddChunkClauses(clauses, hs, previously_chunked_applicants, chunk_size, max_chunks, same_cast_lookup, out var actual_chunks);
+                    AddChunkClauses(clauses, hs, previously_chunked_applicants, chunk_size, max_chunks, same_cast_lookup, out var actual_chunks, applicant_variable_numbers);
                     if (actual_chunks > max_actual_chunks)
                         max_actual_chunks = actual_chunks;
                 }
                 if (clauses.Count == 0)
                     break; // no clauses to solve
                 // run sat solver
-                solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
+                solution = sat.SolveWithoutRemap(new() { Clauses = clauses }).FirstOrDefault();
                 Results.Add(new Result
                 {
                     ChunkSize = chunk_size,
@@ -117,8 +119,8 @@ namespace Carmen.CastingEngine.Selection
             => (applicants_per_cast_group.Max() - previously_chunked) / chunk_size;
 
         /// <summary>Creates clauses for chunks of applicants within one cast group, for each primary criteria, and add them to the supplied collection of clauses</summary>
-        private void AddChunkClauses(ICollection<Clause<Applicant>> clauses, IEnumerable<Applicant> applicants, int skip_applicants, int chunk_size, int max_chunks,
-            Dictionary<Applicant, SameCastSet> same_cast_lookup, out int max_chunk_count)
+        private void AddChunkClauses(ICollection<Clause<int>> clauses, IEnumerable<Applicant> applicants, int skip_applicants, int chunk_size, int max_chunks,
+            Dictionary<Applicant, SameCastSet> same_cast_lookup, out int max_chunk_count, Dictionary<Applicant, int> applicant_variable_numbers)
         {
             max_chunk_count = 0;
             foreach (var criteria in primaryCriterias)
@@ -130,7 +132,7 @@ namespace Carmen.CastingEngine.Selection
                 while (sorted_applicants.Count >= chunk_size && chunk_count < max_chunks)
                 {
                     if (TakeChunk(sorted_applicants, chunk_size, same_cast_lookup) is Applicant[] chunk)
-                        foreach (var clause in KeepSeparate(chunk))
+                        foreach (var clause in KeepSeparate(chunk.Select(a => applicant_variable_numbers[a]).ToArray()))
                             clauses.Add(clause);
                     else
                         // TakeChunk may fail, even though there are technically enough applicants,
@@ -144,14 +146,14 @@ namespace Carmen.CastingEngine.Selection
         }
 
         /// <summary>Creates a clause specifying that exactly half of the given applicants are in each alternative cast</summary>
-        private IEnumerable<Clause<Applicant>> KeepSeparate(Applicant[] applicants)
+        private IEnumerable<Clause<int>> KeepSeparate(int[] applicant_variable_numbers)
         {
-            if (!cachedKeepSeparate.TryGetValue(applicants.Length, out var builder))
+            if (!cachedKeepSeparate.TryGetValue(applicant_variable_numbers.Length, out var builder))
             {
-                builder = new ExpressionBuilder(applicants.Length, values => values.Count(v => v) == applicants.Length / 2);
-                cachedKeepSeparate.Add(applicants.Length, builder);
+                builder = new ExpressionBuilder(applicant_variable_numbers.Length, values => values.Count(v => v) == applicant_variable_numbers.Length / 2);
+                cachedKeepSeparate.Add(applicant_variable_numbers.Length, builder);
             }
-            return builder.Apply(applicants);
+            return builder.Apply(applicant_variable_numbers);
         }
 
         /// <summary>Takes chunk_size applicants from the top of the stack, with at most chunk_size/2 from any one SameCastSet</summary>

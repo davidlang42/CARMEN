@@ -55,12 +55,18 @@ namespace Carmen.CastingEngine.SAT
         }
 
         /// <summary>Solves a boolean expression, or returns an empty sequence if it is found to be unsolveable</summary>
-        public virtual IEnumerable<Solution> Solve(Expression<T> expression)
+        public IEnumerable<Solution> Solve(Expression<T> expression)
         {
             int i = 0;
             var map = Variables.ToDictionary(v => v, v => i++);
             var expression_int = expression.Remap(map);
-            foreach (var solution in PartialSolve(expression_int, new Solution { Assignments = new bool?[i] }))
+            return SolveWithoutRemap(expression_int);
+        }
+
+        /// <summary>Solves a boolean expression, or returns an empty sequence if it is found to be unsolveable</summary>
+        public virtual IEnumerable<Solution> SolveWithoutRemap(Expression<int> expression_int)
+        {
+            foreach (var solution in PartialSolve(expression_int, new Solution { Assignments = new bool?[Variables.Count] }))
                 yield return solution;
         }
 
