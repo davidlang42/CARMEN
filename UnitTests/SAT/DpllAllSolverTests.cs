@@ -12,15 +12,15 @@ namespace UnitTests.SAT
     public class DpllAllSolverTests : SolverTests
     {
         [Test]
-        [TestCase(100, 10, 50, 3, TestName = "All_10_Vars_Easy")] // 40ms
-        [TestCase(100, 15, 70, 3, TestName = "All_15_Vars_Medium")] // 100ms
-        [TestCase(100, 20, 90, 3, TestName = "All_20_Vars_Hard")] // 200ms
-        [TestCase(100, 25, 110, 3, TestName = "All_25_Vars_VeryHard")] // 450ms
-        [TestCase(100, 50, 210, 3, TestName = "All_50_Vars_Extreme")] // 8.9s
+        [TestCase(100, 10, 50, 3, TestName = "All_10_Vars_Easy")] // 50ms
+        [TestCase(100, 15, 70, 3, TestName = "All_15_Vars_Medium")] // 110ms
+        [TestCase(100, 20, 90, 3, TestName = "All_20_Vars_Hard")] // 250ms
+        [TestCase(100, 25, 110, 3, TestName = "All_25_Vars_VeryHard")] // 560ms
+        [TestCase(100, 50, 210, 3, TestName = "All_50_Vars_Extreme")] // 19.4s
         public void RandomAll(int test_cases, int n_variables, int j_clauses, int k_literals)
         {
             var vars = Enumerable.Range(1, n_variables).ToArray();
-            var sat = new DpllSolver<int>(vars); // NOTE: this has always been wrong
+            var sat = new DpllAllSolver<int>(vars);
             var solved = 0;
             for (var seed = 0; seed < test_cases; seed++)
             {
