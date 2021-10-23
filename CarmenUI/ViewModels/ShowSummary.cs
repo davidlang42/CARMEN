@@ -62,27 +62,27 @@ namespace CarmenUI.ViewModels
                 Rows.Add(new Row { Fail = "Show name is required" });
             if (!show_root.ShowDate.HasValue)
                 Rows.Add(new Row { Fail = "Show date is required" });
-            var criterias = await c.Criterias.CountAsync();
-            Rows.Add(CountRow(criterias, 1, "Audition Criteria", true));
+            var criterias = await c.Criterias.ToArrayAsync();
+            Rows.Add(CountRow(criterias.Length, 1, "Audition Criteria", true));
             var cast_groups = await c.CastGroups.ToArrayAsync();
             Rows.Add(CountRow(cast_groups.Length, 1, "Cast Group"));
-            var alternative_casts = await c.AlternativeCasts.CountAsync();
+            var alternative_casts = await c.AlternativeCasts.ToArrayAsync();
             if (cast_groups.Any(g => g.AlternateCasts))
-                Rows.Add(CountRow(alternative_casts, 2, "Alternative Cast"));
-            else if (alternative_casts == 0)
+                Rows.Add(CountRow(alternative_casts.Length, 2, "Alternative Cast"));
+            else if (alternative_casts.Length == 0)
                 Rows.Add(new Row { Success = "Alternating Casts are disabled" });
             else
                 Rows.Add(new Row
                 {
-                    Success = alternative_casts.Plural("Alternative Cast"),
+                    Success = alternative_casts.Length.Plural("Alternative Cast"),
                     Fail = "(but are not enabled)"
                 });
-            var tags = await c.Tags.CountAsync();
-            Rows.Add(CountRow(tags, 0, "Cast Tag"));
-            var section_types = await c.SectionTypes.CountAsync();
-            Rows.Add(CountRow(section_types, 1, "Section Type"));
-            var requirements = await c.Requirements.CountAsync();
-            Rows.Add(CountRow(requirements, 0, "Requirement"));
+            var tags = await c.Tags.ToArrayAsync();
+            Rows.Add(CountRow(tags.Length, 0, "Cast Tag"));
+            var section_types = await c.SectionTypes.ToArrayAsync(); // need to load entities rather than count for CheckDefaultShowSettings
+            Rows.Add(CountRow(section_types.Length, 1, "Section Type"));
+            var requirements = await c.Requirements.ToArrayAsync();
+            Rows.Add(CountRow(requirements.Length, 0, "Requirement"));
             FinishLoad(cancel, c.CheckDefaultShowSettings(defaultShowName, false));
         }
 
