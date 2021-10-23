@@ -528,7 +528,10 @@ namespace CarmenUI.Pages
 
         private void DetectSiblings_Click(object sender, RoutedEventArgs e)
         {
-            engine.DetectFamilies(applicants);
+            engine.DetectFamilies(applicants, out var new_same_cast_sets);
+            var list = (IList)sameCastSetsViewSource.Source;
+            foreach (var new_same_cast_set in new_same_cast_sets)
+                list.Add(new_same_cast_set);
         }
 
         private void AddSameCastSet_Click(object sender, RoutedEventArgs e)

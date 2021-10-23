@@ -190,8 +190,9 @@ namespace Carmen.CastingEngine.Selection
             };
 
         /// <summary>Detects families by matching last name</summary>
-        public void DetectFamilies(IEnumerable<Applicant> applicants)
+        public void DetectFamilies(IEnumerable<Applicant> applicants, out List<SameCastSet> new_same_cast_sets)
         {
+            new_same_cast_sets = new();
             var siblings = applicants
                 .Where(a => !string.IsNullOrEmpty(a.LastName))
                 .OrderBy(a => a.LastName).ThenBy(a => a.FirstName)
@@ -200,8 +201,12 @@ namespace Carmen.CastingEngine.Selection
                 .ToArray();
             foreach (var family in siblings.Where(f => f.Length > 1))
             {
-                var set = family.Select(a => a.SameCastSet).OfType<SameCastSet>().FirstOrDefault()
-                    ?? new SameCastSet();
+                var set = family.Select(a => a.SameCastSet).OfType<SameCastSet>().FirstOrDefault();
+                if (set == null)
+                {
+                    set = new SameCastSet();
+                    new_same_cast_sets.Add(set);
+                }
                 foreach (var applicant in family)
                     if (applicant.SameCastSet == null)
                     {

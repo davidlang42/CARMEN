@@ -23,7 +23,7 @@ namespace Carmen.CastingEngine.Selection
         double SuitabilityOf(Applicant applicant, Tag tag);
 
         /// <summary>Set same cast sets for family groups within the applicants provided.</summary>
-        void DetectFamilies(IEnumerable<Applicant> applicants);
+        void DetectFamilies(IEnumerable<Applicant> applicants, out List<SameCastSet> new_same_cast_sets);
 
         /// <summary>Select applicants into cast groups, respecting those already placed
         /// NOTE: CastGroup requirements may not depend on Tags</summary>
