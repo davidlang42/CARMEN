@@ -27,7 +27,7 @@ namespace Carmen.CastingEngine.SAT
             while (true)
             {
                 // Find next unit clause literal
-                var unit = FindUnitClause(old_clauses.Concat(new_clauses)); //TODO dont need to recheck old clauses
+                var unit = FindUnitClause(old_clauses.Concat(new_clauses));
                 if (unit.Solved)
                     yield return partial_solution;
                 if (unit.Solved || unit.Failed)
