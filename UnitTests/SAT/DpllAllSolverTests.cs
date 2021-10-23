@@ -20,7 +20,7 @@ namespace UnitTests.SAT
         public void RandomAll(int test_cases, int n_variables, int j_clauses, int k_literals)
         {
             var vars = Enumerable.Range(1, n_variables).ToArray();
-            var sat = new DpllSolver<int>(vars);
+            var sat = new DpllSolver<int>(vars); // NOTE: this has always been wrong
             var solved = 0;
             for (var seed = 0; seed < test_cases; seed++)
             {
