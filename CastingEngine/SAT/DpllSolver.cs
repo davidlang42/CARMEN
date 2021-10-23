@@ -18,14 +18,15 @@ namespace Carmen.CastingEngine.SAT
         { }
 
         protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution) //TODO 2) real speed up approach would be using multi-dim arrays to store flags of whether or not that var is referenced in the clause/literal
-        {
+        {//TODO does clause need to be a record?
             partial_solution = partial_solution.Clone();
-            var clauses = expression.Clauses.ToHashSet(); //TODO 1) try storing 2 sets, old and new, so I only need to clone those in old, because new are safe to mutate
+            var old_clauses = expression.Clauses.ToHashSet(); // clauses which haven't been modified yet (don't modify, only remove)
+            var new_clauses = new HashSet<Clause<int>>(); // clauses which have been created in this step (safe to modify)
             // Propogate unit clauses
             while (true)
             {
                 // Find next unit clause literal
-                var unit = FindUnitClause(clauses);
+                var unit = FindUnitClause(old_clauses.Concat(new_clauses)); //TODO dont need to recheck old clauses
                 if (unit.Solved)
                     yield return partial_solution;
                 if (unit.Solved || unit.Failed)
@@ -35,23 +36,31 @@ namespace Carmen.CastingEngine.SAT
                 // Assign unit clause value
                 partial_solution.Assignments[unit.Literal.Variable] = unit.Literal.Polarity;
                 // Remove unit clause and any other clauses containing the unit clause literal
-                clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal));
+                old_clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal));
+                new_clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal));
                 // Remove inverse literal from any remaining clauses
                 var inverse_literal = unit.Literal.Inverse();
-                var containing_inverse_literal = clauses.Where(c => c.Literals.Contains(inverse_literal)).ToList();
-                foreach (var old_clause in containing_inverse_literal)
+                foreach (var new_clause in new_clauses)
+                    new_clause.Literals.Remove(inverse_literal);
+                old_clauses.RemoveWhere(old_clause =>
                 {
-                    clauses.Remove(old_clause);
-                    clauses.Add(old_clause with { Literals = old_clause.Literals.Where(l => l != inverse_literal).ToHashSet() });
-                }
+                    if (old_clause.Literals.Contains(inverse_literal))
+                    {
+                        new_clauses.Add(old_clause with { Literals = old_clause.Literals.Where(l => l != inverse_literal).ToHashSet() });//TODO try copy and remove
+                        return true;
+                    }
+                    return false;
+                });
             }
+            //TODO is unionwith faster? if so, reuse that in my ext method
+            new_clauses.AddRange(old_clauses); // from here on we don't modify clauses, so combine the sets
             // Propogate pure literals
             if (propogatePureLiterals)
             {
                 while (true)
                 {
                     // Find next pure literal
-                    var pure = FindPureLiteral(clauses);
+                    var pure = FindPureLiteral(new_clauses);
                     if (pure.Solved)
                         yield return partial_solution;
                     if (pure.Solved || pure.Failed)
@@ -62,19 +71,19 @@ namespace Carmen.CastingEngine.SAT
                     foreach (var pure_literal in pure.Literals)
                         partial_solution.Assignments[pure_literal.Variable] = pure_literal.Polarity;
                     // Remove all clauses containing the pure literal
-                    clauses.RemoveWhere(c => pure.Literals.Any(pl => c.Literals.Contains(pl)));
+                    new_clauses.RemoveWhere(c => pure.Literals.Any(pl => c.Literals.Contains(pl)));
                 }
             }
             // Pick an unassigned literal and branch
-            var unassigned_literal = clauses.First().Literals.First();
+            var unassigned_literal = new_clauses.First().Literals.First();
             var branching_clause = Clause<int>.Unit(unassigned_literal);
-            clauses.Add(branching_clause);
-            var new_expression = new Expression<int>(clauses); //TODO reuse expression
+            new_clauses.Add(branching_clause);
+            var new_expression = new Expression<int>(new_clauses); //TODO reuse expression
             foreach (var solution in PartialSolve(new_expression, partial_solution))
                 yield return solution; // propogate any found solutions
-            clauses.Remove(branching_clause);
+            new_clauses.Remove(branching_clause);
             branching_clause = Clause<int>.Unit(unassigned_literal.Inverse());//TODO reuse branching clause?
-            clauses.Add(branching_clause);
+            new_clauses.Add(branching_clause);
             foreach (var solution in PartialSolve(new_expression, partial_solution))
                 yield return solution; // propogate any found solutions
         }
@@ -111,17 +120,19 @@ namespace Carmen.CastingEngine.SAT
             };
         }
 
-        private static SearchResult FindUnitClause(HashSet<Clause<int>> clauses)
+        private static SearchResult FindUnitClause(IEnumerable<Clause<int>> clauses)
         {
-            if (clauses.Count == 0)
-                return SearchResult.Solve();
+            bool any = false;
             foreach (var clause in clauses)
             {
                 if (clause.IsEmpty())
                     return SearchResult.Fail();
                 if (clause.IsUnitClause(out var literal))
                     return SearchResult.Find(literal);
+                any = true;
             }
+            if (!any)
+                return SearchResult.Solve();
             return default;
         }
 
