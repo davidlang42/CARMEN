@@ -157,19 +157,11 @@ namespace Carmen.CastingEngine.Selection
             // (A,B,C) is not all equal if (A || B || C) && (A' || B' || C')
             yield return new()
             {
-                Literals = applicants.Select(a => new Literal<Applicant>
-                {
-                    Polarity = true,
-                    Variable = a
-                }).ToHashSet()
+                Literals = applicants.Select(a => Literal<Applicant>.Positive(a)).ToHashSet()
             };
             yield return new()
             {
-                Literals = applicants.Select(a => new Literal<Applicant>
-                {
-                    Polarity = false,
-                    Variable = a
-                }).ToHashSet()
+                Literals = applicants.Select(a => Literal<Applicant>.Negative(a)).ToHashSet()
             };
         }
 

@@ -20,12 +20,12 @@ namespace Carmen.CastingEngine.SAT
         protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
         {
             partial_solution = partial_solution.Clone();
-            expression = expression.Clone();
+            var clauses = expression.Clauses.ToHashSet();
             // Propogate unit clauses
             while (true)
             {
                 // Find next unit clause literal
-                var unit = FindUnitClause(expression);
+                var unit = FindUnitClause(clauses); //TODO process many units at once
                 if (unit.Solved)
                     yield return partial_solution;
                 if (unit.Solved || unit.Failed)
@@ -35,11 +35,15 @@ namespace Carmen.CastingEngine.SAT
                 // Assign unit clause value
                 partial_solution.Assignments[unit.Literal.Variable] = unit.Literal.Polarity;
                 // Remove unit clause and any other clauses containing the unit clause literal
-                expression.Clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal));
+                clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal)); //TODO try hacking the next check into this
                 // Remove inverse literal from any remaining clauses
                 var inverse_literal = unit.Literal.Inverse();
-                foreach (var clause in expression.Clauses)
-                    clause.Literals.RemoveWhere(l => l.Equals(inverse_literal));
+                var containing_inverse_literal = clauses.Where(c => c.Literals.Contains(inverse_literal)).ToList();
+                foreach (var old_clause in containing_inverse_literal)
+                {
+                    clauses.Remove(old_clause);
+                    clauses.Add(old_clause with { Literals = old_clause.Literals.Where(l => l != inverse_literal).ToHashSet() });
+                }
             }
             // Propogate pure literals
             if (propogatePureLiterals)
@@ -47,7 +51,7 @@ namespace Carmen.CastingEngine.SAT
                 while (true)
                 {
                     // Find next pure literal
-                    var pure = FindPureLiteral(expression);
+                    var pure = FindPureLiteral(clauses); //TODO process many pures at once
                     if (pure.Solved)
                         yield return partial_solution;
                     if (pure.Solved || pure.Failed)
@@ -57,19 +61,20 @@ namespace Carmen.CastingEngine.SAT
                     // Assign pure literal value (might not be required, but is always safe)
                     partial_solution.Assignments[pure.Literal.Variable] = pure.Literal.Polarity;
                     // Remove all clauses containing the pure literal
-                    expression.Clauses.RemoveWhere(c => c.Literals.Contains(pure.Literal));
+                    clauses.RemoveWhere(c => c.Literals.Contains(pure.Literal));
                 }
             }
             // Pick an unassigned literal and branch
-            var unassigned_literal = expression.Clauses.First().Literals.First();
-            var branching_clause = new Clause<int> { Literals = unassigned_literal.Yield().ToHashSet() };
-            expression.Clauses.Add(branching_clause);
-            foreach (var solution in PartialSolve(expression, partial_solution))
+            var unassigned_literal = clauses.First().Literals.First();
+            var branching_clause = Clause<int>.Unit(unassigned_literal);
+            clauses.Add(branching_clause);
+            var new_expression = new Expression<int>(clauses); //TODO reuse expression
+            foreach (var solution in PartialSolve(new_expression, partial_solution))
                 yield return solution; // propogate any found solutions
-            expression.Clauses.Remove(branching_clause);
-            branching_clause = new Clause<int> { Literals = unassigned_literal.Inverse().Yield().ToHashSet() };
-            expression.Clauses.Add(branching_clause);
-            foreach (var solution in PartialSolve(expression, partial_solution))
+            clauses.Remove(branching_clause);
+            branching_clause = Clause<int>.Unit(unassigned_literal.Inverse());//TODO reuse branching clause?
+            clauses.Add(branching_clause);
+            foreach (var solution in PartialSolve(new_expression, partial_solution))
                 yield return solution; // propogate any found solutions
         }
 
@@ -89,11 +94,11 @@ namespace Carmen.CastingEngine.SAT
             };
         }
 
-        private static SearchResult FindUnitClause(Expression<int> exp)
+        private static SearchResult FindUnitClause(HashSet<Clause<int>> clauses)
         {
-            if (exp.Clauses.Count == 0)
+            if (clauses.Count == 0)
                 return SearchResult.Solve();
-            foreach (var clause in exp.Clauses)
+            foreach (var clause in clauses)
             {
                 if (clause.IsEmpty())
                     return SearchResult.Fail();
@@ -103,11 +108,11 @@ namespace Carmen.CastingEngine.SAT
             return default;
         }
 
-        private static SearchResult FindPureLiteral(Expression<int> exp)
+        private static SearchResult FindPureLiteral(HashSet<Clause<int>> clauses)
         {
-            if (exp.Clauses.Count == 0)
+            if (clauses.Count == 0)
                 return SearchResult.Solve();
-            var unique_literals = exp.Clauses.SelectMany(c => c.Literals).ToHashSet();
+            var unique_literals = clauses.SelectMany(c => c.Literals).ToHashSet();//TODO is it faster to group by variable?
             foreach (var literal in unique_literals)
             {
                 if (!unique_literals.Contains(literal.Inverse()))

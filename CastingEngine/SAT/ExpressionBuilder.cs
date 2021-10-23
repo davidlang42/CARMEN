@@ -64,12 +64,8 @@ namespace Carmen.CastingEngine.SAT
         {
             var literals = new HashSet<Literal<int>>();
             for (var i = 0; i < values.Length; i++)
-                literals.Add(new Literal<int>
-                {
-                    Variable = i,
-                    Polarity = !values[i]
-                });
-            return new Clause<int> { Literals = literals };
+                literals.Add(new Literal<int>(i, !values[i]));
+            return new Clause<int>(literals);
         }
     }
 }

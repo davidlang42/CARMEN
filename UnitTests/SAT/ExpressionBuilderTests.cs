@@ -22,16 +22,16 @@ namespace UnitTests.SAT
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = false },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Negative(1),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = true },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Positive(1),
                         }.ToHashSet()
                     }
                 }.ToHashSet()
@@ -51,54 +51,54 @@ namespace UnitTests.SAT
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = true },
-                            new Literal<int> { Variable = 2, Polarity = false },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Positive(1),
+                            Literal<int>.Negative(2),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = false },
-                            new Literal<int> { Variable = 2, Polarity = true },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Negative(1),
+                            Literal<int>.Positive(2),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = false },
-                            new Literal<int> { Variable = 2, Polarity = false },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Negative(1),
+                            Literal<int>.Negative(2),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = true },
-                            new Literal<int> { Variable = 2, Polarity = true },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Positive(1),
+                            Literal<int>.Positive(2),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = true },
-                            new Literal<int> { Variable = 2, Polarity = false },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Positive(1),
+                            Literal<int>.Negative(2),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = false },
-                            new Literal<int> { Variable = 2, Polarity = true },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Negative(1),
+                            Literal<int>.Positive(2),
                         }.ToHashSet()
                     }
                 }.ToHashSet()
@@ -118,16 +118,16 @@ namespace UnitTests.SAT
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = true },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Positive(1),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = false },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Negative(1),
                         }.ToHashSet()
                     }
                 }.ToHashSet()
@@ -147,100 +147,100 @@ namespace UnitTests.SAT
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = true },
-                            new Literal<int> { Variable = 2, Polarity = true },
-                            new Literal<int> { Variable = 3, Polarity = true },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Positive(1),
+                            Literal<int>.Positive(2),
+                            Literal<int>.Positive(3),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = true },
-                            new Literal<int> { Variable = 2, Polarity = true },
-                            new Literal<int> { Variable = 3, Polarity = false },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Positive(1),
+                            Literal<int>.Positive(2),
+                            Literal<int>.Negative(3),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = true },
-                            new Literal<int> { Variable = 2, Polarity = false },
-                            new Literal<int> { Variable = 3, Polarity = true },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Positive(1),
+                            Literal<int>.Negative(2),
+                            Literal<int>.Positive(3),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = false },
-                            new Literal<int> { Variable = 2, Polarity = true },
-                            new Literal<int> { Variable = 3, Polarity = true },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Negative(1),
+                            Literal<int>.Positive(2),
+                            Literal<int>.Positive(3),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = true },
-                            new Literal<int> { Variable = 1, Polarity = false },
-                            new Literal<int> { Variable = 2, Polarity = false },
-                            new Literal<int> { Variable = 3, Polarity = false },
+                            Literal<int>.Positive(0),
+                            Literal<int>.Negative(1),
+                            Literal<int>.Negative(2),
+                            Literal<int>.Negative(3),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = true },
-                            new Literal<int> { Variable = 2, Polarity = true },
-                            new Literal<int> { Variable = 3, Polarity = true },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Positive(1),
+                            Literal<int>.Positive(2),
+                            Literal<int>.Positive(3),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = true },
-                            new Literal<int> { Variable = 2, Polarity = false },
-                            new Literal<int> { Variable = 3, Polarity = false },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Positive(1),
+                            Literal<int>.Negative(2),
+                            Literal<int>.Negative(3),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = false },
-                            new Literal<int> { Variable = 2, Polarity = true },
-                            new Literal<int> { Variable = 3, Polarity = false },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Negative(1),
+                            Literal<int>.Positive(2),
+                            Literal<int>.Negative(3),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = false },
-                            new Literal<int> { Variable = 2, Polarity = false },
-                            new Literal<int> { Variable = 3, Polarity = true },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Negative(1),
+                            Literal<int>.Negative(2),
+                            Literal<int>.Positive(3),
                         }.ToHashSet()
                     },
                     new Clause<int>
                     {
                         Literals = new[]
                         {
-                            new Literal<int> { Variable = 0, Polarity = false },
-                            new Literal<int> { Variable = 1, Polarity = false },
-                            new Literal<int> { Variable = 2, Polarity = false },
-                            new Literal<int> { Variable = 3, Polarity = false },
+                            Literal<int>.Negative(0),
+                            Literal<int>.Negative(1),
+                            Literal<int>.Negative(2),
+                            Literal<int>.Negative(3),
                         }.ToHashSet()
                     }
                 }.ToHashSet()

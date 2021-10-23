@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace Carmen.CastingEngine.SAT
@@ -6,16 +7,26 @@ namespace Carmen.CastingEngine.SAT
     /// <summary>
     /// A disjunction (OR) of boolean literals.
     /// </summary>
-    public struct Clause<T>
+    public record Clause<T>
         where T : notnull
     {
         public const string DISJUNCTION = "∨";
 
         public HashSet<Literal<T>> Literals;
 
+        public Clause()//TODO audit use of this with {} initialisers
+        {
+            Literals = new();
+        }
+
+        public Clause(HashSet<Literal<T>> literals)
+        {
+            Literals = literals;
+        }
+
         public bool IsEmpty() => Literals == null || Literals.Count == 0;
 
-        public bool IsUnitClause(out Literal<T> single_literal)
+        public bool IsUnitClause([NotNullWhen(true)]out Literal<T>? single_literal)
         {
             if (Literals == null || Literals.Count == 0 || Literals.Count > 1)
             {
@@ -37,23 +48,10 @@ namespace Carmen.CastingEngine.SAT
                 Literals = Literals.Select(l => l.Remap(variable_map)).ToHashSet()
             };
 
-        public Clause<T> Clone()
-            => new()
-            {
-                Literals = Literals.Select(l => l.Clone()).ToHashSet()
-            };
-
         public static Clause<T> Unit(T variable, bool polarity)
-            => new()
-            {
-                Literals = new[]
-                {
-                    new Literal<T>()
-                    {
-                        Variable = variable,
-                        Polarity = polarity
-                    }
-                }.ToHashSet()
-            };
+            => Unit(new Literal<T>(variable, polarity));
+
+        public static Clause<T> Unit(Literal<T> literal)
+            => new(literal.Yield().ToHashSet());
     }
 }

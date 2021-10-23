@@ -6,17 +6,23 @@ namespace Carmen.CastingEngine.SAT
     /// <summary>
     /// A positive or negative literal of a boolean variable.
     /// </summary>
-    public struct Literal<T>
+    public record Literal<T>
         where T : notnull
     {
         public T Variable;
         public bool Polarity;
 
-        public Literal<T> Inverse() => new Literal<T> { Variable = Variable, Polarity = !Polarity };
+        public Literal(T variable, bool polarity)
+        {
+            Variable = variable;
+            Polarity = polarity;
+        }
 
-        public static Literal<T> Positive(T variable) => new Literal<T> { Variable = variable, Polarity = true };
+        public Literal<T> Inverse() => this with { Polarity = !Polarity };
 
-        public static Literal<T> Negative(T variable) => new Literal<T> { Variable = variable, Polarity = false };
+        public static Literal<T> Positive(T variable) => new Literal<T>(variable, true);
+
+        public static Literal<T> Negative(T variable) => new Literal<T>(variable, false);
 
         public override string ToString() => Polarity ? VariableName : $"neg({VariableName})";
 
@@ -31,18 +37,7 @@ namespace Carmen.CastingEngine.SAT
         {
             if (!variable_map.TryGetValue(Variable, out var mapped_variable))
                 throw new ArgumentException($"{nameof(variable_map)} did not contain variable '{VariableName}'");
-            return new()
-            {
-                Variable = mapped_variable,
-                Polarity = Polarity
-            };
+            return new(mapped_variable, Polarity);
         }
-
-        public Literal<T> Clone() => new Literal<T> { Variable = Variable, Polarity = Polarity };
-
-        public override bool Equals(object? obj)
-            => obj is Literal<T> other && other.Polarity == Polarity && other.Variable.Equals(Variable);
-
-        public override int GetHashCode() => Variable.GetHashCode() ^ Polarity.GetHashCode();
     }
 }
