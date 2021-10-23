@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Carmen.ShowModel;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Carmen.CastingEngine.SAT
@@ -52,7 +53,6 @@ namespace Carmen.CastingEngine.SAT
                     return false;
                 });
             }
-            //TODO is unionwith faster? if so, reuse that in my ext method
             new_clauses.AddRange(old_clauses); // from here on we don't modify clauses, so combine the sets
             // Propogate pure literals
             if (propogatePureLiterals)
@@ -140,7 +140,8 @@ namespace Carmen.CastingEngine.SAT
         {
             if (clauses.Count == 0)
                 return SearchResults.Solve();
-            var pure_literals = clauses.SelectMany(c => c.Literals).Distinct().GroupBy(l => l.Variable).Select(g => g.SingleOrDefaultSafe()).OfType<Literal<int>>().ToList();
+            //TODO try set/clear approach
+            var pure_literals = clauses.SelectMany(c => c.Literals).Distinct().GroupBy(l => l.Variable).Select(g => g.SingleOrDefaultSafe()).NotNull().ToList();
             if (pure_literals.Any())
                 return SearchResults.Find(pure_literals);
             return default;

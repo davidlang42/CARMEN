@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Carmen.ShowModel
 {
-    internal static class IEnumerableExtensions
+    public static class IEnumerableExtensions //TODO reuse extension methods using ShowModel as common ground
     {
         public static IEnumerable<T> Yield<T>(this T obj)
         {
@@ -46,6 +46,14 @@ namespace Carmen.ShowModel
 
         public static T NextOf<T>(this Random random, IList<T> list)
             => list[random.Next(list.Count)];
+
+        /// <summary>Faster than OfType<<typeparamref name="T"/>>()</summary>
+        public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> sequence) where T : class
+            => sequence.Where(i => i != null).Cast<T>();
+
+        /// <summary>Faster than OfType<<typeparamref name="T"/>>()</summary>
+        public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> sequence) where T : struct
+            => sequence.Where(i => i != null).Cast<T>();
     }
 
     public static class StringExtensions
