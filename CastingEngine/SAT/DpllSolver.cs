@@ -78,16 +78,19 @@ namespace Carmen.CastingEngine.SAT
             }
             // Pick an unassigned literal and branch
             var unassigned_literal = new_clauses.First().Literals.First();
-            var branching_clause = Clause<int>.Unit(unassigned_literal);
-            new_clauses.Add(branching_clause);
-            var new_expression = new Expression<int>(new_clauses);
-            foreach (var solution in PartialSolve(new_expression, partial_solution))
-                yield return solution; // propogate any found solutions
-            new_clauses.Remove(branching_clause);
-            branching_clause = Clause<int>.Unit(unassigned_literal.Inverse());
-            new_clauses.Add(branching_clause);
-            foreach (var solution in PartialSolve(new_expression, partial_solution))
-                yield return solution; // propogate any found solutions
+            var branching_clauses = new[]
+            {
+                Clause<int>.Unit(unassigned_literal),
+                Clause<int>.Unit(unassigned_literal.Inverse())
+            };
+            foreach (var branching_clause in branching_clauses)
+            {
+                var branch_clauses = new HashSet<Clause<int>>(new_clauses);
+                branch_clauses.Add(branching_clause);
+                var new_expression = new Expression<int>(branch_clauses);
+                foreach (var solution in PartialSolve(new_expression, partial_solution))
+                    yield return solution; // propogate any found solutions
+            }
         }
 
         private struct SearchResult
