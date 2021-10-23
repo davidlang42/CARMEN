@@ -17,15 +17,15 @@ namespace Carmen.CastingEngine.SAT
             : base(variables)
         { }
 
-        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
+        protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution) //TODO 2) real speed up approach would be using multi-dim arrays to store flags of whether or not that var is referenced in the clause/literal
         {
             partial_solution = partial_solution.Clone();
-            var clauses = expression.Clauses.ToHashSet();
+            var clauses = expression.Clauses.ToHashSet(); //TODO 1) try storing 2 sets, old and new, so I only need to clone those in old, because new are safe to mutate
             // Propogate unit clauses
             while (true)
             {
                 // Find next unit clause literal
-                var unit = FindUnitClause(clauses); //TODO process many units at once
+                var unit = FindUnitClause(clauses);
                 if (unit.Solved)
                     yield return partial_solution;
                 if (unit.Solved || unit.Failed)
@@ -35,7 +35,7 @@ namespace Carmen.CastingEngine.SAT
                 // Assign unit clause value
                 partial_solution.Assignments[unit.Literal.Variable] = unit.Literal.Polarity;
                 // Remove unit clause and any other clauses containing the unit clause literal
-                clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal)); //TODO try hacking the next check into this
+                clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal));
                 // Remove inverse literal from any remaining clauses
                 var inverse_literal = unit.Literal.Inverse();
                 var containing_inverse_literal = clauses.Where(c => c.Literals.Contains(inverse_literal)).ToList();
@@ -129,8 +129,7 @@ namespace Carmen.CastingEngine.SAT
         {
             if (clauses.Count == 0)
                 return SearchResults.Solve();
-            var unique_literals = clauses.SelectMany(c => c.Literals).ToHashSet();//TODO is it faster to group by variable?
-            var pure_literals = unique_literals.Where(l => !unique_literals.Contains(l.Inverse())).ToList();
+            var pure_literals = clauses.SelectMany(c => c.Literals).Distinct().GroupBy(l => l.Variable).Select(g => g.SingleOrDefaultSafe()).OfType<Literal<int>>().ToList();
             if (pure_literals.Any())
                 return SearchResults.Find(pure_literals);
             return default;
