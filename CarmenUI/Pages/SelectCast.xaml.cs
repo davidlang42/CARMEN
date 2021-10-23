@@ -110,11 +110,13 @@ namespace CarmenUI.Pages
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
                 _applicants = await context.Applicants.ToArrayAsync();
-            castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
-            allApplicantsViewSource.Source = castNumbersViewSource.Source = castNumberMissingViewSource.Source
-                = context.Applicants.Local.ToObservableCollection();
-            using (loading.Segment(nameof(TriggerCastNumbersRefresh), "Cast list"))
+            using (loading.Segment(nameof(TriggerCastNumbersRefresh) + nameof(castNumbersViewSource), "Cast numbers"))
+            {
+                castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
+                allApplicantsViewSource.Source = castNumbersViewSource.Source = castNumberMissingViewSource.Source
+                    = context.Applicants.Local.ToObservableCollection();
                 TriggerCastNumbersRefresh();
+            }
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
                 var show_root = context.ShowRoot;
@@ -211,7 +213,8 @@ namespace CarmenUI.Pages
                 engine.AllocateCastNumbers(applicants);
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
                 engine.ApplyTags(applicants, tags);
-            TriggerCastNumbersRefresh();
+            using (processing.Segment(nameof(RefreshMainPanel), "Refreshing cast lists"))
+                RefreshMainPanel();
             //TODO remove test message
 #if DEBUG
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
@@ -395,7 +398,10 @@ namespace CarmenUI.Pages
                 else if (selectionList.SelectedItem is AlternativeCast)
                     applicant.AlternativeCast = null;
                 else if (selectionList.SelectedItem is Tag tag)
+                {
+                    tag.Members.Remove(applicant);
                     applicant.Tags.Remove(tag);
+                }
                 else
                     throw new NotImplementedException($"Selection list type not handled: {selectionList.SelectedItem.GetType().Name}");
             }
@@ -466,6 +472,9 @@ namespace CarmenUI.Pages
             => removeSameCastSetButton_Click(sender, e);
 
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+            => RefreshMainPanel();
+
+        private void RefreshMainPanel()
         {
             selectionPanel.Visibility = numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
             if (selectionList.SelectedItem is CastGroup cast_group)

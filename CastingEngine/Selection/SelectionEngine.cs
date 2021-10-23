@@ -163,11 +163,16 @@ namespace Carmen.CastingEngine.Selection
             {
                 var cast_group = applicant.CastGroup!; // not null because IsAccepted
                 if (!remaining.TryGetValue(cast_group, out var remaining_count))
-                    applicant.Tags.Add(tag); // no limit on this cast group
+                {
+                    // no limit on this cast group
+                    applicant.Tags.Add(tag);
+                    tag.Members.Add(applicant);
+                }
                 else if (remaining_count > 0)
                 {
                     // limited, but space remaining for this cast group
                     applicant.Tags.Add(tag);
+                    tag.Members.Add(applicant);
                     remaining[cast_group] = remaining_count - 1;
                 }
             }
