@@ -37,7 +37,7 @@ namespace CarmenUI.ViewModels
                     consecutive_item_failures.Add(failure);
             // verify section type rules
             var cast_groups = await c.CastGroups.Include(cg => cg.Members).ToArrayAsync();
-            var total_cast = await cast_groups.SumAsync(cg => cg.FullTimeEquivalentMembers(alternative_casts.Length));
+            var total_cast = (uint)cast_groups.Sum(cg => cg.Members.Count);
             var section_types = await c.SectionTypes.Include(st => st.Sections).ToArrayAsync();
             foreach (var section_type in section_types)
             {

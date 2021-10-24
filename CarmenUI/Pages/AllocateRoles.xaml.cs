@@ -107,7 +107,7 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Items), "Items"))
                     await context.Roles.Include(r => r.Items).LoadAsync();
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
-                    _totalCast = await cast_groups.SumAsync(cg => cg.FullTimeEquivalentMembers(_alternativeCasts.Length));
+                    _totalCast = (uint)cast_groups.Sum(cg => cg.Members.Count);
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
                 {
                     IAuditionEngine audition_engine = ParseAuditionEngine() switch
