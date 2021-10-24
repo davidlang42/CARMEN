@@ -4,17 +4,21 @@ using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace CarmenUI.ViewModels
 {
-    public class NullableAbility
+    public class NullableAbility : INotifyPropertyChanged
     {
         ObservableCollection<Ability> collection;
         Ability ability;
         bool attached;
+
+        public event PropertyChangedEventHandler? PropertyChanged;
 
         public Criteria Criteria => ability.Criteria;
 
@@ -36,6 +40,7 @@ namespace CarmenUI.ViewModels
                         collection.Add(ability);
                     attached = true;
                 }
+                OnPropertyChanged();
             }
         }
 
@@ -52,6 +57,11 @@ namespace CarmenUI.ViewModels
                 ability = new Ability { Criteria = criteria };
                 attached = false;
             }
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }
