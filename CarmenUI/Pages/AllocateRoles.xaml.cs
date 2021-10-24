@@ -206,7 +206,7 @@ namespace CarmenUI.Pages
                     Header = "Roles",
                     DisplayMemberBinding = new Binding($"{nameof(ApplicantForRole.ExistingRoles)}[{array_index}]")
                     {
-                        StringFormat = "{0:#.#}"
+                        StringFormat = "{0:0.#}"
                     },
                 };
                 BindingOperations.SetBinding(count_column, GridViewColumn.WidthProperty, new WidthBinding($"{nameof(Properties.Widths.AllocateRolesGrid)}[{criteria.Name}_Count]"));
