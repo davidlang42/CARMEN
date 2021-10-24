@@ -47,9 +47,9 @@ namespace CarmenUI.ViewModels
                 {
                     if (!section.CastingMeetsSectionTypeRules(total_cast, out var no_roles, out var multi_roles))
                     {
-                        if (no_roles > 0)
+                        if (no_roles != 0)
                             Rows.Add(new Row { Fail = $"{no_roles.Plural("Applicant has", "Applicants have")} no role in {section.Name}" });
-                        if (multi_roles > 0)
+                        if (multi_roles != 0)
                             Rows.Add(new Row { Fail = $"{multi_roles.Plural("Applicant has", "Applicants have")} multiple roles in {section.Name}" });
                     }
                     if (!section.VerifyConsecutiveItems(out var section_failures))

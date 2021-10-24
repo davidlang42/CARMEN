@@ -28,9 +28,9 @@ namespace CarmenUI.ViewModels
                 // show section type errors and section consecutive item errors, because they aren't shown anywhere else
                 if (!section.CastingMeetsSectionTypeRules(total_cast_members, out var no_roles, out var multi_roles))
                 {
-                    if (no_roles > 0)
+                    if (no_roles != 0)
                         ValidationErrors.Add($"{no_roles.Plural("Applicant has", "Applicants have")} no role in {section.Name}");
-                    if (multi_roles > 0)
+                    if (multi_roles != 0)
                         ValidationErrors.Add($"{multi_roles.Plural("Applicant has", "Applicants have")} multiple roles in {section.Name}");
                 }
                 if (!section.VerifyConsecutiveItems(out var section_failures))
