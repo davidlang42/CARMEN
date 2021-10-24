@@ -19,16 +19,21 @@ namespace CarmenUI.ViewModels
             var alternative_casts = await c.AlternativeCasts.ToArrayAsync();
             // check role statuses
             var roles = await c.Roles.Include(r => r.Cast).ToArrayAsync();
-            var counts = await roles.GroupBy(r => r.CastingStatus(alternative_casts))
-                .ToDictionaryAsync(g => g.Key, g => g.Count());
-            if (counts.TryGetValue(RoleStatus.FullyCast, out var roles_cast))
-                Rows.Add(new Row { Success = $"{roles_cast.Plural("Role")} cast" });
-            if (counts.TryGetValue(RoleStatus.NotCast, out var roles_blank))
-                Rows.Add(new Row { Success = $"{roles_blank.Plural("Role")} not cast" });
-            if (counts.TryGetValue(RoleStatus.UnderCast, out var roles_undercast))
-                Rows.Add(new Row { Fail = $"{roles_undercast.Plural("Role")} partially cast" });
-            if (counts.TryGetValue(RoleStatus.OverCast, out var roles_overcast))
-                Rows.Add(new Row { Fail = $"{roles_overcast.Plural("Role")} with too many cast" });
+            if (roles.Length == 0)
+                Rows.Add(new Row { Success = "No Roles to cast" });
+            else
+            {
+                var counts = await roles.GroupBy(r => r.CastingStatus(alternative_casts))
+            .       ToDictionaryAsync(g => g.Key, g => g.Count());
+                if (counts.TryGetValue(RoleStatus.FullyCast, out var roles_cast))
+                    Rows.Add(new Row { Success = $"{roles_cast.Plural("Role")} cast" });
+                if (counts.TryGetValue(RoleStatus.NotCast, out var roles_blank))
+                    Rows.Add(new Row { Success = $"{roles_blank.Plural("Role")} not cast" });
+                if (counts.TryGetValue(RoleStatus.UnderCast, out var roles_undercast))
+                    Rows.Add(new Row { Fail = $"{roles_undercast.Plural("Role")} partially cast" });
+                if (counts.TryGetValue(RoleStatus.OverCast, out var roles_overcast))
+                    Rows.Add(new Row { Fail = $"{roles_overcast.Plural("Role")} with too many cast" });
+            }
             // check showroot consecutive items
             await c.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
             var consecutive_item_failures = new HashSet<ConsecutiveItemCast>();
