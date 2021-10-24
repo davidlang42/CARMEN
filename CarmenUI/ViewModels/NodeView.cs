@@ -122,7 +122,7 @@ namespace CarmenUI.ViewModels
             var child_progress = ChildrenInOrder.Average(c => c.Progress) ?? 1;
             var child_errors = ChildrenInOrder.Any(c => c.Status == ProcessStatus.Error);
             var (progress, has_errors) = await CalculateAsync(child_progress, child_errors);
-            if (has_errors && progress == 1)
+            if (has_errors && progress > 0.99)
                 progress = 0.99; // don't show more than 99% complete if there are errors
             FinishUpdate(progress, has_errors);
         }
