@@ -70,9 +70,10 @@ namespace Carmen.ShowModel.Structure
                 var previous_item_roles = items[i - 1].Roles.ToHashSet();
                 var item_roles = items[i].Roles.ToHashSet();
                 // separate the roles common to both items
-                var legitimate_consecutive_cast = previous_item_roles.Intersect(item_roles).SelectMany(r => r.Cast).ToHashSet();
-                previous_item_roles.ExceptWith(item_roles);
-                item_roles.ExceptWith(previous_item_roles);
+                var legitimate_consecutive_roles = previous_item_roles.Intersect(item_roles).ToHashSet();
+                var legitimate_consecutive_cast = legitimate_consecutive_roles.SelectMany(r => r.Cast).ToHashSet();
+                previous_item_roles.ExceptWith(legitimate_consecutive_roles);
+                item_roles.ExceptWith(legitimate_consecutive_roles);
                 // find the set of cast in each item
                 var previous_item_cast = previous_item_roles.SelectMany(r => r.Cast).ToHashSet();
                 var item_cast = item_roles.SelectMany(r => r.Cast).ToHashSet();
