@@ -91,18 +91,14 @@ namespace Carmen.CastingEngine.SAT
 
         protected virtual IEnumerable<Solution> BranchPartialSolve(HashSet<Clause<int>> remaining_clauses, Clause<int>[] branching_clauses, Solution partial_solution)
         {
-            var solutions = new ConcurrentBag<Solution>();
-            Parallel.ForEach(branching_clauses, branching_clause =>
+            foreach (var branching_clause in branching_clauses)
             {
                 var branch_clauses = new HashSet<Clause<int>>(remaining_clauses);
                 branch_clauses.Add(branching_clause);
                 var new_expression = new Expression<int>(branch_clauses);
-                var solution = PartialSolve(new_expression, partial_solution).FirstOrDefault();
-                if (!solution.IsUnsolvable)
-                    solutions.Add(solution);
-            });
-            foreach (var solution in solutions)
-                yield return solution;
+                foreach (var solution in PartialSolve(new_expression, partial_solution))
+                    yield return solution; // propogate any found solutions
+            }
         }
 
         private struct SearchResult
