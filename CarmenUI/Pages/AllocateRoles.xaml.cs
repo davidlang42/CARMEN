@@ -428,6 +428,9 @@ namespace CarmenUI.Pages
                 + "\nDo you still want to automatically cast this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
             engine.BalanceCast(applicantsInCast, selected_roles);
+            SaveChanges(false); // immediately save any automatic casting
+            foreach (var role in selected_roles)
+                rootNodeView.FindRoleView(role)?.UpdateAsync();
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, totalCast);
         }
 
