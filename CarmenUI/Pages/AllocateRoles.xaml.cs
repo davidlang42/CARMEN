@@ -236,19 +236,19 @@ namespace CarmenUI.Pages
             return true;
         }
 
-        private async Task<bool> ChangeToEditMode()
+        private bool ChangeToEditMode()
         {
+            using var loading = new LoadingOverlay(this) { MainText = "Calculating...", SubText = "Applicant suitabilities" };
             if (!CancelChanges())
                 return false;
             if (RevertChanges())
                 Page_Loaded(this, new RoutedEventArgs());
             if (applicantsPanel.Content is IDisposable existing_view)
                 existing_view.Dispose();
-            using var loading = new LoadingOverlay(this) { MainText = "Processing...", SubText = "Calculating applicant suitabilities" };
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
-                RoleNodeView role_node_view => await Task.Run(() => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,
-                    Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants)),
+                RoleNodeView role_node_view => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,//TODO ADD OVERLAY IN TASK
+                    Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants),
                 _ => defaultPanelContent
             };
             if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
@@ -323,11 +323,11 @@ namespace CarmenUI.Pages
                 current_view.ClearSelectedApplicants();
         }
 
-        private async void EditCastButton_Click(object sender, RoutedEventArgs e)
-            => await ChangeToEditMode();
+        private void EditCastButton_Click(object sender, RoutedEventArgs e)
+            => ChangeToEditMode();
 
-        private async void ViewOnlyApplicantsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => await ChangeToEditMode();
+        private void ViewOnlyApplicantsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => ChangeToEditMode();
 
         private void rolesTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
@@ -340,8 +340,8 @@ namespace CarmenUI.Pages
             }
         }
 
-        private async void rolesTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => await ChangeToEditMode();
+        private void rolesTreeView_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+            => ChangeToEditMode();
 
         private void ExpandAll_Click(object sender, RoutedEventArgs e)
             => rootNodeView.ExpandAll();
