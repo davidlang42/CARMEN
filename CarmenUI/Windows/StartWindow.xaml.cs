@@ -40,12 +40,12 @@ namespace CarmenUI.Windows
             if (dialog.ShowDialog() == true)
             {
                 var show = RecentShow.FromLocalFile(dialog.FileName);
-                using var loading = new LoadingOverlay(this).AsSegment($"{nameof(StartWindow)}_{nameof(NewButton_Click)}");
-                using (loading.Segment($"{nameof(StartWindow)}_{nameof(CreateNewShow)}", "Creating new database"))
+                using var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(NewButton_Click));
+                using (loading.Segment(nameof(StartWindow) + nameof(CreateNewShow), "Creating new database"))
                     CreateNewShow(show);
-                using (loading.Segment($"{nameof(StartWindow)}_{nameof(AddToRecentList)}", "Adding to recents list"))
+                using (loading.Segment(nameof(StartWindow) + nameof(AddToRecentList), "Adding to recents list"))
                     AddToRecentList(show);
-                using (loading.Segment($"{nameof(StartWindow)}_{nameof(LaunchMainWindow)}", "Opening show"))
+                using (loading.Segment(nameof(StartWindow) + nameof(LaunchMainWindow), "Opening show"))
                     LaunchMainWindow(show);
             }
         }
@@ -100,12 +100,12 @@ namespace CarmenUI.Windows
 
         private void OpenShow(RecentShow show)
         {
-            using var loading = new LoadingOverlay(this).AsSegment($"{nameof(StartWindow)}_{nameof(OpenShow)}");
-            using (loading.Segment($"{nameof(StartWindow)}_{nameof(CheckIntegrity)}", "Checking database integrity"))
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(OpenShow));
+            using (loading.Segment(nameof(StartWindow) + nameof(CheckIntegrity), "Checking database integrity"))
                 CheckIntegrity(show);
-            using (loading.Segment($"{nameof(StartWindow)}_{nameof(AddToRecentList)}", "Adding to recents list"))
+            using (loading.Segment(nameof(StartWindow) + nameof(AddToRecentList), "Adding to recents list"))
                 AddToRecentList(show);
-            using (loading.Segment($"{nameof(StartWindow)}_{nameof(LaunchMainWindow)}", "Opening show"))
+            using (loading.Segment(nameof(StartWindow) + nameof(LaunchMainWindow), "Opening show"))
                 LaunchMainWindow(show);
         }
 

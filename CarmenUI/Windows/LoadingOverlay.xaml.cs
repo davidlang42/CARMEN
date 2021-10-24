@@ -84,12 +84,14 @@ namespace CarmenUI.Windows
 
         /// <summary>Creates a main LoadingSegment from which sub-segments can be specified.
         /// Disposing this segment will also dispose the LoadingOverlay.</summary>
-        public LoadingSegment AsSegment(string segment_key, string? main_text = null)
+        public LoadingSegment AsSegment(string segment_key, string? main_text = null, string? sub_text = null)
         {
             if (mainSegment != null)
                 throw new ArgumentException("LoadingOverlay has already registered a main LoadingSegment.");
             if (main_text != null)
                 MainText = main_text;
+            if (sub_text != null)
+                SubText = sub_text;
             return mainSegment = new LoadingSegment(SetProgress, s => SubText = s, segment_key);
         }
 
