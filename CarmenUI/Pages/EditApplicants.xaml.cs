@@ -91,8 +91,8 @@ namespace CarmenUI.Pages
         private void CancelButton_Click(object sender, RoutedEventArgs e)
             => CancelChangesAndReturn();
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
-            => SaveChangesAndReturn();
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+            => await SaveChangesAndReturn();
 
         private void AddApplicant_Click(object sender, RoutedEventArgs e)
         {
@@ -252,10 +252,10 @@ namespace CarmenUI.Pages
         private void hideFinishedApplicants_Changed(object sender, RoutedEventArgs e)
             => ConfigureFiltering();
 
-        private void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (Properties.Settings.Default.SaveOnApplicantChange)
-                SaveChanges(user_initiated: false);
+                await SaveChanges(user_initiated: false);
         }
 
         private void ExpandAll_Click(object sender, RoutedEventArgs e)

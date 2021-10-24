@@ -112,8 +112,8 @@ namespace CarmenUI.Pages
         private void CancelButton_Click(object sender, RoutedEventArgs e)
             => CancelChangesAndReturn();
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
-            => SaveChangesAndReturn();
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+            => await SaveChangesAndReturn();
 
         private void RolesDataGrid_Initialized(object sender, EventArgs e)
         {

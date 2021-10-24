@@ -152,10 +152,10 @@ namespace CarmenUI.Pages
         private void CancelButton_Click(object sender, RoutedEventArgs e)
             => CancelChangesAndReturn();
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
-            => SaveChangesAndReturn();
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+            => await SaveChangesAndReturn();
 
-        protected override bool PreSaveChecks()
+        protected override async Task<bool> PreSaveChecks()
         {
             var inconsistent_applicants = applicants
                 .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)))
@@ -178,9 +178,9 @@ namespace CarmenUI.Pages
                     using (var processing = new LoadingOverlay(this).AsSegment(nameof(SelectCast) + nameof(PreSaveChecks), "Processing..."))
                     {
                         using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                            engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
+                            await Task.Run(() => engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local));
                         using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                            engine.AllocateCastNumbers(applicants);
+                            await Task.Run(() => engine.AllocateCastNumbers(applicants));
                     }
                     var updated_inconsistent_applicants = applicants
                         .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)));
@@ -197,7 +197,8 @@ namespace CarmenUI.Pages
                         applicant.CastGroup = null;
                 }
             }
-            engine.AuditionEngine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted));
+            using (new LoadingOverlay(this).AsSegment(nameof(IAuditionEngine) + nameof(IAuditionEngine.UserSelectedCast), "Learning...", "Cast selected by the user"))
+                await Task.Run(() => engine.AuditionEngine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted)));
             return true;
         }
 

@@ -139,7 +139,7 @@ namespace CarmenUI.Pages
 
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
-            if (SaveChanges())
+            if (await SaveChanges())
             {
                 if (applicantsPanel.Content is EditableRoleWithApplicantsView editable_view)
                 {
@@ -150,7 +150,7 @@ namespace CarmenUI.Pages
                         .Select(afr => afr.Applicant);
                     using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Learning...", "Roles allocated by the user"))
                         await Task.Run(() => engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role));
-                    SaveChanges(false); // to save any weights updated by the engine
+                    await SaveChanges(false); // to save any weights updated by the engine
                 }
                 ChangeToViewMode();
             }
@@ -308,7 +308,7 @@ namespace CarmenUI.Pages
         {
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.ExportChanges), "Learning...", "Finalising user session"))
                 await Task.Run(() => engine.ExportChanges());
-            SaveChangesAndReturn(false); // to save any weights updated by the engine
+            await SaveChangesAndReturn(false); // to save any weights updated by the engine
         } 
 
         private void showApplicants_Changed(object sender, RoutedEventArgs e)
@@ -432,7 +432,7 @@ namespace CarmenUI.Pages
                 return;
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.BalanceCast), "Processing...", "Balancing cast between roles"))
                 await Task.Run(() => engine.BalanceCast(applicantsInCast, selected_roles));
-            SaveChanges(false); // immediately save any automatic casting
+            await SaveChanges(false); // immediately save any automatic casting
             foreach (var role in selected_roles)
                 rootNodeView.FindRoleView(role)?.UpdateAsync();
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, totalCast);

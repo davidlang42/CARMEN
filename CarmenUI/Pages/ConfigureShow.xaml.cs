@@ -194,8 +194,8 @@ namespace CarmenUI.Pages
         private void CancelButton_Click(object sender, RoutedEventArgs e)
             => CancelChangesAndReturn();
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
-            => SaveChangesAndReturn();
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
+            => await SaveChangesAndReturn();
 
         private void AddObjectButton_Click(object sender, RoutedEventArgs e)
         {
@@ -339,15 +339,21 @@ namespace CarmenUI.Pages
             moveDownButton.IsEnabled = selected_index != -1 && selected_index < objectList.Items.Count - 1;
         }
 
-        protected override bool PreSaveChecks()
+        protected override async Task<bool> PreSaveChecks()
         {
-            var validation_issues = context.Requirements.Local.ToList().SelectMany(vo => vo.Validate()).ToList();
-            if (validation_issues.Count == 0)
-            {
-                // only validate CastGroups if Requirements/Tags are valid, otherwise there might be circular references
-                validation_issues.AddRange(context.CastGroups.Local.SelectMany(vo => vo.Validate()));
-                validation_issues.AddRange(context.Tags.Local.SelectMany(vo => vo.Validate()));
-            }
+            List<string> validation_issues;
+            using (new LoadingOverlay(this) { MainText = "Processing...", SubText = "Validating requirements" })
+                validation_issues = await Task.Run(() =>
+                {
+                    var issues = context.Requirements.Local.ToList().SelectMany(vo => vo.Validate()).ToList();
+                    if (issues.Count == 0)
+                    {
+                    // only validate CastGroups if Requirements/Tags are valid, otherwise there might be circular references
+                    issues.AddRange(context.CastGroups.Local.SelectMany(vo => vo.Validate()));
+                        issues.AddRange(context.Tags.Local.SelectMany(vo => vo.Validate()));
+                    }
+                    return issues;
+                });
             if (validation_issues.Count == 0)
                 return true;
             string msg;

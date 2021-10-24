@@ -59,18 +59,18 @@ namespace CarmenUI.Pages
                 windowWithEventsAttached.KeyDown -= Window_KeyDown;
         }
 
-        protected virtual void Window_KeyDown(object sender, KeyEventArgs e)
+        protected virtual async void Window_KeyDown(object sender, KeyEventArgs e)
         {
             if (Keyboard.Modifiers == ModifierKeys.Control)
             {
                 if (e.Key == Key.S && Properties.Settings.Default.SaveOnCtrlS)
                 {
-                    SaveChanges();
+                    await SaveChanges();
                     e.Handled = true;
                 }
                 else if (e.Key == Key.Enter && Properties.Settings.Default.SaveAndExitOnCtrlEnter)
                 {
-                    SaveChangesAndReturn();
+                    await SaveChangesAndReturn();
                     e.Handled = true;
                 }
             }
@@ -88,17 +88,17 @@ namespace CarmenUI.Pages
         }
 
         /// <summary>Save changes and exit to main menu if succeeded</summary>
-        protected void SaveChangesAndReturn(bool user_initiated = true)
+        protected async Task SaveChangesAndReturn(bool user_initiated = true)
         {
-            if (SaveChanges(user_initiated))
+            if (await SaveChanges(user_initiated))
                 OnReturn(new ReturnEventArgs<DataObjects>(saved_changes));
         }
 
         /// <summary>Save changes to the database and return true if succeeded</summary>
-        protected bool SaveChanges(bool user_initiated = true)
+        protected async Task<bool> SaveChanges(bool user_initiated = true)
         {
             CommitTextboxValue();
-            if (!PreSaveChecks())
+            if (!await PreSaveChecks())
                 return false;
             if (!context.ChangeTracker.HasChanges())
             {
@@ -106,17 +106,18 @@ namespace CarmenUI.Pages
                     MessageBox.Show("No unsaved changes have been made.", WindowTitle);
                 return true;
             }
-            using var saving = new LoadingOverlay(this);
-            saving.MainText = "Saving...";
+            using var saving = new LoadingOverlay(this) { MainText = "Saving..." };
             var changes = context.DataChanges();
-            context.SaveChanges(); //TODO handle db errors, could this be async?
+            await Task.Run(() => context.SaveChanges()); //TODO handle db errors
             saved_changes |= changes;
             return true;
         }
 
         /// <summary>Check any data consistency constraints before allowing save to be processed.
         /// This may contain user interaction. Return true to continue or false to cancel saving.</summary>
-        protected virtual bool PreSaveChecks() => true;
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+        protected virtual async Task<bool> PreSaveChecks() => true;
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
 
         /// <summary>Confirm cancel with the user and exit to main menu</summary>
         protected void CancelChangesAndReturn()
