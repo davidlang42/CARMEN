@@ -13,6 +13,7 @@ using System.ComponentModel;
 using System.IO;
 using System;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 
 namespace Carmen.ShowModel
 {
@@ -113,6 +114,11 @@ namespace Carmen.ShowModel
                         Type t when t == typeof(Tag) => DataObjects.Tags,
                         _ => throw new NotImplementedException($"Owner of CountByGroup not handled: {entry.Metadata.DefiningEntityType.ClrType.Name}")
                     };
+                else if (entry.Entity is Dictionary<string, object> linking_table)
+                {
+                    if (linking_table.ContainsKey(nameof(Roles) + nameof(Role.RoleId)))
+                        changes |= DataObjects.Roles;
+                }
             }
             return changes;
         }
