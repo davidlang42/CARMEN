@@ -214,7 +214,7 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <ComboBox x:Name="castStatusCombo" FontSize="18" ItemsSource="{Binding Source={StaticResource castStatusEnumValues}}"
-                          SelectionChanged="castStatusCombo_SelectionChanged"/>
+                          SelectionChanged="castStatusCombo_SelectionChanged" MouseDoubleClick="castStatusCombo_MouseDoubleClick"/>
                 <TextBlock x:Name="castStatusNoun" Grid.Column="1" FontSize="18" VerticalAlignment="Center" Margin="5 0 0 0"/>
                 <TextBlock Grid.Column="2" Text="{Binding Source={StaticResource allApplicantsViewSource}, Path=Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
             </Grid>

@@ -558,6 +558,14 @@ namespace CarmenUI.Pages
             if (e.Key == Key.Delete)
                 DeleteSameCastSet_Click(sender, e);
         }
+
+        private void castStatusCombo_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var new_index = castStatusCombo.SelectedIndex + 1;
+            if (new_index >= castStatusCombo.Items.Count)
+                new_index = 0;
+            castStatusCombo.SelectedIndex = new_index;
+        }
     }
 
     public enum CastStatus
