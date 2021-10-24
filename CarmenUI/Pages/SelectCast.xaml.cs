@@ -175,7 +175,7 @@ namespace CarmenUI.Pages
                 else if (response == MessageBoxResult.Yes)
                 {
                     // auto-complete cast numbers & alternative casts
-                    using (var processing = new LoadingOverlay(this).AsSegment(nameof(PreSaveChecks), "Processing..."))
+                    using (var processing = new LoadingOverlay(this).AsSegment(nameof(SelectCast) + nameof(PreSaveChecks), "Processing..."))
                     {
                         using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
                             engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
@@ -526,9 +526,15 @@ namespace CarmenUI.Pages
             }
         }
 
-        private void DetectSiblings_Click(object sender, RoutedEventArgs e)
+        private async void DetectSiblings_Click(object sender, RoutedEventArgs e)
         {
-            engine.DetectFamilies(applicants, out var new_same_cast_sets);
+            IEnumerable<SameCastSet> new_same_cast_sets;
+            using (new LoadingOverlay(this).AsSegment(nameof(SelectCast) + nameof(PreSaveChecks), "Processing...", "Detecting siblings"))
+                new_same_cast_sets = await Task.Run(() =>
+                {
+                    engine.DetectFamilies(applicants, out var new_same_cast_sets);
+                    return new_same_cast_sets;
+                });
             var list = (IList)sameCastSetsViewSource.Source;
             foreach (var new_same_cast_set in new_same_cast_sets)
                 list.Add(new_same_cast_set);
