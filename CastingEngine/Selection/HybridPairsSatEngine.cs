@@ -31,8 +31,8 @@ namespace Carmen.CastingEngine.Selection
         protected override bool Improve(ref int chunk_size, ref int max_chunks)
         {
             chunk_size += 2;
-            max_chunks = int.MaxValue;
-            return true; // eventually terminates when no additional chunk clauses are added
+            max_chunks = int.MaxValue; // usually terminates when no additional chunk clauses are added
+            return chunk_size <= 16; // any more than 16 takes too long to process
         }  
     }
 }
