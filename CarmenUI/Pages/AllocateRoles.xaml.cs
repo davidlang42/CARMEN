@@ -137,7 +137,7 @@ namespace CarmenUI.Pages
         private void CancelButton_Click(object sender, RoutedEventArgs e)
             => ChangeToViewMode();
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (SaveChanges())
             {
@@ -148,7 +148,8 @@ namespace CarmenUI.Pages
                         .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
                         .Where(afr => !afr.IsSelected)
                         .Select(afr => afr.Applicant);
-                    engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
+                    using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Learning...", "Roles allocated by the user"))
+                        await Task.Run(() => engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role));
                     SaveChanges(false); // to save any weights updated by the engine
                 }
                 ChangeToViewMode();
@@ -176,11 +177,13 @@ namespace CarmenUI.Pages
                 base.Window_KeyDown(sender, e);
         }
 
-        private void AutoCastButton_Click(object sender, RoutedEventArgs e)
+        private async void AutoCastButton_Click(object sender, RoutedEventArgs e)
         {
             if (applicantsPanel.Content is not EditableRoleWithApplicantsView current_view)
                 return;
-            var new_applicants = engine.PickCast(applicantsInCast, current_view.Role);
+            IEnumerable<Applicant> new_applicants;
+            using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Processing...", "Finding best applicants"))
+                new_applicants = await Task.Run(() => engine.PickCast(applicantsInCast, current_view.Role));
             current_view.SelectApplicants(new_applicants);
         }
 
@@ -244,7 +247,7 @@ namespace CarmenUI.Pages
                 existing_view.Dispose();
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
-                RoleNodeView role_node_view => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,
+                RoleNodeView role_node_view => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,//TODO ADD OVERLAY IN TASK
                     Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants),
                 _ => defaultPanelContent
             };
@@ -269,7 +272,7 @@ namespace CarmenUI.Pages
             if (recommendedCastingOrder == null)
                 recommendedCastingOrder = engine.IdealCastingOrder(context.ShowRoot, applicantsInCast).GetEnumerator();
             //TODO make this async, also faster by skipping roles already cast WITHIN IdealCastingOrder (maybe?)
-            using (var loading = new LoadingOverlay(this) { MainText = "Searching...", SubText = "for next uncast role" })
+            using (new LoadingOverlay(this) { MainText = "Processing...", SubText = "Finding next uncast role" })
                 while (recommendedCastingOrder.MoveNext())
                     if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
                     {
@@ -302,9 +305,10 @@ namespace CarmenUI.Pages
             selectingRoleProgrammatically = false;
         }
 
-        private void MainMenuButton_Click(object sender, RoutedEventArgs e)
+        private async void MainMenuButton_Click(object sender, RoutedEventArgs e)
         {
-            engine.ExportChanges();
+            using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.ExportChanges), "Learning...", "Finalising user session"))
+                await Task.Run(() => engine.ExportChanges());
             SaveChangesAndReturn(false); // to save any weights updated by the engine
         } 
 
@@ -398,7 +402,7 @@ namespace CarmenUI.Pages
                 afr.IsSelected = value;
         }
 
-        private void BalanceCastButton_Click(object sender, RoutedEventArgs e)
+        private async void BalanceCastButton_Click(object sender, RoutedEventArgs e)
         {
             if (applicantsPanel.Content is not NodeRolesOverview current_view)
                 return;
@@ -427,7 +431,8 @@ namespace CarmenUI.Pages
             if (selected_roles.Count == 1 && MessageBox.Show("Only 1 role is selected, so no balancing will occur."
                 + "\nDo you still want to automatically cast this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
-            engine.BalanceCast(applicantsInCast, selected_roles);
+            using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.BalanceCast), "Processing...", "Balancing cast between roles"))
+                await Task.Run(() => engine.BalanceCast(applicantsInCast, selected_roles));
             SaveChanges(false); // immediately save any automatic casting
             foreach (var role in selected_roles)
                 rootNodeView.FindRoleView(role)?.UpdateAsync();
