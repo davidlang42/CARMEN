@@ -201,18 +201,18 @@ namespace CarmenUI.Pages
             return true;
         }
 
-        private void selectCastButton_Click(object sender, RoutedEventArgs e)
+        private async void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
             //TODO handle exceptions on all engine calls
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
-                engine.SelectCastGroups(applicants, castGroups);
+                await Task.Run(() => engine.SelectCastGroups(applicants, castGroups));
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
+                await Task.Run(() => engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local));
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                engine.AllocateCastNumbers(applicants);
+                await Task.Run(() => engine.AllocateCastNumbers(applicants));
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
-                engine.ApplyTags(applicants, tags);
+                await Task.Run(() => engine.ApplyTags(applicants, tags));
             using (processing.Segment(nameof(RefreshMainPanel), "Refreshing cast lists"))
                 RefreshMainPanel();
             //TODO remove test message
