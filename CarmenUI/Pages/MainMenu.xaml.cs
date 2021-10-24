@@ -124,12 +124,14 @@ namespace CarmenUI.Pages
                 summaries.AddRange(new Summary[] { RegistrationSummary, AuditionSummary });
             if (changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.SameCastSets)
-                || changes.HasFlag(DataObjects.Tags))
+                || changes.HasFlag(DataObjects.Tags)
+                || changes.HasFlag(DataObjects.Applicants))
                 summaries.Add(CastSummary);
             if (changes.HasFlag(DataObjects.Nodes)
                 || changes.HasFlag(DataObjects.Roles)
                 || changes.HasFlag(DataObjects.CastGroups)
-                || changes.HasFlag(DataObjects.SectionTypes))
+                || changes.HasFlag(DataObjects.SectionTypes)
+                || changes.HasFlag(DataObjects.Applicants))
                 summaries.AddRange(new Summary[] { ItemsSummary, RolesSummary });
             // Trigger update if required
             if (summaries.Count == 0)
