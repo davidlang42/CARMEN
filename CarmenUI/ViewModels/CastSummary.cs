@@ -86,10 +86,15 @@ namespace CarmenUI.ViewModels
             var tags = await c.Tags.Include(cg => cg.Members).ToArrayAsync();
             foreach (var tag in tags)
             {
-                var row = new Row { Success = $"{tag.Members.Count} tagged {tag.Name}" };
-                if (tag.Members.GroupBy(a => a.CastGroup).Any(g => g.Key == null || (tag.CountFor(g.Key) is uint required_count && required_count != g.Count())))
-                    row.Fail = $"(doesn't match required)";
-                Rows.Add(row);
+                Rows.Add(new Row { Success = $"{tag.Members.Count} tagged {tag.Name}" });
+                foreach (var group in tag.Members.GroupBy(a => a.CastGroup))
+                {
+                    var count = group.Count();
+                    if (group.Key == null)
+                        Rows.Add(new Row { Fail = $"{count} rejected applicants tagged {tag.Name}" });
+                    else if (tag.CountFor(group.Key) is uint required_count && required_count != count)
+                        Rows.Add(new Row { Fail = $"{count} {group.Key.Abbreviation}s tagged {tag.Name} (required {required_count})" }); //TODO also split this by alternative cast
+                }
             }
             // cast number range and missing numbers
             int min_cast_num = 1;
