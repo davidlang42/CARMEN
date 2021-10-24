@@ -19,7 +19,7 @@ namespace CarmenUI.ViewModels
         public Applicant Applicant { get; init; }
         public Criteria[] PrimaryCriterias { get; init; }
 
-        private Role role;
+        private readonly Role role;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

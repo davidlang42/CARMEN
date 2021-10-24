@@ -25,7 +25,7 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class MainMenu : Page, IDisposable
     {
-        RecentShow connection;
+        readonly RecentShow connection;
 
         public ShowSummary ShowSummary { get; init; }
         public RegistrationSummary RegistrationSummary { get; init; } = new();

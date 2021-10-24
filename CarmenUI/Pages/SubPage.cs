@@ -77,7 +77,7 @@ namespace CarmenUI.Pages
         }
 
         /// <summary>If a text box is focussed, this commits its value.</summary>
-        private void CommitTextboxValue()
+        private static void CommitTextboxValue()
         {
             if (Keyboard.FocusedElement is TextBox text_box
                 && text_box.IsEnabled && !text_box.IsReadOnly
@@ -149,7 +149,7 @@ namespace CarmenUI.Pages
             return true;
         }
 
-        protected string ParseAuditionEngine()
+        protected static string ParseAuditionEngine()
         {
             var name = Properties.Settings.Default.AuditionEngine;
             if (AuditionEngine.Implementations.Any(t => t.Name == name))
@@ -157,7 +157,7 @@ namespace CarmenUI.Pages
             return AuditionEngine.Implementations.First().Name;
         }
 
-        protected string ParseSelectionEngine()
+        protected static string ParseSelectionEngine()
         {
             var name = Properties.Settings.Default.SelectionEngine;
             if (SelectionEngine.Implementations.Any(t => t.Name == name))
@@ -165,7 +165,7 @@ namespace CarmenUI.Pages
             return SelectionEngine.Implementations.First().Name;
         }
 
-        protected string ParseAllocationEngine()
+        protected static string ParseAllocationEngine()
         {
             var name = Properties.Settings.Default.AllocationEngine;
             if (AllocationEngine.Implementations.Any(t => t.Name == name))

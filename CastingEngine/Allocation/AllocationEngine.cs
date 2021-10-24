@@ -525,7 +525,7 @@ namespace Carmen.CastingEngine.Allocation
 
         #region Applicant comparison
         public ApplicantForRoleComparer ComparerFor(Role role)
-            => new ApplicantForRoleComparer(this, role);
+            => new(this, role);
 
         int IComparer<(Applicant, Role)>.Compare((Applicant, Role) x, (Applicant, Role) y)
         {

@@ -14,8 +14,8 @@ namespace CarmenUI.ViewModels
 {
     public class NullableAbility : INotifyPropertyChanged
     {
-        ObservableCollection<Ability> collection;
-        Ability ability;
+        readonly ObservableCollection<Ability> collection;
+        readonly Ability ability;
         bool attached;
 
         public event PropertyChangedEventHandler? PropertyChanged;

@@ -32,15 +32,15 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class SelectCast : SubPage
     {
-        private CollectionViewSource selectedApplicantsViewSource;
-        private CollectionViewSource allApplicantsViewSource;
-        private CollectionViewSource castGroupsViewSource;
-        private CollectionViewSource sameCastSetsViewSource;
-        private CollectionViewSource tagsViewSource;
-        private CollectionViewSource alternativeCastsViewSource;
-        private CollectionViewSource castNumbersViewSource;
-        private CollectionViewSource castNumberMissingViewSource;
-        private ApplicantDescription applicantDescription;
+        private readonly CollectionViewSource selectedApplicantsViewSource;
+        private readonly CollectionViewSource allApplicantsViewSource;
+        private readonly CollectionViewSource castGroupsViewSource;
+        private readonly CollectionViewSource sameCastSetsViewSource;
+        private readonly CollectionViewSource tagsViewSource;
+        private readonly CollectionViewSource alternativeCastsViewSource;
+        private readonly CollectionViewSource castNumbersViewSource;
+        private readonly CollectionViewSource castNumberMissingViewSource;
+        private readonly ApplicantDescription applicantDescription;
 
         private Criteria[]? _criterias;
         private Criteria[] criterias => _criterias
@@ -433,7 +433,7 @@ namespace CarmenUI.Pages
             ConfigureAllApplicantsFiltering();
         }
 
-        private void AddToSameCastSet(SameCastSet set, Applicant[] applicants)
+        private static void AddToSameCastSet(SameCastSet set, Applicant[] applicants)
         {
             foreach (var applicant in applicants)
             {
@@ -457,7 +457,7 @@ namespace CarmenUI.Pages
             ConfigureAllApplicantsFiltering();
         }
 
-        private void RemoveFromSameCastSet(SameCastSet set, Applicant[] applicants)
+        private static void RemoveFromSameCastSet(SameCastSet set, Applicant[] applicants)
         {
             foreach (var applicant in applicants)
             {

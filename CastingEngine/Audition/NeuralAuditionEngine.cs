@@ -127,7 +127,7 @@ namespace Carmen.CastingEngine.Audition
                 LossThreshold = 0.005,
                 MaxIterations = MaxTrainingIterations,
             };
-            var m = trainer.Train(training_pairs.Keys, training_pairs.Values);
+            _ = trainer.Train(training_pairs.Keys, training_pairs.Values);
             UpdateWeights();
         }
 

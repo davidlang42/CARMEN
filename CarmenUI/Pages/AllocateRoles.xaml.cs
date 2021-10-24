@@ -45,7 +45,7 @@ namespace CarmenUI.Pages
         private uint? _totalCast;
         private IAllocationEngine? _engine;
 
-        private object defaultPanelContent;
+        private readonly object defaultPanelContent;
         private IEnumerator<Role[]>? recommendedCastingOrder;
 
         private CastGroupAndCast[] castGroupsByCast => _castGroupsByCast
@@ -393,7 +393,7 @@ namespace CarmenUI.Pages
             }
         }
 
-        private void PickSelectedApplicants(ListView list_view, bool? value_or_toggle)
+        private static void PickSelectedApplicants(ListView list_view, bool? value_or_toggle)
         {
             var selected_items = list_view.SelectedItems.OfType<ApplicantForRole>().ToArray();
             var value = value_or_toggle ?? !(selected_items.Where(afr => afr.IsSelected).Count() > selected_items.Length / 2);

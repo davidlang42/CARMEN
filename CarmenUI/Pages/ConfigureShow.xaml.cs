@@ -109,7 +109,7 @@ namespace CarmenUI.Pages
         }
 
         private void ShowRoot_Selected(object sender, RoutedEventArgs e)
-            => BindObjectList("", false, showRootSource, new AddableObject[0][], true);
+            => BindObjectList("", false, showRootSource, Array.Empty<AddableObject[]>(), true);
 
         readonly AddableObject[][] criteriasButtons = new[]
         {

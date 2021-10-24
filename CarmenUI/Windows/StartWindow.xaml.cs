@@ -50,7 +50,7 @@ namespace CarmenUI.Windows
             }
         }
 
-        private void CreateNewShow(RecentShow show)
+        private static void CreateNewShow(RecentShow show)
         {
             using (var context = new ShowContext(show))
             {
@@ -109,7 +109,7 @@ namespace CarmenUI.Windows
                 LaunchMainWindow(show);
         }
 
-        private void CheckIntegrity(ShowConnection connection)
+        private static void CheckIntegrity(ShowConnection connection)
         {
             using (var context = new ShowContext(connection))
             {
@@ -121,7 +121,7 @@ namespace CarmenUI.Windows
             }
         }
 
-        private void AddToRecentList(RecentShow show)
+        private static void AddToRecentList(RecentShow show)
         {
             show.LastOpened = DateTime.Now;
             var recent = Properties.Settings.Default.RecentShows;
@@ -131,7 +131,7 @@ namespace CarmenUI.Windows
                 recent.RemoveAt(recent.Count - 1);
         }
 
-        private void RemoveFromRecentList(RecentShow show)
+        private static void RemoveFromRecentList(RecentShow show)
         {
             var recent = Properties.Settings.Default.RecentShows;
             recent.Remove(show);

@@ -62,13 +62,13 @@ namespace Carmen.ShowModel.Applicants
             }
         }
 
-        private ObservableCollection<Applicant> members = new();
+        private readonly ObservableCollection<Applicant> members = new();
         public virtual ICollection<Applicant> Members => members;
 
-        private ObservableCollection<Requirement> requirements = new();
+        private readonly ObservableCollection<Requirement> requirements = new();
         public virtual ICollection<Requirement> Requirements => requirements;
 
-        private ObservableCollection<CountByGroup> countByGroups = new();
+        private readonly ObservableCollection<CountByGroup> countByGroups = new();
         public virtual ICollection<CountByGroup> CountByGroups => countByGroups;
 
         public uint? CountFor(CastGroup group)

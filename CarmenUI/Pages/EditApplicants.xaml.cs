@@ -131,7 +131,7 @@ namespace CarmenUI.Pages
         private void filterText_TextChanged(object sender, TextChangedEventArgs e)
             => ConfigureFiltering();
 
-        private Dictionary<string, int> GetGroupCounts(ICollectionView view)
+        private static Dictionary<string, int> GetGroupCounts(ICollectionView view)
             => view.Groups?.OfType<CollectionViewGroup>()
             .Where(g => g.Name != null)
             .Where(g => g.ItemCount > 0)
@@ -234,7 +234,7 @@ namespace CarmenUI.Pages
             }
         }
 
-        private FullNameFormat[] allNameFormats = Enum.GetValues<FullNameFormat>();
+        private readonly FullNameFormat[] allNameFormats = Enum.GetValues<FullNameFormat>();
 
         /// <summary>Checks if this appliants name, in any of the possible name formats, contains the filter text</summary>
         private bool AnyNameContains(Applicant applicant, string filter_text)

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Carmen.ShowModel
 {
@@ -10,6 +11,6 @@ namespace Carmen.ShowModel
         [Key]
         public int ImageId { get; private set; }
         public string Name { get; set; } = "";
-        public byte[] ImageData { get; set; } = new byte[0];
+        public byte[] ImageData { get; set; } = Array.Empty<byte>();
     }
 }

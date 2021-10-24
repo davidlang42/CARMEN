@@ -24,7 +24,7 @@ namespace CarmenUI.Windows
         public static readonly DependencyProperty MainTextProperty = DependencyProperty.Register(
             nameof(MainText), typeof(string), typeof(LoadingOverlay), new PropertyMetadata("Loading..."));
 
-        private IntPtr ownerHwnd;
+        private readonly IntPtr ownerHwnd;
         private LoadingSegment? mainSegment;
 
         public string MainText
@@ -115,12 +115,11 @@ namespace CarmenUI.Windows
         public delegate void UpdateSubTextDelegate(string sub_text);
 
         bool disposed = false;
-        UpdateSegmentDelegate updateSegment;
-        UpdateSubTextDelegate updateSubText;
-        string segmentKey;
-        DateTime startTime;
-
-        HashSet<string> subSegments = new();
+        readonly UpdateSegmentDelegate updateSegment;
+        readonly UpdateSubTextDelegate updateSubText;
+        readonly string segmentKey;
+        readonly DateTime startTime;
+        readonly HashSet<string> subSegments = new();
         LoadingSegment? currentSubSegment;
         int previousSubSegmentsPercentage = 0;
         int currentSubSegmentPercentage;
