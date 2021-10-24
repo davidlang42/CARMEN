@@ -74,8 +74,10 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
                     _castGroups = await context.CastGroups.InOrder().ToArrayAsync();
                 using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
+                {
                     castMembersDictionarySource.Source = _castGroups.ToDictionary(cg => cg, cg => cg.FullTimeEquivalentMembers(alternativeCasts.Length));
-                castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
+                    castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
+                }
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 {
                     var all_requirements = await context.Requirements.InOrder().ToArrayAsync();
@@ -93,8 +95,10 @@ namespace CarmenUI.Pages
                     rootNodesViewSource.View.SortDescriptions.Add(StandardSort.For<Node>()); // sorts top level only, other levels sorted by SortIOrdered converter
                 }
                 using (loading.Segment(nameof(ShowContext.SectionTypes), "Section types"))
+                {
                     await context.SectionTypes.LoadAsync();
-                sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
+                    sectionTypesViewSource.Source = context.SectionTypes.Local.ToObservableCollection();
+                }
             }
             if (itemsTreeView.VisualDescendants<TreeViewItem>().FirstOrDefault() is TreeViewItem show_root_tvi)
                 show_root_tvi.IsSelected = true;
