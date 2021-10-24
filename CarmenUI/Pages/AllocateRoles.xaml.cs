@@ -238,16 +238,16 @@ namespace CarmenUI.Pages
 
         private bool ChangeToEditMode()
         {
-            using var loading = new LoadingOverlay(this) { MainText = "Calculating...", SubText = "Applicant suitabilities" };
             if (!CancelChanges())
                 return false;
             if (RevertChanges())
                 Page_Loaded(this, new RoutedEventArgs());
             if (applicantsPanel.Content is IDisposable existing_view)
                 existing_view.Dispose();
+            using var loading = new LoadingOverlay(this) { MainText = "Processing...", SubText = "Calculating applicant suitabilities" };
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
-                RoleNodeView role_node_view => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,//TODO ADD OVERLAY IN TASK
+                RoleNodeView role_node_view => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,
                     Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants),
                 _ => defaultPanelContent
             };
