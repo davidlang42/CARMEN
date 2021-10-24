@@ -75,6 +75,8 @@ namespace Carmen.ShowModel.Applicants
             get => dateOfBirth;
             set
             {
+                if (value > (ShowRoot.ShowDate ?? DateTime.Now))
+                    value = null;
                 if (dateOfBirth == value)
                     return;
                 dateOfBirth = value;
