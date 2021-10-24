@@ -264,16 +264,15 @@ namespace CarmenUI.Pages
         }
 
         bool selectingRoleProgrammatically = false;
-        private void NextButton_Click(object sender, RoutedEventArgs e)
+        private async void NextButton_Click(object sender, RoutedEventArgs e)
         {
             if (selectingRoleProgrammatically)
                 throw new ApplicationException("Called next role while already selecting a role programatically.");
             selectingRoleProgrammatically = true;
             if (recommendedCastingOrder == null)
                 recommendedCastingOrder = engine.IdealCastingOrder(context.ShowRoot, applicantsInCast).GetEnumerator();
-            //TODO make this async, also faster by skipping roles already cast WITHIN IdealCastingOrder (maybe?)
             using (new LoadingOverlay(this) { MainText = "Processing...", SubText = "Finding next uncast role" })
-                while (recommendedCastingOrder.MoveNext())
+                while (await Task.Run(() => recommendedCastingOrder.MoveNext()))
                     if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
                     {
                         rootNodeView.ClearSelection();
