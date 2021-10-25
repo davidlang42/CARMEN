@@ -188,7 +188,14 @@
                             <CheckBox Grid.Row="2" Grid.Column="1" IsChecked="{Binding Required}" FontSize="14" Content="Required" VerticalContentAlignment="Center"/>
                             <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding Primary}" FontSize="14" Content="Primary" VerticalContentAlignment="Center"/>
                             <TextBlock Grid.Row="4" Text="Weight" FontSize="14"/>
-                            <TextBox Grid.Row="4" Grid.Column="1" Text="{Binding Weight}" FontSize="14"/>
+                            <Grid Grid.Row="4" Grid.Column="1">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBox Grid.Column="0" Text="{Binding Weight}" FontSize="14" IsEnabled="{Binding Weight, Converter={StaticResource trueIfNonZero}}"/>
+                                <CheckBox Grid.Column="1" IsChecked="{Binding Weight, Converter={StaticResource trueIfNonZero}}" Content="Enabled" FontSize="14"/>
+                            </Grid>
                             <TextBlock Grid.Row="5" Text="Maximum" FontSize="14"/>
                             <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding MaxMark}" FontSize="14"/>
                         </Grid>
