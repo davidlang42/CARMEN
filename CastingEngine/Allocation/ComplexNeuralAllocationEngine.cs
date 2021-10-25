@@ -104,14 +104,20 @@ namespace Carmen.CastingEngine.Allocation
             try
             {
                 using var stream = ModelPersistence.Load();
-                if (reader.Deserialize(stream) is FeedforwardNetwork model && model.InputCount == nInputs)
-                    return model;
+                if (reader.Deserialize(stream) is not FeedforwardNetwork model)
+                    throw new ApplicationException("Failed to deserialise FeedforwardNetwork");
+                if (model.InputCount != nInputs)
+                    throw new ApplicationException($"Deserialised model contained {model.InputCount} inputs, expected {nInputs}");
+                return model;
             }
             catch
             {
                 // file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
+                if (confirm($"Neural model failed to load. Would you like to create a new one?"))
+                    return BuildNewModel();
+                else
+                    throw;
             }
-            return BuildNewModel();
         }
 
         private FeedforwardNetwork BuildNewModel()
