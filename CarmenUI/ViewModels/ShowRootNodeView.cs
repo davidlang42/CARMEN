@@ -27,5 +27,33 @@ namespace CarmenUI.ViewModels
         {
             ShowRoot = show_root;
         }
+
+        /// <summary>Updates any node which may need updating due to casting changes of the given role</summary>
+        public void RoleCastingChanged(Role role)
+        {
+            ItemNodeView? current_item = null;
+            ItemNodeView? previous_item = null;
+            bool update_next_item = false;
+            foreach (var node_view in Recurse())
+            {
+                if (node_view is ItemNodeView next_item_view)
+                {
+                    if (update_next_item)
+                    {
+                        _ = next_item_view.UpdateAsync();
+                        update_next_item = false;
+                    }
+                    previous_item = current_item;
+                    current_item = next_item_view;
+                }
+                else if (node_view is RoleNodeView role_view && role_view.Role == role)
+                {
+                    _ = role_view.UpdateAsync(); // this is the role that changed
+                    if (previous_item != null)
+                        _ = previous_item.UpdateAsync(); // previous item might have consecutive item errors
+                    update_next_item = true; // next item might have consecutive item errors
+                }
+            }
+        }
     }
 }

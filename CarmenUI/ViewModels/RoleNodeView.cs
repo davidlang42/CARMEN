@@ -12,7 +12,7 @@ namespace CarmenUI.ViewModels
     public class RoleNodeView : NodeView
     {
         public Role Role { get; init; }
-        private AlternativeCast[] alternativeCasts;
+        readonly AlternativeCast[] alternativeCasts;
 
         public override string Name => Role.Name;
 
@@ -25,7 +25,7 @@ namespace CarmenUI.ViewModels
         }
 
         public RoleNodeView(Role role, AlternativeCast[] alternative_casts)
-            : base(new NodeView[0])
+            : base(Array.Empty<NodeView>())
         {
             this.Role = role;
             alternativeCasts = alternative_casts;

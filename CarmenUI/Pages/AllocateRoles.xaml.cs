@@ -41,8 +41,7 @@ namespace CarmenUI.Pages
         private Criteria[]? _primaryCriterias;
         private Criteria[]? _criterias;
         private Requirement[]? _requirements;
-        private NodeView? _rootNodeView;
-        private uint? _totalCast;
+        private ShowRootNodeView? _rootNodeView;
         private IAllocationEngine? _engine;
 
         private readonly object defaultPanelContent;
@@ -66,7 +65,7 @@ namespace CarmenUI.Pages
         private Requirement[] requirements => _requirements
             ?? throw new ApplicationException($"Tried to used {nameof(requirements)} before it was loaded.");
 
-        private NodeView rootNodeView => _rootNodeView
+        private ShowRootNodeView rootNodeView => _rootNodeView
             ?? throw new ApplicationException($"Tried to used {nameof(rootNodeView)} before it was loaded.");
 
         private IAllocationEngine engine => _engine
@@ -138,7 +137,7 @@ namespace CarmenUI.Pages
             {
                 if (applicantsPanel.Content is EditableRoleWithApplicantsView editable_view)
                 {
-                    rootNodeView.FindRoleView(editable_view.Role)?.UpdateAsync();
+                    rootNodeView.RoleCastingChanged(editable_view.Role);
                     var applicants_not_picked = editable_view.Applicants
                         .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
                         .Where(afr => !afr.IsSelected)
@@ -429,7 +428,7 @@ namespace CarmenUI.Pages
                 await Task.Run(() => engine.BalanceCast(applicantsInCast, selected_roles));
             await SaveChanges(false); // immediately save any automatic casting
             foreach (var role in selected_roles)
-                rootNodeView.FindRoleView(role)?.UpdateAsync();
+                rootNodeView.RoleCastingChanged(role);
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast);
         }
 

@@ -18,9 +18,9 @@ namespace CarmenUI.ViewModels
     {
         bool disposed = false;
 
-        private CastGroup[] castGroups;
-        private Dictionary<CastGroup, uint> castMemberCounts;
-        private Action<Node> removeNodeAction;
+        readonly CastGroup[] castGroups;
+        readonly Dictionary<CastGroup, uint> castMemberCounts;
+        readonly Action<Node> removeNodeAction;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

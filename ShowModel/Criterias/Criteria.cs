@@ -84,7 +84,7 @@ namespace Carmen.ShowModel.Criterias
             }
         }
 
-        private ObservableCollection<Ability> abilities = new();
+        private readonly ObservableCollection<Ability> abilities = new();
         public virtual ICollection<Ability> Abilities => abilities;
 
         private uint maxMark;

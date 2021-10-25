@@ -199,16 +199,12 @@ namespace CarmenUI.ViewModels
             return false;
         }
 
-        /// <summary>Searches recursively for the RoleNodeView for the given Role.
-        /// This will return null if the Role is not found.</summary>
-        public RoleNodeView? FindRoleView(Role role)
+        /// <summary>Recursively enumrates all NodeViews depth-first</summary>
+        internal IEnumerable<NodeView> Recurse()
         {
-            if (this is RoleNodeView rv && rv.Role == role)
-                return rv;
-            foreach (var child in ChildrenInOrder)
-                if (child.FindRoleView(role) is RoleNodeView child_result)
-                    return child_result;
-            return null;
+            yield return this;
+            foreach (var child_of_child in ChildrenInOrder.SelectMany(c => c.Recurse()))
+                yield return child_of_child;
         }
 
         /// <summary>Recursively expands all NodeViews</summary>
