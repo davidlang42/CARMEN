@@ -204,7 +204,6 @@ namespace CarmenUI.Pages
 
         private async void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO handle exceptions on all engine calls
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
                 await Task.Run(() => engine.SelectCastGroups(applicants, castGroups));

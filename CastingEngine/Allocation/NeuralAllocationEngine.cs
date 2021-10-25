@@ -63,7 +63,7 @@ namespace Carmen.CastingEngine.Allocation
             if (overallWeightings.Length + suitabilityRequirements.Length < 2 && !ConfirmEngineCantLearn())
                 throw new ApplicationException("Not enough weights are enabled for the NeuralAllocationEngine to learn from."
                     + "\nPlease enable more Suitability and Overall weights on Requirements on the Configuring Show page."
-                    + "\nThis error can be avoided by choosing a non-learning AllocationEngine in the Advanced settings."); //TODO make sure that when this is thrown, the user is taken cleanly back to the main menu
+                    + "\nThis error can be avoided by choosing a non-learning AllocationEngine in the Advanced settings.");
         }
 
         private static Dictionary<Requirement, int> ArrayLookup<T>(int offset, T[] array)
