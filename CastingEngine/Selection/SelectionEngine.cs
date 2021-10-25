@@ -134,9 +134,13 @@ namespace Carmen.CastingEngine.Selection
         public void ApplyTag(IEnumerable<Applicant> applicants, Tag tag)
         {
             // In this dictionary, if a key is missing that means infinite are allowed
-            var remaining = tag.CountByGroups.ToDictionary(
-                cbg => cbg.CastGroup,
-                cbg => cbg.CastGroup.AlternateCasts ? alternativeCasts.Length * cbg.Count : cbg.Count);
+            var remaining = new Dictionary<(CastGroup, AlternativeCast?), uint>();
+            foreach (var cbg in tag.CountByGroups)
+            {
+                var alternative_casts = cbg.CastGroup.AlternateCasts ? alternativeCasts : new[] { (AlternativeCast?)null };
+                foreach (var alternative_cast in alternative_casts)
+                    remaining.Add((cbg.CastGroup, alternative_cast), cbg.Count);
+            }
             // Subtract cast already allocated to tags
             foreach (var applicant in applicants)
             {
@@ -147,12 +151,17 @@ namespace Carmen.CastingEngine.Selection
                     if (applicant.CastGroup.AlternateCasts != (applicant.AlternativeCast != null))
                         throw new ApplicationException($"Applicant '{applicant.FirstName} {applicant.LastName}' is in a cast group with Alternate Casts"
                             + $" set to {applicant.CastGroup.AlternateCasts}, but {(applicant.AlternativeCast != null ? "has" : "doesn't have")} an alternative cast.");
-                    if (applicant.Tags.Contains(tag)
-                        && remaining.TryGetValue(applicant.CastGroup, out var remaining_count)
-                        && remaining_count != 0)
-                        remaining[applicant.CastGroup] = remaining_count - 1;
+                    if (applicant.Tags.Contains(tag))
+                    {
+                        var key = (applicant.CastGroup, applicant.AlternativeCast);
+                        if (remaining.TryGetValue(key, out var remaining_count) && remaining_count != 0)
+                            remaining[key] = remaining_count - 1;
+                    }
                 }
             }
+            // Don't automatically apply tags with no requirements
+            if (tag.Requirements.Count == 0)
+                return; // but only return after tags have been removed from rejected applicants
             // Apply tags to accepted applicants in order of suitability
             var prioritised_applicants = applicants.Where(a => a.IsAccepted)
                 .Where(a => !a.Tags.Contains(tag))
@@ -161,8 +170,8 @@ namespace Carmen.CastingEngine.Selection
                 .ThenByDescending(a => AuditionEngine.OverallAbility(a));
             foreach (var applicant in prioritised_applicants) 
             {
-                var cast_group = applicant.CastGroup!; // not null because IsAccepted
-                if (!remaining.TryGetValue(cast_group, out var remaining_count))
+                var key = (applicant.CastGroup!, applicant.AlternativeCast); // not null because IsAccepted
+                if (!remaining.TryGetValue(key, out var remaining_count))
                 {
                     // no limit on this cast group
                     applicant.Tags.Add(tag);
@@ -173,7 +182,7 @@ namespace Carmen.CastingEngine.Selection
                     // limited, but space remaining for this cast group
                     applicant.Tags.Add(tag);
                     tag.Members.Add(applicant);
-                    remaining[cast_group] = remaining_count - 1;
+                    remaining[key] = remaining_count - 1;
                 }
             }
         }

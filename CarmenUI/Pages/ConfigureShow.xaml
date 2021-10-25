@@ -386,7 +386,11 @@
                                 <RowDefinition Height="*"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
-                                A tag can be applied to a successful Applicant to indicate that form part of a special team, or have an external attribute, such as wearing a microphone. An Applicant can have many tags.
+                                A tag can be applied to a successful Applicant to indicate that form part of a special team, or have an external attribute, such as wearing a microphone.
+                                An Applicant can have many tags.
+                                If a required count is not set, all applicants of that cast group which meet the requirements will get this tag.
+                                If no requirements are set, this tag will not be applied automatically.
+                                As with all counts, the required count is the number of cast members required per alternative cast.
                             </TextBlock>
                             <TextBlock Grid.Row="1" Text="Name" FontSize="14"/>
                             <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" FontSize="14" LostFocus="Name_LostFocus"/>
