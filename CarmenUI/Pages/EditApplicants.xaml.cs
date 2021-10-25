@@ -256,6 +256,7 @@ namespace CarmenUI.Pages
         {
             if (Properties.Settings.Default.SaveOnApplicantChange)
                 await SaveChanges(user_initiated: false);
+            ConfigureFiltering();
         }
 
         private void ExpandAll_Click(object sender, RoutedEventArgs e)
