@@ -19,8 +19,6 @@ namespace Carmen.ShowModel
 {
     public class ShowContext : DbContext
     {
-        //TODO also audit navigation properties, and change to internal where not required (to avoid the accidental usage from UI causing bad lazy loading)
-        //TODO consider making all IDs internal as well (this would require removing them from DatabaseExplorer)
         #region Database collections
         /// <summary>Auto includes ShowRoot, Abilities, CastGroup, AlternativeCast, Tags.
         /// Remember to include Roles, SameCastSet, Image.</summary>

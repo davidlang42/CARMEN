@@ -117,7 +117,6 @@ namespace CarmenUI.Windows
                 // It is important to do this here, while the loading form is shown, to avoid a synchronous delay when the MainMenu is loaded.
                 _ = context.Model;
                 //TODO handle io errors
-                //TODO ensure that db matches schema
             }
         }
 
