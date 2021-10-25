@@ -114,16 +114,16 @@ namespace Carmen.ShowModel.Requirements
             }
         }
 
-        private ObservableCollection<Role> usedByRoles = new();
+        private readonly ObservableCollection<Role> usedByRoles = new();
         public virtual ICollection<Role> UsedByRoles => usedByRoles;
 
-        private ObservableCollection<CastGroup> usedByCastGroups = new();
+        private readonly ObservableCollection<CastGroup> usedByCastGroups = new();
         public virtual ICollection<CastGroup> UsedByCastGroups => usedByCastGroups;
 
-        private ObservableCollection<CombinedRequirement> usedByCombinedRequirements = new();
+        private readonly ObservableCollection<CombinedRequirement> usedByCombinedRequirements = new();
         public virtual ICollection<CombinedRequirement> UsedByCombinedRequirements => usedByCombinedRequirements;
 
-        private ObservableCollection<Tag> usedByTags = new();
+        private readonly ObservableCollection<Tag> usedByTags = new();
         public virtual ICollection<Tag> UsedByTags => usedByTags;
 
         /// <summary>Checks if an Applicant satisfies this requirement.</summary>
