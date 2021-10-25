@@ -96,30 +96,28 @@ namespace CarmenUI.Pages
 
         private void AddApplicant_Click(object sender, RoutedEventArgs e)
         {
-            if (applicantsViewSource.Source is IList list)//TODO change ilist/not null view checks into hard casts (now that loading is done before showing page)
+            var list = (IList)applicantsViewSource.Source;
+            var applicant = new Applicant { ShowRoot = context.ShowRoot };
+            if (filterText.Text.Contains(","))
             {
-                var applicant = new Applicant { ShowRoot = context.ShowRoot };
-                if (filterText.Text.Contains(","))
-                {
-                    var names = filterText.Text.Split(",");
-                    applicant.FirstName = names[1].Trim().ToProperCase();
-                    applicant.LastName = names[0].Trim().ToProperCase();
-                }
-                else
-                {
-                    var names = filterText.Text.Split(" ", 2);
-                    applicant.FirstName = names[0].Trim().ToProperCase();
-                    if (names.Length > 1)
-                        applicant.LastName = names[1].Trim().ToProperCase();
-                }
-                ClearFilter();
-                list.Add(applicant);
-                applicantsList.SelectedItem = applicant;
-                applicantsList.ScrollIntoView(applicant);
-                if (applicantsViewSource.View.Groups?.FirstOrDefault(g => ((CollectionViewGroup)g).Items.Contains(applicant)) is CollectionViewGroup group)
-                    applicantsList.VisualDescendants<Expander>().First(ex => ex.DataContext == group).IsExpanded = true; // ensure new applicant group is expanded
-                firstNameText.Focus();
+                var names = filterText.Text.Split(",");
+                applicant.FirstName = names[1].Trim().ToProperCase();
+                applicant.LastName = names[0].Trim().ToProperCase();
             }
+            else
+            {
+                var names = filterText.Text.Split(" ", 2);
+                applicant.FirstName = names[0].Trim().ToProperCase();
+                if (names.Length > 1)
+                    applicant.LastName = names[1].Trim().ToProperCase();
+            }
+            ClearFilter();
+            list.Add(applicant);
+            applicantsList.SelectedItem = applicant;
+            applicantsList.ScrollIntoView(applicant);
+            if (applicantsViewSource.View.Groups?.FirstOrDefault(g => ((CollectionViewGroup)g).Items.Contains(applicant)) is CollectionViewGroup group)
+                applicantsList.VisualDescendants<Expander>().First(ex => ex.DataContext == group).IsExpanded = true; // ensure new applicant group is expanded
+            firstNameText.Focus();
         }
 
         private void ClearFilter()
