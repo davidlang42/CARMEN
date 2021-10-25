@@ -118,6 +118,10 @@ namespace Carmen.ShowModel.Structure
             }
         }
 
+        /// <summary>Find cast allocated to multiple roles within this item, as all items are non-multi.</summary>
+        public IEnumerable<KeyValuePair<Applicant, int>> FindDuplicateCast()
+            => CountRolesPerCastMember().Where(p => p.Value > 1);
+
         public static HashSet<InnerNode> CommonParents(params Item[] items)
         {
             if (items.Length == 0)

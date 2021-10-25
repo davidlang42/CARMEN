@@ -154,6 +154,11 @@ namespace Carmen.ShowModel.Structure
             return true;
         }
 
+        protected Dictionary<Applicant, int> CountRolesPerCastMember() => ItemsInOrder()
+            .SelectMany(i => i.Roles).Distinct()
+            .SelectMany(r => r.Cast).GroupBy(a => a)
+            .ToDictionary(g => g.Key, g => g.Count());
+
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

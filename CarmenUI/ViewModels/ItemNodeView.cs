@@ -17,6 +17,7 @@ namespace CarmenUI.ViewModels
 
         protected override async Task<(double progress, bool has_errors)> CalculateAsync(double child_progress, bool child_errors)
         {
+            child_errors |= await Task.Run(() => Item.FindDuplicateCast().Any());
             child_errors |= await Task.Run(() => Item.FindConsecutiveCast().Any());
             return (child_progress, child_errors);
         }

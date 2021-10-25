@@ -59,6 +59,14 @@ namespace CarmenUI.ViewModels
                             consecutive_item_failures.Add(failure);
                 }
             }
+            // verify items dont have duplicate cast
+            var items = await c.Nodes.OfType<Item>().Include(i => i.Roles).ToArrayAsync();
+            foreach (var item in items)
+            {
+                var duplicate_count = item.FindDuplicateCast().Count();
+                if (duplicate_count > 0)
+                    Rows.Add(new Row { Fail = $"{duplicate_count.Plural("Applicant has", "Applicants have")} multiple roles in {item.Name}" });
+            }
             // append combined showroot & section consecutive item failures
             foreach (var failure in consecutive_item_failures)
                 Rows.Add(new Row { Fail = $"{failure.Cast.Count.Plural("Applicant is", "Applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}" });

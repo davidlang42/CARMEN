@@ -40,6 +40,9 @@ namespace CarmenUI.ViewModels
             }
             else if (node is Item item)
             {
+                // check for cast with multiple roles in this item
+                foreach (var applicant in item.FindDuplicateCast())
+                    ValidationErrors.Add($"{FullName.Format(applicant.Key)} has {applicant.Value} roles in {item.Name}");
                 // show showroot (and section) consecutive item errors in the item, because showroot isn't visible
                 foreach (var consecutive_cast in item.FindConsecutiveCast())
                     foreach (var cast in consecutive_cast.Cast)

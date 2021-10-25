@@ -71,11 +71,6 @@ namespace Carmen.ShowModel.Structure
             return cast_with_no_roles == 0 && cast_with_multiple_roles == 0;
         }
 
-        private Dictionary<Applicant, int> CountRolesPerCastMember() => ItemsInOrder()
-            .SelectMany(i => i.Roles).Distinct()
-            .SelectMany(r => r.Cast).GroupBy(a => a)
-            .ToDictionary(g => g.Key, g => g.Count());
-
         /// <summary>Technically this verifies the same business logic as RolesMatchCastMembers(), but it checks the actual casting, rather than the sum of roles.
         /// The out parameters of cast counts are calculated only if they may break the SectionType rules.</summary>
         public bool CastingMeetsSectionTypeRules(IEnumerable<Applicant> cast_members, out Applicant[] cast_with_no_roles, out KeyValuePair<Applicant, int>[] cast_with_multiple_roles)
