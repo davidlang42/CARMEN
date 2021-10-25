@@ -36,12 +36,14 @@ namespace Carmen.ShowModel.Applicants
             }
         }
 
-        private string description = "";
-        public string Description
+        private string? description;
+        public string? Description
         {
             get => description;
             set
             {
+                if (value == "")
+                    value = null;
                 if (description == value)
                     return;
                 description = value;

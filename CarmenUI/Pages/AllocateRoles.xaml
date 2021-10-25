@@ -25,6 +25,7 @@
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
         <cv:BytesToImage x:Key="bytesToImage"/>
+        <cv:FallbackValues x:Key="fallbackValues"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -427,7 +428,16 @@
                                                                 <ItemsControl.ItemTemplate>
                                                                     <DataTemplate>
                                                                         <Image Margin="5 0 0 0" Source="{Binding Icon.ImageData, Converter={StaticResource bytesToImage}}"
-                                                                   Height="{Binding ElementName=EditableApplicantsListView, Path=FontSize}"/>
+                                                                            Height="{Binding ElementName=EditableApplicantsListView, Path=FontSize}">
+                                                                            <Image.ToolTip>
+                                                                                <MultiBinding Converter="{StaticResource fallbackValues}">
+                                                                                    <MultiBinding.Bindings>
+                                                                                        <Binding Path="Description"/>
+                                                                                        <Binding Path="Name"/>
+                                                                                    </MultiBinding.Bindings>
+                                                                                </MultiBinding>
+                                                                            </Image.ToolTip>
+                                                                        </Image>
                                                                     </DataTemplate>
                                                                 </ItemsControl.ItemTemplate>
                                                             </ItemsControl>
