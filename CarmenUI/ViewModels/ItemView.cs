@@ -2,6 +2,7 @@
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
+using CarmenUI.Converters;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -68,14 +69,14 @@ namespace CarmenUI.ViewModels
                 for (var i = 0; i < colors.Length; i++)
                     if (CountByGroups[i].Count is uint required_count
                         && SumOfRolesCount[i] != required_count)
-                        colors[i] = "LightCoral";//TODO use constants, also convert to brush
+                        colors[i] = HighlightError.ERROR_COLOR;
                     else
-                        colors[i] = "White";//TODO use constants, also convert to brush
+                        colors[i] = HighlightError.TEXTBOX_COLOR;
                 return colors;
             }
         }
 
-        public string NoRolesErrorBackgroundColor => Item.Roles.Count == 0 ? "LightCoral" : "WhiteSmoke";//TODO use constants, also convert to brush
+        public string NoRolesErrorBackgroundColor => Item.Roles.Count == 0 ? HighlightError.ERROR_COLOR : HighlightError.PANEL_COLOR;
 
         public uint[] SumOfPrimaryRequirements
         {
