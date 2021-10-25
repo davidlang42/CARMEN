@@ -119,9 +119,10 @@ namespace CarmenUI.ViewModels
             StartUpdate();
             if (ChildrenInOrder.Any(c => c.Status == ProcessStatus.Loading))
                 return; // leave status as loading until child statuses update
-            var child_progress = ChildrenInOrder.Average(c => c.Progress) ?? 1;
-            var child_errors = ChildrenInOrder.Any(c => c.Status == ProcessStatus.Error);
-            var (progress, has_errors) = await CalculateAsync(child_progress, child_errors);
+            var progress = ChildrenInOrder.Average(c => c.Progress) ?? 1;
+            var has_errors = ChildrenInOrder.Any(c => c.Status == ProcessStatus.Error);
+            if (progress > 0) // only check for errors if any casting has been started
+                (progress, has_errors) = await CalculateAsync(progress, has_errors);
             if (has_errors && progress > 0.99)
                 progress = 0.99; // don't show more than 99% complete if there are errors
             FinishUpdate(progress, has_errors);
