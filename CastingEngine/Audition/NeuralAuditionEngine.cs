@@ -10,19 +10,13 @@ namespace Carmen.CastingEngine.Audition
     /// <summary>
     /// An AuditionEngine which can learn from the user's choices, by training a SingleLayerPerceptron to update the criteria weights.
     /// </summary>
-    public class NeuralAuditionEngine : AuditionEngine, IComparer<Applicant>
+    public class NeuralAuditionEngine : WeightedSumEngine, IComparer<Applicant>
     {
         const double MINIMUM_CHANGE = 0.1;
 
         readonly SingleLayerPerceptron model;
         readonly Criteria[] criterias;
         readonly UserConfirmation confirm;
-
-        int maxOverallAbility;
-        public override int MaxOverallAbility => maxOverallAbility;
-
-        int minOverallAbility;
-        public override int MinOverallAbility => minOverallAbility;
 
         /// <summary>The maximum number of training iterations run per invocation of
         /// <see cref="UserSelectedCast(IEnumerable{Applicant}, IEnumerable{Applicant})"/></summary>
@@ -37,6 +31,7 @@ namespace Carmen.CastingEngine.Audition
         public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_3;
 
         public NeuralAuditionEngine(Criteria[] criterias, UserConfirmation confirm)
+            : base(criterias)
         {
             this.criterias = criterias.Where(c => c.Weight != 0).ToArray(); // exclude criterias with zero weight
             if (this.criterias.Length == 0 && criterias.Length != 0)
@@ -50,21 +45,6 @@ namespace Carmen.CastingEngine.Audition
             this.confirm = confirm;
             this.model = new SingleLayerPerceptron(this.criterias.Length * 2, 1);
             LoadWeights();
-            UpdateRange();
-        }
-
-        private void UpdateRange() //TODO really this is common with WeightedSumEngine and NeuralAuditionEngine should extend that
-        {
-            var max = criterias.Select(c => c.Weight).Where(w => w > 0).Sum();
-            if (max > int.MaxValue)
-                throw new ApplicationException($"Sum of positive Criteria weights cannot exceed {int.MaxValue}: {max}");
-            maxOverallAbility = Convert.ToInt32(max);
-            var min = criterias.Select(c => c.Weight).Where(w => w < 0).Sum();
-            if (min < int.MinValue)
-                throw new ApplicationException($"Sum of negative Criteria weights cannot go below {int.MinValue}: {min}");
-            minOverallAbility = Convert.ToInt32(min);
-            if (minOverallAbility == maxOverallAbility) // == 0
-                maxOverallAbility = 1; // to avoid division by zero errors
         }
 
         private void LoadWeights()
@@ -162,7 +142,7 @@ namespace Carmen.CastingEngine.Audition
             {
                 for (var i = 0; i < criterias.Length; i++)
                     criterias[i].Weight = new_weights[i];
-                UpdateRange();
+                UpdateRange(criterias);
             }
             LoadWeights(); // revert minor or refused changes, update neurons with normalised weights
         }

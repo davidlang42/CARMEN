@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Criterias;
+﻿using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
 using System;
 using System.Linq;
 
@@ -9,13 +10,25 @@ namespace Carmen.CastingEngine.Audition
     /// </summary>
     public class WeightedSumEngine : AuditionEngine
     {
-        readonly int maxOverallAbility;
+        int maxOverallAbility;
         public override int MaxOverallAbility => maxOverallAbility;
 
-        readonly int minOverallAbility;
+        int minOverallAbility;
         public override int MinOverallAbility => minOverallAbility;
-        
+
         public WeightedSumEngine(Criteria[] criterias)
+        {
+            UpdateRange(criterias);
+        }
+
+        readonly FunctionCache<Applicant, int> overallAbility = new(applicant
+            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)));
+
+        /// <summary>Calculate the overall ability of an Applicant as a weighted sum of their Abilities.
+        /// NOTE: This is cached for speed, as an Applicant's abilities shouldn't change over the lifetime of an AuditionEngine</summary>
+        public override int OverallAbility(Applicant applicant) => overallAbility[applicant];
+
+        protected void UpdateRange(Criteria[] criterias)
         {
             var max = criterias.Select(c => c.Weight).Where(w => w > 0).Sum();
             if (max > int.MaxValue)
