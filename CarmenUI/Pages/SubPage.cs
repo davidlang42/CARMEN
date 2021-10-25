@@ -108,7 +108,15 @@ namespace CarmenUI.Pages
             }
             using var saving = new LoadingOverlay(this) { MainText = "Saving..." };
             var changes = context.DataChanges();
-            await context.SaveChangesAsync(); //TODO handle db errors
+            try
+            {
+                await context.SaveChangesAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error while saving changes: {ex.Message}\nChanges not saved.");
+                return false;
+            }
             saved_changes |= changes;
             return true;
         }

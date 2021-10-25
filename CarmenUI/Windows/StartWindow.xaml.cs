@@ -30,7 +30,7 @@ namespace CarmenUI.Windows
             InitializeComponent();
         }
 
-        private void NewButton_Click(object sender, RoutedEventArgs e)
+        private async void NewButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new SaveFileDialog
             {
@@ -42,7 +42,7 @@ namespace CarmenUI.Windows
                 var show = RecentShow.FromLocalFile(dialog.FileName);
                 using var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(NewButton_Click));
                 using (loading.Segment(nameof(StartWindow) + nameof(CreateNewShow), "Creating new database"))
-                    CreateNewShow(show);
+                    await CreateNewShow(show);
                 using (loading.Segment(nameof(StartWindow) + nameof(AddToRecentList), "Adding to recents list"))
                     AddToRecentList(show);
                 using (loading.Segment(nameof(StartWindow) + nameof(LaunchMainWindow), "Opening show"))
@@ -50,11 +50,10 @@ namespace CarmenUI.Windows
             }
         }
 
-        private static void CreateNewShow(RecentShow show)
+        private static async Task CreateNewShow(RecentShow show)
         {
             using (var context = new ShowContext(show))
             {
-                //TODO handle io errors
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 #if DEBUG
@@ -63,18 +62,18 @@ namespace CarmenUI.Windows
                     using var test_data = new TestDataGenerator(context, 0);
                     test_data.AddAlternativeCasts();
                     test_data.AddCastGroups(4);
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                     test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false); // after cast groups committed
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                     test_data.AddCriteriaAndRequirements(); // after cast groups committed
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                     test_data.AddTags(1); // after requirements committed
                     context.SaveChanges();
                     test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                     test_data.AddRoles(5); // after applicants, items, cast groups, requirements committed
                     test_data.AddImages(); // after applicants, tags committed
-                    context.SaveChanges();
+                    await context.SaveChangesAsync();
                 }
                 else
                 {
@@ -83,7 +82,7 @@ namespace CarmenUI.Windows
 #else
                 context.SetDefaultShowSettings(show.DefaultShowName);
 #endif
-                context.SaveChanges();
+                await context.SaveChangesAsync();
             }
         }
 
@@ -116,7 +115,6 @@ namespace CarmenUI.Windows
                 // Accessing any model or entity related property on the context causes the model to be build, which takes ~1s synchronously.
                 // It is important to do this here, while the loading form is shown, to avoid a synchronous delay when the MainMenu is loaded.
                 _ = context.Model;
-                //TODO handle io errors
             }
         }
 
