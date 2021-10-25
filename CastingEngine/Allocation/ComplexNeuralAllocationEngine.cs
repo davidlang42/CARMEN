@@ -107,7 +107,7 @@ namespace Carmen.CastingEngine.Allocation
             }
             catch
             {
-                //TODO log exception or otherwise tell user, there are many cases that can get here: file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
+                // file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
             }
             return BuildNewModel();
         }

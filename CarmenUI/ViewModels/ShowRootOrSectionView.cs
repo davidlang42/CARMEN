@@ -167,7 +167,7 @@ namespace CarmenUI.ViewModels
                         }
                     ChildView_PropertyChanged(this, new PropertyChangedEventArgs(""));
                     break;
-                case NotifyCollectionChangedAction.Reset://TODO is this implementation correct? it probably isn't used
+                case NotifyCollectionChangedAction.Reset:
                     foreach (var cv in Children)
                     {
                         cv.PropertyChanged -= ChildView_PropertyChanged;
