@@ -6,6 +6,7 @@ using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Serialization;
 
@@ -131,9 +132,18 @@ namespace Carmen.CastingEngine.Allocation
             if (!model.IsValueCreated)
                 return; // no need to save if we haven't even loaded it
             var writer = new XmlSerializer(typeof(FeedforwardNetwork));
-            //TODO handle exceptions (and check for filename not being empty) and offer to save to temp as a fallback
-            using var stream = ModelPersistence.Save();
-            writer.Serialize(stream, model.Value);
+            try
+            {
+                using var stream = ModelPersistence.Save();
+                writer.Serialize(stream, model.Value);
+            }
+            catch
+            {
+                var temp = Path.GetTempFileName();
+                if (confirm($"Neural model failed to save. Would you like to save it to {temp}?"))
+                    using (var stream = new FilePersistence(temp).Save())
+                        writer.Serialize(stream, model.Value);
+            }
         }
         #endregion
 

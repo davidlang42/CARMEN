@@ -143,7 +143,7 @@ namespace CarmenUI.Pages
                         .Where(afr => !afr.IsSelected)
                         .Select(afr => afr.Applicant);
                     using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Learning...", "Roles allocated by the user"))
-                        await Task.Run(() => engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role));
+                        engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role); // must run in UI thread, because it may call MessageBox
                     await SaveChanges(false); // to save any weights updated by the engine
                 }
                 ChangeToViewMode();
@@ -301,7 +301,7 @@ namespace CarmenUI.Pages
         private async void MainMenuButton_Click(object sender, RoutedEventArgs e)
         {
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.ExportChanges), "Learning...", "Finalising user session"))
-                await Task.Run(() => engine.ExportChanges());
+                engine.ExportChanges(); // must run in UI thread, because it may call MessageBox
             await SaveChangesAndReturn(false); // to save any weights updated by the engine
         } 
 
