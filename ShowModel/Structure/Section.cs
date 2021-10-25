@@ -1,4 +1,5 @@
 ﻿using Carmen.ShowModel.Applicants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -62,15 +63,33 @@ namespace Carmen.ShowModel.Structure
             cast_with_multiple_roles = 0;
             if (SectionType.AllowNoRoles && SectionType.AllowMultipleRoles)
                 return true; // nothing to check
-            var roles_per_cast = ItemsInOrder()
-                .SelectMany(i => i.Roles).Distinct()
-                .SelectMany(r => r.Cast).GroupBy(a => a)
-                .ToDictionary(g => g.Key, g => g.Count());
+            var roles_per_cast = CountRolesPerCastMember();
             if (!SectionType.AllowNoRoles)
                 cast_with_no_roles = (int)total_cast_members - roles_per_cast.Count;
             if (!SectionType.AllowMultipleRoles)
                 cast_with_multiple_roles = roles_per_cast.Values.Count(v => v > 1);
             return cast_with_no_roles == 0 && cast_with_multiple_roles == 0;
+        }
+
+        private Dictionary<Applicant, int> CountRolesPerCastMember() => ItemsInOrder()
+            .SelectMany(i => i.Roles).Distinct()
+            .SelectMany(r => r.Cast).GroupBy(a => a)
+            .ToDictionary(g => g.Key, g => g.Count());
+
+        /// <summary>Technically this verifies the same business logic as RolesMatchCastMembers(), but it checks the actual casting, rather than the sum of roles.
+        /// The out parameters of cast counts are calculated only if they may break the SectionType rules.</summary>
+        public bool CastingMeetsSectionTypeRules(IEnumerable<Applicant> cast_members, out Applicant[] cast_with_no_roles, out KeyValuePair<Applicant, int>[] cast_with_multiple_roles)
+        {
+            cast_with_no_roles = Array.Empty<Applicant>();
+            cast_with_multiple_roles = Array.Empty<KeyValuePair<Applicant, int>>();
+            if (SectionType.AllowNoRoles && SectionType.AllowMultipleRoles)
+                return true; // nothing to check
+            var roles_per_cast = CountRolesPerCastMember();
+            if (!SectionType.AllowNoRoles)
+                cast_with_no_roles = cast_members.Where(a => !roles_per_cast.ContainsKey(a)).ToArray();
+            if (!SectionType.AllowMultipleRoles)
+                cast_with_multiple_roles = roles_per_cast.Where(p => p.Value > 1).ToArray();
+            return cast_with_no_roles.Length == 0 && cast_with_multiple_roles.Length == 0;
         }
     }
 }

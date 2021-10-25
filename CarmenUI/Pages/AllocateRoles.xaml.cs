@@ -69,9 +69,6 @@ namespace CarmenUI.Pages
         private NodeView rootNodeView => _rootNodeView
             ?? throw new ApplicationException($"Tried to used {nameof(rootNodeView)} before it was loaded.");
 
-        private uint totalCast => _totalCast
-            ?? throw new ApplicationException($"Tried to used {nameof(totalCast)} before it was loaded.");
-
         private IAllocationEngine engine => _engine
             ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
 
@@ -95,7 +92,7 @@ namespace CarmenUI.Pages
                     _alternativeCasts = await context.AlternativeCasts.InNameOrder().ToArrayAsync();
                 _castGroupsByCast = CastGroupAndCast.Enumerate(cast_groups, _alternativeCasts).ToArray();
                 using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles), "Applicants"))
-                    _applicantsInCast = await context.Applicants.Include(a => a.Roles).ToArrayAsync();
+                    _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
                     await context.Nodes.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
@@ -106,8 +103,6 @@ namespace CarmenUI.Pages
                     await context.Nodes.OfType<Item>().Include(i => i.Roles).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Items), "Items"))
                     await context.Roles.Include(r => r.Items).LoadAsync();
-                using (loading.Segment(nameof(CastGroup.FullTimeEquivalentMembers), "Cast members"))
-                    _totalCast = (uint)cast_groups.Sum(cg => cg.Members.Count);
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
                 {
                     IAuditionEngine audition_engine = ParseAuditionEngine() switch
@@ -126,7 +121,7 @@ namespace CarmenUI.Pages
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }
-                _rootNodeView = new ShowRootNodeView(context.ShowRoot, totalCast, _alternativeCasts);
+                _rootNodeView = new ShowRootNodeView(context.ShowRoot, (uint)applicantsInCast.Length, _alternativeCasts);
                 showCompleted.IsChecked = true; // must be set after creating ShowRootNodeView because it triggers Checked event
                 rolesTreeView.ItemsSource = rootNodeView.ChildrenInOrder;
                 castingProgress.DataContext = rootNodeView;
@@ -229,8 +224,8 @@ namespace CarmenUI.Pages
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
                 RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
-                ItemNodeView item_node_view => new NodeRolesOverview(item_node_view.Item, alternativeCasts, totalCast),
-                SectionNodeView section_node_view => new NodeRolesOverview(section_node_view.Section, alternativeCasts, totalCast),
+                ItemNodeView item_node_view => new NodeRolesOverview(item_node_view.Item, alternativeCasts, applicantsInCast),
+                SectionNodeView section_node_view => new NodeRolesOverview(section_node_view.Section, alternativeCasts, applicantsInCast),
                 _ => defaultPanelContent
             };
             return true;
@@ -435,7 +430,7 @@ namespace CarmenUI.Pages
             await SaveChanges(false); // immediately save any automatic casting
             foreach (var role in selected_roles)
                 rootNodeView.FindRoleView(role)?.UpdateAsync();
-            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, totalCast);
+            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast);
         }
 
         private List<Role>? ParseSelectedRoles(IEnumerable<IncompleteRole> incomplete_roles)

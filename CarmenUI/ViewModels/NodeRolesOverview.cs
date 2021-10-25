@@ -1,6 +1,7 @@
 ﻿using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
+using CarmenUI.Converters;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +18,7 @@ namespace CarmenUI.ViewModels
         public ObservableCollection<IncompleteRole> IncompleteRoles { get; init; } = new();
         public ObservableCollection<string> ValidationErrors { get; init; } = new();
 
-        public NodeRolesOverview(Node node, AlternativeCast[] alternative_casts, uint total_cast_members)
+        public NodeRolesOverview(Node node, AlternativeCast[] alternative_casts, IEnumerable<Applicant> cast_members)
         {
             Node = node;
             foreach (var role in node.ItemsInOrder().SelectMany(i => i.Roles).Distinct().InNameOrder())
@@ -26,12 +27,12 @@ namespace CarmenUI.ViewModels
             if (node is Section section)
             {
                 // show section type errors and section consecutive item errors, because they aren't shown anywhere else
-                if (!section.CastingMeetsSectionTypeRules(total_cast_members, out var no_roles, out var multi_roles))
+                if (!section.CastingMeetsSectionTypeRules(cast_members, out var no_roles, out var multi_roles))
                 {
-                    if (no_roles != 0)
-                        ValidationErrors.Add($"{no_roles.Plural("Applicant has", "Applicants have")} no role in {section.Name}");
-                    if (multi_roles != 0)
-                        ValidationErrors.Add($"{multi_roles.Plural("Applicant has", "Applicants have")} multiple roles in {section.Name}");
+                    foreach (var applicant in no_roles)
+                        ValidationErrors.Add($"{FullName.Format(applicant)} has no role in {section.Name}");
+                    foreach (var applicant in multi_roles)
+                        ValidationErrors.Add($"{FullName.Format(applicant.Key)} has {applicant.Value} roles in {section.Name}");
                 }
                 if (!section.VerifyConsecutiveItems(out var section_failures))
                     foreach (var failure in section_failures)

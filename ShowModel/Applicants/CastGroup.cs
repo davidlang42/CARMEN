@@ -101,7 +101,7 @@ namespace Carmen.ShowModel.Applicants
         }
 
         /// <summary>Gets the number of FTE members of this cast group, taking AlternateCasts into account</summary>
-        public uint FullTimeEquivalentMembers(int alternative_cast_count)
+        public uint FullTimeEquivalentMembers(int alternative_cast_count) //TODO is this actually needed/correct anywhere?
             => (uint)(AlternateCasts ? Members.Count / alternative_cast_count : Members.Count);
 
         private void Members_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
