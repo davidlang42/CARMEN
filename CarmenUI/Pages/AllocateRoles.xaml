@@ -101,9 +101,9 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="2*"/>
                             <ColumnDefinition Width="10"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="3*"/>
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.ColumnSpan="2" Text="{Binding Node.Name}" FontSize="22" Margin="0 0 0 10"/>
                         <TextBlock Grid.Row="1" Text="Roles not cast:" FontSize="18"/>
@@ -120,14 +120,22 @@
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <CheckBox IsChecked="{Binding IsSelected}"
-                                                  Width="{Binding ElementName=incompleteRolesList, Path=ActualWidth}"
-                                                  Content="{Binding Role.Name}" VerticalAlignment="Center"/>
+                                                  VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Role.Name}" TextWrapping="Wrap"/>
+                                    </CheckBox>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
                         <ListBox Grid.Row="2" Grid.Column="3"
-                                 FontSize="14" Margin="0 0 0 10"
-                                 ItemsSource="{Binding ValidationErrors}"/>
+                                 Margin="0 0 0 10"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding ValidationErrors}">
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}" FontSize="14" TextWrapping="Wrap"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
                         <Grid Grid.Row="3" Grid.ColumnSpan="3">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
