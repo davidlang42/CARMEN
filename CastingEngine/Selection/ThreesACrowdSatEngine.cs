@@ -91,7 +91,7 @@ namespace Carmen.CastingEngine.Selection
                 if (clauses.Count == 0)
                     break; // no clauses to solve
                 // run sat solver
-                solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
+                solution = sat.Solve(new(clauses)).FirstOrDefault();
                 Results.Add(new Result
                 {
                     SetSize = set_size,
@@ -155,14 +155,8 @@ namespace Carmen.CastingEngine.Selection
         private IEnumerable<Clause<Applicant>> KeepNotAllEqual(Applicant[] applicants)
         {
             // (A,B,C) is not all equal if (A || B || C) && (A' || B' || C')
-            yield return new()
-            {
-                Literals = applicants.Select(a => Literal<Applicant>.Positive(a)).ToHashSet()
-            };
-            yield return new()
-            {
-                Literals = applicants.Select(a => Literal<Applicant>.Negative(a)).ToHashSet()
-            };
+            yield return new(applicants.Select(a => Literal<Applicant>.Positive(a)).ToHashSet());
+            yield return new(applicants.Select(a => Literal<Applicant>.Negative(a)).ToHashSet());
         }
 
         /// <summary>Takes set_size applicants starting at start_index, with at most set_size-1 from any one SameCastSet</summary>

@@ -68,7 +68,7 @@ namespace Carmen.CastingEngine.Selection
                 if (clauses.Count == 0)
                     break; // no clauses to solve
                 // run sat solver
-                solution = sat.SolveWithoutRemap(new() { Clauses = clauses }).FirstOrDefault();
+                solution = sat.SolveWithoutRemap(new(clauses)).FirstOrDefault();
                 Results.Add(new Result
                 {
                     ChunkSize = chunk_size,

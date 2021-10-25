@@ -13,12 +13,12 @@ namespace Carmen.CastingEngine.SAT
 
         public HashSet<Clause<T>> Clauses;
 
-        public Expression() //TODO audit use of this with {} initialisers
+        public Expression()
         {
             Clauses = new();
         }
 
-        public Expression(HashSet<Clause<T>> clauses) //TODO remove if not needed
+        public Expression(HashSet<Clause<T>> clauses)
         {
             Clauses = clauses;
         }
@@ -28,12 +28,6 @@ namespace Carmen.CastingEngine.SAT
         public override string ToString() => string.Join(CONJUNCTION, Clauses.Select(c => $"({c})"));
 
         public Expression<U> Remap<U>(Dictionary<T, U> variable_map) where U : notnull
-            => new()
-            {
-                Clauses = Clauses.Select(c => c.Remap(variable_map)).ToHashSet()
-            };
-
-        public Expression<T> WithClause(Clause<T> extra_clause)
-            => this with { Clauses = Clauses.Concat(extra_clause.Yield()).ToHashSet() };//TODO maybe construct fresh
+            => new(Clauses.Select(c => c.Remap(variable_map)).ToHashSet());
     }
 }

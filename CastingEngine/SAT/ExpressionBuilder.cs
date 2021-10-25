@@ -48,15 +48,10 @@ namespace Carmen.CastingEngine.SAT
         /// <summary>Calculate a CNF expression using the truth table method,
         /// that is add one clause per FALSE row in the truth table</summary>
         private static Expression<int> TruthTableExpression(int n_variables, Func<bool[], bool> boolean_function)
-        {
-            return new Expression<int>
-            {
-                Clauses = Enumerate(new bool[n_variables], 0)
-                    .Where(values => !boolean_function(values))
-                    .Select(values => TruthTableClause(values))
-                    .ToHashSet()
-            };
-        }
+            => new(Enumerate(new bool[n_variables], 0)
+                .Where(values => !boolean_function(values))
+                .Select(values => TruthTableClause(values))
+                .ToHashSet());
 
         /// <summary>Calculate a CNF clause for the truth table method,
         /// that is one literal per variable, of the opposite polarity to the value</summary>
@@ -65,7 +60,7 @@ namespace Carmen.CastingEngine.SAT
             var literals = new HashSet<Literal<int>>();
             for (var i = 0; i < values.Length; i++)
                 literals.Add(new Literal<int>(i, !values[i]));
-            return new Clause<int>(literals);
+            return new(literals);
         }
     }
 }

@@ -92,9 +92,9 @@ namespace UnitTests.SAT
                 {
                     literals.Add(all_literals[random.Next(all_literals.Length)]);
                 }
-                clauses.Add(new Clause<T> { Literals = literals.ToHashSet() });
+                clauses.Add(new(literals.ToHashSet()));
             }
-            return new Expression<T> { Clauses = clauses.ToHashSet() };
+            return new(clauses.ToHashSet());
         }
     }
 }

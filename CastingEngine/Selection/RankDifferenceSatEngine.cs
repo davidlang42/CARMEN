@@ -50,15 +50,12 @@ namespace Carmen.CastingEngine.Selection
                 if (sat.Variables.Count == 0)
                     return Solution.Unsolveable;
                 var first_var = sat.Variables.First();
-                clauses.Add(new()
-                {
-                    Literals = new[] {
-                        Literal<Applicant>.Positive(first_var),
-                        Literal<Applicant>.Negative(first_var)
-                    }.ToHashSet()
-                });
+                clauses.Add(new(new[] {
+                    Literal<Applicant>.Positive(first_var),
+                    Literal<Applicant>.Negative(first_var)
+                }.ToHashSet()));
             }
-            var solution = sat.Solve(new() { Clauses = clauses }).FirstOrDefault();
+            var solution = sat.Solve(new(clauses)).FirstOrDefault();
             return solution;
         }
 

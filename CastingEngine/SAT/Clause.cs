@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.SAT
 
         public HashSet<Literal<T>> Literals;
 
-        public Clause()//TODO audit use of this with {} initialisers
+        public Clause()
         {
             Literals = new();
         }
@@ -43,10 +43,7 @@ namespace Carmen.CastingEngine.SAT
         public override string ToString() => string.Join(DISJUNCTION, Literals.Select(l => l.ToString()));
 
         public Clause<U> Remap<U>(Dictionary<T, U> variable_map) where U : notnull
-            => new()
-            {
-                Literals = Literals.Select(l => l.Remap(variable_map)).ToHashSet()
-            };
+            => new(Literals.Select(l => l.Remap(variable_map)).ToHashSet());
 
         public static Clause<T> Unit(T variable, bool polarity)
             => Unit(new Literal<T>(variable, polarity));
