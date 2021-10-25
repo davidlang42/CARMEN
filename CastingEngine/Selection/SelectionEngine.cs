@@ -1,4 +1,5 @@
 ﻿using Carmen.CastingEngine.Audition;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Requirements;
@@ -33,7 +34,6 @@ namespace Carmen.CastingEngine.Selection
         protected AlternativeCast[] alternativeCasts { get; init; }
 
         public abstract void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets);
-        public abstract void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups);
 
         public SelectionEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
         {
@@ -57,10 +57,70 @@ namespace Carmen.CastingEngine.Selection
             return sub_suitabilities.Average();
         }
 
+        /// <summary>Select applicants into Cast Groups, respecting those already selected, by calculating the remaining count for each group,
+        /// then taking the applicants with the highest overall ability until all cast groups are filled or there are no more applicants.
+        /// If an applicant is eligible for more than one cast group, they will be allocated to the first one in order which has an available spot.
+        /// NOTE: This currently ignores the suitability of the applicant for the Cast Group, only checking that the minimum requirements are satisfied,
+        /// but this could be improved in the future. If it is, the current behaviour should be grandfathered into HeuristicSelectionEngine</summary>
+        public void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
+        {
+            // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
+            var remaining_groups = new Dictionary<CastGroup, uint?>();
+            // Calculate the remaining number of cast needed in each group (respecting those already accepted)
+            foreach (var cast_group in cast_groups)
+            {
+                // Check that requirements don't include TagRequirements
+                var tag_requirements = cast_group.Requirements
+                    .SelectMany(r => r.References()).Concat(cast_group.Requirements)
+                    .OfType<TagRequirement>();
+                if (tag_requirements.Any())
+                    throw new ApplicationException("Cast group requirements cannot refer to Tags.");
+                // Add remaining cast to dictionary
+                if (cast_group.RequiredCount is uint required)
+                {
+                    if (cast_group.AlternateCasts)
+                        required *= (uint)alternativeCasts.Length;
+                    required -= (uint)cast_group.Members.Count;
+                    if (required > 0)
+                        remaining_groups.Add(cast_group, required);
+                }
+                else
+                    remaining_groups.Add(cast_group, null);
+            }
+            // Allocate non-accepted applicants to cast groups, until the remaining counts are 0
+            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => AuditionEngine.OverallAbility(a)))
+            {
+                if (NextAvailableCastGroup(remaining_groups, applicant) is CastGroup cg)
+                {
+                    applicant.CastGroup = cg;
+                    if (remaining_groups[cg] is uint remaining_count)
+                    {
+                        if (remaining_count == 1)
+                            remaining_groups.Remove(cg);
+                        else
+                            remaining_groups[cg] = remaining_count - 1;
+                    }
+                }
+                if (remaining_groups.Count == 0)
+                    break;
+            }
+        }
+
+        /// <summary>Find a cast group with availability for which this applicant meets the cast group's requirements</summary>
+        private CastGroup? NextAvailableCastGroup(Dictionary<CastGroup, uint?> remaining_groups, Applicant applicant)
+        {
+            foreach (var cg in remaining_groups.Keys.InOrder())
+            {
+                if (cg.Requirements.All(r => r.IsSatisfiedBy(applicant)))
+                    return cg;
+            }
+            return null;
+        }
+
         /// <summary>Default implementation allocates cast numbers to accepted applicants based on the requested order.
         /// Members of cast groups which alternate casts are given the first available cast number for their alternative
         /// cast, leaving gaps which are later filled from the bottom up.</summary>
-        public virtual void AllocateCastNumbers(IEnumerable<Applicant> applicants)
+        public void AllocateCastNumbers(IEnumerable<Applicant> applicants)
         {
             var cast_numbers = new CastNumberSet();
             // find cast numbers which are already set
@@ -90,9 +150,9 @@ namespace Carmen.CastingEngine.Selection
             }
         }
 
-        /// <summary>Default implementation applies tags in a order that ensures any tags which depend on other tags through
-        /// requirements are processed first. This assumes there are no circular dependency between tags.</summary>
-        public virtual void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)
+        /// <summary>Applies tags in an order that ensures any tags which depend on other tags through requirements
+        /// are processed first. This assumes there are no circular dependency between tags.</summary>
+        public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)
         {
             // list all tags referenced by each tag
             var tag_references = new Dictionary<Tag, HashSet<Tag>>();
@@ -128,8 +188,8 @@ namespace Carmen.CastingEngine.Selection
             } 
         }
 
-        /// <summary>Default implementation applies tags by list accepted cast who aren't in this tag, ordering them
-        /// by suitability for this tag, then ordering by overall mark. Tags are applied down this list until all the
+        /// <summary>Applies tags by list accepted cast who aren't in this tag, ordering them by suitability
+        /// for this tag, then ordering by overall mark. Tags are applied down this list until all the
         /// cast groups have the required number or there are no more eligible cast.</summary>
         public void ApplyTag(IEnumerable<Applicant> applicants, Tag tag)
         {
