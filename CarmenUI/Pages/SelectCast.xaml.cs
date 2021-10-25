@@ -216,7 +216,6 @@ namespace CarmenUI.Pages
                 await Task.Run(() => engine.ApplyTags(applicants, tags));
             using (processing.Segment(nameof(RefreshMainPanel), "Refreshing cast lists"))
                 RefreshMainPanel();
-            //TODO remove test message
 #if DEBUG
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
             string msg = "";
@@ -252,7 +251,6 @@ namespace CarmenUI.Pages
                 }
             }
             ((App)App.Current).CreateLog("Cast", msg);
-            MessageBox.Show(msg, "DEBUG");
 #endif
         }
 
