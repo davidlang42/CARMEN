@@ -248,7 +248,7 @@ namespace Carmen.ShowModel.Applicants
         {
             abilities.CollectionChanged += Abilities_CollectionChanged;
             tags.CollectionChanged += Tags_CollectionChanged;
-            roles.CollectionChanged += Roles_CollectionChanged; //TODO dispose handlers
+            roles.CollectionChanged += Roles_CollectionChanged;
         }
 
         private void Abilities_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -259,7 +259,7 @@ namespace Carmen.ShowModel.Applicants
                 var new_items = e.NewItems?.Cast<Ability>().ToHashSet() ?? new HashSet<Ability>();
                 var old_items = e.OldItems?.Cast<Ability>().ToHashSet() ?? new HashSet<Ability>();
                 foreach (var added in new_items.Where(n => !old_items.Contains(n)))
-                    added.PropertyChanged += Ability_PropertyChanged; //TODO dispose handlers
+                    added.PropertyChanged += Ability_PropertyChanged;
                 foreach (var removed in old_items.Where(o => !new_items.Contains(o)))
                     removed.PropertyChanged -= Ability_PropertyChanged;
             }

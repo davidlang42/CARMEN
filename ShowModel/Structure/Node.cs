@@ -64,7 +64,7 @@ namespace Carmen.ShowModel.Structure
 
         public Node()
         {
-            countByGroups.CollectionChanged += CountByGroups_CollectionChanged; //TODO dispose handlers
+            countByGroups.CollectionChanged += CountByGroups_CollectionChanged;
         }
 
         private void CountByGroups_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -75,7 +75,7 @@ namespace Carmen.ShowModel.Structure
                 var new_items = e.NewItems?.Cast<CountByGroup>().ToHashSet() ?? new HashSet<CountByGroup>();
                 var old_items = e.OldItems?.Cast<CountByGroup>().ToHashSet() ?? new HashSet<CountByGroup>();
                 foreach (var added in new_items.Where(n => !old_items.Contains(n)))
-                    added.PropertyChanged += CountByGroup_PropertyChanged; //TODO dispose handlers
+                    added.PropertyChanged += CountByGroup_PropertyChanged;
                 foreach (var removed in old_items.Where(o => !new_items.Contains(o)))
                     removed.PropertyChanged -= CountByGroup_PropertyChanged;
             }

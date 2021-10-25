@@ -54,7 +54,7 @@ namespace Carmen.ShowModel.Applicants
 
         public AlternativeCast()
         {
-            members.CollectionChanged += Members_CollectionChanged; //TODO dispose handlers
+            members.CollectionChanged += Members_CollectionChanged;
         }
 
         private void Members_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)

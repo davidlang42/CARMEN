@@ -96,7 +96,7 @@ namespace Carmen.ShowModel.Applicants
 
         public CastGroup()
         {
-            members.CollectionChanged += Members_CollectionChanged; //TODO dispose handlers
+            members.CollectionChanged += Members_CollectionChanged;
             requirements.CollectionChanged += Requirements_CollectionChanged;
         }
 

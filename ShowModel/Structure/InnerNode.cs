@@ -25,7 +25,7 @@ namespace Carmen.ShowModel.Structure
 
         public InnerNode()
         {
-            children.CollectionChanged += Children_CollectionChanged; //TODO dispose handlers
+            children.CollectionChanged += Children_CollectionChanged;
         }
 
         private void Children_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -36,7 +36,7 @@ namespace Carmen.ShowModel.Structure
                 var new_items = e.NewItems?.Cast<Node>().ToHashSet() ?? new HashSet<Node>();
                 var old_items = e.OldItems?.Cast<Node>().ToHashSet() ?? new HashSet<Node>();
                 foreach (var added in new_items.Where(n => !old_items.Contains(n)))
-                    added.PropertyChanged += Child_PropertyChanged; //TODO dispose handlers
+                    added.PropertyChanged += Child_PropertyChanged;
                 foreach (var removed in old_items.Where(o => !new_items.Contains(o)))
                     removed.PropertyChanged -= Child_PropertyChanged;
             }
