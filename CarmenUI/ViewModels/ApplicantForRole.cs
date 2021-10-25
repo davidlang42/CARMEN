@@ -54,7 +54,7 @@ namespace CarmenUI.ViewModels
         /// <summary>Not including this role, even if already cast in it</summary>
         public double[] ExistingRoles { get; init; }
 
-        public int OverallAbility { get; init; }
+        public string OverallAbility { get; init; }
 
         public CastGroupAndCast CastGroupAndCast { get; init; }
 
@@ -97,7 +97,9 @@ namespace CarmenUI.ViewModels
             this.role = role;
             PrimaryCriterias = primary_criterias;
             Suitability = engine.SuitabilityOf(applicant, role);
-            OverallAbility = engine.AuditionEngine.OverallAbility(applicant);
+            OverallAbility = engine.AuditionEngine.OverallAbility(applicant).ToString();
+            if (engine.AuditionEngine.MaxOverallAbility == 100)
+                OverallAbility += "%";
             Marks = new string[PrimaryCriterias.Length];
             for (var i = 0; i < Marks.Length; i++)
                 Marks[i] = applicant.FormattedMarkFor(PrimaryCriterias[i]);
