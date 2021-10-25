@@ -116,6 +116,8 @@ namespace Carmen.ShowModel
                 {
                     if (linking_table.ContainsKey(nameof(Roles) + nameof(Role.RoleId)))
                         changes |= DataObjects.Roles;
+                    if (linking_table.ContainsKey(nameof(Tags) + nameof(Tag.TagId)))
+                        changes |= DataObjects.Tags;
                 }
             }
             return changes;

@@ -198,7 +198,7 @@ namespace CarmenUI.Pages
                 }
             }
             using (new LoadingOverlay(this).AsSegment(nameof(IAuditionEngine) + nameof(IAuditionEngine.UserSelectedCast), "Learning...", "Cast selected by the user"))
-                await Task.Run(() => engine.AuditionEngine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted)));
+                engine.AuditionEngine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted)); // must run in UI thread, because it may call MessageBox
             return true;
         }
 
@@ -213,7 +213,7 @@ namespace CarmenUI.Pages
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
                 await Task.Run(() => engine.AllocateCastNumbers(applicants));
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
-                await Task.Run(() => engine.ApplyTags(applicants, tags));
+                engine.ApplyTags(applicants, tags); // must run in UI thread, because Tag.Members collection is bound
             using (processing.Segment(nameof(RefreshMainPanel), "Refreshing cast lists"))
                 RefreshMainPanel();
 #if DEBUG
