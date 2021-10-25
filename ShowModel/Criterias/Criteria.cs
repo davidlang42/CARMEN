@@ -32,19 +32,6 @@ namespace Carmen.ShowModel.Criterias
             }
         }
 
-        private string description = "";
-        public string Description
-        {
-            get => description;
-            set
-            {
-                if (description == value)
-                    return;
-                description = value;
-                OnPropertyChanged();
-            }
-        }
-
         private bool required;
         public bool Required
         {
