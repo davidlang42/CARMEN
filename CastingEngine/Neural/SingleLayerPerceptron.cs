@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Carmen.ShowModel;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Carmen.CastingEngine.Neural

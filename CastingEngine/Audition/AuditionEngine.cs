@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections.Generic;

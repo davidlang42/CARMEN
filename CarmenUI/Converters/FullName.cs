@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -41,21 +42,14 @@ namespace CarmenUI.Converters
             {
                 FullNameFormat.FirstLast => $"{first} {last}",
                 FullNameFormat.LastCommaFirst => $"{last}, {first}",
-                FullNameFormat.InitialDotLast => $"{Initial(first)}. {last}",
-                FullNameFormat.LastCommaInitialDot => $"{last}, {Initial(first)}.",
-                FullNameFormat.FirstInitialDot => $"{first} {Initial(last)}.",
-                FullNameFormat.InitialDotCommaFirst => $"{Initial(last)}., {first}",
-                FullNameFormat.Initials => $"{Initial(first)}{Initial(last)}",
-                FullNameFormat.InitialsDots => $"{Initial(first)}.{Initial(last)}.",
+                FullNameFormat.InitialDotLast => $"{first.Initial()}. {last}",
+                FullNameFormat.LastCommaInitialDot => $"{last}, {first.Initial()}.",
+                FullNameFormat.FirstInitialDot => $"{first} {last.Initial()}.",
+                FullNameFormat.InitialDotCommaFirst => $"{last.Initial()}., {first}",
+                FullNameFormat.Initials => $"{first.Initial()}{last.Initial()}",
+                FullNameFormat.InitialsDots => $"{first.Initial()}.{last.Initial()}.",
                 _ => throw new NotImplementedException($"Enum not handled: {format}")
             };
-        }
-
-        private static string Initial(string name)//TODO make this handle double barrel names and move it into StringExtensions (also in ShowModel)
-        {
-            if (string.IsNullOrWhiteSpace(name))
-                return "";
-            return name.Substring(0, 1);
         }
     }
 

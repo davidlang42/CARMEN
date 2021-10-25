@@ -1,5 +1,6 @@
 ﻿using Carmen.CastingEngine.Audition;
 using Carmen.CastingEngine.Neural;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;

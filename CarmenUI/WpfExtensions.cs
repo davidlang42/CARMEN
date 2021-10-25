@@ -13,69 +13,6 @@ using System.Windows.Media;
 
 namespace CarmenUI
 {
-    internal static class IEnumerableExtensions
-    {
-        public static IEnumerable<T> Yield<T>(this T obj)
-        {
-            yield return obj;
-        }
-
-        public static uint Sum(this IEnumerable<uint> list)
-            => (uint)list.Select(u => (int)u).Sum();
-
-        /// <summary>Like SingleOrDefault() except returns null if more than one element rather than throwing an exception</summary>
-        public static T? SingleOrDefaultSafe<T>(this IEnumerable<T> list) where T : class
-        {
-            var e = list.GetEnumerator();
-            if (!e.MoveNext())
-                return null;
-            var first = e.Current;
-            if (e.MoveNext())
-                return null;
-            return first;
-        }
-
-        public static void AddRange<T>(this HashSet<T> set, IEnumerable<T> range)
-        {
-            foreach (var item in range)
-                set.Add(item);
-        }
-
-        public static void AddRange<T>(this ObservableCollection<T> collection, IEnumerable<T> range)
-        {
-            foreach (var item in range)
-                collection.Add(item);
-        }
-
-        public static bool AllEqual<T>(this IEnumerable<T> sequence)
-            where T : notnull
-        {
-            var e = sequence.GetEnumerator();
-            if (!e.MoveNext())
-                return true;
-            var first = e.Current;
-            while (e.MoveNext())
-                if (!e.Current.Equals(first))
-                    return false;
-            return true;
-        }
-    }
-
-    internal static class AsyncExtensions
-    {
-        public static Task<int> CountAsync<T>(this IEnumerable<T> collection, Func<T, bool> predicate)
-            => Task.Run(() => collection.Count(predicate));
-
-        public static Task<List<T>> ToListAsync<T>(this IEnumerable<T> collection)
-            => Task.Run(() => collection.ToList());
-
-        public static Task<uint> SumAsync<T>(this IEnumerable<T> collection, Func<T, uint> selector)
-            => Task.Run(() => (uint)collection.Sum(v => selector(v)));
-
-        public static Task<Dictionary<U, V>> ToDictionaryAsync<T, U, V>(this IEnumerable<T> collection, Func<T, U> key_selector, Func<T, V> value_selector) where U : notnull
-            => Task.Run(() => collection.ToDictionary(key_selector, value_selector));
-    }
-
     internal static class WpfExtensions
     {
         public static IEnumerable<T> VisualDescendants<T>(this DependencyObject dependency_object) where T : DependencyObject
@@ -238,65 +175,6 @@ namespace CarmenUI
             }
 
             return null;
-        }
-    }
-
-    public static class StringExtenions
-    {
-        public static string ToProperCase(this string words)
-        {
-            if (string.IsNullOrEmpty(words))
-                return "";
-            words = string.Join(" ", words.Split(" ").Select(w => w.Capitalise()));
-            words = string.Join("-", words.Split("-").Select(w => w.Capitalise()));
-            return words;
-        }
-
-        public static string Capitalise(this string word)
-        {
-            if (string.IsNullOrEmpty(word))
-                return "";
-            return word.Substring(0, 1).ToUpper() + word.Substring(1);
-        }
-
-        public static string UnCapitalise(this string word)
-        {
-            if (string.IsNullOrEmpty(word))
-                return "";
-            return word.Substring(0, 1).ToLower() + word.Substring(1);
-        }
-
-        public static string ToOrdinal(this int number)
-        {
-            if (number <= 0)
-                throw new ArgumentException($"{nameof(number)} must be positive.");
-            if (number == 11 || number == 12 || number == 13)
-                return $"{number}th";
-            else if (number % 10 == 1)
-                return $"{number}st";
-            else if (number % 10 == 2)
-                return $"{number}nd";
-            else if (number % 10 == 3)
-                return $"{number}rd";
-            else
-                return $"{number}th";
-        }
-
-        public static string JoinWithCommas(this IEnumerable<string> things, bool use_and_instead_of_last_comma = true)
-        {
-            var e = things.GetEnumerator();
-            if (!e.MoveNext())
-                return "";
-            var result = e.Current;
-            bool moved_next = e.MoveNext();
-            while (moved_next)
-            {
-                string thing = e.Current;
-                moved_next = e.MoveNext();
-                string sep = (moved_next || !use_and_instead_of_last_comma) ? ", " : " and ";
-                result += sep + thing;
-            }
-            return result;
         }
     }
 }

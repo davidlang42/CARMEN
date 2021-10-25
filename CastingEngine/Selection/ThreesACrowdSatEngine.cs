@@ -1,5 +1,6 @@
 ﻿using Carmen.CastingEngine.Audition;
 using Carmen.CastingEngine.SAT;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using System;
