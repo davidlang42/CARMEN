@@ -29,8 +29,6 @@ namespace CarmenUI.Pages
     /// </summary>
     public partial class EditApplicants : SubPage
     {
-        const int AUTO_COLLAPSE_GROUP_THRESHOLD = 10; //TODO why not make this a user setting? (per mode?)
-
         readonly CollectionViewSource applicantsViewSource;
         readonly CollectionViewSource criteriasViewSource;
         readonly BooleanLookupDictionary groupExpansionLookup;
@@ -207,6 +205,7 @@ namespace CarmenUI.Pages
         {
             if (applicantsViewSource.View is ICollectionView view)
             {
+                var auto_collapse_group_threshold = Properties.Settings.Default.AutoCollapseGroupThreshold;
                 var previous_counts = GetGroupCounts(view);
                 var text = filterText.Text;
                 view.Filter = (Mode, hideFinishedApplicants.IsChecked) switch
@@ -222,9 +221,9 @@ namespace CarmenUI.Pages
                 foreach (var (key, new_count) in new_counts)
                 {
                     if (!previous_counts.TryGetValue(key, out var old_count) // the group wasn't previously shown
-                        || ((old_count > AUTO_COLLAPSE_GROUP_THRESHOLD) != (new_count > AUTO_COLLAPSE_GROUP_THRESHOLD))) // or it crossed the threshold
+                        || ((old_count > auto_collapse_group_threshold) != (new_count > auto_collapse_group_threshold))) // or it crossed the threshold
                     {
-                        groupExpansionLookup.Dictionary[key] = new_count <= AUTO_COLLAPSE_GROUP_THRESHOLD;
+                        groupExpansionLookup.Dictionary[key] = new_count <= auto_collapse_group_threshold;
                     }
                 }
                 if (applicantsList.Items.Count == 1)

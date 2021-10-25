@@ -291,7 +291,7 @@ namespace CarmenUI.Pages
                         context.DeleteSectionType(section_type);
                     break;
                 case Requirement requirement:
-                    var used_count = requirement.UsedByCastGroups.Count + requirement.UsedByCombinedRequirements.Count + requirement.UsedByRoles.Count + requirement.UsedByTags.Count;//TODO is this missing NotRequirements?
+                    var used_count = requirement.UsedByCastGroups.Count + requirement.UsedByCombinedRequirements.Count + requirement.UsedByRoles.Count + requirement.UsedByTags.Count;
                     if (used_count == 0 || Confirm($"Are you sure you want to delete the '{requirement.Name}' reqirement?\nThis will also delete any NOT requirements which refer to it, and is currently in used {used_count.Plural("time")}."))
                         context.DeleteRequirement(requirement);
                     break;
