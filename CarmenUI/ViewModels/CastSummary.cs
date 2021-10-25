@@ -87,13 +87,19 @@ namespace CarmenUI.ViewModels
             foreach (var tag in tags)
             {
                 Rows.Add(new Row { Success = $"{tag.Members.Count} tagged {tag.Name}" });
-                foreach (var group in tag.Members.GroupBy(a => a.CastGroup))
+                foreach (var group in tag.Members.GroupBy(a => (a.CastGroup, a.AlternativeCast)))
                 {
                     var count = group.Count();
-                    if (group.Key == null)
-                        Rows.Add(new Row { Fail = $"{count} rejected applicants tagged {tag.Name}" });
-                    else if (tag.CountFor(group.Key) is uint required_count && required_count != count)
-                        Rows.Add(new Row { Fail = $"{count} {group.Key.Abbreviation}s tagged {tag.Name} (required {required_count})" }); //TODO also split this by alternative cast
+                    var alternative_cast = group.Key.AlternativeCast == null ? "" : $" in the {group.Key.AlternativeCast.Name} cast";
+                    if (group.Key.CastGroup == null)
+                        Rows.Add(new Row { Fail = $"{count} rejected applicants tagged {tag.Name}{alternative_cast}" });
+                    else if (tag.CountFor(group.Key.CastGroup) is uint required_count)
+                    {
+                        if ((group.Key.AlternativeCast == null) == group.Key.CastGroup.AlternateCasts)
+                            required_count = 0;
+                        if (required_count != count)
+                            Rows.Add(new Row { Fail = $"{count} {group.Key.CastGroup.Abbreviation}s tagged {tag.Name}{alternative_cast} (required {required_count})" });
+                    }
                 }
             }
             // cast number range and missing numbers
