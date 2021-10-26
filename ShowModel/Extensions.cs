@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Carmen.ShowModel
@@ -293,11 +294,31 @@ namespace Carmen.ShowModel
             return result;
         }
 
+        readonly static char[] wordSeparators = new[] { ' ', '-', '\'' };
         public static string Initial(this string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 return "";
-            return name.Substring(0, 1);
+            var sb = new StringBuilder();
+            char? last_separator = ' ';
+            foreach (var ch in name)
+            {
+                if (wordSeparators.Contains(ch))
+                {
+                    if (last_separator == ' ')
+                        last_separator = ch;
+                    else
+                        last_separator ??= ch;
+                }
+                else if (last_separator.HasValue)
+                {
+                    if (last_separator.Value != ' ')
+                        sb.Append(last_separator.Value);
+                    sb.Append(char.ToUpper(ch));
+                    last_separator = null;
+                }
+            }
+            return sb.ToString();
         }
 
         public static string Plural(this string name)
