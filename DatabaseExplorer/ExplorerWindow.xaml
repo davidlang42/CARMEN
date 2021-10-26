@@ -10,7 +10,7 @@
         xmlns:modelStructure="clr-namespace:Carmen.ShowModel.Structure;assembly=Carmen.ShowModel"
         xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Title="CARMEN: Database Explorer" Height="600" Width="800" Icon="/DatabaseApplication.png" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
+        Title="CARMEN: Database Explorer" Height="600" Width="800" Icon="/WindowCarmenC.ico" Loaded="Window_Loaded" WindowStartupLocation="CenterScreen">
     <Window.Resources>
         <CollectionViewSource x:Key="applicantsViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>

@@ -6,6 +6,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using FontAwesome.WPF;
+using System.Windows.Media;
 
 namespace CarmenUI.ViewModels
 {
@@ -23,8 +25,8 @@ namespace CarmenUI.ViewModels
         /// <summary>The last time the user opened this show</summary>
         public DateTime LastOpened { get; set; } = DateTime.Now;
 
-        public string IconPath
-            => Provider == null ? @"\Icons\OpenFile.png" : @"\Icons\CloudDatabase.png";
+        public ImageSource IconSource
+            => ImageAwesome.CreateImageSource(Provider == null ? FontAwesomeIcon.FolderOutlinepenOutline : FontAwesomeIcon.Database, Brushes.Black);
 
         public bool IsAssessible => Provider switch
         {

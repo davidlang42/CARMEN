@@ -5,8 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:bd="clr-namespace:CarmenUI.Bindings"
         xmlns:vm="clr-namespace:CarmenUI.ViewModels"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
-        Title="CARMEN: Show Selection" Height="440" Width="500" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Icon="/Icons/CarmenC.png"
+        Title="CARMEN: Show Selection" Height="440" Width="500" ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Icon="/Icons/CarmenC.ico"
         KeyDown="Window_KeyDown">
     <Grid>
         <Grid.RowDefinitions>
@@ -21,7 +22,7 @@
         <Button Background="White" Width="30" Height="30" BorderThickness="0" Click="SettingsButton_Click"
                 HorizontalAlignment="Right" VerticalAlignment="Top"
                 Margin="0 0 2 0">
-            <Image Source="/Icons/SettingsOutline.png" VerticalAlignment="Top"/>
+            <fa:ImageAwesome Icon="Gear" Foreground="DimGray"/>
         </Button>
         <TextBlock Grid.Row="1" FontSize="20" HorizontalAlignment="Center">
             Casting And Role Management Equality Network
@@ -34,19 +35,19 @@
             </Grid.ColumnDefinitions>
             <Button x:Name="NewButton" Grid.Column="0" Width="100" Height="100" Click="NewButton_Click">
                 <StackPanel>
-                    <Image Source="/Icons/NewFile.png" Width="32"/>
+                    <fa:ImageAwesome Icon="FileOutline" Width="20" Margin="5"/>
                     <TextBlock HorizontalAlignment="Center">New</TextBlock>
                 </StackPanel>
             </Button>
             <Button x:Name="OpenButton" Grid.Column="1" Width="100" Height="100" Click="OpenButton_Click">
                 <StackPanel>
-                    <Image Source="/Icons/OpenFile.png" Width="32"/>
+                    <fa:ImageAwesome Icon="FolderOutlinepenOutline" Width="25" Margin="5"/>
                     <TextBlock HorizontalAlignment="Center">Open</TextBlock>
                 </StackPanel>
             </Button>
             <Button x:Name="ConnectButton" Grid.Column="2" Width="100" Height="100" IsEnabled="False" Click="ConnectButton_Click">
                 <StackPanel>
-                    <Image Source="/Icons/CloudDatabase.png" Width="32"/>
+                    <fa:ImageAwesome Icon="Database" Width="22" Margin="5"/>
                     <TextBlock HorizontalAlignment="Center">Connect</TextBlock>
                 </StackPanel>
             </Button>
@@ -66,7 +67,7 @@
                             <ColumnDefinition Width="260"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <Image HorizontalAlignment="Left" Source="{Binding IconPath}" Height="18"/>
+                        <Image HorizontalAlignment="Left" Source="{Binding IconSource}" Height="14"/>
                         <TextBlock HorizontalAlignment="Stretch" Grid.Column="1" Text="{Binding Label}"/>
                         <TextBlock HorizontalAlignment="Right" Grid.Column="2" Text="{Binding LastOpened, StringFormat='h:mmtt ddd dd MMM yyyy'}"/>
                     </Grid>

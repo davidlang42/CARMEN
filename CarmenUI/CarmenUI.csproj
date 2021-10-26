@@ -6,7 +6,7 @@
     <UseWPF>true</UseWPF>
     <Nullable>enable</Nullable>
     <ApplicationIcon>Icons\CarmenC.ico</ApplicationIcon>
-    <PackageIcon>CarmenC.png</PackageIcon>
+    <PackageIcon>CarmenC.ico</PackageIcon>
     <PackageIconUrl />
     <PackageProjectUrl>https://github.com/davidlang42/CARMEN</PackageProjectUrl>
     <RepositoryUrl>https://github.com/davidlang42/CARMEN</RepositoryUrl>
@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="5.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.8" />
   </ItemGroup>
@@ -31,24 +32,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Icons\NewFile.png" />
-    <Resource Include="Icons\OpenFile.png" />
-    <Resource Include="Icons\CloudDatabase.png" />
-    <Resource Include="Icons\Cancel.png" />
-    <Resource Include="Icons\Cancel_grey.png" />
-    <Resource Include="Icons\Checkmark.png" />
-    <Resource Include="Icons\Checkmark_blue.png" />
-    <Resource Include="Icons\Ellipsis_bold.png" />
-    <Resource Include="Icons\CarmenC.png" />
-    <Resource Include="Icons\EditPencil.png" />
-    <Resource Include="Icons\Settings.png" />
-    <Resource Include="Icons\SettingsOutline.png" />
-    <Resource Include="Icons\Return.png" />
-    <Resource Include="Icons\Add.png" />
-    <Resource Include="Icons\Download_grey.png" />
-    <Resource Include="Icons\Upload_grey.png" />
+    <Resource Include="Icons\CarmenC.ico" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
@@ -62,7 +48,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
-    <None Include="Icons\CarmenC.png">
+    <None Include="Icons\CarmenC.ico">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>

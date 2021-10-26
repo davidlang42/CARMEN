@@ -1,4 +1,5 @@
 ﻿using CarmenUI.ViewModels;
+using FontAwesome.WPF;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -6,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Data;
+using System.Windows.Media;
 
 namespace CarmenUI.Converters
 {
@@ -17,9 +19,23 @@ namespace CarmenUI.Converters
                 value = status switch
                 {
                     ProcessStatus.None => null,
-                    ProcessStatus.Loading => "/Icons/Ellipsis_bold.png",
-                    ProcessStatus.Complete => "/Icons/Checkmark.png",
-                    ProcessStatus.Error => "/Icons/Cancel.png",
+                    ProcessStatus.Loading => new ImageAwesome
+                    {
+                        Icon = FontAwesomeIcon.Spinner,
+                        Spin = true,
+                        SpinDuration = 1.5,
+                        Foreground = Brushes.DimGray
+                    },
+                    ProcessStatus.Complete => new ImageAwesome
+                    {
+                        Icon = FontAwesomeIcon.Check,
+                        Foreground = Brushes.Green
+                    },
+                    ProcessStatus.Error => new ImageAwesome
+                    {
+                        Icon = FontAwesomeIcon.Times,
+                        Foreground = Brushes.Red
+                    },
                     _ => throw new NotImplementedException($"Enum not handled: {status}")
                 };
             return value;

@@ -5,17 +5,13 @@
     <TargetFramework>net5.0-windows</TargetFramework>
 	  <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
-    <ApplicationIcon>DatabaseApplication.ico</ApplicationIcon>
+    <ApplicationIcon>WindowCarmenC.ico</ApplicationIcon>
     <Deterministic>false</Deterministic>
     <AssemblyName>DatabaseExplorer</AssemblyName>
     <RootNamespace>DatabaseExplorer</RootNamespace>
     <Authors>David Lang</Authors>
   </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="DatabaseApplication.png" />
-  </ItemGroup>
-
+  
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
   </ItemGroup>
@@ -29,9 +25,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="DatabaseApplication.png" />
+    <Resource Include="WindowCarmenC.ico" />
   </ItemGroup>
-
+  
   <ItemGroup>
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
