@@ -92,6 +92,7 @@ namespace CarmenUI.Windows
                 MainText = main_text;
             if (sub_text != null)
                 SubText = sub_text;
+            SetProgress(0, false);
             return mainSegment = new LoadingSegment(SetProgress, s => SubText = s, segment_key);
         }
 
