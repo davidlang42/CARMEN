@@ -14,6 +14,7 @@ using System.IO;
 using System;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Carmen.ShowModel
 {
@@ -69,7 +70,7 @@ namespace Carmen.ShowModel
 
         public ShowConnection Connection { get; private init; }
 
-        public ShowContext(ShowConnection show_connection) : base(show_connection.ContextOptions)
+        public ShowContext(ShowConnection show_connection)
         {
             Connection = show_connection;
         }
@@ -296,10 +297,18 @@ namespace Carmen.ShowModel
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            if (Connection.Provider == null) // Sqlite
+                optionsBuilder
+                    .UseSqlite(Connection.ConnectionString)
+                    .ReplaceService<IHistoryRepository, CustomSqliteHistoryRepository>();
+            else
+                throw new NotImplementedException($"Database provider {Connection.Provider} not implemented.");
+
             // Using LazyLoadingProxies will have a huge performance hit if I forget to include
             // the right objects in my queries, however the alternative is that if I forget to
             // include something then I get incorrect values (eg. nulls and empty collections)
             optionsBuilder.UseLazyLoadingProxies();
+
 #if SLOW_DATABASE
             // Due to risks of LazyLoadingProxies above, it is best to always debug with SLOW_DATABASE
             // so that there is a noticeable delay if I forget to include the right objects, however

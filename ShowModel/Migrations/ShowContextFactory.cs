@@ -16,13 +16,10 @@ namespace Carmen.ShowModel
     {
         private class ShowInMemory : ShowConnection
         {
-            protected override DbContextOptions<ShowContext> CreateOptions()
+            public ShowInMemory()
             {
-                var connection = new SqliteConnection("Filename=:memory:");
-                connection.Open(); // this connection is never closed
-                var builder = new DbContextOptionsBuilder<ShowContext>();
-                builder.UseSqlite(connection);
-                return builder.Options;
+                Provider = null;
+                ConnectionString = "Filename=:memory:";
             }
         }
 
