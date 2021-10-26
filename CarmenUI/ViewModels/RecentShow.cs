@@ -34,6 +34,14 @@ namespace CarmenUI.ViewModels
             _ => throw new NotImplementedException($"Proivder not implemented: {Provider}")
         };
 
+        public void CreateBackup()
+        {
+            if (Provider == null)
+                File.Copy(Details, Details + "_backup", true);
+            else
+                throw new NotImplementedException($"Proivder not implemented: {Provider}");
+        }
+
         public static new RecentShow FromLocalFile(string filename)
             => new RecentShow
             {

@@ -20,6 +20,13 @@ namespace Carmen.ShowModel
 {
     public class ShowContext : DbContext
     {
+        public enum DatabaseState
+        {
+            UpToDate,
+            SavedWithPreviousVersion,
+            SavedWithFutureVersion
+        }
+
         #region Database collections
         /// <summary>Auto includes ShowRoot, Abilities, CastGroup, AlternativeCast, Tags.
         /// Remember to include Roles, SameCastSet, Image.</summary>
@@ -73,6 +80,45 @@ namespace Carmen.ShowModel
         public ShowContext(ShowConnection show_connection)
         {
             Connection = show_connection;
+        }
+
+        /// <summary>Accessing any model or entity related property on the context causes the model to be build,
+        /// which takes ~1s synchronously. This runs it in a separate thread to avoid a synchronous delay.</summary>
+        public async Task PreloadModel()
+        {
+            await Task.Run(() => _ = this.Model);
+        }
+
+        public async Task CreateNewDatabase(string default_show_name)
+        {
+            await Task.Run(() => // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
+            {
+                Database.EnsureDeleted();
+                Database.Migrate(); // instead of EnsureCreated(), so that history table gets created
+                SetDefaultShowSettings(default_show_name);
+                SaveChanges();
+            });
+        }
+
+        public async Task<DatabaseState> CheckDatabaseState()
+        {
+            return await Task.Run(() => // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
+            {
+                var all_migrations = Database.GetMigrations().ToList();
+                var applied_migrations = Database.GetAppliedMigrations().ToList();
+                var pending_migrations = all_migrations.Except(applied_migrations);
+                var future_migrations = applied_migrations.Except(all_migrations);
+                if (future_migrations.Any())
+                    return DatabaseState.SavedWithFutureVersion;
+                if (pending_migrations.Any())
+                    return DatabaseState.SavedWithPreviousVersion;
+                return DatabaseState.UpToDate;
+            });
+        }
+
+        public async Task UpgradeDatabase()
+        {
+            await Task.Run(() => Database.Migrate()); // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
         }
 
         /// <summary>Detect which DataObjects have changed in the current context since the last save</summary>

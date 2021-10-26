@@ -40,53 +40,49 @@ namespace CarmenUI.Windows
             if (dialog.ShowDialog() == true)
             {
                 var show = RecentShow.FromLocalFile(dialog.FileName);
-                using var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(NewButton_Click));
-                using (loading.Segment(nameof(StartWindow) + nameof(CreateNewShow), "Creating new database"))
-                    await CreateNewShow(show);
-                using (loading.Segment(nameof(StartWindow) + nameof(AddToRecentList), "Adding to recents list"))
-                    AddToRecentList(show);
-                using (loading.Segment(nameof(StartWindow) + nameof(LaunchMainWindow), "Opening show"))
+#if DEBUG
+                bool add_test_data = MessageBox.Show("Do you want to add test data?", "DEBUG", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+#endif
+                using (var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(NewButton_Click)))
+                using (var context = new ShowContext(show))
+                {
+                    using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.PreloadModel), "Preparing show model"))
+                        await context.PreloadModel(); // do this here while the overlay is shown to avoid a synchronous delay when the MainMenu is loaded
+                    using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.CreateNewDatabase), "Creating new database"))
+                        await context.CreateNewDatabase(show.DefaultShowName);
+#if DEBUG
+                    if (add_test_data)
+                        using (loading.Segment(nameof(StartWindow) + nameof(AddTestData), "Generating test data"))
+                            await Task.Run(async () => await AddTestData(context));
+#endif
+                }
+                using (new LoadingOverlay(this) { SubText = "Opening show" })
                     LaunchMainWindow(show);
             }
         }
 
-        private static async Task CreateNewShow(RecentShow show)
-        {
-            using (var context = new ShowContext(show))
-            {
-                context.Database.EnsureDeleted();
-                context.Database.EnsureCreated();
 #if DEBUG
-                if (MessageBox.Show("Do you want to add test data?", "DEBUG", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-                {
-                    using var test_data = new TestDataGenerator(context, 0);
-                    test_data.AddAlternativeCasts();
-                    test_data.AddCastGroups(4);
-                    await context.SaveChangesAsync();
-                    test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false); // after cast groups committed
-                    await context.SaveChangesAsync();
-                    test_data.AddCriteriaAndRequirements(); // after cast groups committed
-                    await context.SaveChangesAsync();
-                    test_data.AddTags(1); // after requirements committed
-                    context.SaveChanges();
-                    test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
-                    await context.SaveChangesAsync();
-                    test_data.AddRoles(5); // after applicants, items, cast groups, requirements committed
-                    test_data.AddImages(); // after applicants, tags committed
-                    await context.SaveChangesAsync();
-                }
-                else
-                {
-                    context.SetDefaultShowSettings(show.DefaultShowName);
-                }
-#else
-                context.SetDefaultShowSettings(show.DefaultShowName);
-#endif
-                await context.SaveChangesAsync();
-            }
+        private static async Task AddTestData(ShowContext context)
+        {
+            using var test_data = new TestDataGenerator(context, 0);
+            test_data.AddAlternativeCasts();
+            test_data.AddCastGroups(4);
+            await context.SaveChangesAsync();
+            test_data.AddShowStructure(30, 6, 1, include_items_at_every_depth: false); // after cast groups committed
+            await context.SaveChangesAsync();
+            test_data.AddCriteriaAndRequirements(); // after cast groups committed
+            await context.SaveChangesAsync();
+            test_data.AddTags(1); // after requirements committed
+            context.SaveChanges();
+            test_data.AddApplicants(100); // after criteria, tags, alternative casts committed
+            await context.SaveChangesAsync();
+            test_data.AddRoles(5); // after applicants, items, cast groups, requirements committed
+            test_data.AddImages(); // after applicants, tags committed
+            await context.SaveChangesAsync();
         }
+#endif
 
-        private void OpenButton_Click(object sender, RoutedEventArgs e)
+        private async void OpenButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new OpenFileDialog
             {
@@ -94,28 +90,42 @@ namespace CarmenUI.Windows
                 Filter = "Sqlite Database (*.db)|*.db|All Files (*.*)|*.*"
             };
             if (dialog.ShowDialog() == true)
-                OpenShow(RecentShow.FromLocalFile(dialog.FileName));
+                await OpenShow(RecentShow.FromLocalFile(dialog.FileName));
         }
 
-        private void OpenShow(RecentShow show)
+        private async Task OpenShow(RecentShow show)
         {
-            using var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(OpenShow));
-            using (loading.Segment(nameof(StartWindow) + nameof(CheckIntegrity), "Checking database integrity"))
-                CheckIntegrity(show);
-            using (loading.Segment(nameof(StartWindow) + nameof(AddToRecentList), "Adding to recents list"))
-                AddToRecentList(show);
-            using (loading.Segment(nameof(StartWindow) + nameof(LaunchMainWindow), "Opening show"))
-                LaunchMainWindow(show);
-        }
-
-        private static void CheckIntegrity(ShowConnection connection)
-        {
-            using (var context = new ShowContext(connection))
+            ShowContext.DatabaseState state;
+            using (var context = new ShowContext(show))
             {
-                // Accessing any model or entity related property on the context causes the model to be build, which takes ~1s synchronously.
-                // It is important to do this here, while the loading form is shown, to avoid a synchronous delay when the MainMenu is loaded.
-                _ = context.Model;
+                using (var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(OpenShow)))
+                {
+                    using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.PreloadModel), "Preparing show model"))
+                        await context.PreloadModel(); // do this here while the overlay is shown to avoid a synchronous delay when the MainMenu is loaded
+                    using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.CheckDatabaseState), "Checking database integrity"))
+                        state = await context.CheckDatabaseState();
+                }
+                if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
+                {
+                    MessageBox.Show("This database was saved with a newer version of CARMEN and cannot be opened. Please install the latest version.", "CARMEN");
+                    return;
+                }
+                else if (state == ShowContext.DatabaseState.SavedWithPreviousVersion)
+                {
+                    if (MessageBox.Show("This database was saved with an older version of CARMEN, would you like to upgrade it?\nNOTE: Once upgraded, older versions will no longer be able to read this database.", "CARMEN", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    {
+                        using (new LoadingOverlay(this) { SubText = "Upgrading database" })
+                        {
+                            show.CreateBackup();
+                            await context.UpgradeDatabase();
+                        }
+                    }
+                    else
+                        return;
+                }
             }
+            using (new LoadingOverlay(this) { SubText = "Opening show" })
+                LaunchMainWindow(show);
         }
 
         private static void AddToRecentList(RecentShow show)
@@ -136,24 +146,25 @@ namespace CarmenUI.Windows
 
         private void LaunchMainWindow(RecentShow show)
         {
+            AddToRecentList(show);
             var main = new MainWindow(show);
             main.Show();
             this.Close();
         }
 
-        private void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void RecentList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if(e.AddedItems.Count > 0 && e.AddedItems[0] is RecentShow show)
             {
                 if (show.IsAssessible)
-                    OpenShow(show);
+                    await OpenShow(show);
                 else
                 {
                     if (MessageBox.Show($"{show.Label} cannot be accessed. Would you like to remove it from the recent shows list?", "CARMEN", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         RemoveFromRecentList(show);
-                    RecentList.SelectedItem = null;
                     RecentList.Items.Refresh();
                 }
+                RecentList.SelectedItem = null;
             }
         }
 
