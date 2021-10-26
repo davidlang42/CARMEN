@@ -77,7 +77,7 @@ namespace CarmenUI.Pages
         }
 
         /// <summary>If a text box is focussed, this commits its value.</summary>
-        private static void CommitTextboxValue()
+        protected static void CommitTextboxValue()
         {
             if (Keyboard.FocusedElement is TextBox text_box
                 && text_box.IsEnabled && !text_box.IsReadOnly

@@ -288,6 +288,7 @@ namespace CarmenUI.Pages
             if (Properties.Settings.Default.NewOnCtrlN
                 && e.Key == Key.N && Keyboard.Modifiers == ModifierKeys.Control)
             {
+                CommitTextboxValue();
                 AddApplicant_Click(sender, e);
                 e.Handled = true;
             }
