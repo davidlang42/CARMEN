@@ -141,6 +141,28 @@
                         <CheckBox Content="Save changes whenever a different applicant is selected" Margin="0 5 0 0"
                                   IsChecked="{bd:SettingBinding SaveOnApplicantChange}"/>
                         <TextBlock Margin="0 0 0 5" Text="If not enabled, changes to applicants will only be saved when the save button is pressed, or one of the save related shortcut keys are used." TextWrapping="Wrap"/>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                            <TextBlock Text="Automatically collapse groups if they contain more than "/>
+                            <TextBox Text="{bd:SettingBinding AutoCollapseGroupThreshold}" Width="30"/>
+                            <TextBlock Text=" filtered applicants"/>
+                        </StackPanel>
+                        <TextBlock Margin="0 5 0 0" TextWrapping="Wrap">
+                            The selected option in the 'Group by' dropdown is stored as an index number starting from 0, where:
+                            <LineBreak/>• 0 is no grouping
+                            <LineBreak/>• 1 is First Name
+                            <LineBreak/>• 2 is Last Name
+                            <LineBreak/>• 3 is Gender
+                            <LineBreak/>• 4 is Year of birth
+                            <LineBreak/>• 5+ are the criteria for the current show, in order
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0 1 0 0">
+                            <TextBlock Text="Selected index for 'Group by' on Register Applicants: "/>
+                            <TextBox Text="{bd:SettingBinding RegisterApplicantsGroupByIndex}" Width="30"/>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0 1 0 0">
+                            <TextBlock Text="Selected index for 'Group by' on Audition Applicants: "/>
+                            <TextBox Text="{bd:SettingBinding AuditionApplicantsGroupByIndex}" Width="30"/>
+                        </StackPanel>
                     </StackPanel>
                 </Expander>
                 <Expander IsExpanded="False" Margin="0 5">
@@ -179,15 +201,15 @@
                             Each of these can be changed below, but it is highly recommended that you leave them on their default values.
                             After changing any of the casting engines, you should thoroughly test and investigate the suggestions which CARMEN presents to you, to ensure that it is operating in a manner which achieves your goals.
                         </TextBlock>
-                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0" >
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
                             <TextBlock Text="Audition Engine:" Margin="0 0 10 0" VerticalAlignment="Center"/>
                             <ComboBox ItemsSource="{Binding ElementName=WindowRoot, Path=AuditionEngines}" SelectedItem="{bd:SettingBinding AuditionEngine, TargetNullValue=''}"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0" >
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
                             <TextBlock Text="Selection Engine:" Margin="0 0 10 0" VerticalAlignment="Center"/>
                             <ComboBox ItemsSource="{Binding ElementName=WindowRoot, Path=SelectionEngines}" SelectedItem="{bd:SettingBinding SelectionEngine, TargetNullValue=''}"/>
                         </StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0" >
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
                             <TextBlock Text="Allocation Engine:" Margin="0 0 10 0" VerticalAlignment="Center"/>
                             <ComboBox ItemsSource="{Binding ElementName=WindowRoot, Path=AllocationEngines}" SelectedItem="{bd:SettingBinding AllocationEngine, TargetNullValue=''}"/>
                         </StackPanel>
