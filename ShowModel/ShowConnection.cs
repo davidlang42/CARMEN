@@ -26,11 +26,14 @@ namespace Carmen.ShowModel
         public string ConnectionString { get; init; } = "";
 
         private DbContextOptions<ShowContext>? contextOptions;
-        internal DbContextOptions<ShowContext> ContextOptions => contextOptions ??= Provider switch
-        {
-            null => new DbContextOptionsBuilder<ShowContext>().UseSqlite(ConnectionString).Options,
-            _ => throw new NotImplementedException($"Database provider {Provider} not implemented.")
-        };
+        internal DbContextOptions<ShowContext> ContextOptions => contextOptions ??= CreateOptions();
+
+        protected virtual DbContextOptions<ShowContext> CreateOptions()
+            => Provider switch
+            {
+                null => new DbContextOptionsBuilder<ShowContext>().UseSqlite(ConnectionString).Options,
+                _ => throw new NotImplementedException($"Database provider {Provider} not implemented.")
+            };
 
         public static ShowConnection FromLocalFile(string filename)
             => new ShowConnection
