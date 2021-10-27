@@ -208,7 +208,7 @@ namespace CarmenUI.Pages
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
                 await Task.Run(() => engine.SelectCastGroups(applicants, castGroups));
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                await Task.Run(() => engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local));
+                engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local); // must run in UI thread, because AlternativeCast.Members collection is bound
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
                 await Task.Run(() => engine.AllocateCastNumbers(applicants));
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
