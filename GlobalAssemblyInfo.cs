@@ -1,13 +1,13 @@
 ﻿using System.Reflection;
 
 // AssemblyInformationalVersion is used for Application.ProductVersion
-[assembly: AssemblyInformationalVersion("0.9"
+[assembly: AssemblyInformationalVersion("1.0"
 #if DEBUG
     + "-debug"
 #endif
     )]
 // AssemblyVersion must be deterministic in debug mode so that user settings persist
-[assembly: AssemblyVersion("0.9"
+[assembly: AssemblyVersion("1.0"
 #if !DEBUG
     + ".*"
 #endif
