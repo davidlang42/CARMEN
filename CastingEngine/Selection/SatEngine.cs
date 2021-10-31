@@ -71,7 +71,8 @@ namespace Carmen.CastingEngine.Selection
             // pre-test clauses to ensure they are solvable
             var sat = BuildSatSolver(applicants_needing_alternative_cast);
             var base_expression = new Expression<Applicant>(existing_assignments.Concat(same_cast_clauses).ToHashSet());
-            var solution = sat.Solve(base_expression).FirstOrDefault();
+            var basic_sat = sat.GetType() == typeof(DpllSolver<Applicant>) ? sat : new DpllSolver<Applicant>(sat.Variables);
+            var solution = basic_sat.Solve(base_expression).FirstOrDefault(); // important to use basic DpllSolver to avoid expensive operations for special solvers like BranchAndBound
             // run approach-specific SAT solving
             if (!solution.IsUnsolvable)
                 solution = FindSatSolution(sat, applicants_needing_alternative_cast, existing_assignments, same_cast_clauses, same_cast_lookup);

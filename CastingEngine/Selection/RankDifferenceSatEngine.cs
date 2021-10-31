@@ -101,6 +101,7 @@ namespace Carmen.CastingEngine.Selection
         {
             var best_total = 0;
             var worst_total = 0;
+            var assignments = partial_solution.Assignments;
             for (var c = 0; c < primaryCriterias.Length; c++)
             {
                 var assigned_rank_difference = new int[castGroups.Length];
@@ -110,13 +111,14 @@ namespace Carmen.CastingEngine.Selection
                 var count_true = new int[castGroups.Length];
                 var count_false = new int[castGroups.Length];
                 var count_total = new int[castGroups.Length];
-                for (var av = 0; av < partial_solution.Assignments.Length; av++)
+                var criteria_ranks = applicantRanks[c];
+                for (var av = 0; av < assignments.Length; av++)
                 {
                     var cg = castGroupIndexFromVariableIndex[av];
-                    var rank = applicantRanks[c][av];
-                    if (partial_solution.Assignments[av] is not bool value)
+                    var rank = criteria_ranks[av];
+                    if (assignments[av] is not bool assignment)
                         not_assigned_ranks[cg].Add(rank);
-                    else if (value)
+                    else if (assignment)
                     {
                         assigned_rank_difference[cg] += rank;
                         count_true[cg]++;
@@ -135,9 +137,11 @@ namespace Carmen.CastingEngine.Selection
                     int max = (count_total[cg] + 1) / 2;
                     if (count_true[cg] > max || count_false[cg] > max)
                         return (double.MaxValue, double.MaxValue); // invalid solution, casts are not even
-                    var not_assigned_sorted = not_assigned_ranks[cg].OrderByDescending(r => r).ToArray();
-                    var assignable_true = not_assigned_sorted.Take(max - count_true[cg]).Sum();
-                    var assignable_false = not_assigned_sorted.Take(max - count_false[cg]).Sum();
+                    var not_assigned_sorted = not_assigned_ranks[cg]; // not yet sorted
+                    not_assigned_sorted.Sort(); // now sorted ascending
+                    not_assigned_sorted.Reverse(); // now sorted descending
+                    var assignable_true = not_assigned_sorted.TakeSum(max - count_true[cg]);
+                    var assignable_false = not_assigned_sorted.TakeSum(max - count_false[cg]);
                     var (best_cg, worst_cg) = FindBestAndWorstCases(assigned_rank_difference[cg], assignable_true, assignable_false);
                     best_criteria += best_cg;
                     worst_criteria += worst_cg;

@@ -178,6 +178,15 @@ namespace Carmen.ShowModel
                 median_if_in_order = list[middle];
             return (double)total / list.Count;
         }
+
+        /// <summary>Take().Sum() is quite slow on indexable lists, this method speeds it up by avoiding enumerators</summary>
+        public static int TakeSum(this List<int> sequence, int count)
+        {
+            var sum = 0;
+            for (var i = 0; i < count; i++)
+                sum += sequence[i];
+            return sum;
+        }
     }
 
     public static class AsyncExtensions
