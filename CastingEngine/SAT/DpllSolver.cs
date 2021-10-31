@@ -23,13 +23,12 @@ namespace Carmen.CastingEngine.SAT
         protected override IEnumerable<Solution> PartialSolve(Expression<int> expression, Solution partial_solution)
         {
             partial_solution = partial_solution.Clone();
-            var old_clauses = expression.Clauses.ToHashSet(); // clauses which haven't been modified yet (don't modify, only remove)
-            var new_clauses = new HashSet<Clause<int>>(); // clauses which have been created in this step (safe to modify)
+            var clauses = expression.Clauses.ToHashSet(); // don't modify clauses, only remove
             // Propogate unit clauses
             while (true)
             {
                 // Find next unit clause literal
-                var unit = FindUnitClause(old_clauses.Concat(new_clauses));
+                var unit = FindUnitClause(clauses);
                 if (unit.Solved)
                     yield return partial_solution;
                 if (unit.Solved || unit.Failed)
@@ -39,32 +38,23 @@ namespace Carmen.CastingEngine.SAT
                 // Assign unit clause value
                 partial_solution.Assignments[unit.Literal.Variable] = unit.Literal.Polarity;
                 // Remove unit clause and any other clauses containing the unit clause literal
-                old_clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal));
-                new_clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal));
+                clauses.RemoveWhere(c => c.Literals.Contains(unit.Literal));
                 // Remove inverse literal from any remaining clauses
                 var inverse_literal = unit.Literal.Inverse();
-                foreach (var new_clause in new_clauses)
-                    new_clause.Literals.Remove(inverse_literal);
-                old_clauses.RemoveWhere(old_clause =>
+                var containing_inverse_literal = clauses.Where(c => c.Literals.Contains(inverse_literal)).ToList();
+                foreach (var old_clause in containing_inverse_literal)
                 {
-                    if (old_clause.Literals.Contains(inverse_literal))
-                    {
-                        var new_literals = new HashSet<Literal<int>>(old_clause.Literals);
-                        new_literals.Remove(inverse_literal);
-                        new_clauses.Add(new(new_literals));
-                        return true;
-                    }
-                    return false;
-                });
+                    clauses.Remove(old_clause);
+                    clauses.Add(old_clause with { Literals = old_clause.Literals.Where(l => l != inverse_literal).ToHashSet() });
+                }
             }
-            new_clauses.AddRange(old_clauses); // from here on we don't modify clauses, so combine the sets
             // Propogate pure literals
             if (propogatePureLiterals)
             {
                 while (true)
                 {
                     // Find next pure literal
-                    var pure = FindPureLiteral(new_clauses);
+                    var pure = FindPureLiteral(clauses);
                     if (pure.Solved)
                         yield return partial_solution;
                     if (pure.Solved || pure.Failed)
@@ -75,17 +65,17 @@ namespace Carmen.CastingEngine.SAT
                     foreach (var pure_literal in pure.Literals)
                         partial_solution.Assignments[pure_literal.Variable] = pure_literal.Polarity;
                     // Remove all clauses containing the pure literal
-                    new_clauses.RemoveWhere(c => pure.Literals.Any(pl => c.Literals.Contains(pl)));
+                    clauses.RemoveWhere(c => pure.Literals.Any(pl => c.Literals.Contains(pl)));
                 }
             }
             // Pick an unassigned literal and branch
-            var unassigned_literal = new_clauses.First().Literals.First();
+            var unassigned_literal = clauses.First().Literals.First();
             var branching_clauses = new[]
             {
                 Clause<int>.Unit(unassigned_literal),
                 Clause<int>.Unit(unassigned_literal.Inverse())
             };
-            foreach (var solution in BranchPartialSolve(new_clauses, branching_clauses, partial_solution))
+            foreach (var solution in BranchPartialSolve(clauses, branching_clauses, partial_solution))
                 yield return solution;
         }
 
