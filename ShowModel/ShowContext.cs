@@ -347,6 +347,10 @@ namespace Carmen.ShowModel
                 optionsBuilder
                     .UseSqlite(Connection.ConnectionString)
                     .ReplaceService<IHistoryRepository, CustomSqliteHistoryRepository>();
+            else if (Connection.Provider == ShowConnection.DbProvider.MySql) // MySql or MariaDb
+                optionsBuilder
+                    .UseMySql(Connection.ConnectionString, ServerVersion.AutoDetect(Connection.ConnectionString))
+                    .ReplaceService<IHistoryRepository, CustomMySqlHistoryRepository>();
             else
                 throw new NotImplementedException($"Database provider {Connection.Provider} not implemented.");
 

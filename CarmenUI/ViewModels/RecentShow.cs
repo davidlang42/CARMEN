@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using FontAwesome.WPF;
 using System.Windows.Media;
+using MySqlConnector;
 
 namespace CarmenUI.ViewModels
 {
@@ -51,6 +52,21 @@ namespace CarmenUI.ViewModels
                 Details = filename,
                 DefaultShowName = Path.GetFileNameWithoutExtension(filename)
             };
+
+        public static new ShowConnection FromMySql(string host, string database, string user, string pass, uint? port = null)
+        {
+            var connection = new MySqlConnectionStringBuilder { Server = host, Database = database, UserID = user, Password = pass };
+            if (port.HasValue)
+                connection.Port = port.Value;
+            return new RecentShow
+            {
+                Provider = DbProvider.MySql,
+                ConnectionString = connection.ToString(),
+                Label = $"'{database}' on {host}",
+                Details = $"mysql://{user}@{host}:{connection.Port}/{database}",
+                DefaultShowName = database
+            };
+        }
 
         public override bool Equals(object? obj)
         {

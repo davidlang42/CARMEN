@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
+using MySqlConnector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,6 +31,18 @@ namespace Carmen.ShowModel
             {
                 Provider = null,
                 ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString()
-            }; 
+            };
+
+        public static ShowConnection FromMySql(string host, string database, string user, string pass, uint? port = null)
+        {
+            var connection = new MySqlConnectionStringBuilder { Server = host, Database = database, UserID = user, Password = pass };
+            if (port.HasValue)
+                connection.Port = port.Value;
+            return new ShowConnection
+            {
+                Provider = DbProvider.MySql,
+                ConnectionString = connection.ToString()
+            };
+        }
     }
 }
