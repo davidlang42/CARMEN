@@ -30,15 +30,15 @@ namespace Carmen.CastingEngine.Allocation
         #region Engine parameters
         /// <summary>The maximum number of training iterations run per invocation of
         /// <see cref="UserPickedCast(IEnumerable{Applicant}, IEnumerable{Applicant}, Role)"/></summary>
-        public int MaxTrainingIterations { get; set; } = 100;
+        public int MaxTrainingIterations { get; set; } = 1;
 
         /// <summary>The speed at which the neural network learns from results, as a fraction of the sum of
         /// <see cref="Requirement.SuitabilityWeight"/>. Reasonable values are between 0.001 and 0.01.
         /// WARNING: Changing this can have crazy consequences, slower is generally safer but be careful.</summary>
-        public double NeuralLearningRate { get; set; } = 0.005;
+        public double NeuralLearningRate { get; set; } = 0.0001;
 
         /// <summary>Determines which loss function is used when training the neural network.</summary>
-        public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_4;
+        public LossFunctionChoice NeuralLossFunction { get; set; } = LossFunctionChoice.Classification0_1;
 
         /// <summary>The sorting algorithm used for ordering the applicants with the neural network</summary>
         public virtual SortAlgorithm SortAlgorithm { get; set; } = SortAlgorithm.OrderBySuitability;

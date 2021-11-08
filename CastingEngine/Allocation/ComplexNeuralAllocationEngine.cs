@@ -37,7 +37,7 @@ namespace Carmen.CastingEngine.Allocation
         public IDataPersistence ModelPersistence { get; set; }
 
         /// <summary>The number of hidden layers to be created in a new model (does not affect loaded models)</summary>
-        public int NeuralHiddenLayers { get; set; } = 2;
+        public int NeuralHiddenLayers { get; set; } = 1;
 
         /// <summary>The constant number of neurons to be created in a new model layer (does not affect loaded models)
         /// NOTE: This is used in conjunction with <see cref="NeuralLayerNeuronsPerInput"/></summary>
@@ -48,7 +48,7 @@ namespace Carmen.CastingEngine.Allocation
         public double NeuralLayerNeuronsPerInput { get; set; } = 1;
 
         /// <summary>Determines which activation function is used for the hidden layers of a new model (does not affect loaded models)</summary>
-        public ActivationFunctionChoice NeuralHiddenActivationFunction { get; set; } = ActivationFunctionChoice.Tanh;
+        public ActivationFunctionChoice NeuralHiddenActivationFunction { get; set; } = ActivationFunctionChoice.ExponentialLu;
 
         public override SortAlgorithm SortAlgorithm
         {
@@ -65,6 +65,9 @@ namespace Carmen.CastingEngine.Allocation
         public ComplexNeuralAllocationEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, ShowRoot show_root, Requirement[] requirements, UserConfirmation confirm, IDataPersistence model_persistence)
             : base(audition_engine, alternative_casts, show_root, show_root.Yield().ToArray(), requirements, requirements.OfType<ICriteriaRequirement>().ToArray(), confirm)
         {
+            MaxTrainingIterations = 100;
+            NeuralLossFunction = LossFunctionChoice.BinaryCrossEntrophy;
+            CountRolesByGeometricMean = false;
             model = new Lazy<FeedforwardNetwork>(LoadModelFromDisk);
             SortAlgorithm = SortAlgorithm.DisagreementSort;
             ModelPersistence = model_persistence;

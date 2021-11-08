@@ -17,11 +17,11 @@ namespace Carmen.CastingEngine.Allocation
     {
         /// <summary>A list of available selection engines</summary>
         public static readonly Type[] Implementations = new[] {
+            typeof(RoleLearningAllocationEngine), // default
             typeof(SessionLearningAllocationEngine),
-            typeof(RoleLearningAllocationEngine),
-            typeof(ComplexNeuralAllocationEngine),
             typeof(WeightedAverageEngine),
-            typeof(HeuristicAllocationEngine)
+            typeof(HeuristicAllocationEngine),
+            typeof(ComplexNeuralAllocationEngine)
         };
 
         public IAuditionEngine AuditionEngine { get; init; }
@@ -39,7 +39,7 @@ namespace Carmen.CastingEngine.Allocation
 
         /// <summary>If true, <see cref="IdealCastingOrder(ShowRoot, Applicant[])"/> will enumerate roles grouped
         /// by non-multi section, in show order. If false, roles are considered across the entire show as one group.</summary>
-        public bool CastingOrderByNonMultiSection { get; set; } = false;
+        public bool CastingOrderByNonMultiSection { get; set; } = true;
 
         /// <summary>Determines how roles are prioritised based on their requirements</summary>
         public RequirementsPriority CastingOrderByPriority { get; set; } = RequirementsPriority.AllRequirementsAtOnce;

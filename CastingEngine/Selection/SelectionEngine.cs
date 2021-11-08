@@ -17,13 +17,13 @@ namespace Carmen.CastingEngine.Selection
     {
         /// <summary>A list of available selection engines</summary>
         public static readonly Type[] Implementations = new[] {
+            typeof(HybridPairsSatEngine), // default
             typeof(ChunkedPairsSatEngine),
-            typeof(HeuristicSelectionEngine),
+            typeof(BestPairsSatEngine),
             typeof(TopPairsSatEngine),
             typeof(ThreesACrowdSatEngine),
-            typeof(HybridPairsSatEngine),
-            typeof(RankDifferenceSatEngine),
-            typeof(BestPairsSatEngine)
+            typeof(HeuristicSelectionEngine),
+            typeof(RankDifferenceSatEngine)
         };
 
         public IAuditionEngine AuditionEngine { get; init; }

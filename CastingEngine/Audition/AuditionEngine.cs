@@ -14,7 +14,7 @@ namespace Carmen.CastingEngine.Audition
     {
         /// <summary>A list of available audition engines</summary>
         public static readonly Type[] Implementations = new[] {
-            typeof(NeuralAuditionEngine),
+            typeof(NeuralAuditionEngine), // default
             typeof(WeightedSumEngine),
         };
 
