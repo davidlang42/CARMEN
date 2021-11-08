@@ -61,6 +61,7 @@ Global
 		{8B152042-0D2C-4879-AD55-884942188ED0}.Slow DB|Any CPU.Build.0 = Debug|Any CPU
 		{2647799D-C38B-4231-8961-B43DC22747EE}.Debug|Any CPU.ActiveCfg = Debug
 		{2647799D-C38B-4231-8961-B43DC22747EE}.Release|Any CPU.ActiveCfg = Release
+		{2647799D-C38B-4231-8961-B43DC22747EE}.Release|Any CPU.Build.0 = Release
 		{2647799D-C38B-4231-8961-B43DC22747EE}.Slow DB|Any CPU.ActiveCfg = Debug
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
