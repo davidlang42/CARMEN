@@ -9,7 +9,7 @@ namespace UnitTests.Database
 {
     public class RelationshipTests
     {
-        readonly ShowConnection connection = ShowConnection.FromLocalFile($"{nameof(RelationshipTests)}.db");
+        readonly ShowConnection connection = BasicShowConnection.FromLocalFile($"{nameof(RelationshipTests)}.db");
 
         [OneTimeSetUp]
         public void CreateDatabase()

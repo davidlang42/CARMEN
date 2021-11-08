@@ -12,7 +12,7 @@ namespace Carmen.ShowModel
     /// <summary>
     /// An object containing all the details required to connect to a ShowModel database
     /// </summary>
-    public class ShowConnection
+    public abstract class ShowConnection
     {
         public enum DbProvider
         {
@@ -22,27 +22,32 @@ namespace Carmen.ShowModel
         }
 
         /// <summary>The type of database server, or null if a local file (sqlite)</summary>
-        public DbProvider? Provider { get; init; }
+        public DbProvider? Provider { get; private init; }
         /// <summary>The db connection string</summary>
-        public string ConnectionString { get; init; } = "";
+        public abstract string ConnectionString { get; }
 
-        public static ShowConnection FromLocalFile(string filename)
-            => new ShowConnection
-            {
-                Provider = null,
-                ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString()
-            };
-
-        public static ShowConnection FromMySql(string host, string database, string user, string pass, uint? port = null)
+        public ShowConnection(DbProvider? provider)
         {
-            var connection = new MySqlConnectionStringBuilder { Server = host, Database = database, UserID = user, Password = pass };
-            if (port.HasValue)
-                connection.Port = port.Value;
-            return new ShowConnection
-            {
-                Provider = DbProvider.MySql,
-                ConnectionString = connection.ToString()
-            };
+            Provider = provider;
         }
+    }
+
+    public class BasicShowConnection : ShowConnection
+    {
+        string connectionString;
+
+        public override string ConnectionString => connectionString;
+
+        public BasicShowConnection(DbProvider? provider, string connection_string)
+            : base(provider)
+        {
+            connectionString = connection_string;
+        }
+
+        public static BasicShowConnection FromLocalFile(string filename)
+            => new BasicShowConnection(null, new SqliteConnectionStringBuilder { DataSource = filename }.ToString());
+
+        internal static BasicShowConnection InMemory()
+            => new BasicShowConnection(null, "Filename=:memory:");
     }
 }

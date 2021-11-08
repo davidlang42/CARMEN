@@ -39,7 +39,7 @@ namespace CarmenUI.Windows
             };
             if (dialog.ShowDialog() == true)
             {
-                var show = RecentShow.FromLocalFile(dialog.FileName);
+                var show = new RecentShow(dialog.FileName);
 #if DEBUG
                 bool add_test_data = MessageBox.Show("Do you want to add test data?", "DEBUG", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 #endif
@@ -90,7 +90,7 @@ namespace CarmenUI.Windows
                 Filter = "Sqlite Database (*.db)|*.db|All Files (*.*)|*.*"
             };
             if (dialog.ShowDialog() == true)
-                await OpenShow(RecentShow.FromLocalFile(dialog.FileName));
+                await OpenShow(new RecentShow(dialog.FileName));
         }
 
         private async Task OpenShow(RecentShow show)
@@ -116,7 +116,7 @@ namespace CarmenUI.Windows
                     {
                         using (new LoadingOverlay(this) { SubText = "Upgrading database" })
                         {
-                            show.CreateBackup();
+                            show.CreateBackupIfFile();
                             await context.UpgradeDatabase();
                         }
                     }
@@ -156,7 +156,7 @@ namespace CarmenUI.Windows
         {
             if(e.AddedItems.Count > 0 && e.AddedItems[0] is RecentShow show)
             {
-                if (show.IsAssessible)
+                if (show.CheckAssessible())
                     await OpenShow(show);
                 else
                 {
@@ -188,9 +188,12 @@ namespace CarmenUI.Windows
             }
         }
 
-        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        private async void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            // Not yet implemented
+            var show = new RecentShow(ShowConnection.DbProvider.MySql, "", "", "", "");
+            var login = new LoginDialog(show);
+            if (login.ShowDialog() == true)
+                await OpenShow(show);
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)

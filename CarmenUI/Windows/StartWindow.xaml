@@ -45,7 +45,7 @@
                     <TextBlock HorizontalAlignment="Center">Open</TextBlock>
                 </StackPanel>
             </Button>
-            <Button x:Name="ConnectButton" Grid.Column="2" Width="100" Height="100" IsEnabled="False" Click="ConnectButton_Click">
+            <Button x:Name="ConnectButton" Grid.Column="2" Width="100" Height="100" Click="ConnectButton_Click">
                 <StackPanel>
                     <fa:ImageAwesome Icon="Database" Width="22" Margin="5"/>
                     <TextBlock HorizontalAlignment="Center">Connect</TextBlock>
@@ -61,7 +61,7 @@
             </ListBox.ItemContainerStyle>
             <ListBox.ItemTemplate>
                 <DataTemplate DataType="{x:Type vm:RecentShow}" >
-                    <Grid ToolTip="{Binding Details}">
+                    <Grid ToolTip="{Binding Tooltip}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="24"/>
                             <ColumnDefinition Width="260"/>

@@ -14,20 +14,11 @@ namespace Carmen.ShowModel
     /// </summary>
     internal class MigrationFactory : IDesignTimeDbContextFactory<ShowContext>
     {
-        private class ShowInMemory : ShowConnection
-        {
-            public ShowInMemory()
-            {
-                Provider = null;
-                ConnectionString = "Filename=:memory:";
-            }
-        }
-
         public ShowContext CreateDbContext(string[] args)
         {
             if (args.FirstOrDefault() is string filename)
-                return new ShowContext(ShowConnection.FromLocalFile(filename));
-            return new ShowContext(new ShowInMemory());
+                return new ShowContext(BasicShowConnection.FromLocalFile(filename));
+            return new ShowContext(BasicShowConnection.InMemory());
         }
     }
 }

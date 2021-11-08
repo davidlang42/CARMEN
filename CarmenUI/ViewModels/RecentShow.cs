@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using FontAwesome.WPF;
 using System.Windows.Media;
 using MySqlConnector;
+using System.Net.NetworkInformation;
 
 namespace CarmenUI.ViewModels
 {
@@ -19,53 +20,67 @@ namespace CarmenUI.ViewModels
     {
         /// <summary>The label to be shown to the user</summary>
         public string Label { get; set; } = "";
-        /// <summary>The details to be shown to the user (as tooltip)</summary>
-        public string Details { get; set; } = "";
+        /// <summary>The tooltip to be shown to the user</summary>
+        public string Tooltip => Filename;
         /// <summary>The default name for the show</summary>
         public string DefaultShowName { get; set; } = "";
         /// <summary>The last time the user opened this show</summary>
         public DateTime LastOpened { get; set; } = DateTime.Now;
-
+        /// <summary>The icon shown to the user</summary>
         public ImageSource IconSource
             => ImageAwesome.CreateImageSource(Provider == null ? FontAwesomeIcon.FolderOutlinepenOutline : FontAwesomeIcon.Database, Brushes.Black);
 
-        public bool IsAssessible => Provider switch
+        #region Set if Provider == null
+        public string Filename { get; set; } = "";
+        #endregion
+
+        #region Set if Provider != null
+        public string Host { get; set; } = "";
+        public string Database { get; set; } = "";
+        /// <summary>Null means default</summary>
+        public uint? Port { get; set; }
+        public string User { get; set; } = "";
+        public string Password { get; set; } = "";
+        #endregion
+
+        public override string ConnectionString => Provider switch
         {
-            null => File.Exists(Details),
-            _ => throw new NotImplementedException($"Proivder not implemented: {Provider}")
+            null => new SqliteConnectionStringBuilder { DataSource = Filename }.ToString(),
+            DbProvider.MySql => new MySqlConnectionStringBuilder { Server = Host, Database = Database, UserID = User, Password = Password, Port = Port ?? 3306 }.ToString(),
+            _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
         };
 
-        public void CreateBackup()
+        public bool CheckAssessible() => Provider switch
+        {
+            null => File.Exists(Filename),
+            DbProvider.MySql => new Ping().Send(Host, 500).Status == IPStatus.Success,
+            _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
+        };
+
+        public void CreateBackupIfFile()
         {
             if (Provider == null)
-                File.Copy(Details, Details + "_backup", true);
-            else
-                throw new NotImplementedException($"Proivder not implemented: {Provider}");
+                File.Copy(Filename, Filename + "_backup", true);
         }
 
-        public static new RecentShow FromLocalFile(string filename)
-            => new RecentShow
-            {
-                Provider = null,
-                ConnectionString = new SqliteConnectionStringBuilder { DataSource = filename }.ToString(),
-                Label = Path.GetFileName(filename),
-                Details = filename,
-                DefaultShowName = Path.GetFileNameWithoutExtension(filename)
-            };
-
-        public static new ShowConnection FromMySql(string host, string database, string user, string pass, uint? port = null)
+        public RecentShow(string filename)
+            : base(null)
         {
-            var connection = new MySqlConnectionStringBuilder { Server = host, Database = database, UserID = user, Password = pass };
-            if (port.HasValue)
-                connection.Port = port.Value;
-            return new RecentShow
-            {
-                Provider = DbProvider.MySql,
-                ConnectionString = connection.ToString(),
-                Label = $"'{database}' on {host}",
-                Details = $"mysql://{user}@{host}:{connection.Port}/{database}",
-                DefaultShowName = database
-            };
+            Filename = filename;
+            Label = Path.GetFileName(filename);
+            DefaultShowName = Path.GetFileNameWithoutExtension(filename);
+        }
+
+        public RecentShow(DbProvider provider, string host, string database, string user, string pass, uint? port = null)
+            : base(provider)
+        {
+            Host = host;
+            Database = database;
+            User = user;
+            Password = pass;
+            Port = port;
+            Label = $"'{database}' on {host}";
+            DefaultShowName = database;
         }
 
         public override bool Equals(object? obj)

@@ -11,7 +11,7 @@ namespace UnitTests.Database
 {
     public class ContextTests
     {
-        readonly ShowConnection connection = ShowConnection.FromLocalFile($"{nameof(ContextTests)}.db");
+        readonly ShowConnection connection = BasicShowConnection.FromLocalFile($"{nameof(ContextTests)}.db");
 
         [OneTimeSetUp]
         public void CreateDatabase()

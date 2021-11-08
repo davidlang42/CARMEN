@@ -92,7 +92,7 @@ namespace DatabaseExplorer
 
         private void OpenDatabase(string filename)
         {
-            CreateContext(ShowConnection.FromLocalFile(filename));
+            CreateContext(BasicShowConnection.FromLocalFile(filename));
             foreach (var ui_element in this.AllControls<UIElement>())
                 ui_element.IsEnabled = true;
         }
