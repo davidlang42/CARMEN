@@ -3,14 +3,16 @@ using System;
 using Carmen.ShowModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Carmen.ShowModel.Migrations
 {
     [DbContext(typeof(ShowContext))]
-    partial class ShowContextModelSnapshot : ModelSnapshot
+    [Migration("20211108065815_FixCommonExistingRoleCost")]
+    partial class FixCommonExistingRoleCost
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

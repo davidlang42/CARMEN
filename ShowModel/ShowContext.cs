@@ -417,9 +417,11 @@ namespace Carmen.ShowModel
                 .WithMany()
                 .HasForeignKey(nameof(TagRequirement.RequiredTagId));
             modelBuilder.Entity<AbilityExactRequirement>()
-                .CommonProperty(nameof(AbilityExactRequirement.Criteria.CriteriaId));
+                .CommonProperty(nameof(AbilityExactRequirement.Criteria.CriteriaId))
+                .CommonProperty(nameof(AbilityExactRequirement.ExistingRoleCost));
             modelBuilder.Entity<AbilityRangeRequirement>()
-                .CommonProperty(nameof(AbilityRangeRequirement.Criteria.CriteriaId));
+                .CommonProperty(nameof(AbilityRangeRequirement.Criteria.CriteriaId))
+                .CommonProperty(nameof(AbilityRangeRequirement.ExistingRoleCost));
             modelBuilder.Entity<NotRequirement>()
                 .HasOne(nr => nr.SubRequirement)
                 .WithMany()
