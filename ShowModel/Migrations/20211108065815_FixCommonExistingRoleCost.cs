@@ -6,7 +6,7 @@ namespace Carmen.ShowModel.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("UPDATE Requirements SET ExistingRoleCost = AbilityExactRequirement_ExistingRoleCost WHERE AbilityExactRequirement_ExistingRoleCost NOT NULL");
+            migrationBuilder.Sql("UPDATE Requirements SET ExistingRoleCost = AbilityExactRequirement_ExistingRoleCost WHERE AbilityExactRequirement_ExistingRoleCost IS NOT NULL");
             migrationBuilder.DropColumn(
                 name: "AbilityExactRequirement_ExistingRoleCost",
                 table: "Requirements");
@@ -19,7 +19,7 @@ namespace Carmen.ShowModel.Migrations
                 table: "Requirements",
                 type: "REAL",
                 nullable: true);
-            migrationBuilder.Sql("UPDATE Requirements SET AbilityExactRequirement_ExistingRoleCost = ExistingRoleCost, ExistingRoleCost = NULL WHERE Discriminator = 'AbilityExactRequirement'");
+            migrationBuilder.Sql("UPDATE Requirements SET AbilityExactRequirement_ExistingRoleCost = ExistingRoleCost, ExistingRoleCost IS NULL WHERE Discriminator = 'AbilityExactRequirement'");
         }
     }
 }
