@@ -22,6 +22,7 @@ namespace Carmen.ShowModel
     {
         public enum DatabaseState
         {
+            Empty,
             UpToDate,
             SavedWithPreviousVersion,
             SavedWithFutureVersion
@@ -106,7 +107,8 @@ namespace Carmen.ShowModel
             {
                 var all_migrations = Database.GetMigrations().ToList();
                 var applied_migrations = Database.GetAppliedMigrations().ToList();
-                //TODO add state for empty db
+                if (all_migrations.Any() && !applied_migrations.Any())
+                    return DatabaseState.Empty;
                 var pending_migrations = all_migrations.Except(applied_migrations);
                 var future_migrations = applied_migrations.Except(all_migrations);
                 if (future_migrations.Any())

@@ -106,7 +106,12 @@ namespace CarmenUI.Windows
                     using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.CheckDatabaseState), "Checking database integrity"))
                         state = await context.CheckDatabaseState();
                 }
-                if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
+                if (state == ShowContext.DatabaseState.Empty)
+                {
+                    using (new LoadingOverlay(this) { SubText = "Creating new database" })
+                        await context.CreateNewDatabase(show.DefaultShowName);
+                }
+                else if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
                 {
                     MessageBox.Show("This database was saved with a newer version of CARMEN and cannot be opened. Please install the latest version.", "CARMEN");
                     return;
@@ -123,7 +128,7 @@ namespace CarmenUI.Windows
                     }
                     else
                         return;
-                }//TODO handle state of empty db
+                }
             }
             using (new LoadingOverlay(this) { SubText = "Opening show" })
                 LaunchMainWindow(show);
