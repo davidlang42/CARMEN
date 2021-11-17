@@ -28,8 +28,8 @@ namespace Carmen.ShowModel
     public enum DbProvider
     {
         MySql,
-        SqlServer,
-        PostgreSql
+        //SqlServer,
+        //PostgreSql
     }
 
     public class BasicShowConnection : ShowConnection
