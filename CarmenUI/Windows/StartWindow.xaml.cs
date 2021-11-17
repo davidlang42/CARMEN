@@ -100,6 +100,7 @@ namespace CarmenUI.Windows
             {
                 using (var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(OpenShow)))
                 {
+                    //TODO handle server connection exceptions
                     using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.PreloadModel), "Preparing show model"))
                         await context.PreloadModel(); // do this here while the overlay is shown to avoid a synchronous delay when the MainMenu is loaded
                     using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.CheckDatabaseState), "Checking database integrity"))
@@ -122,7 +123,7 @@ namespace CarmenUI.Windows
                     }
                     else
                         return;
-                }
+                }//TODO handle state of empty db
             }
             using (new LoadingOverlay(this) { SubText = "Opening show" })
                 LaunchMainWindow(show);
@@ -190,8 +191,11 @@ namespace CarmenUI.Windows
 
         private async void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            var show = new RecentShow(ShowConnection.DbProvider.MySql, "", "", "", "");
-            var login = new LoginDialog(show);
+            var show = new RecentShow(DbProvider.MySql, "", "", "", "");
+            var login = new LoginDialog(show)
+            {
+                Owner = this
+            };
             if (login.ShowDialog() == true)
                 await OpenShow(show);
         }

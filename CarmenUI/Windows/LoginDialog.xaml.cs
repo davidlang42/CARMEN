@@ -26,6 +26,19 @@ namespace CarmenUI.Windows
         {
             this.show = show;
             InitializeComponent();
+            MainGrid.DataContext = show;
+            PasswordText.Password = show.Password;
+        }
+
+        private void ConnectButton_Click(object sender, RoutedEventArgs e)
+        {
+            show.Password = PasswordText.Password;
+            if (!show.CheckAssessible())
+            {
+                MessageBox.Show("Failed to connect.");
+                return;
+            }
+            DialogResult = true;
         }
     }
 }

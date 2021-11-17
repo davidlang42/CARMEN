@@ -106,6 +106,7 @@ namespace Carmen.ShowModel
             {
                 var all_migrations = Database.GetMigrations().ToList();
                 var applied_migrations = Database.GetAppliedMigrations().ToList();
+                //TODO add state for empty db
                 var pending_migrations = all_migrations.Except(applied_migrations);
                 var future_migrations = applied_migrations.Except(all_migrations);
                 if (future_migrations.Any())
@@ -347,7 +348,7 @@ namespace Carmen.ShowModel
                 optionsBuilder
                     .UseSqlite(Connection.ConnectionString)
                     .ReplaceService<IHistoryRepository, CustomSqliteHistoryRepository>();
-            else if (Connection.Provider == ShowConnection.DbProvider.MySql) // MySql or MariaDb
+            else if (Connection.Provider == DbProvider.MySql) // MySql or MariaDb
                 optionsBuilder
                     .UseMySql(Connection.ConnectionString, ServerVersion.AutoDetect(Connection.ConnectionString))
                     .ReplaceService<IHistoryRepository, CustomMySqlHistoryRepository>();

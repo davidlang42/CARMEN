@@ -14,15 +14,8 @@ namespace Carmen.ShowModel
     /// </summary>
     public abstract class ShowConnection
     {
-        public enum DbProvider
-        {
-            MySql,
-            SqlServer,
-            PostgreSql
-        }
-
         /// <summary>The type of database server, or null if a local file (sqlite)</summary>
-        public DbProvider? Provider { get; private init; }
+        public DbProvider? Provider { get; set; }
         /// <summary>The db connection string</summary>
         public abstract string ConnectionString { get; }
 
@@ -30,6 +23,13 @@ namespace Carmen.ShowModel
         {
             Provider = provider;
         }
+    }
+
+    public enum DbProvider
+    {
+        MySql,
+        SqlServer,
+        PostgreSql
     }
 
     public class BasicShowConnection : ShowConnection
