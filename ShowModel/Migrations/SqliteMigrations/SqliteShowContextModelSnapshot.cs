@@ -3,16 +3,14 @@ using System;
 using Carmen.ShowModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Carmen.ShowModel.Migrations
+namespace Carmen.ShowModel.Migrations.SqliteMigrations
 {
-    [DbContext(typeof(ShowContext))]
-    [Migration("20211108065815_FixCommonExistingRoleCost")]
-    partial class FixCommonExistingRoleCost
+    [DbContext(typeof(SqliteShowContext))]
+    partial class SqliteShowContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

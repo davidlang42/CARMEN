@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Carmen.ShowModel.Migrations
+namespace Carmen.ShowModel.Migrations.SqliteMigrations
 {
     public partial class InitialRelease : Migration
     {

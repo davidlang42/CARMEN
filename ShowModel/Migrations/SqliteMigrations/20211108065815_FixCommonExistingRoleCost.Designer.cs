@@ -6,11 +6,11 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Carmen.ShowModel.Migrations
+namespace Carmen.ShowModel.Migrations.SqliteMigrations
 {
-    [DbContext(typeof(ShowContext))]
-    [Migration("20211026110942_InitialRelease")]
-    partial class InitialRelease
+    [DbContext(typeof(SqliteShowContext))]
+    [Migration("20211108065815_FixCommonExistingRoleCost")]
+    partial class FixCommonExistingRoleCost
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -476,8 +476,9 @@ namespace Carmen.ShowModel.Migrations
                         .HasColumnName("CriteriaId");
 
                     b.Property<double>("ExistingRoleCost")
+                        .ValueGeneratedOnUpdateSometimes()
                         .HasColumnType("REAL")
-                        .HasColumnName("AbilityExactRequirement_ExistingRoleCost");
+                        .HasColumnName("ExistingRoleCost");
 
                     b.Property<uint>("RequiredValue")
                         .ValueGeneratedOnUpdateSometimes()
@@ -498,7 +499,9 @@ namespace Carmen.ShowModel.Migrations
                         .HasColumnName("CriteriaId");
 
                     b.Property<double>("ExistingRoleCost")
-                        .HasColumnType("REAL");
+                        .ValueGeneratedOnUpdateSometimes()
+                        .HasColumnType("REAL")
+                        .HasColumnName("ExistingRoleCost");
 
                     b.Property<uint?>("Maximum")
                         .ValueGeneratedOnUpdateSometimes()
