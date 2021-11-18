@@ -1,14 +1,10 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Builders;
+﻿using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Sqlite.Migrations.Internal;
 using Microsoft.EntityFrameworkCore.Storage;
-using Pomelo.EntityFrameworkCore.MySql.Migrations.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Carmen.ShowModel
 {
@@ -16,15 +12,15 @@ namespace Carmen.ShowModel
     // | IMPORTANT: Any changes must be made to all Custom*HistoryRepository classes |
     // |-----------------------------------------------------------------------------|
 #pragma warning disable EF1001 // Internal EF Core API usage.
-    internal class CustomMySqlHistoryRepository : MySqlHistoryRepository
+    internal class CustomSqliteHistoryRepository : SqliteHistoryRepository
     {
         #region Extra values for history table
-        public string ApplicationVersion = CustomSqliteHistoryRepository.VersionAsString(Assembly.GetEntryAssembly(), true);
-        public string CarmenVersion = CustomSqliteHistoryRepository.VersionAsString(Assembly.GetExecutingAssembly());
+        public string ApplicationVersion = VersionAsString(Assembly.GetEntryAssembly(), true);
+        public string CarmenVersion = VersionAsString(Assembly.GetExecutingAssembly());
         public DateTime DateApplied = DateTime.Now;
         #endregion
 
-        public CustomMySqlHistoryRepository(HistoryRepositoryDependencies dependencies)
+        public CustomSqliteHistoryRepository(HistoryRepositoryDependencies dependencies)
             : base(dependencies)
         { }
 
@@ -67,6 +63,21 @@ namespace Carmen.ShowModel
                 .Append(')')
                 .AppendLine(SqlGenerationHelper.StatementTerminator)
                 .ToString();
+        }
+
+        public static string VersionAsString(Assembly? assembly, bool include_name = false)
+        {
+            if (assembly == null)
+                return "Unknown assembly";
+            var name = assembly.GetName();
+            if (name.Version is Version version)
+            {
+                if (!include_name)
+                    return version.ToString();
+                else if (name.Name is string plain_name)
+                    return $"{plain_name} {version}";
+            }
+            return name.FullName;
         }
     }
 #pragma warning restore EF1001 // Internal EF Core API usage.
