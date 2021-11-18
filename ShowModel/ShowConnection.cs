@@ -32,22 +32,16 @@ namespace Carmen.ShowModel
         //PostgreSql
     }
 
-    public class BasicShowConnection : ShowConnection
+    public class LocalShowConnection : ShowConnection
     {
-        string connectionString;
+        public string Filename { get; }
 
-        public override string ConnectionString => connectionString;
+        public override string ConnectionString => new SqliteConnectionStringBuilder { DataSource = Filename }.ToString();
 
-        public BasicShowConnection(DbProvider? provider, string connection_string)
-            : base(provider)
+        public LocalShowConnection(string filename)
+            : base(null)
         {
-            connectionString = connection_string;
+            Filename = filename;
         }
-
-        public static BasicShowConnection FromLocalFile(string filename)
-            => new BasicShowConnection(null, new SqliteConnectionStringBuilder { DataSource = filename }.ToString());
-
-        internal static BasicShowConnection InMemory()
-            => new BasicShowConnection(null, "Filename=:memory:");
     }
 }

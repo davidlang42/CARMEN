@@ -21,15 +21,16 @@ namespace DatabaseExplorer
     /// </summary>
     public partial class ExplorerWindow : Window
     {
+        private ShowConnection? connection;
         private ShowContext? _context;
 
         public ShowContext Context => _context ?? throw new Exception("Attempted to use Context before loading.");
 
         /// <summary>Create a new database context, disposing the old one if set</summary>
-        private void CreateContext(ShowConnection connection)
+        private void CreateContext()
         {
             _context?.Dispose();
-            _context = new ShowContext(connection);
+            _context = ShowContext.Open(connection ?? throw new ApplicationException("Connection not set."));
         }
 
         private readonly CollectionViewSource applicantsViewSource;
@@ -92,7 +93,8 @@ namespace DatabaseExplorer
 
         private void OpenDatabase(string filename)
         {
-            CreateContext(BasicShowConnection.FromLocalFile(filename));
+            connection = new LocalShowConnection(filename);
+            CreateContext();
             foreach (var ui_element in this.AllControls<UIElement>())
                 ui_element.IsEnabled = true;
         }
@@ -151,7 +153,7 @@ namespace DatabaseExplorer
 
         private void RevertChanges()
         {
-            CreateContext(Context.Connection);
+            CreateContext();
             PopulateViews();
         }
 

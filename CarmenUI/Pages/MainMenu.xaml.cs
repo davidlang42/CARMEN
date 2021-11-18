@@ -152,7 +152,7 @@ namespace CarmenUI.Pages
                 summary.Status = ProcessStatus.Loading;
             CastingComplete.Visibility = Visibility.Hidden;
             // Use a short-lived context
-            using var context = new ShowContext(connection);
+            using var context = ShowContext.Open(connection);
             // Update summaries sequentially
             foreach (var summary in allSummaries.Where(s => summaries.Contains(s)))
             {

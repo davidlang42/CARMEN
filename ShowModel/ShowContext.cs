@@ -18,7 +18,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Carmen.ShowModel
 {
-    public class ShowContext : DbContext
+    public abstract class ShowContext : DbContext
     {
         public enum DatabaseState
         {
@@ -76,12 +76,13 @@ namespace Carmen.ShowModel
         /// <summary>The root node of the show structure</summary>
         public ShowRoot ShowRoot => showRoot ??= Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;
 
-        public ShowConnection Connection { get; private init; }
-
-        public ShowContext(ShowConnection show_connection)
-        {
-            Connection = show_connection;
-        }
+        public static ShowContext Open(ShowConnection show)
+            => show.Provider switch
+            {
+                DbProvider.MySql => new MySqlShowContext(show.ConnectionString),
+                null => new SqliteShowContext(show.ConnectionString),
+                _ => throw new NotImplementedException($"Database provider {show.Provider} not implemented.")
+            };
 
         /// <summary>Accessing any model or entity related property on the context causes the model to be build,
         /// which takes ~1s synchronously. This runs it in a separate thread to avoid a synchronous delay.</summary>
@@ -346,17 +347,6 @@ namespace Carmen.ShowModel
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (Connection.Provider == null) // Sqlite
-                optionsBuilder
-                    .UseSqlite(Connection.ConnectionString)
-                    .ReplaceService<IHistoryRepository, CustomSqliteHistoryRepository>();
-            else if (Connection.Provider == DbProvider.MySql) // MySql or MariaDb
-                optionsBuilder
-                    .UseMySql(Connection.ConnectionString, ServerVersion.AutoDetect(Connection.ConnectionString))
-                    .ReplaceService<IHistoryRepository, CustomMySqlHistoryRepository>();
-            else
-                throw new NotImplementedException($"Database provider {Connection.Provider} not implemented.");
-
             // Using LazyLoadingProxies will have a huge performance hit if I forget to include
             // the right objects in my queries, however the alternative is that if I forget to
             // include something then I get incorrect values (eg. nulls and empty collections)
@@ -464,7 +454,6 @@ namespace Carmen.ShowModel
             modelBuilder.Entity<Section>().Navigation(s => s.SectionType).AutoInclude();
             modelBuilder.Entity<SameCastSet>().Navigation(set => set.Applicants).AutoInclude();
         }
-
 #if SLOW_DATABASE
         private class DelayInterceptor : DbCommandInterceptor
         {
@@ -491,5 +480,41 @@ namespace Carmen.ShowModel
             }
         }
 #endif
+    }
+
+    public class SqliteShowContext : ShowContext
+    {
+        string connectionString;
+
+        public SqliteShowContext(string connection_string)
+        {
+            connectionString = connection_string;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder
+                .UseSqlite(connectionString)
+                .ReplaceService<IHistoryRepository, CustomSqliteHistoryRepository>();
+            base.OnConfiguring(optionsBuilder);
+        }
+    }
+
+    public class MySqlShowContext : ShowContext
+    {
+        string connectionString;
+
+        public MySqlShowContext(string connection_string)
+        {
+            connectionString = connection_string;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder
+                .UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
+                .ReplaceService<IHistoryRepository, CustomMySqlHistoryRepository>();
+            base.OnConfiguring(optionsBuilder);
+        }
     }
 }

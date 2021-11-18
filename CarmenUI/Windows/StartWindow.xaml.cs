@@ -44,7 +44,7 @@ namespace CarmenUI.Windows
                 bool add_test_data = MessageBox.Show("Do you want to add test data?", "DEBUG", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 #endif
                 using (var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(NewButton_Click)))
-                using (var context = new ShowContext(show))
+                using (var context = ShowContext.Open(show))
                 {
                     using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.PreloadModel), "Preparing show model"))
                         await context.PreloadModel(); // do this here while the overlay is shown to avoid a synchronous delay when the MainMenu is loaded
@@ -96,7 +96,7 @@ namespace CarmenUI.Windows
         private async Task OpenShow(RecentShow show)
         {
             ShowContext.DatabaseState state;
-            using (var context = new ShowContext(show))
+            using (var context = ShowContext.Open(show))
             {
                 using (var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(OpenShow)))
                 {

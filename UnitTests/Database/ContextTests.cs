@@ -11,12 +11,12 @@ namespace UnitTests.Database
 {
     public class ContextTests
     {
-        readonly ShowConnection connection = BasicShowConnection.FromLocalFile($"{nameof(ContextTests)}.db");
+        readonly ShowConnection connection = new LocalShowConnection($"{nameof(ContextTests)}.db");
 
         [OneTimeSetUp]
         public void CreateDatabase()
         {
-            using var context = new ShowContext(connection);
+            using var context = ShowContext.Open(connection);
             context.Database.EnsureDeleted();
             context.Database.EnsureCreated();
         }
@@ -24,7 +24,7 @@ namespace UnitTests.Database
         [Test]
         public void ShowRootAccessorCreatesOnlyOneNode()
         {
-            using var context = new ShowContext(connection);
+            using var context = ShowContext.Open(connection);
             context.Nodes.Count().Should().Be(0);
             var show_root = context.ShowRoot;
             context.ShowRoot.Should().Be(show_root);
@@ -79,7 +79,7 @@ namespace UnitTests.Database
         public void CheckDefaultSettings_TrueAfterSetDefault_FalseAfterChange()
         {
             var default_show_name = "DefaultShow";
-            using var context = new ShowContext(connection);
+            using var context = ShowContext.Open(connection);
             context.SetDefaultShowSettings(default_show_name);
             context.CheckDefaultShowSettings(default_show_name).Should().BeTrue();
             context.ShowRoot.Name = "";

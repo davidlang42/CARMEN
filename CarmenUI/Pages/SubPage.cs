@@ -44,7 +44,7 @@ namespace CarmenUI.Pages
         private void RecreateContext()
         {
             _context?.Dispose();
-            _context = new ShowContext(connection);
+            _context = ShowContext.Open(connection);
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e)
