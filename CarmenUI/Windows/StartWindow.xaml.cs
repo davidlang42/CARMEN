@@ -39,7 +39,7 @@ namespace CarmenUI.Windows
             };
             if (dialog.ShowDialog() == true)
             {
-                var show = new RecentShow(dialog.FileName);
+                var show = new RecentShow { Filename = dialog.FileName };
 #if DEBUG
                 bool add_test_data = MessageBox.Show("Do you want to add test data?", "DEBUG", MessageBoxButton.YesNo) == MessageBoxResult.Yes;
 #endif
@@ -90,7 +90,7 @@ namespace CarmenUI.Windows
                 Filter = "Sqlite Database (*.db)|*.db|All Files (*.*)|*.*"
             };
             if (dialog.ShowDialog() == true)
-                await OpenShow(new RecentShow(dialog.FileName));
+                await OpenShow(new RecentShow { Filename = dialog.FileName});
         }
 
         private async Task OpenShow(RecentShow show)
@@ -196,7 +196,7 @@ namespace CarmenUI.Windows
 
         private async void ConnectButton_Click(object sender, RoutedEventArgs e)
         {
-            var show = new RecentShow(DbProvider.MySql, "", "", "", "");
+            var show = new RecentShow { Provider = DbProvider.MySql };
             var login = new LoginDialog(show)
             {
                 Owner = this

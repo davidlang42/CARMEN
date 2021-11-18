@@ -18,17 +18,8 @@ namespace CarmenUI.ViewModels
     /// </summary>
     public class RecentShow : ShowConnection
     {
-        /// <summary>The label to be shown to the user</summary>
-        public string Label { get; set; } = "";
-        /// <summary>The tooltip to be shown to the user</summary>
-        public string Tooltip => Filename;
-        /// <summary>The default name for the show</summary>
-        public string DefaultShowName { get; set; } = "";
         /// <summary>The last time the user opened this show</summary>
         public DateTime LastOpened { get; set; } = DateTime.Now;
-        /// <summary>The icon shown to the user</summary>
-        public ImageSource IconSource
-            => ImageAwesome.CreateImageSource(Provider == null ? FontAwesomeIcon.FolderOutlinepenOutline : FontAwesomeIcon.Database, Brushes.Black);
 
         #region Set if Provider == null
         public string Filename { get; set; } = "";
@@ -43,12 +34,44 @@ namespace CarmenUI.ViewModels
         public string Password { get; set; } = "";
         #endregion
 
+        /// <summary>The icon shown to the user</summary>
+        public ImageSource IconSource
+            => ImageAwesome.CreateImageSource(Provider == null ? FontAwesomeIcon.FolderOutlinepenOutline : FontAwesomeIcon.Database, Brushes.Black);
+
+        /// <summary>The database connection string</summary>
         public override string ConnectionString => Provider switch
         {
             null => new SqliteConnectionStringBuilder { DataSource = Filename }.ToString(),
             DbProvider.MySql => new MySqlConnectionStringBuilder { Server = Host, Database = Database, UserID = User, Password = Password, Port = Port ?? 3306 }.ToString(),
             _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
         };
+
+        /// <summary>The label to be shown to the user</summary>
+        public string Label => Provider switch
+        {
+            null => Path.GetFileName(Filename),
+            DbProvider.MySql => $"'{Database}' on {Host}",
+            _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
+        };
+        /// <summary>The tooltip to be shown to the user</summary>
+        public string Tooltip => Provider switch
+        {
+            null => Filename,
+            DbProvider.MySql => $"mysql://{User}@{Host}{(Port.HasValue ? $":{Port}" : "")}/{Database}",
+            _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
+        };
+        /// <summary>The default name for the show</summary>
+        public string DefaultShowName => Provider switch
+        {
+            null => Path.GetFileNameWithoutExtension(Filename),
+            DbProvider.MySql => Database,
+            _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
+        };
+
+        /// <summary>Parameterless constructor required for serialization, defaults to Sqlite</summary>
+        public RecentShow()
+            : base(null)
+        { }
 
         public bool CheckAssessible() => Provider switch
         {
@@ -61,26 +84,6 @@ namespace CarmenUI.ViewModels
         {
             if (Provider == null)
                 File.Copy(Filename, Filename + "_backup", true);
-        }
-
-        public RecentShow(string filename)
-            : base(null)
-        {
-            Filename = filename;
-            Label = Path.GetFileName(filename);
-            DefaultShowName = Path.GetFileNameWithoutExtension(filename);
-        }
-
-        public RecentShow(DbProvider provider, string host, string database, string user, string pass, uint? port = null)
-            : base(provider)
-        {
-            Host = host;
-            Database = database;
-            User = user;
-            Password = pass;
-            Port = port;
-            Label = $"'{database}' on {host}";
-            DefaultShowName = database;
         }
 
         public override bool Equals(object? obj)
