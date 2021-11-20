@@ -27,7 +27,7 @@ namespace Carmen.ShowModel.Import
         }
 
         private bool matchExisting;
-        public bool MatchExisting
+        public virtual bool MatchExisting
         {
             get => matchExisting;
             set

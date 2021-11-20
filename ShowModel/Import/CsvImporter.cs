@@ -21,6 +21,7 @@ namespace Carmen.ShowModel.Import
         CastGroup[] castGroups;
         AlternativeCast[] alternativeCasts;
         CsvReader csv;
+        string importPath; // with trailing backslash
 
         public InputColumn[] InputColumns { get; }
         public ImportColumn[] ImportColumns { get; }
@@ -28,9 +29,12 @@ namespace Carmen.ShowModel.Import
 
         public CsvImporter(string file_name, Criteria[] criterias, CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Tag[] tags)
         {
+            importPath = Path.GetDirectoryName(Path.GetFullPath(file_name)) ?? Directory.GetCurrentDirectory();
+            if (!importPath.EndsWith(Path.DirectorySeparatorChar))
+                importPath += Path.DirectorySeparatorChar;
             castGroups = cast_groups;
             alternativeCasts = alternative_casts;
-            csv = new CsvReader(new StreamReader(file_name), CultureInfo.InvariantCulture);
+            csv = new CsvReader(new StreamReader(file_name), CultureInfo.InvariantCulture); //TODO handle file io exceptions
             csv.Read();
             csv.ReadHeader();
             InputColumns = csv.HeaderRecord.Select((h, i) => new InputColumn(i, h)).ToArray();
@@ -124,6 +128,7 @@ namespace Carmen.ShowModel.Import
             yield return ImportColumn.ForNullable("Date of Birth", a => a.DateOfBirth, (a, v) => a.DateOfBirth = v, ParseDateOfBirth);
             foreach (var criteria in criterias)
                 yield return ImportColumn.ForNullable(criteria.Name, a => a.MarkFor(criteria), (a, v) => a.SetMarkFor(criteria, v), s => ParseCriteriaMark(criteria, s));
+            yield return new ImageImportColumn("Photo", (a, v) => a.Photo = v, LoadImageData);
             yield return ImportColumn.ForString("Notes", a => a.Notes, (a, v) => a.Notes = v, false);
             yield return ImportColumn.ForString("External Data", a => a.ExternalData, (a, v) => a.ExternalData = v, false);
             // everything below here should only be imported if they are already accepted into the cast
@@ -132,6 +137,23 @@ namespace Carmen.ShowModel.Import
             yield return ImportColumn.ForConditionalNullable("Alternative Cast", a => a.AlternativeCast, (a, v) => a.AlternativeCast = v, ParseAlternativeCast);
             foreach (var tag in tags)
                 yield return ImportColumn.ForConditionalNullable(tag.Name, a => a.Tags.Contains(tag), (a, v) => SetTag(a, tag, v), (a, s) => ParseTagFlag(a, tag, s));
+        }
+
+        private byte[]? LoadImageData(string filename)
+        {
+            if (string.IsNullOrWhiteSpace(filename))
+                return null;
+            var fullpath = importPath + filename;
+            if (!File.Exists(fullpath))
+                throw new ParseException("image", filename, $"a file within the same folder ({importPath})");
+            try
+            {
+                return File.ReadAllBytes(fullpath);
+            }
+            catch (Exception ex)
+            {
+                throw new ParseException("image", filename, $"no error reading file ({ex.Message})");
+            }
         }
 
         private Gender? ParseGender(string value)
