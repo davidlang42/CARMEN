@@ -54,7 +54,7 @@ namespace Carmen.ShowModel.Import
             // everything below here should only be imported if they are already accepted into the cast
             yield return new("Cast Group", (a, s) => a.CastGroup = ParseCastGroup(s));
             yield return new("Cast Number", (a, s) => a.CastNumber = ParseCastNumber(a.IsAccepted, s));
-            yield return new("Alternative Cast", (a, s) => a.AlternativeCast = ParseAlternativeCast(a.IsAccepted, s));//TODO data integr. cast group must alt
+            yield return new("Alternative Cast", (a, s) => a.AlternativeCast = ParseAlternativeCast(a.CastGroup, s));
             foreach (var tag in tags)
                 yield return new(tag.Name, (a, s) => SetTag(a, tag, s));
         }
@@ -138,12 +138,14 @@ namespace Carmen.ShowModel.Import
             throw new ParseException("cast number", value, "a whole number only");
         }
 
-        private AlternativeCast? ParseAlternativeCast(bool is_accepted, string value)
+        private AlternativeCast? ParseAlternativeCast(CastGroup? cast_group, string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
-            if (!is_accepted)
+            if (cast_group == null)
                 throw new ParseException("alternative cast", value, "no alternative cast unless applicant is accepted");
+            if (!cast_group.AlternateCasts)
+                throw new ParseException("alternative cast", value, "no alternative cast if cast group does not alternate");
             foreach (var alternative_cast in alternativeCasts)
                 if (value.Equals(alternative_cast.Name, StringComparison.InvariantCultureIgnoreCase)
                     || value.Equals(alternative_cast.Initial.ToString(), StringComparison.InvariantCultureIgnoreCase))
