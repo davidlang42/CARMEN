@@ -32,6 +32,11 @@ namespace CarmenUI.Windows
 
         private void ImportButton_Click(object sender, RoutedEventArgs e)
         {
+            if (!ImportColumns.Any(c => c.SelectedInput != null))
+            {
+                MessageBox.Show("At least one field must be mapped to an input column.");
+                return;
+            }
             DialogResult = true;
         }
     }

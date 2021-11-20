@@ -375,10 +375,11 @@ namespace CarmenUI.Pages
             };
             if (import.ShowDialog() == true)
             {
-                //TODO loading overlay during import using actual progress
-                csv.Import(context.Applicants.Local);
+                using (var importing = new LoadingOverlay(this) { MainText = "Importing...", SubText = "0 rows processed" })
+                    csv.Import(context.Applicants.Local, r => importing.SubText = r.Plural("row") + " processed");
                 //TODO might be required: applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             }
+            csv.Dispose();
         }
 
         private void ImportMarks()

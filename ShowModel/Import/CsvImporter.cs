@@ -1,7 +1,10 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using CsvHelper;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,34 +14,54 @@ namespace Carmen.ShowModel.Import
     /// <summary>
     /// Imports applicants from a CSV file
     /// </summary>
-    public class CsvImporter
+    public class CsvImporter : IDisposable
     {
+        bool disposed;
+        CastGroup[] castGroups;
+        AlternativeCast[] alternativeCasts;
+        CsvReader csv;
+
         public InputColumn[] InputColumns { get; }
         public ImportColumn[] ImportColumns { get; }
-        public List<string> Errors { get; } = new();
         public DateTime MaximumDateOfBirth { get; set; } = DateTime.Now; //TODO set this to show's date
-
-        private CastGroup[] castGroups;
-        private AlternativeCast[] alternativeCasts;
 
         public CsvImporter(string file_name, Criteria[] criterias, CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Tag[] tags)
         {
             castGroups = cast_groups;
             alternativeCasts = alternative_casts;
-            //TODO
-            InputColumns = new InputColumn[]
-            {
-                new(0,"Col1"),
-                new(1,"Col2"),
-                new(2,"Col3"),
-            };
+            csv = new CsvReader(new StreamReader(file_name), CultureInfo.InvariantCulture);
+            csv.Read();
+            csv.ReadHeader();
+            InputColumns = csv.HeaderRecord.Select((h, i) => new InputColumn(i, h)).ToArray();
+            //TODO auto-map columns
             ImportColumns = GenerateColumns(criterias, tags).ToArray();
         }
 
-        public ImportResult Import(ICollection<Applicant> applicant_collection)
+        public ImportResult Import(ICollection<Applicant> applicant_collection, Action<int>? progress_callback = null)
         {
-            //TODO
-            return default;
+            if (disposed)
+                throw new InvalidOperationException("Tried to use after dispose");
+            var result = new ImportResult();
+            result.ErrorRows = new();
+            while (csv.Read())
+            {
+                //TODO implement row matching
+                var applicant = new Applicant();
+                try
+                {
+                    foreach (var column in ImportColumns)
+                        if (column.SelectedInput != null)
+                            column.ValueSetter(applicant, csv.GetField(column.SelectedInput.Index));
+                    applicant_collection.Add(applicant);
+                    result.NewApplicantsAdded++;
+                } catch (ParseException ex)
+                {
+                    result.ErrorRows.Add(result.RecordsProcessed + 1, ex.Message);
+                }
+                result.RecordsProcessed++;
+                progress_callback?.Invoke(result.RecordsProcessed);
+            }
+            return result;
         }
 
         private IEnumerable<ImportColumn> GenerateColumns(Criteria[] criterias, Tag[] tags)
@@ -178,12 +201,23 @@ namespace Carmen.ShowModel.Import
                 tag.Members.Remove(applicant);
             }
         }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                disposed = true;
+                csv.Dispose();
+            }
+        }
     }
 
     public struct ImportResult
     {
+        public int RecordsProcessed;
         public int NewApplicantsAdded;
         public int ExistingApplicantsUpdated;
         public int ExistingApplicantsNotChanged;
+        public Dictionary<int, string> ErrorRows;
     }
 }
