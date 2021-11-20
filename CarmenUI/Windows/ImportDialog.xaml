@@ -8,6 +8,12 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         Title="Import applicants" Height="600" MinHeight="200" Width="800" MinWidth="450"
         Name="Window" WindowStartupLocation="CenterOwner">
+    <Window.Resources>
+        <RoutedUICommand x:Key="clearInputCommand"/>
+    </Window.Resources>
+    <Window.CommandBindings>
+        <CommandBinding Command="{StaticResource clearInputCommand}" Executed="ClearInputCommand_Executed"/>
+    </Window.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>
@@ -41,8 +47,14 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
-                                <ComboBox SelectedItem="{Binding SelectedInput}" VerticalAlignment="Center" Margin="0 0 0 10" ItemsSource="{Binding ElementName=Window, Path=InputColumns}"/>
-                        </DataTemplate>
+                                <ComboBox SelectedItem="{Binding SelectedInput}" VerticalAlignment="Center" Margin="0 0 0 10" ItemsSource="{Binding ElementName=Window, Path=InputColumns}">
+                                    <ComboBox.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Clear Input" Command="{Binding Source={StaticResource clearInputCommand}}" CommandParameter="{Binding}"/>
+                                        </ContextMenu>
+                                    </ComboBox.ContextMenu>
+                                </ComboBox>
+                            </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
                     <ItemsControl Grid.Column="2" ItemsSource="{Binding ElementName=Window, Path=ImportColumns}" KeyboardNavigation.IsTabStop="False">

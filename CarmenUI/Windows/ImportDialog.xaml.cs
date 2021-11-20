@@ -53,5 +53,8 @@ namespace CarmenUI.Windows
             }
             DialogResult = true;
         }
+
+        private void ClearInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+            => ((ImportColumn)e.Parameter).SelectedInput = null;
     }
 }
