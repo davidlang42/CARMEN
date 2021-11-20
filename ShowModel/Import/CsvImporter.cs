@@ -139,10 +139,10 @@ namespace Carmen.ShowModel.Import
                 yield return ImportColumn.ForConditionalNullable(tag.Name, a => a.Tags.Contains(tag), (a, v) => SetTag(a, tag, v), (a, s) => ParseTagFlag(a, tag, s));
         }
 
-        private byte[]? LoadImageData(string filename)
+        private byte[] LoadImageData(string filename)
         {
             if (string.IsNullOrWhiteSpace(filename))
-                return null;
+                throw new ApplicationException("Tried to load image with an empty filename");
             var fullpath = importPath + filename;
             if (!File.Exists(fullpath))
                 throw new ParseException("image", filename, $"a file within the same folder ({importPath})");
