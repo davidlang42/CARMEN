@@ -405,7 +405,6 @@ namespace CarmenUI.Pages
                         UseShellExecute = true
                     }); // launches default application for TXT files
                 }
-                //TODO might be required: applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             }
             csv.Dispose();
         }

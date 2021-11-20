@@ -24,7 +24,7 @@ namespace Carmen.ShowModel.Import
 
         public InputColumn[] InputColumns { get; }
         public ImportColumn[] ImportColumns { get; }
-        public DateTime MaximumDateOfBirth { get; set; } = DateTime.Now; //TODO set this to show's date
+        public DateTime MaximumDateOfBirth { get; set; } = DateTime.Now;
 
         public CsvImporter(string file_name, Criteria[] criterias, CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Tag[] tags)
         {
@@ -158,7 +158,7 @@ namespace Carmen.ShowModel.Import
                     throw new ParseException("date of birth", value, $"a date before {MaximumDateOfBirth}");
                 return date;
             }
-            throw new ParseException("date of birth", value); //TODO this should suggest the expected format
+            throw new ParseException("date of birth", value, "dd/mm/yyyy");
         }
 
         private uint? ParseCriteriaMark(Criteria criteria, string value)
