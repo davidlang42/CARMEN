@@ -334,17 +334,17 @@ namespace CarmenUI.Pages
         private void NoApplicantsPanel_MouseDoubleClick(object sender, MouseButtonEventArgs e)
             => AddApplicant_Click(sender, e);
 
-        private void importButton_Click(object sender, RoutedEventArgs e)
+        private async void importButton_Click(object sender, RoutedEventArgs e)
         {
             if (Mode == EditApplicantsMode.RegisterApplicants)
-                ImportApplicants();
+                await ImportApplicants();
             else if (Mode == EditApplicantsMode.AuditionApplicants)
                 ImportMarks();
             else
                 throw new NotImplementedException($"Enum not handled: {Mode}");
         }
 
-        private void ImportApplicants()
+        private async Task ImportApplicants()
         {
             var file = new OpenFileDialog
             {
@@ -353,7 +353,21 @@ namespace CarmenUI.Pages
             };
             if (file.ShowDialog() == false)
                 return;
-            var csv = new CsvImporter(file.FileName);
+            CsvImporter csv;
+            using (var loading = new LoadingOverlay(this).AsSegment($"{nameof(ImportApplicants)}_Preparation"))
+            {
+                CastGroup[] castGroups;
+                AlternativeCast[] alternativeCasts;
+                Tag[] tags;
+                using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
+                    castGroups = await context.CastGroups.ToArrayAsync();
+                using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
+                    alternativeCasts = await context.AlternativeCasts.ToArrayAsync();
+                using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
+                    tags = await context.Tags.ToArrayAsync();
+                using (loading.Segment(nameof(CsvImporter),"Columns headers"))
+                    csv = new CsvImporter(file.FileName, criterias, castGroups, alternativeCasts, tags);
+            }
             var import = new ImportDialog(csv)
             {
                 Title = "Import applicants from " + System.IO.Path.GetFileName(file.FileName),
@@ -361,6 +375,7 @@ namespace CarmenUI.Pages
             };
             if (import.ShowDialog() == true)
             {
+                //TODO loading overlay during import using actual progress
                 csv.Import(context.Applicants.Local);
                 //TODO might be required: applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             }

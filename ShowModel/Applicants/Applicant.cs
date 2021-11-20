@@ -284,6 +284,25 @@ namespace Carmen.ShowModel.Applicants
         public uint MarkFor(Criteria criteria)
             => Abilities.Where(a => a.Criteria == criteria).SingleOrDefault()?.Mark ?? 0;
 
+        public void SetMarkFor(Criteria criteria, uint? mark)
+        {
+            if (Abilities.SingleOrDefault(ab => ab.Criteria == criteria) is not Ability ability)
+            {
+                if (mark == null)
+                    return; // nothing to do
+                ability = new Ability
+                {
+                    Applicant = this,
+                    Criteria = criteria
+                };
+                Abilities.Add(ability);
+            }
+            if (mark == null)
+                Abilities.Remove(ability);
+            else
+                ability.Mark = mark.Value;
+        }
+
         public string FormattedMarkFor(Criteria criteria) => criteria.Format(MarkFor(criteria));
 
         /// <summary>Determines if an Applicant has been accepted into the cast.

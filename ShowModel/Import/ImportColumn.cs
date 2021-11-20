@@ -11,8 +11,9 @@ namespace Carmen.ShowModel.Import
     {
         public string Name { get; set; }
         public InputColumn? SelectedInput { get; set; }
-        public Action<Applicant, string> ValueSetter { get; set; }
         public bool MatchExisting { get; set; }
+        /// <summary>Should throw ParseException if string value is invalid.</summary>
+        public Action<Applicant, string> ValueSetter { get; set; }
 
         public ImportColumn(string name, Action<Applicant, string> setter, bool match_existing = false)
         {
