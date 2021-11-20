@@ -44,12 +44,19 @@ namespace Carmen.ShowModel.Import
                 throw new InvalidOperationException("Tried to use after dispose");
             var result = new ImportResult();
             result.ErrorRows = new();
+            var match_columns = ImportColumns.Where(c => c.MatchExisting && c.SelectedInput != null).ToArray();
             while (csv.Read())
             {
-                IEnumerable<Applicant> existing = applicant_collection;
-                foreach (var column in ImportColumns.Where(c => c.MatchExisting && c.SelectedInput != null))
-                    existing = existing.Where(a => column.ValueComparer(a, csv.GetField(column.SelectedInput!.Index)));
-                var applicants = existing.ToArray();
+                Applicant[] applicants;
+                if (match_columns.Length > 0)
+                {
+                    IEnumerable<Applicant> existing = applicant_collection;
+                    foreach (var column in ImportColumns.Where(c => c.MatchExisting && c.SelectedInput != null))
+                        existing = existing.Where(a => column.ValueComparer(a, csv.GetField(column.SelectedInput!.Index)));
+                    applicants = existing.ToArray();
+                }
+                else
+                    applicants = Array.Empty<Applicant>();
                 if (applicants.Length == 0)
                 {
                     // new applicant
