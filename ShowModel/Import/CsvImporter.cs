@@ -46,18 +46,55 @@ namespace Carmen.ShowModel.Import
             result.ErrorRows = new();
             while (csv.Read())
             {
-                //TODO implement row matching
-                var applicant = new Applicant() { ShowRoot = show_root };
-                try
+                IEnumerable<Applicant> existing = applicant_collection;
+                foreach (var column in ImportColumns.Where(c => c.MatchExisting && c.SelectedInput != null))
+                    existing = existing.Where(a => column.ValueComparer(a, csv.GetField(column.SelectedInput!.Index)));
+                var applicants = existing.ToArray();
+                if (applicants.Length == 0)
                 {
-                    foreach (var column in ImportColumns)
-                        if (column.SelectedInput != null)
-                            column.ValueSetter(applicant, csv.GetField(column.SelectedInput.Index));
-                    applicant_collection.Add(applicant);
-                    result.NewApplicantsAdded++;
-                } catch (ParseException ex)
+                    // new applicant
+                    var applicant = new Applicant { ShowRoot = show_root };
+                    try
+                    {
+                        foreach (var column in ImportColumns.Where(c => c.SelectedInput != null))
+                            column.ValueSetter(applicant, csv.GetField(column.SelectedInput!.Index));
+                        applicant_collection.Add(applicant);
+                        result.NewApplicantsAdded++;
+                    }
+                    catch (ParseException ex)
+                    {
+                        result.ErrorRows.Add(result.RecordsProcessed + 1, ex.Message);
+                    }
+                }
+                else if (applicants.Length == 1)
                 {
-                    result.ErrorRows.Add(result.RecordsProcessed + 1, ex.Message);
+                    // matched applicant
+                    try
+                    {
+                        bool changed = false;
+                        foreach (var column in ImportColumns.Where(c => c.SelectedInput != null))
+                        {
+                            var value = csv.GetField(column.SelectedInput!.Index);
+                            if (!column.ValueComparer(applicants[0], value))
+                            {
+                                column.ValueSetter(applicants[0], value);
+                                changed = true;
+                            }
+                        }
+                        if (changed)
+                            result.ExistingApplicantsUpdated++;
+                        else
+                            result.ExistingApplicantsNotChanged++;
+                    }
+                    catch (ParseException ex)
+                    {
+                        result.ErrorRows.Add(result.RecordsProcessed + 1, ex.Message);
+                    }
+                }
+                else
+                {
+                    // more than 1 match
+                    result.ErrorRows.Add(result.RecordsProcessed + 1, $"Matched {applicants.Length.Plural("row")} by columns {string.Join(", ", ImportColumns.Where(c => c.MatchExisting).Select(c => $"'{c.Name}'"))}");
                 }
                 result.RecordsProcessed++;
                 progress_callback?.Invoke(result.RecordsProcessed);
@@ -67,24 +104,27 @@ namespace Carmen.ShowModel.Import
 
         private IEnumerable<ImportColumn> GenerateColumns(Criteria[] criterias, Tag[] tags)
         {
-            yield return new("First Name", (a, s) => a.FirstName = s);
-            yield return new("Last Name", (a, s) => a.LastName = s);
-            yield return new("Gender", (a, s) => a.Gender = ParseGender(s));
-            yield return new("Date of Birth", (a, s) => a.DateOfBirth = ParseDateOfBirth(s));
+            yield return ImportColumn.ForString("First Name", a => a.FirstName, (a, s) => a.FirstName = s);
+            yield return ImportColumn.ForString("Last Name", a => a.LastName, (a, s) => a.LastName = s);
+            yield return ImportColumn.ForNullable("Gender", a => a.Gender, (a, v) => a.Gender = v, ParseGender);
+            yield return ImportColumn.ForNullable("Date of Birth", a => a.DateOfBirth, (a, v) => a.DateOfBirth = v, ParseDateOfBirth);
             foreach (var criteria in criterias)
-                yield return new(criteria.Name, (a, s) => a.SetMarkFor(criteria, ParseCriteriaMark(criteria, s)));
-            yield return new("Notes", (a, s) => a.Notes = s);
-            yield return new("External Data", (a, s) => a.ExternalData = s);
+                yield return ImportColumn.ForNullable(criteria.Name, a => a.MarkFor(criteria), (a, v) => a.SetMarkFor(criteria, v), s => ParseCriteriaMark(criteria, s));
+            yield return ImportColumn.ForString("Notes", a => a.Notes, (a, v) => a.Notes = v, false);
+            yield return ImportColumn.ForString("External Data", a => a.ExternalData, (a, v) => a.ExternalData = v, false);
             // everything below here should only be imported if they are already accepted into the cast
-            yield return new("Cast Group", (a, s) => a.CastGroup = ParseCastGroup(s));
-            yield return new("Cast Number", (a, s) => a.CastNumber = ParseCastNumber(a.IsAccepted, s));
-            yield return new("Alternative Cast", (a, s) => a.AlternativeCast = ParseAlternativeCast(a.CastGroup, s));
+            yield return ImportColumn.ForNullable("Cast Group", a => a.CastGroup, (a, v) => a.CastGroup = v, ParseCastGroup);
+            yield return ImportColumn.ForConditionalNullable("Cast Number", a => a.CastNumber, (a, v) => a.CastNumber = v, ParseCastNumber);
+            yield return ImportColumn.ForConditionalNullable("Alternative Cast", a => a.AlternativeCast, (a, v) => a.AlternativeCast = v, ParseAlternativeCast);
             foreach (var tag in tags)
-                yield return new(tag.Name, (a, s) => SetTag(a, tag, s));
+                yield return ImportColumn.ForConditionalNullable(tag.Name, a => a.Tags.Contains(tag), (a, v) => SetTag(a, tag, v), (a, s) => ParseTagFlag(a, tag, s));
         }
 
-        private Gender ParseGender(string value)
-            => value.ToLower() switch
+        private Gender? ParseGender(string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+                return null;
+            return value.ToLower() switch
             {
                 "m" => Gender.Male,
                 "male" => Gender.Male,
@@ -92,6 +132,7 @@ namespace Carmen.ShowModel.Import
                 "female" => Gender.Female,
                 _ => throw new ParseException("gender", value, "M/F/Male/Female")
             };
+        }
 
         private DateTime? ParseDateOfBirth(string value)
         {
@@ -151,24 +192,24 @@ namespace Carmen.ShowModel.Import
             throw new ParseException("cast group", value, string.Join(", ", castGroups.Select(cg => cg.Name)));
         }
 
-        private int? ParseCastNumber(bool is_accepted, string value)
+        private int? ParseCastNumber(Applicant applicant, string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
-            if (!is_accepted)
+            if (!applicant.IsAccepted)
                 throw new ParseException("cast number", value, "no cast number applicant is accepted");
             if (int.TryParse(value, out var number))
                 return number;
             throw new ParseException("cast number", value, "a whole number only");
         }
 
-        private AlternativeCast? ParseAlternativeCast(CastGroup? cast_group, string value)
+        private AlternativeCast? ParseAlternativeCast(Applicant applicant, string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
-            if (cast_group == null)
+            if (applicant.CastGroup == null)
                 throw new ParseException("alternative cast", value, "no alternative cast unless applicant is accepted");
-            if (!cast_group.AlternateCasts)
+            if (!applicant.CastGroup.AlternateCasts)
                 throw new ParseException("alternative cast", value, "no alternative cast if cast group does not alternate");
             foreach (var alternative_cast in alternativeCasts)
                 if (value.Equals(alternative_cast.Name, StringComparison.InvariantCultureIgnoreCase)
@@ -177,11 +218,11 @@ namespace Carmen.ShowModel.Import
             throw new ParseException("alternative cast", value, string.Join(", ", alternativeCasts.Select(cg => cg.Name)));
         }
 
-        public void SetTag(Applicant applicant, Tag tag, string value)
+        public bool? ParseTagFlag(Applicant applicant, Tag tag, string value)
         {
             if (string.IsNullOrWhiteSpace(value))
-                return; // nothing to do
-            bool apply_tag = value.ToLower() switch
+                return null;
+            var apply_tag = value.ToLower() switch
             {
                 "y" => true,
                 "n" => false,
@@ -191,12 +232,19 @@ namespace Carmen.ShowModel.Import
             };
             if (apply_tag && !applicant.IsAccepted)
                 throw new ParseException(tag.Name, value, "no tag to be applied unless applicant is accepted");
-            if (apply_tag && !applicant.Tags.Contains(tag))
+            return apply_tag;
+        }
+
+        public void SetTag(Applicant applicant, Tag tag, bool? value)
+        {
+            if (value == null)
+                return; // nothing to do
+            if (value.Value && !applicant.Tags.Contains(tag))
             {
                 applicant.Tags.Add(tag);
                 tag.Members.Add(applicant);
             }
-            else if (!apply_tag && applicant.Tags.Contains(tag))
+            else if (!value.Value && applicant.Tags.Contains(tag))
             {
                 applicant.Tags.Remove(tag);
                 tag.Members.Remove(applicant);
