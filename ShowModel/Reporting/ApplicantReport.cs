@@ -20,7 +20,7 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<Applicant>("Last Name", a => a.LastName);
             yield return new Column<Applicant>("Gender", a => a.Gender);
             yield return new Column<Applicant>("Date of Birth", a => a.DateOfBirth, "dd/MM/yyyy");
-            foreach (var criteria in criterias)
+            foreach (var criteria in criterias.InOrder())
                 if (criteria is SelectCriteria select)
                     yield return new Column<Applicant>(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria == criteria) is Ability ab ? (ab.Mark > criteria.MaxMark ? ab.Mark : select.Options[ab.Mark]) : null);
                 else if (criteria is BooleanCriteria)
@@ -34,7 +34,7 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<Applicant>("Cast Group", a => a.CastGroup?.Name);
             yield return new Column<Applicant>("Cast Number", a => a.CastNumber);
             yield return new Column<Applicant>("Alternative Cast", a => a.AlternativeCast?.Initial);
-            foreach (var tag in tags)
+            foreach (var tag in tags.InNameOrder())
                 yield return new Column<Applicant>(tag.Name, a => a.Tags.Contains(tag));
         }
     }

@@ -46,7 +46,7 @@ namespace Carmen.ShowModel.Export
             yield return new ExportColumn("Last Name", a => a.LastName);
             yield return new ExportColumn("Gender", a => a.Gender?.ToString() ?? "");
             yield return new ExportColumn("Date of Birth", a => $"{a.DateOfBirth:dd/MM/yyyy}");
-            foreach (var criteria in criterias)
+            foreach (var criteria in criterias.InOrder())
                 if (criteria is SelectCriteria select)
                     yield return new ExportColumn(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria == criteria) is Ability ab ? (ab.Mark > criteria.MaxMark ? ab.Mark.ToString() : select.Options[ab.Mark]) : "");
                 else if (criteria is BooleanCriteria)
@@ -60,7 +60,7 @@ namespace Carmen.ShowModel.Export
             yield return new ExportColumn("Cast Group", a => a.CastGroup?.Name ?? "");
             yield return new ExportColumn("Cast Number", a => a.CastNumber?.ToString() ?? "");
             yield return new ExportColumn("Alternative Cast", a => a.AlternativeCast?.Initial.ToString() ?? "");
-            foreach (var tag in tags)
+            foreach (var tag in tags.InNameOrder())
                 yield return new ExportColumn(tag.Name, a => a.Tags.Contains(tag) ? "Y" : "N");
         }
     }

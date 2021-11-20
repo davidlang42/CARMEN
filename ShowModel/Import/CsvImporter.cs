@@ -126,7 +126,7 @@ namespace Carmen.ShowModel.Import
             yield return ImportColumn.ForString("Last Name", a => a.LastName, (a, s) => a.LastName = s);
             yield return ImportColumn.ForNullable("Gender", a => a.Gender, (a, v) => a.Gender = v, ParseGender);
             yield return ImportColumn.ForNullable("Date of Birth", a => a.DateOfBirth, (a, v) => a.DateOfBirth = v, ParseDateOfBirth);
-            foreach (var criteria in criterias)
+            foreach (var criteria in criterias.InOrder())
                 yield return ImportColumn.ForNullable(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria == criteria)?.Mark, (a, v) => a.SetMarkFor(criteria, v), s => ParseCriteriaMark(criteria, s));
             yield return new ImageImportColumn("Photo", (a, v) => a.Photo = v, LoadImageData);
             yield return ImportColumn.ForString("Notes", a => a.Notes, (a, v) => a.Notes = v, false);
@@ -135,7 +135,7 @@ namespace Carmen.ShowModel.Import
             yield return ImportColumn.ForNullable("Cast Group", a => a.CastGroup, (a, v) => a.CastGroup = v, ParseCastGroup);
             yield return ImportColumn.ForConditionalNullable("Cast Number", a => a.CastNumber, (a, v) => a.CastNumber = v, ParseCastNumber);
             yield return ImportColumn.ForConditionalNullable("Alternative Cast", a => a.AlternativeCast, (a, v) => a.AlternativeCast = v, ParseAlternativeCast);
-            foreach (var tag in tags)
+            foreach (var tag in tags.InNameOrder())
                 yield return ImportColumn.ForConditionalNullable(tag.Name, a => a.Tags.Contains(tag), (a, v) => SetTag(a, tag, v), (a, s) => ParseTagFlag(a, tag, s));
         }
 
