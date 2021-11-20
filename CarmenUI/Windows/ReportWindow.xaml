@@ -16,7 +16,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <WrapPanel Margin="5" VerticalAlignment="Center">
-            <Button Margin="5 0" VerticalAlignment="Center">
+            <Button Margin="5 0" VerticalAlignment="Center" Click="RefreshButton_Click">
                 <TextBlock Margin="5 0" Text="Refresh"/>
             </Button>
             <CheckBox Margin="5 0" VerticalAlignment="Center" Content="Always on top" IsChecked="{Binding ElementName=WindowRoot, Path=Topmost}"/>

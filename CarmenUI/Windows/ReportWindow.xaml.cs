@@ -84,5 +84,10 @@ namespace CarmenUI.Windows
             }
             MainData.ItemsSource = Report.GenerateRows();
         }
+
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            await RefreshData();
+        }
     }
 }
