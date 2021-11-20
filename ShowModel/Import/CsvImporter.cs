@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Structure;
 using CsvHelper;
 using System;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ namespace Carmen.ShowModel.Import
             ImportColumns = GenerateColumns(criterias, tags).ToArray();
         }
 
-        public ImportResult Import(ICollection<Applicant> applicant_collection, Action<int>? progress_callback = null)
+        public ImportResult Import(ICollection<Applicant> applicant_collection, ShowRoot show_root, Action<int>? progress_callback = null)
         {
             if (disposed)
                 throw new InvalidOperationException("Tried to use after dispose");
@@ -46,7 +47,7 @@ namespace Carmen.ShowModel.Import
             while (csv.Read())
             {
                 //TODO implement row matching
-                var applicant = new Applicant();
+                var applicant = new Applicant() { ShowRoot = show_root };
                 try
                 {
                     foreach (var column in ImportColumns)
