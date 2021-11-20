@@ -7,7 +7,8 @@
         xmlns:cv="clr-namespace:CarmenUI.Converters"
         mc:Ignorable="d"
         ResizeMode="CanResizeWithGrip"
-        x:Name="ReportWindow"
+        x:Name="WindowRoot"
+        Loaded="ReportWindow_Loaded"
         Title="ReportWindow" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
@@ -18,7 +19,7 @@
             <Button Margin="5 0" VerticalAlignment="Center">
                 <TextBlock Margin="5 0" Text="Refresh"/>
             </Button>
-            <CheckBox Margin="5 0" VerticalAlignment="Center" Content="Always on top" IsChecked="{Binding ElementName=ReportWindow, Path=Topmost}"/>
+            <CheckBox Margin="5 0" VerticalAlignment="Center" Content="Always on top" IsChecked="{Binding ElementName=WindowRoot, Path=Topmost}"/>
             <ComboBox Margin="5 0" VerticalAlignment="Center">
                 <ComboBox.Items>
                     <ComboBoxItem IsSelected="True" Content="Applicants"/>

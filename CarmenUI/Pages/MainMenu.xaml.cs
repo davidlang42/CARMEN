@@ -221,9 +221,9 @@ namespace CarmenUI.Pages
             this.Close();
         }
 
-        private async void ReportsButton_Click(object sender, RoutedEventArgs e)
+        private void ReportsButton_Click(object sender, RoutedEventArgs e)
         {
-            var report = new ReportWindow();
+            var report = new ReportWindow(connection);
             report.Show();
             //TODO await ExportApplicants();
         }

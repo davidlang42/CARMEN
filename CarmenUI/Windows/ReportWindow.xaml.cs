@@ -1,5 +1,9 @@
-﻿using System;
+﻿using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Reporting;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -19,37 +23,49 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class ReportWindow : Window
     {
-        public ReportWindow()
+        ShowConnection connection;
+
+        public ApplicantReport Report { get; }
+
+        public ReportWindow(ShowConnection connection)
         {
+            this.connection = connection;
             InitializeComponent();
-            //TODO real data
-            string[] header = new[] { "1", "2", "3" };
-            object[][] data = new[]
-            {
-                 new object[] {"a",1,true} ,
-                 new object[] {"d",2,false} ,
-                 new object[] { "g", 11, true },
-            };
-            PopulateDataGrid(header, data);
+            Report = new();
         }
 
-        public void Refresh()
+        private async void ReportWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            //TODO refresh
+            await RefreshData();
         }
 
-        private void PopulateDataGrid(string[] headers, object[][] data)
+        public async Task RefreshData()
+        {
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshData));
+            using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
+            using (var context = ShowContext.Open(connection))
+                Report.Data = await context.Applicants.ToArrayAsync();
+            using (loading.Segment(nameof(PopulateGrid), "Generating report"))
+                PopulateGrid();
+        }
+
+        private void PopulateGrid()
         {
             MainData.Columns.Clear();
             int array_index = 0;
-            foreach (var header in headers)
+            foreach (var column in Report.VisibleColumns)
+            {
+                var binding = new Binding($"[{array_index++}]");
+                if (column.Format != null)
+                    binding.StringFormat = column.Format;
                 MainData.Columns.Add(new DataGridTextColumn
                 {
-                    Header = header,
-                    Binding = new Binding($"[{array_index++}]"),
+                    Header = column.Name,
+                    Binding = binding,
                     IsReadOnly = true
                 });
-            MainData.ItemsSource = data;
+            }
+            MainData.ItemsSource = Report.GenerateRows();
         }
     }
 }
