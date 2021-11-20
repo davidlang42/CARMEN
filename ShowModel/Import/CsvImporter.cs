@@ -127,7 +127,7 @@ namespace Carmen.ShowModel.Import
             yield return ImportColumn.ForNullable("Gender", a => a.Gender, (a, v) => a.Gender = v, ParseGender);
             yield return ImportColumn.ForNullable("Date of Birth", a => a.DateOfBirth, (a, v) => a.DateOfBirth = v, ParseDateOfBirth);
             foreach (var criteria in criterias)
-                yield return ImportColumn.ForNullable(criteria.Name, a => a.MarkFor(criteria), (a, v) => a.SetMarkFor(criteria, v), s => ParseCriteriaMark(criteria, s));
+                yield return ImportColumn.ForNullable(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria == criteria)?.Mark, (a, v) => a.SetMarkFor(criteria, v), s => ParseCriteriaMark(criteria, s));
             yield return new ImageImportColumn("Photo", (a, v) => a.Photo = v, LoadImageData);
             yield return ImportColumn.ForString("Notes", a => a.Notes, (a, v) => a.Notes = v, false);
             yield return ImportColumn.ForString("External Data", a => a.ExternalData, (a, v) => a.ExternalData = v, false);
