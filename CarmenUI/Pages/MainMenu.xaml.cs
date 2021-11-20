@@ -223,7 +223,9 @@ namespace CarmenUI.Pages
 
         private async void ReportsButton_Click(object sender, RoutedEventArgs e)
         {
-            await ExportApplicants();
+            var report = new ReportWindow();
+            report.Show();
+            //TODO await ExportApplicants();
         }
 
         private async Task ExportApplicants()

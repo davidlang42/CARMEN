@@ -1,0 +1,50 @@
+﻿<Window x:Class="CarmenUI.Windows.ReportWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:CarmenUI.Windows"
+        xmlns:cv="clr-namespace:CarmenUI.Converters"
+        mc:Ignorable="d"
+        ResizeMode="CanResizeWithGrip"
+        x:Name="ReportWindow"
+        Title="ReportWindow" Height="450" Width="800">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <WrapPanel Margin="5" VerticalAlignment="Center">
+            <Button Margin="5 0" VerticalAlignment="Center">
+                <TextBlock Margin="5 0" Text="Refresh"/>
+            </Button>
+            <CheckBox Margin="5 0" VerticalAlignment="Center" Content="Always on top" IsChecked="{Binding ElementName=ReportWindow, Path=Topmost}"/>
+            <ComboBox Margin="5 0" VerticalAlignment="Center">
+                <ComboBox.Items>
+                    <ComboBoxItem IsSelected="True" Content="Applicants"/>
+                </ComboBox.Items>
+            </ComboBox>
+            <!--<ComboBox SelectedIndex="0" ItemsSource="{Binding Role, Converter={StaticResource selectableItemsList}, ConverterParameter={StaticResource itemsViewSource}}">
+                <ComboBox.ItemTemplateSelector>
+                    <cv:ComboBoxFaceTemplateSelector>
+                        <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding ElementName=itemsCombo, Path=DataContext.CommaSeparatedItems}"/>
+                            </DataTemplate>
+                        </cv:ComboBoxFaceTemplateSelector.FaceTemplate>
+                        <cv:ComboBoxFaceTemplateSelector.ItemTemplate>
+                            <DataTemplate>
+                                <CheckBox IsChecked="{Binding IsSelected}"
+                                                                  Width="{Binding ElementName=itemsCombo, Path=ActualWidth}"
+                                                                  Content="{Binding ObjectValue.Name}"/>
+                            </DataTemplate>
+                        </cv:ComboBoxFaceTemplateSelector.ItemTemplate>
+                    </cv:ComboBoxFaceTemplateSelector>
+                </ComboBox.ItemTemplateSelector>
+            </ComboBox>-->
+        </WrapPanel>
+        <DataGrid Grid.Row="1" x:Name="MainData" AutoGenerateColumns="False">
+            
+        </DataGrid>
+    </Grid>
+</Window>
