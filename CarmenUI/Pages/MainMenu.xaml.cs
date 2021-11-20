@@ -221,9 +221,14 @@ namespace CarmenUI.Pages
             this.Close();
         }
 
+        private int reportCount = 1;
         private void ReportsButton_Click(object sender, RoutedEventArgs e)
         {
-            var report = new ReportWindow(connection);
+            var report = new ReportWindow(connection)
+            {
+                Owner = Window.GetWindow(this),
+                Title = $"Report #{reportCount++}"
+            };
             report.Show();
             //TODO await ExportApplicants();
         }
