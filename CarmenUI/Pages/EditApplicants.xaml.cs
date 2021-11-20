@@ -23,6 +23,7 @@ using System.Windows.Shapes;
 using CarmenUI.Bindings;
 using Microsoft.Win32;
 using Carmen.ShowModel.Import;
+using System.Diagnostics;
 
 namespace CarmenUI.Pages
 {
@@ -375,8 +376,35 @@ namespace CarmenUI.Pages
             };
             if (import.ShowDialog() == true)
             {
+                ImportResult result;
                 using (var importing = new LoadingOverlay(this) { MainText = "Importing...", SubText = "0 rows processed" })
-                    csv.Import(context.Applicants.Local, context.ShowRoot, r => importing.SubText = r.Plural("row") + " processed");
+                    result = csv.Import(context.Applicants.Local, context.ShowRoot, r => importing.SubText = r.Plural("row") + " processed");
+                var msg = $"{result.RecordsProcessed.Plural("row")} processed";
+                var buttons = MessageBoxButton.OK;
+                if (result.NewApplicantsAdded != 0)
+                    msg += $"\n{result.NewApplicantsAdded.Plural("applicant")} added";
+                if (result.ExistingApplicantsUpdated != 0)
+                    msg += $"\n{result.ExistingApplicantsUpdated.Plural("existing applicant")} updated";
+                if (result.ExistingApplicantsNotChanged != 0)
+                    msg += $"\n{result.ExistingApplicantsNotChanged.Plural("existing applicant")} not changed";
+                if (result.ErrorRows.Count != 0)
+                {
+                    msg += $"\n{result.ErrorRows.Count.Plural("row")} contained errors";
+                    msg += "\n\nWould you like to view the errors?";
+                    buttons = MessageBoxButton.YesNo;
+                }
+                if (MessageBox.Show(msg, WindowTitle, buttons) == MessageBoxResult.Yes)
+                {
+                    var temp_file = $"{System.IO.Path.GetTempPath()}import_errors_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt";
+                    using (var writer = new System.IO.StreamWriter(temp_file))
+                        foreach (var (row, error) in result.ErrorRows)
+                            writer.WriteLine($"Row {row}: {error}");
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = temp_file,
+                        UseShellExecute = true
+                    }); // launches default application for TXT files
+                }
                 //TODO might be required: applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             }
             csv.Dispose();
