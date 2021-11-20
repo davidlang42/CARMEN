@@ -116,7 +116,7 @@
                                   IsChecked="{bd:SettingBinding ShortcutsOnStartWindow}"/>
                         <TextBlock Text="• 'N' for New show"/>
                         <TextBlock Text="• 'O' for Open show"/>
-                        <TextBlock Text="• 'C' for Connect to datbase"/>
+                        <TextBlock Text="• 'C' for Connect to database"/>
                         <TextBlock Text="• '1'-'9' to select from the Recent Shows list" Margin="0 0 0 5"/>
                         <CheckBox Content="Enable single letter shortcut keys on the Main Menu:" Margin="0 5 0 0"
                                   IsChecked="{bd:SettingBinding ShortcutsOnMainMenu}"/>
