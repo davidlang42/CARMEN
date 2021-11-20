@@ -230,38 +230,6 @@ namespace CarmenUI.Pages
                 Title = $"Report #{reportCount++}"
             };
             report.Show();
-            //TODO await ExportApplicants();
-        }
-
-        private async Task ExportApplicants()
-        {
-            var file = new SaveFileDialog
-            {
-                Title = "Export Applicants to CSV ",
-                Filter = "Comma separated values (*.csv)|*.csv|All Files (*.*)|*.*"
-            };
-            if (file.ShowDialog() == false)
-                return;
-            int count;
-            using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportApplicants), "Exporting..."))
-            using (var context = ShowContext.Open(connection))
-            {
-                Criteria[] criterias;
-                Tag[] tags;
-                Applicant[] applicants;
-                using (loading.Segment(nameof(ShowContext.Criterias), "Criterias"))
-                    criterias = await context.Criterias.ToArrayAsync();
-                using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
-                    tags = await context.Tags.ToArrayAsync();
-                using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
-                    applicants = await context.Applicants.ToArrayAsync();
-                using (loading.Segment(nameof(CsvExporter), "Writing data"))
-                {
-                    var export = new CsvExporter(criterias, tags);
-                    count = export.Export(file.FileName, applicants);
-                }
-            }
-            MessageBox.Show($"Exported {count.Plural("applicant")} to {file.FileName}");
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)

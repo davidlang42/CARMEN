@@ -1,7 +1,9 @@
 ﻿using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Export;
 using Carmen.ShowModel.Reporting;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -88,6 +90,40 @@ namespace CarmenUI.Windows
         private async void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
             await RefreshData();
+        }
+
+        private async void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            var file = new SaveFileDialog
+            {
+                Title = "Export Applicants to CSV ",
+                Filter = "Comma separated values (*.csv)|*.csv|All Files (*.*)|*.*"
+            };
+            if (file.ShowDialog() == true)
+            {
+                var count = await ExportApplicants(file.FileName);
+                MessageBox.Show($"Exported {count.Plural("applicant")} to {file.FileName}", Title);
+            }
+        }
+
+        private async Task<int> ExportApplicants(string filename)
+        {
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(ExportApplicants), "Exporting...");
+            using var context = ShowContext.Open(connection);
+            Criteria[] criterias;
+            Tag[] tags;
+            Applicant[] applicants;
+            using (loading.Segment(nameof(ShowContext.Criterias), "Criterias"))
+                criterias = await context.Criterias.ToArrayAsync();
+            using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
+                tags = await context.Tags.ToArrayAsync();
+            using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
+                applicants = await context.Applicants.ToArrayAsync();
+            using (loading.Segment(nameof(CsvExporter), "Writing data"))
+            {
+                var export = new CsvExporter(criterias, tags);
+                return export.Export(filename, applicants);
+            }
         }
     }
 }
