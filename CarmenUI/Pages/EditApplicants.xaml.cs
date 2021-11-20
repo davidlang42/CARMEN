@@ -21,6 +21,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CarmenUI.Bindings;
+using Microsoft.Win32;
+using Carmen.ShowModel.Import;
 
 namespace CarmenUI.Pages
 {
@@ -344,13 +346,23 @@ namespace CarmenUI.Pages
 
         private void ImportApplicants()
         {
-            if (MessageBox.Show("Importing applicants is not currently supported. Would you like to add some randomly generated applicants instead?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            var file = new OpenFileDialog
             {
-                if (!TryInputNumber("How many applicants would you like to add?", WindowTitle, out var applicant_count, 100))
-                    return;
-                using var test_data = new TestDataGenerator(context);
-                test_data.AddApplicants(applicant_count, 0.5, false, false, false);
-                applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
+                Title = "Import Applicants from CSV ",
+                Filter = "Comma separated values (*.csv)|*.csv|All Files (*.*)|*.*"
+            };
+            if (file.ShowDialog() == false)
+                return;
+            var csv = new CsvImporter(file.FileName);
+            var import = new ImportDialog(csv)
+            {
+                Title = "Import applicants from " + System.IO.Path.GetFileName(file.FileName),
+                Owner = Window.GetWindow(this)
+            };
+            if (import.ShowDialog() == true)
+            {
+                csv.Import(context.Applicants.Local);
+                //TODO might be required: applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             }
         }
 
