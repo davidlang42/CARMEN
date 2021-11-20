@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Reporting;
 using System;
 using System.Collections.Generic;
@@ -25,18 +26,34 @@ namespace CarmenUI.Windows
     {
         ShowConnection connection;
 
-        public ApplicantReport Report { get; }
+        private ApplicantReport? report;
+        public ApplicantReport Report => report ?? throw new ApplicationException("Attempted to access report before initializing.");
 
         public ReportWindow(ShowConnection connection)
         {
             this.connection = connection;
             InitializeComponent();
-            Report = new();
         }
 
         private async void ReportWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            await InitializeReport();
             await RefreshData();
+        }
+
+        private async Task InitializeReport()
+        {
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(InitializeReport));
+            using (var context = ShowContext.Open(connection))
+            {
+                Criteria[] criterias;
+                Tag[] tags;
+                using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
+                    criterias = await context.Criterias.ToArrayAsync();
+                using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
+                    tags = await context.Tags.ToArrayAsync();
+                report = new(criterias, tags);
+            }
         }
 
         public async Task RefreshData()
