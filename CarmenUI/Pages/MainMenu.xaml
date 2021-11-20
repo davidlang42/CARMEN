@@ -99,6 +99,12 @@
             </ListViewItem>
         </ListView>
         <TextBlock Grid.Row="3" x:Name="CastingComplete" Visibility="Hidden" Margin="20 0 20 20" Text="IT'S SHOWTIME" HorizontalAlignment="Right" FontStyle="Italic" FontSize="20"/>
+        <Button Grid.Row="3" Grid.Column="1" Background="White" BorderThickness="0" Click="ReportsButton_Click" HorizontalAlignment="Right">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="Reports " FontSize="18" VerticalAlignment="Center" Margin="10 0 0 0"/>
+                <fa:ImageAwesome Icon="Table" Width="30" Margin="5" Foreground="MediumBlue" VerticalAlignment="Center"/>
+            </StackPanel>
+        </Button>
         <ScrollViewer Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="20 20 20 0" KeyboardNavigation.IsTabStop="False">
             <ContentControl x:Name="SummaryPanel" VerticalAlignment="Bottom" KeyboardNavigation.IsTabStop="False">
                 <ContentControl.Resources>

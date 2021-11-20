@@ -217,6 +217,11 @@ namespace CarmenUI.Pages
             this.Close();
         }
 
+        private void ReportsButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO reports
+        }
+
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             var settings = new SettingsWindow();
