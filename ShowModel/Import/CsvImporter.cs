@@ -34,8 +34,8 @@ namespace Carmen.ShowModel.Import
             csv.Read();
             csv.ReadHeader();
             InputColumns = csv.HeaderRecord.Select((h, i) => new InputColumn(i, h)).ToArray();
-            //TODO auto-map columns
             ImportColumns = GenerateColumns(criterias, tags).ToArray();
+            LoadColumnMap(InputColumns.ToDictionary(c => c.Header, new FilteredStringComparer(char.IsLetterOrDigit, StringComparison.InvariantCultureIgnoreCase)));
         }
 
         public ImportResult Import(ICollection<Applicant> applicant_collection, ShowRoot show_root, Action<int>? progress_callback = null)
@@ -107,6 +107,13 @@ namespace Carmen.ShowModel.Import
                 progress_callback?.Invoke(result.RecordsProcessed);
             }
             return result;
+        }
+
+        public void LoadColumnMap(Dictionary<string, InputColumn> field_name_to_input_column)
+        {
+            foreach (var column in ImportColumns)
+                if (field_name_to_input_column.TryGetValue(column.Name, out var input))
+                    column.SelectedInput = input;
         }
 
         private IEnumerable<ImportColumn> GenerateColumns(Criteria[] criterias, Tag[] tags)
