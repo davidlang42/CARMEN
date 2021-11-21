@@ -5,6 +5,7 @@ using Carmen.ShowModel.Reporting;
 using CarmenUI.Converters;
 using Microsoft.Win32;
 using System;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -102,6 +103,9 @@ namespace CarmenUI.Windows
 
         private void ConfigureSorting()
         {
+            MainData.Items.SortDescriptions.Clear();
+            if (Report.GroupColumn != null)
+                MainData.Items.SortDescriptions.Add(new($"[{Report.IndexOf(Report.GroupColumn)}]", ListSortDirection.Ascending));
             foreach (var sort_column in Report.SortColumns)
             {
                 var grid_column = MainData.Columns[sort_column.ColumnIndex];
@@ -112,7 +116,10 @@ namespace CarmenUI.Windows
 
         private void GroupColumn_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            using var loading = new LoadingOverlay(this).AsSegment(nameof(ConfigureGrouping), "Grouping...");
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(GroupColumn_SelectionChanged));
+            using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
+                ConfigureSorting();
+            using (loading.Segment(nameof(ConfigureGrouping), "Grouping"))
                 ConfigureGrouping();
         }    
 
