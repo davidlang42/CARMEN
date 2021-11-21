@@ -77,6 +77,16 @@ namespace Carmen.ShowModel.Reporting
             SortColumns.CollectionChanged += SortColumns_CollectionChanged;
         }
 
+        /// <summary>Finds the index of the given column in the current report.
+        /// Throws an exception if not found, rather than returning an invalid index.</summary>
+        public int IndexOf(Column<T> column)
+        {
+            for (var c = 0; c < Columns.Length; c++)
+                if (Columns[c] == column)
+                    return c;
+            throw new InvalidOperationException("Column not found.");
+        }
+
         public void SetData(IEnumerable<T> data)
         {
             Rows = data.Select(d => Columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();

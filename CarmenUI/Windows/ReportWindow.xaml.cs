@@ -104,6 +104,8 @@ namespace CarmenUI.Windows
                 Report.SetData(await context.Applicants.ToArrayAsync());
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
+            using (loading.Segment(nameof(ConfigureGrouping), "Grouping"))
+                ConfigureGrouping(); // TODO ??? must be called every time ItemsSource changes
         }
 
         private void ConfigureSorting()
@@ -114,6 +116,13 @@ namespace CarmenUI.Windows
                 grid_column.SortDirection = sort_column.SortDirection;
                 MainData.Items.SortDescriptions.Add(new(grid_column.SortMemberPath, sort_column.SortDirection));
             }
+        }
+
+        private void ConfigureGrouping() //TODO call this on group combo change, might need overlay
+        {
+            MainData.Items.GroupDescriptions.Clear();
+            if (Report.GroupColumn != null)
+                MainData.Items.GroupDescriptions.Add(new PropertyGroupDescription($"[{Report.IndexOf(Report.GroupColumn)}]"));
         }
 
         private async void ExportButton_Click(object sender, RoutedEventArgs e)
