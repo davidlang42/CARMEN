@@ -5,7 +5,9 @@ using Carmen.ShowModel.Reporting;
 using CarmenUI.Converters;
 using Microsoft.Win32;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -159,8 +161,11 @@ namespace CarmenUI.Windows
             Dispatcher.BeginInvoke((Action)delegate ()
             {
                 // after sorting has occured
+                IEnumerable<SortDescription> sort_descriptions = MainData.Items.SortDescriptions;
+                if (Report.GroupColumn != null)
+                    sort_descriptions = sort_descriptions.Skip(1);
                 Report.SortColumns.Clear();
-                foreach (var sd in MainData.Items.SortDescriptions)
+                foreach (var sd in sort_descriptions)
                 {
                     var index = int.Parse(sd.PropertyName[1..^1]); // eg. [0]
                     Report.SortColumns.Add(new(index, sd.Direction));
