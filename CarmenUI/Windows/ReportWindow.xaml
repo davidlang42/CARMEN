@@ -47,7 +47,12 @@
             <ComboBox Margin="5 0" VerticalAlignment="Center" DisplayMemberPath="Name"
                       ItemsSource="{Binding ElementName=MainData, Path=DataContext.Columns}"
                       SelectedItem="{Binding ElementName=MainData, Path=DataContext.GroupColumn}"
-                      SelectionChanged="GroupColumn_SelectionChanged">
+                      SelectionChanged="GroupColumn_SelectionChanged" MinWidth="100">
+                <ComboBox.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Clear Grouping" Click="ClearGrouping_Click"/>
+                    </ContextMenu>
+                </ComboBox.ContextMenu>
             </ComboBox>
             <TextBlock VerticalAlignment="Center" Text="sorted by" FontStyle="Italic"/>
             <TextBlock Margin="5 0" VerticalAlignment="Center" Text="{Binding ElementName=MainData, Path=DataContext.SortDescription}"/>

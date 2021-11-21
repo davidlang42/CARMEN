@@ -35,7 +35,7 @@ namespace CarmenUI.Windows
         public ReportWindow(ShowConnection connection)
         {
             this.connection = connection;
-            InitializeComponent();
+            InitializeComponent(); //TODO fix binding errors
         }
 
         private async void ReportWindow_Loaded(object sender, RoutedEventArgs e)
@@ -120,7 +120,7 @@ namespace CarmenUI.Windows
             }
         }
 
-        private void GroupColumn_SelectionChanged(object sender, SelectionChangedEventArgs e) //TODO show something reasonable when nothing selected, and make sure you can select "nothing"
+        private void GroupColumn_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             using var loading = new LoadingOverlay(this).AsSegment(nameof(ConfigureGrouping), "Grouping...");
                 ConfigureGrouping();
@@ -187,6 +187,11 @@ namespace CarmenUI.Windows
                     Report.SortColumns.Add(new(index, sd.Direction));
                 }
             });
+        }
+
+        private void ClearGrouping_Click(object sender, RoutedEventArgs e)
+        {
+            Report.GroupColumn = null;
         }
     }
 }
