@@ -55,12 +55,16 @@ namespace CarmenUI.Windows
                     criterias = await context.Criterias.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
                     tags = await context.Tags.ToArrayAsync();
-                report = new(criterias, tags);
-                AddGridColumns(MainData, Report.Columns);
-                MainData.DataContext = report;
-                columnsCombo.Items.IsLiveSorting = true;
-                columnsCombo.Items.SortDescriptions.Add(StandardSort.For<Column<Applicant>>());
-                columnsCombo.SelectedIndex = 0;
+                using (loading.Segment(nameof(AddGridColumns), "Report"))
+                {
+                    report = new(criterias, tags);
+                    AddGridColumns(MainData, Report.Columns);
+                    MainData.DataContext = report;
+                    columnsCombo.Items.IsLiveSorting = true;
+                    columnsCombo.Items.SortDescriptions.Add(StandardSort.For<Column<Applicant>>());
+                    columnsCombo.SelectedIndex = 0;
+                    ConfigureGrouping();
+                }   
             }
         }
 
@@ -104,8 +108,6 @@ namespace CarmenUI.Windows
                 Report.SetData(await context.Applicants.ToArrayAsync());
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
-            using (loading.Segment(nameof(ConfigureGrouping), "Grouping")) //TODO make sure overlay is shown
-                ConfigureGrouping(); // TODO ??? must be called every time ItemsSource changes
         }
 
         private void ConfigureSorting()
@@ -119,7 +121,10 @@ namespace CarmenUI.Windows
         }
 
         private void GroupColumn_SelectionChanged(object sender, SelectionChangedEventArgs e) //TODO show something reasonable when nothing selected, and make sure you can select "nothing"
-            => ConfigureGrouping(); //TODO add overlay
+        {
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(ConfigureGrouping), "Grouping...");
+                ConfigureGrouping();
+        }    
 
         private void ConfigureGrouping()
         {
