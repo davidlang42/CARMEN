@@ -19,6 +19,19 @@ namespace Carmen.ShowModel.Reporting
         public T[] Data { get; set; } = Array.Empty<T>();
         public ObservableCollection<SortColumn> SortColumns { get; } = new();
 
+        private Column<T>? groupColumn;
+        public Column<T>? GroupColumn
+        {
+            get => groupColumn;
+            set
+            {
+                if (groupColumn == value)
+                    return;
+                groupColumn = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string ColumnsDescription
         {
             get
