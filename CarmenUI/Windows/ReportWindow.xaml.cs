@@ -55,6 +55,8 @@ namespace CarmenUI.Windows
                 using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
                     tags = await context.Tags.ToArrayAsync();
                 columnsCombo.DataContext = report = new(criterias, tags);
+                columnsCombo.Items.IsLiveSorting = true;
+                columnsCombo.Items.SortDescriptions.Add(new(nameof(Column<Applicant>.Order), ListSortDirection.Ascending));
                 columnsCombo.SelectedIndex = 0;
             }
         }
@@ -80,7 +82,7 @@ namespace CarmenUI.Windows
                 MainData.Columns.Add(new DataGridTextColumn
                 {
                     Header = Report.Columns[c].Name,
-                    Visibility = Report.Columns[c].Show ? Visibility.Visible : Visibility.Hidden, //TODO need to bind this
+                    Visibility = Report.Columns[c].Show ? Visibility.Visible : Visibility.Hidden, //TODO need to bind this so it updates the report as soon as you click it
                     Binding = binding,
                     IsReadOnly = true
                 });
