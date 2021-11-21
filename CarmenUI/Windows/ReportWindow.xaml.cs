@@ -27,14 +27,12 @@ namespace CarmenUI.Windows
     public partial class ReportWindow : Window
     {
         ShowConnection connection;
-        Column<Applicant>[] loadedColumns;
 
         private ApplicantReport? report;
         public ApplicantReport Report => report ?? throw new ApplicationException("Attempted to access report before initializing.");
 
         public ReportWindow(ShowConnection connection)
         {
-            loadedColumns = Array.Empty<Column<Applicant>>();
             this.connection = connection;
             InitializeComponent();
         }
@@ -73,21 +71,31 @@ namespace CarmenUI.Windows
         private void PopulateGrid()
         {
             MainData.Columns.Clear();
-            int array_index = 0;
-            loadedColumns = Report.VisibleColumns.ToArray();
-            foreach (var column in loadedColumns)
+            for (var c = 0; c < Report.Columns.Length; c++)
             {
-                var binding = new Binding($"[{array_index++}]");
-                if (column.Format != null)
-                    binding.StringFormat = column.Format;
+                var binding = new Binding($"[{c}]"); // this gets parsed in MainData_Sorting
+                if (Report.Columns[c].Format != null)
+                    binding.StringFormat = Report.Columns[c].Format;
                 MainData.Columns.Add(new DataGridTextColumn
                 {
-                    Header = column.Name,
+                    Header = Report.Columns[c].Name,
+                    Visibility = Report.Columns[c].Show ? Visibility.Visible : Visibility.Hidden,
                     Binding = binding,
                     IsReadOnly = true
                 });
             }
+            // display index must be set after all columns have been added
+            for (var c = 0; c < Report.Columns.Length; c++)
+                MainData.Columns[c].DisplayIndex = Report.Columns[c].Order;
+            // update data
             MainData.ItemsSource = Report.GenerateRows();
+            // sort direction must be set after ItemsSource
+            foreach (var sort_column in Report.SortColumns)
+            {
+                var grid_column = MainData.Columns[sort_column.ColumnIndex];
+                grid_column.SortDirection = sort_column.SortDirection;
+                MainData.Items.SortDescriptions.Add(new(grid_column.SortMemberPath, sort_column.SortDirection));
+            }
         }
 
         private async void RefreshButton_Click(object sender, RoutedEventArgs e)
@@ -132,10 +140,23 @@ namespace CarmenUI.Windows
         private void MainData_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)
         {
             var index = MainData.Columns.IndexOf(e.Column);
-            if (index < 0 || index >= loadedColumns.Length)
+            if (index < 0 || index >= Report.Columns.Length)
                 return; // column not found
-            var column = loadedColumns[index];
-            column.Order = e.Column.DisplayIndex;
+            Report.Columns[index].Order = e.Column.DisplayIndex;
+        }
+
+        private void MainData_Sorting(object sender, DataGridSortingEventArgs e)
+        {
+            Dispatcher.BeginInvoke((Action)delegate ()
+            {
+                // after sorting has occured
+                Report.SortColumns.Clear();
+                foreach (var sd in MainData.Items.SortDescriptions)
+                {
+                    var index = int.Parse(sd.PropertyName[1..^1]); // eg. [0]
+                    Report.SortColumns.Add(new(index, sd.Direction));
+                }
+            });
         }
     }
 }
