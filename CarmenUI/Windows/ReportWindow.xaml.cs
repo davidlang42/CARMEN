@@ -72,12 +72,18 @@ namespace CarmenUI.Windows
                 var binding = new Binding($"[{c}]"); // this gets parsed in MainData_Sorting
                 if (columns[c].Format != null)
                     binding.StringFormat = columns[c].Format;
-                data_grid.Columns.Add(new DataGridTextColumn
+                var grid_column = new DataGridTextColumn
                 {
                     Header = columns[c].Name,
-                    Visibility = columns[c].Show ? Visibility.Visible : Visibility.Hidden, //TODO need to bind this so it updates when changed
                     Binding = binding,
                     IsReadOnly = true
+                };
+                data_grid.Columns.Add(grid_column);
+                BindingOperations.SetBinding(grid_column, DataGridColumn.VisibilityProperty, new Binding
+                {
+                    Source = columns[c],
+                    Path = new(nameof(Column<Applicant>.Show)),
+                    Converter = new BooleanToVisibilityConverter()
                 });
             }
             // display index must be set after all columns have been added
