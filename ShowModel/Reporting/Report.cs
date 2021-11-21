@@ -98,15 +98,22 @@ namespace Carmen.ShowModel.Reporting
 
         public int Export(string file_name)
         {
-            int count = 0;
             var ordered_columns = Columns.Where(c => c.Show).InOrder().ToArray();
+            if (ordered_columns.Length == 0)
+                return 0; // nothing to export
+            int count = 0;
             using (var writer = new StreamWriter(file_name)) //TODO handle file io exceptions
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 foreach (var column in ordered_columns)
                     csv.WriteField(column.Name);
                 csv.NextRecord();
-                foreach (var row in Sort(Rows, SortColumns))
+                if (Rows.Length == 0)
+                    return 0; // nothing to export after header
+                var rows = Sort(Rows, SortColumns);
+                if (GroupColumn != null)
+                    rows = Group(rows, Rows[0].Length, IndexOf(GroupColumn), IndexOf(ordered_columns.First()));
+                foreach (var row in rows)
                 {
                     foreach (var column in ordered_columns)
                         csv.WriteField(FormatAsString(row[IndexOf(column)]));
@@ -140,6 +147,21 @@ namespace Carmen.ShowModel.Reporting
                     _ => throw new NotImplementedException($"Enum not handled: {sort_column.SortDirection}")
                 };
             return sorted_rows;
+        }
+
+        private static IEnumerable<object?[]> Group(IEnumerable<object?[]> rows, int row_length, int group_column_index, int first_column_index)
+        {
+            object? previous_group = null;
+            foreach (var row in rows.OrderBy(r => r[group_column_index]))
+            {
+                if (!Equals(row[group_column_index], previous_group))
+                {
+                    var group_header_row = new object?[row_length];
+                    previous_group = group_header_row[first_column_index] = row[group_column_index];
+                    yield return group_header_row;
+                }
+                yield return row;
+            }
         }
 
         private void SortColumns_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
