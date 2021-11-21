@@ -3,6 +3,7 @@ using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Export;
 using Carmen.ShowModel.Reporting;
+using CarmenUI.Converters;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -55,33 +56,38 @@ namespace CarmenUI.Windows
                 using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
                     tags = await context.Tags.ToArrayAsync();
                 report = new(criterias, tags);
-                PopulateGridColumns();
+                AddGridColumns(MainData, Report.Columns);
                 MainData.DataContext = report;
-                columnsCombo.Items.IsLiveSorting = true; //TODO do we still need columnsCombo
-                columnsCombo.Items.SortDescriptions.Add(new(nameof(Column<Applicant>.Order), ListSortDirection.Ascending));
+                columnsCombo.Items.IsLiveSorting = true;
+                columnsCombo.Items.SortDescriptions.Add(StandardSort.For<Column<Applicant>>());
                 columnsCombo.SelectedIndex = 0;
             }
         }
 
-        private void PopulateGridColumns()
+        private static void AddGridColumns(DataGrid data_grid, Column<Applicant>[] columns)
         {
-            MainData.Columns.Clear(); //TODO is clear needed?
-            for (var c = 0; c < Report.Columns.Length; c++)
+            data_grid.Columns.Clear();
+            for (var c = 0; c < columns.Length; c++)
             {
                 var binding = new Binding($"[{c}]"); // this gets parsed in MainData_Sorting
-                if (Report.Columns[c].Format != null)
-                    binding.StringFormat = Report.Columns[c].Format;
-                MainData.Columns.Add(new DataGridTextColumn
+                if (columns[c].Format != null)
+                    binding.StringFormat = columns[c].Format;
+                data_grid.Columns.Add(new DataGridTextColumn
                 {
-                    Header = Report.Columns[c].Name,
-                    Visibility = Report.Columns[c].Show ? Visibility.Visible : Visibility.Hidden, //TODO need to bind this so it updates when changed
+                    Header = columns[c].Name,
+                    Visibility = columns[c].Show ? Visibility.Visible : Visibility.Hidden, //TODO need to bind this so it updates when changed
                     Binding = binding,
                     IsReadOnly = true
                 });
             }
             // display index must be set after all columns have been added
-            for (var c = 0; c < Report.Columns.Length; c++)
-                MainData.Columns[c].DisplayIndex = Report.Columns[c].Order;
+            for (var c = 0; c < columns.Length; c++)
+                data_grid.Columns[c].DisplayIndex = columns[c].Order;
+        }
+
+        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
+        {
+            await RefreshData();
         }
 
         public async Task RefreshData()
@@ -91,10 +97,10 @@ namespace CarmenUI.Windows
             using (var context = ShowContext.Open(connection))
                 Report.SetData(await context.Applicants.ToArrayAsync());
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
-                ConfigureSorting(); // must be set after ItemsSource
+                ConfigureSorting(); // must be called every time ItemsSource changes
         }
 
-        private void ConfigureSorting()//TODO do we need to do this every time?
+        private void ConfigureSorting()
         {
             foreach (var sort_column in Report.SortColumns)
             {
@@ -102,11 +108,6 @@ namespace CarmenUI.Windows
                 grid_column.SortDirection = sort_column.SortDirection;
                 MainData.Items.SortDescriptions.Add(new(grid_column.SortMemberPath, sort_column.SortDirection));
             }
-        }
-
-        private async void RefreshButton_Click(object sender, RoutedEventArgs e)
-        {
-            await RefreshData();
         }
 
         private async void ExportButton_Click(object sender, RoutedEventArgs e)
