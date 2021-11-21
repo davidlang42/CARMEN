@@ -54,7 +54,8 @@ namespace CarmenUI.Windows
                     criterias = await context.Criterias.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
                     tags = await context.Tags.ToArrayAsync();
-                report = new(criterias, tags);
+                columnsCombo.DataContext = report = new(criterias, tags);
+                columnsCombo.SelectedIndex = 0;
             }
         }
 
@@ -79,7 +80,7 @@ namespace CarmenUI.Windows
                 MainData.Columns.Add(new DataGridTextColumn
                 {
                     Header = Report.Columns[c].Name,
-                    Visibility = Report.Columns[c].Show ? Visibility.Visible : Visibility.Hidden,
+                    Visibility = Report.Columns[c].Show ? Visibility.Visible : Visibility.Hidden, //TODO need to bind this
                     Binding = binding,
                     IsReadOnly = true
                 });

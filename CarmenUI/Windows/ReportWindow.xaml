@@ -9,6 +9,7 @@
         ResizeMode="CanResizeWithGrip"
         WindowStartupLocation="CenterOwner"
         Loaded="ReportWindow_Loaded"
+        Name="WindowRoot"
         Title="Report" Height="450" Width="800">
     <Grid>
         <Grid.RowDefinitions>
@@ -24,27 +25,28 @@
                     <ComboBoxItem IsSelected="True" Content="Applicants"/>
                 </ComboBox.Items>
             </ComboBox>
-            <Button Margin="5 0" VerticalAlignment="Center" Click="ExportButton_Click">
-                <TextBlock Margin="5 0" Text="Export"/>
-            </Button>
-            <!--<ComboBox SelectedIndex="0" ItemsSource="{Binding Role, Converter={StaticResource selectableItemsList}, ConverterParameter={StaticResource itemsViewSource}}">
+
+            <ComboBox x:Name="columnsCombo" ItemsSource="{Binding Columns}">
                 <ComboBox.ItemTemplateSelector>
                     <cv:ComboBoxFaceTemplateSelector>
                         <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ElementName=itemsCombo, Path=DataContext.CommaSeparatedItems}"/>
+                                <TextBlock Text="{Binding ElementName=columnsCombo, Path=DataContext.ColumnsDescription}"/>
                             </DataTemplate>
                         </cv:ComboBoxFaceTemplateSelector.FaceTemplate>
                         <cv:ComboBoxFaceTemplateSelector.ItemTemplate>
                             <DataTemplate>
-                                <CheckBox IsChecked="{Binding IsSelected}"
-                                                                  Width="{Binding ElementName=itemsCombo, Path=ActualWidth}"
-                                                                  Content="{Binding ObjectValue.Name}"/>
+                                <CheckBox IsChecked="{Binding Show}"
+                                    Content="{Binding Name}"/>
                             </DataTemplate>
                         </cv:ComboBoxFaceTemplateSelector.ItemTemplate>
                     </cv:ComboBoxFaceTemplateSelector>
                 </ComboBox.ItemTemplateSelector>
-            </ComboBox>-->
+            </ComboBox>
+
+            <Button Margin="5 0" VerticalAlignment="Center" Click="ExportButton_Click">
+                <TextBlock Margin="5 0" Text="Export"/>
+            </Button>
         </WrapPanel>
         <DataGrid Grid.Row="1" x:Name="MainData" AutoGenerateColumns="False" ColumnDisplayIndexChanged="MainData_ColumnDisplayIndexChanged" Sorting="MainData_Sorting"/>
     </Grid>
