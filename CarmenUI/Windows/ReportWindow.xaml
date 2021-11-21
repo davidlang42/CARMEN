@@ -46,8 +46,6 @@
                 </ComboBox.ItemTemplateSelector>
             </ComboBox>-->
         </WrapPanel>
-        <DataGrid Grid.Row="1" x:Name="MainData" AutoGenerateColumns="False">
-            
-        </DataGrid>
+        <DataGrid Grid.Row="1" x:Name="MainData" AutoGenerateColumns="False" ColumnDisplayIndexChanged="MainData_ColumnDisplayIndexChanged"/>
     </Grid>
 </Window>

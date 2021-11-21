@@ -27,12 +27,14 @@ namespace CarmenUI.Windows
     public partial class ReportWindow : Window
     {
         ShowConnection connection;
+        Column<Applicant>[] loadedColumns;
 
         private ApplicantReport? report;
         public ApplicantReport Report => report ?? throw new ApplicationException("Attempted to access report before initializing.");
 
         public ReportWindow(ShowConnection connection)
         {
+            loadedColumns = Array.Empty<Column<Applicant>>();
             this.connection = connection;
             InitializeComponent();
         }
@@ -72,7 +74,8 @@ namespace CarmenUI.Windows
         {
             MainData.Columns.Clear();
             int array_index = 0;
-            foreach (var column in Report.VisibleColumns)
+            loadedColumns = Report.VisibleColumns.ToArray();
+            foreach (var column in loadedColumns)
             {
                 var binding = new Binding($"[{array_index++}]");
                 if (column.Format != null)
@@ -124,6 +127,15 @@ namespace CarmenUI.Windows
                 var export = new CsvExporter(criterias, tags);
                 return export.Export(filename, applicants);
             }
+        }
+
+        private void MainData_ColumnDisplayIndexChanged(object sender, DataGridColumnEventArgs e)
+        {
+            var index = MainData.Columns.IndexOf(e.Column);
+            if (index < 0 || index >= loadedColumns.Length)
+                return; // column not found
+            var column = loadedColumns[index];
+            column.Order = e.Column.DisplayIndex;
         }
     }
 }

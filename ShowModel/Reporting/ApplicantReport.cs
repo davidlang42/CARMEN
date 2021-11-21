@@ -11,7 +11,7 @@ namespace Carmen.ShowModel.Reporting
     public class ApplicantReport : Report<Applicant>
     {
         public ApplicantReport(Criteria[] criterias, Tag[] tags)
-            : base(GenerateColumns(criterias, tags).ToArray())
+            : base(AssignOrder(GenerateColumns(criterias, tags)))
         { }
 
         private static IEnumerable<Column<Applicant>> GenerateColumns(Criteria[] criterias, Tag[] tags)

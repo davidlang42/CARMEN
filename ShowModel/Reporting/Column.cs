@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace Carmen.ShowModel.Reporting
 {
-    public class Column<T>
+    public class Column<T> : IOrdered
     {
         public string Name { get; }
+        public int Order { get; set; }
         public Func<T, object?> ValueGetter { get; }
         public bool Show { get; set; } = true;
         public ListSortDirection? Sort { get; set; }
