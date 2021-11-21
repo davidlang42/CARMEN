@@ -92,23 +92,24 @@ namespace Carmen.ShowModel.Reporting
         }
 
         public void SetData(IEnumerable<T> data)
-        {
+        {   
             Rows = data.Select(d => Columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();
         }
 
         public int Export(string file_name)
         {
             int count = 0;
+            var ordered_columns = Columns.Where(c => c.Show).InOrder().ToArray();
             using (var writer = new StreamWriter(file_name)) //TODO handle file io exceptions
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                foreach (var column in Columns)
+                foreach (var column in ordered_columns)
                     csv.WriteField(column.Name);
                 csv.NextRecord();
-                foreach (var row in Rows)
+                foreach (var row in Sort(Rows, SortColumns))
                 {
-                    foreach (var field in row)
-                        csv.WriteField(FormatAsString(field));
+                    foreach (var column in ordered_columns)
+                        csv.WriteField(FormatAsString(row[IndexOf(column)]));
                     csv.NextRecord();
                     count++;
                 }
@@ -127,6 +128,19 @@ namespace Carmen.ShowModel.Reporting
                 bool b => b ? "Y" : "N",
                 _ => obj.ToString() ?? ""
             };
+
+        private static IEnumerable<object?[]> Sort(object?[][] rows, IEnumerable<SortColumn> sort_columns)
+        {
+            IEnumerable<object?[]> sorted_rows = rows;
+            foreach (var sort_column in sort_columns.Reverse())
+                sorted_rows = sort_column.SortDirection switch
+                {
+                    ListSortDirection.Ascending => sorted_rows.OrderBy(r => r[sort_column.ColumnIndex]),
+                    ListSortDirection.Descending => sorted_rows.OrderByDescending(r => r[sort_column.ColumnIndex]),
+                    _ => throw new NotImplementedException($"Enum not handled: {sort_column.SortDirection}")
+                };
+            return sorted_rows;
+        }
 
         private void SortColumns_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(SortDescription));
