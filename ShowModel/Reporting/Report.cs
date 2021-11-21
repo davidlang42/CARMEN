@@ -16,7 +16,6 @@ namespace Carmen.ShowModel.Reporting
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public Column<T>[] Columns { get; }
-        public T[] Data { get; set; } = Array.Empty<T>();
         public ObservableCollection<SortColumn> SortColumns { get; } = new();
 
         private Column<T>? groupColumn;
@@ -28,6 +27,19 @@ namespace Carmen.ShowModel.Reporting
                 if (groupColumn == value)
                     return;
                 groupColumn = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private object?[][] rows = Array.Empty<object?[]>();
+        public object?[][] Rows
+        {
+            get => rows;
+            set
+            {
+                if (rows == value)
+                    return;
+                rows = value;
                 OnPropertyChanged();
             }
         }
@@ -65,6 +77,11 @@ namespace Carmen.ShowModel.Reporting
             SortColumns.CollectionChanged += SortColumns_CollectionChanged;
         }
 
+        public void SetData(IEnumerable<T> data)
+        {
+            Rows = data.Select(d => Columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();
+        }
+
         private void SortColumns_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(SortDescription));
 
@@ -73,9 +90,6 @@ namespace Carmen.ShowModel.Reporting
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Column<T>.Show) || e.PropertyName == nameof(Column<T>.Order))
                 OnPropertyChanged(nameof(ColumnsDescription));
         }
-
-        public object?[][] GenerateRows()
-            => Data.Select(d => Columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();
 
         protected static Column<T>[] AssignOrder(IEnumerable<Column<T>> columns)
         {

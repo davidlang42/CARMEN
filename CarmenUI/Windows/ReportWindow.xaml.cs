@@ -54,26 +54,18 @@ namespace CarmenUI.Windows
                     criterias = await context.Criterias.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
                     tags = await context.Tags.ToArrayAsync();
-                columnsCombo.DataContext = report = new(criterias, tags);
-                columnsCombo.Items.IsLiveSorting = true;
+                report = new(criterias, tags);
+                PopulateGridColumns();
+                MainData.DataContext = report;
+                columnsCombo.Items.IsLiveSorting = true; //TODO do we still need columnsCombo
                 columnsCombo.Items.SortDescriptions.Add(new(nameof(Column<Applicant>.Order), ListSortDirection.Ascending));
                 columnsCombo.SelectedIndex = 0;
             }
         }
 
-        public async Task RefreshData()
+        private void PopulateGridColumns()
         {
-            using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshData));
-            using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
-            using (var context = ShowContext.Open(connection))
-                Report.Data = await context.Applicants.ToArrayAsync();
-            using (loading.Segment(nameof(PopulateGrid), "Generating report"))
-                PopulateGrid();
-        }
-
-        private void PopulateGrid()
-        {
-            MainData.Columns.Clear();
+            MainData.Columns.Clear(); //TODO is clear needed?
             for (var c = 0; c < Report.Columns.Length; c++)
             {
                 var binding = new Binding($"[{c}]"); // this gets parsed in MainData_Sorting
@@ -82,7 +74,7 @@ namespace CarmenUI.Windows
                 MainData.Columns.Add(new DataGridTextColumn
                 {
                     Header = Report.Columns[c].Name,
-                    Visibility = Report.Columns[c].Show ? Visibility.Visible : Visibility.Hidden, //TODO need to bind this so it updates the report as soon as you click it
+                    Visibility = Report.Columns[c].Show ? Visibility.Visible : Visibility.Hidden, //TODO need to bind this so it updates when changed
                     Binding = binding,
                     IsReadOnly = true
                 });
@@ -90,9 +82,20 @@ namespace CarmenUI.Windows
             // display index must be set after all columns have been added
             for (var c = 0; c < Report.Columns.Length; c++)
                 MainData.Columns[c].DisplayIndex = Report.Columns[c].Order;
-            // update data
-            MainData.ItemsSource = Report.GenerateRows();
-            // sort direction must be set after ItemsSource
+        }
+
+        public async Task RefreshData()
+        {
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshData));
+            using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
+            using (var context = ShowContext.Open(connection))
+                Report.SetData(await context.Applicants.ToArrayAsync());
+            using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
+                ConfigureSorting(); // must be set after ItemsSource
+        }
+
+        private void ConfigureSorting()//TODO do we need to do this every time?
+        {
             foreach (var sort_column in Report.SortColumns)
             {
                 var grid_column = MainData.Columns[sort_column.ColumnIndex];
