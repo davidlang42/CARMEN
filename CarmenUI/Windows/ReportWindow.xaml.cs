@@ -1,24 +1,14 @@
 ﻿using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
-using Carmen.ShowModel.Export;
 using Carmen.ShowModel.Reporting;
 using CarmenUI.Converters;
 using Microsoft.Win32;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CarmenUI.Windows
 {
@@ -133,7 +123,7 @@ namespace CarmenUI.Windows
                 MainData.Items.GroupDescriptions.Add(new PropertyGroupDescription($"[{Report.IndexOf(Report.GroupColumn)}]"));
         }
 
-        private async void ExportButton_Click(object sender, RoutedEventArgs e)
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             var file = new SaveFileDialog
             {
@@ -142,28 +132,10 @@ namespace CarmenUI.Windows
             };
             if (file.ShowDialog() == true)
             {
-                var count = await ExportApplicants(file.FileName);
+                int count;
+                using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportButton_Click), "Exporting..."))
+                    count = Report.Export(file.FileName);
                 MessageBox.Show($"Exported {count.Plural("applicant")} to {file.FileName}", Title);
-            }
-        }
-
-        private async Task<int> ExportApplicants(string filename)
-        {
-            using var loading = new LoadingOverlay(this).AsSegment(nameof(ExportApplicants), "Exporting...");
-            using var context = ShowContext.Open(connection);
-            Criteria[] criterias;
-            Tag[] tags;
-            Applicant[] applicants;
-            using (loading.Segment(nameof(ShowContext.Criterias), "Criterias"))
-                criterias = await context.Criterias.ToArrayAsync();
-            using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
-                tags = await context.Tags.ToArrayAsync();
-            using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
-                applicants = await context.Applicants.ToArrayAsync();
-            using (loading.Segment(nameof(CsvExporter), "Writing data"))
-            {
-                var export = new CsvExporter(criterias, tags);
-                return export.Export(filename, applicants);
             }
         }
 

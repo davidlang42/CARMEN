@@ -1,7 +1,11 @@
-﻿using System;
+﻿using Carmen.ShowModel.Applicants;
+using CsvHelper;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -91,6 +95,38 @@ namespace Carmen.ShowModel.Reporting
         {
             Rows = data.Select(d => Columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();
         }
+
+        public int Export(string file_name)
+        {
+            int count = 0;
+            using (var writer = new StreamWriter(file_name)) //TODO handle file io exceptions
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                foreach (var column in Columns)
+                    csv.WriteField(column.Name);
+                csv.NextRecord();
+                foreach (var row in Rows)
+                {
+                    foreach (var field in row)
+                        csv.WriteField(FormatAsString(field));
+                    csv.NextRecord();
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private string FormatAsString(object? obj)
+            => obj switch
+            {
+                null => "",
+                string s => s,
+                DateTime dt => $"{dt:dd/MM/yyyy}",
+                CastGroup cg => cg.Name,
+                AlternativeCast ac => ac.Initial.ToString(),
+                bool b => b ? "Y" : "N",
+                _ => obj.ToString() ?? ""
+            };
 
         private void SortColumns_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(SortDescription));
