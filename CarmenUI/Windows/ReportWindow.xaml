@@ -16,17 +16,17 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <WrapPanel Margin="5" VerticalAlignment="Center">
-            <Button Margin="5 0" VerticalAlignment="Center" Click="RefreshButton_Click">
+        <WrapPanel VerticalAlignment="Center">
+            <Button Margin="5" VerticalAlignment="Center" Click="RefreshButton_Click">
                 <TextBlock Margin="5 0" Text="Refresh"/>
             </Button>
-            <ComboBox Margin="5 0" VerticalAlignment="Center">
+            <ComboBox Margin="5" VerticalAlignment="Center">
                 <ComboBox.Items>
                     <ComboBoxItem IsSelected="True" Content="Applicants"/>
                 </ComboBox.Items>
             </ComboBox>
             <TextBlock VerticalAlignment="Center" Text="with" FontStyle="Italic"/>
-            <ComboBox Margin="5 0" x:Name="columnsCombo" ItemsSource="{Binding ElementName=MainData, Path=DataContext.Columns}" VerticalAlignment="Center">
+            <ComboBox Margin="5" x:Name="columnsCombo" ItemsSource="{Binding ElementName=MainData, Path=DataContext.Columns}" VerticalAlignment="Center">
                 <ComboBox.ItemTemplateSelector>
                     <cv:ComboBoxFaceTemplateSelector>
                         <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
@@ -44,7 +44,7 @@
                 </ComboBox.ItemTemplateSelector>
             </ComboBox>
             <TextBlock VerticalAlignment="Center" Text="grouped by" FontStyle="Italic"/>
-            <ComboBox Margin="5 0" VerticalAlignment="Center" DisplayMemberPath="Name"
+            <ComboBox Margin="5" VerticalAlignment="Center" DisplayMemberPath="Name"
                       ItemsSource="{Binding ElementName=MainData, Path=DataContext.Columns}"
                       SelectedItem="{Binding ElementName=MainData, Path=DataContext.GroupColumn}"
                       SelectionChanged="GroupColumn_SelectionChanged" MinWidth="100">
@@ -55,10 +55,11 @@
                 </ComboBox.ContextMenu>
             </ComboBox>
             <TextBlock VerticalAlignment="Center" Text="sorted by" FontStyle="Italic"/>
-            <TextBlock Margin="5 0" VerticalAlignment="Center" Text="{Binding ElementName=MainData, Path=DataContext.SortDescription}"/>
-            <Button Margin="5 0" VerticalAlignment="Center" Click="ExportButton_Click">
+            <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding ElementName=MainData, Path=DataContext.SortDescription}"/>
+            <Button Margin="5" VerticalAlignment="Center" Click="ExportButton_Click">
                 <TextBlock Margin="5 0" Text="Export"/>
             </Button>
+            <CheckBox Margin="5" VerticalAlignment="Center" Content="Export descriptive header" IsChecked="{Binding ElementName=MainData, Path=DataContext.ExportDescriptiveHeader}"/>
         </WrapPanel>
         <DataGrid Grid.Row="1" x:Name="MainData" AutoGenerateColumns="False" ItemsSource="{Binding Rows}"
                   ColumnDisplayIndexChanged="MainData_ColumnDisplayIndexChanged" Sorting="MainData_Sorting">

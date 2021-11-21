@@ -13,11 +13,13 @@ using System.Threading.Tasks;
 
 namespace Carmen.ShowModel.Reporting
 {
-    public class Report<T> : INotifyPropertyChanged
+    public abstract class Report<T> : INotifyPropertyChanged
     {
         const int MAX_DESCRIPTIONS = 3;
 
         public event PropertyChangedEventHandler? PropertyChanged;
+
+        string reportName;
 
         public Column<T>[] Columns { get; }
         public ObservableCollection<SortColumn> SortColumns { get; } = new();
@@ -48,6 +50,19 @@ namespace Carmen.ShowModel.Reporting
             }
         }
 
+        private bool exportDescriptiveHeader = false;
+        public bool ExportDescriptiveHeader
+        {
+            get => exportDescriptiveHeader;
+            set
+            {
+                if (exportDescriptiveHeader == value)
+                    return;
+                exportDescriptiveHeader = value;
+                OnPropertyChanged();
+            }
+        }
+
         public string ColumnsDescription
         {
             get
@@ -73,8 +88,22 @@ namespace Carmen.ShowModel.Reporting
             }
         }
 
-        public Report(Column<T>[] columns)
+        public string FullDescription
         {
+            get
+            {
+                var description = $"{reportName} with {ColumnsDescription}";
+                if (GroupColumn != null)
+                    description += $" grouped by {GroupColumn.Name}";
+                if (SortColumns.Any())
+                    description += $" sorted by {SortDescription}";
+                return description;
+            }
+        }
+
+        public Report(string report_name, Column<T>[] columns)
+        {
+            reportName = report_name;
             Columns = columns;
             foreach (var column in columns)
                 column.PropertyChanged += Column_PropertyChanged;
@@ -105,8 +134,11 @@ namespace Carmen.ShowModel.Reporting
             using (var writer = new StreamWriter(file_name)) //TODO handle file io exceptions
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
-                foreach (var column in ordered_columns)
-                    csv.WriteField(column.Name);
+                if (ExportDescriptiveHeader)
+                    csv.WriteField(FullDescription);
+                else
+                    foreach (var column in ordered_columns)
+                        csv.WriteField(column.Name);
                 csv.NextRecord();
                 if (Rows.Length == 0)
                     return 0; // nothing to export after header
