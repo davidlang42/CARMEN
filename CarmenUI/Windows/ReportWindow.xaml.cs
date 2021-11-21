@@ -104,7 +104,7 @@ namespace CarmenUI.Windows
                 Report.SetData(await context.Applicants.ToArrayAsync());
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
-            using (loading.Segment(nameof(ConfigureGrouping), "Grouping"))
+            using (loading.Segment(nameof(ConfigureGrouping), "Grouping")) //TODO make sure overlay is shown
                 ConfigureGrouping(); // TODO ??? must be called every time ItemsSource changes
         }
 
@@ -118,7 +118,10 @@ namespace CarmenUI.Windows
             }
         }
 
-        private void ConfigureGrouping() //TODO call this on group combo change, might need overlay
+        private void GroupColumn_SelectionChanged(object sender, SelectionChangedEventArgs e) //TODO show something reasonable when nothing selected, and make sure you can select "nothing"
+            => ConfigureGrouping(); //TODO add overlay
+
+        private void ConfigureGrouping()
         {
             MainData.Items.GroupDescriptions.Clear();
             if (Report.GroupColumn != null)
