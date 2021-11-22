@@ -42,7 +42,7 @@ namespace CarmenUI.ViewModels
         public override string ConnectionString => Provider switch
         {
             null => new SqliteConnectionStringBuilder { DataSource = Filename }.ToString(),
-            DbProvider.MySql => new MySqlConnectionStringBuilder { Server = Host, Database = Database, UserID = User, Password = Password, Port = Port ?? 3306 }.ToString(),
+            DbProvider.MySql => new MySqlConnectionStringBuilder { Server = Host, Database = Database, UserID = User, Password = Password, Port = Port ?? 3306, SslMode = Properties.Settings.Default.ConnectionSslMode }.ToString(),
             _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
         };
 

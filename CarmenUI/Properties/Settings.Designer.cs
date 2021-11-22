@@ -345,5 +345,17 @@ namespace CarmenUI.Properties {
                 this["AutoCollapseGroupThreshold"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("VerifyFull")]
+        public global::MySqlConnector.MySqlSslMode ConnectionSslMode {
+            get {
+                return ((global::MySqlConnector.MySqlSslMode)(this["ConnectionSslMode"]));
+            }
+            set {
+                this["ConnectionSslMode"] = value;
+            }
+        }
     }
 }

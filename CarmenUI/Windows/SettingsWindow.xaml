@@ -6,6 +6,7 @@
         xmlns:local="clr-namespace:CarmenUI.Windows"
         xmlns:bd="clr-namespace:CarmenUI.Bindings"
         xmlns:cv="clr-namespace:CarmenUI.Converters"
+        xmlns:mysql="clr-namespace:MySqlConnector;assembly=MySqlConnector"
         xmlns:sys="clr-namespace:System;assembly=System.Runtime"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         mc:Ignorable="d"
@@ -17,6 +18,11 @@
         <ObjectDataProvider x:Key="fullNameFormatEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
                 <x:Type TypeName="cv:FullNameFormat"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <ObjectDataProvider x:Key="sslModeEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="mysql:MySqlSslMode"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
         <cv:FullName x:Key="fullName"/>
@@ -213,6 +219,14 @@
                         <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
                             <TextBlock Text="Allocation Engine:" Margin="0 0 10 0" VerticalAlignment="Center"/>
                             <ComboBox ItemsSource="{Binding ElementName=WindowRoot, Path=AllocationEngines}" SelectedItem="{bd:SettingBinding AllocationEngine, TargetNullValue=''}"/>
+                        </StackPanel>
+                        <TextBlock Margin="0 10 0 0" TextWrapping="Wrap">
+                            When connecting to a database server, SSL can be used to encrypt the connection. The most secure options are VerifyFull, VerifyCA and Required (in that order).
+                            Preferred and None may allow data to be transferred unencrypted, so that anyone can read it. These should ONLY be used if the database server is on your local network, and not available over the internet.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" Margin="0 5 0 0">
+                            <TextBlock Text="SSL Mode:" Margin="0 0 10 0" VerticalAlignment="Center"/>
+                            <ComboBox ItemsSource="{Binding Source={StaticResource sslModeEnumValues}}"  SelectedItem="{bd:SettingBinding ConnectionSslMode, TargetNullValue=''}"/>
                         </StackPanel>
                     </StackPanel>
                 </Expander>

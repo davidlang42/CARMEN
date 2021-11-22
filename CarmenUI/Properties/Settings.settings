@@ -83,5 +83,8 @@
     <Setting Name="AutoCollapseGroupThreshold" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">10</Value>
     </Setting>
+    <Setting Name="ConnectionSslMode" Type="MySqlConnector.MySqlSslMode" Scope="User">
+      <Value Profile="(Default)">VerifyFull</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
