@@ -805,7 +805,7 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             <TextBlock Grid.ColumnSpan="2" TextWrapping="Wrap" FontSize="14">
-                                This is an Age requirement, which means that an Applicant must have an age within the specified range.
+                                This is an Age requirement, which means that an Applicant must have a whole number age within the specified range (inclusive).
                                 If set to primary, this requirement will be shown on the role allocation screen.
                                 The requirement weight specifies the importance of this requirement in calculating applicants suitability for a role.
                                 If disabled, this requirement will not be used in determining the applicants suitability percentage.
