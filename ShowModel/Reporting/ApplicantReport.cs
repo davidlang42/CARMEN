@@ -35,6 +35,8 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<Applicant>("Cast Group", a => a.CastGroup?.Name);
             yield return new Column<Applicant>("Cast Number", a => a.CastNumber);
             yield return new Column<Applicant>("Alternative Cast", a => a.AlternativeCast?.Initial);
+            yield return new Column<Applicant>("Cast Number And Cast", a => $"{a.CastNumber}{a.AlternativeCast?.Initial}") { Show = false };
+            yield return new Column<Applicant>("Cast Group And Cast", a => $"{a.CastGroup?.Name}{(a.AlternativeCast == null ? "" : $" ({a.AlternativeCast.Name})")}") { Show = false };
             foreach (var tag in tags.InNameOrder())
             {
                 yield return new Column<Applicant>(tag.Name, a => a.Tags.Any(t => t.TagId == tag.TagId));
