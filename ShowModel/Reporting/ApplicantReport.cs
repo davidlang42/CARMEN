@@ -20,6 +20,7 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<Applicant>("Last Name", a => a.LastName);
             yield return new Column<Applicant>("Gender", a => a.Gender);
             yield return new Column<Applicant>("Date of Birth", a => a.DateOfBirth, "dd/MM/yyyy");
+            yield return new Column<Applicant>("Age", a => a.Age, "0 yrs");
             foreach (var criteria in criterias.InOrder())
                 if (criteria is SelectCriteria select)
                     yield return new Column<Applicant>(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == criteria.CriteriaId) is Ability ab ? (ab.Mark > criteria.MaxMark ? ab.Mark : select.Options[ab.Mark]) : null);
