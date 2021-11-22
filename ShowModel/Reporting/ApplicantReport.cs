@@ -35,7 +35,10 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<Applicant>("Cast Number", a => a.CastNumber);
             yield return new Column<Applicant>("Alternative Cast", a => a.AlternativeCast?.Initial);
             foreach (var tag in tags.InNameOrder())
+            {
                 yield return new Column<Applicant>(tag.Name, a => a.Tags.Contains(tag));
+                yield return new Column<Applicant>($"{tag.Name} (Name/Blank)", a => a.Tags.Contains(tag) ? tag.Name : "") { Show = false };
+            }
         }
     }
 }
