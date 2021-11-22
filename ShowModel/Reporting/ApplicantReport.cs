@@ -18,6 +18,7 @@ namespace Carmen.ShowModel.Reporting
         {
             yield return new Column<Applicant>("First Name", a => a.FirstName);
             yield return new Column<Applicant>("Last Name", a => a.LastName);
+            yield return new Column<Applicant>("Full Name", a => $"{a.LastName}, {a.FirstName}") { Show = false };
             yield return new Column<Applicant>("Gender", a => a.Gender);
             yield return new Column<Applicant>("Date of Birth", a => a.DateOfBirth, "dd/MM/yyyy");
             yield return new Column<Applicant>("Age", a => a.Age, "0 yrs");
