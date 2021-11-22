@@ -35,6 +35,11 @@ namespace CarmenUI.Windows
             NavigationCommands.BrowseBack.InputGestures.Clear(); // otherwise the backspace key changes pages without saving or confirming
             NavigationCommands.BrowseForward.InputGestures.Clear();
             this.connection = connection;
+            NavigateToMainMenu();
+        }
+
+        public void NavigateToMainMenu()
+        {
             var main_menu = new MainMenu(connection);
             MainFrame.Navigate(main_menu);
         }

@@ -11,6 +11,8 @@ using System.Windows;
 using System.IO;
 using System.Text.Json;
 using CarmenUI.Properties;
+using System.Diagnostics.CodeAnalysis;
+using CarmenUI.Windows;
 
 namespace CarmenUI
 {
@@ -61,6 +63,23 @@ namespace CarmenUI
         {
             CreateLog("Error", $"Handler: {handler}\n{ExceptionString(ex)}");
             MessageBox.Show($"Error in {handler}: {ex.Message}");
+            bool main_window_found = false;
+            foreach (var obj in Current.Windows)
+            {
+                if (obj is MainWindow main_window)
+                {
+                    main_window_found = true;
+                    main_window.Show();
+                    main_window.NavigateToMainMenu();
+                }
+                else if (obj is Window window)
+                    window.Close();
+            }
+            if (!main_window_found)
+            {
+                var start_window = new StartWindow();
+                start_window.Show();
+            }
         }
 
         private string ExceptionString(Exception ex)
