@@ -61,7 +61,6 @@
             <Button Margin="5" VerticalAlignment="Center" Click="ExportButton_Click">
                 <TextBlock Margin="5 0" Text="Export"/>
             </Button>
-            <CheckBox Margin="5" VerticalAlignment="Center" Content="Export descriptive header" IsChecked="{Binding ElementName=MainData, Path=DataContext.ExportDescriptiveHeader}"/>
         </WrapPanel>
         <DataGrid Grid.Row="1" x:Name="MainData" AutoGenerateColumns="False" ItemsSource="{Binding Rows}"
                   ColumnDisplayIndexChanged="MainData_ColumnDisplayIndexChanged" Sorting="MainData_Sorting">
