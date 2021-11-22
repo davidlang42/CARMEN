@@ -98,7 +98,16 @@ namespace CarmenUI.Windows
             using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshData));
             using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
             using (var context = ShowContext.Open(connection))
-                Report.SetData(await context.Applicants.ToArrayAsync());
+            {
+                var data = (ReportTypeCombo.SelectedItem as ComboBoxItem)?.Content switch
+                {
+                    "All Applicants" => await context.Applicants.ToArrayAsync(),
+                    "Accepted Applicants" => await context.Applicants.Where(a => a.CastGroup != null).ToArrayAsync(),
+                    "Rejected Applicants" => await context.Applicants.Where(a => a.CastGroup == null).ToArrayAsync(),
+                    _ => throw new ApplicationException($"Report type combo not handled: {ReportTypeCombo.SelectedItem}")
+                };
+                Report.SetData(data);
+            }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
         }
@@ -176,6 +185,12 @@ namespace CarmenUI.Windows
         private void ClearGrouping_Click(object sender, RoutedEventArgs e)
         {
             Report.GroupColumn = null;
+        }
+
+        private async void ReportTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (report != null) // might still be loading
+                await RefreshData();
         }
     }
 }

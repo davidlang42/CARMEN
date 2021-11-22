@@ -20,9 +20,11 @@
             <Button Margin="5" VerticalAlignment="Center" Click="RefreshButton_Click">
                 <TextBlock Margin="5 0" Text="Refresh"/>
             </Button>
-            <ComboBox Margin="5" VerticalAlignment="Center">
+            <ComboBox Name="ReportTypeCombo" Margin="5" VerticalAlignment="Center" SelectionChanged="ReportTypeCombo_SelectionChanged">
                 <ComboBox.Items>
-                    <ComboBoxItem IsSelected="True" Content="Applicants"/>
+                    <ComboBoxItem IsSelected="True" Content="All Applicants"/>
+                    <ComboBoxItem Content="Accepted Applicants"/>
+                    <ComboBoxItem Content="Rejected Applicants"/>
                 </ComboBox.Items>
             </ComboBox>
             <TextBlock VerticalAlignment="Center" Text="with" FontStyle="Italic"/>
