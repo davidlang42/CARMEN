@@ -33,8 +33,6 @@ namespace Carmen.CastingEngine.Selection
 
         public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets)
         {
-            if (alternativeCasts.Length != 2)
-                throw new ApplicationException("This approach only works for exactly 2 alternative casts.");
             // sort the applicants into cast groups
             var applicants_needing_alternative_cast = new List<(CastGroup, HashSet<Applicant>)>();
             var existing_assignments = new List<Clause<Applicant>>();
@@ -59,6 +57,8 @@ namespace Carmen.CastingEngine.Selection
             }
             if (applicants_needing_alternative_cast.Count == 0)
                 return; // nothing to do
+            if (alternativeCasts.Length != 2)
+                throw new ApplicationException("This approach only works for exactly 2 alternative casts.");
             // create clauses for same cast sets
             var same_cast_clauses = new List<Clause<Applicant>>();
             var same_cast_lookup = new Dictionary<Applicant, SameCastSet>();
