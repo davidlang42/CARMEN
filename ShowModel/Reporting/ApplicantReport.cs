@@ -31,6 +31,7 @@ namespace Carmen.ShowModel.Reporting
                     yield return new Column<Applicant>(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == criteria.CriteriaId)?.Mark);
                 else
                     throw new ApplicationException($"Type not handled: {criteria.GetType().Name}");
+            yield return new Column<Applicant>("Overall Ability", a => OverallAbility(a, criterias));
             yield return new Column<Applicant>("Notes", a => a.Notes);
             yield return new Column<Applicant>("External Data", a => a.ExternalData);
             yield return new Column<Applicant>("Cast Group", a => a.CastGroup?.Name);
@@ -43,6 +44,14 @@ namespace Carmen.ShowModel.Reporting
                 yield return new Column<Applicant>(tag.Name, a => a.Tags.Any(t => t.TagId == tag.TagId));
                 yield return new Column<Applicant>($"{tag.Name} (Name/Blank)", a => a.Tags.Any(t => t.TagId == tag.TagId) ? tag.Name : "") { Show = false };
             }
+        }
+
+        /// <summary>Same calculation as WeightedSumEngine, except returns null for incomplete applicants</summary>
+        private static int? OverallAbility(Applicant applicant, Criteria[] criterias)
+        {
+            if (!applicant.HasAuditioned(criterias))
+                return null;
+            return Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));    
         }
     }
 }

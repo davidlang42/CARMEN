@@ -21,6 +21,7 @@ namespace Carmen.CastingEngine.Audition
             UpdateRange(criterias);
         }
 
+        /// <summary>Calculation duplicated in ApplicantReport</summary>
         readonly FunctionCache<Applicant, int> overallAbility = new(applicant
             => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)));
 

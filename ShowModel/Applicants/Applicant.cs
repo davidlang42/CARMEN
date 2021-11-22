@@ -239,7 +239,7 @@ namespace Carmen.ShowModel.Applicants
                 if (ability.Mark > ability.Criteria.MaxMark)
                     return false;
             foreach (var required_criteria in all_criterias.Where(c => c.Required))
-                if (!applicant_abilities.Any(ab => ab.Criteria == required_criteria))
+                if (!applicant_abilities.Any(ab => ab.Criteria.CriteriaId == required_criteria.CriteriaId))
                     return false;
             return true;
         }
