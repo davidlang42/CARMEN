@@ -22,11 +22,11 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<Applicant>("Date of Birth", a => a.DateOfBirth, "dd/MM/yyyy");
             foreach (var criteria in criterias.InOrder())
                 if (criteria is SelectCriteria select)
-                    yield return new Column<Applicant>(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria == criteria) is Ability ab ? (ab.Mark > criteria.MaxMark ? ab.Mark : select.Options[ab.Mark]) : null);
+                    yield return new Column<Applicant>(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == criteria.CriteriaId) is Ability ab ? (ab.Mark > criteria.MaxMark ? ab.Mark : select.Options[ab.Mark]) : null);
                 else if (criteria is BooleanCriteria)
-                    yield return new Column<Applicant>(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria == criteria) is Ability ab ? (ab.Mark > 1 ? ab.Mark : ab.Mark == 1) : null);
+                    yield return new Column<Applicant>(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == criteria.CriteriaId) is Ability ab ? (ab.Mark > 1 ? ab.Mark : ab.Mark == 1) : null);
                 else if (criteria is NumericCriteria)
-                    yield return new Column<Applicant>(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria == criteria)?.Mark);
+                    yield return new Column<Applicant>(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == criteria.CriteriaId)?.Mark);
                 else
                     throw new ApplicationException($"Type not handled: {criteria.GetType().Name}");
             yield return new Column<Applicant>("Notes", a => a.Notes);
