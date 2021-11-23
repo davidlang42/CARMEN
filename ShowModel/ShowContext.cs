@@ -125,6 +125,41 @@ namespace Carmen.ShowModel
             await Task.Run(() => Database.Migrate()); // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
         }
 
+        public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)
+        {
+            using var destination = Open(overwrite_database);
+            destination.Database.EnsureDeleted();
+            destination.Database.Migrate(); // instead of EnsureCreated(), so that history table gets created
+            progress_callback?.Invoke(nameof(Images), "Images");
+            destination.AddRange(await Images.ToArrayAsync());
+            progress_callback?.Invoke(nameof(AlternativeCasts), "Alternative casts");
+            destination.AddRange(await AlternativeCasts.ToArrayAsync());
+            progress_callback?.Invoke(nameof(Criterias), "Criteria");
+            destination.AddRange(await Criterias.ToArrayAsync());
+            progress_callback?.Invoke(nameof(Tags) + nameof(Tag.Requirements), "Tags");
+            destination.AddRange(await Tags.Include(t => t.Requirements).ToArrayAsync());
+            progress_callback?.Invoke(nameof(CastGroups) + nameof(Tag.Requirements), "Cast groups");
+            destination.AddRange(await CastGroups.Include(t => t.Requirements).ToArrayAsync());
+            progress_callback?.Invoke(nameof(Requirements), "Requirements");
+            destination.AddRange(await Requirements.ToArrayAsync());
+            progress_callback?.Invoke(nameof(Requirements) + nameof(CombinedRequirement.SubRequirements), "Sub-requirements");
+            destination.AddRange(await Requirements.OfType<CombinedRequirement>().Include(cr => cr.SubRequirements).ToArrayAsync());
+            progress_callback?.Invoke(nameof(Applicants) + nameof(Applicant.Roles), "Applicants");
+            destination.AddRange(await Applicants.Include(a => a.Roles).ToArrayAsync());
+            progress_callback?.Invoke(nameof(Abilities), "Abilities");
+            destination.AddRange(await Abilities.ToArrayAsync());
+            progress_callback?.Invoke(nameof(SameCastSets), "Same cast sets");
+            destination.AddRange(await SameCastSets.ToArrayAsync());
+            progress_callback?.Invoke(nameof(SectionTypes), "Section types");
+            destination.AddRange(await SectionTypes.ToArrayAsync());
+            progress_callback?.Invoke(nameof(Nodes), "Nodes");
+            destination.AddRange(await Nodes.ToArrayAsync());
+            progress_callback?.Invoke(nameof(Roles) + nameof(Role.Items), "Roles");
+            destination.AddRange(await Roles.Include(r => r.Items).ToArrayAsync());
+            progress_callback?.Invoke(nameof(SaveChanges), "Saving");
+            await Task.Run(() => destination.SaveChanges());
+        }
+
         /// <summary>Detect which DataObjects have changed in the current context since the last save</summary>
         public DataObjects DataChanges()
         {

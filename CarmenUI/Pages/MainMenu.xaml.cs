@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
+using Microsoft.Win32;
 
 namespace CarmenUI.Pages
 {
@@ -220,9 +221,25 @@ namespace CarmenUI.Pages
             report.Show();
         }
 
-        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            var dialog = new SaveFileDialog
+            {
+                Title = "Export Database",
+                Filter = "Sqlite Database (*.db)|*.db"
+            };
+            if (dialog.ShowDialog() == true)
+                using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportButton_Click), "Exporting..."))
+                using (var source = ShowContext.Open(connection))
+                {
+                    var segment = loading.Segment(nameof(ShowContext.CopyDatabase), "Creating database");
+                    await source.CopyDatabase(new LocalShowConnection(dialog.FileName), (key, display) =>
+                    {
+                        segment.Dispose();
+                        segment = loading.Segment(key, display);
+                    });
+                    segment.Dispose();
+                }
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
