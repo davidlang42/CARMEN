@@ -98,7 +98,19 @@
                 </StackPanel>
             </ListViewItem>
         </ListView>
-        <TextBlock Grid.Row="3" x:Name="CastingComplete" Visibility="Hidden" Margin="20 0 20 20" Text="IT'S SHOWTIME" HorizontalAlignment="Right" FontStyle="Italic" FontSize="20"/>
+        <Grid Grid.Row="3">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Name="ExportButton" Background="White" BorderThickness="0" Click="ExportButton_Click" HorizontalAlignment="Right">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Download" Width="25" Margin="5" Foreground="MediumBlue" VerticalAlignment="Center"/>
+                    <TextBlock Text=" Export database" FontSize="18" VerticalAlignment="Center" Margin="0 0 10 0"/>
+                </StackPanel>
+            </Button>
+            <TextBlock Grid.Column="1" x:Name="CastingComplete" Visibility="Hidden" Margin="20 0 20 20" Text="IT'S SHOWTIME" HorizontalAlignment="Right" FontStyle="Italic" FontSize="20"/>
+        </Grid>
         <Button Grid.Row="3" Grid.Column="1" Background="White" BorderThickness="0" Click="ReportsButton_Click" HorizontalAlignment="Right">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Reports " FontSize="18" VerticalAlignment="Center" Margin="10 0 0 0"/>

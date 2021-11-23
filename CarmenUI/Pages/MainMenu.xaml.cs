@@ -220,6 +220,11 @@ namespace CarmenUI.Pages
             report.Show();
         }
 
+        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
         {
             var settings = new SettingsWindow();
