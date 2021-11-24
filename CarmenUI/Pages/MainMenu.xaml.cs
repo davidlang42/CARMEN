@@ -238,9 +238,52 @@ namespace CarmenUI.Pages
             report.Show();
         }
 
-        private void ImportButton_Click(object sender, RoutedEventArgs e)
+        private async void ImportButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            var dialog = new OpenFileDialog
+            {
+                Title = "Import database",
+                Filter = "Sqlite Database (*.db)|*.db"
+            };
+            if (dialog.ShowDialog() == true)
+            {
+                var msg = $"This will DELETE all existing data in the currently open show, including applicant details, audition marks, and casting information, and replace it with only the data in '{dialog.FileName}'. THIS IS IRREVERSABLE, the existing data will be lost forever.\n\nAre you sure you want to overwrite all existing data?";
+                if (MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
+                    return;
+                msg = $"WARNING!!! You should only do this if you are the person in charge. This will affect ALL users of this database, and there will be no way to recover the data after this point.\n\n{msg}";
+                if (MessageBox.Show(msg, "WARNING", MessageBoxButton.YesNo, MessageBoxImage.Warning) == MessageBoxResult.No)
+                {
+                    MessageBox.Show("Good choice.", WindowTitle);
+                    return;
+                }
+                var backup_file = $"{Path.GetTempPath()}backup_before_import_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.db";
+                // create backup
+                using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportButton_Click), "Backing up..."))
+                using (var current_show = ShowContext.Open(connection))
+                {
+                    var segment = loading.Segment(nameof(ShowContext.CopyDatabase), "Creating backup");
+                    await current_show.CopyDatabase(new LocalShowConnection(backup_file), (key, display) =>
+                    {
+                        segment.Dispose();
+                        segment = loading.Segment(key, display);
+                    });
+                    segment.Dispose();
+                }
+                // delete and import
+                using (var loading = new LoadingOverlay(this).AsSegment(nameof(ImportButton_Click), "Importing..."))
+                using (var import_from = ShowContext.Open(new LocalShowConnection(dialog.FileName)))
+                {
+                    var segment = loading.Segment(nameof(ShowContext.CopyDatabase), "Clearing database");
+                    await import_from.CopyDatabase(connection, (key, display) =>
+                    {
+                        segment.Dispose();
+                        segment = loading.Segment(key, display);
+                    });
+                    segment.Dispose();
+                }
+                MessageBox.Show($"Imported database from: {dialog.FileName}\nBackup saved to: {backup_file}");
+                InvalidateSummaries(DataObjects.All);
+            }
         }
 
         private async void ExportButton_Click(object sender, RoutedEventArgs e)
