@@ -251,6 +251,13 @@ namespace CarmenUI.Pages
                 Filter = "Sqlite Database (*.db)|*.db"
             };
             if (dialog.ShowDialog() == true)
+            {
+                if (File.Exists(dialog.FileName))
+                {
+                    if (MessageBox.Show($"This will delete '{dialog.FileName}' and create a new database in its place. Are you sure you want to continue?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
+                        return;
+                    FileSystem.DeleteFile(dialog.FileName, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
+                }
                 using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportButton_Click), "Exporting..."))
                 using (var source = ShowContext.Open(connection))
                 {
@@ -262,6 +269,7 @@ namespace CarmenUI.Pages
                     });
                     segment.Dispose();
                 }
+            }
         }
 
         private void SettingsButton_Click(object sender, RoutedEventArgs e)
