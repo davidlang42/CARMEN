@@ -301,7 +301,7 @@ namespace CarmenUI.Pages
                 filterText.Focus();
                 e.Handled = true;
             }
-            else if (e.Key == Key.Escape && applicantsList.SelectedItem != null)
+            else if (e.Key == Key.Escape && applicantsList.SelectedItem != null && Keyboard.Modifiers == ModifierKeys.None)
             {
                 filterText.Focus();
                 applicantsList.SelectedItem = null;

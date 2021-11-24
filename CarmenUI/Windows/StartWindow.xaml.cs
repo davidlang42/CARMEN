@@ -176,12 +176,12 @@ namespace CarmenUI.Windows
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
         {
-            if(Properties.Settings.Default.OpenSettingsOnF1 && e.Key == Key.F1)
+            if(Properties.Settings.Default.OpenSettingsOnF1 && e.Key == Key.F1 && Keyboard.Modifiers == ModifierKeys.None)
             {
                 SettingsButton_Click(sender, e);
                 e.Handled = true;
             }
-            else if (Properties.Settings.Default.ShortcutsOnStartWindow)
+            else if (Properties.Settings.Default.ShortcutsOnStartWindow && Keyboard.Modifiers == ModifierKeys.None)
             {
                 if (e.Key == Key.N)
                     NewButton_Click(sender, e);

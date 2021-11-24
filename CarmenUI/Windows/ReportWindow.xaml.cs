@@ -264,7 +264,7 @@ namespace CarmenUI.Windows
 
         private async void WindowRoot_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
         {
-            if (Properties.Settings.Default.RefreshOnF5 && e.Key == Key.F5)
+            if (Properties.Settings.Default.RefreshOnF5 && e.Key == Key.F5 && Keyboard.Modifiers == ModifierKeys.None)
             {
                 await RefreshData();
                 e.Handled = true;
