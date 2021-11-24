@@ -37,6 +37,7 @@ namespace CarmenUI.Pages
             this.connection = connection;
             ShowSummary = new(connection.DefaultShowName);
             InitializeComponent();
+            DatabaseButton.Visibility = connection.Provider.HasValue ? Visibility.Visible : Visibility.Hidden;
         }
 
         public void Dispose()
