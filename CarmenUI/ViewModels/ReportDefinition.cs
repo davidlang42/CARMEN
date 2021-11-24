@@ -9,9 +9,16 @@ namespace CarmenUI.ViewModels
 {
     public class ReportDefinition
     {
+        public struct ColumnDefinition
+        {
+            public string Name;
+            public bool Show;
+            public int Order;
+        }
+
         public string SavedName { get; set; }
         public string ReportType { get; set; }
-        public Column[] Columns { get; set; }
+        public ColumnDefinition[] Columns { get; set; }
         public SortColumn[] SortColumns { get; set; }
         public int? GroupColumnIndex { get; set; }
 
@@ -20,7 +27,7 @@ namespace CarmenUI.ViewModels
         {
             SavedName = "";
             ReportType = "";
-            Columns = Array.Empty<Column>();
+            Columns = Array.Empty<ColumnDefinition>();
             SortColumns = Array.Empty<SortColumn>();
         }
 
@@ -29,7 +36,12 @@ namespace CarmenUI.ViewModels
             {
                 SavedName = saved_name,
                 ReportType = report.ReportType,
-                Columns = report.Columns,
+                Columns = report.Columns.Select(c => new ColumnDefinition
+                {
+                    Name = c.Name,
+                    Show = c.Show,
+                    Order = c.Order
+                }).ToArray(),
                 SortColumns = report.SortColumns.ToArray(),
                 GroupColumnIndex = report.GroupColumn == null ? null : report.IndexOf(report.GroupColumn)
             };

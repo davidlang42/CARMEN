@@ -8,12 +8,13 @@ using System.Threading.Tasks;
 
 namespace Carmen.ShowModel.Reporting
 {
-    public class Column : IOrdered, INotifyPropertyChanged
+    public class Column<T> : IOrdered, INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public string Name { get; init;  } = "";
-        public string? Format { get; init; }
+        public string Name { get; }
+        public string? Format { get; }
+        public Func<T, object?> ValueGetter { get; }
 
         private bool show = true;
         public bool Show
@@ -41,25 +42,16 @@ namespace Carmen.ShowModel.Reporting
             }
         }
 
-        /// <summary>Parameterless constructor required for serialization</summary>
-        public Column()
-        { }
-
-        protected void OnPropertyChanged([CallerMemberName] string? name = null)
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-    }
-
-    public class Column<T> : Column
-    {
-        public Func<T, object?> ValueGetter { get; }
-
         public Column(string name, Func<T, object?> getter, string? format = null)
         {
             Name = name;
             ValueGetter = getter;
             Format = format;
+        }
+
+        protected void OnPropertyChanged([CallerMemberName] string? name = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
     }
 }
