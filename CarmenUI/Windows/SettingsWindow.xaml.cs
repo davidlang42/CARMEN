@@ -100,6 +100,7 @@ namespace CarmenUI.Windows
             Settings.Default.Save();
             Widths.Default.Save();
             Timings.Default.Save();
+            Imports.Default.Save();
         }
 
         private void Reload()
@@ -107,6 +108,7 @@ namespace CarmenUI.Windows
             Settings.Default.Reload();
             Widths.Default.Reload();
             Timings.Default.Reload();
+            Imports.Default.Reload();
         }
 
         private void ResetAndSave()
@@ -119,6 +121,8 @@ namespace CarmenUI.Windows
             Widths.Default.ClearAllocateRolesGrid();
             Timings.Default.Reset();
             Timings.Default.ClearTimings();
+            Imports.Default.Reset();
+            Imports.Default.ClearImportSettings();
         }
 
         private void FullNameFormatCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

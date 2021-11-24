@@ -26,6 +26,7 @@ namespace CarmenUI
             Settings.Default.Save();
             Timings.Default.Save();
             Widths.Default.Save();
+            Imports.Default.Save();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)

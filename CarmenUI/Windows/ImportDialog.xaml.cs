@@ -27,6 +27,7 @@ namespace CarmenUI.Windows
         {
             ImportColumns = importer.ImportColumns;
             InputColumns = importer.InputColumns;
+            LoadImportSettings();
             InitializeComponent();
         }
 
@@ -51,10 +52,31 @@ namespace CarmenUI.Windows
                 if (MessageBox.Show("No fields are selected to match existing applicants. This means every row will be added as a NEW applicant and may cause duplicates.\nDo you want to continue?", Window.Title, MessageBoxButton.YesNo) == MessageBoxResult.No)
                     return;
             }
+            SaveImportSettings();
             DialogResult = true;
         }
 
         private void ClearInputCommand_Executed(object sender, ExecutedRoutedEventArgs e)
             => ((ImportColumn)e.Parameter).SelectedInput = null;
+
+        private void LoadImportSettings()
+        {
+            foreach (var input in InputColumns)
+                if (Properties.Imports.Default.ColumnMappings.TryGetValue(input.Header, out var import_name)
+                    && ImportColumns.FirstOrDefault(c => c.Name.Equals(import_name, StringComparison.OrdinalIgnoreCase)) is ImportColumn import)
+                    import.SelectedInput = input;
+            foreach (var import in ImportColumns)
+                if (Properties.Imports.Default.MatchingColumns.TryGetValue(import.Name, out var match_existing))
+                    import.MatchExisting = match_existing;
+        }
+
+        private void SaveImportSettings()
+        {
+            foreach (var import in ImportColumns.Where(c => c.SelectedInput != null))
+            {
+                Properties.Imports.Default.ColumnMappings[import.SelectedInput!.Header] = import.Name;
+                Properties.Imports.Default.MatchingColumns[import.Name] = import.MatchExisting;
+            }
+        }
     }
 }
