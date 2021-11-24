@@ -212,7 +212,8 @@ namespace CarmenUI.Pages
 
         private void OpenReportCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            ReportsPopup.IsOpen = false;
+            if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
+                ReportsPopup.IsOpen = false;
             OpenReport(e.Parameter as ReportDefinition);
         }
 
