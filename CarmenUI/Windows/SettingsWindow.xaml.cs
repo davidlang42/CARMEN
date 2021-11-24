@@ -6,6 +6,7 @@ using CarmenUI.Properties;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Configuration;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
@@ -55,10 +56,22 @@ namespace CarmenUI.Windows
         public string[] SelectionEngines => SelectionEngine.Implementations.Select(t => t.Name).ToArray();
         public string[] AllocationEngines => AllocationEngine.Implementations.Select(t => t.Name).ToArray();
 
+        public string SettingsPath => ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+
         public SettingsWindow()
         {
             Save(); // save on load so that if we cancel, we reload the settings as they were when we opened
             InitializeComponent();
+        }
+
+        private void OpenSettingsPath_Click(object sender, RoutedEventArgs e)
+        {
+            Process.Start("explorer.exe", @$"/select,""{SettingsPath}""");
+        }
+
+        private void ReloadSettings_Click(object sender, RoutedEventArgs e)
+        {
+            Reload();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
