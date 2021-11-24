@@ -151,7 +151,7 @@ namespace CarmenUI.Windows
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
-            var default_file_name = reportDefinition?.SavedName ?? defaultTitle + ".csv";
+            var default_file_name = (reportDefinition?.SavedName ?? Report.FullDescription).Replace(".","") + ".csv";
             default_file_name = string.Concat(default_file_name.Split(Path.GetInvalidFileNameChars()));
             var file = new SaveFileDialog
             {
@@ -234,7 +234,7 @@ namespace CarmenUI.Windows
 
         private void AddBookmark()
         {
-            var name = Microsoft.VisualBasic.Interaction.InputBox("What should this saved report be called?", Title, Title); // I'm sorry
+            var name = Microsoft.VisualBasic.Interaction.InputBox("What should this saved report be called?", Title, Report.FullDescription); // I'm sorry
             if (!string.IsNullOrWhiteSpace(name))
             {
                 reportDefinition = ReportDefinition.FromReport(Report, name);
