@@ -59,6 +59,7 @@ namespace CarmenUI.Windows
                 using (loading.Segment(nameof(AddGridColumns), "Report"))
                 {
                     report = new(criterias, tags);
+                    report.PropertyChanged += Report_PropertyChanged;
                     AddGridColumns(MainData, Report.Columns);
                     MainData.DataContext = report;
                     columnsCombo.Items.IsLiveSorting = true;
@@ -66,6 +67,15 @@ namespace CarmenUI.Windows
                     columnsCombo.SelectedIndex = 0;
                     ConfigureGrouping();
                 }   
+            }
+        }
+
+        private void Report_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != nameof(Report<Applicant>.Rows))
+            {
+                reportDefinition = null;
+                UpdateBookmarkIconAndReportTitle();
             }
         }
 

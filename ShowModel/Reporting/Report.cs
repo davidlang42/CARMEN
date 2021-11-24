@@ -202,6 +202,7 @@ namespace Carmen.ShowModel.Reporting
 
         private void Column_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            OnPropertyChanged(nameof(Columns));
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Column<T>.Show) || e.PropertyName == nameof(Column<T>.Order))
                 OnPropertyChanged(nameof(ColumnsDescription));
         }
