@@ -10,6 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Navigation;
 using Microsoft.Win32;
+using System.IO;
+using Microsoft.VisualBasic.FileIO;
 
 namespace CarmenUI.Pages
 {
@@ -236,11 +238,16 @@ namespace CarmenUI.Pages
             report.Show();
         }
 
+        private void ImportButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO
+        }
+
         private async void ExportButton_Click(object sender, RoutedEventArgs e)
         {
             var dialog = new SaveFileDialog
             {
-                Title = "Export Database",
+                Title = "Export database",
                 Filter = "Sqlite Database (*.db)|*.db"
             };
             if (dialog.ShowDialog() == true)

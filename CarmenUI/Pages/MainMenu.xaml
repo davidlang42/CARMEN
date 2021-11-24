@@ -108,14 +108,29 @@
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <Button Name="ExportButton" Background="White" BorderThickness="0" Click="ExportButton_Click" HorizontalAlignment="Right">
-                <StackPanel Orientation="Horizontal">
-                    <fa:ImageAwesome Icon="Download" Width="25" Margin="5" Foreground="MediumBlue" VerticalAlignment="Center"/>
-                    <TextBlock Text=" Export database" FontSize="18" VerticalAlignment="Center" Margin="0 0 10 0"/>
-                </StackPanel>
-            </Button>
+            <ToggleButton Name="DatabaseButton" Background="White" BorderThickness="0" HorizontalAlignment="Right">
+                <fa:ImageAwesome Icon="Database" Width="22" Margin="10 5" Foreground="Black" VerticalAlignment="Center"/>
+            </ToggleButton>
             <TextBlock Grid.Column="1" x:Name="CastingComplete" Visibility="Hidden" Margin="20 0 20 20" Text="IT'S SHOWTIME" HorizontalAlignment="Right" FontStyle="Italic" FontSize="20"/>
         </Grid>
+        <Popup Name="DatabasePopup" PlacementTarget="{Binding ElementName=DatabaseButton}" IsOpen="{Binding ElementName=DatabaseButton, Path=IsChecked}" Placement="Top" StaysOpen="False">
+            <Border Background="White" BorderBrush="Black" BorderThickness="1">
+                <StackPanel>
+                    <Button Background="White" BorderThickness="0" HorizontalAlignment="Stretch" Click="ImportButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="CloudUpload" Height="14" Margin="2" VerticalAlignment="Center"/>
+                            <TextBlock Text="Import database" FontSize="14" Margin="2" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Background="White" BorderThickness="0" HorizontalAlignment="Stretch" Click="ExportButton_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Download" Height="14" Margin="2" VerticalAlignment="Center"/>
+                            <TextBlock Text="Export database" FontSize="14" Margin="2" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Popup>
         <ToggleButton Name="ReportsButton" Grid.Row="3" Grid.Column="1" Background="White" BorderThickness="0" HorizontalAlignment="Right" Click="ReportsButton_Click">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Reports " FontSize="18" VerticalAlignment="Center" Margin="10 0 0 0"/>
