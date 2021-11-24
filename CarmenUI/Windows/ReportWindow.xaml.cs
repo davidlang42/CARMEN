@@ -9,6 +9,7 @@ using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
@@ -150,17 +151,20 @@ namespace CarmenUI.Windows
 
         private void ExportButton_Click(object sender, RoutedEventArgs e)
         {
+            var default_file_name = reportDefinition?.SavedName ?? defaultTitle + ".csv";
+            default_file_name = string.Concat(default_file_name.Split(Path.GetInvalidFileNameChars()));
             var file = new SaveFileDialog
             {
                 Title = "Export Applicants to CSV ",
-                Filter = "Comma separated values (*.csv)|*.csv|All Files (*.*)|*.*"
+                Filter = "Comma separated values (*.csv)|*.csv|All Files (*.*)|*.*",
+                FileName = default_file_name
             };
             if (file.ShowDialog() == true)
             {
                 int count;
                 using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportButton_Click), "Exporting..."))
                     count = Report.Export(file.FileName);
-                MessageBox.Show($"Exported {count.Plural("applicant")} to {file.FileName}", Title);
+                MessageBox.Show($"Exported {count.Plural("row")} to {file.FileName}", Title);
             }
         }
 
@@ -196,7 +200,7 @@ namespace CarmenUI.Windows
 
         private void ClearSorting_Click(object sender, RoutedEventArgs e)
         {
-            Report.SortColumns.Clear();//TODO fix, doesnt actually remove sorting
+            Report.SortColumns.Clear(); //TODO fix, doesnt actually remove sorting
         }
 
         private async void ReportTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
