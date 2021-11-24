@@ -36,6 +36,7 @@ namespace CarmenUI
                 settings.FirstRun = false;
                 settings.SetDefaultWindowPosition();
                 settings.ClearRecentShowsList();
+                settings.ClearReportDefinitionsList();
             }
         }
 

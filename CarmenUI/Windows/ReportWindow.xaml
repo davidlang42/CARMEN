@@ -11,58 +11,67 @@
         Loaded="ReportWindow_Loaded"
         Name="WindowRoot"
         Title="Report" Height="450" Width="800">
+    <Window.Resources>
+        <cv:HideIfNull x:Key="hideIfNull"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
-        <WrapPanel VerticalAlignment="Center">
-            <Button Margin="5" VerticalAlignment="Center" Click="RefreshButton_Click">
+        <WrapPanel Orientation="Horizontal">
+            <Button Margin="5" VerticalAlignment="Center" Click="RefreshButton_Click" Height="23">
                 <TextBlock Margin="5 0" Text="Refresh"/>
             </Button>
-            <ComboBox Name="ReportTypeCombo" Margin="5" VerticalAlignment="Center" SelectionChanged="ReportTypeCombo_SelectionChanged">
-                <ComboBox.Items>
-                    <ComboBoxItem IsSelected="True" Content="All Applicants"/>
-                    <ComboBoxItem Content="Accepted Applicants"/>
-                    <ComboBoxItem Content="Rejected Applicants"/>
-                </ComboBox.Items>
-            </ComboBox>
-            <TextBlock VerticalAlignment="Center" Text="with" FontStyle="Italic"/>
-            <ComboBox Margin="5" x:Name="columnsCombo" ItemsSource="{Binding ElementName=MainData, Path=DataContext.Columns}" VerticalAlignment="Center">
-                <ComboBox.ItemTemplateSelector>
-                    <cv:ComboBoxFaceTemplateSelector>
-                        <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
-                            <DataTemplate>
-                                <TextBlock Text="{Binding ElementName=MainData, Path=DataContext.ColumnsDescription}"/>
-                            </DataTemplate>
-                        </cv:ComboBoxFaceTemplateSelector.FaceTemplate>
-                        <cv:ComboBoxFaceTemplateSelector.ItemTemplate>
-                            <DataTemplate>
-                                <CheckBox IsChecked="{Binding Show}"
+            <Button Margin="5" VerticalAlignment="Center" Click="ExportButton_Click" Height="23">
+                <TextBlock Margin="5 0" Text="Export"/>
+            </Button>
+            <Button Margin="5" VerticalAlignment="Center" Click="SaveButton_Click" Height="23">
+                <TextBlock Margin="5 0" Text="Add to saved reports"/>
+            </Button>
+            <WrapPanel VerticalAlignment="Center">
+                <ComboBox Name="ReportTypeCombo" Margin="5" VerticalAlignment="Center" SelectionChanged="ReportTypeCombo_SelectionChanged">
+                    <ComboBox.Items>
+                        <ComboBoxItem IsSelected="True" Content="All Applicants"/>
+                        <ComboBoxItem Content="Accepted Applicants"/>
+                        <ComboBoxItem Content="Rejected Applicants"/>
+                    </ComboBox.Items>
+                </ComboBox>
+                <TextBlock VerticalAlignment="Center" Text="with" FontStyle="Italic"/>
+                <ComboBox Margin="5" x:Name="columnsCombo" ItemsSource="{Binding ElementName=MainData, Path=DataContext.Columns}" VerticalAlignment="Center">
+                    <ComboBox.ItemTemplateSelector>
+                        <cv:ComboBoxFaceTemplateSelector>
+                            <cv:ComboBoxFaceTemplateSelector.FaceTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding ElementName=MainData, Path=DataContext.ColumnsDescription}"/>
+                                </DataTemplate>
+                            </cv:ComboBoxFaceTemplateSelector.FaceTemplate>
+                            <cv:ComboBoxFaceTemplateSelector.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding Show}"
                                     Content="{Binding Name}"/>
-                            </DataTemplate>
-                        </cv:ComboBoxFaceTemplateSelector.ItemTemplate>
-                    </cv:ComboBoxFaceTemplateSelector>
-                </ComboBox.ItemTemplateSelector>
-            </ComboBox>
-            <TextBlock VerticalAlignment="Center" Text="grouped by" FontStyle="Italic"/>
-            <ComboBox Margin="5" VerticalAlignment="Center" DisplayMemberPath="Name"
+                                </DataTemplate>
+                            </cv:ComboBoxFaceTemplateSelector.ItemTemplate>
+                        </cv:ComboBoxFaceTemplateSelector>
+                    </ComboBox.ItemTemplateSelector>
+                </ComboBox>
+                <TextBlock VerticalAlignment="Center" Text="grouped by" FontStyle="Italic"/>
+                <ComboBox Margin="5" VerticalAlignment="Center" DisplayMemberPath="Name"
                       ItemsSource="{Binding ElementName=MainData, Path=DataContext.Columns}"
                       SelectedItem="{Binding ElementName=MainData, Path=DataContext.GroupColumn}"
                       SelectionChanged="GroupColumn_SelectionChanged" MinWidth="100">
-                <ComboBox.ContextMenu>
-                    <ContextMenu>
-                        <MenuItem Header="Clear Grouping" Click="ClearGrouping_Click"/>
-                    </ContextMenu>
-                </ComboBox.ContextMenu>
-            </ComboBox>
-            <TextBlock VerticalAlignment="Center" Text="sorted by" FontStyle="Italic"/>
-            <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding ElementName=MainData, Path=DataContext.SortDescription}"/>
-            <Button Margin="5" VerticalAlignment="Center" Click="ExportButton_Click">
-                <TextBlock Margin="5 0" Text="Export"/>
-            </Button>
+                    <ComboBox.ContextMenu>
+                        <ContextMenu>
+                            <MenuItem Header="Clear Grouping" Click="ClearGrouping_Click"/>
+                        </ContextMenu>
+                    </ComboBox.ContextMenu>
+                </ComboBox>
+                <TextBlock VerticalAlignment="Center" Text="sorted by" FontStyle="Italic"
+                           Visibility="{Binding ElementName=MainData, Path=DataContext.SortDescription, Converter={StaticResource hideIfNull}}"/>
+                <TextBlock Margin="5" VerticalAlignment="Center" Text="{Binding ElementName=MainData, Path=DataContext.SortDescription}"/>
+            </WrapPanel>
         </WrapPanel>
-        <DataGrid Grid.Row="1" x:Name="MainData" AutoGenerateColumns="False" ItemsSource="{Binding Rows}"
+        <DataGrid Grid.Row="2" x:Name="MainData" AutoGenerateColumns="False" ItemsSource="{Binding Rows}"
                   ColumnDisplayIndexChanged="MainData_ColumnDisplayIndexChanged" Sorting="MainData_Sorting">
             <DataGrid.GroupStyle>
                 <GroupStyle>

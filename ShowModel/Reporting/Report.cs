@@ -19,8 +19,7 @@ namespace Carmen.ShowModel.Reporting
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        string reportName;
-
+        public string ReportType { get; }
         public Column<T>[] Columns { get; }
         public ObservableCollection<SortColumn> SortColumns { get; } = new();
 
@@ -77,11 +76,13 @@ namespace Carmen.ShowModel.Reporting
             }
         }
 
-        public string SortDescription
+        public string? SortDescription
         {
             get
             {
-                if (SortColumns.Count > MAX_DESCRIPTIONS)
+                if (SortColumns.Count == 0)
+                    return null;
+                else if (SortColumns.Count > MAX_DESCRIPTIONS)
                     return string.Join(", ", SortColumns.Select(c => Columns[c.ColumnIndex].Name));
                 else
                     return string.Join(", ", SortColumns.Select(c => $"{Columns[c.ColumnIndex].Name} {c.SortDirection.ToString().ToLower()}"));
@@ -92,7 +93,7 @@ namespace Carmen.ShowModel.Reporting
         {
             get
             {
-                var description = $"{reportName} with {ColumnsDescription}";
+                var description = $"{ReportType} with {ColumnsDescription}";
                 if (GroupColumn != null)
                     description += $" grouped by {GroupColumn.Name}";
                 if (SortColumns.Any())
@@ -101,9 +102,9 @@ namespace Carmen.ShowModel.Reporting
             }
         }
 
-        public Report(string report_name, Column<T>[] columns)
+        public Report(string report_type, Column<T>[] columns)
         {
-            reportName = report_name;
+            ReportType = report_type;
             Columns = columns;
             foreach (var column in columns)
                 column.PropertyChanged += Column_PropertyChanged;

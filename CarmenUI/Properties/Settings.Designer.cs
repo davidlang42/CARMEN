@@ -357,5 +357,16 @@ namespace CarmenUI.Properties {
                 this["ConnectionSslMode"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Generic.List<CarmenUI.ViewModels.ReportDefinition> ReportDefinitions {
+            get {
+                return ((global::System.Collections.Generic.List<CarmenUI.ViewModels.ReportDefinition>)(this["ReportDefinitions"]));
+            }
+            set {
+                this["ReportDefinitions"] = value;
+            }
+        }
     }
 }

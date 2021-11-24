@@ -101,6 +101,7 @@ namespace CarmenUI.Windows
             Settings.Default.Reset();
             Settings.Default.SetDefaultWindowPosition();
             Settings.Default.ClearRecentShowsList();
+            Settings.Default.ClearReportDefinitionsList();
             Widths.Default.Reset();
             Widths.Default.ClearAllocateRolesGrid();
             Timings.Default.Reset();
@@ -126,6 +127,11 @@ namespace CarmenUI.Windows
         private void ClearRecentShowsButton_Click(object sender, RoutedEventArgs e)
         {
             Settings.Default.ClearRecentShowsList();
+        }
+
+        private void ClearReportDefinitionsButton_Click(object sender, RoutedEventArgs e)//TODO
+        {
+            Settings.Default.ClearReportDefinitionsList();
         }
 
         private void ClearLoadingTimesButton_Click(object sender, RoutedEventArgs e)

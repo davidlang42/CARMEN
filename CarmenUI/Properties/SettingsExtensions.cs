@@ -23,5 +23,10 @@ namespace CarmenUI.Properties
         {
             settings.RecentShows = new List<RecentShow>();
         }
+
+        public static void ClearReportDefinitionsList(this Settings settings)
+        {
+            settings.ReportDefinitions = new List<ReportDefinition>();
+        }
     }
 }

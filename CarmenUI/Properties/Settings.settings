@@ -86,5 +86,8 @@
     <Setting Name="ConnectionSslMode" Type="MySqlConnector.MySqlSslMode" Scope="User">
       <Value Profile="(Default)">VerifyFull</Value>
     </Setting>
+    <Setting Name="ReportDefinitions" Type="System.Collections.Generic.List&lt;CarmenUI.ViewModels.ReportDefinition&gt;" Scope="User">
+      <Value Profile="(Default)" />
+    </Setting>
   </Settings>
 </SettingsFile>

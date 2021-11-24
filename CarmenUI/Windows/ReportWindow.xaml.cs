@@ -3,6 +3,7 @@ using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Reporting;
 using CarmenUI.Converters;
+using CarmenUI.ViewModels;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -191,6 +192,13 @@ namespace CarmenUI.Windows
         {
             if (report != null) // might still be loading
                 await RefreshData();
+        }
+
+        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            var name = Microsoft.VisualBasic.Interaction.InputBox("What should this saved report be called?", Title, Title); // I'm sorry
+            if (!string.IsNullOrWhiteSpace(name))
+                Properties.Settings.Default.ReportDefinitions.Add(ReportDefinition.FromReport(Report, name));
         }
     }
 }
