@@ -21,7 +21,11 @@
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
         <cv:BytesToImage x:Key="bytesToImage"/>
+        <RoutedUICommand x:Key="openReportCommand"/>
     </Page.Resources>
+    <Page.CommandBindings>
+        <CommandBinding Command="{StaticResource openReportCommand}" Executed="OpenReportCommand_Executed"/>
+    </Page.CommandBindings>
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="400"/>
@@ -129,13 +133,16 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Background="White" BorderThickness="0">
+                                <Button Background="White" BorderThickness="0"
+                                        Command="{Binding Source={StaticResource openReportCommand}}"
+                                        CommandParameter="{Binding}">
                                     <TextBlock Margin="2" Text="{Binding SavedName}" FontSize="14"/>
                                 </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-                    <Button Background="White" BorderThickness="0" HorizontalAlignment="Stretch">
+                    <Button Background="White" BorderThickness="0" HorizontalAlignment="Stretch"
+                            Command="{Binding Source={StaticResource openReportCommand}}">
                         <StackPanel Orientation="Horizontal">
                             <fa:ImageAwesome Icon="PlusSquareOutline" Height="14" Margin="2" VerticalAlignment="Center"/>
                             <TextBlock Text="New report" FontSize="14" Margin="2" VerticalAlignment="Center"/>

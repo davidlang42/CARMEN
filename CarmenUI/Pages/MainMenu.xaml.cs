@@ -210,10 +210,16 @@ namespace CarmenUI.Pages
             this.Close();
         }
 
-        private int reportCount = 1;
-        private void ReportsButton_Click(object sender, RoutedEventArgs e)//TODO
+        private void OpenReportCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            var report = new ReportWindow(connection, $"Report #{reportCount++}")
+            ReportsPopup.IsOpen = false;
+            OpenReport(e.Parameter as ReportDefinition);
+        }
+
+        private int reportCount = 1;
+        private void OpenReport(ReportDefinition? definition)
+        {
+            var report = new ReportWindow(connection, $"Report #{reportCount++}", definition)
             {
                 Owner = Window.GetWindow(this)
             };
