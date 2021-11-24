@@ -7,6 +7,7 @@
       xmlns:fa="http://schemas.fontawesome.io/icons/"
       xmlns:cv="clr-namespace:CarmenUI.Converters"
       xmlns:vm="clr-namespace:CarmenUI.ViewModels"
+      xmlns:bd="clr-namespace:CarmenUI.Bindings"
       mc:Ignorable="d" 
       d:DesignHeight="768" d:DesignWidth="1024"
       Title="Main Menu"
@@ -111,12 +112,38 @@
             </Button>
             <TextBlock Grid.Column="1" x:Name="CastingComplete" Visibility="Hidden" Margin="20 0 20 20" Text="IT'S SHOWTIME" HorizontalAlignment="Right" FontStyle="Italic" FontSize="20"/>
         </Grid>
-        <Button Grid.Row="3" Grid.Column="1" Background="White" BorderThickness="0" Click="ReportsButton_Click" HorizontalAlignment="Right">
+        <ToggleButton Name="ReportsButton" Grid.Row="3" Grid.Column="1" Background="White" BorderThickness="0" HorizontalAlignment="Right">
             <StackPanel Orientation="Horizontal">
                 <TextBlock Text="Reports " FontSize="18" VerticalAlignment="Center" Margin="10 0 0 0"/>
                 <fa:ImageAwesome Icon="Table" Width="30" Margin="5" Foreground="MediumBlue" VerticalAlignment="Center"/>
             </StackPanel>
-        </Button>
+        </ToggleButton>
+        <Popup Name="ReportsPopup" PlacementTarget="{Binding ElementName=ReportsButton}" IsOpen="{Binding ElementName=ReportsButton, Path=IsChecked}" Placement="Top" StaysOpen="False">
+            <Border Background="White" BorderBrush="Black" BorderThickness="0.5">
+                <StackPanel>
+                    <ItemsControl ItemsSource="{bd:SettingBinding ReportDefinitions}" KeyboardNavigation.IsTabStop="False">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Background="White" BorderThickness="0">
+                                    <TextBlock Margin="2" Text="{Binding SavedName}" FontSize="14"/>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                    <Button Background="White" BorderThickness="0" HorizontalAlignment="Stretch">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="PlusSquareOutline" Height="14" Margin="2" VerticalAlignment="Center"/>
+                            <TextBlock Text="New report" FontSize="14" Margin="2" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Popup>
         <ScrollViewer Grid.Row="1" Grid.Column="1" Grid.RowSpan="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Margin="20 20 20 0" KeyboardNavigation.IsTabStop="False">
             <ContentControl x:Name="SummaryPanel" VerticalAlignment="Bottom" KeyboardNavigation.IsTabStop="False">
                 <ContentControl.Resources>

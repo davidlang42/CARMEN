@@ -211,7 +211,7 @@ namespace CarmenUI.Pages
         }
 
         private int reportCount = 1;
-        private void ReportsButton_Click(object sender, RoutedEventArgs e)
+        private void ReportsButton_Click(object sender, RoutedEventArgs e)//TODO
         {
             var report = new ReportWindow(connection, $"Report #{reportCount++}")
             {
