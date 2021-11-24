@@ -123,7 +123,7 @@
             </StackPanel>
         </ToggleButton>
         <Popup Name="ReportsPopup" PlacementTarget="{Binding ElementName=ReportsButton}" IsOpen="{Binding ElementName=ReportsButton, Path=IsChecked}" Placement="Top" StaysOpen="False">
-            <Border Background="White" BorderBrush="Black" BorderThickness="0.5">
+            <Border Background="White" BorderBrush="Black" BorderThickness="1">
                 <StackPanel>
                     <ItemsControl ItemsSource="{bd:SettingBinding ReportDefinitions}" KeyboardNavigation.IsTabStop="False">
                         <ItemsControl.ItemsPanel>
