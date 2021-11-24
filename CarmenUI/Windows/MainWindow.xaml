@@ -17,6 +17,7 @@
         Width="{bd:SettingBinding Width}"
         WindowState="{bd:SettingBinding WindowState}"
         MinHeight="600" MinWidth="800"
+        KeyDown="Window_KeyDown"
         Title="CARMEN" Icon="/Icons/CarmenC.ico">
     <Window.Resources>
         <cv:FullName x:Key="fullName"/>

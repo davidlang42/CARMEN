@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace CarmenUI.Windows
 {
@@ -258,6 +259,20 @@ namespace CarmenUI.Windows
             {
                 Properties.Settings.Default.ReportDefinitions.Remove(reportDefinition);
                 reportDefinition = null;
+            }
+        }
+
+        private async void WindowRoot_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (Properties.Settings.Default.RefreshOnF5 && e.Key == Key.F5)
+            {
+                await RefreshData();
+                e.Handled = true;
+            }
+            else if (Properties.Settings.Default.ReportOnCtrlR && e.Key == Key.R && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                ((MainWindow)Owner).OpenReport(null);
+                e.Handled = true;
             }
         }
     }

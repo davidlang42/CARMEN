@@ -11,6 +11,7 @@
         WindowStartupLocation="CenterOwner"
         Loaded="ReportWindow_Loaded"
         Name="WindowRoot"
+        KeyDown="WindowRoot_KeyDown"
         Title="Report" Height="450" Width="800" MinWidth="220" MinHeight="253">
     <Window.Resources>
         <cv:HideIfNull x:Key="hideIfNull"/>

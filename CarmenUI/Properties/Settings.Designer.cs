@@ -368,5 +368,29 @@ namespace CarmenUI.Properties {
                 this["ReportDefinitions"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool RefreshOnF5 {
+            get {
+                return ((bool)(this["RefreshOnF5"]));
+            }
+            set {
+                this["RefreshOnF5"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool ReportOnCtrlR {
+            get {
+                return ((bool)(this["ReportOnCtrlR"]));
+            }
+            set {
+                this["ReportOnCtrlR"] = value;
+            }
+        }
     }
 }

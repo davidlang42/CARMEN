@@ -54,5 +54,26 @@ namespace CarmenUI.Windows
         {
             (sender as TextBox)?.SelectAll();
         }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.R && Properties.Settings.Default.ReportOnCtrlR)
+            {
+                OpenReport(null);
+                e.Handled = true;
+            }
+        }
+
+        private uint reportCount = 1;
+        public void OpenReport(ReportDefinition? definition)
+        {
+            if (reportCount == uint.MaxValue)
+                reportCount = 1;
+            var report = new ReportWindow(connection, $"Report #{reportCount++}", definition)
+            {
+                Owner = this
+            };
+            report.Show();
+        }
     }
 }

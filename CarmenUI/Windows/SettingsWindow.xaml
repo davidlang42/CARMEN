@@ -138,6 +138,10 @@
                                   IsChecked="{bd:SettingBinding OpenSettingsOnF1}"/>
                         <CheckBox Content="Press Ctrl+Up/Down to move items within a list (while configuring show settings or items)" Margin="0 5"
                                   IsChecked="{bd:SettingBinding MoveOnCtrlArrow}"/>
+                        <CheckBox Content="Press F5 to refresh the data in a report window" Margin="0 5"
+                                  IsChecked="{bd:SettingBinding RefreshOnF5}"/>
+                        <CheckBox Content="Press Ctrl+R to open a new report window (from any screen)" Margin="0 5"
+                                  IsChecked="{bd:SettingBinding ReportOnCtrlR}"/>
                     </StackPanel>
                 </Expander>
                 <Expander IsExpanded="False" Margin="0 5">
