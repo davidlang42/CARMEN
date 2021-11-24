@@ -213,10 +213,9 @@ namespace CarmenUI.Pages
         private int reportCount = 1;
         private void ReportsButton_Click(object sender, RoutedEventArgs e)
         {
-            var report = new ReportWindow(connection)
+            var report = new ReportWindow(connection, $"Report #{reportCount++}")
             {
-                Owner = Window.GetWindow(this),
-                Title = $"Report #{reportCount++}"
+                Owner = Window.GetWindow(this)
             };
             report.Show();
         }

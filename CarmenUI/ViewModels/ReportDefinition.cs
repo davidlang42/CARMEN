@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace CarmenUI.ViewModels
 {
-    class ReportDefinition
+    public class ReportDefinition
     {
         public string SavedName { get; set; }
         public string ReportType { get; set; }

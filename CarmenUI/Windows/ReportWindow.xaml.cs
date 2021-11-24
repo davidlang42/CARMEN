@@ -4,6 +4,7 @@ using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Reporting;
 using CarmenUI.Converters;
 using CarmenUI.ViewModels;
+using FontAwesome.WPF;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -22,14 +23,19 @@ namespace CarmenUI.Windows
     public partial class ReportWindow : Window
     {
         ShowConnection connection;
+        ReportDefinition? reportDefinition;
+        string defaultTitle;
 
         private ApplicantReport? report;
         public ApplicantReport Report => report ?? throw new ApplicationException("Attempted to access report before initializing.");
 
-        public ReportWindow(ShowConnection connection)
+        public ReportWindow(ShowConnection connection, string default_title, ReportDefinition? report_definition = null)
         {
+            defaultTitle = default_title;
             this.connection = connection;
+            this.reportDefinition = report_definition;
             InitializeComponent(); //TODO fix binding errors
+            UpdateBookmarkIconAndReportTitle();
         }
 
         private async void ReportWindow_Loaded(object sender, RoutedEventArgs e)
@@ -188,17 +194,57 @@ namespace CarmenUI.Windows
             Report.GroupColumn = null;
         }
 
+        private void ClearSorting_Click(object sender, RoutedEventArgs e)
+        {
+            Report.SortColumns.Clear();//TODO fix, doesnt actually remove sorting
+        }
+
         private async void ReportTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (report != null) // might still be loading
                 await RefreshData();
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private void BookmarkButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (reportDefinition == null)
+                AddBookmark();
+            else
+                RemoveBookmark();
+            UpdateBookmarkIconAndReportTitle();
+        }
+
+        private void UpdateBookmarkIconAndReportTitle()
+        {
+            if (reportDefinition == null)
+            {
+                BookmarkIcon.Icon = FontAwesomeIcon.BookmarkOutline;
+                Title = defaultTitle;
+            }
+            else
+            {
+                BookmarkIcon.Icon = FontAwesomeIcon.Bookmark;
+                Title = "Report: " + reportDefinition.SavedName;
+            }
+        }
+
+        private void AddBookmark()
         {
             var name = Microsoft.VisualBasic.Interaction.InputBox("What should this saved report be called?", Title, Title); // I'm sorry
             if (!string.IsNullOrWhiteSpace(name))
-                Properties.Settings.Default.ReportDefinitions.Add(ReportDefinition.FromReport(Report, name));
+            {
+                reportDefinition = ReportDefinition.FromReport(Report, name);
+                Properties.Settings.Default.ReportDefinitions.Add(reportDefinition);
+            }
+        }
+
+        private void RemoveBookmark()
+        {
+            if (MessageBox.Show($"Are you sure you want to remove the '{reportDefinition?.SavedName}' saved report?", Title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            {
+                Properties.Settings.Default.ReportDefinitions.Remove(reportDefinition);
+                reportDefinition = null;
+            }
         }
     }
 }
