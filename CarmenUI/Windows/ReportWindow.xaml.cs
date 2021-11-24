@@ -28,8 +28,8 @@ namespace CarmenUI.Windows
         ReportDefinition? reportDefinition;
         string defaultTitle;
 
-        private ApplicantReport? report;
-        public ApplicantReport Report => report ?? throw new ApplicationException("Attempted to access report before initializing.");
+        private ApplicantsReport? report;
+        public ApplicantsReport Report => report ?? throw new ApplicationException("Attempted to access report before initializing.");
 
         public ReportWindow(ShowConnection connection, string default_title, ReportDefinition? report_definition = null)
         {
@@ -59,7 +59,17 @@ namespace CarmenUI.Windows
                     tags = await context.Tags.ToArrayAsync();
                 using (loading.Segment(nameof(AddGridColumns), "Report"))
                 {
-                    report = new(criterias, tags);
+                    if (reportDefinition != null && ReportTypeCombo.Items.OfType<ComboBoxItem>().FirstOrDefault(cbi => reportDefinition.ReportType.Equals(cbi.Content)) is ComboBoxItem item)
+                        item.IsSelected = true;
+                    report = (ReportTypeCombo.SelectedItem as ComboBoxItem)?.Content switch
+                    {
+                        "All Applicants" => new ApplicantsReport(criterias, tags),
+                        "Accepted Applicants" => new AcceptedApplicantsReport(criterias, tags),
+                        "Rejected Applicants" => new RejectedApplicantsReport(criterias, tags),
+                        _ => throw new ApplicationException($"Report type combo not handled: {ReportTypeCombo.SelectedItem}")
+                    };
+                    if (reportDefinition != null)
+                        reportDefinition.Apply(report);
                     report.PropertyChanged += Report_PropertyChanged;
                     AddGridColumns(MainData, Report.Columns);
                     MainData.DataContext = report;
@@ -118,13 +128,7 @@ namespace CarmenUI.Windows
             using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
             using (var context = ShowContext.Open(connection))
             {
-                var data = (ReportTypeCombo.SelectedItem as ComboBoxItem)?.Content switch
-                {
-                    "All Applicants" => await context.Applicants.ToArrayAsync(),
-                    "Accepted Applicants" => await context.Applicants.Where(a => a.CastGroup != null).ToArrayAsync(),
-                    "Rejected Applicants" => await context.Applicants.Where(a => a.CastGroup == null).ToArrayAsync(),
-                    _ => throw new ApplicationException($"Report type combo not handled: {ReportTypeCombo.SelectedItem}")
-                };
+                var data = await context.Applicants.ToArrayAsync();
                 Report.SetData(data);
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
@@ -217,7 +221,13 @@ namespace CarmenUI.Windows
         private async void ReportTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (report != null) // might still be loading
+            {
+                reportDefinition = null;
+                UpdateBookmarkIconAndReportTitle();
+                if (!report.ReportType.Equals((ReportTypeCombo.SelectedItem as ComboBoxItem)?.Content))
+                    await InitializeReport();
                 await RefreshData();
+            }
         }
 
         private void BookmarkButton_Click(object sender, RoutedEventArgs e)

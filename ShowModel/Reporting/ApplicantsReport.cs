@@ -8,10 +8,12 @@ using System.Threading.Tasks;
 
 namespace Carmen.ShowModel.Reporting
 {
-    public class ApplicantReport : Report<Applicant>
+    public class ApplicantsReport : Report<Applicant>
     {
-        public ApplicantReport(Criteria[] criterias, Tag[] tags)
-            : base("Applicants", AssignOrder(GenerateColumns(criterias, tags)))
+        public override string ReportType => "All Applicants";
+
+        public ApplicantsReport(Criteria[] criterias, Tag[] tags)
+            : base(AssignOrder(GenerateColumns(criterias, tags)))
         { }
 
         private static IEnumerable<Column<Applicant>> GenerateColumns(Criteria[] criterias, Tag[] tags)

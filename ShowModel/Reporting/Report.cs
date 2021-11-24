@@ -19,7 +19,7 @@ namespace Carmen.ShowModel.Reporting
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public string ReportType { get; }
+        public abstract string ReportType { get; }
         public Column<T>[] Columns { get; }
         public ObservableCollection<SortColumn> SortColumns { get; } = new();
 
@@ -102,9 +102,8 @@ namespace Carmen.ShowModel.Reporting
             }
         }
 
-        public Report(string report_type, Column<T>[] columns)
+        public Report(Column<T>[] columns)
         {
-            ReportType = report_type;
             Columns = columns;
             foreach (var column in columns)
                 column.PropertyChanged += Column_PropertyChanged;
@@ -121,7 +120,7 @@ namespace Carmen.ShowModel.Reporting
             throw new InvalidOperationException("Column not found.");
         }
 
-        public void SetData(IEnumerable<T> data)
+        public virtual void SetData(IEnumerable<T> data)
         {   
             Rows = data.Select(d => Columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();
         }
