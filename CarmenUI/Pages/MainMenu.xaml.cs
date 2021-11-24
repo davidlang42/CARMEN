@@ -269,6 +269,7 @@ namespace CarmenUI.Pages
                     });
                     segment.Dispose();
                 }
+                MessageBox.Show($"Exported database to: {dialog.FileName}");
             }
         }
 
