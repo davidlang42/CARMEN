@@ -360,9 +360,9 @@ namespace CarmenUI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        public global::System.Collections.Generic.List<CarmenUI.ViewModels.ReportDefinition> ReportDefinitions {
+        public global::System.Collections.ObjectModel.ObservableCollection<CarmenUI.ViewModels.ReportDefinition> ReportDefinitions {
             get {
-                return ((global::System.Collections.Generic.List<CarmenUI.ViewModels.ReportDefinition>)(this["ReportDefinitions"]));
+                return ((global::System.Collections.ObjectModel.ObservableCollection<CarmenUI.ViewModels.ReportDefinition>)(this["ReportDefinitions"]));
             }
             set {
                 this["ReportDefinitions"] = value;

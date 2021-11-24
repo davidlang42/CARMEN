@@ -1,6 +1,7 @@
 ﻿using CarmenUI.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -26,7 +27,7 @@ namespace CarmenUI.Properties
 
         public static void ClearReportDefinitionsList(this Settings settings)
         {
-            settings.ReportDefinitions = new List<ReportDefinition>();
+            settings.ReportDefinitions = new ObservableCollection<ReportDefinition>();
         }
     }
 }
