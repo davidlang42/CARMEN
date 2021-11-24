@@ -217,6 +217,15 @@ namespace CarmenUI.Pages
             OpenReport(e.Parameter as ReportDefinition);
         }
 
+        private void ReportsButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Properties.Settings.Default.ReportDefinitions.Count == 0)
+            {
+                ReportsPopup.IsOpen = false;
+                OpenReport(null);
+            }
+        }
+
         private int reportCount = 1;
         private void OpenReport(ReportDefinition? definition)
         {
