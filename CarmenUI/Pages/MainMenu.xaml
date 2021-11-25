@@ -21,6 +21,7 @@
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
         <cv:BytesToImage x:Key="bytesToImage"/>
+        <cv:ImageCache x:Key="imageCache"/>
         <RoutedUICommand x:Key="openReportCommand"/>
     </Page.Resources>
     <Page.CommandBindings>
@@ -58,7 +59,7 @@
                 <fa:ImageAwesome Icon="Gear" Width="40" Margin="10" Foreground="DimGray" VerticalAlignment="Top"/>
             </Button>
         </Grid>
-        <Image Grid.Row="1" Grid.Column="0" Source="{Binding ElementName=PageRoot, Path=ShowSummary.LogoImage, Converter={StaticResource bytesToImage}}"/>
+        <Image Grid.Row="1" Grid.Column="0" Source="{Binding ElementName=PageRoot, Path=ShowSummary.LogoImageId, Converter={StaticResource imageCache}}"/>
         <ListView KeyboardNavigation.IsTabStop="False" Grid.Row="2" Grid.Column="0" x:Name="menuList" Margin="20 20 20 0" BorderThickness="0" VerticalAlignment="Bottom" SelectionChanged="menuList_SelectionChanged">
             <ListViewItem x:Name="ConfigureShow" MouseEnter="ConfigureShow_MouseEnter" KeyboardNavigation.IsTabStop="False"
                           Background="{Binding ElementName=PageRoot, Path=ShowSummary.Status, Converter={StaticResource processStatusColor}}">

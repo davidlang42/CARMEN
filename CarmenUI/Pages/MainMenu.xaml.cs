@@ -1,6 +1,7 @@
 ﻿using CarmenUI.ViewModels;
 using CarmenUI.Windows;
 using Carmen.ShowModel;
+using C = Carmen.ShowModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,7 @@ using System.Windows.Navigation;
 using Microsoft.Win32;
 using System.IO;
 using Microsoft.VisualBasic.FileIO;
+using CarmenUI.Converters;
 
 namespace CarmenUI.Pages
 {
@@ -32,12 +34,23 @@ namespace CarmenUI.Pages
         private Summary[] allSummaries => new Summary[] { ShowSummary, RegistrationSummary, AuditionSummary, CastSummary, ItemsSummary, RolesSummary };
         private CancellationTokenSource? updatingSummaries;
 
+        private ImageCache imageCache;
+
         public MainMenu(RecentShow connection)
         {
             this.connection = connection;
             ShowSummary = new(connection.DefaultShowName);
             InitializeComponent();
+            imageCache = (ImageCache)FindResource(nameof(imageCache));
+            imageCache.CachePath = Path.GetTempPath() + Path.DirectorySeparatorChar + "testCache" + Path.DirectorySeparatorChar; //TODO put this in ImageCache
+            imageCache.LoadImage = LoadImage;
             DatabaseButton.Visibility = connection.Provider.HasValue ? Visibility.Visible : Visibility.Hidden;
+        }
+
+        private C.Image LoadImage(int image_id)
+        {
+            using (var context = ShowContext.Open(connection))
+                return context.Images.Single(i => i.ImageId == image_id);
         }
 
         public void Dispose()
