@@ -102,7 +102,6 @@ namespace Carmen.ShowModel.Applicants
         #endregion
 
         #region Audition properties
-        //TODO public int? PhotoImageId { get; set; }//TODO OnPropertyChanged
         private Image? photo;
         public virtual Image? Photo
         {

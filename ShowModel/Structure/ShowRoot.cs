@@ -27,7 +27,6 @@ namespace Carmen.ShowModel.Structure
             }
         }
 
-        public int? LogoImageId { get; set; } //TODO onpropertychange? does this update automatically when the image updates?
         private Image? logo;
         public virtual Image? Logo
         {

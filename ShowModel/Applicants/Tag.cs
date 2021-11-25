@@ -51,7 +51,6 @@ namespace Carmen.ShowModel.Applicants
             }
         }
 
-        //TODO int? IconImageId
         private Image? icon;
         public virtual Image? Icon
         {

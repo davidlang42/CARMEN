@@ -33,13 +33,13 @@ namespace CarmenUI.ViewModels
             set => SetValue(SubHeadingProperty, value);
         }
 
-        public static readonly DependencyProperty LogoImageIdProperty = DependencyProperty.Register(
-            nameof(LogoImageId), typeof(int?), typeof(ShowSummary), new PropertyMetadata(null));
+        public static readonly DependencyProperty LogoImageProperty = DependencyProperty.Register(
+            nameof(LogoImage), typeof(byte[]), typeof(ShowSummary), new PropertyMetadata(null));
 
-        public int? LogoImageId
+        public byte[]? LogoImage
         {
-            get => (int?)GetValue(LogoImageIdProperty);
-            set => SetValue(LogoImageIdProperty, value);
+            get => (byte[]?)GetValue(LogoImageProperty);
+            set => SetValue(LogoImageProperty, value);
         }
 
         public ShowSummary(string default_show_name)
@@ -50,14 +50,14 @@ namespace CarmenUI.ViewModels
         public override async Task LoadAsync(ShowContext c, CancellationToken cancel)
         {
             StartLoad();
-            var show_root = await c.Nodes.OfType<ShowRoot>().SingleAsync();
+            var show_root = await c.Nodes.OfType<ShowRoot>().Include(sr => sr.Logo).SingleAsync();
             Heading = show_root.Name;
             SubHeading = show_root.ShowDate switch {
                 DateTime d when d >= DateTime.Now => $"opening {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}",
                 DateTime d => $"opened {show_root.ShowDate.Value.Day.ToOrdinal()} {show_root.ShowDate.Value:MMMM yyyy}",
                 _ => ""
             };
-            LogoImageId = show_root.LogoImageId;
+            LogoImage = show_root.Logo?.ImageData;
             if (string.IsNullOrEmpty(show_root.Name))
                 Rows.Add(new Row { Fail = "Show name is required" });
             if (!show_root.ShowDate.HasValue)
