@@ -102,6 +102,9 @@ namespace Carmen.ShowModel.Applicants
         #endregion
 
         #region Audition properties
+        /// <summary>May be null if Photo has been set but not saved</summary>
+        public int? PhotoImageId { get; private set; }
+
         private Image? photo;
         public virtual Image? Photo
         {
@@ -111,6 +114,7 @@ namespace Carmen.ShowModel.Applicants
                 if (photo == value)
                     return;
                 photo = value;
+                PhotoImageId = null;
                 OnPropertyChanged();
             }
         }

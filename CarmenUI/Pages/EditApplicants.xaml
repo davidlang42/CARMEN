@@ -291,7 +291,7 @@
                         <RowDefinition Height="*" MinHeight="200"/>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    <uc:EditableImage ImageObject="{Binding Photo, Mode=TwoWay}"/>
+                    <uc:ApplicantImage ApplicantObject="{Binding}"/>
                     <Grid Grid.Row="1">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
