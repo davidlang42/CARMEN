@@ -195,6 +195,8 @@ namespace CarmenUI.Windows
             };
             if (file.ShowDialog() == true)
             {
+                if (File.Exists(file.FileName))
+                    File.Delete(file.FileName); // user has accepted overwrite in the SaveFileDialog
                 int count;
                 using (var loading = new LoadingOverlay(this) { MainText = "Exporting..." })
                 using (var context = ShowContext.Open(connection))
