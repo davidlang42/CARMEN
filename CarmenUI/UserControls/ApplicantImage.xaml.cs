@@ -32,6 +32,7 @@ namespace CarmenUI.UserControls
             => ((ApplicantImage)sender).UpdateImage(); //TODO really should add change handler for Applicant.Photo rather than call UpdateImage() after each change
 
         public static string DefaultImageCachePath => Path.GetTempPath() + "CarmenImageCache";
+        public const string ImageCacheExtension = "BMP";
 
         public Applicant? ApplicantObject
         {
@@ -61,29 +62,28 @@ namespace CarmenUI.UserControls
             if (ApplicantObject == null)
                 ImageControl.Source = null;
             else if (ApplicantObject.PhotoImageId != null)
-                ImageControl.Source = CachedImage(ApplicantObject.PhotoImageId.Value, ApplicantObject.ShowRoot, ApplicantObject.Photo);
+                ImageControl.Source = CachedImage(ApplicantObject.PhotoImageId.Value, ApplicantObject.ShowRoot,
+                    () => ApplicantObject.Photo ?? throw new ApplicationException("Applicant photo not set, but photo ID was.")); //TODO call async
             else if (ApplicantObject.Photo != null)
-                ImageControl.Source = ActualImage(ApplicantObject.Photo);
+                ImageControl.Source = ActualImage(ApplicantObject.Photo); //TODO call async
             else
                 ImageControl.Source = null;
         }
 
-        private ImageSource CachedImage(int image_id, ShowRoot show, Image? lazy_loading_photo)
+        public static ImageSource CachedImage(int image_id, ShowRoot show, Func<Image> lazy_loading_photo_getter)
         {
             var cache_path = GetCachePath(show);
-            var filename = $"{cache_path}{image_id}.BMP";
+            var filename = $"{cache_path}{image_id}.{ImageCacheExtension}";
             if (!File.Exists(filename))
             {
                 if (!Directory.Exists(cache_path))
                     Directory.CreateDirectory(cache_path);
-                if (lazy_loading_photo == null)
-                    throw new ApplicationException("Applicant photo not set, but photo ID was.");
-                File.WriteAllBytes(filename, lazy_loading_photo.ImageData);
+                File.WriteAllBytes(filename, lazy_loading_photo_getter().ImageData);
             }
             return new BitmapImage(new Uri(filename));
         }
 
-        public static string GetCachePath(ShowRoot show_root) //TODO public?
+        public static string GetCachePath(ShowRoot show_root)
         {
             var root_path = Properties.Settings.Default.ImageCachePath;
             if (string.IsNullOrEmpty(root_path))
@@ -168,7 +168,7 @@ namespace CarmenUI.UserControls
                 return;
             //TODO loading overlay
             // load the original image
-            if (ApplicantObject.Photo is not Image original_image)
+            if (ApplicantObject.Photo is not Image original_image) //TODO call async
                 return;
             using var original_stream = new MemoryStream(original_image.ImageData);
             // find the correct rotation from metadata
@@ -192,7 +192,7 @@ namespace CarmenUI.UserControls
             original_stream.Seek(0, SeekOrigin.Begin);
             corrected.StreamSource = original_stream;
             corrected.Rotation = rotation;
-            corrected.EndInit();
+            corrected.EndInit(); //TODO call async
             corrected.Freeze();
             // re-encode
             var encoder = new JpegBitmapEncoder()

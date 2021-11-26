@@ -194,6 +194,9 @@ namespace Carmen.ShowModel
         public static Task<int> CountAsync<T>(this IEnumerable<T> collection, Func<T, bool> predicate)
             => Task.Run(() => collection.Count(predicate));
 
+        public static Task<Dictionary<U, T>> ToDictionaryAsync<T, U>(this IEnumerable<T> collection, Func<T, U> key_selector) where U : notnull
+            => Task.Run(() => collection.ToDictionary(key_selector));
+
         public static Task<Dictionary<U, V>> ToDictionaryAsync<T, U, V>(this IEnumerable<T> collection, Func<T, U> key_selector, Func<T, V> value_selector) where U : notnull
             => Task.Run(() => collection.ToDictionary(key_selector, value_selector));
     }

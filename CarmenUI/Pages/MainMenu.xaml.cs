@@ -1,6 +1,7 @@
 ﻿using CarmenUI.ViewModels;
 using CarmenUI.Windows;
 using Carmen.ShowModel;
+using C = Carmen.ShowModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,8 @@ using System.Windows.Navigation;
 using Microsoft.Win32;
 using System.IO;
 using Microsoft.VisualBasic.FileIO;
+using CarmenUI.UserControls;
+using System.Threading.Tasks;
 
 namespace CarmenUI.Pages
 {
@@ -327,6 +330,60 @@ namespace CarmenUI.Pages
         {
             var this_window = Window.GetWindow(this);
             this_window.Close();
+        }
+
+        private async void RefreshImageCache_Click(object sender, RoutedEventArgs e)
+        {
+            using var context = ShowContext.Open(connection);
+            Dictionary<int, C.Image> load_images;
+            Dictionary<int, string> cached_ids = new();
+            using (var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshImageCache_Click), "Refreshing..."))
+            {
+                using (loading.Segment(nameof(ShowContext.Images), "Image list"))
+                    load_images = await context.Images.ToDictionaryAsync(i => i.ImageId);
+                using (loading.Segment(nameof(ApplicantImage.GetCachePath), "Cache list"))
+                {
+                    var cache_path = ApplicantImage.GetCachePath(context.ShowRoot);
+                    if (Directory.Exists(cache_path))
+                    {
+                        foreach (var cached_file in Directory.GetFiles(cache_path))
+                        {
+                            var filename = Path.GetFileName(cached_file);
+                            if (MatchImageId(filename, out var image_id) && load_images.ContainsKey(image_id))
+                                cached_ids.Add(image_id, cached_file);
+                            else
+                                File.Delete(cached_file);
+                        }
+                    }
+                }
+            }
+            if (cached_ids.Any())
+            {
+                if (MessageBox.Show($"Do you want to clear the existing {cached_ids.Count} images in the cache?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    foreach (var (_, cached_file) in cached_ids)
+                        File.Delete(cached_file);
+                else
+                    foreach (var (id, _) in cached_ids)
+                        load_images.Remove(id);
+            }
+            using (var loading = new LoadingOverlay(this) { MainText = "Refreshing..." })
+            {
+                var i = 0;
+                foreach (var image in load_images.Values)
+                {
+                    loading.Progress = 100 * i / load_images.Count;
+                    loading.SubText = $"Loading image {++i}/{load_images.Count}";
+                    await Task.Run(() => ApplicantImage.CachedImage(image.ImageId, context.ShowRoot, () => image));
+                }
+            }
+            MessageBox.Show($"Loaded and cached {load_images.Count.Plural("image")}.", WindowTitle);
+        }
+
+        private bool MatchImageId(string filename, out int image_id)
+        {
+            image_id = default;
+            var ext = "." + ApplicantImage.ImageCacheExtension;
+            return filename.EndsWith(ext) && int.TryParse(filename[0..^ext.Length], out image_id);
         }
     }
 }
