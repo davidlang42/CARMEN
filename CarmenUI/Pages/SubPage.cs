@@ -16,6 +16,7 @@ using Carmen.CastingEngine.Audition;
 using Carmen.CastingEngine.Selection;
 using Carmen.CastingEngine.Allocation;
 using CarmenUI.ViewModels;
+using CarmenUI.UserControls;
 
 namespace CarmenUI.Pages
 {
@@ -186,6 +187,12 @@ namespace CarmenUI.Pages
 
         protected bool Confirm(string msg)
             => MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+
+        protected void EditableImage_ImageChanged(object sender, ImageChangedEventArgs e)
+        {
+            if (e.OldImage != null)
+                context.Images.Remove(e.OldImage); // this assumes images are only ever used once
+        }
 
         /// <summary>Actually dispose change handlers, etc.
         /// This will only be called once.</summary>

@@ -31,6 +31,8 @@ namespace CarmenUI.UserControls
         private static void OnApplicantObjectChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
             => ((ApplicantImage)sender).UpdateImage(); //TODO really should add change handler for Applicant.Photo rather than call UpdateImage() after each change
 
+        public event ImageChangedEventHandler? ImageChanged = null;
+
         public static string DefaultImageCachePath => Path.GetTempPath() + "CarmenImageCache";
         public const string ImageCacheExtension = "BMP";
 
@@ -110,9 +112,9 @@ namespace CarmenUI.UserControls
                 catch
                 {
                     // invalid image data
+                    return null;
                 }
             }
-            return null;
         }
 
         private void UploadImage_Click(object sender, RoutedEventArgs e)
@@ -126,11 +128,13 @@ namespace CarmenUI.UserControls
             };
             if (dialog.ShowDialog() == true)
             {
+                var old_image = ApplicantObject.Photo;
                 ApplicantObject.Photo = new Image
                 {
                     Name = Path.GetFileName(dialog.FileName),
                     ImageData = File.ReadAllBytes(dialog.FileName)
                 };
+                ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ApplicantObject.Photo));
                 UpdateImage();
             }
         }
@@ -145,11 +149,13 @@ namespace CarmenUI.UserControls
                 encoder.Frames.Add(BitmapFrame.Create(source));
                 using var stream = new MemoryStream();
                 encoder.Save(stream);
+                var old_image = ApplicantObject.Photo;
                 ApplicantObject.Photo = new Image
                 {
                     Name = $"Pasted at {DateTime.Now:yyyy-MM-dd HH:mm}.png",
                     ImageData = stream.ToArray()
                 };
+                ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ApplicantObject.Photo));
                 UpdateImage();
             }
         }
@@ -158,7 +164,9 @@ namespace CarmenUI.UserControls
         {
             if (ApplicantObject == null)
                 return;
+            var old_image = ApplicantObject.Photo;
             ApplicantObject.Photo = null;
+            ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ApplicantObject.Photo));
             UpdateImage();
         }
 
@@ -208,6 +216,7 @@ namespace CarmenUI.UserControls
                 Name = original_image.Name,
                 ImageData = corrected_stream.ToArray()
             };
+            ImageChanged?.Invoke(this, new ImageChangedEventArgs(original_image, ApplicantObject.Photo));
             UpdateImage();
         }
     }

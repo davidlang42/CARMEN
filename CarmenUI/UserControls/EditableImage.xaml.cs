@@ -26,6 +26,8 @@ namespace CarmenUI.UserControls
         public static readonly DependencyProperty ImageBytesProperty = DependencyProperty.Register(
            nameof(ImageObject), typeof(Image), typeof(EditableImage), new PropertyMetadata(null));
 
+        public event ImageChangedEventHandler? ImageChanged = null;
+
         public Image? ImageObject
         {
             get => (Image?)GetValue(ImageBytesProperty);
@@ -58,11 +60,13 @@ namespace CarmenUI.UserControls
             };
             if (dialog.ShowDialog() == true)
             {
+                var old_image = ImageObject;
                 ImageObject = new Image
                 {
                     Name = System.IO.Path.GetFileName(dialog.FileName),
                     ImageData = File.ReadAllBytes(dialog.FileName)
                 };
+                ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ImageObject));
             }
         }
 
@@ -74,17 +78,21 @@ namespace CarmenUI.UserControls
                 encoder.Frames.Add(BitmapFrame.Create(source));
                 using var stream = new MemoryStream();
                 encoder.Save(stream);
+                var old_image = ImageObject;
                 ImageObject = new Image
                 {
                     Name = $"Pasted at {DateTime.Now:yyyy-MM-dd HH:mm}.png",
                     ImageData = stream.ToArray()
                 };
+                ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ImageObject));
             }
         }
 
         private void ClearImage_Click(object sender, RoutedEventArgs e)
         {
+            var old_image = ImageObject;
             ImageObject = null;
+            ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ImageObject));
         }
     }
 }

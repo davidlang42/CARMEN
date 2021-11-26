@@ -367,7 +367,7 @@ namespace CarmenUI.Pages
                 using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
                     tags = await context.Tags.ToArrayAsync();
                 using (loading.Segment(nameof(CsvImporter),"Columns headers"))
-                    csv = new CsvImporter(file.FileName, criterias, castGroups, alternativeCasts, tags);
+                    csv = new CsvImporter(file.FileName, criterias, castGroups, alternativeCasts, tags, i => context.Images.Remove(i));
             }
             var import = new ImportDialog(csv)
             {

@@ -421,7 +421,7 @@
                             <TextBlock Grid.Row="3" Text="Icon" FontSize="14"/>
                             <uc:EditableImage Grid.Row="3" Grid.Column="1" Margin="5 0 0 0" HorizontalAlignment="Left"
                                               ImageObject="{Binding Icon, Mode=TwoWay}"
-                                              Width="50" Height="50"/>
+                                              Width="50" Height="50" ImageChanged="EditableImage_ImageChanged"/>
                             <TextBlock Grid.Row="4" Grid.ColumnSpan="2" Text="Required Counts:" FontSize="14"/>
                             <ItemsControl Grid.Row="5" ItemsSource="{Binding Source={StaticResource castGroupsViewSource}}"
                                           KeyboardNavigation.IsTabStop="False">
@@ -581,7 +581,8 @@
                             <TextBlock Grid.Row="7" Text="Company Logo" FontSize="14"/>
                             <uc:EditableImage Grid.Row="7" Grid.Column="1" Margin="5 0 0 0" HorizontalAlignment="Left"
                                               ImageObject="{Binding Logo, Mode=TwoWay}"
-                                              x:Name="LogoImage" MinWidth="{Binding ElementName=LogoImage, Path=ActualHeight}"/>
+                                              x:Name="LogoImage" MinWidth="{Binding ElementName=LogoImage, Path=ActualHeight}"
+                                              ImageChanged="EditableImage_ImageChanged"/>
                         </Grid>
                     </DataTemplate>
                     <DataTemplate DataType="{x:Type modelRequirements:AbilityExactRequirement}">

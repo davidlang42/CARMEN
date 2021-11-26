@@ -329,6 +329,8 @@ namespace Carmen.ShowModel
             ShowRoot.AllowConsecutiveItems = false;
             ShowRoot.CastNumberOrderBy = null;
             ShowRoot.CastNumberOrderDirection = ListSortDirection.Ascending;
+            if (ShowRoot.Logo != null)
+                Images.Remove(ShowRoot.Logo);
             ShowRoot.Logo = null;
         }
 
