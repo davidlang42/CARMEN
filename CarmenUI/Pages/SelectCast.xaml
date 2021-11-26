@@ -110,6 +110,41 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
+            <Grid DockPanel.Dock="Bottom" Margin="0 5 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="moveUpButton" Height="30" Click="moveUpButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="ArrowUp" Width="12" Margin="5 0"/>
+                        <TextBlock Text="Move Up" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="2" x:Name="moveDownButton" Height="30" Click="moveDownButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="ArrowDown" Width="12" Margin="5 0"/>
+                        <TextBlock Text="Move Down" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="4" x:Name="mergeButton" Height="30" Click="mergeButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Compress" Width="12" Margin="5 0"/>
+                        <TextBlock Text="Merge" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="6" x:Name="splitButton" Height="30" Click="splitButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Expand" Width="12" Margin="5 0"/>
+                        <TextBlock Text="Split" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
             <Grid DockPanel.Dock="Bottom" Visibility="{Binding Source={StaticResource castNumberMissingViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
@@ -128,7 +163,7 @@
                 <TextBlock Margin="5" Text="Gaps exist between cast numbers, click here to fill gaps"/>
             </Button>
             <ListBox ItemsSource="{Binding Source={StaticResource castNumbersViewSource}}" HorizontalContentAlignment="Stretch"
-                     x:Name="CastNumbersList">
+                     x:Name="CastNumbersList" SelectionMode="Extended">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>

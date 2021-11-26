@@ -54,15 +54,6 @@ namespace CarmenUI.ViewModels
                 applicant.PropertyChanged += Applicant_PropertyChanged;
         }
 
-        public void FillGaps()
-        {
-            var i = CastNumberSet.FIRST_CAST_NUMBER;
-            var new_cast_numbers = CastNumbers.OrderBy(n => n.Number).Select(n => (i++, n.Applicants.NotNull().ToArray())).ToArray();
-            foreach (var (new_cast_number, applicants) in new_cast_numbers)
-                foreach (var applicant in applicants)
-                    applicant.CastNumber = new_cast_number;
-        }
-
         private void CastNumbers_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
         {
             if (e.Action == NotifyCollectionChangedAction.Move)
@@ -127,6 +118,35 @@ namespace CarmenUI.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public void FillGaps()
+        {
+            var i = CastNumberSet.FIRST_CAST_NUMBER;
+            var new_cast_numbers = CastNumbers.OrderBy(n => n.Number).Select(n => (i++, n.Applicants.NotNull().ToArray())).ToArray();
+            foreach (var (new_cast_number, applicants) in new_cast_numbers)
+                foreach (var applicant in applicants)
+                    applicant.CastNumber = new_cast_number;
+        }
+
+        public void Merge(IEnumerable<CastNumber> cast_numbers)
+        {
+            //TODO
+        }
+
+        public void Split(IEnumerable<CastNumber> cast_numbers)
+        {
+            //TODO
+        }
+
+        public void MoveUp(CastNumber cast_number)
+        {
+            //TODO
+        }
+
+        public void MoveDown(CastNumber cast_number)
+        {
+            //TODO
         }
     }
 }

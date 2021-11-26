@@ -581,6 +581,36 @@ namespace CarmenUI.Pages
         {
             castList.FillGaps();
         }
+
+        private void moveUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CastNumbersList.SelectedItems.Count == 0)
+                return;
+            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>()) //TODO sort this by reverse order in list
+                castList.MoveUp(cast_number);
+        }
+
+        private void moveDownButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CastNumbersList.SelectedItems.Count == 0)
+                return;
+            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>()) //TODO sort this by order in list
+                castList.MoveDown(cast_number);
+        }
+
+        private void mergeButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CastNumbersList.SelectedItems.Count == 0)
+                return;
+            castList.Merge(CastNumbersList.SelectedItems.OfType<CastNumber>());
+        }
+
+        private void splitButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CastNumbersList.SelectedItems.Count == 0)
+                return;
+            castList.Split(CastNumbersList.SelectedItems.OfType<CastNumber>());
+        }
     }
 
     public enum CastStatus
