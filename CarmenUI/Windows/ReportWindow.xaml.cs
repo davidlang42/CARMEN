@@ -183,7 +183,7 @@ namespace CarmenUI.Windows
             }
         }
 
-        private void ExportPhotos_Click(object sender, RoutedEventArgs e)
+        private async void ExportPhotos_Click(object sender, RoutedEventArgs e)
         {
             var default_file_name = (reportDefinition?.SavedName ?? Report.FullDescription).Replace(".", "") + ".zip";
             default_file_name = string.Concat(default_file_name.Split(Path.GetInvalidFileNameChars()));
@@ -196,8 +196,17 @@ namespace CarmenUI.Windows
             if (file.ShowDialog() == true)
             {
                 int count;
-                using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportPhotos_Click), "Exporting..."))
-                    count = Report.ExportPhotos(file.FileName);
+                using (var loading = new LoadingOverlay(this) { MainText = "Exporting..." })
+                using (var context = ShowContext.Open(connection))
+                {
+                    loading.SubText = "Loading applicants";
+                    var applicants = await context.Applicants.ToArrayAsync();
+                    count = await Report.ExportPhotos(file.FileName, applicants, i =>
+                    {
+                        loading.Progress = 100 * i / applicants.Length;
+                        loading.SubText = $"Applicant {i + 1}/{applicants.Length}";
+                    });
+                }
                 MessageBox.Show($"Exported {count.Plural("photos")} to {file.FileName}", Title);
             }
         }

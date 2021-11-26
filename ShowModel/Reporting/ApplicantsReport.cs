@@ -2,6 +2,8 @@
 using Carmen.ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -54,6 +56,49 @@ namespace Carmen.ShowModel.Reporting
             if (!applicant.HasAuditioned(criterias))
                 return null;
             return Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));    
+        }
+
+        public async Task<int> ExportPhotos(string file_name, Applicant[] applicants, Action<int>? start_each_applicant_callback) // mostly copied from Report<T>.ExportCsv(), Group(), SetData()
+        {
+            var ordered_columns = Columns.Where(c => c.Show).InOrder().ToArray();
+            if (ordered_columns.Length == 0 || applicants.Length == 0)
+                return 0; // nothing to export
+            int count = 0;
+            using (var zip = ZipFile.Open(file_name, ZipArchiveMode.Create)) //TODO handle file io exceptions
+            {
+                //TODO make new folders per group
+                //if (GroupColumn != null)
+                //    rows = Group(rows, Rows[0].Length, IndexOf(GroupColumn), IndexOf(ordered_columns.First()));
+                //object? previous_group = null;
+                //foreach (var row in rows.OrderBy(r => r[group_column_index]))
+                //{
+                //    if (!Equals(row[group_column_index], previous_group))
+                //    {
+                //        var group_header_row = new object?[row_length];
+                //        previous_group = group_header_row[first_column_index] = row[group_column_index];
+                //        yield return group_header_row;
+                //    }
+                //    yield return row;
+                //}
+                for (var i = 0; i < applicants.Length; i++)
+                {
+                    start_each_applicant_callback?.Invoke(i);
+                    if (await Task.Run(() => applicants[i].Photo) is Image image)
+                    {
+                        var extension = Path.GetExtension(image.Name);
+                        if (string.IsNullOrWhiteSpace(extension))
+                            extension = ".BMP";
+                        var field_values = ordered_columns.Select(c => FormatAsString(c.ValueGetter(applicants[i])));
+                        var filename = string.Join("-", field_values) + extension;
+                        var sanitised_filename = string.Concat(filename.Split(Path.GetInvalidFileNameChars()));
+                        var entry = zip.CreateEntry(sanitised_filename); //TODO handle duplicate file names
+                        using (var stream = entry.Open())
+                            await stream.WriteAsync(image.ImageData, 0, image.ImageData.Length);
+                        count++;
+                    }
+                }
+            }
+            return count;
         }
     }
 }
