@@ -125,6 +125,12 @@ namespace CarmenUI.Pages
             using (loading.Segment(nameof(CastList), "Cast list"))
             {
                 _castList = new CastList(applicants, alternativeCasts);
+                FillGapsButton.SetBinding(Button.VisibilityProperty, new Binding
+                {
+                    Source = castList,
+                    Path = new(nameof(CastList.ContainsGaps)),
+                    Converter = new BooleanToVisibilityConverter()
+                });
                 castNumberMissingViewSource.Source = castList.MissingNumbers;
                 castNumbersViewSource.Source = castList.CastNumbers;
             }
@@ -209,7 +215,7 @@ namespace CarmenUI.Pages
         {
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
-                await Task.Run(() => engine.SelectCastGroups(applicants, castGroups));
+                engine.SelectCastGroups(applicants, castGroups); // must run in UI thread, because CastList handles change events
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
                 engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local); // must run in UI thread, because AlternativeCast.Members collection is bound
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
@@ -569,6 +575,11 @@ namespace CarmenUI.Pages
             if (new_index >= castStatusCombo.Items.Count)
                 new_index = 0;
             castStatusCombo.SelectedIndex = new_index;
+        }
+
+        private void FillGapsButton_Click(object sender, RoutedEventArgs e)
+        {
+            castList.FillGaps();
         }
     }
 
