@@ -164,22 +164,41 @@ namespace CarmenUI.Windows
                 MainData.Items.GroupDescriptions.Add(new PropertyGroupDescription($"[{Report.IndexOf(Report.GroupColumn)}]"));
         }
 
-        private void ExportButton_Click(object sender, RoutedEventArgs e)
+        private void ExportCsv_Click(object sender, RoutedEventArgs e)
         {
             var default_file_name = (reportDefinition?.SavedName ?? Report.FullDescription).Replace(".","") + ".csv";
             default_file_name = string.Concat(default_file_name.Split(Path.GetInvalidFileNameChars()));
             var file = new SaveFileDialog
             {
-                Title = "Export Applicants to CSV ",
+                Title = "Export Applicants to CSV",
                 Filter = "Comma separated values (*.csv)|*.csv|All Files (*.*)|*.*",
                 FileName = default_file_name
             };
             if (file.ShowDialog() == true)
             {
                 int count;
-                using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportButton_Click), "Exporting..."))
-                    count = Report.Export(file.FileName);
+                using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportCsv_Click), "Exporting..."))
+                    count = Report.ExportCsv(file.FileName);
                 MessageBox.Show($"Exported {count.Plural("row")} to {file.FileName}", Title);
+            }
+        }
+
+        private void ExportPhotos_Click(object sender, RoutedEventArgs e)
+        {
+            var default_file_name = (reportDefinition?.SavedName ?? Report.FullDescription).Replace(".", "") + ".zip";
+            default_file_name = string.Concat(default_file_name.Split(Path.GetInvalidFileNameChars()));
+            var file = new SaveFileDialog
+            {
+                Title = "Export Photos as ZIP",
+                Filter = "Zip archive (*.zip)|*.zip|All Files (*.*)|*.*",
+                FileName = default_file_name
+            };
+            if (file.ShowDialog() == true)
+            {
+                int count;
+                using (var loading = new LoadingOverlay(this).AsSegment(nameof(ExportPhotos_Click), "Exporting..."))
+                    count = Report.ExportPhotos(file.FileName);
+                MessageBox.Show($"Exported {count.Plural("photos")} to {file.FileName}", Title);
             }
         }
 

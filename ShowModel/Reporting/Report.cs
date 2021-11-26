@@ -125,8 +125,40 @@ namespace Carmen.ShowModel.Reporting
             Rows = data.Select(d => Columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();
         }
 
-        public int Export(string file_name)
+        public int ExportCsv(string file_name)
         {
+            var ordered_columns = Columns.Where(c => c.Show).InOrder().ToArray();
+            if (ordered_columns.Length == 0)
+                return 0; // nothing to export
+            int count = 0;
+            using (var writer = new StreamWriter(file_name)) //TODO handle file io exceptions
+            using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+            {
+                if (ExportDescriptiveHeader)
+                    csv.WriteField(FullDescription);
+                else
+                    foreach (var column in ordered_columns)
+                        csv.WriteField(column.Name);
+                csv.NextRecord();
+                if (Rows.Length == 0)
+                    return 0; // nothing to export after header
+                var rows = Sort(Rows, SortColumns);
+                if (GroupColumn != null)
+                    rows = Group(rows, Rows[0].Length, IndexOf(GroupColumn), IndexOf(ordered_columns.First()));
+                foreach (var row in rows)
+                {
+                    foreach (var column in ordered_columns)
+                        csv.WriteField(FormatAsString(row[IndexOf(column)]));
+                    csv.NextRecord();
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        public int ExportPhotos(string file_name)
+        {
+            return 42;//TODO
             var ordered_columns = Columns.Where(c => c.Show).InOrder().ToArray();
             if (ordered_columns.Length == 0)
                 return 0; // nothing to export

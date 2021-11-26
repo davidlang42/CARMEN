@@ -76,13 +76,31 @@
             <Button VerticalAlignment="Top" Click="RefreshButton_Click" Background="White" BorderThickness="0">
                 <fa:ImageAwesome Icon="Refresh" Height="20" Margin="5" Foreground="Black" VerticalAlignment="Center"/>
             </Button>
-            <Button VerticalAlignment="Top" Click="ExportButton_Click" Background="White" BorderThickness="0">
+            <ToggleButton x:Name="ExportButton" VerticalAlignment="Top" Background="White" BorderThickness="0">
                 <fa:ImageAwesome Icon="Download" Height="20" Margin="5" Foreground="Black" VerticalAlignment="Center"/>
-            </Button>
+            </ToggleButton>
             <Button VerticalAlignment="Top" Click="BookmarkButton_Click" Background="White" BorderThickness="0">
                 <fa:ImageAwesome x:Name="BookmarkIcon" Height="20" Margin="5" Foreground="Black" VerticalAlignment="Center"/>
             </Button>
         </StackPanel>
+        <Popup Name="ExportPopup" PlacementTarget="{Binding ElementName=ExportButton}" IsOpen="{Binding ElementName=ExportButton, Path=IsChecked}" Placement="Bottom" StaysOpen="False">
+            <Border Background="White" BorderBrush="Black" BorderThickness="1">
+                <StackPanel>
+                    <Button Background="White" BorderThickness="0" HorizontalAlignment="Stretch" Click="ExportCsv_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="PlusSquareOutline" Height="14" Margin="2" VerticalAlignment="Center"/>
+                            <TextBlock Text="Export as CSV" FontSize="14" Margin="2" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Background="White" BorderThickness="0" HorizontalAlignment="Stretch" Click="ExportPhotos_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="PlusSquareOutline" Height="14" Margin="2" VerticalAlignment="Center"/>
+                            <TextBlock Text="Export photos" FontSize="14" Margin="2" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </Border>
+        </Popup>
         <DataGrid Grid.Row="2" Grid.ColumnSpan="2" x:Name="MainData" AutoGenerateColumns="False" ItemsSource="{Binding Rows}"
                 ColumnDisplayIndexChanged="MainData_ColumnDisplayIndexChanged" Sorting="MainData_Sorting">
             <DataGrid.GroupStyle>
