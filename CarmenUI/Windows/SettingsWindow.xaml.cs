@@ -161,7 +161,7 @@ namespace CarmenUI.Windows
             Settings.Default.ClearRecentShowsList();
         }
 
-        private void ClearReportDefinitionsButton_Click(object sender, RoutedEventArgs e)//TODO
+        private void ClearReportDefinitionsButton_Click(object sender, RoutedEventArgs e) //TODO clear report definitions button
         {
             Settings.Default.ClearReportDefinitionsList();
         }

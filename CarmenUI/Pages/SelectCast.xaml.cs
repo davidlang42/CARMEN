@@ -74,6 +74,7 @@ namespace CarmenUI.Pages
         {
             InitializeComponent();
             castNumbersViewSource = (CollectionViewSource)FindResource(nameof(castNumbersViewSource));
+            castNumbersViewSource.SortDescriptions.Add(new(nameof(CastNumber.Number), ListSortDirection.Ascending));
             castGroupsViewSource = (CollectionViewSource)FindResource(nameof(castGroupsViewSource));
             castGroupsViewSource.SortDescriptions.Add(StandardSort.For<CastGroup>());
             sameCastSetsViewSource = (CollectionViewSource)FindResource(nameof(sameCastSetsViewSource));
@@ -89,6 +90,7 @@ namespace CarmenUI.Pages
             {
                 allApplicantsViewSource.SortDescriptions.Add(sd);
                 selectedApplicantsViewSource.SortDescriptions.Add(sd);
+                castNumberMissingViewSource.SortDescriptions.Add(sd);
             }
             castStatusCombo.SelectedIndex = 0; // must be here because it triggers event below
         }
@@ -124,9 +126,7 @@ namespace CarmenUI.Pages
             {
                 _castList = new CastList(applicants, alternativeCasts);
                 castNumberMissingViewSource.Source = castList.MissingNumbers;
-                //TODO castNumberMissingViewSource.SortDescriptions.Add(StandardSort.For<Applicant>());
                 castNumbersViewSource.Source = castList.CastNumbers;
-                castNumbersViewSource.SortDescriptions.Add(new(nameof(CastNumber.Number), ListSortDirection.Ascending));
             }
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
