@@ -113,6 +113,17 @@ namespace CarmenUI.Windows
             Widths.Default.Reload();
             Timings.Default.Reload();
             Imports.Default.Reload();
+            var settings = Settings.Default;
+            if (settings.FirstRun)
+            {
+                settings.FirstRun = false;
+                settings.SetDefaultWindowPosition();
+                settings.ClearRecentShowsList();
+                settings.ClearReportDefinitionsList();
+                Widths.Default.ClearAllocateRolesGrid();
+                Timings.Default.ClearTimings();
+                Imports.Default.ClearImportSettings();
+            }
         }
 
         private void ResetAndSave()
