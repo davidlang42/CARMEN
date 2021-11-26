@@ -12,48 +12,60 @@ namespace CarmenUI.ViewModels
 {
     public class CastList
     {
-        public AlternativeCast[] AlternativeCasts { get; }
+        Applicant[] allApplicants;
+        AlternativeCast[] alternativeCasts;
+
         public ObservableCollection<Applicant> MissingNumbers { get; } = new();
         public ObservableCollection<CastNumber> CastNumbers { get; } = new();
 
-        public CastList(IEnumerable<Applicant> applicants, AlternativeCast[] alternative_casts)
+        public CastList(Applicant[] all_applicants, AlternativeCast[] alternative_casts)
         {
-            AlternativeCasts = alternative_casts;
-            foreach (var group in applicants.Where(a => a.CastGroup != null).GroupBy(a => a.CastNumber))
+            allApplicants = all_applicants;
+            alternativeCasts = alternative_casts;
+            foreach (var group in all_applicants.Where(a => a.CastGroup != null).GroupBy(a => a.CastNumber))
             {
                 if (group.Key == null)
                     foreach (var applicant in group)
-                    {
-                        applicant.PropertyChanged += Applicant_PropertyChanged;
                         MissingNumbers.Add(applicant);
-                    }
                 else
-                    CastNumbers.Add(new CastNumber(group.Wrap(a => a.PropertyChanged += Applicant_PropertyChanged).ToArray(), alternative_casts));
+                    CastNumbers.Add(new CastNumber(group.ToArray(), alternative_casts));
             }
+            foreach (var applicant in allApplicants)
+                applicant.PropertyChanged += Applicant_PropertyChanged;
         }
 
-        private void Applicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        private void Applicant_PropertyChanged(object? sender, PropertyChangedEventArgs e) //TODO dispose handlers
         {
-            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Applicant.CastNumber))
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Applicant.CastNumber)
+                || e.PropertyName == nameof(Applicant.CastGroup) || e.PropertyName == nameof(Applicant.AlternativeCast))
             {
+                // Any all times an applicant will either be in:
+                // - MissingNumbers, if their cast number isn't set
+                // - CastNumbers, if their cast number is set
+                // - neither, if they aren't selected into a valid CastGroup/AlternativeCast
                 var applicant = sender as Applicant ?? throw new ApplicationException("Sender not set to applicant.");
                 if (MissingNumbers.Contains(applicant))
                     MissingNumbers.Remove(applicant);
                 else
-                    RemoveFromCastNumbers(applicant);
-                if (applicant.CastNumber.HasValue)
-                    AddToCastNumbers(applicant);
-                else
-                    MissingNumbers.Add(applicant);
+                    RemoveFromCastNumbersIfPresent(applicant);
+                if (applicant.CastGroup is CastGroup cg && (applicant.AlternativeCast == null) != cg.AlternateCasts)
+                {
+                    if (applicant.CastNumber.HasValue)
+                        AddToCastNumbers(applicant);
+                    else
+                        MissingNumbers.Add(applicant);
+                }
             }
         }
 
-        private void RemoveFromCastNumbers(Applicant applicant)
+        private void RemoveFromCastNumbersIfPresent(Applicant applicant)
         {
-            var existing = CastNumbers.Where(n => n.Contains(applicant)).Single();
-            existing.Remove(applicant);
-            if (existing.IsEmpty)
-                CastNumbers.Remove(existing);
+            if (CastNumbers.Where(n => n.Contains(applicant)).SingleOrDefault() is CastNumber existing)
+            {
+                existing.Remove(applicant);
+                if (existing.IsEmpty)
+                    CastNumbers.Remove(existing);
+            }
         }
 
         private void AddToCastNumbers(Applicant applicant)
@@ -61,7 +73,7 @@ namespace CarmenUI.ViewModels
             if (CastNumbers.Where(n => n.Number == applicant.CastNumber).SingleOrDefault() is CastNumber existing)
                 existing.Add(applicant);
             else
-                CastNumbers.Add(new CastNumber(applicant.Yield(), AlternativeCasts));
+                CastNumbers.Add(new CastNumber(applicant.Yield(), alternativeCasts));
         }
     }
 }

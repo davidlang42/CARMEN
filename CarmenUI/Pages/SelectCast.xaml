@@ -14,6 +14,8 @@
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Select Cast" Loaded="Page_Loaded">
     <Page.Resources>
+        <CollectionViewSource x:Key="castNumbersViewSource"/>
+        <CollectionViewSource x:Key="castNumberMissingViewSource"/>
         <CollectionViewSource x:Key="selectedApplicantsViewSource"/>
         <CollectionViewSource x:Key="allApplicantsViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
@@ -104,13 +106,13 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
-            <Grid DockPanel.Dock="Bottom" Visibility="{Binding MissingNumbers.IsEmpty, Converter={StaticResource hideIfTrue}}">
+            <Grid DockPanel.Dock="Bottom" Visibility="{Binding Source={StaticResource castNumberMissingViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Cast members without numbers:" FontSize="18"/>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding MissingNumbers}">
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource castNumberMissingViewSource}}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid/>
@@ -118,7 +120,7 @@
                     </ItemsControl.ItemsPanel>
                 </ItemsControl>
             </Grid>
-            <ListBox ItemsSource="{Binding Source={StaticResource castNumbersViewSource}, Path=Groups}" HorizontalContentAlignment="Stretch"
+            <ListBox ItemsSource="{Binding Source={StaticResource castNumbersViewSource}}" HorizontalContentAlignment="Stretch"
                      x:Name="CastNumbersList">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
@@ -127,8 +129,8 @@
                                 <ColumnDefinition Width="50"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Name}" VerticalAlignment="Center"/>
-                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Items}">
+                            <TextBlock Text="{Binding Number}" VerticalAlignment="Center"/>
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Applicants}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Rows="1"/>

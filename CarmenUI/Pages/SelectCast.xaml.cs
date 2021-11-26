@@ -50,6 +50,10 @@ namespace CarmenUI.Pages
         private Applicant[] applicants => _applicants
             ?? throw new ApplicationException($"Tried to used {nameof(applicants)} before it was loaded.");
 
+        private AlternativeCast[]? _alternativeCasts;
+        private AlternativeCast[] alternativeCasts => _alternativeCasts
+            ?? throw new ApplicationException($"Tried to used {nameof(alternativeCasts)} before it was loaded.");
+
         private CastGroup[]? _castGroups;
         private CastGroup[] castGroups => _castGroups
             ?? throw new ApplicationException($"Tried to used {nameof(castGroups)} before it was loaded.");
@@ -61,6 +65,10 @@ namespace CarmenUI.Pages
         private ISelectionEngine? _engine;
         private ISelectionEngine engine => _engine
             ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
+
+        private CastList? _castList;
+        private CastList castList => _castList
+            ?? throw new ApplicationException($"Tried to used {nameof(castList)} before it was loaded.");
 
         public SelectCast(RecentShow connection) : base(connection)
         {
@@ -88,14 +96,13 @@ namespace CarmenUI.Pages
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
             using var loading = new LoadingOverlay(this).AsSegment(nameof(SelectCast));
-            AlternativeCast[] alternative_casts;
             using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
                 _criterias = await context.Criterias.ToArrayAsync();
             using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                 await context.Requirements.LoadAsync();
             using (loading.Segment(nameof(ShowContext.AlternativeCasts) + nameof(AlternativeCast.Members), "Alternative casts"))
             {
-                alternative_casts = await context.AlternativeCasts.Include(ac => ac.Members).ToArrayAsync();
+                _alternativeCasts = await context.AlternativeCasts.Include(ac => ac.Members).ToArrayAsync();
                 alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
                 alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
             }
@@ -113,6 +120,14 @@ namespace CarmenUI.Pages
                 _applicants = await context.Applicants.Include(a => a.SameCastSet).ToArrayAsync();
                 allApplicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             }
+            using (loading.Segment(nameof(CastList), "Cast list"))
+            {
+                _castList = new CastList(applicants, alternativeCasts);
+                castNumberMissingViewSource.Source = castList.MissingNumbers;
+                //TODO castNumberMissingViewSource.SortDescriptions.Add(StandardSort.For<Applicant>());
+                castNumbersViewSource.Source = castList.CastNumbers;
+                castNumbersViewSource.SortDescriptions.Add(new(nameof(CastNumber.Number), ListSortDirection.Ascending));
+            }
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
                 var show_root = context.ShowRoot;
@@ -125,13 +140,13 @@ namespace CarmenUI.Pages
                 applicantDescription.AuditionEngine = audition_engine;
                 _engine = ParseSelectionEngine() switch
                 {
-                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
-                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(TopPairsSatEngine) => new TopPairsSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(BestPairsSatEngine) => new BestPairsSatEngine(audition_engine, alternative_casts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
+                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(TopPairsSatEngine) => new TopPairsSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(BestPairsSatEngine) => new BestPairsSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
                     _ => throw new ArgumentException($"Allocation engine not handled: {ParseSelectionEngine()}")
                 };
             }
@@ -198,7 +213,7 @@ namespace CarmenUI.Pages
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
                 engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local); // must run in UI thread, because AlternativeCast.Members collection is bound
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                await Task.Run(() => engine.AllocateCastNumbers(applicants));
+                engine.AllocateCastNumbers(applicants); // must run in UI thread, because CastList handles change events
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
                 engine.ApplyTags(applicants, tags); // must run in UI thread, because Tag.Members collection is bound
             using (processing.Segment(nameof(RefreshMainPanel), "Refreshing cast lists"))
@@ -482,10 +497,7 @@ namespace CarmenUI.Pages
                 castStatusNoun.Text = "cast members";
             }
             else if (selectionList.SelectedItem == finalCastList)
-            {
-                numbersPanel.DataContext = new CastList(); //TODO does this really need re-creating each time?
                 numbersPanel.Visibility = Visibility.Visible;
-            }
             else if (selectionList.SelectedItem == keepApplicantsTogether)
                 sameCastSetsPanel.Visibility = Visibility.Visible;
             else // no selection (initial state)

@@ -1,6 +1,7 @@
 ﻿using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -27,17 +28,7 @@ namespace CarmenUI.ViewModels
         }
 
         private Applicant?[] applicants;
-        public Applicant?[] Applicants
-        {
-            get => applicants;
-            set
-            {
-                if (applicants == value)
-                    return;
-                applicants = value;
-                OnPropertyChanged();
-            }
-        }
+        public ReadOnlyCollection<Applicant?> Applicants => Array.AsReadOnly(applicants);
 
         public bool IsEmpty => Applicants.All(a => a == null);
 
