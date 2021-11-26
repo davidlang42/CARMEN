@@ -23,7 +23,7 @@ namespace CarmenUI.UserControls
     /// <summary>
     /// Interaction logic for ApplicantImage.xaml
     /// </summary>
-    public partial class ApplicantImage : UserControl
+    public partial class ApplicantImage : UserControl // mostly copied from EditableImage
     {
         public static readonly DependencyProperty ApplicantObjectProperty = DependencyProperty.Register(
            nameof(ApplicantObject), typeof(Applicant), typeof(ApplicantImage), new PropertyMetadata(null, OnApplicantObjectChanged));
@@ -147,7 +147,7 @@ namespace CarmenUI.UserControls
                 encoder.Save(stream);
                 ApplicantObject.Photo = new Image
                 {
-                    Name = $"Pasted at {DateTime.Now:yyyy-MM-dd HH:mm}",
+                    Name = $"Pasted at {DateTime.Now:yyyy-MM-dd HH:mm}.png",
                     ImageData = stream.ToArray()
                 };
                 UpdateImage();

@@ -76,7 +76,7 @@ namespace CarmenUI.UserControls
                 encoder.Save(stream);
                 ImageObject = new Image
                 {
-                    Name = $"Pasted at {DateTime.Now:yyyy-MM-dd HH:mm}",
+                    Name = $"Pasted at {DateTime.Now:yyyy-MM-dd HH:mm}.png",
                     ImageData = stream.ToArray()
                 };
             }
