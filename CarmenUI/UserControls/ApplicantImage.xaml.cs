@@ -195,7 +195,10 @@ namespace CarmenUI.UserControls
             corrected.EndInit();
             corrected.Freeze();
             // re-encode
-            var encoder = new PngBitmapEncoder();
+            var encoder = new JpegBitmapEncoder()
+            {
+                QualityLevel = 95
+            };
             encoder.Frames.Add(BitmapFrame.Create(corrected));
             using var corrected_stream = new MemoryStream();
             encoder.Save(corrected_stream);
