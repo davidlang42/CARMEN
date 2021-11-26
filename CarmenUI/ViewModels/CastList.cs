@@ -38,47 +38,30 @@ namespace CarmenUI.ViewModels
             {
                 var applicant = sender as Applicant ?? throw new ApplicationException("Sender not set to applicant.");
                 if (MissingNumbers.Contains(applicant))
-                {
-                    if (applicant.CastNumber.HasValue)
-                    {
-                        // move applicant from MissingNumbers to CastNumbers
-                        MissingNumbers.Remove(applicant);
-
-                        if (CastNumbers.Where(n => n.Number == applicant.CastNumber).SingleOrDefault() is CastNumber existing)
-                            existing.Add(applicant);
-                        else
-                            CastNumbers.Add(new CastNumber(applicant.Yield(), AlternativeCasts));
-                    }
-                    else
-                    { } // nothing to do
-                }
+                    MissingNumbers.Remove(applicant);
                 else
-                {
-                    if (applicant.CastNumber.HasValue)
-                    {
-                        // move applicant between cast numbers
-                        var old_number = CastNumbers.Where(n => n.Contains(applicant)).Single();
-                        old_number.Remove(applicant);
-                        if (old_number.IsEmpty)
-                            CastNumbers.Remove(old_number);
-
-                        if (CastNumbers.Where(n => n.Number == applicant.CastNumber).SingleOrDefault() is CastNumber existing)
-                            existing.Add(applicant);
-                        else
-                            CastNumbers.Add(new CastNumber(applicant.Yield(), AlternativeCasts));
-                    }
-                    else
-                    {
-                        //TODO move applicant from cast numbers to missing
-                        var old_number = CastNumbers.Where(n => n.Contains(applicant)).Single();
-                        old_number.Remove(applicant);
-                        if (old_number.IsEmpty)
-                            CastNumbers.Remove(old_number);
-
-                        MissingNumbers.Add(applicant);
-                    }
-                }
+                    RemoveFromCastNumbers(applicant);
+                if (applicant.CastNumber.HasValue)
+                    AddToCastNumbers(applicant);
+                else
+                    MissingNumbers.Add(applicant);
             }
+        }
+
+        private void RemoveFromCastNumbers(Applicant applicant)
+        {
+            var existing = CastNumbers.Where(n => n.Contains(applicant)).Single();
+            existing.Remove(applicant);
+            if (existing.IsEmpty)
+                CastNumbers.Remove(existing);
+        }
+
+        private void AddToCastNumbers(Applicant applicant)
+        {
+            if (CastNumbers.Where(n => n.Number == applicant.CastNumber).SingleOrDefault() is CastNumber existing)
+                existing.Add(applicant);
+            else
+                CastNumbers.Add(new CastNumber(applicant.Yield(), AlternativeCasts));
         }
     }
 }
