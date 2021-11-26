@@ -116,7 +116,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Cast members without numbers:" FontSize="18"/>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource castNumberMissingViewSource}}">
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource castNumberMissingViewSource}}" Background="LightCoral">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid/>
