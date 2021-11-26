@@ -47,7 +47,7 @@ namespace Carmen.ShowModel.Import
             if (disposed)
                 throw new InvalidOperationException("Tried to use after dispose");
             var result = new ImportResult();
-            result.ErrorRows = new();
+            result.ParseErrors = new();
             var match_columns = ImportColumns.Where(c => c.MatchExisting && c.SelectedInput != null).ToArray();
             while (csv.Read())
             {
@@ -65,47 +65,47 @@ namespace Carmen.ShowModel.Import
                 {
                     // new applicant
                     var applicant = new Applicant { ShowRoot = show_root };
-                    try
-                    {
-                        foreach (var column in ImportColumns.Where(c => c.SelectedInput != null))
+                    foreach (var column in ImportColumns.Where(c => c.SelectedInput != null))
+                        try
+                        {
                             column.ValueSetter(applicant, csv.GetField(column.SelectedInput!.Index));
-                        applicant_collection.Add(applicant);
-                        result.NewApplicantsAdded++;
-                    }
-                    catch (ParseException ex)
-                    {
-                        result.ErrorRows.Add(result.RecordsProcessed + 1, ex.Message);
-                    }
+                        }
+                        catch (ParseException ex)
+                        {
+                            result.ParseErrors.Add((result.RecordsProcessed + 1, ex.Message));
+                        }
+                    applicant_collection.Add(applicant);
+                    result.NewApplicantsAdded++;
                 }
                 else if (applicants.Length == 1)
                 {
                     // matched applicant
-                    try
+                    bool changed = false;
+                    foreach (var column in ImportColumns.Where(c => c.SelectedInput != null))
                     {
-                        bool changed = false;
-                        foreach (var column in ImportColumns.Where(c => c.SelectedInput != null))
+                        var value = csv.GetField(column.SelectedInput!.Index);
+                        if (!column.ValueComparer(applicants[0], value))
                         {
-                            var value = csv.GetField(column.SelectedInput!.Index);
-                            if (!column.ValueComparer(applicants[0], value))
+                            try
                             {
                                 column.ValueSetter(applicants[0], value);
                                 changed = true;
                             }
+                            catch (ParseException ex)
+                            {
+                                result.ParseErrors.Add((result.RecordsProcessed + 1, ex.Message));
+                            }
                         }
-                        if (changed)
-                            result.ExistingApplicantsUpdated++;
-                        else
-                            result.ExistingApplicantsNotChanged++;
                     }
-                    catch (ParseException ex)
-                    {
-                        result.ErrorRows.Add(result.RecordsProcessed + 1, ex.Message);
-                    }
+                    if (changed)
+                        result.ExistingApplicantsUpdated++;
+                    else
+                        result.ExistingApplicantsNotChanged++;
                 }
                 else
                 {
                     // more than 1 match
-                    result.ErrorRows.Add(result.RecordsProcessed + 1, $"Matched {applicants.Length.Plural("row")} by columns {string.Join(", ", ImportColumns.Where(c => c.MatchExisting).Select(c => $"'{c.Name}'"))}");
+                    result.ParseErrors.Add((result.RecordsProcessed + 1, $"Matched {applicants.Length.Plural("row")} by columns {string.Join(", ", ImportColumns.Where(c => c.MatchExisting).Select(c => $"'{c.Name}'"))}"));
                 }
                 result.RecordsProcessed++;
                 progress_callback?.Invoke(result.RecordsProcessed);
@@ -303,6 +303,6 @@ namespace Carmen.ShowModel.Import
         public int NewApplicantsAdded;
         public int ExistingApplicantsUpdated;
         public int ExistingApplicantsNotChanged;
-        public Dictionary<int, string> ErrorRows;
+        public List<(int, string)> ParseErrors;
     }
 }

@@ -387,9 +387,9 @@ namespace CarmenUI.Pages
                     msg += $"\n{result.ExistingApplicantsUpdated.Plural("existing applicant")} updated";
                 if (result.ExistingApplicantsNotChanged != 0)
                     msg += $"\n{result.ExistingApplicantsNotChanged.Plural("existing applicant")} not changed";
-                if (result.ErrorRows.Count != 0)
+                if (result.ParseErrors.Count != 0)
                 {
-                    msg += $"\n{result.ErrorRows.Count.Plural("row")} contained errors";
+                    msg += $"\n{result.ParseErrors.Count.Plural("field")} contained errors";
                     msg += "\n\nWould you like to view the errors?";
                     buttons = MessageBoxButton.YesNo;
                 }
@@ -397,7 +397,7 @@ namespace CarmenUI.Pages
                 {
                     var temp_file = $"{System.IO.Path.GetTempPath()}import_errors_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt";
                     using (var writer = new System.IO.StreamWriter(temp_file))
-                        foreach (var (row, error) in result.ErrorRows)
+                        foreach (var (row, error) in result.ParseErrors)
                             writer.WriteLine($"Row {row}: {error}");
                     Process.Start(new ProcessStartInfo
                     {
