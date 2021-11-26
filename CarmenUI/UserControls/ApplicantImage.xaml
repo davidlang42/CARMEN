@@ -19,9 +19,10 @@
         </Grid>
         <Grid.ContextMenu>
             <ContextMenu>
-                <MenuItem Header="Upload Image" Click="UploadImage_Click"/>
-                <MenuItem Header="Paste Image" Click="PasteImage_Click"/>
-                <MenuItem Header="Clear Image" Click="ClearImage_Click"/>
+                <MenuItem Header="Upload Photo" Click="UploadImage_Click"/>
+                <MenuItem Header="Paste Photo" Click="PasteImage_Click"/>
+                <MenuItem Header="Clear Photo" Click="ClearImage_Click"/>
+                <MenuItem Header="Fix Orientation" Click="FixOrientation_Click"/>
             </ContextMenu>
         </Grid.ContextMenu>
     </Grid>

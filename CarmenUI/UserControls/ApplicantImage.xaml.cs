@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
+using CarmenUI.Windows;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -149,6 +150,52 @@ namespace CarmenUI.UserControls
             if (ApplicantObject == null)
                 return;
             ApplicantObject.Photo = null;
+            UpdateImage();
+        }
+
+        private void FixOrientation_Click(object sender, RoutedEventArgs e)
+        {
+            if (ApplicantObject == null)
+                return;
+            //TODO loading overlay
+            // load the original image
+            if (ApplicantObject.Photo is not Image original_image)
+                return;
+            using var original_stream = new MemoryStream(original_image.ImageData);
+            // find the correct rotation from metadata
+            if (BitmapFrame.Create(original_stream).Metadata is not BitmapMetadata metadata)
+                return;
+            var query = "System.Photo.Orientation";
+            if (!metadata.ContainsQuery(query))
+                return;
+            var rotation = (metadata.GetQuery("System.Photo.Orientation") as ushort?) switch
+            {
+                1 => Rotation.Rotate0,
+                3 => Rotation.Rotate180,
+                6 => Rotation.Rotate90,
+                8 => Rotation.Rotate270,
+                _ => throw new ApplicationException($"Invalid orientation: {metadata.GetQuery("System.Photo.Orientation")}")
+            };
+            // create image with correct rotation
+            var corrected = new BitmapImage();
+            corrected.BeginInit();
+            corrected.CacheOption = BitmapCacheOption.OnLoad;
+            original_stream.Seek(0, SeekOrigin.Begin);
+            corrected.StreamSource = original_stream;
+            corrected.Rotation = rotation;
+            corrected.EndInit();
+            corrected.Freeze();
+            // re-encode as png
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(corrected));
+            using var corrected_stream = new MemoryStream();
+            encoder.Save(corrected_stream);
+            // update the applicant
+            ApplicantObject.Photo = new Image
+            {
+                Name = original_image.Name,
+                ImageData = corrected_stream.ToArray()
+            };
             UpdateImage();
         }
     }
