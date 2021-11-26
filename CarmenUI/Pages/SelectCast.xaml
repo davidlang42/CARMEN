@@ -145,33 +145,31 @@
                                 </ItemsControl.ItemsPanel>
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <ListBoxItem HorizontalAlignment="Center">
-                                            <StackPanel Orientation="Horizontal">
-                                                <ContentControl Content="{Binding}"/>
-                                                <ItemsControl ItemsSource="{Binding Tags}">
-                                                    <ItemsControl.ItemsPanel>
-                                                        <ItemsPanelTemplate>
-                                                            <StackPanel Orientation="Horizontal"/>
-                                                        </ItemsPanelTemplate>
-                                                    </ItemsControl.ItemsPanel>
-                                                    <ItemsControl.ItemTemplate>
-                                                        <DataTemplate>
-                                                            <Image Margin="5 0 0 0" Source="{Binding Icon.ImageData, Converter={StaticResource bytesToImage}}"
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 2">
+                                            <ContentControl Content="{Binding}"/>
+                                            <ItemsControl ItemsSource="{Binding Tags}">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Image Margin="5 0 0 0" Source="{Binding Icon.ImageData, Converter={StaticResource bytesToImage}}"
                                                                    Height="{Binding ElementName=CastNumbersList, Path=FontSize}">
-                                                                <Image.ToolTip>
-                                                                    <MultiBinding Converter="{StaticResource fallbackValues}">
-                                                                        <MultiBinding.Bindings>
-                                                                            <Binding Path="Description"/>
-                                                                            <Binding Path="Name"/>
-                                                                        </MultiBinding.Bindings>
-                                                                    </MultiBinding>
-                                                                </Image.ToolTip>
-                                                            </Image>
-                                                        </DataTemplate>
-                                                    </ItemsControl.ItemTemplate>
-                                                </ItemsControl>
-                                            </StackPanel>
-                                        </ListBoxItem>
+                                                            <Image.ToolTip>
+                                                                <MultiBinding Converter="{StaticResource fallbackValues}">
+                                                                    <MultiBinding.Bindings>
+                                                                        <Binding Path="Description"/>
+                                                                        <Binding Path="Name"/>
+                                                                    </MultiBinding.Bindings>
+                                                                </MultiBinding>
+                                                            </Image.ToolTip>
+                                                        </Image>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
