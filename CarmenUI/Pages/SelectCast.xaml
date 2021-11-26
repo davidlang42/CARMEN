@@ -14,14 +14,12 @@
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Select Cast" Loaded="Page_Loaded">
     <Page.Resources>
-        <CollectionViewSource x:Key="castNumbersViewSource"/>
         <CollectionViewSource x:Key="selectedApplicantsViewSource"/>
         <CollectionViewSource x:Key="allApplicantsViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>
         <CollectionViewSource x:Key="alternativeCastsViewSource"/>
         <CollectionViewSource x:Key="sameCastSetsViewSource"/>
         <CollectionViewSource x:Key="tagsViewSource"/>
-        <CollectionViewSource x:Key="castNumberMissingViewSource"/>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <ObjectDataProvider x:Key="castStatusEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -93,7 +91,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="#" FontSize="22"/>
-                <ItemsControl Grid.Column="1" ItemsSource="{Binding Source={StaticResource alternativeCastsViewSource}}">
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding AlternativeCasts}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Rows="1"/>
@@ -106,13 +104,13 @@
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
             </Grid>
-            <Grid DockPanel.Dock="Bottom" Visibility="{Binding Source={StaticResource castNumberMissingViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
+            <Grid DockPanel.Dock="Bottom" Visibility="{Binding MissingNumbers.IsEmpty, Converter={StaticResource hideIfTrue}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Cast members without numbers:" FontSize="18"/>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource castNumberMissingViewSource}}">
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding MissingNumbers}">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid/>

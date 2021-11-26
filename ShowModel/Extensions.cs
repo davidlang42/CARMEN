@@ -187,6 +187,16 @@ namespace Carmen.ShowModel
                 sum += sequence[i];
             return sum;
         }
+
+        /// <summary>Performs an action on each item as it is enumerated</summary>
+        public static IEnumerable<T> Wrap<T>(this IEnumerable<T> sequence, Action<T> action)
+        {
+            foreach (var item in sequence)
+            {
+                action(item);
+                yield return item;
+            }
+        }
     }
 
     public static class AsyncExtensions

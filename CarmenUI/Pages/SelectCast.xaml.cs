@@ -109,13 +109,9 @@ namespace CarmenUI.Pages
                 _tags = await context.Tags.Include(t => t.Members).Include(t => t.Requirements).ToArrayAsync();
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.SameCastSet), "Applicants"))
-                _applicants = await context.Applicants.Include(a => a.SameCastSet).ToArrayAsync();
-            using (loading.Segment(nameof(TriggerCastNumbersRefresh) + nameof(castNumbersViewSource), "Cast numbers"))
             {
-                castNumbersViewSource.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Applicant.CastNumber)));
-                allApplicantsViewSource.Source = castNumbersViewSource.Source = castNumberMissingViewSource.Source
-                    = context.Applicants.Local.ToObservableCollection();
-                TriggerCastNumbersRefresh();
+                _applicants = await context.Applicants.Include(a => a.SameCastSet).ToArrayAsync();
+                allApplicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
             }
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
@@ -139,14 +135,6 @@ namespace CarmenUI.Pages
                     _ => throw new ArgumentException($"Allocation engine not handled: {ParseSelectionEngine()}")
                 };
             }
-        }
-
-        private void TriggerCastNumbersRefresh()
-        {
-            castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.CastNumber), ListSortDirection.Ascending));
-            castNumbersViewSource.View.SortDescriptions.Add(new(nameof(Applicant.AlternativeCast), ListSortDirection.Ascending));
-            castNumbersViewSource.View.Filter = a => ((Applicant)a).CastNumber != null;
-            castNumberMissingViewSource.View.Filter = a => ((Applicant)a).CastNumber == null && ((Applicant)a).CastGroup != null;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -495,7 +483,7 @@ namespace CarmenUI.Pages
             }
             else if (selectionList.SelectedItem == finalCastList)
             {
-                TriggerCastNumbersRefresh();
+                numbersPanel.DataContext = new CastList(); //TODO does this really need re-creating each time?
                 numbersPanel.Visibility = Visibility.Visible;
             }
             else if (selectionList.SelectedItem == keepApplicantsTogether)
