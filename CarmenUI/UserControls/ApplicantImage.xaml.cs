@@ -71,7 +71,7 @@ namespace CarmenUI.UserControls
         private ImageSource CachedImage(int image_id, ShowRoot show, Image? lazy_loading_photo)
         {
             var cache_path = GetCachePath(show);
-            var filename = $"{cache_path}{image_id}.jpg";
+            var filename = $"{cache_path}{image_id}.BMP";
             if (!File.Exists(filename))
             {
                 if (!Directory.Exists(cache_path))
@@ -194,7 +194,7 @@ namespace CarmenUI.UserControls
             corrected.Rotation = rotation;
             corrected.EndInit();
             corrected.Freeze();
-            // re-encode as png
+            // re-encode
             var encoder = new PngBitmapEncoder();
             encoder.Frames.Add(BitmapFrame.Create(corrected));
             using var corrected_stream = new MemoryStream();
