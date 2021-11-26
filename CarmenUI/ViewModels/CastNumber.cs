@@ -31,6 +31,7 @@ namespace CarmenUI.ViewModels
         public ReadOnlyCollection<Applicant?> Applicants => Array.AsReadOnly(applicants);
 
         public bool IsEmpty => Applicants.All(a => a == null);
+        public bool IsComplete => Applicants.Any() && Applicants.All(a => a != null);
 
         public CastNumber(IEnumerable<Applicant> applicants_of_the_same_cast_number, AlternativeCast[] alternative_casts)
         {

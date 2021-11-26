@@ -37,6 +37,10 @@
         </cv:MultiConverter>
         <cv:HideIfNull x:Key="hideIfNull"/>
         <cv:FallbackValues x:Key="fallbackValues"/>
+        <cv:MultiConverter x:Key="highlightIfFalse">
+            <cv:InvertBoolean/>
+            <cv:HighlightError/>
+        </cv:MultiConverter>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -133,7 +137,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Number}" VerticalAlignment="Center"/>
-                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Applicants}">
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Applicants}" Background="{Binding IsComplete, Converter={StaticResource highlightIfFalse}}">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Rows="1"/>

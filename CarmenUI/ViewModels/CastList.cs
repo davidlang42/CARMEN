@@ -20,7 +20,6 @@ namespace CarmenUI.ViewModels
         public AlternativeCast[] AlternativeCasts { get; }
         public ObservableCollection<Applicant> MissingNumbers { get; } = new();
         public ObservableCollection<CastNumber> CastNumbers { get; } = new();
-        public ObservableCollection<int> EmptyNumbers { get; } = new();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
