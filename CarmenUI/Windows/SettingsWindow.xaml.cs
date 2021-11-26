@@ -3,11 +3,13 @@ using Carmen.CastingEngine.Audition;
 using Carmen.CastingEngine.Selection;
 using Carmen.ShowModel.Applicants;
 using CarmenUI.Properties;
+using CarmenUI.UserControls;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -57,6 +59,8 @@ namespace CarmenUI.Windows
         public string[] AllocationEngines => AllocationEngine.Implementations.Select(t => t.Name).ToArray();
 
         public string SettingsPath => ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.PerUserRoamingAndLocal).FilePath;
+
+        public string DefaultImageCachePath => ApplicantImage.DefaultImageCachePath;
 
         public SettingsWindow()
         {
@@ -171,6 +175,22 @@ namespace CarmenUI.Windows
         {
             Process.Start(new ProcessStartInfo(e.Uri.AbsoluteUri) { UseShellExecute = true });
             e.Handled = true;
+        }
+
+        private void ClearImageCacheButton_Click(object sender, RoutedEventArgs e)
+        {
+            var image_cache_path = Settings.Default.ImageCachePath;
+            if (string.IsNullOrEmpty(image_cache_path))
+                image_cache_path = DefaultImageCachePath;
+            if (!Directory.Exists(image_cache_path))
+            {
+                MessageBox.Show($"Directory '{image_cache_path}' does not exist.", Title);
+                return;
+            }    
+            if (MessageBox.Show($"Are you sure you wanted to clear all cached images in '{image_cache_path}'?", Title, MessageBoxButton.YesNo) == MessageBoxResult.No)
+                return;
+            Directory.Delete(image_cache_path, true); //TODO bug: file handle still open to last viewed image in EditApplicants
+            MessageBox.Show("Image cache cleared", Title);
         }
     }
 }

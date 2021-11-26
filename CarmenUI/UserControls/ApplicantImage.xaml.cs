@@ -31,6 +31,8 @@ namespace CarmenUI.UserControls
         private static void OnApplicantObjectChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
             => ((ApplicantImage)sender).UpdateImage(); //TODO really should add change handler for Applicant.Photo rather than call UpdateImage() after each change
 
+        public static string DefaultImageCachePath => Path.GetTempPath() + "CarmenImageCache";
+
         public Applicant? ApplicantObject
         {
             get => (Applicant?)GetValue(ApplicantObjectProperty);
@@ -68,7 +70,7 @@ namespace CarmenUI.UserControls
 
         private ImageSource CachedImage(int image_id, ShowRoot show, Image? lazy_loading_photo)
         {
-            var cache_path = CachePath(show);
+            var cache_path = GetCachePath(show);
             var filename = $"{cache_path}{image_id}.jpg";
             if (!File.Exists(filename))
             {
@@ -81,8 +83,15 @@ namespace CarmenUI.UserControls
             return new BitmapImage(new Uri(filename));
         }
 
-        public static string CachePath(ShowRoot show_root)
-            => Path.GetTempPath() + Path.DirectorySeparatorChar + string.Concat(show_root.Name.Split(Path.GetInvalidFileNameChars())) + Path.DirectorySeparatorChar; //TODO public?
+        public static string GetCachePath(ShowRoot show_root) //TODO public?
+        {
+            var root_path = Properties.Settings.Default.ImageCachePath;
+            if (string.IsNullOrEmpty(root_path))
+                root_path = DefaultImageCachePath;
+            if (!root_path.EndsWith(Path.DirectorySeparatorChar))
+                root_path += Path.DirectorySeparatorChar;
+            return root_path + string.Concat(show_root.Name.Split(Path.GetInvalidFileNameChars())) + Path.DirectorySeparatorChar;
+        }
 
         private ImageSource? ActualImage(Image photo)
         {

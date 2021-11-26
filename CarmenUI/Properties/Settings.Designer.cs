@@ -392,5 +392,17 @@ namespace CarmenUI.Properties {
                 this["ReportOnCtrlR"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string ImageCachePath {
+            get {
+                return ((string)(this["ImageCachePath"]));
+            }
+            set {
+                this["ImageCachePath"] = value;
+            }
+        }
     }
 }
