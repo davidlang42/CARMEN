@@ -335,12 +335,12 @@ namespace CarmenUI.Pages
         private async void RefreshImageCache_Click(object sender, RoutedEventArgs e)
         {
             using var context = ShowContext.Open(connection);
-            Dictionary<int, C.Image> load_images;
+            HashSet<int> image_ids;
             Dictionary<int, string> cached_ids = new();
             using (var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshImageCache_Click), "Refreshing..."))
             {
                 using (loading.Segment(nameof(ShowContext.Images), "Image list"))
-                    load_images = await context.Images.ToDictionaryAsync(i => i.ImageId);
+                    image_ids = await context.Images.Select(i => i.ImageId).ToHashSetAsync();
                 using (loading.Segment(nameof(ApplicantImage.GetCachePath), "Cache list"))
                 {
                     var cache_path = ApplicantImage.GetCachePath(context.ShowRoot);
@@ -349,7 +349,7 @@ namespace CarmenUI.Pages
                         foreach (var cached_file in Directory.GetFiles(cache_path))
                         {
                             var filename = Path.GetFileName(cached_file);
-                            if (MatchImageId(filename, out var image_id) && load_images.ContainsKey(image_id))
+                            if (MatchImageId(filename, out var image_id) && image_ids.Contains(image_id))
                                 cached_ids.Add(image_id, cached_file);
                             else
                                 File.Delete(cached_file);
@@ -364,19 +364,19 @@ namespace CarmenUI.Pages
                         File.Delete(cached_file);
                 else
                     foreach (var (id, _) in cached_ids)
-                        load_images.Remove(id);
+                        image_ids.Remove(id);
             }
             using (var loading = new LoadingOverlay(this) { MainText = "Refreshing..." })
             {
                 var i = 0;
-                foreach (var image in load_images.Values)
+                foreach (var image_id in image_ids)
                 {
-                    loading.Progress = 100 * i / load_images.Count;
-                    loading.SubText = $"Loading image {++i}/{load_images.Count}";
-                    await Task.Run(() => ApplicantImage.CachedImage(image.ImageId, context.ShowRoot, () => image));
+                    loading.Progress = 100 * i / image_ids.Count;
+                    loading.SubText = $"Loading image {++i}/{image_ids.Count}";
+                    await Task.Run(() => ApplicantImage.CachedImage(image_id, context.ShowRoot, () => context.Images.Single(i => i.ImageId == image_id)));
                 }
             }
-            MessageBox.Show($"Loaded and cached {load_images.Count.Plural("image")}.", WindowTitle);
+            MessageBox.Show($"Loaded and cached {image_ids.Count.Plural("image")}.", WindowTitle);
         }
 
         private bool MatchImageId(string filename, out int image_id)
