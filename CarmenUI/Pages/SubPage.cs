@@ -114,7 +114,7 @@ namespace CarmenUI.Pages
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error while saving changes: {ex.Message}\nChanges not saved.");
+                MessageBox.Show($"Error while saving changes: {ex.InnermostException().Message}\nChanges not saved.");
                 return false;
             }
             saved_changes |= changes;
