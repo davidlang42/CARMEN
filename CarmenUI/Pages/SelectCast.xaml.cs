@@ -187,9 +187,9 @@ namespace CarmenUI.Pages
                     using (var processing = new LoadingOverlay(this).AsSegment(nameof(SelectCast) + nameof(PreSaveChecks), "Processing..."))
                     {
                         using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                            await Task.Run(() => engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local));
+                            engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local); // see selectCastButton_Click()
                         using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                            await Task.Run(() => engine.AllocateCastNumbers(applicants));
+                            engine.AllocateCastNumbers(applicants); // see selectCastButton_Click()
                     }
                     var updated_inconsistent_applicants = applicants
                         .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)));
