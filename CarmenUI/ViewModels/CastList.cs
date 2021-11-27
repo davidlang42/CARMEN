@@ -137,9 +137,26 @@ namespace CarmenUI.ViewModels
             //TODO
         }
 
-        public void Split(IEnumerable<CastNumber> cast_numbers)
+        public IEnumerable<CastNumber> Split(CastNumber cast_number)
         {
-            //TODO
+            var applicants = cast_number.Applicants.NotNull().ToArray();
+            for (var i = 0; i < applicants.Length - 1; i++)
+            {
+                cast_number.Remove(applicants[i]);
+                ShiftDown(cast_number);
+                var new_cast_number = new CastNumber(applicants[i].Yield(), AlternativeCasts);
+                CastNumbers.Add(new_cast_number);
+                yield return new_cast_number;
+            }
+            yield return cast_number; // still contains the last applicant
+        }
+
+        private void ShiftDown(CastNumber cast_number)
+        {
+            var new_cast_number = cast_number.Number + 1;
+            if (CastNumbers.Where(n => n.Number == new_cast_number).SingleOrDefault() is CastNumber existing)
+                ShiftDown(existing);
+            SetCastNumber(cast_number, new_cast_number);
         }
 
         public void MoveUp(CastNumber cast_number, int dont_move_above = CastNumberSet.FIRST_CAST_NUMBER)

@@ -613,7 +613,11 @@ namespace CarmenUI.Pages
         {
             if (CastNumbersList.SelectedItems.Count == 0)
                 return;
-            castList.Split(CastNumbersList.SelectedItems.OfType<CastNumber>());
+            var previous_selection = CastNumbersList.SelectedItems.OfType<CastNumber>().ToArray();
+            CastNumbersList.SelectedItems.Clear();
+            foreach (var cast_number in previous_selection)
+                foreach (var new_cast_number in castList.Split(cast_number))
+                    CastNumbersList.SelectedItems.Add(new_cast_number);
         }
     }
 

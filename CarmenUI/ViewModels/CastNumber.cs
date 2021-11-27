@@ -65,6 +65,8 @@ namespace CarmenUI.ViewModels
                         throw new ApplicationException("Applicant has an alternative cast but is in a cast group which does not alternate.");
                     applicants = new Applicant?[] { applicant };
                     OnPropertyChanged(nameof(Applicants));
+                    OnPropertyChanged(nameof(IsEmpty));
+                    OnPropertyChanged(nameof(IsComplete));
                     return;
                 }
             }
@@ -75,6 +77,8 @@ namespace CarmenUI.ViewModels
                 throw new ApplicationException($"Cast number {number} already contains an applicant in {applicant.AlternativeCast.Name}");
             applicants[index] = applicant;
             OnPropertyChanged(nameof(Applicants));
+            OnPropertyChanged(nameof(IsEmpty));
+            OnPropertyChanged(nameof(IsComplete));
         }
 
         public void Remove(Applicant applicant)
@@ -84,6 +88,8 @@ namespace CarmenUI.ViewModels
                 {
                     applicants[i] = null;
                     OnPropertyChanged(nameof(Applicants));
+                    OnPropertyChanged(nameof(IsEmpty));
+                    OnPropertyChanged(nameof(IsComplete));
                     return;
                 }
             throw new ApplicationException("Applicant not found.");
