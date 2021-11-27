@@ -10,6 +10,7 @@ using FontAwesome.WPF;
 using System.Windows.Media;
 using MySqlConnector;
 using System.Net.NetworkInformation;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarmenUI.ViewModels
 {
@@ -79,6 +80,24 @@ namespace CarmenUI.ViewModels
             DbProvider.MySql => new Ping().Send(Host, 500).Status == IPStatus.Success, //TODO this should check server is connectable (ie. user & pass) using ServerVersion.AutoDetect or similar, and handle blanks/malformed
             _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
         };
+
+        public bool TryConnection(out string? error)
+        {
+            error = null;
+            try
+            {
+                if (Provider == null)
+                    _ = File.ReadAllBytes(Filename);
+                else if (Provider == DbProvider.MySql)
+                    ServerVersion.AutoDetect(ConnectionString);
+                else
+                    throw new NotImplementedException($"Provider not implemented: {Provider}");
+            } catch (Exception ex)
+            {
+                error = ex.Message;
+            }
+            return error == null;
+        }
 
         public void CreateBackupIfFile()
         {

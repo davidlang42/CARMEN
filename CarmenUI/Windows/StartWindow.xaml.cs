@@ -89,8 +89,13 @@ namespace CarmenUI.Windows
                 Title = "Open Existing Database",
                 Filter = "Sqlite Database (*.db)|*.db|All Files (*.*)|*.*"
             };
-            if (dialog.ShowDialog() == true)
-                await OpenShow(new RecentShow { Filename = dialog.FileName});
+            if (dialog.ShowDialog() != true)
+                return;
+            var show = new RecentShow { Filename = dialog.FileName };
+            if (!show.TryConnection(out var error))
+                MessageBox.Show($"Error opening {show.Label}: {error}", Title);
+            else
+                await OpenShow(show);
         }
 
         private async Task OpenShow(RecentShow show)
@@ -113,12 +118,12 @@ namespace CarmenUI.Windows
                 }
                 else if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
                 {
-                    MessageBox.Show("This database was saved with a newer version of CARMEN and cannot be opened. Please install the latest version.", "CARMEN");
+                    MessageBox.Show("This database was saved with a newer version of CARMEN and cannot be opened. Please install the latest version.", Title);
                     return;
                 }
                 else if (state == ShowContext.DatabaseState.SavedWithPreviousVersion)
                 {
-                    if (MessageBox.Show("This database was saved with an older version of CARMEN, would you like to upgrade it?\nNOTE: Once upgraded, older versions will no longer be able to read this database.", "CARMEN", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    if (MessageBox.Show("This database was saved with an older version of CARMEN, would you like to upgrade it?\nNOTE: Once upgraded, older versions will no longer be able to read this database.", Title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     {
                         using (new LoadingOverlay(this) { SubText = "Upgrading database" })
                         {
@@ -162,14 +167,20 @@ namespace CarmenUI.Windows
         {
             if(e.AddedItems.Count > 0 && e.AddedItems[0] is RecentShow show)
             {
-                if (show.CheckAssessible())
-                    await OpenShow(show);
-                else
+                if (!show.CheckAssessible())
                 {
-                    if (MessageBox.Show($"{show.Label} cannot be accessed. Would you like to remove it from the recent shows list?", "CARMEN", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                    if (MessageBox.Show($"{show.Label} cannot be accessed. Would you like to remove it from the recent shows list?", Title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                         RemoveFromRecentList(show);
                     RecentList.Items.Refresh();
                 }
+                else if (!show.TryConnection(out var error))
+                {
+                    if (MessageBox.Show($"Error opening {show.Label}: {error}\nWould you like to remove it from the recent shows list?", Title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        RemoveFromRecentList(show);
+                    RecentList.Items.Refresh();
+                }
+                else
+                    await OpenShow(show);
                 RecentList.SelectedItem = null;
             }
         }

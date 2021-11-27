@@ -35,7 +35,12 @@ namespace CarmenUI.Windows
             show.Password = PasswordText.Password;
             if (!show.CheckAssessible())
             {
-                MessageBox.Show("Failed to connect.");
+                MessageBox.Show("Server not accessible.", Title);
+                return;
+            }
+            if (!show.TryConnection(out var error))
+            {
+                MessageBox.Show($"Connection error: {error}", Title);
                 return;
             }
             DialogResult = true;
