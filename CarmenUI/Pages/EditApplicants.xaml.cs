@@ -488,29 +488,6 @@ namespace CarmenUI.Pages
             MessageBox.Show($"Imported {count.Plural("ability","abilities")} for '{applicant.FirstName} {applicant.LastName}'.", WindowTitle);
         }
 
-        private static bool TryInputBoolean(string message, string title, out bool value) //TODO remove if not used
-        {
-            var result = MessageBox.Show(message, title, MessageBoxButton.YesNoCancel);
-            value = result == MessageBoxResult.Yes;
-            return result != MessageBoxResult.Cancel;
-        }
-
-        private static bool TryInputNumber(string message, string title, out uint value, uint? default_response = null) //TODO remove if not used
-        {
-            var response = default_response?.ToString() ?? "";
-            while (true)
-            {
-                response = Microsoft.VisualBasic.Interaction.InputBox(message, title, response); // I'm sorry
-                if (string.IsNullOrEmpty(response))
-                {
-                    value = default;
-                    return false;
-                }
-                else if (uint.TryParse(response, out value))
-                    return true;
-            }
-        }
-
         private void DeleteApplicant_Click(object sender, RoutedEventArgs e)
         {
             if (applicantsList.SelectedItem is Applicant applicant)
