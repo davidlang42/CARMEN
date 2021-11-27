@@ -14,16 +14,12 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using CarmenUI.Bindings;
 using Microsoft.Win32;
 using Carmen.ShowModel.Import;
 using System.Diagnostics;
+using System.IO;
 
 namespace CarmenUI.Pages
 {
@@ -423,66 +419,98 @@ namespace CarmenUI.Pages
             };
             if (dialog.ShowDialog() != true)
                 return;
-            using var import = ShowContext.Open(new LocalShowConnection(dialog.FileName));
-            //TODO handle migration?
             Applicant[] import_applicants;
-            using (var loading = new LoadingOverlay(this) { SubText = "Applicant list" })
-                import_applicants = await import.Applicants.ToArrayAsync();
-            var picker = new ApplicantPickerDialog(import_applicants, applicant.FirstName, applicant.LastName)
+            ShowContext import;
+            ApplicantPickerDialog picker;
+            using (var loading = new LoadingOverlay(this))
             {
-                Owner = Window.GetWindow(this)
-            };
-            if (picker.ShowDialog() != true || picker.SelectedApplicant is not Applicant import_selected)
-                return;
-            var add_notes = "Imported marks";
-            if (!import_selected.FirstName.Equals(applicant.FirstName, StringComparison.OrdinalIgnoreCase) || !import_selected.LastName.Equals(applicant.LastName, StringComparison.OrdinalIgnoreCase))
-            {
-                var msg = $"Importing applicant '{import_selected.FirstName} {import_selected.LastName}' does not match selected applicant '{applicant.FirstName} {applicant.LastName}'. Would you like to add them as a new applicant instead?";
-                var result = MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNoCancel);
-                if (result == MessageBoxResult.Cancel)
+                loading.SubText = "Checking database integrity";
+                import = ShowContext.Open(new LocalShowConnection(dialog.FileName));
+                var state = await import.CheckDatabaseState();
+                if (state == ShowContext.DatabaseState.Empty)
+                {
+                    loading.Dispose();
+                    await import.DisposeAsync();
+                    MessageBox.Show("The selected database is empty.", Title);
                     return;
-                if (result == MessageBoxResult.Yes)
-                {
-                    applicant = new Applicant
-                    {
-                        ShowRoot = context.ShowRoot,
-                        FirstName = import_selected.FirstName,
-                        LastName = import_selected.LastName,
-                        Gender = import_selected.Gender,
-                        DateOfBirth = import_selected.DateOfBirth
-                    };
-                    context.Applicants.Add(applicant);
-                    add_notes = "Imported applicant";
                 }
-            }
-            add_notes += " from " + import.ShowRoot.Name;
-            int count = 0;
-            using (var loading = new LoadingOverlay(this) { MainText = "Importing...", SubText = $"{import_selected.FirstName} {import_selected.FirstName}" })
-            {
-                var import_abilities = await import.Abilities.Where(a => a.Applicant == import_selected).Include(ab => ab.Criteria).ToArrayAsync();
-                foreach (var import_ability in import_abilities)
+                else if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
                 {
-                    var import_formatted_mark = import_ability.Criteria.Format(import_ability.Mark);
-                    if (criterias.Where(c => c.Name.Equals(import_ability.Criteria.Name, StringComparison.OrdinalIgnoreCase)).SingleOrDefault() is Criteria matching_criteria)
+                    loading.Dispose();
+                    await import.DisposeAsync();
+                    MessageBox.Show("The selected database was saved with a newer version of CARMEN and cannot be opened. Please install the latest version.", Title);
+                    return;
+                }
+                else if (state == ShowContext.DatabaseState.SavedWithPreviousVersion)
+                {
+                    loading.SubText = "Creating temporary migration";
+                    await import.DisposeAsync();
+                    var temp_file = Path.GetTempFileName();
+                    File.Copy(dialog.FileName, temp_file, true); // make a copy so the original is not migrated
+                    import = ShowContext.Open(new LocalShowConnection(temp_file));
+                    await import.UpgradeDatabase();
+                }
+                loading.SubText = "Applicant list";
+                import_applicants = await import.Applicants.ToArrayAsync();
+                picker = new ApplicantPickerDialog(import_applicants, applicant.FirstName, applicant.LastName)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+            }
+            int count = 0;
+            using (import)
+            {
+                if (picker.ShowDialog() != true || picker.SelectedApplicant is not Applicant import_selected)
+                    return;
+                var add_notes = "Imported marks";
+                if (!import_selected.FirstName.Equals(applicant.FirstName, StringComparison.OrdinalIgnoreCase) || !import_selected.LastName.Equals(applicant.LastName, StringComparison.OrdinalIgnoreCase))
+                {
+                    var msg = $"Importing applicant '{import_selected.FirstName} {import_selected.LastName}' does not match selected applicant '{applicant.FirstName} {applicant.LastName}'. Would you like to add them as a new applicant instead?";
+                    var result = MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNoCancel);
+                    if (result == MessageBoxResult.Cancel)
+                        return;
+                    if (result == MessageBoxResult.Yes)
                     {
-                        if (import_formatted_mark.Equals(matching_criteria.Format(import_ability.Mark), StringComparison.OrdinalIgnoreCase)) // important for select criteria
+                        applicant = new Applicant
                         {
-                            if (applicant.Abilities.Where(ab => ab.Criteria == matching_criteria).SingleOrDefault() is Ability existing_ability && existing_ability.Mark != import_ability.Mark)
-                                add_notes += $"\nOverwrote previous {matching_criteria.Name} ability of {matching_criteria.Format(existing_ability.Mark)} with {import_formatted_mark}";
-                            applicant.SetMarkFor(matching_criteria, import_ability.Mark);
-                            count++;
+                            ShowRoot = context.ShowRoot,
+                            FirstName = import_selected.FirstName,
+                            LastName = import_selected.LastName,
+                            Gender = import_selected.Gender,
+                            DateOfBirth = import_selected.DateOfBirth
+                        };
+                        context.Applicants.Add(applicant);
+                        add_notes = "Imported applicant";
+                    }
+                }
+                using (var loading = new LoadingOverlay(this) { MainText = "Importing...", SubText = $"{import_selected.FirstName} {import_selected.FirstName}" })
+                {
+                    add_notes += " from " + import.ShowRoot.Name;
+                    var import_abilities = await import.Abilities.Where(a => a.Applicant == import_selected).Include(ab => ab.Criteria).ToArrayAsync();
+                    foreach (var import_ability in import_abilities)
+                    {
+                        var import_formatted_mark = import_ability.Criteria.Format(import_ability.Mark);
+                        if (criterias.Where(c => c.Name.Equals(import_ability.Criteria.Name, StringComparison.OrdinalIgnoreCase)).SingleOrDefault() is Criteria matching_criteria)
+                        {
+                            if (import_formatted_mark.Equals(matching_criteria.Format(import_ability.Mark), StringComparison.OrdinalIgnoreCase)) // important for select criteria
+                            {
+                                if (applicant.Abilities.Where(ab => ab.Criteria == matching_criteria).SingleOrDefault() is Ability existing_ability && existing_ability.Mark != import_ability.Mark)
+                                    add_notes += $"\nOverwrote previous {matching_criteria.Name} ability of {matching_criteria.Format(existing_ability.Mark)} with {import_formatted_mark}";
+                                applicant.SetMarkFor(matching_criteria, import_ability.Mark);
+                                count++;
+                            }
+                            else
+                                add_notes += $"\nHad {matching_criteria.Name} ability of {import_formatted_mark} (format mismatch)";
                         }
                         else
-                            add_notes += $"\nHad {matching_criteria.Name} ability of {import_formatted_mark} (format mismatch)";
+                            add_notes += $"\nHad {import_ability.Criteria.Name} ability of {import_formatted_mark} (no match found)";
                     }
+                    if (string.IsNullOrWhiteSpace(applicant.Notes))
+                        applicant.Notes = add_notes;
                     else
-                        add_notes += $"\nHad {import_ability.Criteria.Name} ability of {import_formatted_mark} (no match found)";
+                        applicant.Notes += "\n\n" + add_notes;
                 }
             }
-            if (string.IsNullOrWhiteSpace(applicant.Notes))
-                applicant.Notes = add_notes;
-            else
-                applicant.Notes += "\n\n" + add_notes;
             applicantsList.SelectedItem = null;
             applicantsList.SelectedItem = applicant;
             MessageBox.Show($"Imported {count.Plural("ability","abilities")} for '{applicant.FirstName} {applicant.LastName}'.", WindowTitle);
