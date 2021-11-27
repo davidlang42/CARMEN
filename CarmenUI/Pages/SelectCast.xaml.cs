@@ -606,7 +606,11 @@ namespace CarmenUI.Pages
         {
             if (CastNumbersList.SelectedItems.Count == 0)
                 return;
-            castList.Merge(CastNumbersList.SelectedItems.OfType<CastNumber>());
+            var selection = CastNumbersList.SelectedItems.OfType<CastNumber>().ToArray();
+            if (selection.Length < 2)
+                MessageBox.Show("Please select 2 or more rows to merge.", WindowTitle);
+            else
+                castList.Merge(selection);
         }
 
         private void splitButton_Click(object sender, RoutedEventArgs e)

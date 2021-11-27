@@ -50,6 +50,9 @@ namespace CarmenUI.ViewModels
             } while (e.MoveNext());
         }
 
+        public CastGroup GetCastGroup() => applicants.NotNull().FirstOrDefault()?.CastGroup
+            ?? throw new InvalidOperationException("Cannot get the cast group of an empty cast number.");
+
         public void Add(Applicant applicant)
         {
             if (applicant.CastNumber != number)
@@ -69,6 +72,12 @@ namespace CarmenUI.ViewModels
                     OnPropertyChanged(nameof(IsComplete));
                     return;
                 }
+            }
+            else
+            {
+                var existing_cast_group = GetCastGroup();
+                if (applicant.CastGroup != existing_cast_group)
+                    throw new ApplicationException("Tried to add an applicant with the wrong cast group.");
             }
             if (applicant.AlternativeCast == null)
                 throw new ApplicationException("Tried to add an applicant to an alternating cast number without an alternative cast.");

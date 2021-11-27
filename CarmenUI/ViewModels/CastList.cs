@@ -134,7 +134,33 @@ namespace CarmenUI.ViewModels
 
         public void Merge(IEnumerable<CastNumber> cast_numbers)
         {
-            //TODO
+            foreach (var group in cast_numbers.GroupBy(cn => cn.GetCastGroup()).Where(g => g.Key.AlternateCasts))
+            {
+                var numbers = group.ToArray();
+                for (var i = 0; i < numbers.Length; i++)
+                {
+                    for (var ac = 0; ac < AlternativeCasts.Length; ac++)
+                    {
+                        if (numbers[i].Applicants[ac] == null)
+                        {
+                            for (var j = i + 1; j < numbers.Length; j++)
+                            {
+                                if (numbers[j].Applicants[ac] is Applicant move)
+                                {
+                                    ignoreApplicantChanges = true;
+                                    numbers[j].Remove(move);
+                                    move.CastNumber = numbers[i].Number;
+                                    numbers[i].Add(move);
+                                    ignoreApplicantChanges = false;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    if (numbers[i].IsEmpty)
+                        CastNumbers.Remove(numbers[i]);
+                }
+            }
         }
 
         public IEnumerable<CastNumber> Split(CastNumber cast_number)
