@@ -205,7 +205,10 @@ namespace Carmen.CastingEngine.Selection
             foreach (var applicant in applicants)
             {
                 if (applicant.CastGroup == null)
+                {
                     applicant.Tags.Remove(tag); // not accepted, therefore remove tag
+                    tag.Members.Remove(applicant);
+                }
                 else
                 {
                     if (applicant.CastGroup.AlternateCasts != (applicant.AlternativeCast != null))
