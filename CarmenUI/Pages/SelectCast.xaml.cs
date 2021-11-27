@@ -586,15 +586,19 @@ namespace CarmenUI.Pages
         {
             if (CastNumbersList.SelectedItems.Count == 0)
                 return;
-            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>().ToArray()) //TODO sort this by reverse order in list
-                castList.MoveUp(cast_number);
+            int dont_move_above = CastNumberSet.FIRST_CAST_NUMBER;
+            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>().OrderBy(n => n.Number).ToArray()) // order ensures they move together when adjacent
+            {
+                castList.MoveUp(cast_number, dont_move_above);
+                dont_move_above = cast_number.Number + 1; // avoid swapping with other selected rows when they reach the top of the list
+            }
         }
 
         private void moveDownButton_Click(object sender, RoutedEventArgs e)
         {
             if (CastNumbersList.SelectedItems.Count == 0)
                 return;
-            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>().ToArray()) //TODO sort this by order in list
+            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>().OrderByDescending(n => n.Number).ToArray()) // order ensures they move together when adajcent
                 castList.MoveDown(cast_number);
         }
 

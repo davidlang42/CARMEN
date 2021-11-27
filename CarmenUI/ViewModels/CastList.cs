@@ -142,9 +142,9 @@ namespace CarmenUI.ViewModels
             //TODO
         }
 
-        public void MoveUp(CastNumber cast_number)
+        public void MoveUp(CastNumber cast_number, int dont_move_above = CastNumberSet.FIRST_CAST_NUMBER)
         {
-            if (cast_number.Number == CastNumberSet.FIRST_CAST_NUMBER)
+            if (cast_number.Number <= dont_move_above)
                 return; // nothing to do
             var new_cast_number = cast_number.Number - 1;
             if (CastNumbers.Where(n => n.Number == new_cast_number).SingleOrDefault() is CastNumber existing)
