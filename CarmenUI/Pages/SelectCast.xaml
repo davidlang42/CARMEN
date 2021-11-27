@@ -97,7 +97,7 @@
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="#" FontSize="22"/>
-                <ItemsControl Grid.Column="1" ItemsSource="{Binding Source={StaticResource alternativeCastsViewSource}}">
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding Source={StaticResource alternativeCastsViewSource}}" KeyboardNavigation.IsTabStop="False">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid Rows="1"/>
@@ -151,7 +151,7 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="Cast members without numbers:" FontSize="18"/>
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource castNumberMissingViewSource}}" Background="LightCoral">
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource castNumberMissingViewSource}}" Background="LightCoral" KeyboardNavigation.IsTabStop="False">
                     <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <UniformGrid/>
@@ -172,7 +172,7 @@
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                             <TextBlock Text="{Binding Number}" VerticalAlignment="Center"/>
-                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Applicants}" Background="{Binding IsComplete, Converter={StaticResource highlightIfFalse}}">
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Applicants}" Background="{Binding IsComplete, Converter={StaticResource highlightIfFalse}}" KeyboardNavigation.IsTabStop="False">
                                 <ItemsControl.ItemsPanel>
                                     <ItemsPanelTemplate>
                                         <UniformGrid Rows="1"/>
@@ -181,8 +181,8 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 2">
-                                            <ContentControl Content="{Binding}"/>
-                                            <ItemsControl ItemsSource="{Binding Tags}">
+                                            <ContentControl Content="{Binding}" KeyboardNavigation.IsTabStop="False"/>
+                                            <ItemsControl ItemsSource="{Binding Tags}" KeyboardNavigation.IsTabStop="False">
                                                 <ItemsControl.ItemsPanel>
                                                     <ItemsPanelTemplate>
                                                         <StackPanel Orientation="Horizontal"/>
