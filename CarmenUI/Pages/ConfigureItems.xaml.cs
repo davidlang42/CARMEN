@@ -334,6 +334,7 @@ namespace CarmenUI.Pages
             else if (e.Key == Key.Delete && itemsTreeView.SelectedItem is Node node && node is not ShowRoot)
             {
                 context.DeleteNode(node);
+                itemsTreeView.Focus();
                 e.Handled = true;
             }
         }
