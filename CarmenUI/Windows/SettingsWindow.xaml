@@ -136,7 +136,7 @@
                                   IsChecked="{bd:SettingBinding ExitToStartOnBackspace}"/>
                         <CheckBox Content="Press F1 to open this settings window (from starting window or Main Menu)" Margin="0 5"
                                   IsChecked="{bd:SettingBinding OpenSettingsOnF1}"/>
-                        <CheckBox Content="Press Ctrl+Up/Down to move items within a list (while configuring show settings or items)" Margin="0 5"
+                        <CheckBox Content="Press Ctrl+Up/Down to move items within a list (while configuring show settings, items or cast list)" Margin="0 5"
                                   IsChecked="{bd:SettingBinding MoveOnCtrlArrow}"/>
                         <CheckBox Content="Press F5 to refresh the data in a report window" Margin="0 5"
                                   IsChecked="{bd:SettingBinding RefreshOnF5}"/>

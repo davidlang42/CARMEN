@@ -623,6 +623,24 @@ namespace CarmenUI.Pages
                 foreach (var new_cast_number in castList.Split(cast_number))
                     CastNumbersList.SelectedItems.Add(new_cast_number);
         }
+
+        private void CastNumbersList_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Properties.Settings.Default.MoveOnCtrlArrow
+                && Keyboard.Modifiers == ModifierKeys.Control)
+            {
+                if (e.Key == Key.Up)
+                {
+                    moveUpButton_Click(sender, e);
+                    e.Handled = true;
+                }
+                else if (e.Key == Key.Down)
+                {
+                    moveDownButton_Click(sender, e);
+                    e.Handled = true;
+                }
+            }
+        }
     }
 
     public enum CastStatus

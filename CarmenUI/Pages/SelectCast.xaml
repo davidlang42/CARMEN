@@ -163,7 +163,7 @@
                 <TextBlock Margin="5" Text="Gaps exist between cast numbers, click here to fill gaps"/>
             </Button>
             <ListBox ItemsSource="{Binding Source={StaticResource castNumbersViewSource}}" HorizontalContentAlignment="Stretch"
-                     x:Name="CastNumbersList" SelectionMode="Extended">
+                     x:Name="CastNumbersList" SelectionMode="Extended" PreviewKeyDown="CastNumbersList_PreviewKeyDown">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <Grid>
