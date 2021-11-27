@@ -36,6 +36,11 @@ namespace CarmenUI.ViewModels
                 if (balanceAlternativeCasts == value)
                     return;
                 balanceAlternativeCasts = value;
+                if (value == false)
+                {
+                    AllocateCastNumbers = false;
+                    ApplyTags = false;
+                }
                 OnPropertyChanged();
             }
         }
@@ -49,6 +54,8 @@ namespace CarmenUI.ViewModels
                 if (applyTags == value)
                     return;
                 applyTags = value;
+                if (value != false)
+                    BalanceAlternativeCasts = null;
                 OnPropertyChanged();
             }
         }
@@ -62,6 +69,8 @@ namespace CarmenUI.ViewModels
                 if (allocateCastNumbers == value)
                     return;
                 allocateCastNumbers = value;
+                if (value != false)
+                    BalanceAlternativeCasts = null;
                 OnPropertyChanged();
             }
         }
