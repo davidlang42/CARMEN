@@ -187,9 +187,9 @@ namespace CarmenUI.Pages
                     using (var processing = new LoadingOverlay(this).AsSegment(nameof(SelectCast) + nameof(PreSaveChecks), "Processing..."))
                     {
                         using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                            engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local); // see selectCastButton_Click()
+                            await engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
                         using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                            engine.AllocateCastNumbers(applicants); // see selectCastButton_Click()
+                            await engine.AllocateCastNumbers(applicants);
                     }
                     var updated_inconsistent_applicants = applicants
                         .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)));
@@ -207,7 +207,7 @@ namespace CarmenUI.Pages
                 }
             }
             using (new LoadingOverlay(this).AsSegment(nameof(IAuditionEngine) + nameof(IAuditionEngine.UserSelectedCast), "Learning...", "Cast selected by the user"))
-                engine.AuditionEngine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted)); // must run in UI thread, because it may call MessageBox
+                await engine.AuditionEngine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted));
             return true;
         }
 
@@ -226,28 +226,28 @@ namespace CarmenUI.Pages
                 if (settings.SelectCastGroups == true)
                     ClearCastGroups();
                 if (settings.SelectCastGroups != false)
-                    engine.SelectCastGroups(applicants, castGroups); // must run in UI thread, because CastList handles change events
+                    await engine.SelectCastGroups(applicants, castGroups);
             }
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
             {
                 if (settings.BalanceAlternativeCasts == true)
                     ClearAlternativeCasts();
                 if (settings.BalanceAlternativeCasts != false)
-                    engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local); // must run in UI thread, because AlternativeCast.Members collection is bound
+                    await engine .BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
             }
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
             {
                 if (settings.AllocateCastNumbers == true)
                     ClearCastNumbers();
                 if (settings.AllocateCastNumbers != false)
-                    engine.AllocateCastNumbers(applicants); // must run in UI thread, because CastList handles change events
+                    await engine.AllocateCastNumbers(applicants);
             }
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
             {
                 if (settings.ApplyTags == true)
                     ClearTags();
                 if (settings.ApplyTags != false)
-                    engine.ApplyTags(applicants, tags); // must run in UI thread, because Tag.Members collection is bound
+                    await engine.ApplyTags(applicants, tags);
             }
             using (processing.Segment(nameof(RefreshMainPanel), "Refreshing cast lists"))
                 RefreshMainPanel();
@@ -587,11 +587,7 @@ namespace CarmenUI.Pages
         {
             IEnumerable<SameCastSet> new_same_cast_sets;
             using (new LoadingOverlay(this).AsSegment(nameof(SelectCast) + nameof(PreSaveChecks), "Processing...", "Detecting siblings"))
-                new_same_cast_sets = await Task.Run(() =>
-                {
-                    engine.DetectFamilies(applicants, out var new_same_cast_sets);
-                    return new_same_cast_sets;
-                });
+                new_same_cast_sets = await engine.DetectFamilies(applicants);
             var list = (IList)sameCastSetsViewSource.Source;
             foreach (var new_same_cast_set in new_same_cast_sets)
                 list.Add(new_same_cast_set);

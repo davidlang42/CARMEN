@@ -207,6 +207,9 @@ namespace Carmen.ShowModel
         public static Task<Dictionary<U, T>> ToDictionaryAsync<T, U>(this IEnumerable<T> collection, Func<T, U> key_selector) where U : notnull
             => Task.Run(() => collection.ToDictionary(key_selector));
 
+        public static Task<T[]> ToArrayAsync<T>(this IEnumerable<T> collection)
+            => Task.Run(() => collection.ToArray());
+
         public static Task<HashSet<T>> ToHashSetAsync<T>(this IEnumerable<T> collection)
             => Task.Run(() => collection.ToHashSet());
 

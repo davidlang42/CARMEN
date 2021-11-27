@@ -1,6 +1,7 @@
 ﻿using Carmen.CastingEngine.Audition;
 using Carmen.ShowModel.Applicants;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Selection
 {
@@ -23,21 +24,21 @@ namespace Carmen.CastingEngine.Selection
         double SuitabilityOf(Applicant applicant, Tag tag);
 
         /// <summary>Set same cast sets for family groups within the applicants provided.</summary>
-        void DetectFamilies(IEnumerable<Applicant> applicants, out List<SameCastSet> new_same_cast_sets);
+        Task<List<SameCastSet>> DetectFamilies(IEnumerable<Applicant> applicants);
 
         /// <summary>Select applicants into cast groups, respecting those already placed
         /// NOTE: CastGroup requirements may not depend on Tags</summary>
-        void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups);
+        Task SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups);
 
         /// <summary>Balance applicants between alternative casts, respecting those already set
         /// NOTE: This will clear the AlternativeCast of rejected Applicants</summary>
-        void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets);
+        Task BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets);
 
         /// <summary>Allocate cast numbers, respecting those already set, ordered by a criteria, otherwise overall ability
         /// NOTE:
         /// - This will clear the cast number of rejected Applicants
         /// - Accepted applicants must have an AlternativeCast set when CastGroup.AlternateCasts == true</summary>
-        void AllocateCastNumbers(IEnumerable<Applicant> applicants);
+        Task AllocateCastNumbers(IEnumerable<Applicant> applicants);
 
         /// <summary>Apply tags to applicants, respecting those already applied
         /// NOTE:
@@ -45,6 +46,6 @@ namespace Carmen.CastingEngine.Selection
         /// - Accepted applicants must have an AlternativeCast set when CastGroup.AlternateCasts == true
         /// - Tag requirements may depend on other Tags as long as there is no circular dependency and the dependee
         ///   tag is also being applied as part of this call</summary>
-        void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags);
+        Task ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags);
     }
 }

@@ -4,6 +4,7 @@ using Carmen.ShowModel.Requirements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Audition
 {
@@ -23,8 +24,8 @@ namespace Carmen.CastingEngine.Audition
 
         public abstract int OverallAbility(Applicant applicant);
 
-        public virtual void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
-        { }
+        public virtual Task UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
+            => Task.CompletedTask;
 
         readonly FunctionCache<Applicant, Requirement, double> suitabilityOf = new();
         /// <summary>Assumes no circular references between requirements

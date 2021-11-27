@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Selection
 {
@@ -19,7 +20,7 @@ namespace Carmen.CastingEngine.Selection
         /// <summary>Allocate applicants into alternative casts by grouping by cast group, counting the applicants already in casts,
         /// allocating the same_cast_set applicants first, then filling the rest by sorting the applicants into cast number order
         /// and putting one at a time into the cast with the current smallest count.</summary>
-        public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets)
+        public override async Task BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets)
         {
             same_cast_sets = same_cast_sets.ToArray(); // make it safe to enumerate repeatedly
             // sort the applicants into cast groups
@@ -66,7 +67,8 @@ namespace Carmen.CastingEngine.Selection
                     }
                     // allocate remaining alternative casts
                     int next_cast = 0;
-                    foreach (var applicant in CastNumberingOrder(applicants_needing_cast))
+                    var applicants_in_order = await CastNumberingOrder(applicants_needing_cast).ToArrayAsync();
+                    foreach (var applicant in applicants_in_order)
                     {
                         applicant.AlternativeCast = alternativeCasts[next_cast++];
                         if (next_cast == alternativeCasts.Length)

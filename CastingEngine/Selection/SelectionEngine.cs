@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Selection
 {
@@ -33,7 +34,7 @@ namespace Carmen.CastingEngine.Selection
         protected ListSortDirection castNumberOrderDirection { get; init; }
         protected AlternativeCast[] alternativeCasts { get; init; }
 
-        public abstract void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets);
+        public abstract Task BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets);
 
         public SelectionEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
         {
@@ -62,7 +63,7 @@ namespace Carmen.CastingEngine.Selection
         /// If an applicant is eligible for more than one cast group, they will be allocated to the first one in order which has an available spot.
         /// NOTE: This currently ignores the suitability of the applicant for the Cast Group, only checking that the minimum requirements are satisfied,
         /// but this could be improved in the future. If it is, the current behaviour should be grandfathered into HeuristicSelectionEngine</summary>
-        public void SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
+        public async Task SelectCastGroups(IEnumerable<Applicant> applicants, IEnumerable<CastGroup> cast_groups)
         {
             // In this dictionary, a value of null means infinite are allowed, but if the key is missing that means no more are allowed
             var remaining_groups = new Dictionary<CastGroup, uint?>();
@@ -88,7 +89,8 @@ namespace Carmen.CastingEngine.Selection
                     remaining_groups.Add(cast_group, null);
             }
             // Allocate non-accepted applicants to cast groups, until the remaining counts are 0
-            foreach (var applicant in applicants.Where(a => !a.IsAccepted).OrderByDescending(a => AuditionEngine.OverallAbility(a)))
+            var applicants_in_order = await applicants.Where(a => !a.IsAccepted).OrderByDescending(a => AuditionEngine.OverallAbility(a)).ToArrayAsync();
+            foreach (var applicant in applicants_in_order)
             {
                 if (NextAvailableCastGroup(remaining_groups, applicant) is CastGroup cg)
                 {
@@ -120,7 +122,7 @@ namespace Carmen.CastingEngine.Selection
         /// <summary>Default implementation allocates cast numbers to accepted applicants based on the requested order.
         /// Members of cast groups which alternate casts are given the first available cast number for their alternative
         /// cast, leaving gaps which are later filled from the bottom up.</summary>
-        public void AllocateCastNumbers(IEnumerable<Applicant> applicants)
+        public async Task AllocateCastNumbers(IEnumerable<Applicant> applicants)
         {
             var cast_numbers = new CastNumberSet();
             // find cast numbers which are already set
@@ -143,16 +145,17 @@ namespace Carmen.CastingEngine.Selection
                 }
             }
             // allocate cast numbers to those who need them
-            foreach (var applicant in CastNumberingOrder(applicants.Where(a => a.IsAccepted)))
+            var applicants_in_order = await CastNumberingOrder (applicants.Where(a => a.IsAccepted)).ToArrayAsync();
+            foreach (var applicant in applicants_in_order)
             {
                 if (applicant.CastNumber == null)
-                    applicant.CastNumber = cast_numbers.AddNextAvailable(applicant.AlternativeCast, applicant.CastGroup!); // not null because IsAccepted
+                    applicant.CastNumber = await Task.Run(() => cast_numbers.AddNextAvailable(applicant.AlternativeCast, applicant.CastGroup!)); // not null because IsAccepted
             }
         }
 
         /// <summary>Applies tags in an order that ensures any tags which depend on other tags through requirements
         /// are processed first. This assumes there are no circular dependency between tags.</summary>
-        public void ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)
+        public async Task ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags)
         {
             // list all tags referenced by each tag
             var tag_references = new Dictionary<Tag, HashSet<Tag>>();
@@ -178,7 +181,7 @@ namespace Carmen.CastingEngine.Selection
                 {
                     if (!references.Any(t => tag_references.ContainsKey(t)))
                     {
-                        ApplyTag(applicants, tag);
+                        await ApplyTag(applicants, tag);
                         tag_references.Remove(tag);
                         any_change = true;
                     }
@@ -191,7 +194,7 @@ namespace Carmen.CastingEngine.Selection
         /// <summary>Applies tags by list accepted cast who aren't in this tag, ordering them by suitability
         /// for this tag, then ordering by overall mark. Tags are applied down this list until all the
         /// cast groups have the required number or there are no more eligible cast.</summary>
-        public void ApplyTag(IEnumerable<Applicant> applicants, Tag tag)
+        public async Task ApplyTag(IEnumerable<Applicant> applicants, Tag tag)
         {
             // In this dictionary, if a key is missing that means infinite are allowed
             var remaining = new Dictionary<(CastGroup, AlternativeCast?), uint>();
@@ -226,11 +229,12 @@ namespace Carmen.CastingEngine.Selection
             if (tag.Requirements.Count == 0)
                 return; // but only return after tags have been removed from rejected applicants
             // Apply tags to accepted applicants in order of suitability
-            var prioritised_applicants = applicants.Where(a => a.IsAccepted)
+            var prioritised_applicants = await applicants.Where(a => a.IsAccepted)
                 .Where(a => !a.Tags.Contains(tag))
                 .Where(a => tag.Requirements.All(r => r.IsSatisfiedBy(a)))
                 .OrderByDescending(a => SuitabilityOf(a, tag))
-                .ThenByDescending(a => AuditionEngine.OverallAbility(a));
+                .ThenByDescending(a => AuditionEngine.OverallAbility(a))
+                .ToArrayAsync();
             foreach (var applicant in prioritised_applicants) 
             {
                 var key = (applicant.CastGroup!, applicant.AlternativeCast); // not null because IsAccepted
@@ -262,15 +266,15 @@ namespace Carmen.CastingEngine.Selection
             };
 
         /// <summary>Detects families by matching last name</summary>
-        public void DetectFamilies(IEnumerable<Applicant> applicants, out List<SameCastSet> new_same_cast_sets)
+        public async Task<List<SameCastSet>> DetectFamilies(IEnumerable<Applicant> applicants)
         {
-            new_same_cast_sets = new();
-            var siblings = applicants
+            var siblings = await Task.Run(() => applicants
                 .Where(a => !string.IsNullOrEmpty(a.LastName))
                 .OrderBy(a => a.LastName).ThenBy(a => a.FirstName)
                 .GroupBy(a => a.LastName)
                 .Select(g => g.ToArray())
-                .ToArray();
+                .ToArray());
+            var new_same_cast_sets = new List<SameCastSet>();
             foreach (var family in siblings.Where(f => f.Length > 1))
             {
                 var set = family.Select(a => a.SameCastSet).OfType<SameCastSet>().FirstOrDefault();
@@ -286,6 +290,7 @@ namespace Carmen.CastingEngine.Selection
                         set.Applicants.Add(applicant);
                     }
             }
+            return new_same_cast_sets;
         }
     }
 }

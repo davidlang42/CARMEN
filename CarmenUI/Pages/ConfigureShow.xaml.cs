@@ -348,8 +348,8 @@ namespace CarmenUI.Pages
                     var issues = context.Requirements.Local.ToList().SelectMany(vo => vo.Validate()).ToList();
                     if (issues.Count == 0)
                     {
-                    // only validate CastGroups if Requirements/Tags are valid, otherwise there might be circular references
-                    issues.AddRange(context.CastGroups.Local.SelectMany(vo => vo.Validate()));
+                        // only validate CastGroups if Requirements/Tags are valid, otherwise there might be circular references
+                        issues.AddRange(context.CastGroups.Local.SelectMany(vo => vo.Validate()));
                         issues.AddRange(context.Tags.Local.SelectMany(vo => vo.Validate()));
                     }
                     return issues;

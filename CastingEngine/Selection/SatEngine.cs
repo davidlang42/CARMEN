@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Selection
 {
@@ -31,7 +32,7 @@ namespace Carmen.CastingEngine.Selection
         protected abstract Solution FindSatSolution(Solver<Applicant> sat, List<(CastGroup, HashSet<Applicant>)> applicants_needing_alternative_cast,
             List<Clause<Applicant>> existing_assignments, List<Clause<Applicant>> same_cast_clauses, Dictionary<Applicant, SameCastSet> same_cast_lookup);
 
-        public override void BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets)
+        public override async Task BalanceAlternativeCasts(IEnumerable<Applicant> applicants, IEnumerable<SameCastSet> same_cast_sets)
         {
             // sort the applicants into cast groups
             var applicants_needing_alternative_cast = new List<(CastGroup, HashSet<Applicant>)>();
@@ -59,23 +60,29 @@ namespace Carmen.CastingEngine.Selection
                 return; // nothing to do
             if (alternativeCasts.Length != 2)
                 throw new ApplicationException("This approach only works for exactly 2 alternative casts.");
-            // create clauses for same cast sets
-            var same_cast_clauses = new List<Clause<Applicant>>();
-            var same_cast_lookup = new Dictionary<Applicant, SameCastSet>();
-            foreach (var same_cast_set in same_cast_sets)
-            {
-                foreach (var applicant in same_cast_set.Applicants)
-                    same_cast_lookup.Add(applicant, same_cast_set); // Applicants can only be in one SameCastSet
-                same_cast_clauses.AddRange(KeepTogether(same_cast_set.Applicants.Where(a => applicants_needing_alternative_cast.Any(p => p.Item2.Contains(a))).ToArray()));
-            }
-            // pre-test clauses to ensure they are solvable
+            // build the sat solver
             var sat = BuildSatSolver(applicants_needing_alternative_cast);
-            var base_expression = new Expression<Applicant>(existing_assignments.Concat(same_cast_clauses).ToHashSet());
-            var basic_sat = sat.GetType() == typeof(DpllSolver<Applicant>) ? sat : new DpllSolver<Applicant>(sat.Variables);
-            var solution = basic_sat.Solve(base_expression).FirstOrDefault(); // important to use basic DpllSolver to avoid expensive operations for special solvers like BranchAndBound
-            // run approach-specific SAT solving
-            if (!solution.IsUnsolvable)
-                solution = FindSatSolution(sat, applicants_needing_alternative_cast, existing_assignments, same_cast_clauses, same_cast_lookup);
+            // do the work
+            var solution = await Task.Run(() =>
+            {
+                // create clauses for same cast sets
+                var same_cast_clauses = new List<Clause<Applicant>>();
+                var same_cast_lookup = new Dictionary<Applicant, SameCastSet>();
+                foreach (var same_cast_set in same_cast_sets)
+                {
+                    foreach (var applicant in same_cast_set.Applicants)
+                        same_cast_lookup.Add(applicant, same_cast_set); // Applicants can only be in one SameCastSet
+                    same_cast_clauses.AddRange(KeepTogether(same_cast_set.Applicants.Where(a => applicants_needing_alternative_cast.Any(p => p.Item2.Contains(a))).ToArray()));
+                }
+                // pre-test clauses to ensure they are solvable
+                var base_expression = new Expression<Applicant>(existing_assignments.Concat(same_cast_clauses).ToHashSet());
+                var basic_sat = sat.GetType() == typeof(DpllSolver<Applicant>) ? sat : new DpllSolver<Applicant>(sat.Variables);
+                var solution = basic_sat.Solve(base_expression).FirstOrDefault(); // important to use basic DpllSolver to avoid expensive operations for special solvers like BranchAndBound
+                                                                                  // run approach-specific SAT solving
+                if (!solution.IsUnsolvable)
+                    solution = FindSatSolution(sat, applicants_needing_alternative_cast, existing_assignments, same_cast_clauses, same_cast_lookup);
+                return solution;
+            });
             // set alternative casts
             List<IEnumerable<Assignment<Applicant>>> grouped_assignments;
             if (!solution.IsUnsolvable)

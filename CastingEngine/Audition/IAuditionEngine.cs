@@ -1,6 +1,7 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Audition
 {
@@ -20,7 +21,7 @@ namespace Carmen.CastingEngine.Audition
 
         /// <summary>A callback for when the user selects cast into cast groups manually, providing
         /// information to the engine which can be used to improve future recommendations.</summary>
-        void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected);
+        Task UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected);
 
         /// <summary>Calculate the suitability of an applicant against a single requirement.
         /// Value returned will be between 0 and 1 (inclusive).</summary>

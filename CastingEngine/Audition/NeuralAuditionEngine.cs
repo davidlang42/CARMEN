@@ -4,6 +4,7 @@ using Carmen.ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Audition
 {
@@ -83,7 +84,7 @@ namespace Carmen.CastingEngine.Audition
             return values;
         }
 
-        public override void UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
+        public override async Task UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
         {
             if (criterias.Length == 0)
                 return; // nothing to do
@@ -91,12 +92,7 @@ namespace Carmen.CastingEngine.Audition
             var rejected_array = applicants_rejected.ToArray();
             if (rejected_array.Length == 0)
                 return; // nothing to do
-            var training_pairs = new Dictionary<double[], double[]>();
-            foreach (var (accepted, rejected) in ComparablePairs(applicants_accepted, rejected_array))
-            {
-                training_pairs.Add(InputValues(accepted, rejected), new[] { 1.0 });
-                training_pairs.Add(InputValues(rejected, accepted), new[] { 0.0 });
-            }
+            var training_pairs = await Task.Run(() => TrainingPairs(applicants_accepted, rejected_array));
             if (training_pairs.Count == 0)
                 return; // nothing to do
             // Train the model
@@ -107,8 +103,19 @@ namespace Carmen.CastingEngine.Audition
                 LossThreshold = 0.005,
                 MaxIterations = MaxTrainingIterations,
             };
-            _ = trainer.Train(training_pairs.Keys, training_pairs.Values);
+            await Task.Run(() => trainer.Train(training_pairs.Keys, training_pairs.Values));
             UpdateWeights();
+        }
+
+        private Dictionary<double[], double[]> TrainingPairs(IEnumerable<Applicant> applicants_accepted, Applicant[] rejected_array)
+        {
+            var pairs = new Dictionary<double[], double[]>();
+            foreach (var (accepted, rejected) in ComparablePairs(applicants_accepted, rejected_array))
+            {
+                pairs.Add(InputValues(accepted, rejected), new[] { 1.0 });
+                pairs.Add(InputValues(rejected, accepted), new[] { 0.0 });
+            }
+            return pairs;
         }
 
         private void UpdateWeights()
