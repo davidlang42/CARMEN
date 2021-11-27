@@ -107,6 +107,16 @@
                 </StackPanel>
             </Button>
             <ListBox x:Name="applicantsList" ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" Margin="5" KeyUp="applicantsList_KeyUp" SelectionChanged="applicantsList_SelectionChanged">
+                <ListBox.Resources>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Style.Triggers>
+                            <Trigger Property="IsSelected" Value="True">
+                                <Setter Property="FocusManager.FocusedElement"
+                                Value="{Binding RelativeSource={RelativeSource Self}}"></Setter>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </ListBox.Resources>
                 <ListBox.GroupStyle>
                     <GroupStyle>
                         <GroupStyle.ContainerStyle>
