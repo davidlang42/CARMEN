@@ -17,6 +17,7 @@ using Carmen.CastingEngine.Selection;
 using Carmen.CastingEngine.Allocation;
 using CarmenUI.ViewModels;
 using CarmenUI.UserControls;
+using Microsoft.EntityFrameworkCore;
 
 namespace CarmenUI.Pages
 {
@@ -109,14 +110,52 @@ namespace CarmenUI.Pages
             }
             using var saving = new LoadingOverlay(this) { MainText = "Saving..." };
             var changes = context.DataChanges();
-            try
+            var saved = false;
+            while (!saved)
             {
-                await context.SaveChangesAsync();
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Error while saving changes: {ex.InnermostException().Message}\nChanges not saved.");
-                return false;
+                try
+                {
+                    await context.SaveChangesAsync();
+                    saved = true;
+                }
+                catch (DbUpdateConcurrencyException ex)
+                {
+                    foreach (var entry in ex.Entries)
+                    {
+                        var proposed_values = entry.CurrentValues;
+                        if (entry.GetDatabaseValues() is PropertyValues database_values)
+                        {
+                            foreach (var property in proposed_values.Properties)
+                            {
+                                var proposed = proposed_values[property];
+                                var database = database_values[property];
+                                var msg = $"A conflicting change has been made to {entry.Metadata.Name} (possibly caused by another user). " +
+                                    $"Would you like to overwrite their {property.Name} value of '{database}' with your value of '{proposed}'?";
+                                var result = MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNoCancel);
+                                if (result == MessageBoxResult.Cancel)
+                                    return false;
+                                if (result == MessageBoxResult.No)
+                                    proposed_values[property] = database;
+                            }
+                            entry.OriginalValues.SetValues(database_values); // clear conflict for next time
+                        }
+                        else
+                        {
+                            var msg = $"A conflicting change has been made to {entry.Metadata.Name} (possibly caused by another user). " +
+                                $"Would you like to skip this object and save all other changes?";
+                            var result = MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNoCancel);
+                            if (result == MessageBoxResult.Cancel)
+                                return false;
+                            if (result == MessageBoxResult.Yes)
+                                entry.State = EntityState.Detached; // force skip this entry so other changes can succeed
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error while saving changes: {ex.InnermostException().Message}\nChanges not saved.");
+                    return false;
+                }
             }
             saved_changes |= changes;
             return true;
