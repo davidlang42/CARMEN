@@ -5,10 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarmenUI.ViewModels"
         mc:Ignorable="d"
+        xmlns:cv="clr-namespace:CarmenUI.Converters"
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         MinHeight="300" MinWidth="400"
         WindowStartupLocation="CenterOwner"
         Title="Import marks from another show" Height="480" Width="640">
+    <Window.Resources>
+        <cv:FullName x:Key="fullName"/>
+        <CollectionViewSource x:Key="applicantsViewSource"/>
+    </Window.Resources>
     <DockPanel>
         <Grid DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
@@ -28,12 +33,22 @@
                 </StackPanel>
             </Button>
         </Grid>
-        <ListBox x:Name="ApplicantsList" SelectionChanged="ApplicantsList_SelectionChanged">
+        <ListBox x:Name="ApplicantsList" SelectionChanged="ApplicantsList_SelectionChanged" Margin="5 5 5 0"
+                 ItemsSource="{Binding Source={StaticResource applicantsViewSource}}">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock>
-                        <Run Text="{Binding FirstName}"/>
-                        <Run Text="{Binding LastName}"/>
+                        <Run FontWeight="SemiBold">
+                            <Run.Text>
+                                <MultiBinding Converter="{StaticResource fullName}">
+                                    <MultiBinding.Bindings>
+                                        <Binding Path="FirstName"/>
+                                        <Binding Path="LastName"/>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </Run.Text>
+                        </Run>
+                        <Run Text="{Binding Description, Mode=OneWay, StringFormat='(\{0\})'}" FontStyle="Italic"/>
                     </TextBlock>
                 </DataTemplate>
             </ListBox.ItemTemplate>

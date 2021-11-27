@@ -1,4 +1,5 @@
 ﻿using Carmen.ShowModel.Applicants;
+using CarmenUI.Converters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,20 +21,24 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class ApplicantPickerDialog : Window
     {
+        readonly CollectionViewSource applicantsViewSource;
+
         public Applicant? SelectedApplicant { get; private set; }
 
         public ApplicantPickerDialog(Applicant[] applicants, string match_first_name, string match_last_name)
         {
             InitializeComponent();
-            ApplicantsList.ItemsSource = applicants;
+            applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
+            applicantsViewSource.Source = applicants;
+            foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
+                if (!applicantsViewSource.View.SortDescriptions.Contains(sd))
+                    applicantsViewSource.View.SortDescriptions.Add(sd);
             foreach (var applicant in applicants)
-            {
                 if (applicant.FirstName.Equals(match_first_name, StringComparison.OrdinalIgnoreCase) && applicant.LastName.Equals(match_last_name, StringComparison.OrdinalIgnoreCase))
                 {
                     ApplicantsList.SelectedItem = applicant;
                     break;
                 }
-            }
         }
 
         private void ApplicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)

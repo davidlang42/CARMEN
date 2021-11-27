@@ -412,7 +412,10 @@ namespace CarmenUI.Pages
         private async Task ImportMarks()
         {
             if (applicantsList.SelectedItem is not Applicant applicant)
+            {
+                MessageBox.Show("Please select an applicant.", WindowTitle);
                 return;
+            }
             var dialog = new OpenFileDialog
             {
                 Title = $"Import marks from another show",
@@ -480,8 +483,9 @@ namespace CarmenUI.Pages
                 applicant.Notes = add_notes;
             else
                 applicant.Notes += "\n\n" + add_notes;
+            applicantsList.SelectedItem = null;
+            applicantsList.SelectedItem = applicant;
             MessageBox.Show($"Imported {count.Plural("ability","abilities")} for '{applicant.FirstName} {applicant.LastName}'.", WindowTitle);
-            //TODO confirm it updates both the applicant list AND the current applicant -- applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();    
         }
 
         private static bool TryInputBoolean(string message, string title, out bool value) //TODO remove if not used
