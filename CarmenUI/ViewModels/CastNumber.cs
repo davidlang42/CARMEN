@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -20,6 +21,8 @@ namespace CarmenUI.ViewModels
             get => number;
             set
             {
+                if (applicants.NotNull().Any(a => a.CastNumber != value))
+                    throw new ApplicationException("Tried to change CastNumber.Number without changing Applicant.CastNumber first.");
                 if (number == value)
                     return;
                 number = value;

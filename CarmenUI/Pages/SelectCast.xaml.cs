@@ -586,7 +586,7 @@ namespace CarmenUI.Pages
         {
             if (CastNumbersList.SelectedItems.Count == 0)
                 return;
-            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>()) //TODO sort this by reverse order in list
+            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>().ToArray()) //TODO sort this by reverse order in list
                 castList.MoveUp(cast_number);
         }
 
@@ -594,7 +594,7 @@ namespace CarmenUI.Pages
         {
             if (CastNumbersList.SelectedItems.Count == 0)
                 return;
-            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>()) //TODO sort this by order in list
+            foreach (var cast_number in CastNumbersList.SelectedItems.OfType<CastNumber>().ToArray()) //TODO sort this by order in list
                 castList.MoveDown(cast_number);
         }
 

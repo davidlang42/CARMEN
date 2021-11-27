@@ -14,8 +14,8 @@
     d:DesignHeight="600" d:DesignWidth="800"
     Title="Select Cast" Loaded="Page_Loaded">
     <Page.Resources>
-        <CollectionViewSource x:Key="castNumbersViewSource"/>
-        <CollectionViewSource x:Key="castNumberMissingViewSource"/>
+        <CollectionViewSource x:Key="castNumbersViewSource" IsLiveSortingRequested="True"/>
+        <CollectionViewSource x:Key="castNumberMissingViewSource" IsLiveSortingRequested="True"/>
         <CollectionViewSource x:Key="selectedApplicantsViewSource"/>
         <CollectionViewSource x:Key="allApplicantsViewSource"/>
         <CollectionViewSource x:Key="castGroupsViewSource"/>

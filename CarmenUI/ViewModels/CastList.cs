@@ -15,6 +15,7 @@ namespace CarmenUI.ViewModels
 {
     public class CastList : INotifyPropertyChanged
     {
+        bool ignoreApplicantChanges = false;
         Applicant[] allApplicants;
         
         public AlternativeCast[] AlternativeCasts { get; }
@@ -75,6 +76,8 @@ namespace CarmenUI.ViewModels
 
         private void Applicant_PropertyChanged(object? sender, PropertyChangedEventArgs e) //TODO dispose handlers
         {
+            if (ignoreApplicantChanges)
+                return;
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Applicant.CastNumber)
                 || e.PropertyName == nameof(Applicant.CastGroup) || e.PropertyName == nameof(Applicant.AlternativeCast))
             {
@@ -141,12 +144,39 @@ namespace CarmenUI.ViewModels
 
         public void MoveUp(CastNumber cast_number)
         {
-            //TODO
+            if (cast_number.Number == CastNumberSet.FIRST_CAST_NUMBER)
+                return; // nothing to do
+            var new_cast_number = cast_number.Number - 1;
+            if (CastNumbers.Where(n => n.Number == new_cast_number).SingleOrDefault() is CastNumber existing)
+                SwapCastNumbers(cast_number, existing);
+            else
+                SetCastNumber(cast_number, new_cast_number);
         }
 
         public void MoveDown(CastNumber cast_number)
         {
-            //TODO
+            // allow move down to create gaps
+            var new_cast_number = cast_number.Number + 1;
+            if (CastNumbers.Where(n => n.Number == new_cast_number).SingleOrDefault() is CastNumber existing)
+                SwapCastNumbers(cast_number, existing);
+            else
+                SetCastNumber(cast_number, new_cast_number);
+        }
+
+        private void SwapCastNumbers(CastNumber a, CastNumber b)
+        {
+            var old_a = a.Number;
+            SetCastNumber(a, b.Number);
+            SetCastNumber(b, old_a);
+        }
+
+        private void SetCastNumber(CastNumber cast_number, int new_cast_number)
+        {
+            ignoreApplicantChanges = true;
+            foreach (var applicant in cast_number.Applicants.NotNull().ToArray())
+                applicant.CastNumber = new_cast_number;
+            ignoreApplicantChanges = false;
+            cast_number.Number = new_cast_number;
         }
     }
 }
