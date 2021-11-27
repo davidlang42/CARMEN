@@ -60,7 +60,7 @@
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding ChildrenInOrder}">
                         <StackPanel Orientation="Horizontal">
-                            <ContentControl Content="{Binding Status, Converter={StaticResource processStatusIcon}}" Width="12" Margin="3 2"/>
+                            <ContentControl Content="{Binding Status, Converter={StaticResource processStatusIcon}}" Width="12" Margin="3 2" IsTabStop="False"/>
                             <TextBlock Text="{Binding Name}"/>
                         </StackPanel>
                     </HierarchicalDataTemplate>
