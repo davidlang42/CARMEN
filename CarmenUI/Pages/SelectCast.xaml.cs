@@ -222,13 +222,33 @@ namespace CarmenUI.Pages
                 return;
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
-                engine.SelectCastGroups(applicants, castGroups); // must run in UI thread, because CastList handles change events
+            {
+                if (settings.SelectCastGroups == true)
+                    ClearCastGroups();
+                if (settings.SelectCastGroups != false)
+                    engine.SelectCastGroups(applicants, castGroups); // must run in UI thread, because CastList handles change events
+            }
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local); // must run in UI thread, because AlternativeCast.Members collection is bound
+            {
+                if (settings.BalanceAlternativeCasts == true)
+                    ClearAlternativeCasts();
+                if (settings.BalanceAlternativeCasts != false)
+                    engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local); // must run in UI thread, because AlternativeCast.Members collection is bound
+            }
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                engine.AllocateCastNumbers(applicants); // must run in UI thread, because CastList handles change events
+            {
+                if (settings.AllocateCastNumbers == true)
+                    ClearCastNumbers();
+                if (settings.AllocateCastNumbers != false)
+                    engine.AllocateCastNumbers(applicants); // must run in UI thread, because CastList handles change events
+            }
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
-                engine.ApplyTags(applicants, tags); // must run in UI thread, because Tag.Members collection is bound
+            {
+                if (settings.ApplyTags == true)
+                    ClearTags();
+                if (settings.ApplyTags != false)
+                    engine.ApplyTags(applicants, tags); // must run in UI thread, because Tag.Members collection is bound
+            }
             using (processing.Segment(nameof(RefreshMainPanel), "Refreshing cast lists"))
                 RefreshMainPanel();
 #if DEBUG
@@ -267,6 +287,32 @@ namespace CarmenUI.Pages
             }
             ((App)App.Current).CreateLog("Cast", msg);
 #endif
+        }
+
+        private void ClearCastGroups()
+        {
+            foreach (var applicant in applicants)
+                applicant.CastGroup = null;
+        }
+
+        private void ClearAlternativeCasts()
+        {
+            foreach (var applicant in applicants)
+                applicant.AlternativeCast = null;
+        }
+
+        private void ClearCastNumbers()
+        {
+            foreach (var applicant in applicants)
+                applicant.CastNumber = null;
+        }
+
+        private void ClearTags()
+        {
+            foreach (var applicant in applicants)
+                applicant.Tags.Clear();
+            foreach (var tag in tags)
+                tag.Members.Clear();
         }
 
         private void addButton_Click(object sender, RoutedEventArgs e)
