@@ -250,7 +250,7 @@ namespace CarmenUI.Pages
                     await engine.ApplyTags(applicants, tags);
             }
             using (processing.Segment(nameof(RefreshMainPanel), "Refreshing cast lists"))
-                RefreshMainPanel();
+                RefreshMainPanel(); //TODO is this required?
 #if DEBUG
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
             string msg = "";
@@ -540,18 +540,21 @@ namespace CarmenUI.Pages
             if (selectionList.SelectedItem is CastGroup cast_group)
             {
                 selectedApplicantsViewSource.Source = cast_group.Members;
+                castStatusCombo.SelectedItem = CastStatus.Eligible;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "applicants";
             }
             else if (selectionList.SelectedItem is AlternativeCast alternative_cast)
             {
                 selectedApplicantsViewSource.Source = alternative_cast.Members;
+                castStatusCombo.SelectedItem = CastStatus.Available;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "alternating cast members";
             }
             else if (selectionList.SelectedItem is Tag tag)
             {
                 selectedApplicantsViewSource.Source = tag.Members;
+                castStatusCombo.SelectedItem = CastStatus.Eligible;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "cast members";
             }
