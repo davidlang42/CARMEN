@@ -104,18 +104,18 @@ namespace CarmenUI.Pages
                 await context.Requirements.LoadAsync();
             using (loading.Segment(nameof(ShowContext.AlternativeCasts) + nameof(AlternativeCast.Members), "Alternative casts"))
             {
-                _alternativeCasts = await context.AlternativeCasts.Include(ac => ac.Members).ToArrayAsync();
+                _alternativeCasts = await context.AlternativeCasts.Include(ac => ac.Members).InNameOrder().ToArrayAsync();
                 alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
                 alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
             }
             using (loading.Segment(nameof(ShowContext.CastGroups) + nameof(CastGroup.Members) + nameof(CastGroup.Requirements), "Cast groups"))
-                _castGroups = await context.CastGroups.Include(cg => cg.Members).Include(cg => cg.Requirements).ToArrayAsync();
+                _castGroups = await context.CastGroups.Include(cg => cg.Members).Include(cg => cg.Requirements).InOrder().ToArrayAsync();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.SameCastSets), "Same cast sets"))
                 await context.SameCastSets.LoadAsync();
             sameCastSetsViewSource.Source = context.SameCastSets.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.Tags) + nameof(A.Tag.Members) + nameof(A.Tag.Requirements), "Tags"))
-                _tags = await context.Tags.Include(t => t.Members).Include(t => t.Requirements).ToArrayAsync();
+                _tags = await context.Tags.Include(t => t.Members).Include(t => t.Requirements).InNameOrder().ToArrayAsync();
             tagsViewSource.Source = context.Tags.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.SameCastSet), "Applicants"))
             {
@@ -213,6 +213,13 @@ namespace CarmenUI.Pages
 
         private async void selectCastButton_Click(object sender, RoutedEventArgs e)
         {
+            var settings = new AutoSelectSettings(castGroups, alternativeCasts, tags, context.ShowRoot);
+            var dialog = new AutoSelectDialog(settings)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            if (dialog.ShowDialog() != true)
+                return;
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
                 engine.SelectCastGroups(applicants, castGroups); // must run in UI thread, because CastList handles change events
