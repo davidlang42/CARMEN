@@ -7,6 +7,7 @@ using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Allocation
 {
@@ -70,69 +71,71 @@ namespace Carmen.CastingEngine.Allocation
             : applicants.OrderByDescending(a => SuitabilityOf(a, role)).ThenByDescending(a => AuditionEngine.OverallAbility(a)).ToList();
 
         /// <summary>Default implementation does nothing</summary>
-        public virtual void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
-        { }
+        public virtual Task UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
+            => Task.CompletedTask;
 
         /// <summary>Default implementation does nothing</summary>
-        public virtual void ExportChanges()
-        { }
+        public virtual Task ExportChanges() => Task.CompletedTask;
 
         /// <summary>Return a list of the best cast to pick for the role, based on suitability. If a role has no requirements,
         /// the default implementation selects other alternative casts by matching cast number, if possible.
         /// NOTE: If this behaviour is changed, this version should be grandfathered in HeuristicAllocationEngine</summary>
-        public virtual IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role)
-        {
-            // list existing cast by cast group and cast
-            var existing_cast = new Dictionary<(CastGroup?, AlternativeCast?), HashSet<Applicant>>();
-            foreach (var group in role.Cast.GroupBy(a => (a.CastGroup, a.AlternativeCast)))
-                existing_cast.Add(group.Key, group.ToHashSet());
-            // calculate how many of each cast group we need to pick
-            var required_cast_groups = new Dictionary<(CastGroup, AlternativeCast?), uint>();
-            foreach (var cbg in role.CountByGroups)
+        public virtual async Task<List<Applicant>> PickCast(IEnumerable<Applicant> applicants, Role role)
+            => await Task.Run(() =>
             {
-                var alternative_casts = cbg.CastGroup.AlternateCasts ? alternativeCasts : new[] { (AlternativeCast?)null };
-                foreach (var alternative_cast in alternative_casts)
+                // list existing cast by cast group and cast
+                var existing_cast = new Dictionary<(CastGroup?, AlternativeCast?), HashSet<Applicant>>();
+                foreach (var group in role.Cast.GroupBy(a => (a.CastGroup, a.AlternativeCast)))
+                    existing_cast.Add(group.Key, group.ToHashSet());
+                // calculate how many of each cast group we need to pick
+                var required_cast_groups = new Dictionary<(CastGroup, AlternativeCast?), uint>();
+                foreach (var cbg in role.CountByGroups)
                 {
-                    var required = (int)cbg.Count;
-                    if (existing_cast.TryGetValue((cbg.CastGroup, alternative_cast), out var existing_cast_in_this_group))
-                        required -= existing_cast_in_this_group.Count;
-                    if (required > 0)
-                        required_cast_groups.Add((cbg.CastGroup, alternative_cast), (uint)required);
+                    var alternative_casts = cbg.CastGroup.AlternateCasts ? alternativeCasts : new[] { (AlternativeCast?)null };
+                    foreach (var alternative_cast in alternative_casts)
+                    {
+                        var required = (int)cbg.Count;
+                        if (existing_cast.TryGetValue((cbg.CastGroup, alternative_cast), out var existing_cast_in_this_group))
+                            required -= existing_cast_in_this_group.Count;
+                        if (required > 0)
+                            required_cast_groups.Add((cbg.CastGroup, alternative_cast), (uint)required);
+                    }
                 }
-            }
-            // list available cast in priority order, grouped by cast group
-            var potential_cast_by_group = applicants
-                .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey((cg, a.AlternativeCast)))
-                .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
-                .Where(a => IsEligible(a, role))
-                .Where(a => IsAvailable(a, role))
-                .GroupBy(a => (a.CastGroup!, a.AlternativeCast))
-                .ToDictionary(g => g.Key,
-                g => new Stack<Applicant>(InPreferredOrder(g, role, reverse: true))); // order in reverse so the lowest suitability is at the bottom of the stack
-            // select the required number of cast in the priority order, prioritising alternative cast buddies of those already selected
-            var buddy_numbers = existing_cast // existing cast
-                .Where(p => p.Key.Item1.AlternateCasts) // in a cast group which alternates
-                .SelectMany(p => p.Value.Select(a => a.CastNumber)) // get cast number
-                .ToHashSet();
-            foreach (var (cast_group_and_cast, potential_cast) in potential_cast_by_group)
-            {
-                var required = required_cast_groups[cast_group_and_cast];
-                for (var i = 0; i < required; i++)
+                // list available cast in priority order, grouped by cast group
+                var potential_cast_by_group = applicants
+                    .Where(a => a.CastGroup is CastGroup cg && required_cast_groups.ContainsKey((cg, a.AlternativeCast)))
+                    .Where(a => !existing_cast.Values.Any(hs => hs.Contains(a)))
+                    .Where(a => IsEligible(a, role))
+                    .Where(a => IsAvailable(a, role))
+                    .GroupBy(a => (a.CastGroup!, a.AlternativeCast))
+                    .ToDictionary(g => g.Key,
+                    g => new Stack<Applicant>(InPreferredOrder(g, role, reverse: true))); // order in reverse so the lowest suitability is at the bottom of the stack
+                // select the required number of cast in the priority order, prioritising alternative cast buddies of those already selected
+                var picked_cast = new List<Applicant>();
+                var buddy_numbers = existing_cast // existing cast
+                    .Where(p => p.Key.Item1.AlternateCasts) // in a cast group which alternates
+                    .SelectMany(p => p.Value.Select(a => a.CastNumber)) // get cast number
+                    .ToHashSet();
+                foreach (var (cast_group_and_cast, potential_cast) in potential_cast_by_group)
                 {
-                    if (potential_cast.Count == 0)
-                        break; // no more available applicants
-                    Applicant? next_cast = null;
-                    if (cast_group_and_cast.Item1.AlternateCasts // if this cast group alternates
-                        && role.Requirements.Count == 0 // and not a special role
-                        && potential_cast.FindAndRemove(a => a.CastNumber != null && buddy_numbers.Contains(a.CastNumber)) is Applicant buddy) // take the cast number buddies, if possible
-                        next_cast = buddy;
-                    next_cast ??= potential_cast.Pop();
-                    yield return next_cast;
-                    if (cast_group_and_cast.Item1.AlternateCasts)
-                        buddy_numbers.Add(next_cast.CastNumber);
+                    var required = required_cast_groups[cast_group_and_cast];
+                    for (var i = 0; i < required; i++)
+                    {
+                        if (potential_cast.Count == 0)
+                            break; // no more available applicants
+                        Applicant? next_cast = null;
+                        if (cast_group_and_cast.Item1.AlternateCasts // if this cast group alternates
+                            && role.Requirements.Count == 0 // and not a special role
+                            && potential_cast.FindAndRemove(a => a.CastNumber != null && buddy_numbers.Contains(a.CastNumber)) is Applicant buddy) // take the cast number buddies, if possible
+                            next_cast = buddy;
+                        next_cast ??= potential_cast.Pop();
+                        picked_cast.Add(next_cast);
+                        if (cast_group_and_cast.Item1.AlternateCasts)
+                            buddy_numbers.Add(next_cast.CastNumber);
+                    }
                 }
-            }
-        }
+                return picked_cast;
+            });
 
         readonly FunctionCache<Node, Item[]> itemsInOrderCache = new();
         protected Item[] ItemsInOrderFast(Node node) => itemsInOrderCache.Get(node, node
@@ -291,7 +294,7 @@ namespace Carmen.CastingEngine.Allocation
         /// is less than or equal to the number of cast still required for that role, then that role will cast its entire remaining list.
         /// This is not a bullet-proof approach, but *should* be good enough to balance general cast between roles/items and handle
         /// the edge cases caused by consecutive item clashes on the edge of non-multi sections.</summary>
-        public void BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
+        public async Task BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles)
         {
             // Make roles an array to avoid re-enumeration
             var roles_array = roles.ToArray();
@@ -304,18 +307,18 @@ namespace Carmen.CastingEngine.Allocation
             {
                 var alternative_casts = cast_group.AlternateCasts ? alternativeCasts : new AlternativeCast?[] { null };
                 foreach (var alternative_cast in alternative_casts)
-                    BalanceCastForOneCastGroupAndCast(applicants_by_group[(cast_group, alternative_cast)], roles_array, cast_group, alternative_cast);
+                    await BalanceCastForOneCastGroupAndCast(applicants_by_group[(cast_group, alternative_cast)], roles_array, cast_group, alternative_cast);
             }
         }
 
-        private void BalanceCastForOneCastGroupAndCast(Applicant[] applicants, Role[] roles, CastGroup cast_group, AlternativeCast? alternative_cast)
+        private async Task BalanceCastForOneCastGroupAndCast(Applicant[] applicants, Role[] roles, CastGroup cast_group, AlternativeCast? alternative_cast)
         {
             // Count the remaining required cast for each role
             var required_cast = roles.Select(r => (int)r.CountFor(cast_group) - r.Cast.Count(a => a.CastGroup == cast_group && a.AlternativeCast == alternative_cast)).ToArray();
             // List the available applicants for each role
-            var available_cast = roles.Select(r => new Queue<Applicant>(
+            var available_cast = await Task.Run(() => roles.Select(r => new Queue<Applicant>(
                 InPreferredOrder(applicants.Where(a => IsEligible(a, r) && IsAvailable(a, r)), r))
-                ).ToArray();
+                ).ToArray());
             // Check for a role which must be immediately cast, otherwise start at the first uncast role
             int role;
             if (RoleNeedsImmediateCasting(required_cast, available_cast) is int first_immediate_role)
@@ -334,7 +337,7 @@ namespace Carmen.CastingEngine.Allocation
                     next_available.Roles.Add(roles[role]);
                     required_cast[role]--;
                     // Remove the cast applicant from other available_cast lists
-                    RemoveIfNotAvailable(next_available, roles, available_cast);
+                    await Task.Run(() => RemoveIfNotAvailable(next_available, roles, available_cast));
                     if (RoleNeedsImmediateCasting(required_cast, available_cast) is int immediate_role)
                     {
                         // If any roles now have available_cast <= required_cast, cast them now

@@ -6,6 +6,7 @@ using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Allocation
 {
@@ -88,7 +89,7 @@ namespace Carmen.CastingEngine.Allocation
             return confirm(msg);
         }
 
-        public override void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
+        public override async Task UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)
         {
             if (role.Requirements.Count(r => suitabilityRequirements.Contains(r)) == 0)
                 return; // nothing to do
@@ -96,16 +97,22 @@ namespace Carmen.CastingEngine.Allocation
             var not_picked_array = applicants_not_picked.ToArray();
             if (not_picked_array.Length == 0)
                 return; // nothing to do
-            var training_pairs = new Dictionary<double[], double[]>();
-            foreach (var (picked, not_picked) in ComparablePairs(applicants_picked, not_picked_array))
-            {
-                training_pairs.Add(InputValues(picked, not_picked, role), new[] { 1.0 });
-                training_pairs.Add(InputValues(not_picked, picked, role), new[] { 0.0 });
-            }
+            var training_pairs = await Task.Run(() => GenerateTrainingPairs(applicants_picked, not_picked_array, role));
             if (!training_pairs.Any())
                 return; // nothing to do
             // Process training data
-            AddTrainingPairs(training_pairs, role);
+            await AddTrainingPairs(training_pairs, role);
+        }
+
+        private Dictionary<double[], double[]> GenerateTrainingPairs(IEnumerable<Applicant> applicants_picked, Applicant[] not_picked_array, Role role)
+        {
+            var pairs = new Dictionary<double[], double[]>();
+            foreach (var (picked, not_picked) in ComparablePairs(applicants_picked, not_picked_array))
+            {
+                pairs.Add(InputValues(picked, not_picked, role), new[] { 1.0 });
+                pairs.Add(InputValues(not_picked, picked, role), new[] { 0.0 });
+            }
+            return pairs;
         }
 
         /// <summary>Finds pairs of good and bad applicants with matching cast groups</summary>
@@ -120,13 +127,13 @@ namespace Carmen.CastingEngine.Allocation
                             yield return (good, bad);
         }
 
-        public override void ExportChanges() => FinaliseTraining();
+        public override async Task ExportChanges() => await FinaliseTraining();
 
         /// <summary>Handle the addition of new training pairs, returning suggested weight changes, if any</summary>
-        protected abstract void AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role);
+        protected abstract Task AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role);
 
         /// <summary>Handle any remaining training, returning suggested weight changes, if any</summary>
-        protected abstract void FinaliseTraining();
+        protected abstract Task FinaliseTraining();
         #endregion
 
         #region Neural structure
@@ -164,7 +171,7 @@ namespace Carmen.CastingEngine.Allocation
         }
 
         /// <summary>Performs a training operation, but doesn't update any weights outside the model</summary>
-        protected void TrainModel(Dictionary<double[], double[]> pairs)
+        protected async Task TrainModel(Dictionary<double[], double[]> pairs)
         {
             Model.LearningRate = CalculateLearningRate();
             Model.LossFunction = NeuralLossFunction;
@@ -173,7 +180,7 @@ namespace Carmen.CastingEngine.Allocation
                 LossThreshold = 0.005,
                 MaxIterations = MaxTrainingIterations
             };
-            LastTrainingMontage = trainer.Train(pairs.Keys, pairs.Values);
+            LastTrainingMontage = await Task.Run(() => trainer.Train(pairs.Keys, pairs.Values));
         }
 
         protected virtual double CalculateLearningRate() => NeuralLearningRate;

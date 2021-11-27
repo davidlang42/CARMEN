@@ -3,6 +3,7 @@ using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Allocation
 {
@@ -34,20 +35,20 @@ namespace Carmen.CastingEngine.Allocation
         double CountRoles(Applicant applicant, Criteria criteria, Role? excluding_role);
 
         /// <summary>Pick the best cast for a role, returning the chosen cast without casting them.</summary>
-        IEnumerable<Applicant> PickCast(IEnumerable<Applicant> applicants, Role role);
+        Task<List<Applicant>> PickCast(IEnumerable<Applicant> applicants, Role role);
 
         /// <summary>A callback for when the user allocates cast to a role, providing
         /// information to the engine which can be used to improve future recommendations.</summary>
-        void UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role);
+        Task UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role);
 
         /// <summary>Saves any changes made in the engine back to the ShowModel or otherwise.
         /// This should be called whenever the engine's job is finished.</summary>
-        void ExportChanges();
+        Task ExportChanges();
 
         /// <summary>Allocate the best cast to one or more roles, balancing talent between them.
         /// NOTE: Unlike <see cref="PickCast(IEnumerable{Applicant}, Role)"/> this directly allocates
         /// cast to the role rather than returning the chosen cast.</summary>
-        void BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
+        Task BalanceCast(IEnumerable<Applicant> applicants, IEnumerable<Role> roles);
 
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>

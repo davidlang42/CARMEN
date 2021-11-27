@@ -92,7 +92,7 @@ namespace Carmen.CastingEngine.Audition
             var rejected_array = applicants_rejected.ToArray();
             if (rejected_array.Length == 0)
                 return; // nothing to do
-            var training_pairs = await Task.Run(() => TrainingPairs(applicants_accepted, rejected_array));
+            var training_pairs = await Task.Run(() => GenerateTrainingPairs(applicants_accepted, rejected_array));
             if (training_pairs.Count == 0)
                 return; // nothing to do
             // Train the model
@@ -107,7 +107,7 @@ namespace Carmen.CastingEngine.Audition
             UpdateWeights();
         }
 
-        private Dictionary<double[], double[]> TrainingPairs(IEnumerable<Applicant> applicants_accepted, Applicant[] rejected_array)
+        private Dictionary<double[], double[]> GenerateTrainingPairs(IEnumerable<Applicant> applicants_accepted, Applicant[] rejected_array)
         {
             var pairs = new Dictionary<double[], double[]>();
             foreach (var (accepted, rejected) in ComparablePairs(applicants_accepted, rejected_array))

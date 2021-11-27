@@ -143,7 +143,7 @@ namespace CarmenUI.Pages
                         .Where(afr => !afr.IsSelected)
                         .Select(afr => afr.Applicant);
                     using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Learning...", "Roles allocated by the user"))
-                        engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role); // must run in UI thread, because it may call MessageBox
+                        await engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
                     await SaveChanges(false); // to save any weights updated by the engine
                 }
                 ChangeToViewMode();
@@ -177,7 +177,7 @@ namespace CarmenUI.Pages
                 return;
             IEnumerable<Applicant> new_applicants;
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Processing...", "Finding best applicants"))
-                new_applicants = await Task.Run(() => engine.PickCast(applicantsInCast, current_view.Role));
+                new_applicants = await engine.PickCast(applicantsInCast, current_view.Role);
             current_view.SelectApplicants(new_applicants);
         }
 
@@ -301,7 +301,7 @@ namespace CarmenUI.Pages
         private async void MainMenuButton_Click(object sender, RoutedEventArgs e)
         {
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.ExportChanges), "Learning...", "Finalising user session"))
-                engine.ExportChanges(); // must run in UI thread, because it may call MessageBox
+                await engine.ExportChanges();
             await SaveChangesAndReturn(false); // to save any weights updated by the engine
         } 
 
@@ -425,7 +425,7 @@ namespace CarmenUI.Pages
                 + "\nDo you still want to automatically cast this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.BalanceCast), "Processing...", "Balancing cast between roles"))
-                await Task.Run(() => engine.BalanceCast(applicantsInCast, selected_roles));
+                await engine.BalanceCast(applicantsInCast, selected_roles);
             await SaveChanges(false); // immediately save any automatic casting
             foreach (var role in selected_roles)
                 rootNodeView.RoleCastingChanged(role);

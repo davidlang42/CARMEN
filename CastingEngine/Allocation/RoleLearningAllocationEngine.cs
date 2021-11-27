@@ -3,6 +3,7 @@ using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Allocation
 {
@@ -16,14 +17,14 @@ namespace Carmen.CastingEngine.Allocation
             : base(audition_engine, alternative_casts, show_root, requirements, confirm)
         { }
 
-        protected override void AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role)
+        protected override async Task AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role)
         {
-            TrainModel(pairs); // always train immediately
+            await TrainModel (pairs); // always train immediately
             PropogateChangesToShowModel(role.Requirements.Contains);
         }
 
         /// <summary>Empty implementation because training is always processed immediately</summary>
-        protected override void FinaliseTraining()
-        { }
+        protected override Task FinaliseTraining()
+            => Task.CompletedTask;
     }
 }

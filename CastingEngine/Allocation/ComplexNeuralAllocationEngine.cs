@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Carmen.CastingEngine.Allocation
@@ -74,14 +75,14 @@ namespace Carmen.CastingEngine.Allocation
         }
 
         #region Business logic
-        public override void ExportChanges()
+        public override async Task ExportChanges()
         {
-            base.ExportChanges();
+            await base.ExportChanges();
             if (AllowTraining)
-                SaveModelToDisk();
+                await Task.Run(() => SaveModelToDisk());
         }
 
-        protected override void AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role)
+        protected override async Task AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role)
         {
             if (!AllowTraining)
                 return; // nothing to do
@@ -89,14 +90,14 @@ namespace Carmen.CastingEngine.Allocation
                 trainingPairs.Add(pair.Key, pair.Value);
             if (!TrainImmediately)
                 return; // do it later
-            FinaliseTraining();
+            await FinaliseTraining();
         }
 
-        protected override void FinaliseTraining()
+        protected override async Task FinaliseTraining()
         {
             if (!trainingPairs.Any())
                 return; // nothing to do
-            TrainModel(trainingPairs);
+            await TrainModel(trainingPairs);
             if (!StockpileTrainingData)
                 trainingPairs.Clear();
         }

@@ -4,6 +4,7 @@ using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Carmen.CastingEngine.Allocation
 {
@@ -28,20 +29,20 @@ namespace Carmen.CastingEngine.Allocation
         { }
 
         #region Business logic
-        protected override void AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role)
+        protected override async Task AddTrainingPairs(Dictionary<double[], double[]> pairs, Role role)
         {
             foreach (var pair in pairs)
                 trainingPairs.Add(pair.Key, pair.Value);
             if (!TrainImmediately)
                 return; // do it later
-            FinaliseTraining();
+            await FinaliseTraining();
         }
 
-        protected override void FinaliseTraining()
+        protected override async Task FinaliseTraining()
         {
             if (!trainingPairs.Any())
                 return; // nothing to do
-            TrainModel(trainingPairs);
+            await TrainModel(trainingPairs);
             if (!StockpileTrainingData)
                 trainingPairs.Clear();
             PropogateChangesToShowModel(r => true);
