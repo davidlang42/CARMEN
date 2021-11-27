@@ -607,8 +607,12 @@ namespace CarmenUI.Pages
         {
             if (sameCastSetsList.SelectedItem is SameCastSet set)
             {
+                var index = sameCastSetsList.SelectedIndex;
+                if (index == sameCastSetsList.Items.Count - 1)
+                    index -= 1; // deleting last item
                 context.DeleteSameCastSet(set);
                 ConfigureAllApplicantsFiltering();
+                sameCastSetsList.SelectedIndex = index;
             }
         }
 
