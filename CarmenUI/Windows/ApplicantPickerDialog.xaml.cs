@@ -53,5 +53,10 @@ namespace CarmenUI.Windows
             else
                 this.DialogResult = true;
         }
+
+        private void ApplicantsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            ImportButton_Click(sender, e);
+        }
     }
 }

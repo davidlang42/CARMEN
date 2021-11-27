@@ -34,7 +34,7 @@
             </Button>
         </Grid>
         <ListBox x:Name="ApplicantsList" SelectionChanged="ApplicantsList_SelectionChanged" Margin="5 5 5 0"
-                 ItemsSource="{Binding Source={StaticResource applicantsViewSource}}">
+                 ItemsSource="{Binding Source={StaticResource applicantsViewSource}}" MouseDoubleClick="ApplicantsList_MouseDoubleClick">
             <ListBox.ItemTemplate>
                 <DataTemplate>
                     <TextBlock>
