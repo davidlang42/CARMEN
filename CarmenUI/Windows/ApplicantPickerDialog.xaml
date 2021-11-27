@@ -5,8 +5,38 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:CarmenUI.ViewModels"
         mc:Ignorable="d"
-        Title="ApplicantPickerDialog" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        MinHeight="300" MinWidth="400"
+        WindowStartupLocation="CenterOwner"
+        Title="Import marks from another show" Height="480" Width="640">
+    <DockPanel>
+        <Grid DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button IsCancel="True" Width="100" Height="35" Margin="5">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Times" Width="12" Margin="2 0" Foreground="DimGray"/>
+                    <TextBlock Text="Cancel" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+            <Button IsDefault="True" Grid.Column="1" Width="100" Height="35" Margin="5" Click="ImportButton_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Share" Width="12" Margin="2 0" Foreground="MediumBlue"/>
+                    <TextBlock Text="Import" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+        <ListBox x:Name="ApplicantsList" SelectionChanged="ApplicantsList_SelectionChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <Run Text="{Binding FirstName}"/>
+                        <Run Text="{Binding LastName}"/>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
 </Window>

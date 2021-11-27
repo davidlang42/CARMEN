@@ -340,7 +340,7 @@ namespace CarmenUI.Pages
             if (Mode == EditApplicantsMode.RegisterApplicants)
                 await ImportApplicants();
             else if (Mode == EditApplicantsMode.AuditionApplicants)
-                ImportMarks();
+                await ImportMarks();
             else
                 throw new NotImplementedException($"Enum not handled: {Mode}");
         }
@@ -409,7 +409,7 @@ namespace CarmenUI.Pages
             csv.Dispose();
         }
 
-        private async void ImportMarks()
+        private async Task ImportMarks()
         {
             if (applicantsList.SelectedItem is not Applicant applicant)
                 return;
@@ -425,8 +425,11 @@ namespace CarmenUI.Pages
             Applicant[] import_applicants;
             using (var loading = new LoadingOverlay(this) { SubText = "Applicant list" })
                 import_applicants = await import.Applicants.ToArrayAsync();
-            var picker = new ApplicantPickerDialog(import_applicants, applicant.FirstName, applicant.LastName);
-            if (dialog.ShowDialog() != true || picker.SelectedApplicant is not Applicant import_selected)
+            var picker = new ApplicantPickerDialog(import_applicants, applicant.FirstName, applicant.LastName)
+            {
+                Owner = Window.GetWindow(this)
+            };
+            if (picker.ShowDialog() != true || picker.SelectedApplicant is not Applicant import_selected)
                 return;
             var add_notes = "Imported marks";
             if (!import_selected.FirstName.Equals(applicant.FirstName, StringComparison.OrdinalIgnoreCase) || !import_selected.LastName.Equals(applicant.LastName, StringComparison.OrdinalIgnoreCase))
@@ -461,7 +464,7 @@ namespace CarmenUI.Pages
                     {
                         if (import_formatted_mark.Equals(matching_criteria.Format(import_ability.Mark), StringComparison.OrdinalIgnoreCase)) // important for select criteria
                         {
-                            if (applicant.Abilities.Where(ab => ab.Criteria == matching_criteria).SingleOrDefault() is Ability existing_ability)
+                            if (applicant.Abilities.Where(ab => ab.Criteria == matching_criteria).SingleOrDefault() is Ability existing_ability && existing_ability.Mark != import_ability.Mark)
                                 add_notes += $"\nOverwrote previous {matching_criteria.Name} ability of {matching_criteria.Format(existing_ability.Mark)} with {import_formatted_mark}";
                             applicant.SetMarkFor(matching_criteria, import_ability.Mark);
                             count++;
@@ -477,8 +480,8 @@ namespace CarmenUI.Pages
                 applicant.Notes = add_notes;
             else
                 applicant.Notes += "\n\n" + add_notes;
-            MessageBox.Show($"Imported {count.Plural("ability","abilities")} for '{applicant.FirstName} {applicant.LastName}'.");
-            //TODO required? applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();    
+            MessageBox.Show($"Imported {count.Plural("ability","abilities")} for '{applicant.FirstName} {applicant.LastName}'.", WindowTitle);
+            //TODO confirm it updates both the applicant list AND the current applicant -- applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();    
         }
 
         private static bool TryInputBoolean(string message, string title, out bool value) //TODO remove if not used

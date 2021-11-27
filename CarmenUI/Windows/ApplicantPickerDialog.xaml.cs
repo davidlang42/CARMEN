@@ -25,6 +25,28 @@ namespace CarmenUI.Windows
         public ApplicantPickerDialog(Applicant[] applicants, string match_first_name, string match_last_name)
         {
             InitializeComponent();
+            ApplicantsList.ItemsSource = applicants;
+            foreach (var applicant in applicants)
+            {
+                if (applicant.FirstName.Equals(match_first_name, StringComparison.OrdinalIgnoreCase) && applicant.LastName.Equals(match_last_name, StringComparison.OrdinalIgnoreCase))
+                {
+                    ApplicantsList.SelectedItem = applicant;
+                    break;
+                }
+            }
+        }
+
+        private void ApplicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            SelectedApplicant = ApplicantsList.SelectedItem as Applicant;
+        }
+
+        private void ImportButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (SelectedApplicant == null)
+                MessageBox.Show("Please select an applicant to import.");
+            else
+                this.DialogResult = true;
         }
     }
 }
