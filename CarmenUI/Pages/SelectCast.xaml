@@ -42,6 +42,7 @@
             <cv:InvertBoolean/>
             <cv:HighlightError/>
         </cv:MultiConverter>
+        <cv:CheckRequiredCount x:Key="checkRequiredCount"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -236,7 +237,16 @@
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Selected applicants" FontSize="18" VerticalAlignment="Center"/>
-                <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource selectedApplicantsViewSource}, Path=Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource selectedApplicantsViewSource}, Path=Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center">
+                    <TextBlock.Background>
+                        <MultiBinding Converter="{StaticResource checkRequiredCount}">
+                            <MultiBinding.Bindings>
+                                <Binding Source="{StaticResource selectedApplicantsViewSource}" Path="Count"/>
+                                <Binding ElementName="selectionList" Path="SelectedItem"/>
+                            </MultiBinding.Bindings>
+                        </MultiBinding>
+                    </TextBlock.Background>
+                </TextBlock>
             </Grid>
             <ListBox x:Name="selectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="7"
                      SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick"

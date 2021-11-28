@@ -42,6 +42,7 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource castNumberMissingViewSource;
         private readonly ApplicantDescription applicantDescription;
         private readonly SuitabilityCalculator suitabilityCalculator;
+        private readonly CheckRequiredCount checkRequiredCount;
 
         private Criteria[]? _criterias;
         private Criteria[] criterias => _criterias
@@ -88,6 +89,7 @@ namespace CarmenUI.Pages
             castNumberMissingViewSource = (CollectionViewSource)FindResource(nameof(castNumberMissingViewSource));
             applicantDescription = (ApplicantDescription)FindResource(nameof(applicantDescription));
             suitabilityCalculator = (SuitabilityCalculator)FindResource(nameof(suitabilityCalculator));
+            checkRequiredCount = (CheckRequiredCount)FindResource(nameof(checkRequiredCount));
             foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
             {
                 allApplicantsViewSource.SortDescriptions.Add(sd);
@@ -107,11 +109,13 @@ namespace CarmenUI.Pages
             using (loading.Segment(nameof(ShowContext.AlternativeCasts) + nameof(AlternativeCast.Members), "Alternative casts"))
             {
                 _alternativeCasts = await context.AlternativeCasts.Include(ac => ac.Members).InNameOrder().ToArrayAsync();
+                checkRequiredCount.AlternativeCasts = alternativeCasts.Length;
                 alternativeCastsViewSource.Source = context.AlternativeCasts.Local.ToObservableCollection();
                 alternativeCastsViewSource.SortDescriptions.Add(StandardSort.For<AlternativeCast>());
             }
             using (loading.Segment(nameof(ShowContext.CastGroups) + nameof(CastGroup.Members) + nameof(CastGroup.Requirements), "Cast groups"))
                 _castGroups = await context.CastGroups.Include(cg => cg.Members).Include(cg => cg.Requirements).InOrder().ToArrayAsync();
+            checkRequiredCount.AlternatingCastGroups = castGroups.Where(cg => cg.AlternateCasts).Count();
             castGroupsViewSource.Source = context.CastGroups.Local.ToObservableCollection();
             using (loading.Segment(nameof(ShowContext.SameCastSets), "Same cast sets"))
                 await context.SameCastSets.LoadAsync();
