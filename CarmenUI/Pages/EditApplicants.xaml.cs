@@ -34,6 +34,9 @@ namespace CarmenUI.Pages
         readonly BooleanLookupDictionary groupExpansionLookup;
         readonly OverallAbilityCalculator overallAbilityCalculator;
 
+        readonly FullNameFormat[] allNameFormats = Enum.GetValues<FullNameFormat>();
+        bool pageLoaded = false;
+
         private Criteria[]? _criterias;
         private Criteria[] criterias => _criterias ?? throw new ApplicationException($"Tried to used {nameof(criterias)} before it was loaded.");
 
@@ -97,6 +100,7 @@ namespace CarmenUI.Pages
                     ConfigureGroupingAndSorting();
             }
             filterText.Focus();
+            pageLoaded = true;
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -166,12 +170,13 @@ namespace CarmenUI.Pages
         }
 
         private void groupCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
-            => ConfigureGroupingAndSorting();
+        {
+            if (pageLoaded)
+                ConfigureGroupingAndSorting();
+        }
 
         private void ConfigureGroupingAndSorting()
         {
-            if (applicantsViewSource.View == null)
-                return;
             // clear old grouping
             applicantsViewSource.GroupDescriptions.Clear();
             // add new grouping
@@ -216,35 +221,31 @@ namespace CarmenUI.Pages
 
         private void ConfigureFiltering()
         {
-            if (applicantsViewSource.View is ICollectionView view)
+            var view = applicantsViewSource.View ?? throw new ApplicationException($"{nameof(ConfigureFiltering)} called during page loading.");
+            var auto_collapse_group_threshold = Properties.Settings.Default.AutoCollapseGroupThreshold;
+            var previous_counts = GetGroupCounts(view);
+            var text = filterText.Text;
+            view.Filter = (Mode, hideFinishedApplicants.IsChecked) switch
             {
-                var auto_collapse_group_threshold = Properties.Settings.Default.AutoCollapseGroupThreshold;
-                var previous_counts = GetGroupCounts(view);
-                var text = filterText.Text;
-                view.Filter = (Mode, hideFinishedApplicants.IsChecked) switch
+                (EditApplicantsMode.RegisterApplicants, true) when string.IsNullOrEmpty(text) => o => o is Applicant a && !a.IsRegistered,
+                (EditApplicantsMode.RegisterApplicants, true) => o => o is Applicant a && AnyNameContains(a, text) && !a.IsRegistered,
+                (EditApplicantsMode.AuditionApplicants, true) when string.IsNullOrEmpty(text) => o => o is Applicant a && !a.HasAuditioned(criterias),
+                (EditApplicantsMode.AuditionApplicants, true) => o => o is Applicant a && AnyNameContains(a, text) && !a.HasAuditioned(criterias),
+                _ when string.IsNullOrEmpty(text) => o => o is Applicant a,
+                _ => o => o is Applicant a && AnyNameContains(a, text),
+            };
+            var new_counts = GetGroupCounts(view);
+            foreach (var (key, new_count) in new_counts)
+            {
+                if (!previous_counts.TryGetValue(key, out var old_count) // the group wasn't previously shown
+                    || ((old_count > auto_collapse_group_threshold) != (new_count > auto_collapse_group_threshold))) // or it crossed the threshold
                 {
-                    (EditApplicantsMode.RegisterApplicants, true) when string.IsNullOrEmpty(text) => o => o is Applicant a && !a.IsRegistered,
-                    (EditApplicantsMode.RegisterApplicants, true) => o => o is Applicant a && AnyNameContains(a, text) && !a.IsRegistered,
-                    (EditApplicantsMode.AuditionApplicants, true) when string.IsNullOrEmpty(text) => o => o is Applicant a && !a.HasAuditioned(criterias),
-                    (EditApplicantsMode.AuditionApplicants, true) => o => o is Applicant a && AnyNameContains(a, text) && !a.HasAuditioned(criterias),
-                    _ when string.IsNullOrEmpty(text) => o => o is Applicant a,
-                    _ => o => o is Applicant a && AnyNameContains(a, text),
-                };
-                var new_counts = GetGroupCounts(view);
-                foreach (var (key, new_count) in new_counts)
-                {
-                    if (!previous_counts.TryGetValue(key, out var old_count) // the group wasn't previously shown
-                        || ((old_count > auto_collapse_group_threshold) != (new_count > auto_collapse_group_threshold))) // or it crossed the threshold
-                    {
-                        groupExpansionLookup.Dictionary[key] = new_count <= auto_collapse_group_threshold;
-                    }
+                    groupExpansionLookup.Dictionary[key] = new_count <= auto_collapse_group_threshold;
                 }
-                if (applicantsList.Items.Count == 1)
-                    applicantsList.SelectedIndex = 0;
             }
+            if (pageLoaded && applicantsList.Items.Count == 1)
+                applicantsList.SelectedIndex = 0;
         }
-
-        private readonly FullNameFormat[] allNameFormats = Enum.GetValues<FullNameFormat>();
 
         /// <summary>Checks if this appliants name, in any of the possible name formats, contains the filter text</summary>
         private bool AnyNameContains(Applicant applicant, string filter_text)
@@ -264,6 +265,8 @@ namespace CarmenUI.Pages
 
         private async void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (!pageLoaded)
+                return;
             CommitNewNote(e.RemovedItems.OfType<Applicant>().FirstOrDefault());
             if (Properties.Settings.Default.SaveOnApplicantChange)
                 await SaveChanges(user_initiated: false);
@@ -320,7 +323,7 @@ namespace CarmenUI.Pages
 
         private void filterText_GotFocus(object sender, RoutedEventArgs e)
         {
-            ConfigureFiltering();
+            ConfigureFiltering(); //TODO is this needed?
             filterText.SelectAll();
         }
 
