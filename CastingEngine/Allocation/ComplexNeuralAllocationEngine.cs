@@ -122,7 +122,7 @@ namespace Carmen.CastingEngine.Allocation
                 if (confirm($"Neural model failed to load. Would you like to create a new one?"))
                     return BuildNewModel();
                 else
-                    throw;
+                    throw new UserException(ex, "Failed to load neural model.");
             }
         }
 

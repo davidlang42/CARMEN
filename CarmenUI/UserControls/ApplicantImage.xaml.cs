@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
 using CarmenUI.Windows;
 using Microsoft.Win32;
@@ -82,7 +83,7 @@ namespace CarmenUI.UserControls
                 {
                     if (!Directory.Exists(cache_path))
                         Directory.CreateDirectory(cache_path);
-                    File.WriteAllBytes(filename, lazy_loading_photo_getter().ImageData);
+                    UserException.Handle(() => File.WriteAllBytes(filename, lazy_loading_photo_getter().ImageData), "Error caching image.");
                 });
             return new BitmapImage(new Uri(filename));
         }
@@ -137,7 +138,7 @@ namespace CarmenUI.UserControls
                 ApplicantObject.Photo = new Image
                 {
                     Name = Path.GetFileName(dialog.FileName),
-                    ImageData = File.ReadAllBytes(dialog.FileName)
+                    ImageData = UserException.Handle(() => File.ReadAllBytes(dialog.FileName), "Error uploading image.")
                 };
                 ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ApplicantObject.Photo));
                 await UpdateImage();

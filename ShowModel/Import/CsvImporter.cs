@@ -35,9 +35,17 @@ namespace Carmen.ShowModel.Import
                 importPath += Path.DirectorySeparatorChar;
             castGroups = cast_groups;
             alternativeCasts = alternative_casts;
-            csv = new CsvReader(new StreamReader(file_name), CultureInfo.InvariantCulture); //TODO handle file io exceptions
-            csv.Read();
-            csv.ReadHeader();
+            var stream = UserException.Handle(() => new StreamReader(file_name), "Error opening CSV file.");
+            try
+            {
+                csv = new CsvReader(stream, CultureInfo.InvariantCulture);
+                csv.Read();
+                csv.ReadHeader();
+            }
+            catch (Exception ex)
+            {
+                throw new UserException(ex, $"Error reading CSV file.");
+            }
             InputColumns = csv.HeaderRecord.Select((h, i) => new InputColumn(i, h)).ToArray();
             ImportColumns = GenerateColumns(criterias, tags, delete_image).ToArray();
             LoadColumnMap(InputColumns.ToDictionary(c => c.Header, new FilteredStringComparer(char.IsLetterOrDigit, StringComparison.InvariantCultureIgnoreCase)));

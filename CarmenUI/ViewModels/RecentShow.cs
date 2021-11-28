@@ -104,7 +104,7 @@ namespace CarmenUI.ViewModels
         public void CreateBackupIfFile()
         {
             if (Provider == null)
-                File.Copy(Filename, Filename + "_backup", true);
+                UserException.Handle(() => File.Copy(Filename, Filename + "_backup", true), "Error creating backup of database.");
         }
 
         public override bool Equals(object? obj)

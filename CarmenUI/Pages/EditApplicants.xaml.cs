@@ -440,8 +440,8 @@ namespace CarmenUI.Pages
                 }
                 if (MessageBox.Show(msg, WindowTitle, buttons) == MessageBoxResult.Yes)
                 {
-                    var temp_file = $"{System.IO.Path.GetTempPath()}import_errors_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt";
-                    using (var writer = new System.IO.StreamWriter(temp_file))
+                    var temp_file = $"{Path.GetTempPath()}import_errors_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.txt";
+                    using (var writer = UserException.Handle(() => new StreamWriter(temp_file), "Error saving import errors."))
                         foreach (var (row, error) in result.ParseErrors)
                             writer.WriteLine($"Row {row}: {error}");
                     Process.Start(new ProcessStartInfo
@@ -495,7 +495,7 @@ namespace CarmenUI.Pages
                     loading.SubText = "Creating temporary migration";
                     await import.DisposeAsync();
                     var temp_file = Path.GetTempFileName();
-                    File.Copy(dialog.FileName, temp_file, true); // make a copy so the original is not migrated
+                    UserException.Handle(() => File.Copy(dialog.FileName, temp_file, true), "Error making temporary copy of database."); // make a copy so the original is not migrated
                     import = ShowContext.Open(new LocalShowConnection(temp_file));
                     await import.UpgradeDatabase();
                 }

@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -64,7 +65,7 @@ namespace Carmen.ShowModel.Reporting
             if (ordered_columns.Length == 0 || applicants.Length == 0)
                 return 0; // nothing to export
             int count = 0;
-            using (var zip = ZipFile.Open(file_name, ZipArchiveMode.Create)) //TODO handle file io exceptions
+            using (var zip = UserException.Handle(() => ZipFile.Open(file_name, ZipArchiveMode.Create), "Error creating ZIP file."))
             {
                 for (var i = 0; i < applicants.Length; i++)
                 {
@@ -80,7 +81,7 @@ namespace Carmen.ShowModel.Reporting
                         var field_values = ordered_columns.Select(c => FormatAsString(c.ValueGetter(applicants[i])));
                         var filename = string.Join("-", field_values) + extension;
                         var full_path = string.Concat(group_folder.Split(Path.GetInvalidPathChars())) + string.Concat(filename.Split(Path.GetInvalidFileNameChars()));
-                        var entry = zip.CreateEntry(full_path); //TODO handle duplicate file names
+                        var entry = UserException.Handle(() => zip.CreateEntry(full_path), "Error adding to ZIP file.");
                         using (var stream = entry.Open())
                             await stream.WriteAsync(image.ImageData, 0, image.ImageData.Length);
                         count++;

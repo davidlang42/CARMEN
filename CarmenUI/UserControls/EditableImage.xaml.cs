@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using Carmen.ShowModel;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -64,7 +65,7 @@ namespace CarmenUI.UserControls
                 ImageObject = new Image
                 {
                     Name = System.IO.Path.GetFileName(dialog.FileName),
-                    ImageData = File.ReadAllBytes(dialog.FileName)
+                    ImageData = UserException.Handle(() => File.ReadAllBytes(dialog.FileName), "Error uploading image.")
                 };
                 ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ImageObject));
             }

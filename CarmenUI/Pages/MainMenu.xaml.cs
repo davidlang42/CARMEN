@@ -361,7 +361,7 @@ namespace CarmenUI.Pages
                             if (MatchImageId(filename, out var image_id) && image_ids.Contains(image_id))
                                 cached_ids.Add(image_id, cached_file);
                             else
-                                File.Delete(cached_file);
+                                UserException.Handle(() => File.Delete(cached_file), "Error deleting cached images.");
                         }
                     }
                 }
@@ -370,7 +370,7 @@ namespace CarmenUI.Pages
             {
                 if (MessageBox.Show($"Do you want to clear the existing {cached_ids.Count} images in the cache?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
                     foreach (var (_, cached_file) in cached_ids)
-                        File.Delete(cached_file);
+                        UserException.Handle(() => File.Delete(cached_file), "Error deleting cached images.");
                 else
                     foreach (var (id, _) in cached_ids)
                         image_ids.Remove(id);

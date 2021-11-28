@@ -46,10 +46,25 @@ namespace CarmenUI
             ConfigureLogging();
         }
 
+        public void ConfigureLogging()
+        {
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.File("CARMEN_.log", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
+                .CreateLogger();
+            Log.Information("Launch");
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
 #if !DEBUG
+            AttachExceptionHandlers();
+#endif
+        }
+
+        private void AttachExceptionHandlers()
+        {
             AppDomain.CurrentDomain.UnhandledException += (s, e) =>
                 HandleUnhandledException((Exception)e.ExceptionObject, "AppDomain");
             DispatcherUnhandledException += (s, e) =>
@@ -62,46 +77,39 @@ namespace CarmenUI
                 HandleUnhandledException(e.Exception, "TaskScheduler");
                 e.SetObserved();
             };
-#endif
         }
 
-#if !DEBUG
         private void HandleUnhandledException(Exception ex, string handler)
         {
             Log.Error(ex, $"Unhandled exception in {handler}");
-            MessageBox.Show($"Error in {handler}: {ex.Message}");
-            bool main_window_found = false;
-            foreach (var obj in Current.Windows)
+            if (ex is UserException user)
+                MessageBox.Show(user.Message, "CARMEN");
+            else
             {
-                if (obj is MainWindow main_window)
+                MessageBox.Show($"Error in {handler}: {ex.Message}", "CARMEN");
+                bool main_window_found = false;
+                foreach (var obj in Current.Windows)
                 {
-                    Log.Information($"Returning to {nameof(MainWindow)}");
-                    main_window_found = true;
-                    main_window.Show();
-                    main_window.NavigateToMainMenu();
+                    if (obj is MainWindow main_window)
+                    {
+                        Log.Information($"Returning to {nameof(MainWindow)}");
+                        main_window_found = true;
+                        main_window.Show();
+                        main_window.NavigateToMainMenu();
+                    }
+                    else if (obj is Window window)
+                    {
+                        Log.Information($"Closing {obj.GetType().Name} '{window.Title}'");
+                        window.Close();
+                    }
                 }
-                else if (obj is Window window)
+                if (!main_window_found)
                 {
-                    Log.Information($"Closing {obj.GetType().Name} '{window.Title}'");
-                    window.Close();
+                    Log.Information($"Relaunching {nameof(StartWindow)}");
+                    var start_window = new StartWindow();
+                    start_window.Show();
                 }
             }
-            if (!main_window_found)
-            {
-                Log.Information($"Relaunching {nameof(StartWindow)}");
-                var start_window = new StartWindow();
-                start_window.Show();
-            }
-        }
-
-#endif
-        public void ConfigureLogging()
-        {
-            Log.Logger = new LoggerConfiguration()
-                .MinimumLevel.Information()
-                .WriteTo.File("CARMEN_.log", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
-                .CreateLogger();
-            Log.Information("Launch");
         }
     }
 }

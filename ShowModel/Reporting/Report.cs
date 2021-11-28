@@ -131,7 +131,7 @@ namespace Carmen.ShowModel.Reporting
             if (ordered_columns.Length == 0)
                 return 0; // nothing to export
             int count = 0;
-            using (var writer = new StreamWriter(file_name)) //TODO handle file io exceptions
+            using (var writer = UserException.Handle(() => new StreamWriter(file_name), "Error writing to CSV file."))
             using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
             {
                 if (ExportDescriptiveHeader)
