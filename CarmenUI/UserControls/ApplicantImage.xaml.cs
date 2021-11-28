@@ -29,8 +29,8 @@ namespace CarmenUI.UserControls
         public static readonly DependencyProperty ApplicantObjectProperty = DependencyProperty.Register(
            nameof(ApplicantObject), typeof(Applicant), typeof(ApplicantImage), new PropertyMetadata(null, OnApplicantObjectChanged));
 
-        private static void OnApplicantObjectChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
-            => ((ApplicantImage)sender).UpdateImage(); //TODO really should add change handler for Applicant.Photo rather than call UpdateImage() after each change
+        private static async void OnApplicantObjectChanged(DependencyObject sender, DependencyPropertyChangedEventArgs e)
+            => await ((ApplicantImage)sender).UpdateImage();
 
         public event ImageChangedEventHandler? ImageChanged = null;
 
@@ -60,29 +60,30 @@ namespace CarmenUI.UserControls
                 UploadImage_Click(sender, e);
         }
 
-        private void UpdateImage()
+        private async Task UpdateImage()
         {
-            if (ApplicantObject == null)
+            if (ApplicantObject is not Applicant applicant)
                 ImageControl.Source = null;
-            else if (ApplicantObject.PhotoImageId != null)
-                ImageControl.Source = CachedImage(ApplicantObject.PhotoImageId.Value, ApplicantObject.ShowRoot,
-                    () => ApplicantObject.Photo ?? throw new ApplicationException("Applicant photo not set, but photo ID was.")); //TODO call async
-            else if (ApplicantObject.Photo != null)
-                ImageControl.Source = ActualImage(ApplicantObject.Photo); //TODO call async
+            else if (applicant.PhotoImageId != null)
+                ImageControl.Source = await CachedImage(applicant.PhotoImageId.Value, applicant.ShowRoot,
+                    () => applicant.Photo ?? throw new ApplicationException("Applicant photo not set, but photo ID was."));
+            else if (await Task.Run(() => applicant.Photo) is Image photo)
+                ImageControl.Source = await ActualImage(photo);
             else
                 ImageControl.Source = null;
         }
 
-        public static ImageSource CachedImage(int image_id, ShowRoot show, Func<Image> lazy_loading_photo_getter)
+        public static async Task<ImageSource> CachedImage(int image_id, ShowRoot show, Func<Image> lazy_loading_photo_getter)
         {
             var cache_path = GetCachePath(show);
             var filename = $"{cache_path}{image_id}.{ImageCacheExtension}";
             if (!File.Exists(filename))
-            {
-                if (!Directory.Exists(cache_path))
-                    Directory.CreateDirectory(cache_path);
-                File.WriteAllBytes(filename, lazy_loading_photo_getter().ImageData);
-            }
+                await Task.Run(() =>
+                {
+                    if (!Directory.Exists(cache_path))
+                        Directory.CreateDirectory(cache_path);
+                    File.WriteAllBytes(filename, lazy_loading_photo_getter().ImageData);
+                });
             return new BitmapImage(new Uri(filename));
         }
 
@@ -96,19 +97,22 @@ namespace CarmenUI.UserControls
             return root_path + string.Concat(show_root.Name.Split(Path.GetInvalidFileNameChars())) + Path.DirectorySeparatorChar;
         }
 
-        private ImageSource? ActualImage(Image photo)
+        private async Task<ImageSource?> ActualImage(Image photo)
         {
             using (var stream = new MemoryStream(photo.ImageData))
             {
                 try
                 {
-                    var image = new BitmapImage();
-                    image.BeginInit();
-                    image.CacheOption = BitmapCacheOption.OnLoad;
-                    image.StreamSource = stream;
-                    image.EndInit();
-                    image.Freeze();
-                    return image;
+                    return await Task.Run(() =>
+                    {
+                        var image = new BitmapImage();
+                        image.BeginInit();
+                        image.CacheOption = BitmapCacheOption.OnLoad;
+                        image.StreamSource = stream;
+                        image.EndInit();
+                        image.Freeze();
+                        return image;
+                    });
                 }
                 catch (Exception ex)
                 {
@@ -118,7 +122,7 @@ namespace CarmenUI.UserControls
             }
         }
 
-        private void UploadImage_Click(object sender, RoutedEventArgs e)
+        private async void UploadImage_Click(object sender, RoutedEventArgs e)
         {
             if (ApplicantObject == null)
                 return;
@@ -136,11 +140,11 @@ namespace CarmenUI.UserControls
                     ImageData = File.ReadAllBytes(dialog.FileName)
                 };
                 ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ApplicantObject.Photo));
-                UpdateImage();
+                await UpdateImage();
             }
         }
 
-        private void PasteImage_Click(object sender, RoutedEventArgs e)
+        private async void PasteImage_Click(object sender, RoutedEventArgs e)
         {
             if (ApplicantObject == null)
                 return;
@@ -157,30 +161,32 @@ namespace CarmenUI.UserControls
                     ImageData = stream.ToArray()
                 };
                 ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ApplicantObject.Photo));
-                UpdateImage();
+                await UpdateImage();
             }
         }
 
-        private void ClearImage_Click(object sender, RoutedEventArgs e)
+        private async void ClearImage_Click(object sender, RoutedEventArgs e)
         {
             if (ApplicantObject == null)
                 return;
             var old_image = ApplicantObject.Photo;
             ApplicantObject.Photo = null;
             ImageChanged?.Invoke(this, new ImageChangedEventArgs(old_image, ApplicantObject.Photo));
-            UpdateImage();
+            await UpdateImage();
         }
 
-        private void FixOrientation_Click(object sender, RoutedEventArgs e)
+        private async void FixOrientation_Click(object sender, RoutedEventArgs e)
         {
-            if (ApplicantObject == null)
+            if (ApplicantObject is not Applicant applicant)
                 return;
-            //TODO loading overlay
+            using var overlay = new LoadingOverlay(Window.GetWindow(this)) { MainText = "Rotating..." };
             // load the original image
-            if (ApplicantObject.Photo is not Image original_image) //TODO call async
+            overlay.SubText = "Loading photo";
+            if (await Task.Run(() => applicant.Photo) is not Image original_image)
                 return;
-            using var original_stream = new MemoryStream(original_image.ImageData);
             // find the correct rotation from metadata
+            overlay.SubText = "Parsing orientation";
+            using var original_stream = new MemoryStream(original_image.ImageData);
             if (BitmapFrame.Create(original_stream).Metadata is not BitmapMetadata metadata)
                 return;
             var query = "System.Photo.Orientation";
@@ -194,31 +200,45 @@ namespace CarmenUI.UserControls
                 8 => Rotation.Rotate270,
                 _ => throw new ApplicationException($"Invalid orientation: {metadata.GetQuery("System.Photo.Orientation")}")
             };
+            using var main_segment = overlay.AsSegment(nameof(FixOrientation_Click));
             // create image with correct rotation
-            var corrected = new BitmapImage();
-            corrected.BeginInit();
-            corrected.CacheOption = BitmapCacheOption.OnLoad;
-            original_stream.Seek(0, SeekOrigin.Begin);
-            corrected.StreamSource = original_stream;
-            corrected.Rotation = rotation;
-            corrected.EndInit(); //TODO call async
-            corrected.Freeze();
+            BitmapImage corrected;
+            using (var segment = main_segment.Segment(nameof(FixOrientation_Click) + nameof(BitmapImage), "Rendering"))
+                corrected = await Task.Run(() =>
+                {
+                    var corrected = new BitmapImage();
+                    corrected.BeginInit();
+                    corrected.CacheOption = BitmapCacheOption.OnLoad;
+                    original_stream.Seek(0, SeekOrigin.Begin);
+                    corrected.StreamSource = original_stream;
+                    corrected.Rotation = rotation;
+                    corrected.EndInit();
+                    corrected.Freeze();
+                    return corrected;
+                });
             // re-encode
-            var encoder = new JpegBitmapEncoder()
-            {
-                QualityLevel = 95
-            };
-            encoder.Frames.Add(BitmapFrame.Create(corrected));
             using var corrected_stream = new MemoryStream();
-            encoder.Save(corrected_stream);
+            using (var segment = main_segment.Segment(nameof(FixOrientation_Click) + nameof(JpegBitmapEncoder), "Encoding"))
+                await Task.Run(() =>
+                {
+                    var encoder = new JpegBitmapEncoder()
+                    {
+                        QualityLevel = 95
+                    };
+                    encoder.Frames.Add(BitmapFrame.Create(corrected));
+                    encoder.Save(corrected_stream);
+                });
             // update the applicant
-            ApplicantObject.Photo = new Image
+            using (var segment = main_segment.Segment(nameof(FixOrientation_Click) + nameof(UpdateImage), "Saving"))
             {
-                Name = original_image.Name,
-                ImageData = corrected_stream.ToArray()
-            };
-            ImageChanged?.Invoke(this, new ImageChangedEventArgs(original_image, ApplicantObject.Photo));
-            UpdateImage();
+                applicant.Photo = new Image
+                {
+                    Name = original_image.Name,
+                    ImageData = corrected_stream.ToArray()
+                };
+                ImageChanged?.Invoke(this, new ImageChangedEventArgs(original_image, applicant.Photo));
+                await UpdateImage();
+            }
         }
     }
 }
