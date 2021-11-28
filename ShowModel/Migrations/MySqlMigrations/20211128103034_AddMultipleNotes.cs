@@ -8,10 +8,6 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Notes",
-                table: "Applicants");
-
             migrationBuilder.CreateTable(
                 name: "Notes",
                 columns: table => new
@@ -41,6 +37,12 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 name: "IX_Notes_ApplicantId",
                 table: "Notes",
                 column: "ApplicantId");
+
+            migrationBuilder.Sql("INSERT INTO Notes(ApplicantId, Text, Author, Timestamp) SELECT ApplicantId, Notes AS Text, 'Migration' AS Author, NOW() AS Timestamp FROM Applicants WHERE Notes IS NOT NULL AND Notes <> ''");
+
+            migrationBuilder.DropColumn(
+                name: "Notes",
+                table: "Applicants");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

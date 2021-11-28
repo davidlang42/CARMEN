@@ -7,10 +7,6 @@ namespace Carmen.ShowModel.Migrations.SqliteMigrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Notes",
-                table: "Applicants");
-
             migrationBuilder.CreateTable(
                 name: "Notes",
                 columns: table => new
@@ -37,6 +33,12 @@ namespace Carmen.ShowModel.Migrations.SqliteMigrations
                 name: "IX_Notes_ApplicantId",
                 table: "Notes",
                 column: "ApplicantId");
+
+            migrationBuilder.Sql("INSERT INTO Notes(ApplicantId, Text, Author, Timestamp) SELECT ApplicantId, Notes AS Text, 'Migration' AS Author, DATETIME('now') AS Timestamp FROM Applicants WHERE Text NOTNULL AND Text <> ''");
+
+            migrationBuilder.DropColumn(
+                name: "Notes",
+                table: "Applicants");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
