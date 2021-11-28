@@ -22,6 +22,7 @@
         <CollectionViewSource x:Key="alternativeCastsViewSource"/>
         <CollectionViewSource x:Key="sameCastSetsViewSource"/>
         <CollectionViewSource x:Key="tagsViewSource"/>
+        <cv:SuitabilityCalculator x:Key="suitabilityCalculator"/>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <ObjectDataProvider x:Key="castStatusEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
             <ObjectDataProvider.MethodParameters>
@@ -239,12 +240,43 @@
             </Grid>
             <ListBox x:Name="selectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="7"
                      SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick"
+                     HorizontalContentAlignment="Stretch"
                      ItemsSource="{Binding Source={StaticResource selectedApplicantsViewSource}}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type modelApplicants:Applicant}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource fullName}">
+                                        <MultiBinding.Bindings>
+                                            <Binding Path="FirstName"/>
+                                            <Binding Path="LastName"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Grid.Column="1">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource suitabilityCalculator}">
+                                        <MultiBinding.Bindings>
+                                            <Binding/>
+                                            <Binding ElementName="selectionList" Path="SelectedItem"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
             <Button Grid.Column="1" Grid.Row="1" Click="addButton_Click" Margin="5 0">
                 <TextBlock>&lt;</TextBlock>
@@ -271,12 +303,43 @@
             </Grid>
             <ListBox x:Name="availableList" Grid.Column="2" Grid.Row="1" Grid.RowSpan="7"
                      SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick"
+                     HorizontalContentAlignment="Stretch"
                      ItemsSource="{Binding Source={StaticResource allApplicantsViewSource}}">
                 <ListBox.ItemContainerStyle>
                     <Style TargetType="{x:Type ListBoxItem}">
                         <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>
                     </Style>
                 </ListBox.ItemContainerStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type modelApplicants:Applicant}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource fullName}">
+                                        <MultiBinding.Bindings>
+                                            <Binding Path="FirstName"/>
+                                            <Binding Path="LastName"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Grid.Column="1">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource suitabilityCalculator}">
+                                        <MultiBinding.Bindings>
+                                            <Binding/>
+                                            <Binding ElementName="selectionList" Path="SelectedItem"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
         <Grid x:Name="sameCastSetsPanel" Grid.Column="1" Margin="5" Visibility="Collapsed">

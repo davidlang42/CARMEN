@@ -41,6 +41,7 @@ namespace CarmenUI.Pages
         private readonly CollectionViewSource castNumbersViewSource;
         private readonly CollectionViewSource castNumberMissingViewSource;
         private readonly ApplicantDescription applicantDescription;
+        private readonly SuitabilityCalculator suitabilityCalculator;
 
         private Criteria[]? _criterias;
         private Criteria[] criterias => _criterias
@@ -86,6 +87,7 @@ namespace CarmenUI.Pages
             allApplicantsViewSource = (CollectionViewSource)FindResource(nameof(allApplicantsViewSource));
             castNumberMissingViewSource = (CollectionViewSource)FindResource(nameof(castNumberMissingViewSource));
             applicantDescription = (ApplicantDescription)FindResource(nameof(applicantDescription));
+            suitabilityCalculator = (SuitabilityCalculator)FindResource(nameof(suitabilityCalculator));
             foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
             {
                 allApplicantsViewSource.SortDescriptions.Add(sd);
@@ -144,7 +146,7 @@ namespace CarmenUI.Pages
                     _ => throw new ArgumentException($"Audition engine not handled: {ParseAuditionEngine()}")
                 };
                 applicantDescription.AuditionEngine = audition_engine;
-                _engine = ParseSelectionEngine() switch
+                _engine = suitabilityCalculator.SelectionEngine = ParseSelectionEngine() switch
                 {
                     nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
                     nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
