@@ -249,8 +249,6 @@ namespace CarmenUI.Pages
                 if (settings.ApplyTags != false)
                     await engine.ApplyTags(applicants, tags);
             }
-            using (processing.Segment(nameof(RefreshMainPanel), "Refreshing cast lists"))
-                RefreshMainPanel(); //TODO is this required?
 #if DEBUG
             var alternative_casts = context.AlternativeCasts.Local.ToArray();
             string msg = "";
