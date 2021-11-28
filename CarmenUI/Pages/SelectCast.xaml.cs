@@ -538,8 +538,7 @@ namespace CarmenUI.Pages
                 sameCastSetsPanel.Visibility = Visibility.Visible;
             else // no selection (initial state)
                 return;
-            ConfigureApplicantListSorting();
-            ConfigureAllApplicantsFiltering();
+            ConfigureApplicantGroupingAndSorting();//TODO why do we need to do this for final cast list and keep applicants together?
         }
 
         private void ConfigureAllApplicantsFiltering()
@@ -676,16 +675,23 @@ namespace CarmenUI.Pages
         private void SortBySuitabilityCheckbox_Changed(object sender, RoutedEventArgs e)
         {
             if (selectionList?.SelectedItem != null)
-            {
-                ConfigureApplicantListSorting();
-                ConfigureAllApplicantsFiltering(); // needs to be recalled after setting sorting
-            }
+                ConfigureApplicantGroupingAndSorting();
         }
 
-        private void ConfigureApplicantListSorting()
+        private void ConfigureApplicantGroupingAndSorting()
         {
+            allApplicantsViewSource.GroupDescriptions.Clear();
+            selectedApplicantsViewSource.GroupDescriptions.Clear();
+            var group = selectionList.SelectedItem is not CastGroup;
+            if (group)
+            {
+                var gd = new PropertyGroupDescription(nameof(Applicant.CastGroup));
+                allApplicantsViewSource.GroupDescriptions.Add(gd);
+                selectedApplicantsViewSource.GroupDescriptions.Add(gd);
+            }
             if (Properties.Settings.Default.SortBySuitability)
             {
+                suitabilityComparer.GroupByCastGroup = group;
                 SortBySuitability(allApplicantsViewSource);
                 SortBySuitability(selectedApplicantsViewSource);
             }
@@ -694,11 +700,14 @@ namespace CarmenUI.Pages
                 SortByName(allApplicantsViewSource);
                 SortByName(selectedApplicantsViewSource);
             }
+            ConfigureAllApplicantsFiltering();
         }
 
         private static void SortByName(CollectionViewSource collection)
         {
             collection.SortDescriptions.Clear();
+            foreach (var gd in collection.GroupDescriptions.OfType<PropertyGroupDescription>())
+                collection.SortDescriptions.Add(new(gd.PropertyName, ListSortDirection.Ascending));
             foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
                 collection.SortDescriptions.Add(sd);
         }
@@ -714,6 +723,7 @@ namespace CarmenUI.Pages
     {
         SuitabilityCalculator suitability;
 
+        public bool GroupByCastGroup { get; set; }
         public object? SelectedCastGroupOrTag { get; set; }
         
         public SuitabilityComparer(SuitabilityCalculator suitability_calculator)
@@ -727,14 +737,29 @@ namespace CarmenUI.Pages
                 return int.MinValue;
             if (y is not Applicant a2)
                 return int.MaxValue;
+            // sort by cast group (if grouping)
+            if (GroupByCastGroup)
+            {
+                if (a1.CastGroup is not CastGroup cg1)
+                    return int.MinValue;
+                if (a2.CastGroup is not CastGroup cg2)
+                    return int.MaxValue;
+                if (cg1.Order > cg2.Order)
+                    return 1;
+                if (cg1.Order < cg2.Order)
+                    return -1;
+            }
+            // sort by suitability
             var s1 = suitability.Calculate(a1, SelectedCastGroupOrTag);
             var s2 = suitability.Calculate(a2, SelectedCastGroupOrTag);
             if (s1 < s2)
                 return 1; // descending order
             else if (s1 > s2)
                 return -1; // descending order
-            else //TODO default to name sorting
-                return 0;
+            // fallback to name
+            var n1 = FullName.Format(a1);
+            var n2 = FullName.Format(a2);
+            return n1.CompareTo(n2);
         }
     }
 
