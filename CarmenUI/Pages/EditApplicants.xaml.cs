@@ -267,11 +267,13 @@ namespace CarmenUI.Pages
         {
             if (!pageLoaded)
                 return;
-            CommitNewNote(e.RemovedItems.OfType<Applicant>().FirstOrDefault());
+            var previous_applicant = e.RemovedItems.OfType<Applicant>().FirstOrDefault();
+            CommitNewNote(previous_applicant);
             if (Properties.Settings.Default.SaveOnApplicantChange)
                 await SaveChanges(user_initiated: false);
             NotesScrollViewer.ScrollToEnd();
-            ConfigureFiltering();
+            if (previous_applicant != null && !applicantsViewSource.View.Filter(previous_applicant))
+                ConfigureFiltering();
         }
 
         private void CommitNewNote(Applicant? applicant)
@@ -323,7 +325,7 @@ namespace CarmenUI.Pages
 
         private void filterText_GotFocus(object sender, RoutedEventArgs e)
         {
-            ConfigureFiltering(); //TODO is this needed?
+            ConfigureFiltering(); // helpful if applicant should have changed group but hasn't updated yet
             filterText.SelectAll();
         }
 
