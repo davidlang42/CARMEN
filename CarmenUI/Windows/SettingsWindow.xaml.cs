@@ -163,7 +163,7 @@ namespace CarmenUI.Windows
             Settings.Default.ClearRecentShowsList();
         }
 
-        private void ClearReportDefinitionsButton_Click(object sender, RoutedEventArgs e) //TODO clear report definitions button
+        private void ClearReportDefinitionsButton_Click(object sender, RoutedEventArgs e)
         {
             Settings.Default.ClearReportDefinitionsList();
         }
@@ -204,6 +204,11 @@ namespace CarmenUI.Windows
                 return;
             Directory.Delete(image_cache_path, true); //TODO bug: file handle still open to last viewed image in EditApplicants
             MessageBox.Show("Image cache cleared", Title);
+        }
+
+        private void ClearColumnMappingsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Imports.Default.ClearImportSettings();
         }
     }
 }

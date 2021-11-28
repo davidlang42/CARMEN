@@ -74,6 +74,20 @@
                             <Button Content="Clear last loading times" Width="140" HorizontalAlignment="Left" Margin="0 0 0 5" Click="ClearLoadingTimesButton_Click"/>
                             <TextBlock Text="{bd:TimingBinding TotalTime.Count, Mode=OneWay, StringFormat=' (\{0\} loading times stored)'}"/>
                         </StackPanel>
+                        <TextBlock VerticalAlignment="Center" TextWrapping="Wrap">
+                                The most recently used import settings are remembered to be pre-populated next time.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Clear import column mapping" Width="175" HorizontalAlignment="Left" Margin="0 0 0 5" Click="ClearColumnMappingsButton_Click"/>
+                            <TextBlock Text="{bd:ImportBinding ColumnMappings.Count, Mode=OneWay, StringFormat=' (\{0\} column mappings stored)'}"/>
+                        </StackPanel>
+                        <TextBlock VerticalAlignment="Center" TextWrapping="Wrap">
+                                Any reports which have been saved are stored in the settings, to be shown in the pop-up menu when the Reports button is clicked.
+                        </TextBlock>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Content="Clear bookmarked reports" Width="155" HorizontalAlignment="Left" Margin="0 0 0 5" Click="ClearReportDefinitionsButton_Click"/>
+                            <TextBlock Text="{bd:SettingBinding ReportDefinitions.Count, Mode=OneWay, StringFormat=' (\{0\} reports bookmarked)'}"/>
+                        </StackPanel>
                     </StackPanel>
                 </Expander>
                 <Expander IsExpanded="False" Margin="0 5">

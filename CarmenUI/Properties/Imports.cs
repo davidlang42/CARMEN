@@ -40,7 +40,7 @@ namespace CarmenUI.Properties
             private set => this[nameof(MatchingColumns)] = value;
         }
 
-        public void ClearImportSettings() //TODO add a clear button to SettingsWindow
+        public void ClearImportSettings()
         {
             ColumnMappings = new();
             MatchingColumns = new();
