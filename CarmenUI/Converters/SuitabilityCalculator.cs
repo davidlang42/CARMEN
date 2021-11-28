@@ -28,7 +28,7 @@ namespace CarmenUI.Converters
             {
                 CastGroup cg => engine.SuitabilityOf(applicant, cg),
                 Tag t => engine.SuitabilityOf(applicant, t),
-                _ => engine.AuditionEngine.OverallSuitability(applicant)
+                _ => engine.OverallSuitability(applicant)
             };
             return $"{suitability * 100:0}%";
         }

@@ -21,13 +21,10 @@ namespace Carmen.CastingEngine.Audition
             UpdateRange(criterias);
         }
 
-        /// <summary>Calculation duplicated in ApplicantReport</summary>
-        readonly FunctionCache<Applicant, int> overallAbility = new(applicant
-            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight)));
-
         /// <summary>Calculate the overall ability of an Applicant as a weighted sum of their Abilities.
-        /// NOTE: This is cached for speed, as an Applicant's abilities shouldn't change over the lifetime of an AuditionEngine</summary>
-        public override int OverallAbility(Applicant applicant) => overallAbility[applicant];
+        /// NOTE: Calculation duplicated in ApplicantReport for simplicity.</summary>
+        public override int OverallAbility(Applicant applicant)
+            => Convert.ToInt32(applicant.Abilities.Sum(a => (double)a.Mark / a.Criteria.MaxMark * a.Criteria.Weight));
 
         protected void UpdateRange(Criteria[] criterias)
         {

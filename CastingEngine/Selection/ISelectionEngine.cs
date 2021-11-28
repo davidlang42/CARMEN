@@ -10,9 +10,6 @@ namespace Carmen.CastingEngine.Selection
     /// </summary>
     public interface ISelectionEngine
     {
-        /// <summary>An accessor to the IAuditionEngine used by this selection engine</summary>
-        IAuditionEngine AuditionEngine { get; }
-
         /// <summary>Calculate the suitability of an applicant for a cast group, regardless of whether they meet all requirements.
         /// Value returned will be between 0 and 1 (inclusive). This may contain logic specific to cast groups, and is therefore
         /// different to <see cref="IAuditionEngine.SuitabilityOf(Applicant, Requirement)"/>.</summary>
@@ -47,5 +44,15 @@ namespace Carmen.CastingEngine.Selection
         /// - Tag requirements may depend on other Tags as long as there is no circular dependency and the dependee
         ///   tag is also being applied as part of this call</summary>
         Task ApplyTags(IEnumerable<Applicant> applicants, IEnumerable<Tag> tags);
+
+        #region Passthrough of IAuditionEngine functions
+        /// <summary>Calculate the overall ability of an applicant as a suitability
+        /// value between 0 and 1 (inclusive).</summary>
+        double OverallSuitability(Applicant applicant);
+
+        /// <summary>A callback for when the user selects cast into cast groups manually, providing
+        /// information to the engine which can be used to improve future recommendations.</summary>
+        Task UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected);
+        #endregion
     }
 }

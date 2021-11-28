@@ -22,12 +22,12 @@ namespace Carmen.CastingEngine.Allocation
 
         public override double SuitabilityOf(Applicant applicant, Role role)
         {
-            var overall_suitability = AuditionEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
+            var overall_suitability = auditionEngine.OverallSuitability(applicant); // between 0 and 1 inclusive
             double score = 0;
             double max = 0;
             foreach (var requirement in role.Requirements)
             {
-                score += requirement.SuitabilityWeight * AuditionEngine.SuitabilityOf(applicant, requirement);
+                score += requirement.SuitabilityWeight * auditionEngine.SuitabilityOf(applicant, requirement);
                 max += requirement.SuitabilityWeight;
                 if (!showRoot.CommonOverallWeight.HasValue)
                 {

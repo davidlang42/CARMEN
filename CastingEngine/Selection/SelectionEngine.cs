@@ -27,7 +27,7 @@ namespace Carmen.CastingEngine.Selection
             typeof(RankDifferenceSatEngine)
         };
 
-        public IAuditionEngine AuditionEngine { get; init; }
+        protected IAuditionEngine auditionEngine { get; init; }
 
         /// <summary>If null, order by OverallAbility</summary>
         protected Criteria? castNumberOrderBy { get; init; }
@@ -38,23 +38,41 @@ namespace Carmen.CastingEngine.Selection
 
         public SelectionEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts, Criteria? cast_number_order_by, ListSortDirection cast_number_order_direction)
         {
-            AuditionEngine = audition_engine;
+            auditionEngine = audition_engine;
             alternativeCasts = alternative_casts;
             castNumberOrderBy = cast_number_order_by;
             castNumberOrderDirection = cast_number_order_direction;
+            overallAbility = new(a => auditionEngine.OverallAbility(a));
         }
+
+        #region Passthrough of IAuditionEngine functions
+        readonly FunctionCache<Applicant, int> overallAbility;
+
+        /// <summary>Calculate the overall ability of an applicant
+        /// NOTE: This is cached for speed, as an Applicant's abilities shouldn't change over the lifetime of a SelectionEngine</summary>
+        public int OverallAbility(Applicant applicant) => overallAbility[applicant];
+
+        /// <summary>Calculate the overall ability of an applicant as a suitability
+        /// value between 0 and 1 (inclusive).</summary>
+        public double OverallSuitability(Applicant applicant) => auditionEngine.OverallSuitability(applicant);
+
+        /// <summary>A callback for when the user selects cast into cast groups manually, providing
+        /// information to the engine which can be used to improve future recommendations.</summary>
+        public Task UserSelectedCast(IEnumerable<Applicant> applicants_accepted, IEnumerable<Applicant> applicants_rejected)
+            => auditionEngine.UserSelectedCast(applicants_accepted, applicants_rejected);
+        #endregion
 
         /// <summary>Default implementation returns an average of the suitability for each individual requirement</summary>
         public virtual double SuitabilityOf(Applicant applicant, CastGroup cast_group)
         {
-            var sub_suitabilities = cast_group.Requirements.Select(req => AuditionEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
+            var sub_suitabilities = cast_group.Requirements.Select(req => auditionEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
             return sub_suitabilities.Average();
         }
 
         /// <summary>Default implementation returns an average of the suitability for each individual requirement</summary>
         public virtual double SuitabilityOf(Applicant applicant, Tag tag)
         {
-            var sub_suitabilities = tag.Requirements.Select(req => AuditionEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
+            var sub_suitabilities = tag.Requirements.Select(req => auditionEngine.SuitabilityOf(applicant, req)).DefaultIfEmpty();
             return sub_suitabilities.Average();
         }
 
@@ -89,7 +107,7 @@ namespace Carmen.CastingEngine.Selection
                     remaining_groups.Add(cast_group, null);
             }
             // Allocate non-accepted applicants to cast groups, until the remaining counts are 0
-            var applicants_in_order = await applicants.Where(a => !a.IsAccepted).OrderByDescending(a => AuditionEngine.OverallAbility(a)).ToArrayAsync();
+            var applicants_in_order = await applicants.Where(a => !a.IsAccepted).OrderByDescending(a => auditionEngine.OverallAbility(a)).ToArrayAsync();
             foreach (var applicant in applicants_in_order)
             {
                 if (NextAvailableCastGroup(remaining_groups, applicant) is CastGroup cg)
@@ -233,7 +251,7 @@ namespace Carmen.CastingEngine.Selection
                 .Where(a => !a.Tags.Contains(tag))
                 .Where(a => tag.Requirements.All(r => r.IsSatisfiedBy(a)))
                 .OrderByDescending(a => SuitabilityOf(a, tag))
-                .ThenByDescending(a => AuditionEngine.OverallAbility(a))
+                .ThenByDescending(a => auditionEngine.OverallAbility(a))
                 .ToArrayAsync();
             foreach (var applicant in prioritised_applicants) 
             {
@@ -260,8 +278,8 @@ namespace Carmen.CastingEngine.Selection
             {
                 (Criteria c, ListSortDirection.Ascending) => applicants.OrderBy(a => a.MarkFor(c)),
                 (Criteria c, ListSortDirection.Descending) => applicants.OrderByDescending(a => a.MarkFor(c)),
-                (null, ListSortDirection.Ascending) => applicants.OrderBy(a => AuditionEngine.OverallAbility(a)),
-                (null, ListSortDirection.Descending) => applicants.OrderByDescending(a => AuditionEngine.OverallAbility(a)),
+                (null, ListSortDirection.Ascending) => applicants.OrderBy(a => auditionEngine.OverallAbility(a)),
+                (null, ListSortDirection.Descending) => applicants.OrderByDescending(a => auditionEngine.OverallAbility(a)),
                 _ => throw new ApplicationException($"Sort type not handled: {castNumberOrderBy} / {castNumberOrderDirection}")
             };
 

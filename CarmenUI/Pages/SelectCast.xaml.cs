@@ -213,7 +213,7 @@ namespace CarmenUI.Pages
                 }
             }
             using (new LoadingOverlay(this).AsSegment(nameof(IAuditionEngine) + nameof(IAuditionEngine.UserSelectedCast), "Learning...", "Cast selected by the user"))
-                await engine.AuditionEngine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted));
+                await engine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted));
             return true;
         }
 

@@ -25,7 +25,7 @@ namespace Carmen.CastingEngine.Allocation
             typeof(ComplexNeuralAllocationEngine)
         };
 
-        public IAuditionEngine AuditionEngine { get; init; }
+        protected IAuditionEngine auditionEngine { get; init; }
 
         protected readonly AlternativeCast[] alternativeCasts;
 
@@ -59,16 +59,28 @@ namespace Carmen.CastingEngine.Allocation
 
         public AllocationEngine(IAuditionEngine audition_engine, AlternativeCast[] alternative_casts)
         {
-            AuditionEngine = audition_engine;
+            auditionEngine = audition_engine;
             alternativeCasts = alternative_casts;
+            overallAbility = new(a => auditionEngine.OverallAbility(a));
         }
+
+        #region Passthrough of IAuditionEngine functions
+        readonly FunctionCache<Applicant, int> overallAbility;
+
+        /// <summary>Calculate the overall ability of an applicant
+        /// NOTE: This is cached for speed, as an Applicant's abilities shouldn't change over the lifetime of a SelectionEngine</summary>
+        public int OverallAbility(Applicant applicant) => overallAbility[applicant];
+
+        /// <summary>The maximum value an applicant's overall ability can be</summary>
+        public int MaxOverallAbility => auditionEngine.MaxOverallAbility;
+        #endregion
 
         public abstract double SuitabilityOf(Applicant applicant, Role role);
 
         /// <summary>Default implementation orders by <see cref="SuitabilityOf(Applicant, Role)"/> descending (ascending if reversed)</summary>
         protected virtual List<Applicant> InPreferredOrder(IEnumerable<Applicant> applicants, Role role, bool reverse = false)
-            => reverse ? applicants.OrderBy(a => SuitabilityOf(a, role)).ThenBy(a => AuditionEngine.OverallAbility(a)).ToList()
-            : applicants.OrderByDescending(a => SuitabilityOf(a, role)).ThenByDescending(a => AuditionEngine.OverallAbility(a)).ToList();
+            => reverse ? applicants.OrderBy(a => SuitabilityOf(a, role)).ThenBy(a => auditionEngine.OverallAbility(a)).ToList()
+            : applicants.OrderByDescending(a => SuitabilityOf(a, role)).ThenByDescending(a => auditionEngine.OverallAbility(a)).ToList();
 
         /// <summary>Default implementation does nothing</summary>
         public virtual Task UserPickedCast(IEnumerable<Applicant> applicants_picked, IEnumerable<Applicant> applicants_not_picked, Role role)

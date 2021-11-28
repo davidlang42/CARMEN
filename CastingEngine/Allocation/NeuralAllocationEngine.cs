@@ -146,20 +146,20 @@ namespace Carmen.CastingEngine.Allocation
             for (var i = 0; i < overallWeightings.Length; i++)
                 if (overallWeightings[i] is not Requirement)
                 {
-                    values[i] = overall_a ??= AuditionEngine.OverallSuitability(a);
-                    values[i + offset] = overall_b ??= AuditionEngine.OverallSuitability(b);
+                    values[i] = overall_a ??= auditionEngine.OverallSuitability(a);
+                    values[i + offset] = overall_b ??= auditionEngine.OverallSuitability(b);
                 }
             foreach (var requirement in role.Requirements)
             {
                 if (overallWeightingsLookup.TryGetValue(requirement, out int overall_index))
                 {
-                    values[overall_index] = overall_a ??= AuditionEngine.OverallSuitability(a);
-                    values[overall_index + offset] = overall_b ??= AuditionEngine.OverallSuitability(b);
+                    values[overall_index] = overall_a ??= auditionEngine.OverallSuitability(a);
+                    values[overall_index + offset] = overall_b ??= auditionEngine.OverallSuitability(b);
                 }
                 if (suitabilityRequirementsLookup.TryGetValue(requirement, out var suitability_index))
                 {
-                    values[suitability_index] = AuditionEngine.SuitabilityOf(a, requirement);
-                    values[suitability_index + offset] = AuditionEngine.SuitabilityOf(b, requirement);
+                    values[suitability_index] = auditionEngine.SuitabilityOf(a, requirement);
+                    values[suitability_index + offset] = auditionEngine.SuitabilityOf(b, requirement);
                 }
                 if (existingRoleRequirementsLookup.TryGetValue(requirement, out var existing_role_index))
                 {

@@ -120,7 +120,7 @@ namespace Carmen.CastingEngine.Selection
         /// <summary>Fills any free (null) assignments, keeping the totals in each alternative cast as close to equal as possible</summary>
         private Assignment<Applicant>[] EvenlyFillAssignments(IEnumerable<Assignment<Applicant>> assignments)
         {
-            var result = assignments.OrderByDescending(a => AuditionEngine.OverallAbility(a.Variable)).ToArray();
+            var result = assignments.OrderByDescending(a => auditionEngine.OverallAbility(a.Variable)).ToArray();
             int count_true = 0;
             int count_false = 0;
             for (var r = 0; r < result.Length; r++)

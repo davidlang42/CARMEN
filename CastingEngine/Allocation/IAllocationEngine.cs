@@ -12,9 +12,6 @@ namespace Carmen.CastingEngine.Allocation
     /// </summary>
     public interface IAllocationEngine
     {
-        /// <summary>An accessor to the IAuditionEngine used by this allocation engine</summary>
-        IAuditionEngine AuditionEngine { get; }
-
         /// <summary>Determine the recommended order in which the roles should be cast.
         /// Each array in the sequence should be cast as one step, ie. a single element array recommends
         /// a call to <see cref="PickCast(IEnumerable{Applicant}, Role)"/>, whereas a multi-element array
@@ -57,5 +54,13 @@ namespace Carmen.CastingEngine.Allocation
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
         Availability AvailabilityOf(Applicant applicant, Role role);
+
+        #region Passthrough of IAuditionEngine functions
+        /// <summary>The maximum value an applicant's overall ability can be</summary>
+        int MaxOverallAbility { get; }
+
+        /// <summary>Calculate the overall ability of an applicant</summary>
+        int OverallAbility(Applicant applicant);
+        #endregion
     }
 }
