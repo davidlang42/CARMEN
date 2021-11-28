@@ -355,7 +355,7 @@ namespace CarmenUI.Pages
                     var cache_path = ApplicantImage.GetCachePath(context.ShowRoot);
                     if (Directory.Exists(cache_path))
                     {
-                        foreach (var cached_file in Directory.GetFiles(cache_path))//TODO handle io
+                        foreach (var cached_file in UserException.Handle(() => Directory.GetFiles(cache_path), "Error reading image cache path."))
                         {
                             var filename = Path.GetFileName(cached_file);
                             if (MatchImageId(filename, out var image_id) && image_ids.Contains(image_id))

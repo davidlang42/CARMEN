@@ -1,6 +1,7 @@
 ﻿using Carmen.CastingEngine.Allocation;
 using Carmen.CastingEngine.Audition;
 using Carmen.CastingEngine.Selection;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using CarmenUI.Properties;
 using CarmenUI.UserControls;
@@ -202,7 +203,7 @@ namespace CarmenUI.Windows
             }    
             if (MessageBox.Show($"Are you sure you wanted to clear all cached images in '{image_cache_path}'?", Title, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
-            Directory.Delete(image_cache_path, true);//TODO handle io
+            UserException.Handle(() => Directory.Delete(image_cache_path, true), "Error deleting image cache path.");
             MessageBox.Show("Image cache cleared", Title);
         }
 
