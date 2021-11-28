@@ -272,6 +272,7 @@ namespace CarmenUI.Pages
 
         private void CommitNewNote(Applicant? applicant)
         {
+            CommitTextboxValue();
             if (!string.IsNullOrWhiteSpace(NewNoteTextBox.Text))
             {
                 if (applicant != null)
