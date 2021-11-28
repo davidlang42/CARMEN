@@ -267,6 +267,7 @@ namespace CarmenUI.Pages
             CommitNewNote(e.RemovedItems.OfType<Applicant>().FirstOrDefault());
             if (Properties.Settings.Default.SaveOnApplicantChange)
                 await SaveChanges(user_initiated: false);
+            NotesScrollViewer.ScrollToEnd();
             ConfigureFiltering();
         }
 
