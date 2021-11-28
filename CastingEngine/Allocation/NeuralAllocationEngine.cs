@@ -3,6 +3,7 @@ using Carmen.CastingEngine.Neural;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;

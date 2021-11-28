@@ -68,39 +68,30 @@ namespace CarmenUI
 #if !DEBUG
         private void HandleUnhandledException(Exception ex, string handler)
         {
-            CreateLog("Error", $"Handler: {handler}\n{ExceptionString(ex)}");
+            Log.Error(ex, $"Unhandled exception in {handler}");
             MessageBox.Show($"Error in {handler}: {ex.Message}");
             bool main_window_found = false;
             foreach (var obj in Current.Windows)
             {
                 if (obj is MainWindow main_window)
                 {
+                    Log.Information($"Returning to {nameof(MainWindow)}");
                     main_window_found = true;
                     main_window.Show();
                     main_window.NavigateToMainMenu();
                 }
                 else if (obj is Window window)
+                {
+                    Log.Information($"Closing {obj.GetType().Name} '{window.Title}'");
                     window.Close();
+                }
             }
             if (!main_window_found)
             {
+                Log.Information($"Relaunching {nameof(StartWindow)}");
                 var start_window = new StartWindow();
                 start_window.Show();
             }
-        }
-
-        private string ExceptionString(Exception ex)
-        {
-            var str = ex.ToString();
-            if (ex.Data is IDictionary data && data.Count > 0)
-            {
-                str += "\nData:";
-                foreach (var key in data.Keys)
-                    str += $"\n{key}={data[key]}";
-            }
-            if (ex.InnerException is Exception inner)
-                str += $"\nInner:\n{ExceptionString(inner)}";
-            return str;
         }
 
 #endif
