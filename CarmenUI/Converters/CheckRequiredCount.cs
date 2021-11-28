@@ -33,14 +33,15 @@ namespace CarmenUI.Converters
             var obj = values[1];
             bool error;
             if (obj is CastGroup cg)
-                error = cg.RequiredCount is uint required && (cg.AlternateCasts ? required * AlternativeCasts : required) != count; //TODO when no required count, and alterating, make sure count is divisible by alternative_casts
+                error = cg.RequiredCount is uint required ? (cg.AlternateCasts ? required * AlternativeCasts : required) != count
+                    : count % AlternativeCasts == 0; // when no required count, make sure count is divisible by AlternativeCasts
             else if (obj is AlternativeCast ac)
             {
                 var remaining = AlternatingCastGroups;
                 error = ac.Members.Where(a => a.CastGroup != null)
                     .GroupBy(a => a.CastGroup)
                     .Wrap(_ => remaining--)
-                    .Any(g => g.Key.RequiredCount is uint required && required != g.Count()) //TODO handle when no requiredcount, alt cast count should be cast group count / alternative_casts
+                    .Any(g => g.Count() != g.Key!.Members.Count / AlternativeCasts)
                     || remaining != 0;
             }
             else if (obj is Tag t)

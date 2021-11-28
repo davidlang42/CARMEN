@@ -30,8 +30,10 @@ namespace CarmenUI.ViewModels
                         row.Fail = $"({extra} too many)";
                     else if (extra < 0)
                         row.Fail = $"({-extra} missing)";
-                    Rows.Add(row);
                 }
+                else if (count % alternative_casts_for_group != 0)
+                    row.Fail = $"(not a multiple of {alternative_casts_for_group})";
+                Rows.Add(row);
                 if (cast_group.AlternateCasts && count > 0)
                 {
                     var count_per_ac = count / alternative_casts_for_group;

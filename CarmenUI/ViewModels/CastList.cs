@@ -74,7 +74,7 @@ namespace CarmenUI.ViewModels
                 OnPropertyChanged(nameof(ContainsGaps)); // maybe
         }
 
-        private void Applicant_PropertyChanged(object? sender, PropertyChangedEventArgs e) //TODO dispose handlers
+        private void Applicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             if (ignoreApplicantChanges)
                 return;
