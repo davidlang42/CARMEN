@@ -29,7 +29,7 @@ namespace CarmenUI.ViewModels
             }
             var not_auditioned = applicants.Length - auditioned.Length;
             if (not_auditioned > 0)
-                Rows.Add(new Row { Fail = $"{not_auditioned.Plural("Appliant has","Applicants have")} not auditioned" });
+                Rows.Add(new Row { Fail = $"{not_auditioned.Plural("Applicant has","Applicants have")} not auditioned" });
             FinishLoad(cancel, auditioned.Length == 0 || not_auditioned > 0);
         }
     }

@@ -199,6 +199,16 @@
                 </Expander>
                 <Expander IsExpanded="False" Margin="0 5">
                     <Expander.Header>
+                        <TextBlock Text="Select cast" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+                        <CheckBox Content="Sort applicants by suitability" Margin="0 5 0 0"
+                                  IsChecked="{bd:SettingBinding SortBySuitability}"/>
+                        <TextBlock Margin="0 0 0 5" Text="If not enabled, applicants are sorted by name in alphabetical order." TextWrapping="Wrap"/>
+                    </StackPanel>
+                </Expander>
+                <Expander IsExpanded="False" Margin="0 5">
+                    <Expander.Header>
                         <TextBlock Text="Role allocation" FontWeight="Bold" FontSize="14"/>
                     </Expander.Header>
                     <StackPanel>

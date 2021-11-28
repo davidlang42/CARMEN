@@ -404,5 +404,17 @@ namespace CarmenUI.Properties {
                 this["ImageCachePath"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SortBySuitability {
+            get {
+                return ((bool)(this["SortBySuitability"]));
+            }
+            set {
+                this["SortBySuitability"] = value;
+            }
+        }
     }
 }

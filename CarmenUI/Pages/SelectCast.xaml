@@ -8,6 +8,7 @@
     xmlns:local="clr-namespace:CarmenUI.Pages"
     xmlns:cv="clr-namespace:CarmenUI.Converters"
     xmlns:vm="clr-namespace:CarmenUI.ViewModels"
+    xmlns:bd="clr-namespace:CarmenUI.Bindings"
     xmlns:fa="http://schemas.fontawesome.io/icons/"
     xmlns:modelApplicants="clr-namespace:Carmen.ShowModel.Applicants;assembly=Carmen.ShowModel"
     mc:Ignorable="d"
@@ -471,6 +472,9 @@
         <Button Grid.Row="1" Width="200" Height="35" Margin="5" HorizontalAlignment="Left" Click="selectCastButton_Click">
             <TextBlock Text="Automatically select cast"/>
         </Button>
+        <CheckBox x:Name="sortBySuitabilityCheckbox" Visibility="Hidden" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5"
+                  IsChecked="{bd:SettingBinding SortBySuitability}" Checked="SortBySuitabilityCheckbox_Changed" Unchecked="SortBySuitabilityCheckbox_Changed"
+                  Content="Sort applicants by suitability score"/>
         <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
             <Button IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
                 <StackPanel Orientation="Horizontal">

@@ -72,6 +72,8 @@ namespace CarmenUI.Pages
         private CastList castList => _castList
             ?? throw new ApplicationException($"Tried to used {nameof(castList)} before it was loaded.");
 
+        private readonly SuitabilityComparer suitabilityComparer;
+
         public SelectCast(RecentShow connection) : base(connection)
         {
             InitializeComponent();
@@ -90,12 +92,8 @@ namespace CarmenUI.Pages
             applicantDescription = (ApplicantDescription)FindResource(nameof(applicantDescription));
             suitabilityCalculator = (SuitabilityCalculator)FindResource(nameof(suitabilityCalculator));
             checkRequiredCount = (CheckRequiredCount)FindResource(nameof(checkRequiredCount));
-            foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
-            {
-                allApplicantsViewSource.SortDescriptions.Add(sd);
-                selectedApplicantsViewSource.SortDescriptions.Add(sd);
-                castNumberMissingViewSource.SortDescriptions.Add(sd);
-            }
+            SortByName(castNumberMissingViewSource);
+            suitabilityComparer = new SuitabilityComparer(suitabilityCalculator);
             castStatusCombo.SelectedIndex = 0; // must be here because it triggers event below
         }
 
@@ -500,17 +498,23 @@ namespace CarmenUI.Pages
             => removeSameCastSetButton_Click(sender, e);
 
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
-            => RefreshMainPanel();
+        {
+            if (suitabilityComparer != null)
+                suitabilityComparer.SelectedCastGroupOrTag = selectionList.SelectedItem;
+            RefreshMainPanel();
+        }
 
         private void RefreshMainPanel()
         {
             selectionPanel.Visibility = numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
+            sortBySuitabilityCheckbox.Visibility = Visibility.Hidden;
             if (selectionList.SelectedItem is CastGroup cast_group)
             {
                 selectedApplicantsViewSource.Source = cast_group.Members;
                 castStatusCombo.SelectedItem = CastStatus.Eligible;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "applicants";
+                sortBySuitabilityCheckbox.Visibility = Visibility.Visible;
             }
             else if (selectionList.SelectedItem is AlternativeCast alternative_cast)
             {
@@ -518,6 +522,7 @@ namespace CarmenUI.Pages
                 castStatusCombo.SelectedItem = CastStatus.Available;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "alternating cast members";
+                sortBySuitabilityCheckbox.Visibility = Visibility.Visible;
             }
             else if (selectionList.SelectedItem is Tag tag)
             {
@@ -525,6 +530,7 @@ namespace CarmenUI.Pages
                 castStatusCombo.SelectedItem = CastStatus.Eligible;
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "cast members";
+                sortBySuitabilityCheckbox.Visibility = Visibility.Visible;
             }
             else if (selectionList.SelectedItem == finalCastList)
                 numbersPanel.Visibility = Visibility.Visible;
@@ -532,6 +538,7 @@ namespace CarmenUI.Pages
                 sameCastSetsPanel.Visibility = Visibility.Visible;
             else // no selection (initial state)
                 return;
+            ConfigureApplicantListSorting();
             ConfigureAllApplicantsFiltering();
         }
 
@@ -664,6 +671,70 @@ namespace CarmenUI.Pages
                     e.Handled = true;
                 }
             }
+        }
+
+        private void SortBySuitabilityCheckbox_Changed(object sender, RoutedEventArgs e)
+        {
+            if (selectionList?.SelectedItem != null)
+            {
+                ConfigureApplicantListSorting();
+                ConfigureAllApplicantsFiltering(); // needs to be recalled after setting sorting
+            }
+        }
+
+        private void ConfigureApplicantListSorting()
+        {
+            if (Properties.Settings.Default.SortBySuitability)
+            {
+                SortBySuitability(allApplicantsViewSource);
+                SortBySuitability(selectedApplicantsViewSource);
+            }
+            else
+            {
+                SortByName(allApplicantsViewSource);
+                SortByName(selectedApplicantsViewSource);
+            }
+        }
+
+        private static void SortByName(CollectionViewSource collection)
+        {
+            collection.SortDescriptions.Clear();
+            foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions())
+                collection.SortDescriptions.Add(sd);
+        }
+
+        private void SortBySuitability(CollectionViewSource collection)
+        {
+            if (collection.View is ListCollectionView view)
+                view.CustomSort = suitabilityComparer;
+        }
+    }
+
+    public class SuitabilityComparer : IComparer
+    {
+        SuitabilityCalculator suitability;
+
+        public object? SelectedCastGroupOrTag { get; set; }
+        
+        public SuitabilityComparer(SuitabilityCalculator suitability_calculator)
+        {
+            suitability = suitability_calculator;
+        }
+
+        public int Compare(object? x, object? y)
+        {
+            if (x is not Applicant a1)
+                return int.MinValue;
+            if (y is not Applicant a2)
+                return int.MaxValue;
+            var s1 = suitability.Calculate(a1, SelectedCastGroupOrTag);
+            var s2 = suitability.Calculate(a2, SelectedCastGroupOrTag);
+            if (s1 < s2)
+                return 1; // descending order
+            else if (s1 > s2)
+                return -1; // descending order
+            else //TODO default to name sorting
+                return 0;
         }
     }
 
