@@ -23,14 +23,18 @@ namespace CarmenUI.ViewModels
                 var count = cast_group.Members.Count;
                 var row = new Row { Success = $"{count} in {cast_group.Name}" };
                 var alternative_casts_for_group = cast_group.AlternateCasts ? alternative_casts.Length : 1;
-                var extra = count - cast_group.RequiredCount * alternative_casts_for_group; //TODO what if CastGroup.RequiredCount is null?
-                if (extra > 0)
-                    row.Fail = $"({extra} too many)";
-                else if (extra < 0)
-                    row.Fail = $"({-extra} missing)";
-                Rows.Add(row);
+                if (cast_group.RequiredCount is uint required)
+                {
+                    var extra = count - required * alternative_casts_for_group;
+                    if (extra > 0)
+                        row.Fail = $"({extra} too many)";
+                    else if (extra < 0)
+                        row.Fail = $"({-extra} missing)";
+                    Rows.Add(row);
+                }
                 if (cast_group.AlternateCasts && count > 0)
                 {
+                    var count_per_ac = count / alternative_casts_for_group;
                     var ac_assigned = new Dictionary<AlternativeCast, int>();
                     int not_assigned = 0;
                     foreach (var group in cast_group.Members.GroupBy(a => a.AlternativeCast))
@@ -45,7 +49,7 @@ namespace CarmenUI.ViewModels
                         if (!ac_assigned.TryGetValue(alternative_cast, out int assigned))
                             assigned = ac_assigned[alternative_cast] = 0;
                         var ac_row = new Row { Success = $"{assigned.Plural(cast_group.Abbreviation)} assigned to {alternative_cast.Name}" };
-                        var ac_extra = assigned - cast_group.RequiredCount; //TODO what if CastGroup.RequiredCount is null? shouldn't this be actual cast anyway?
+                        var ac_extra = assigned - count_per_ac;
                         if (ac_extra > 0)
                             ac_row.Fail = $"({ac_extra} too many)";
                         else if (ac_extra < 0)

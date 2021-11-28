@@ -540,7 +540,7 @@ namespace CarmenUI.Pages
                 sameCastSetsPanel.Visibility = Visibility.Visible;
             else // no selection (initial state)
                 return;
-            ConfigureApplicantGroupingAndSorting(); //TODO why do we need to do this for final cast list and keep applicants together?
+            ConfigureApplicantGroupingAndSorting();
         }
 
         private void ConfigureAllApplicantsFiltering()
