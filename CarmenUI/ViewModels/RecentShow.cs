@@ -11,6 +11,7 @@ using System.Windows.Media;
 using MySqlConnector;
 using System.Net.NetworkInformation;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace CarmenUI.ViewModels
 {
@@ -94,6 +95,7 @@ namespace CarmenUI.ViewModels
                     throw new NotImplementedException($"Provider not implemented: {Provider}");
             } catch (Exception ex)
             {
+                Log.Error(ex, nameof(TryConnection));
                 error = ex.Message;
             }
             return error == null;

@@ -2,6 +2,7 @@
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
 using CsvHelper;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -72,6 +73,7 @@ namespace Carmen.ShowModel.Import
                         }
                         catch (ParseException ex)
                         {
+                            Log.Error(ex, $"{nameof(CsvImporter)}.{nameof(Import)} row {result.RecordsProcessed + 1}");
                             result.ParseErrors.Add((result.RecordsProcessed + 1, ex.Message));
                         }
                     applicant_collection.Add(applicant);
@@ -93,6 +95,7 @@ namespace Carmen.ShowModel.Import
                             }
                             catch (ParseException ex)
                             {
+                                Log.Error(ex, $"{nameof(CsvImporter)}.{nameof(Import)} row {result.RecordsProcessed + 1}");
                                 result.ParseErrors.Add((result.RecordsProcessed + 1, ex.Message));
                             }
                         }
@@ -157,6 +160,7 @@ namespace Carmen.ShowModel.Import
             }
             catch (Exception ex)
             {
+                Log.Error(ex, $"{nameof(CsvImporter)}.{nameof(LoadImageData)}");
                 throw new ParseException("image", filename, $"no error reading file ({ex.Message})");
             }
         }

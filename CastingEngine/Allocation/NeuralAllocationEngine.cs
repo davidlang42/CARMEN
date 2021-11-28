@@ -220,6 +220,7 @@ namespace Carmen.CastingEngine.Allocation
             }
             catch (ArgumentException ex)
             {
+                Log.Error(ex, nameof(InPreferredOrder));
                 if (ex.Message.Contains("IComparer.Compare"))
                     // Only DisagreementSort is guarenteed to work with an imperfect comparer
                     list = sorter.Sort(list).ToList();

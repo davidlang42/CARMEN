@@ -2,6 +2,7 @@
 using Carmen.ShowModel.Structure;
 using CarmenUI.Windows;
 using Microsoft.Win32;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -109,9 +110,9 @@ namespace CarmenUI.UserControls
                     image.Freeze();
                     return image;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // invalid image data
+                    Log.Error(ex, $"Invalid image data of length {photo.ImageData.Length}, id {photo.ImageId}, {photo.Name}");
                     return null;
                 }
             }

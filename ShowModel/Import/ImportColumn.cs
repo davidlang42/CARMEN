@@ -1,4 +1,5 @@
 ﻿using Carmen.ShowModel.Applicants;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -71,8 +72,9 @@ namespace Carmen.ShowModel.Import
                 {
                     parsed_value = parse(s);
                 }
-                catch (ParseException)
+                catch (ParseException ex)
                 {
+                    Log.Error(ex, $"{nameof(ImportColumn)}.{nameof(ForNullable)}<{typeof(T).Name}> {nameof(value_comparer)}");
                     return false;
                 }
                 var existing_value = getter(a);
@@ -95,8 +97,9 @@ namespace Carmen.ShowModel.Import
                 {
                     parsed_value = parse(a, s);
                 }
-                catch (ParseException)
+                catch (ParseException ex)
                 {
+                    Log.Error(ex, $"{nameof(ImportColumn)}.{nameof(ForConditionalNullable)}<{typeof(T).Name}> {nameof(value_comparer)}");
                     return false;
                 }
                 var existing_value = getter(a);

@@ -4,6 +4,7 @@ using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Requirements;
 using Carmen.ShowModel.Structure;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -114,9 +115,10 @@ namespace Carmen.CastingEngine.Allocation
                     throw new ApplicationException($"Deserialised model contained {model.InputCount} inputs, expected {nInputs}");
                 return model;
             }
-            catch
+            catch (Exception ex)
             {
                 // file access issue, corrupt/invalid file format, file contains model with wrong number of inputs
+                Log.Error(ex, nameof(LoadModelFromDisk));
                 if (confirm($"Neural model failed to load. Would you like to create a new one?"))
                     return BuildNewModel();
                 else
@@ -147,8 +149,9 @@ namespace Carmen.CastingEngine.Allocation
                 using var stream = ModelPersistence.Save();
                 writer.Serialize(stream, model.Value);
             }
-            catch
+            catch (Exception ex)
             {
+                Log.Error(ex, nameof(SaveModelToDisk));
                 var temp = Path.GetTempFileName();
                 if (confirm($"Neural model failed to save. Would you like to save it to {temp}?"))
                     using (var stream = new FilePersistence(temp).Save())

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -28,9 +29,9 @@ namespace CarmenUI.Converters
                         image.Freeze();
                         return image;
                     }
-                    catch
+                    catch (Exception ex)
                     {
-                        // invalid image data
+                        Log.Error(ex, $"Invalid image data of length {bytes.Length}");
                     }
                 }
             }
