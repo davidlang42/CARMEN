@@ -1,4 +1,5 @@
 ﻿using CarmenUI.ViewModels;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace CarmenUI.Windows
     {
         public AutoSelectDialog(AutoSelectSettings settings)
         {
+            Log.Information(nameof(AutoSelectDialog));
             InitializeComponent();
             this.DataContext = settings;
         }

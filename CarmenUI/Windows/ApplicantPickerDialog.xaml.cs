@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel.Applicants;
 using CarmenUI.Converters;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,7 @@ namespace CarmenUI.Windows
 
         public ApplicantPickerDialog(Applicant[] applicants, string match_first_name, string match_last_name)
         {
+            Log.Information(nameof(ApplicantPickerDialog));
             InitializeComponent();
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
             applicantsViewSource.Source = applicants;

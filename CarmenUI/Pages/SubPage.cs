@@ -18,6 +18,7 @@ using Carmen.CastingEngine.Allocation;
 using CarmenUI.ViewModels;
 using CarmenUI.UserControls;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace CarmenUI.Pages
 {
@@ -45,15 +46,24 @@ namespace CarmenUI.Pages
 
         private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            Log.Information($"{GetType().Name}.{nameof(Window_Closing)}");
             CommitTextboxValue();
             if (context.ChangeTracker.HasChanges())
             {
                 var result = MessageBox.Show("Do you want to save changes?", WindowTitle, MessageBoxButton.YesNoCancel);
                 if (result == MessageBoxResult.No)
+                {
+                    LogChanges();
                     return;
+                }
                 if (result == MessageBoxResult.Cancel || !await SaveChanges(false))
                     e.Cancel = true;
             }
+        }
+
+        private void LogChanges()
+        {
+            Log.Information($"OUTSTANDING CHANGES"); //TODO include all changes in the log message
         }
 
         /// <summary>Returns the database username, if set, otherwise the local machine username</summary>
@@ -61,6 +71,7 @@ namespace CarmenUI.Pages
 
         private void RecreateContext()
         {
+            Log.Information($"{GetType().Name}.{nameof(RecreateContext)}");
             _context?.Dispose();
             _context = ShowContext.Open(connection);
         }
@@ -119,6 +130,7 @@ namespace CarmenUI.Pages
         /// <summary>Save changes to the database and return true if succeeded</summary>
         protected async Task<bool> SaveChanges(bool user_initiated = true)
         {
+            Log.Information($"{GetType().Name}.{nameof(SaveChanges)}({user_initiated})");
             CommitTextboxValue();
             if (!await PreSaveChecks())
                 return false;
@@ -140,6 +152,8 @@ namespace CarmenUI.Pages
                 }
                 catch (DbUpdateConcurrencyException ex)
                 {
+                    Log.Error(ex, $"{GetType().Name}.{nameof(SaveChanges)}({user_initiated})");
+                    LogChanges();
                     foreach (var entry in ex.Entries)
                     {
                         var proposed_values = entry.CurrentValues;
@@ -173,11 +187,13 @@ namespace CarmenUI.Pages
                 }
                 catch (Exception ex)
                 {
+                    Log.Error(ex, $"{GetType().Name}.{nameof(SaveChanges)}({user_initiated})");
                     MessageBox.Show($"Error while saving changes: {ex.InnermostException().Message}\nChanges not saved.");
                     return false;
                 }
             }
             saved_changes |= changes;
+            Log.Information($"{GetType().Name}.{nameof(SaveChanges)}({user_initiated}) SUCCESS");
             return true;
         }
 
@@ -195,11 +211,13 @@ namespace CarmenUI.Pages
         /// <summary>Confirms cancel with the user (if any changes have been made) and returns true if its okay to cancel</summary>
         protected bool CancelChanges()
         {
+            Log.Error($"{GetType().Name}.{nameof(CancelChanges)}");
             CommitTextboxValue();
             if (!context.ChangeTracker.HasChanges())
                 return true; // no changes, always okay to cancel
             if (MessageBox.Show("Are you sure you want to cancel?\nAny unsaved changes will be lost.", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return false;
+            LogChanges();
             return true;
         }
 
@@ -207,6 +225,7 @@ namespace CarmenUI.Pages
         /// Returns true if a full context refresh is required.</summary>
         protected bool RevertChanges()
         {
+            Log.Error($"{GetType().Name}.{nameof(RevertChanges)}");
             if (!context.ChangeTracker.HasChanges())
                 return false; // no changes to revert
             using var reverting = new LoadingOverlay(this);
@@ -240,10 +259,18 @@ namespace CarmenUI.Pages
         }
 
         protected bool NeuralEngineConfirm(string message)
-            => MessageBox.Show(message, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+        {
+            var result = MessageBox.Show(message, WindowTitle, MessageBoxButton.YesNo);
+            Log.Error($"{GetType().Name}.{nameof(NeuralEngineConfirm)}={result}");
+            return result == MessageBoxResult.Yes;
+        }
 
         protected bool Confirm(string msg)
-            => MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.Yes;
+        {
+            var result = MessageBox.Show(msg, WindowTitle, MessageBoxButton.YesNo);
+            Log.Error($"{GetType().Name}.{nameof(Confirm)}={result}");
+            return result == MessageBoxResult.Yes;
+        }
 
         protected void EditableImage_ImageChanged(object sender, ImageChangedEventArgs e)
         {

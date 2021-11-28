@@ -1,4 +1,5 @@
 ﻿using CarmenUI.ViewModels;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +25,7 @@ namespace CarmenUI.Windows
 
         public LoginDialog(RecentShow show)
         {
+            Log.Information(nameof(LoginDialog));
             this.show = show;
             InitializeComponent();
             MainGrid.DataContext = show;

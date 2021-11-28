@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using CarmenUI.ViewModels;
+using Serilog;
 
 namespace CarmenUI.Windows
 {
@@ -29,6 +30,7 @@ namespace CarmenUI.Windows
 
         public MainWindow(RecentShow connection)
         {
+            Log.Information(nameof(MainWindow));
             if (Properties.Settings.Default.SelectAllOnFocusTextBox)
                 EventManager.RegisterClassHandler(typeof(TextBox), GotFocusEvent, new RoutedEventHandler(TextBox_GotFocus));
             InitializeComponent();
@@ -74,6 +76,7 @@ namespace CarmenUI.Windows
                 Owner = this
             };
             report.Show();
+            Log.Information($"Opened report: {definition?.SavedName ?? reportCount.ToString()}");
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using Carmen.ShowModel.Import;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,7 @@ namespace CarmenUI.Windows
 
         public ImportDialog(CsvImporter importer)
         {
+            Log.Information(nameof(ImportDialog));
             ImportColumns = importer.ImportColumns;
             InputColumns = importer.InputColumns;
             LoadImportSettings();

@@ -6,6 +6,7 @@ using CarmenUI.Converters;
 using CarmenUI.ViewModels;
 using FontAwesome.WPF;
 using Microsoft.Win32;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,6 +34,7 @@ namespace CarmenUI.Windows
 
         public ReportWindow(ShowConnection connection, string default_title, ReportDefinition? report_definition = null)
         {
+            Log.Information(nameof(ReportWindow));
             defaultTitle = default_title;
             this.connection = connection;
             this.reportDefinition = report_definition;

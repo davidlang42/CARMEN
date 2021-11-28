@@ -15,6 +15,7 @@ using System.IO;
 using Microsoft.VisualBasic.FileIO;
 using CarmenUI.UserControls;
 using System.Threading.Tasks;
+using Serilog;
 
 namespace CarmenUI.Pages
 {
@@ -59,6 +60,7 @@ namespace CarmenUI.Pages
 
         private void NavigateToSubPage(SubPage sub_page)
         {
+            Log.Information($"Navigate to {sub_page.Title}");
             sub_page.Return += HandleChangesOnReturn;
             this.NavigationService.Navigate(sub_page);
         }
@@ -155,13 +157,17 @@ namespace CarmenUI.Pages
             // Update summaries sequentially
             foreach (var summary in allSummaries.Where(s => summaries.Contains(s)))
             {
+                Log.Information($"Update summary {summary.GetType().Name}");
                 await summary.LoadAsync(context, cancel);
                 if (cancel.IsCancellationRequested)
                     return;
             }  
             // Show complete text if required
             if (allSummaries.All(s => s.Status == ProcessStatus.Complete))
+            {
+                Log.Information($"IT'S SHOWTIME");
                 CastingComplete.Visibility = Visibility.Visible;
+            }
         }
 
         private void Window_KeyDown(object sender, KeyEventArgs e)
@@ -199,18 +205,21 @@ namespace CarmenUI.Pages
         Window? window;
         private void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            Log.Information("Loaded MainMenu");
             window = Window.GetWindow(this);
             window.KeyDown += Window_KeyDown;
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
+            Log.Information("Unloaded MainMenu");
             if (window != null)
                 window.KeyDown -= Window_KeyDown;
         }
 
         private void BackButton_Click(object sender, RoutedEventArgs e)
         {
+            Log.Information("Exited MainMenu");
             var start = new StartWindow();
             start.Show();
             this.Close();

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Serilog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -61,6 +62,7 @@ namespace CarmenUI.Windows
 
         public LoadingOverlay(Window owner)
         {
+            Log.Information(nameof(LoadingOverlay));
             Owner = owner;
             ownerHwnd = new WindowInteropHelper(owner).Handle;
             if (ownerHwnd == IntPtr.Zero)
@@ -77,6 +79,7 @@ namespace CarmenUI.Windows
 
         public void Dispose()
         {
+            Log.Information($"{nameof(LoadingOverlay)}: {MainText}/{SubText}");
             WinUser.EnableWindow(ownerHwnd, true);
             Owner.IsEnabled = true;
             Hide();
@@ -221,6 +224,7 @@ namespace CarmenUI.Windows
                 }
             }
 #endif
+            Log.Information($"{nameof(LoadingSegment)}: {segment_key}({total_milliseconds}ms) [{string.Join(", ", sub_segment_keys)}]");
             Properties.Timings.Default.TotalTime[segment_key] = total_milliseconds;
             Properties.Timings.Default.SubSegments[segment_key] = sub_segment_keys.ToArray();
         }

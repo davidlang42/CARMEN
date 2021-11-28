@@ -4,6 +4,7 @@ using Carmen.CastingEngine.Selection;
 using Carmen.ShowModel.Applicants;
 using CarmenUI.Properties;
 using CarmenUI.UserControls;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -64,6 +65,7 @@ namespace CarmenUI.Windows
 
         public SettingsWindow()
         {
+            Log.Information(nameof(SettingsWindow));
             Save(); // save on load so that if we cancel, we reload the settings as they were when we opened
             InitializeComponent();
         }

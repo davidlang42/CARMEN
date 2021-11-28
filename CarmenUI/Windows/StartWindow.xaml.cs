@@ -15,6 +15,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Serilog;
 
 namespace CarmenUI.Windows
 {
@@ -27,6 +28,7 @@ namespace CarmenUI.Windows
 
         public StartWindow()
         {
+            Log.Information(nameof(StartWindow));
             InitializeComponent();
         }
 
