@@ -28,7 +28,7 @@ namespace Carmen.ShowModel.Import
         public ImportColumn[] ImportColumns { get; }
         public DateTime MaximumDateOfBirth { get; set; } = DateTime.Now;
 
-        public CsvImporter(string file_name, Criteria[] criterias, CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Tag[] tags, Action<Image> delete_image)
+        public CsvImporter(string file_name, Criteria[] criterias, CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Tag[] tags, Action<Image> delete_image, string current_user_name)
         {
             importPath = Path.GetDirectoryName(Path.GetFullPath(file_name)) ?? Directory.GetCurrentDirectory();
             if (!importPath.EndsWith(Path.DirectorySeparatorChar))
@@ -47,7 +47,7 @@ namespace Carmen.ShowModel.Import
                 throw new UserException(ex, $"Error reading CSV file.");
             }
             InputColumns = csv.HeaderRecord.Select((h, i) => new InputColumn(i, h)).ToArray();
-            ImportColumns = GenerateColumns(criterias, tags, delete_image).ToArray();
+            ImportColumns = GenerateColumns(criterias, tags, delete_image, current_user_name).ToArray();
             LoadColumnMap(InputColumns.ToDictionary(c => c.Header, new FilteredStringComparer(char.IsLetterOrDigit, StringComparison.InvariantCultureIgnoreCase)));
         }
 
@@ -131,7 +131,7 @@ namespace Carmen.ShowModel.Import
                     column.SelectedInput = input;
         }
 
-        private IEnumerable<ImportColumn> GenerateColumns(Criteria[] criterias, Tag[] tags, Action<Image> delete_image)
+        private IEnumerable<ImportColumn> GenerateColumns(Criteria[] criterias, Tag[] tags, Action<Image> delete_image, string current_user_name)
         {
             void set_photo(Applicant a, Image v) {
                 if (a.Photo != null)
@@ -145,7 +145,7 @@ namespace Carmen.ShowModel.Import
             foreach (var criteria in criterias.InOrder())
                 yield return ImportColumn.ForNullable(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria == criteria)?.Mark, (a, v) => a.SetMarkFor(criteria, v), s => ParseCriteriaMark(criteria, s));
             yield return new ImageImportColumn("Photo", set_photo, LoadImageData);
-            yield return new NoteImportColumn("Add Note", a => a.Notes);
+            yield return new NoteImportColumn("Add Note", a => a.Notes, current_user_name);
             yield return ImportColumn.ForString("External Data", a => a.ExternalData, (a, v) => a.ExternalData = v, false);
             // everything below here should only be imported if they are already accepted into the cast
             yield return ImportColumn.ForNullable("Cast Group", a => a.CastGroup, (a, v) => a.CastGroup = v, ParseCastGroup);

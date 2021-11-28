@@ -13,13 +13,13 @@ namespace Carmen.ShowModel.Import
             set { }
         }
 
-        public NoteImportColumn(string name, Func<Applicant, ICollection<Note>> collection_getter)
-            : base(name, (a, s) => AddNote(s, a, collection_getter), (a, s) => collection_getter(a).Where(n => n.Text == s).Any())
+        public NoteImportColumn(string name, Func<Applicant, ICollection<Note>> collection_getter, string current_user_name)
+            : base(name, (a, s) => AddNote(s, a, collection_getter, current_user_name), (a, s) => collection_getter(a).Where(n => n.Text == s).Any())
         {
             base.MatchExisting = false;
         }
 
-        private static void AddNote(string note_text, Applicant applicant, Func<Applicant, ICollection<Note>> getter)
+        private static void AddNote(string note_text, Applicant applicant, Func<Applicant, ICollection<Note>> getter, string current_user_name)
         {
             if (string.IsNullOrWhiteSpace(note_text))
                 return; // nothing to do
@@ -28,7 +28,7 @@ namespace Carmen.ShowModel.Import
             {
                 Applicant = applicant,
                 Text = note_text,
-                Author = "Importer" //TODO set note author when importing
+                Author = current_user_name
             });
         }
     }
