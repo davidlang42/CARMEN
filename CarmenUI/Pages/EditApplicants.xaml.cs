@@ -294,6 +294,8 @@ namespace CarmenUI.Pages
                 else
                     MessageBox.Show("Unable to add new note:\n" + NewNoteTextBox.Text, WindowTitle);
             }
+            else
+                NewNoteTextBox.Text = ""; // in case it was whitespace
         }
 
         protected override Task<bool> PreSaveChecks()
