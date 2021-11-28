@@ -249,42 +249,6 @@ namespace CarmenUI.Pages
                 if (settings.ApplyTags != false)
                     await engine.ApplyTags(applicants, tags);
             }
-#if DEBUG
-            var alternative_casts = context.AlternativeCasts.Local.ToArray();
-            string msg = "";
-            if (engine is PairsSatEngine chunky && chunky.Results.LastOrDefault() is PairsSatEngine.Result r)
-            {
-                var chunk_size = $"{r.ChunkSize}";
-                if (r.MaxChunks != int.MaxValue)
-                    chunk_size += $" (max {r.MaxChunks})";
-                if (r.Solved)
-                    msg += $"Balanced casts by solving a {r.MaxLiterals}-SAT problem with {r.Variables} variables and {r.Clauses} clauses."
-                        + $"\nIt took {chunky.Results.Count} chunking attempts with a final chunk size of {chunk_size}";
-                else
-                    msg += $"Failed to solve a {r.MaxLiterals}-SAT problem with {r.Variables} variables and {r.Clauses} clauses."
-                        + $"\nAfter {chunky.Results.Count} chunking attempts, and a final chunk size of {chunk_size}, it was still unsolvable.";
-                msg += "\n\n";
-            }
-            msg += "The resulting casts have the follow distributions:\n";
-            foreach (var cg in castGroups)
-            {
-                if (cg.Members.Count == 0 || !cg.AlternateCasts)
-                    continue;
-                foreach (var c in criterias.Where(c => c.Primary))
-                {
-                    msg += $"\n{c.Name} ({cg.Abbreviation})";
-                    foreach (var ac in alternative_casts)
-                    {
-                        var marks = ac.Members.Where(a => a.CastGroup == cg).Select(a => a.MarkFor(c)).ToArray();
-                        var dist = MarkDistribution.Analyse(marks);
-                        msg += $"\n{dist}";
-                        msg += $"\n[{string.Join(",", marks.OrderByDescending(m => m))}]";
-                    }
-                    msg += "\n";
-                }
-            }
-            ((App)App.Current).CreateLog("Cast", msg);
-#endif
         }
 
         private void ClearCastGroups()
