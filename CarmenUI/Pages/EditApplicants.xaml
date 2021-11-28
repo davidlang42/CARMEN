@@ -31,6 +31,9 @@
             <cv:InvertBoolean/>
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
+        <cv:FakeItTilYouUpdateIt x:Key="overallAbilityCalculator">
+            <cv:OverallAbilityCalculator/>
+        </cv:FakeItTilYouUpdateIt>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -195,7 +198,7 @@
                         <TextBlock Grid.Row="1" Text="Incomplete"
                                    Visibility="{Binding IsRegistered, Converter={StaticResource hideIfTrue}}"
                                    Foreground="Red" FontStyle="Italic" FontSize="16"/>
-                        <TextBlock Grid.Row="1" Text="Auditioned" Foreground="Green" FontSize="16">
+                        <TextBlock Grid.Row="1" Foreground="Green" FontSize="16">
                             <TextBlock.Visibility>
                                 <MultiBinding Converter="{StaticResource showIfApplicantRegisteredAndAuditioned}" ConverterParameter="{StaticResource criteriasViewSource}">
                                     <MultiBinding.Bindings>
@@ -204,6 +207,14 @@
                                     </MultiBinding.Bindings>
                                 </MultiBinding>
                             </TextBlock.Visibility>
+                            <TextBlock.Text>
+                                <MultiBinding Converter="{StaticResource overallAbilityCalculator}" StringFormat="Overall: {0}">
+                                    <MultiBinding.Bindings>
+                                        <Binding/>
+                                        <Binding Path="Abilities"/>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </TextBlock.Text>
                         </TextBlock>
                         <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Description}" FontSize="16">
                             <TextBlock.ToolTip>

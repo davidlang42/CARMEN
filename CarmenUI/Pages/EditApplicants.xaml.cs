@@ -20,6 +20,7 @@ using Microsoft.Win32;
 using Carmen.ShowModel.Import;
 using System.Diagnostics;
 using System.IO;
+using Carmen.CastingEngine.Audition;
 
 namespace CarmenUI.Pages
 {
@@ -31,6 +32,7 @@ namespace CarmenUI.Pages
         readonly CollectionViewSource applicantsViewSource;
         readonly CollectionViewSource criteriasViewSource;
         readonly BooleanLookupDictionary groupExpansionLookup;
+        readonly OverallAbilityCalculator overallAbilityCalculator;
 
         private Criteria[]? _criterias;
         private Criteria[] criterias => _criterias ?? throw new ApplicationException($"Tried to used {nameof(criterias)} before it was loaded.");
@@ -44,6 +46,7 @@ namespace CarmenUI.Pages
             applicantsViewSource = (CollectionViewSource)FindResource(nameof(applicantsViewSource));
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
             groupExpansionLookup = (BooleanLookupDictionary)FindResource(nameof(groupExpansionLookup));
+            overallAbilityCalculator = (OverallAbilityCalculator)((FakeItTilYouUpdateIt)FindResource(nameof(overallAbilityCalculator))).First();
             if (mode == EditApplicantsMode.RegisterApplicants)
             {
                 this.Title = "Register Applicants";
@@ -71,16 +74,27 @@ namespace CarmenUI.Pages
             using (var loading = new LoadingOverlay(this).AsSegment(nameof(EditApplicants)))
             {
                 using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
+                {
                     _criterias = await context.Criterias.InOrder().ToArrayAsync();
-                criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
-                criteriasViewSource.View.SortDescriptions.Add(StandardSort.For<Criteria>());
+                    criteriasViewSource.Source = context.Criterias.Local.ToObservableCollection();
+                    criteriasViewSource.View.SortDescriptions.Add(StandardSort.For<Criteria>());
+                }
+                using (loading.Segment(nameof(IAuditionEngine), "Audition engine"))
+                    overallAbilityCalculator.AuditionEngine = ParseAuditionEngine() switch
+                    {
+                        nameof(NeuralAuditionEngine) => new NeuralAuditionEngine(criterias, NeuralEngineConfirm),
+                        nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
+                        _ => throw new ArgumentException($"Audition engine not handled: {ParseAuditionEngine()}")
+                    };
                 using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
                     await context.Applicants.LoadAsync();
                 using (loading.Segment(nameof(EditApplicants) + nameof(Applicant), "First applicant"))
+                {
                     applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
+                    applicantsList.SelectedItem = null;
+                }
                 using (loading.Segment(nameof(EditApplicants) + nameof(ConfigureGroupingAndSorting), "Sorting"))
                     ConfigureGroupingAndSorting();
-                applicantsList.SelectedItem = null;
             }
             filterText.Focus();
         }
