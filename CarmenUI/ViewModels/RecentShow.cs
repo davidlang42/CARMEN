@@ -78,9 +78,22 @@ namespace CarmenUI.ViewModels
         public bool CheckAssessible() => Provider switch
         {
             null => File.Exists(Filename),
-            DbProvider.MySql => new Ping().Send(Host, 500).Status == IPStatus.Success, //TODO this should check server is connectable (ie. user & pass) using ServerVersion.AutoDetect or similar, and handle blanks/malformed
+            DbProvider.MySql => TryPing(Host),
             _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
         };
+
+        private static bool TryPing(string host)
+        {
+            try
+            {
+                return new Ping().Send(host, 500).Status == IPStatus.Success;
+            }
+            catch (Exception ex)
+            {
+                Log.Warning(ex, $"Try ping failed: {host}");
+                return false;
+            }
+        }
 
         public bool TryConnection(out string? error)
         {
