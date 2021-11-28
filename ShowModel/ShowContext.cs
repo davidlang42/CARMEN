@@ -17,6 +17,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Logging;
 using Serilog;
+using Serilog.Events;
 
 namespace Carmen.ShowModel
 {
@@ -224,6 +225,17 @@ namespace Carmen.ShowModel
                 }
             }
             return changes;
+        }
+
+        /// <summary>Log all changes in the current context since the last save.
+        /// WARNING: This is a VERY expensive operation</summary>
+        public void LogChanges(LogEventLevel level)
+        {
+            foreach (var entry in ChangeTracker.Entries().Where(e => e.State != EntityState.Unchanged))
+            {
+                var type_name = entry.Entity.GetType().Name;
+                Log.Write(level, $"{type_name}: {{@{type_name}}}", entry.Entity); // its not great, but at least the data is saved
+            }
         }
 
         /// <summary>For any current members of this alternative cast, this sets their alternative cast to null.

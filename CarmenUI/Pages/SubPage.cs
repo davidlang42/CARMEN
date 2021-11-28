@@ -19,6 +19,7 @@ using CarmenUI.ViewModels;
 using CarmenUI.UserControls;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using Serilog.Events;
 
 namespace CarmenUI.Pages
 {
@@ -63,7 +64,8 @@ namespace CarmenUI.Pages
 
         private void LogChanges()
         {
-            Log.Information($"OUTSTANDING CHANGES"); //TODO include all changes in the log message
+            Log.Information($"OUTSTANDING CHANGES");
+            context.LogChanges(LogEventLevel.Warning);
         }
 
         /// <summary>Returns the database username, if set, otherwise the local machine username</summary>
