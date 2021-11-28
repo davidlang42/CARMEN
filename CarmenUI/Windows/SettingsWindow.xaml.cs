@@ -202,7 +202,7 @@ namespace CarmenUI.Windows
             }    
             if (MessageBox.Show($"Are you sure you wanted to clear all cached images in '{image_cache_path}'?", Title, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
-            Directory.Delete(image_cache_path, true); //TODO bug: file handle still open to last viewed image in EditApplicants
+            Directory.Delete(image_cache_path, true);//TODO handle io
             MessageBox.Show("Image cache cleared", Title);
         }
 

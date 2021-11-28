@@ -38,7 +38,7 @@ namespace CarmenUI.Windows
             defaultTitle = default_title;
             this.connection = connection;
             this.reportDefinition = report_definition;
-            InitializeComponent(); //TODO fix binding errors
+            InitializeComponent();
             UpdateBookmarkIconAndReportTitle();
         }
 
@@ -247,7 +247,7 @@ namespace CarmenUI.Windows
 
         private void ClearSorting_Click(object sender, RoutedEventArgs e)
         {
-            Report.SortColumns.Clear(); //TODO fix, doesnt actually remove sorting
+            Report.SortColumns.Clear();
         }
 
         private async void ReportTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

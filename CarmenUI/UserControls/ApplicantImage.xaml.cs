@@ -82,7 +82,7 @@ namespace CarmenUI.UserControls
                 await Task.Run(() =>
                 {
                     if (!Directory.Exists(cache_path))
-                        Directory.CreateDirectory(cache_path);
+                        Directory.CreateDirectory(cache_path);//TODO handle io
                     UserException.Handle(() => File.WriteAllBytes(filename, lazy_loading_photo_getter().ImageData), "Error caching image.");
                 });
             return new BitmapImage(new Uri(filename));
