@@ -98,7 +98,10 @@
     <Setting Name="ImageCachePath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="SortBySuitability" Type="System.Boolean" Scope="User">
+    <Setting Name="SelectCastSortBySuitability" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="SelectCastGroupByCastGroup" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
   </Settings>

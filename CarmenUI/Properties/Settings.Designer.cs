@@ -408,12 +408,24 @@ namespace CarmenUI.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
-        public bool SortBySuitability {
+        public bool SelectCastSortBySuitability {
             get {
-                return ((bool)(this["SortBySuitability"]));
+                return ((bool)(this["SelectCastSortBySuitability"]));
             }
             set {
-                this["SortBySuitability"] = value;
+                this["SelectCastSortBySuitability"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool SelectCastGroupByCastGroup {
+            get {
+                return ((bool)(this["SelectCastGroupByCastGroup"]));
+            }
+            set {
+                this["SelectCastGroupByCastGroup"] = value;
             }
         }
     }

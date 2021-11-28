@@ -203,8 +203,10 @@
                     </Expander.Header>
                     <StackPanel>
                         <CheckBox Content="Sort applicants by suitability" Margin="0 5 0 0"
-                                  IsChecked="{bd:SettingBinding SortBySuitability}"/>
+                                  IsChecked="{bd:SettingBinding SelectCastSortBySuitability}"/>
                         <TextBlock Margin="0 0 0 5" Text="If not enabled, applicants are sorted by name in alphabetical order." TextWrapping="Wrap"/>
+                        <CheckBox Content="Group applicants by cast group" Margin="0 5 0 0"
+                                  IsChecked="{bd:SettingBinding SelectCastGroupByCastGroup}"/>
                     </StackPanel>
                 </Expander>
                 <Expander IsExpanded="False" Margin="0 5">

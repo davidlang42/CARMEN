@@ -507,7 +507,7 @@ namespace CarmenUI.Pages
         private void RefreshMainPanel()
         {
             selectionPanel.Visibility = numbersPanel.Visibility = sameCastSetsPanel.Visibility = Visibility.Collapsed;
-            sortBySuitabilityCheckbox.Visibility = Visibility.Hidden;
+            sortBySuitabilityCheckbox.Visibility = groupByCastGroupCheckbox.Visibility = Visibility.Hidden;
             if (selectionList.SelectedItem is CastGroup cast_group)
             {
                 selectedApplicantsViewSource.Source = cast_group.Members;
@@ -523,6 +523,7 @@ namespace CarmenUI.Pages
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "alternating cast members";
                 sortBySuitabilityCheckbox.Visibility = Visibility.Visible;
+                groupByCastGroupCheckbox.Visibility = Visibility.Visible;
             }
             else if (selectionList.SelectedItem is Tag tag)
             {
@@ -531,6 +532,7 @@ namespace CarmenUI.Pages
                 selectionPanel.Visibility = Visibility.Visible;
                 castStatusNoun.Text = "cast members";
                 sortBySuitabilityCheckbox.Visibility = Visibility.Visible;
+                groupByCastGroupCheckbox.Visibility = Visibility.Visible;
             }
             else if (selectionList.SelectedItem == finalCastList)
                 numbersPanel.Visibility = Visibility.Visible;
@@ -538,7 +540,7 @@ namespace CarmenUI.Pages
                 sameCastSetsPanel.Visibility = Visibility.Visible;
             else // no selection (initial state)
                 return;
-            ConfigureApplicantGroupingAndSorting();//TODO why do we need to do this for final cast list and keep applicants together?
+            ConfigureApplicantGroupingAndSorting(); //TODO why do we need to do this for final cast list and keep applicants together?
         }
 
         private void ConfigureAllApplicantsFiltering()
@@ -682,14 +684,14 @@ namespace CarmenUI.Pages
         {
             allApplicantsViewSource.GroupDescriptions.Clear();
             selectedApplicantsViewSource.GroupDescriptions.Clear();
-            var group = selectionList.SelectedItem is not CastGroup;
+            var group = selectionList.SelectedItem is not CastGroup && Properties.Settings.Default.SelectCastGroupByCastGroup;
             if (group)
             {
                 var gd = new PropertyGroupDescription(nameof(Applicant.CastGroup));
                 allApplicantsViewSource.GroupDescriptions.Add(gd);
                 selectedApplicantsViewSource.GroupDescriptions.Add(gd);
             }
-            if (Properties.Settings.Default.SortBySuitability)
+            if (Properties.Settings.Default.SelectCastSortBySuitability)
             {
                 suitabilityComparer.GroupByCastGroup = group;
                 SortBySuitability(allApplicantsViewSource);
@@ -716,6 +718,12 @@ namespace CarmenUI.Pages
         {
             if (collection.View is ListCollectionView view)
                 view.CustomSort = suitabilityComparer;
+        }
+
+        private void GroupByCastGroupCheckbox_Changed(object sender, RoutedEventArgs e)
+        {
+            if (selectionList?.SelectedItem != null)
+                ConfigureApplicantGroupingAndSorting();
         }
     }
 
