@@ -43,6 +43,19 @@ namespace CarmenUI.Pages
             RecreateContext();
         }
 
+        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            CommitTextboxValue();
+            if (context.ChangeTracker.HasChanges())
+            {
+                var result = MessageBox.Show("Do you want to save changes?", WindowTitle, MessageBoxButton.YesNoCancel);
+                if (result == MessageBoxResult.No)
+                    return;
+                if (result == MessageBoxResult.Cancel || !await SaveChanges(false))
+                    e.Cancel = true;
+            }
+        }
+
         /// <summary>Returns the database username, if set, otherwise the local machine username</summary>
         protected string GetUserName() => string.IsNullOrWhiteSpace(connection.User) ? Environment.UserName : connection.User;
 
@@ -56,12 +69,16 @@ namespace CarmenUI.Pages
         {
             windowWithEventsAttached = Window.GetWindow(this);
             windowWithEventsAttached.KeyDown += Window_KeyDown;
+            windowWithEventsAttached.Closing += Window_Closing;
         }
 
         private void Page_Unloaded(object sender, RoutedEventArgs e)
         {
             if (windowWithEventsAttached != null)
+            {
                 windowWithEventsAttached.KeyDown -= Window_KeyDown;
+                windowWithEventsAttached.Closing -= Window_Closing;
+            }
         }
 
         protected virtual async void Window_KeyDown(object sender, KeyEventArgs e)
