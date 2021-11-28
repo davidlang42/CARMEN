@@ -43,6 +43,7 @@
             <cv:HighlightError/>
         </cv:MultiConverter>
         <cv:CheckRequiredCount x:Key="checkRequiredCount"/>
+        <cv:CheckSameCastSets x:Key="checkSameCastSets"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.RowDefinitions>
@@ -260,6 +261,14 @@
                 <ListBox.ItemTemplate>
                     <DataTemplate DataType="{x:Type modelApplicants:Applicant}">
                         <Grid>
+                            <Grid.Background>
+                                <MultiBinding Converter="{StaticResource checkSameCastSets}">
+                                    <MultiBinding.Bindings>
+                                        <Binding Path="AlternativeCast"/>
+                                        <Binding Path="SameCastSet"/>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </Grid.Background>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
