@@ -30,8 +30,11 @@ namespace Carmen.ShowModel
 
         #region Database collections
         /// <summary>Auto includes ShowRoot, Abilities, CastGroup, AlternativeCast, Tags.
-        /// Remember to include Roles, SameCastSet, Image.</summary>
+        /// Remember to include Roles, SameCastSet, Image, Notes.</summary>
         public DbSet<Applicant> Applicants => Set<Applicant>();
+
+        /// <summary>Auto includes Applicants.</summary>
+        public DbSet<Note> Notes => Set<Note>();
 
         /// <summary>Remember to include Members.</summary>
         public DbSet<AlternativeCast> AlternativeCasts => Set<AlternativeCast>();
@@ -146,6 +149,8 @@ namespace Carmen.ShowModel
             destination.AddRange(await Requirements.OfType<CombinedRequirement>().Include(cr => cr.SubRequirements).ToArrayAsync());
             progress_callback?.Invoke(nameof(Applicants) + nameof(Applicant.Roles), "Applicants");
             destination.AddRange(await Applicants.Include(a => a.Roles).ToArrayAsync());
+            progress_callback?.Invoke(nameof(Notes), "Notes");
+            destination.AddRange(await Notes.ToArrayAsync());
             progress_callback?.Invoke(nameof(Abilities), "Abilities");
             destination.AddRange(await Abilities.ToArrayAsync());
             progress_callback?.Invoke(nameof(SameCastSets), "Same cast sets");
@@ -170,6 +175,8 @@ namespace Carmen.ShowModel
                     changes |= DataObjects.Applicants;
                 else if (entry.Entity is Ability)
                     changes |= DataObjects.Abilities;
+                else if (entry.Entity is Note)
+                    changes |= DataObjects.Notes;
                 else if (entry.Entity is AlternativeCast)
                     changes |= DataObjects.AlternativeCasts;
                 else if (entry.Entity is CastGroup)

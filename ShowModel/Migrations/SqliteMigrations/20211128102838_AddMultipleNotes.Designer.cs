@@ -3,14 +3,16 @@ using System;
 using Carmen.ShowModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Carmen.ShowModel.Migrations.SqliteMigrations
 {
     [DbContext(typeof(SqliteShowContext))]
-    partial class SqliteShowContextModelSnapshot : ModelSnapshot
+    [Migration("20211128102838_AddMultipleNotes")]
+    partial class AddMultipleNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

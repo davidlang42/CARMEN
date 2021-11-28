@@ -122,18 +122,8 @@ namespace Carmen.ShowModel.Applicants
         private readonly ObservableCollection<Ability> abilities = new();
         public virtual ICollection<Ability> Abilities => abilities;
 
-        private string notes = "";
-        public string Notes
-        {
-            get => notes;
-            set
-            {
-                if (notes == value)
-                    return;
-                notes = value;
-                OnPropertyChanged();
-            }
-        }
+        private readonly ObservableCollection<Note> notes = new();
+        public virtual ICollection<Note> Notes => notes;
         #endregion
 
         #region Selection & Casting properties

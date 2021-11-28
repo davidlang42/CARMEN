@@ -134,7 +134,7 @@ namespace Carmen.ShowModel.Import
             foreach (var criteria in criterias.InOrder())
                 yield return ImportColumn.ForNullable(criteria.Name, a => a.Abilities.SingleOrDefault(ab => ab.Criteria == criteria)?.Mark, (a, v) => a.SetMarkFor(criteria, v), s => ParseCriteriaMark(criteria, s));
             yield return new ImageImportColumn("Photo", set_photo, LoadImageData);
-            yield return ImportColumn.ForString("Notes", a => a.Notes, (a, v) => a.Notes = v, false);
+            yield return new NoteImportColumn("Add Note", a => a.Notes);
             yield return ImportColumn.ForString("External Data", a => a.ExternalData, (a, v) => a.ExternalData = v, false);
             // everything below here should only be imported if they are already accepted into the cast
             yield return ImportColumn.ForNullable("Cast Group", a => a.CastGroup, (a, v) => a.CastGroup = v, ParseCastGroup);

@@ -117,10 +117,6 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                         .IsRequired()
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Notes")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
                     b.Property<int?>("PhotoImageId")
                         .HasColumnType("int");
 
@@ -171,6 +167,33 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                     b.HasKey("CastGroupId");
 
                     b.ToTable("CastGroups");
+                });
+
+            modelBuilder.Entity("Carmen.ShowModel.Applicants.Note", b =>
+                {
+                    b.Property<int>("NoteId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    b.Property<int>("ApplicantId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Author")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Text")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("Timestamp")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("NoteId");
+
+                    b.HasIndex("ApplicantId");
+
+                    b.ToTable("Notes");
                 });
 
             modelBuilder.Entity("Carmen.ShowModel.Applicants.SameCastSet", b =>
@@ -747,6 +770,17 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                     b.Navigation("ShowRoot");
                 });
 
+            modelBuilder.Entity("Carmen.ShowModel.Applicants.Note", b =>
+                {
+                    b.HasOne("Carmen.ShowModel.Applicants.Applicant", "Applicant")
+                        .WithMany("Notes")
+                        .HasForeignKey("ApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Applicant");
+                });
+
             modelBuilder.Entity("Carmen.ShowModel.Applicants.Tag", b =>
                 {
                     b.HasOne("Carmen.ShowModel.Image", "Icon")
@@ -1014,6 +1048,8 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("Carmen.ShowModel.Applicants.Applicant", b =>
                 {
                     b.Navigation("Abilities");
+
+                    b.Navigation("Notes");
                 });
 
             modelBuilder.Entity("Carmen.ShowModel.Applicants.CastGroup", b =>

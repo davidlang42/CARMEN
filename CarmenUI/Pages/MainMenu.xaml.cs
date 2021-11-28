@@ -115,7 +115,7 @@ namespace CarmenUI.Pages
                 || changes.HasFlag(DataObjects.SectionTypes)
                 || changes.HasFlag(DataObjects.Requirements))
                 summaries.Add(ShowSummary);
-            if (changes.HasFlag(DataObjects.Applicants)
+            if (changes.HasFlag(DataObjects.Applicants)//TODO does applicant change really affect this?
                 || changes.HasFlag(DataObjects.Abilities)
                 || changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.Requirements)
@@ -124,13 +124,13 @@ namespace CarmenUI.Pages
             if (changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.SameCastSets)
                 || changes.HasFlag(DataObjects.Tags)
-                || changes.HasFlag(DataObjects.Applicants))
+                || changes.HasFlag(DataObjects.Applicants))//TODO does applicant change really affect this?
                 summaries.Add(CastSummary);
             if (changes.HasFlag(DataObjects.Nodes)
                 || changes.HasFlag(DataObjects.Roles)
                 || changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.SectionTypes)
-                || changes.HasFlag(DataObjects.Applicants))
+                || changes.HasFlag(DataObjects.Applicants))//TODO does applicant change really affect this?
                 summaries.AddRange(new Summary[] { ItemsSummary, RolesSummary });
             // Trigger update if required
             if (summaries.Count == 0)

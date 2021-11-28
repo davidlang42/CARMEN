@@ -86,8 +86,8 @@ namespace CarmenUI.Pages
                         nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
                         _ => throw new ArgumentException($"Audition engine not handled: {ParseAuditionEngine()}")
                     };
-                using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
-                    await context.Applicants.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Notes), "Applicants"))
+                    await context.Applicants.Include(a => a.Notes).LoadAsync();
                 using (loading.Segment(nameof(EditApplicants) + nameof(Applicant), "First applicant"))
                 {
                     applicantsViewSource.Source = context.Applicants.Local.ToObservableCollection();
@@ -264,9 +264,35 @@ namespace CarmenUI.Pages
 
         private async void applicantsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            CommitNewNote(e.RemovedItems.OfType<Applicant>().FirstOrDefault());
             if (Properties.Settings.Default.SaveOnApplicantChange)
                 await SaveChanges(user_initiated: false);
             ConfigureFiltering();
+        }
+
+        private void CommitNewNote(Applicant? applicant)
+        {
+            if (!string.IsNullOrWhiteSpace(NewNoteTextBox.Text))
+            {
+                if (applicant != null)
+                {
+                    applicant.Notes.Add(new Note
+                    {
+                        Applicant = applicant,
+                        Text = NewNoteTextBox.Text,
+                        Author = GetUserName()
+                    });
+                    NewNoteTextBox.Text = "";
+                }
+                else
+                    MessageBox.Show("Unable to add new note:\n" + NewNoteTextBox.Text, WindowTitle);
+            }
+        }
+
+        protected override Task<bool> PreSaveChecks()
+        {
+            CommitNewNote(applicantsList.SelectedItem as Applicant);
+            return Task.FromResult(true);
         }
 
         private void ExpandAll_Click(object sender, RoutedEventArgs e)
@@ -476,7 +502,7 @@ namespace CarmenUI.Pages
             {
                 if (picker.ShowDialog() != true || picker.SelectedApplicant is not Applicant import_selected)
                     return;
-                var add_notes = "Imported marks";
+                var note_text = "Imported marks";
                 if (!import_selected.FirstName.Equals(applicant.FirstName, StringComparison.OrdinalIgnoreCase) || !import_selected.LastName.Equals(applicant.LastName, StringComparison.OrdinalIgnoreCase))
                 {
                     var msg = $"Importing applicant '{import_selected.FirstName} {import_selected.LastName}' does not match selected applicant '{applicant.FirstName} {applicant.LastName}'. Would you like to add them as a new applicant instead?";
@@ -494,12 +520,12 @@ namespace CarmenUI.Pages
                             DateOfBirth = import_selected.DateOfBirth
                         };
                         context.Applicants.Add(applicant);
-                        add_notes = "Imported applicant";
+                        note_text = "Imported applicant";
                     }
                 }
                 using (var loading = new LoadingOverlay(this) { MainText = "Importing...", SubText = $"{import_selected.FirstName} {import_selected.FirstName}" })
                 {
-                    add_notes += " from " + import.ShowRoot.Name;
+                    note_text += " from " + import.ShowRoot.Name;
                     var import_abilities = await import.Abilities.Where(a => a.Applicant == import_selected).Include(ab => ab.Criteria).ToArrayAsync();
                     foreach (var import_ability in import_abilities)
                     {
@@ -509,20 +535,22 @@ namespace CarmenUI.Pages
                             if (import_formatted_mark.Equals(matching_criteria.Format(import_ability.Mark), StringComparison.OrdinalIgnoreCase)) // important for select criteria
                             {
                                 if (applicant.Abilities.Where(ab => ab.Criteria == matching_criteria).SingleOrDefault() is Ability existing_ability && existing_ability.Mark != import_ability.Mark)
-                                    add_notes += $"\nOverwrote previous {matching_criteria.Name} ability of {matching_criteria.Format(existing_ability.Mark)} with {import_formatted_mark}";
+                                    note_text += $"\nOverwrote previous {matching_criteria.Name} ability of {matching_criteria.Format(existing_ability.Mark)} with {import_formatted_mark}";
                                 applicant.SetMarkFor(matching_criteria, import_ability.Mark);
                                 count++;
                             }
                             else
-                                add_notes += $"\nHad {matching_criteria.Name} ability of {import_formatted_mark} (format mismatch)";
+                                note_text += $"\nHad {matching_criteria.Name} ability of {import_formatted_mark} (format mismatch)";
                         }
                         else
-                            add_notes += $"\nHad {import_ability.Criteria.Name} ability of {import_formatted_mark} (no match found)";
+                            note_text += $"\nHad {import_ability.Criteria.Name} ability of {import_formatted_mark} (no match found)";
                     }
-                    if (string.IsNullOrWhiteSpace(applicant.Notes))
-                        applicant.Notes = add_notes;
-                    else
-                        applicant.Notes += "\n\n" + add_notes;
+                    applicant.Notes.Add(new Note
+                    {
+                        Applicant = applicant,
+                        Text = note_text,
+                        Author = GetUserName()
+                    });
                 }
             }
             applicantsList.SelectedItem = null;

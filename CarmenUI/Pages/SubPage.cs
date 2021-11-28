@@ -43,6 +43,9 @@ namespace CarmenUI.Pages
             RecreateContext();
         }
 
+        /// <summary>Returns the database username, if set, otherwise the local machine username</summary>
+        protected string GetUserName() => string.IsNullOrWhiteSpace(connection.User) ? Environment.UserName : connection.User;
+
         private void RecreateContext()
         {
             _context?.Dispose();
@@ -163,9 +166,7 @@ namespace CarmenUI.Pages
 
         /// <summary>Check any data consistency constraints before allowing save to be processed.
         /// This may contain user interaction. Return true to continue or false to cancel saving.</summary>
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        protected virtual async Task<bool> PreSaveChecks() => true;
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        protected virtual Task<bool> PreSaveChecks() => Task.FromResult(true);
 
         /// <summary>Confirm cancel with the user and exit to main menu</summary>
         protected void CancelChangesAndReturn()
