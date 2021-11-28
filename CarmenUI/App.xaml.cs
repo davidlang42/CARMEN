@@ -13,6 +13,8 @@ using System.Text.Json;
 using CarmenUI.Properties;
 using System.Diagnostics.CodeAnalysis;
 using CarmenUI.Windows;
+using Serilog;
+using Microsoft.Extensions.Logging;
 
 namespace CarmenUI
 {
@@ -27,6 +29,8 @@ namespace CarmenUI
             Timings.Default.Save();
             Widths.Default.Save();
             Imports.Default.Save();
+            Log.Information("Exit");
+            Log.CloseAndFlush();
         }
 
         private void Application_Startup(object sender, StartupEventArgs e)
@@ -39,6 +43,7 @@ namespace CarmenUI
                 settings.ClearRecentShowsList();
                 settings.ClearReportDefinitionsList();
             }
+            ConfigureLogging();
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -99,13 +104,13 @@ namespace CarmenUI
         }
 
 #endif
-        public void CreateLog(string type_name, string text)
+        public void ConfigureLogging()
         {
-            var path = $"{AppDomain.CurrentDomain.BaseDirectory}\\Logs";
-            Directory.CreateDirectory(path);
-            var filename = $"{path}\\{type_name}_{DateTime.Now:yyyy-MM-dd_HH-mm-ss_fffffff}.log";
-            using (var file = File.CreateText(filename))
-                file.WriteLine(text);
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Information()
+                .WriteTo.File("CARMEN_.log", rollingInterval: RollingInterval.Day, rollOnFileSizeLimit: true)
+                .CreateLogger();
+            Log.Information("Launch");
         }
     }
 }

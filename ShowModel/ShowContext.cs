@@ -15,11 +15,15 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace Carmen.ShowModel
 {
     public abstract class ShowContext : DbContext
     {
+        static readonly ILoggerFactory loggerFactory = LoggerFactory.Create(factory => factory.AddSerilog());
+
         public enum DatabaseState
         {
             Empty,
@@ -80,12 +84,15 @@ namespace Carmen.ShowModel
         public ShowRoot ShowRoot => showRoot ??= Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;
 
         public static ShowContext Open(ShowConnection show)
-            => show.Provider switch
+        {
+            Log.Information($"{nameof(ShowContext)}.{nameof(Open)}: {show.ConnectionString}");
+            return show.Provider switch
             {
                 DbProvider.MySql => new MySqlShowContext(show.ConnectionString),
                 null => new SqliteShowContext(show.ConnectionString),
                 _ => throw new NotImplementedException($"Database provider {show.Provider} not implemented.")
             };
+        }
 
         /// <summary>Accessing any model or entity related property on the context causes the model to be build,
         /// which takes ~1s synchronously. This runs it in a separate thread to avoid a synchronous delay.</summary>
@@ -96,6 +103,7 @@ namespace Carmen.ShowModel
 
         public async Task CreateNewDatabase(string default_show_name)
         {
+            Log.Information($"{nameof(ShowContext)}.{nameof(CreateNewDatabase)}");
             await Task.Run(() => // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
             {
                 Database.EnsureDeleted();
@@ -125,11 +133,13 @@ namespace Carmen.ShowModel
 
         public async Task UpgradeDatabase()
         {
+            Log.Information($"{nameof(ShowContext)}.{nameof(UpgradeDatabase)}");
             await Task.Run(() => Database.Migrate()); // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
         }
 
         public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)
         {
+            Log.Information($"{nameof(ShowContext)}.{nameof(CopyDatabase)}");
             using var destination = Open(overwrite_database);
             destination.Database.EnsureDeleted();
             destination.Database.Migrate(); // instead of EnsureCreated(), so that history table gets created
@@ -394,13 +404,15 @@ namespace Carmen.ShowModel
             // Using LazyLoadingProxies will have a huge performance hit if I forget to include
             // the right objects in my queries, however the alternative is that if I forget to
             // include something then I get incorrect values (eg. nulls and empty collections)
-            optionsBuilder.UseLazyLoadingProxies();
-
+            optionsBuilder.UseLazyLoadingProxies()
+                .UseLoggerFactory(loggerFactory)
+                .EnableSensitiveDataLogging();
 #if SLOW_DATABASE
             // Due to risks of LazyLoadingProxies above, it is best to always debug with SLOW_DATABASE
             // so that there is a noticeable delay if I forget to include the right objects, however
             // its worth noting that a delay of 200ms blocks unit tests from completing.
             optionsBuilder.AddInterceptors(new DelayInterceptor(200)); // simulates a 3g connection
+            Log.Warning($"{nameof(optionsBuilder.AddInterceptors)}({nameof(DelayInterceptor)})");
 #endif
             base.OnConfiguring(optionsBuilder);
         }
