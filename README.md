@@ -23,9 +23,12 @@ This deliverable, and the research that went into it, has improved the quality o
 ## Installation Guide
 
 1. Find the [latest release](https://github.com/davidlang42/CARMEN/releases/latest) and download [setup.exe](https://github.com/davidlang42/CARMEN/releases/latest/download/setup.exe) AND [Carmen.msi](https://github.com/davidlang42/CARMEN/releases/latest/download/Carmen.msi)
-2. Run setup.exe, and follow the prompts to install CARMEN and any pre-requisites
-3. If you receive an error while installing (when your user is not an administrator), try changing the "Install CARMEN for yourself, or anyone who uses this computer" setting to "Just me" on the 2nd screen.
-4. Once installed, you can run "CARMEN: Casting And Role Management Equality Network" from the start menu, under the "CARMEN" folder
+2. Run setup.exe, and follow the prompts to install any pre-requisites
+3. Once you reach "Welcome to CARMEN setup", press "Next"
+4. If you receive an error while installing (because your user is not administrator), change the "Install CARMEN for yourself, or anyone who uses this computer" setting to "Just me"
+5. Press "Next"
+6. Press "Next" again
+7. Once installed, you can run "CARMEN: Casting And Role Management Equality Network" from the start menu, under the "CARMEN" folder
 
 ## Login Guide
 
@@ -38,6 +41,8 @@ If you have been given a username and password for a database server, you should
 5. Type your username and password in "Username" and "Password"
 6. Click "Connect" to save this connection, and open the show
 7. Next time you open CARMEN, you can skip steps 2-6 by selecting the saved connection from the list below the "New"/"Open"/"Connect" buttons
+8. Click "Auditioning" to go to the audition page.
+9. It is HIGHLY recommended that you tick "Auto-save on applicant change" so that changes are saved every time you switch between applicants, rather than only when you press the "Save" button to return to the main menu. Alternatively, you can press Ctrl+S at any time to save without returning to the main menu.
 
 ## Basic User Guide
 
