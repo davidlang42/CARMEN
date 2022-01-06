@@ -205,7 +205,7 @@ namespace CarmenUI.Pages
                 var count_column = new GridViewColumn
                 {
                     Header = "Roles",
-                    DisplayMemberBinding = new Binding($"{nameof(ApplicantForRole.ExistingRoles)}[{array_index}]")
+                    DisplayMemberBinding = new Binding($"{nameof(ApplicantForRole.ExistingRoleCounts)}[{array_index}]")
                     {
                         StringFormat = "{0:0.#}"
                     },

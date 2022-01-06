@@ -51,8 +51,13 @@ namespace CarmenUI.ViewModels
         /// <summary>Indicies match PrimaryCriterias</summary>
         public string[] Marks { get; init; }
 
-        /// <summary>Not including this role, even if already cast in it</summary>
-        public double[] ExistingRoles { get; init; }
+        /// <summary>Indicies match PrimaryCriterias</summary>
+        public double[] ExistingRoleCounts { get; init; }
+
+        /// <summary>Not including this role, even if already cast in it.</summary>
+        public IEnumerable<string> ExistingRoles
+            => Applicant.Roles.Where(r => r != role)
+            .Select(r => $"'{r.Name}' in {string.Join(", ", r.Items.Select(i => i.Name))}");
 
         public string OverallAbility { get; init; }
 
@@ -103,9 +108,9 @@ namespace CarmenUI.ViewModels
             Marks = new string[PrimaryCriterias.Length];
             for (var i = 0; i < Marks.Length; i++)
                 Marks[i] = applicant.FormattedMarkFor(PrimaryCriterias[i]);
-            ExistingRoles = new double[PrimaryCriterias.Length];
-            for (var i = 0; i < ExistingRoles.Length; i++)
-                ExistingRoles[i] = engine.CountRoles(applicant, PrimaryCriterias[i], role);
+            ExistingRoleCounts = new double[PrimaryCriterias.Length];
+            for (var i = 0; i < ExistingRoleCounts.Length; i++)
+                ExistingRoleCounts[i] = engine.CountRoles(applicant, PrimaryCriterias[i], role);
             Availability = engine.AvailabilityOf(applicant, role);
             Eligibility = engine.EligibilityOf(applicant, role);
         }

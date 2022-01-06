@@ -111,13 +111,17 @@
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Expander>
-                <Expander IsExpanded="True">
+                <Expander IsExpanded="True" Visibility="{Binding ExistingRoles, Converter={StaticResource hideIfEmpty}}">
                     <Expander.Header>
                         <TextBlock Text="Existing Roles" FontStyle="Italic" FontSize="14"/>
                     </Expander.Header>
-                    <StackPanel>
-
-                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding ExistingRoles}" IsTabStop="False" Margin="0 0 0 5">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap" Text="{Binding}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Expander>
                 <Expander IsExpanded="True" Visibility="{Binding UnavailabilityReasons, Converter={StaticResource hideIfEmpty}}">
                     <Expander.Header>
