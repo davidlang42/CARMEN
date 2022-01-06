@@ -69,13 +69,13 @@
                 </TextBlock.ToolTip>
             </TextBlock>
         </Grid>
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Margin="5">
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Margin="5" VerticalScrollBarVisibility="Auto">
             <StackPanel>
                 <Expander IsExpanded="True">
                     <Expander.Header>
-                        <TextBlock Text="Abilities" FontWeight="Bold" FontSize="14"/>
+                        <TextBlock Text="Abilities" FontStyle="Italic" FontSize="14"/>
                     </Expander.Header>
-                    <ItemsControl ItemsSource="{Binding Applicant.Abilities}" KeyboardNavigation.IsTabStop="False">
+                    <ItemsControl ItemsSource="{Binding Applicant.Abilities}" KeyboardNavigation.IsTabStop="False" Margin="0 0 0 5">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate>
                                     <WrapPanel KeyboardNavigation.IsTabStop="False" ItemWidth="150"/>
@@ -93,7 +93,26 @@
                 </Expander>
                 <Expander IsExpanded="True">
                     <Expander.Header>
-                        <TextBlock Text="Notes" FontWeight="Bold" FontSize="14"/>
+                        <TextBlock Text="Notes" FontStyle="Italic" FontSize="14"/>
+                    </Expander.Header>
+                    <ItemsControl ItemsSource="{Binding Applicant.Notes}" IsTabStop="False">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel>
+                                    <TextBlock TextWrapping="Wrap" FontStyle="Italic">
+                                                    <Run Text="{Binding Author}" FontWeight="Bold"/>
+                                                    <Run Text="on"/>
+                                                    <Run Text="{Binding Timestamp, StringFormat='{}{0:d MMM yyyy h:mmtt}'}"/>
+                                    </TextBlock>
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="5 0 0 5"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Expander>
+                <Expander IsExpanded="True" Margin="0 5">
+                    <Expander.Header>
+                        <TextBlock Text="Existing Roles" FontStyle="Italic" FontSize="14"/>
                     </Expander.Header>
                     <StackPanel>
 
@@ -101,7 +120,7 @@
                 </Expander>
                 <Expander IsExpanded="True" Margin="0 5">
                     <Expander.Header>
-                        <TextBlock Text="Existing Roles" FontWeight="Bold" FontSize="14"/>
+                        <TextBlock Text="Unavailability" FontStyle="Italic" FontSize="14"/>
                     </Expander.Header>
                     <StackPanel>
 
@@ -109,15 +128,7 @@
                 </Expander>
                 <Expander IsExpanded="True" Margin="0 5">
                     <Expander.Header>
-                        <TextBlock Text="Unavailability Reasons" FontWeight="Bold" FontSize="14"/>
-                    </Expander.Header>
-                    <StackPanel>
-
-                    </StackPanel>
-                </Expander>
-                <Expander IsExpanded="True" Margin="0 5">
-                    <Expander.Header>
-                        <TextBlock Text="Ineligibility Reasons" FontWeight="Bold" FontSize="14"/>
+                        <TextBlock Text="Ineligibility" FontStyle="Italic" FontSize="14"/>
                     </Expander.Header>
                     <StackPanel>
 
