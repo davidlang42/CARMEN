@@ -7,7 +7,7 @@
         xmlns:cv="clr-namespace:CarmenUI.Converters"
         mc:Ignorable="d" Closed="Window_Closed"
         WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip"
-        Height="300" Width="600" Loaded="Window_Loaded">
+        Height="300" Width="600" Loaded="Window_Loaded" KeyDown="Window_KeyDown">
     <Window.Resources>
         <cv:FullName x:Key="fullName"/>
         <cv:ShowIfApplicantRegisteredAndAuditioned x:Key="showIfApplicantRegisteredAndAuditioned"/>

@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Windows;
 using System.Windows.Data;
+using System.Windows.Input;
 
 namespace CarmenUI.Windows
 {
@@ -68,6 +69,15 @@ namespace CarmenUI.Windows
         {
             using var context = ShowContext.Open(connection);
             return context.Images.Single(i => i.ImageId == applicant.PhotoImageId);
+        }
+
+        private void Window_KeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            if (e.Key == Key.Escape)
+            {
+                e.Handled = true;
+                Close();
+            }
         }
     }
 }
