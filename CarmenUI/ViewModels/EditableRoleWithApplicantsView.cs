@@ -1,7 +1,10 @@
 ﻿using Carmen.CastingEngine.Allocation;
+using Carmen.CastingEngine.Audition;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
+using CarmenUI.Windows;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,6 +20,8 @@ namespace CarmenUI.ViewModels
 {
     public class EditableRoleWithApplicantsView : RoleWithApplicantsView
     {
+        Dictionary<ApplicantForRole, ApplicantDetailsWindow> detailsWindows = new();
+
         public ApplicantForRole[] Applicants { get; init; }
 
         /// <summary>Array arguments are not expected not to change over the lifetime of this View.
@@ -79,8 +84,28 @@ namespace CarmenUI.ViewModels
 
         protected override void DisposeInternal()
         {
+            foreach (var window in detailsWindows.Values)
+                window.Close();
+            detailsWindows.Clear();
             foreach (var applicant in Applicants)
                 applicant.PropertyChanged -= ApplicantForRole_PropertyChanged;
+            base.DisposeInternal();
+        }
+
+        public void ShowDetailsWindow(ShowConnection connection, ApplicantForRole afr, Window owner, Criteria[] criterias, IAuditionEngine audition_engine)
+        {
+            if (!detailsWindows.TryGetValue(afr, out var window) || window.IsClosed)
+            {
+                window = new ApplicantDetailsWindow(connection, criterias, audition_engine, afr)
+                {
+                    Owner = owner
+                };
+                detailsWindows[afr] = window;
+                window.Show();
+            }
+            if (window.WindowState == WindowState.Minimized)
+                window.WindowState = WindowState.Normal;
+            window.Activate();
         }
     }
 }

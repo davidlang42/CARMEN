@@ -42,7 +42,8 @@ namespace CarmenUI.Pages
         private Criteria[]? _criterias;
         private Requirement[]? _requirements;
         private ShowRootNodeView? _rootNodeView;
-        private IAllocationEngine? _engine;
+        private IAuditionEngine? _auditionEngine;
+        private IAllocationEngine? _allocationEngine;
 
         private readonly object defaultPanelContent;
         private IEnumerator<Role[]>? recommendedCastingOrder;
@@ -68,8 +69,11 @@ namespace CarmenUI.Pages
         private ShowRootNodeView rootNodeView => _rootNodeView
             ?? throw new ApplicationException($"Tried to used {nameof(rootNodeView)} before it was loaded.");
 
-        private IAllocationEngine engine => _engine
-            ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
+        private IAuditionEngine auditionEngine => _auditionEngine
+            ?? throw new ApplicationException($"Tried to used {nameof(auditionEngine)} before it was loaded.");
+
+        private IAllocationEngine allocationEngine => _allocationEngine
+            ?? throw new ApplicationException($"Tried to used {nameof(allocationEngine)} before it was loaded.");
 
         public AllocateRoles(RecentShow connection) : base(connection)
         {
@@ -104,19 +108,19 @@ namespace CarmenUI.Pages
                     await context.Roles.Include(r => r.Items).LoadAsync();
                 using (loading.Segment(nameof(IAllocationEngine), "Allocation engine"))
                 {
-                    IAuditionEngine audition_engine = ParseAuditionEngine() switch
+                    _auditionEngine = ParseAuditionEngine() switch
                     {
                         nameof(NeuralAuditionEngine) => new NeuralAuditionEngine(criterias, NeuralEngineConfirm),
                         nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
                         _ => throw new ArgumentException($"Audition engine not handled: {ParseAuditionEngine()}")
                     };
-                    _engine = ParseAllocationEngine() switch
+                    _allocationEngine = ParseAllocationEngine() switch
                     {
-                        nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(audition_engine, alternativeCasts, criterias),
-                        nameof(WeightedAverageEngine) => new WeightedAverageEngine(audition_engine, alternativeCasts, context.ShowRoot),
-                        nameof(SessionLearningAllocationEngine) => new SessionLearningAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
-                        nameof(RoleLearningAllocationEngine) => new RoleLearningAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
-                        nameof(ComplexNeuralAllocationEngine) => new ComplexNeuralAllocationEngine(audition_engine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm, new FilePersistence("ComplexNeuralModel.xml")),
+                        nameof(HeuristicAllocationEngine) => new HeuristicAllocationEngine(auditionEngine, alternativeCasts, criterias),
+                        nameof(WeightedAverageEngine) => new WeightedAverageEngine(auditionEngine, alternativeCasts, context.ShowRoot),
+                        nameof(SessionLearningAllocationEngine) => new SessionLearningAllocationEngine(auditionEngine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
+                        nameof(RoleLearningAllocationEngine) => new RoleLearningAllocationEngine(auditionEngine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm),
+                        nameof(ComplexNeuralAllocationEngine) => new ComplexNeuralAllocationEngine(auditionEngine, alternativeCasts, context.ShowRoot, requirements, NeuralEngineConfirm, new FilePersistence("ComplexNeuralModel.xml")),
                         _ => throw new ArgumentException($"Allocation engine not handled: {ParseAllocationEngine()}")
                     };
                 }
@@ -143,7 +147,7 @@ namespace CarmenUI.Pages
                         .Where(afr => !afr.IsSelected)
                         .Select(afr => afr.Applicant);
                     using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Learning...", "Roles allocated by the user"))
-                        await engine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
+                        await allocationEngine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
                     await SaveChanges(false); // to save any weights updated by the engine
                 }
                 ChangeToViewMode();
@@ -177,7 +181,7 @@ namespace CarmenUI.Pages
                 return;
             IEnumerable<Applicant> new_applicants;
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Processing...", "Finding best applicants"))
-                new_applicants = await engine.PickCast(applicantsInCast, current_view.Role);
+                new_applicants = await allocationEngine.PickCast(applicantsInCast, current_view.Role);
             current_view.SelectApplicants(new_applicants);
         }
 
@@ -241,7 +245,7 @@ namespace CarmenUI.Pages
             using var loading = new LoadingOverlay(this) { MainText = "Processing...", SubText = "Calculating applicant suitabilities" };
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
-                RoleNodeView role_node_view => new EditableRoleWithApplicantsView(engine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,
+                RoleNodeView role_node_view => new EditableRoleWithApplicantsView(allocationEngine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,
                     Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants),
                 _ => defaultPanelContent
             };
@@ -264,7 +268,7 @@ namespace CarmenUI.Pages
                 throw new ApplicationException("Called next role while already selecting a role programatically.");
             selectingRoleProgrammatically = true;
             if (recommendedCastingOrder == null)
-                recommendedCastingOrder = engine.IdealCastingOrder(context.ShowRoot, applicantsInCast).GetEnumerator();
+                recommendedCastingOrder = allocationEngine.IdealCastingOrder(context.ShowRoot, applicantsInCast).GetEnumerator();
             using (new LoadingOverlay(this) { MainText = "Processing...", SubText = "Finding next uncast role" })
                 while (await Task.Run(() => recommendedCastingOrder.MoveNext()))
                     if (recommendedCastingOrder.Current.Any(r => r.CastingStatus(alternativeCasts) != Role.RoleStatus.FullyCast))
@@ -301,7 +305,7 @@ namespace CarmenUI.Pages
         private async void MainMenuButton_Click(object sender, RoutedEventArgs e)
         {
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.ExportChanges), "Learning...", "Finalising user session"))
-                await engine.ExportChanges();
+                await allocationEngine.ExportChanges();
             await SaveChangesAndReturn(false); // to save any weights updated by the engine
         } 
 
@@ -352,8 +356,11 @@ namespace CarmenUI.Pages
         private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var list_view_item = (ListViewItem)sender;
-            if (list_view_item.DataContext is ApplicantForRole afr)
-                afr.IsSelected = !afr.IsSelected;
+            if (applicantsPanel.Content is EditableRoleWithApplicantsView view && list_view_item.DataContext is ApplicantForRole afr)
+            {
+                view.ShowDetailsWindow(connection, afr, Window.GetWindow(this), criterias, auditionEngine);
+                e.Handled = true;
+            }
         }
 
         private void ListView_KeyDown(object sender, KeyEventArgs e)
@@ -425,7 +432,7 @@ namespace CarmenUI.Pages
                 + "\nDo you still want to automatically cast this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return;
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.BalanceCast), "Processing...", "Balancing cast between roles"))
-                await engine.BalanceCast(applicantsInCast, selected_roles);
+                await allocationEngine.BalanceCast(applicantsInCast, selected_roles);
             await SaveChanges(false); // immediately save any automatic casting
             foreach (var role in selected_roles)
                 rootNodeView.RoleCastingChanged(role);

@@ -25,15 +25,7 @@ namespace CarmenUI.Converters
                 return null;
             var elements = new List<string>();
             if (a.Gender.HasValue && a.DateOfBirth.HasValue)
-            {
-                var g = a.Gender.Value switch
-                {
-                    Gender.Male => "M",
-                    Gender.Female => "F",
-                    _ => throw new NotImplementedException($"Gender not handled: {a.Gender}")
-                };
-                elements.Add($"{a.Age}{g}");
-            }
+                elements.Add($"{a.Age}{a.Gender.Value.ToChar()}");
             if (a.CastGroup is CastGroup cg)
                 elements.Add(cg.Abbreviation);
             if (a.CastNumber is int num)
