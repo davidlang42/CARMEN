@@ -17,6 +17,7 @@
             <cv:InvertBoolean/>
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
+        <cv:AbilityMarkFormatter x:Key="abilityMarkFormatter"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -70,15 +71,27 @@
         </Grid>
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Margin="5">
             <StackPanel>
-                <Expander IsExpanded="True" Margin="0 5">
+                <Expander IsExpanded="True">
                     <Expander.Header>
                         <TextBlock Text="Abilities" FontWeight="Bold" FontSize="14"/>
                     </Expander.Header>
-                    <StackPanel>
-
-                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding Applicant.Abilities}" KeyboardNavigation.IsTabStop="False">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel KeyboardNavigation.IsTabStop="False" ItemWidth="150"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock VerticalAlignment="Center" Margin="0 0 10 0">
+                                        <Run Text="{Binding Criteria.Name, StringFormat='\{0\}:'}" FontWeight="Bold"/>
+                                        <Run Text="{Binding Mode=OneWay, Converter={StaticResource abilityMarkFormatter}}"/>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
                 </Expander>
-                <Expander IsExpanded="True" Margin="0 5">
+                <Expander IsExpanded="True">
                     <Expander.Header>
                         <TextBlock Text="Notes" FontWeight="Bold" FontSize="14"/>
                     </Expander.Header>
