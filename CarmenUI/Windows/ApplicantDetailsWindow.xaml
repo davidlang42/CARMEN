@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:CarmenUI.Windows"
         xmlns:cv="clr-namespace:CarmenUI.Converters"
         mc:Ignorable="d" Closed="Window_Closed"
-        WindowStartupLocation="CenterOwner"
-        Height="450" Width="450">
+        WindowStartupLocation="CenterOwner" ResizeMode="CanResizeWithGrip"
+        Height="300" Width="600" Loaded="Window_Loaded">
     <Window.Resources>
         <cv:FullName x:Key="fullName"/>
         <cv:ShowIfApplicantRegisteredAndAuditioned x:Key="showIfApplicantRegisteredAndAuditioned"/>
@@ -18,9 +18,9 @@
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
     </Window.Resources>
-    <Grid Margin="5">
+    <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*" MinWidth="250"/>
             <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
@@ -28,7 +28,7 @@
             <RowDefinition Height="*"/>
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
-        <Grid>
+        <Grid Margin="5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="Auto"/>
@@ -68,14 +68,53 @@
                 </TextBlock.ToolTip>
             </TextBlock>
         </Grid>
-        <Grid Grid.Row="1">
-            <TextBlock>TODO: scroll panel</TextBlock>
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled" Margin="5">
+            <StackPanel>
+                <Expander IsExpanded="True" Margin="0 5">
+                    <Expander.Header>
+                        <TextBlock Text="Abilities" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+
+                    </StackPanel>
+                </Expander>
+                <Expander IsExpanded="True" Margin="0 5">
+                    <Expander.Header>
+                        <TextBlock Text="Notes" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+
+                    </StackPanel>
+                </Expander>
+                <Expander IsExpanded="True" Margin="0 5">
+                    <Expander.Header>
+                        <TextBlock Text="Existing Roles" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+
+                    </StackPanel>
+                </Expander>
+                <Expander IsExpanded="True" Margin="0 5">
+                    <Expander.Header>
+                        <TextBlock Text="Unavailability Reasons" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+
+                    </StackPanel>
+                </Expander>
+                <Expander IsExpanded="True" Margin="0 5">
+                    <Expander.Header>
+                        <TextBlock Text="Ineligibility Reasons" FontWeight="Bold" FontSize="14"/>
+                    </Expander.Header>
+                    <StackPanel>
+
+                    </StackPanel>
+                </Expander>
+            </StackPanel>
+        </ScrollViewer>
+        <Grid Grid.Row="2" Margin="5">
+            <TextBlock>TODO: select for this role tickbox (include suitability here)</TextBlock>
         </Grid>
-        <Grid Grid.Row="2">
-            <TextBlock>TODO: select for this role tickbox</TextBlock>
-        </Grid>
-        <Grid Grid.Column="1" Grid.RowSpan="3">
-            <TextBlock>TODO: photo</TextBlock>
-        </Grid>
+        <Image Grid.Column="1" Grid.RowSpan="3" x:Name="ImageControl"/>
     </Grid>
 </Window>

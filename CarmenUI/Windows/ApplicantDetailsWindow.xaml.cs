@@ -3,20 +3,12 @@ using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using CarmenUI.Converters;
+using CarmenUI.UserControls;
 using CarmenUI.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace CarmenUI.Windows
 {
@@ -26,22 +18,24 @@ namespace CarmenUI.Windows
     public partial class ApplicantDetailsWindow : Window
     {
         ShowConnection connection;
+        Applicant applicant;
 
         readonly CollectionViewSource criteriasViewSource;
         readonly OverallAbilityCalculator overallAbilityCalculator;
 
         public bool IsClosed { get; private set; } = false;
 
-        public ApplicantDetailsWindow(ShowConnection connection, Criteria[] criterias, IAuditionEngine audition_engine, ApplicantForRole applicant)
+        public ApplicantDetailsWindow(ShowConnection connection, Criteria[] criterias, IAuditionEngine audition_engine, ApplicantForRole applicant_for_role)
         {
-            Title = WindowTitleFor(applicant.Applicant);
             this.connection = connection;
+            this.applicant = applicant_for_role.Applicant;
+            Title = WindowTitleFor(applicant);
             InitializeComponent();
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
             criteriasViewSource.Source = criterias;
             overallAbilityCalculator = (OverallAbilityCalculator)FindResource(nameof(overallAbilityCalculator));
             overallAbilityCalculator.AuditionEngine = audition_engine;
-            this.DataContext = applicant;
+            DataContext = applicant_for_role; // must be done after setting up overallAbilityCalculator
         }
 
         private static string WindowTitleFor(Applicant a)
@@ -59,6 +53,21 @@ namespace CarmenUI.Windows
         private void Window_Closed(object sender, EventArgs e)
         {
             IsClosed = true;
+        }
+
+        private async void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (applicant.PhotoImageId is int photo_id)
+                ImageControl.Source = await ApplicantImage.CachedImage(applicant.PhotoImageId.Value, applicant.ShowRoot, LoadApplicantImage);
+            else
+                ImageControl.Source = null;
+        }
+
+        /// <summary>Loads the applicant's photo in a dedicated db context to avoid concurrency issues</summary>
+        private Image LoadApplicantImage()
+        {
+            using var context = ShowContext.Open(connection);
+            return context.Images.Single(i => i.ImageId == applicant.PhotoImageId);
         }
     }
 }
