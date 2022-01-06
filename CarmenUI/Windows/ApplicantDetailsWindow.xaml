@@ -152,7 +152,14 @@
             </StackPanel>
         </ScrollViewer>
         <Grid Grid.Row="2" Margin="5">
-            <TextBlock>TODO: select for this role tickbox (include suitability here)</TextBlock>
+            <CheckBox IsChecked="{Binding IsSelected}">
+                <TextBlock>
+                    <Run Text="Allocate"/>
+                    <Run Text="{Binding RoleName, Mode=OneWay}"/>
+                    <Run Text="to"/>
+                    <Run Text="{Binding FirstName, Mode=OneWay}"/>
+                </TextBlock>
+            </CheckBox>
         </Grid>
         <Image Grid.Column="1" Grid.RowSpan="3" x:Name="ImageControl"/>
     </Grid>
