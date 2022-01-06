@@ -17,6 +17,7 @@
             <cv:InvertBoolean/>
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
+        <cv:HideIfEmpty x:Key="hideIfEmpty"/>
         <cv:AbilityMarkFormatter x:Key="abilityMarkFormatter"/>
     </Window.Resources>
     <Grid>
@@ -95,7 +96,7 @@
                     <Expander.Header>
                         <TextBlock Text="Notes" FontStyle="Italic" FontSize="14"/>
                     </Expander.Header>
-                    <ItemsControl ItemsSource="{Binding Applicant.Notes}" IsTabStop="False">
+                    <ItemsControl ItemsSource="{Binding Applicant.Notes}" IsTabStop="False" Margin="0 0 0 5">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <StackPanel>
@@ -104,13 +105,13 @@
                                                     <Run Text="on"/>
                                                     <Run Text="{Binding Timestamp, StringFormat='{}{0:d MMM yyyy h:mmtt}'}"/>
                                     </TextBlock>
-                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="5 0 0 5"/>
+                                    <TextBlock Text="{Binding Text}" TextWrapping="Wrap" Margin="5 0 0 0"/>
                                 </StackPanel>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
                 </Expander>
-                <Expander IsExpanded="True" Margin="0 5">
+                <Expander IsExpanded="True">
                     <Expander.Header>
                         <TextBlock Text="Existing Roles" FontStyle="Italic" FontSize="14"/>
                     </Expander.Header>
@@ -118,21 +119,31 @@
 
                     </StackPanel>
                 </Expander>
-                <Expander IsExpanded="True" Margin="0 5">
+                <Expander IsExpanded="True" Visibility="{Binding UnavailabilityReasons, Converter={StaticResource hideIfEmpty}}">
                     <Expander.Header>
                         <TextBlock Text="Unavailability" FontStyle="Italic" FontSize="14"/>
                     </Expander.Header>
-                    <StackPanel>
-
-                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding UnavailabilityReasons}" IsTabStop="False" Margin="0 0 0 5">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap"
+                                           Text="{Binding Mode=OneWay, StringFormat='• \{0\}'}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Expander>
-                <Expander IsExpanded="True" Margin="0 5">
+                <Expander IsExpanded="True" Visibility="{Binding IneligibilityReasons, Converter={StaticResource hideIfEmpty}}">
                     <Expander.Header>
                         <TextBlock Text="Ineligibility" FontStyle="Italic" FontSize="14"/>
                     </Expander.Header>
-                    <StackPanel>
-
-                    </StackPanel>
+                    <ItemsControl ItemsSource="{Binding IneligibilityReasons}" IsTabStop="False" Margin="0 0 0 5">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock TextWrapping="Wrap"
+                                           Text="{Binding Mode=OneWay, StringFormat='• \{0\}'}"/>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
                 </Expander>
             </StackPanel>
         </ScrollViewer>
