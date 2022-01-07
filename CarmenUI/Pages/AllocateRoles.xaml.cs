@@ -227,8 +227,8 @@ namespace CarmenUI.Pages
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
                 RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
-                ItemNodeView item_node_view => new NodeRolesOverview(item_node_view.Item, alternativeCasts, applicantsInCast),
-                SectionNodeView section_node_view => new NodeRolesOverview(section_node_view.Section, alternativeCasts, applicantsInCast),
+                ItemNodeView item_node_view => new NodeRolesOverview(item_node_view.Item, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection),
+                SectionNodeView section_node_view => new NodeRolesOverview(section_node_view.Section, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection),
                 _ => defaultPanelContent
             };
             return true;
@@ -252,6 +252,18 @@ namespace CarmenUI.Pages
             if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
                 check_box.IsChecked = false;
             return true;
+        }
+
+        /// <summary>Callback provided to NodeRolesOverview</summary>
+        private async void SaveChangesAfterErrorCorrection(IEnumerable<Item> changed_items, IEnumerable<Role> changed_roles)
+        {
+            var current_view = (NodeRolesOverview)applicantsPanel.Content;
+            await SaveChanges(false); // immediately save any error corrections
+            foreach (var item in changed_items)
+                rootNodeView.ItemCastingChanged(item);
+            foreach (var role in changed_roles)
+                rootNodeView.RoleCastingChanged(role);
+            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection); // refresh
         }
 
         protected override void DisposeInternal()
@@ -436,7 +448,7 @@ namespace CarmenUI.Pages
             await SaveChanges(false); // immediately save any automatic casting
             foreach (var role in selected_roles)
                 rootNodeView.RoleCastingChanged(role);
-            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast);
+            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection);
         }
 
         private List<Role>? ParseSelectedRoles(IEnumerable<IncompleteRole> incomplete_roles)

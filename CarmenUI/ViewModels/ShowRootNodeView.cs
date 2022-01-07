@@ -55,5 +55,18 @@ namespace CarmenUI.ViewModels
                 }
             }
         }
+
+        /// <summary>Updates the given item node</summary>
+        public void ItemCastingChanged(Item item)
+        {
+            foreach (var node_view in Recurse())
+            {
+                if (node_view is ItemNodeView item_view && item_view.Item == item)
+                {
+                    _ = item_view.UpdateAsync(); // this is the item that changed
+                    break;
+                }
+            }
+        }
     }
 }
