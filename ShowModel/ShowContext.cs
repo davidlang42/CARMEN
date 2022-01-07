@@ -61,7 +61,7 @@ namespace Carmen.ShowModel
         /// Remember to include UsedByRoles, UsedByCastGroups, UsedByCombinedRequirements, UsedByTags, CombinedRequirement.SubRequirements, NotRequirement.SubRequirement.</summary>
         public DbSet<Requirement> Requirements => Set<Requirement>();
 
-        /// <summary>Auto includes CountByGroups, CountByGroup.CastGroup, Section.SectionType.
+        /// <summary>Auto includes CountByGroups, CountByGroup.CastGroup, Section.SectionType, Item.AllowedConsecutives, AllowedConsecutive.Cast.
         /// Remember to include Parent, InnerNode.Children, Item.Roles, ShowRoot.Logo, ShowRoot.CastNumberOrderBy.</summary>
         public DbSet<Node> Nodes => Set<Node>();
         
@@ -78,6 +78,10 @@ namespace Carmen.ShowModel
         /// <summary>Auto includes Criteria.
         /// Remember to include Applicant.</summary>
         public DbSet<Ability> Abilities => Set<Ability>();
+
+        /// <summary>Auto includes Cast.
+        /// Remember to include Items.</summary>
+        public DbSet<AllowedConsecutive> AllowedConsecutives => Set<AllowedConsecutive>();
         #endregion
 
         private ShowRoot? showRoot;
@@ -138,7 +142,7 @@ namespace Carmen.ShowModel
             await Task.Run(() => Database.Migrate()); // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
         }
 
-        public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)
+        public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)//TODO copy AllowedConsecutives
         {
             Log.Information($"{nameof(ShowContext)}.{nameof(CopyDatabase)}");
             using var destination = Open(overwrite_database);
@@ -202,6 +206,8 @@ namespace Carmen.ShowModel
                     changes |= DataObjects.Requirements;
                 else if (entry.Entity is Node)
                     changes |= DataObjects.Nodes;
+                else if (entry.Entity is AllowedConsecutive)
+                    changes |= DataObjects.AllowedConsecutives;
                 else if (entry.Entity is Role)
                     changes |= DataObjects.Roles;
                 else if (entry.Entity is SectionType)
@@ -275,8 +281,8 @@ namespace Carmen.ShowModel
             SectionTypes.Remove(section_type);
         }
 
-        /// <summary>Also deletes any child nodes under this node, any roles which are no longer in any items, and unsets the
-        /// cast allocated to those roles.</summary>
+        /// <summary>Also deletes any child nodes under this node, any allowed consecutives with less than 2 items,
+        /// and any roles which are no longer in any items (and unsets the cast allocated to those roles).</summary>
         public void DeleteNode(Node node)
         {
             if (node is ShowRoot)
@@ -290,6 +296,8 @@ namespace Carmen.ShowModel
             {
                 foreach (var role in item.Roles.ToArray())
                     RemoveRole(role, item);
+                foreach (var consecutive in item.AllowedConsecutives.ToArray())
+                    RemoveItemFromAllowedConsecutive(item, consecutive);
             }
             else
                 throw new NotImplementedException($"Node type not handled: {node.GetType().Name}");
@@ -298,6 +306,28 @@ namespace Carmen.ShowModel
             Nodes.Remove(node);
             if (node is Section section)
                 section.SectionType.Sections.Remove(section);
+        }
+
+        /// <summary>Removes the item from this allowed consecutive only, but if the allowed consecutive no longer
+        /// contains at least 2 items, this also deletes the allowed consecutive.</summary>
+        public void RemoveItemFromAllowedConsecutive(Item item, AllowedConsecutive consecutive)
+        {
+            item.AllowedConsecutives.Remove(consecutive);
+            consecutive.Items.Remove(item);
+            if (consecutive.Items.Count < 2)
+                DeleteAllowedConsecutive(consecutive);
+        }
+
+        public void DeleteAllowedConsecutive(AllowedConsecutive consecutive)
+        {
+            foreach (var applicant in consecutive.Cast.ToArray())
+            {
+                consecutive.Cast.Remove(applicant);
+                applicant.AllowedConsecutives.Remove(consecutive);
+            }
+            var entry = Entry(consecutive);
+            if (entry.State != EntityState.Detached)
+                entry.State = EntityState.Deleted;
         }
 
         /// <summary>Removes the role from this item only, but if the role is no longer in any items, this also
@@ -469,6 +499,12 @@ namespace Carmen.ShowModel
             modelBuilder.Entity<Applicant>()
                 .HasMany(a => a.Roles)
                 .WithMany(r => r.Cast);
+            modelBuilder.Entity<AllowedConsecutive>()
+                .HasMany(c => c.Items)
+                .WithMany(i => i.AllowedConsecutives);
+            modelBuilder.Entity<AllowedConsecutive>()
+                .HasMany(c => c.Cast)
+                .WithMany(a => a.AllowedConsecutives);
 
             // Add inheritance structure for requirements
             // Foreign keys are manually defined to avoid IndexOutOfRangeException being
@@ -521,6 +557,8 @@ namespace Carmen.ShowModel
             modelBuilder.Entity<Role>().Navigation(r => r.Requirements).AutoInclude();
             modelBuilder.Entity<Section>().Navigation(s => s.SectionType).AutoInclude();
             modelBuilder.Entity<SameCastSet>().Navigation(set => set.Applicants).AutoInclude();
+            modelBuilder.Entity<Item>().Navigation(i => i.AllowedConsecutives).AutoInclude();
+            modelBuilder.Entity<AllowedConsecutive>().Navigation(c => c.Cast).AutoInclude();
         }
 #if SLOW_DATABASE
         private class DelayInterceptor : DbCommandInterceptor

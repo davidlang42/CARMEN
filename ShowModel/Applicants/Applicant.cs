@@ -124,6 +124,9 @@ namespace Carmen.ShowModel.Applicants
 
         private readonly ObservableCollection<Note> notes = new();
         public virtual ICollection<Note> Notes => notes;
+
+        private readonly ObservableCollection<AllowedConsecutive> allowedConsecutives = new();
+        public virtual ICollection<AllowedConsecutive> AllowedConsecutives => allowedConsecutives;
         #endregion
 
         #region Selection & Casting properties

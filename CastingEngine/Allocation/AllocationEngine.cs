@@ -477,7 +477,7 @@ namespace Carmen.CastingEngine.Allocation
             {
                 AlreadyInItems = applicant_items.Intersect(role_items).ToArray(),
                 AlreadyInNonMultiSections = FindCommonNonMultiSections(applicant_items, role_items).ToArray(),
-                InAdjacentItems = FindAdjacentItems(applicant_items, role_items).ToArray()
+                InAdjacentItems = FindConsecutiveItems(applicant, applicant_items, role_items).ToArray()
             };
         }
 
@@ -488,7 +488,7 @@ namespace Carmen.CastingEngine.Allocation
             var role_items = role.Items.ToHashSet();
             return !applicant_items.Intersect(role_items).Any()
                 && !FindCommonNonMultiSections(applicant_items, role_items).Any()
-                && !FindAdjacentItems(applicant_items, role_items).Any();
+                && !FindConsecutiveItems(applicant, applicant_items, role_items).Any();
         }
 
         private IEnumerable<NonMultiSectionItem> FindCommonNonMultiSections(HashSet<Item> applicant_items, HashSet<Item> role_items)
@@ -507,7 +507,7 @@ namespace Carmen.CastingEngine.Allocation
         readonly FunctionCache<Item, Section[]> nonMultiSections = new(item
             => item.Parents().OfType<Section>().Where(s => !s.SectionType.AllowMultipleRoles).ToArray());
 
-        private IEnumerable<AdjacentItem> FindAdjacentItems(HashSet<Item> applicant_items, HashSet<Item> role_items)
+        private IEnumerable<AdjacentItem> FindConsecutiveItems(Applicant reference_applicant, HashSet<Item> applicant_items, HashSet<Item> role_items)
         {
             var applicant_non_consecutive_nodes = applicant_items.Select(i => highestNonConsecutiveNode[i]).OfType<InnerNode>();
             var role_non_consecutive_nodes = role_items.Select(i => highestNonConsecutiveNode[i]).OfType<InnerNode>();
@@ -516,7 +516,8 @@ namespace Carmen.CastingEngine.Allocation
             {
                 var items = ItemsInOrderFast(non_consecutive_node);
                 for (var i = 1; i < items.Length; i++)
-                    if (applicant_items.Contains(items[i - 1]) && role_items.Contains(items[i]))
+                    if (applicant_items.Contains(items[i - 1]) && role_items.Contains(items[i])
+                        && !ConsecutiveItemAllowed(items[i - 1], items[i], reference_applicant))
                         yield return new AdjacentItem
                         {
                             AlreadyInItem = items[i - 1],
@@ -524,7 +525,8 @@ namespace Carmen.CastingEngine.Allocation
                             AdjacentTo = items[i],
                             NonConsecutiveSection = non_consecutive_node
                         };
-                    else if (role_items.Contains(items[i - 1]) && applicant_items.Contains(items[i]))
+                    else if (role_items.Contains(items[i - 1]) && applicant_items.Contains(items[i])
+                        && !ConsecutiveItemAllowed(items[i - 1], items[i], reference_applicant))
                         yield return new AdjacentItem
                         {
                             AlreadyInItem = items[i],
@@ -534,6 +536,9 @@ namespace Carmen.CastingEngine.Allocation
                         };
             }
         }
+
+        private bool ConsecutiveItemAllowed(Item item1, Item item2, Applicant applicant)
+            => item1.AllowedConsecutives.Intersect(item2.AllowedConsecutives).Any(c => c.IsAllowed(applicant));
 
         readonly FunctionCache<Item, InnerNode?> highestNonConsecutiveNode = new(item
             => item.Parents().Where(n => !n.AllowConsecutiveItems).LastOrDefault());

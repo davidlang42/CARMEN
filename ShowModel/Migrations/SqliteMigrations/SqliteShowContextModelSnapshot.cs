@@ -16,6 +16,36 @@ namespace Carmen.ShowModel.Migrations.SqliteMigrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "5.0.10");
 
+            modelBuilder.Entity("AllowedConsecutiveApplicant", b =>
+                {
+                    b.Property<int>("AllowedConsecutivesAllowedConsecutiveId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("CastApplicantId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("AllowedConsecutivesAllowedConsecutiveId", "CastApplicantId");
+
+                    b.HasIndex("CastApplicantId");
+
+                    b.ToTable("AllowedConsecutiveApplicant");
+                });
+
+            modelBuilder.Entity("AllowedConsecutiveItem", b =>
+                {
+                    b.Property<int>("AllowedConsecutivesAllowedConsecutiveId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("ItemsNodeId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("AllowedConsecutivesAllowedConsecutiveId", "ItemsNodeId");
+
+                    b.HasIndex("ItemsNodeId");
+
+                    b.ToTable("AllowedConsecutiveItem");
+                });
+
             modelBuilder.Entity("ApplicantRole", b =>
                 {
                     b.Property<int>("CastApplicantId")
@@ -317,6 +347,17 @@ namespace Carmen.ShowModel.Migrations.SqliteMigrations
                     b.ToTable("Requirements");
 
                     b.HasDiscriminator<string>("Discriminator").HasValue("Requirement");
+                });
+
+            modelBuilder.Entity("Carmen.ShowModel.Structure.AllowedConsecutive", b =>
+                {
+                    b.Property<int>("AllowedConsecutiveId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("AllowedConsecutiveId");
+
+                    b.ToTable("AllowedConsecutives");
                 });
 
             modelBuilder.Entity("Carmen.ShowModel.Structure.Node", b =>
@@ -684,6 +725,36 @@ namespace Carmen.ShowModel.Migrations.SqliteMigrations
                     b.HasIndex("LogoImageId");
 
                     b.HasDiscriminator().HasValue("ShowRoot");
+                });
+
+            modelBuilder.Entity("AllowedConsecutiveApplicant", b =>
+                {
+                    b.HasOne("Carmen.ShowModel.Structure.AllowedConsecutive", null)
+                        .WithMany()
+                        .HasForeignKey("AllowedConsecutivesAllowedConsecutiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Carmen.ShowModel.Applicants.Applicant", null)
+                        .WithMany()
+                        .HasForeignKey("CastApplicantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("AllowedConsecutiveItem", b =>
+                {
+                    b.HasOne("Carmen.ShowModel.Structure.AllowedConsecutive", null)
+                        .WithMany()
+                        .HasForeignKey("AllowedConsecutivesAllowedConsecutiveId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Carmen.ShowModel.Structure.Item", null)
+                        .WithMany()
+                        .HasForeignKey("ItemsNodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("ApplicantRole", b =>

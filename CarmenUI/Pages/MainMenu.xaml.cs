@@ -135,7 +135,8 @@ namespace CarmenUI.Pages
                 || changes.HasFlag(DataObjects.CastGroups)
                 || changes.HasFlag(DataObjects.AlternativeCasts)
                 || changes.HasFlag(DataObjects.SectionTypes)
-                || changes.HasFlag(DataObjects.Applicants))
+                || changes.HasFlag(DataObjects.Applicants)
+                || changes.HasFlag(DataObjects.AllowedConsecutives))
                 summaries.AddRange(new Summary[] { ItemsSummary, RolesSummary });
             // Trigger update if required
             if (summaries.Count == 0)

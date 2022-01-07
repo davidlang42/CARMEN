@@ -514,5 +514,16 @@ namespace CarmenUI.Pages
             }
             EnableMoveButtons(node);
         }
+
+        protected override Task<bool> PreSaveChecks()
+        {
+            // remove any allowed consecutives which are no longer consecutive
+            foreach (var consecutive in context.AllowedConsecutives.Include(c => c.Items).ToArray())
+            {
+                if (!consecutive.IsValid(context.ShowRoot))
+                    context.DeleteAllowedConsecutive(consecutive);
+            }
+            return base.PreSaveChecks();
+        }
     }
 }

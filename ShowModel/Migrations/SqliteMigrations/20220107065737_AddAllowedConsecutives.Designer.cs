@@ -3,27 +3,28 @@ using System;
 using Carmen.ShowModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
-namespace Carmen.ShowModel.Migrations.MySqlMigrations
+namespace Carmen.ShowModel.Migrations.SqliteMigrations
 {
-    [DbContext(typeof(MySqlShowContext))]
-    partial class MySqlShowContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(SqliteShowContext))]
+    [Migration("20220107065737_AddAllowedConsecutives")]
+    partial class AddAllowedConsecutives
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("Relational:MaxIdentifierLength", 64)
                 .HasAnnotation("ProductVersion", "5.0.10");
 
             modelBuilder.Entity("AllowedConsecutiveApplicant", b =>
                 {
                     b.Property<int>("AllowedConsecutivesAllowedConsecutiveId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("CastApplicantId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("AllowedConsecutivesAllowedConsecutiveId", "CastApplicantId");
 
@@ -35,10 +36,10 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("AllowedConsecutiveItem", b =>
                 {
                     b.Property<int>("AllowedConsecutivesAllowedConsecutiveId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("ItemsNodeId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("AllowedConsecutivesAllowedConsecutiveId", "ItemsNodeId");
 
@@ -50,10 +51,10 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("ApplicantRole", b =>
                 {
                     b.Property<int>("CastApplicantId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("RolesRoleId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("CastApplicantId", "RolesRoleId");
 
@@ -65,10 +66,10 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("ApplicantTag", b =>
                 {
                     b.Property<int>("MembersApplicantId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("TagsTagId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("MembersApplicantId", "TagsTagId");
 
@@ -80,13 +81,13 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("Carmen.ShowModel.Applicants.Ability", b =>
                 {
                     b.Property<int>("ApplicantId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("CriteriaId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<uint>("Mark")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ApplicantId", "CriteriaId");
 
@@ -99,15 +100,14 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("AlternativeCastId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
-                    b.Property<string>("Initial")
-                        .IsRequired()
-                        .HasColumnType("varchar(1)");
+                    b.Property<char>("Initial")
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("AlternativeCastId");
 
@@ -118,43 +118,43 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("ApplicantId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("AlternativeCastId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("CastGroupId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("CastNumber")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("DateOfBirth")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ExternalData")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("FirstName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("Gender")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("LastName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("PhotoImageId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("SameCastSetId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("ShowRootNodeId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ApplicantId");
 
@@ -175,24 +175,24 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("CastGroupId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Abbreviation")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("AlternateCasts")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<uint?>("RequiredCount")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("CastGroupId");
 
@@ -203,21 +203,21 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("NoteId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("ApplicantId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Author")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Text")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Timestamp")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("NoteId");
 
@@ -230,7 +230,7 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("SameCastSetId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("SameCastSetId");
 
@@ -241,17 +241,17 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("TagId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Description")
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("IconImageId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("TagId");
 
@@ -264,30 +264,30 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("CriteriaId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<uint>("MaxMark")
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("Primary")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("Required")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<double>("Weight")
-                        .HasColumnType("double");
+                        .HasColumnType("REAL");
 
                     b.HasKey("CriteriaId");
 
@@ -300,15 +300,15 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("ImageId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<byte[]>("ImageData")
                         .IsRequired()
-                        .HasColumnType("longblob");
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("ImageId");
 
@@ -319,30 +319,30 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("RequirementId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<double>("OverallWeight")
-                        .HasColumnType("double");
+                        .HasColumnType("REAL");
 
                     b.Property<bool>("Primary")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Reason")
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<double>("SuitabilityWeight")
-                        .HasColumnType("double");
+                        .HasColumnType("REAL");
 
                     b.HasKey("RequirementId");
 
@@ -355,7 +355,7 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("AllowedConsecutiveId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("AllowedConsecutiveId");
 
@@ -366,21 +366,21 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("NodeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Discriminator")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("Order")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("ParentNodeId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("NodeId");
 
@@ -395,11 +395,11 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("RoleId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("RoleId");
 
@@ -410,20 +410,20 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                 {
                     b.Property<int>("SectionTypeId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("AllowConsecutiveItems")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("AllowMultipleRoles")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("AllowNoRoles")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("SectionTypeId");
 
@@ -433,10 +433,10 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("CastGroupRequirement", b =>
                 {
                     b.Property<int>("RequirementsRequirementId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("UsedByCastGroupsCastGroupId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("RequirementsRequirementId", "UsedByCastGroupsCastGroupId");
 
@@ -448,10 +448,10 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("CombinedRequirementRequirement", b =>
                 {
                     b.Property<int>("SubRequirementsRequirementId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("UsedByCombinedRequirementsRequirementId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("SubRequirementsRequirementId", "UsedByCombinedRequirementsRequirementId");
 
@@ -463,10 +463,10 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("ItemRole", b =>
                 {
                     b.Property<int>("ItemsNodeId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("RolesRoleId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("ItemsNodeId", "RolesRoleId");
 
@@ -478,10 +478,10 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("RequirementRole", b =>
                 {
                     b.Property<int>("RequirementsRequirementId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("UsedByRolesRoleId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("RequirementsRequirementId", "UsedByRolesRoleId");
 
@@ -493,10 +493,10 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
             modelBuilder.Entity("RequirementTag", b =>
                 {
                     b.Property<int>("RequirementsRequirementId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("UsedByTagsTagId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("RequirementsRequirementId", "UsedByTagsTagId");
 
@@ -525,7 +525,7 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
 
                     b.Property<string>("Options")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.HasDiscriminator().HasValue("SelectCriteria");
                 });
@@ -536,17 +536,17 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
 
                     b.Property<int>("CriteriaId")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("CriteriaId");
 
                     b.Property<double>("ExistingRoleCost")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("double")
+                        .HasColumnType("REAL")
                         .HasColumnName("ExistingRoleCost");
 
                     b.Property<uint>("RequiredValue")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("INTEGER");
 
                     b.HasIndex("CriteriaId");
 
@@ -559,24 +559,24 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
 
                     b.Property<int>("CriteriaId")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("int")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("CriteriaId");
 
                     b.Property<double>("ExistingRoleCost")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("double")
+                        .HasColumnType("REAL")
                         .HasColumnName("ExistingRoleCost");
 
                     b.Property<uint?>("Maximum")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("INTEGER");
 
                     b.Property<uint?>("Minimum")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("ScaleSuitability")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.HasIndex("CriteriaId");
 
@@ -589,11 +589,11 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
 
                     b.Property<uint?>("Maximum")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("INTEGER");
 
                     b.Property<uint?>("Minimum")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("INTEGER");
 
                     b.HasDiscriminator().HasValue("AgeRequirement");
                 });
@@ -611,7 +611,7 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
 
                     b.Property<uint>("RequiredValue")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("int unsigned");
+                        .HasColumnType("INTEGER");
 
                     b.HasDiscriminator().HasValue("GenderRequirement");
                 });
@@ -621,7 +621,7 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                     b.HasBaseType("Carmen.ShowModel.Requirements.Requirement");
 
                     b.Property<int>("SubRequirementId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasIndex("SubRequirementId");
 
@@ -633,7 +633,7 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                     b.HasBaseType("Carmen.ShowModel.Requirements.Requirement");
 
                     b.Property<int>("RequiredTagId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasIndex("RequiredTagId");
 
@@ -660,7 +660,7 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
 
                     b.Property<bool>("AverageSuitability")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("AverageSuitability");
 
                     b.HasDiscriminator().HasValue("AndRequirement");
@@ -672,7 +672,7 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
 
                     b.Property<bool>("AverageSuitability")
                         .ValueGeneratedOnUpdateSometimes()
-                        .HasColumnType("tinyint(1)")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("AverageSuitability");
 
                     b.HasDiscriminator().HasValue("OrRequirement");
@@ -690,7 +690,7 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                     b.HasBaseType("Carmen.ShowModel.Structure.InnerNode");
 
                     b.Property<int>("SectionTypeId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasIndex("SectionTypeId");
 
@@ -702,25 +702,25 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                     b.HasBaseType("Carmen.ShowModel.Structure.InnerNode");
 
                     b.Property<bool>("AllowConsecutiveItems")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int?>("CastNumberOrderByCriteriaId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<int>("CastNumberOrderDirection")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<double?>("CommonOverallWeight")
-                        .HasColumnType("double");
+                        .HasColumnType("REAL");
 
                     b.Property<int?>("LogoImageId")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("ShowDate")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("WeightExistingRoleCosts")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.HasIndex("CastNumberOrderByCriteriaId");
 
@@ -861,13 +861,13 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                     b.OwnsMany("Carmen.ShowModel.Structure.CountByGroup", "CountByGroups", b1 =>
                         {
                             b1.Property<int>("TagId")
-                                .HasColumnType("int");
+                                .HasColumnType("INTEGER");
 
                             b1.Property<int>("CastGroupId")
-                                .HasColumnType("int");
+                                .HasColumnType("INTEGER");
 
                             b1.Property<uint>("Count")
-                                .HasColumnType("int unsigned");
+                                .HasColumnType("INTEGER");
 
                             b1.HasKey("TagId", "CastGroupId");
 
@@ -901,13 +901,13 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                     b.OwnsMany("Carmen.ShowModel.Structure.CountByGroup", "CountByGroups", b1 =>
                         {
                             b1.Property<int>("NodeId")
-                                .HasColumnType("int");
+                                .HasColumnType("INTEGER");
 
                             b1.Property<int>("CastGroupId")
-                                .HasColumnType("int");
+                                .HasColumnType("INTEGER");
 
                             b1.Property<uint>("Count")
-                                .HasColumnType("int unsigned");
+                                .HasColumnType("INTEGER");
 
                             b1.HasKey("NodeId", "CastGroupId");
 
@@ -937,13 +937,13 @@ namespace Carmen.ShowModel.Migrations.MySqlMigrations
                     b.OwnsMany("Carmen.ShowModel.Structure.CountByGroup", "CountByGroups", b1 =>
                         {
                             b1.Property<int>("RoleId")
-                                .HasColumnType("int");
+                                .HasColumnType("INTEGER");
 
                             b1.Property<int>("CastGroupId")
-                                .HasColumnType("int");
+                                .HasColumnType("INTEGER");
 
                             b1.Property<uint>("Count")
-                                .HasColumnType("int unsigned");
+                                .HasColumnType("INTEGER");
 
                             b1.HasKey("RoleId", "CastGroupId");
 

@@ -81,6 +81,9 @@ namespace Carmen.ShowModel.Structure
                 var cast_in_consecutive_items = previous_item_cast.Intersect(item_cast).ToHashSet();
                 // if anyone legitimately cast in a role which is common to both items is ALSO in either item as another role, then they count as consecutive item cast too
                 cast_in_consecutive_items.AddRange(legitimate_consecutive_cast.Where(a => previous_item_cast.Contains(a) || item_cast.Contains(a)));
+                // remove any allowed consecutive cast
+                var allowed_consecutives = items[i - 1].AllowedConsecutives.Intersect(items[i].AllowedConsecutives).ToArray();
+                cast_in_consecutive_items.RemoveWhere(a => allowed_consecutives.Any(c => c.IsAllowed(a)));
                 // report result
                 if (cast_in_consecutive_items.Count != 0)
                 {

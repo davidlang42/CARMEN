@@ -16,6 +16,9 @@ namespace Carmen.ShowModel.Structure
         private readonly ObservableCollection<Role> roles = new();
         public virtual ICollection<Role> Roles => roles;
 
+        private readonly ObservableCollection<AllowedConsecutive> allowedConsecutives = new();
+        public virtual ICollection<AllowedConsecutive> AllowedConsecutives => allowedConsecutives;
+
         public Item()
         {
             roles.CollectionChanged += Roles_CollectionChanged;
@@ -113,6 +116,8 @@ namespace Carmen.ShowModel.Structure
                     .Where(r => !item_roles.Contains(r)) // a role is allowed to be in 2 consecutive items
                     .SelectMany(r => r.Cast).ToHashSet();
                 next_cast.IntersectWith(item_cast); // result in next_cast
+                var allowed_consecutives = AllowedConsecutives.Intersect(next.AllowedConsecutives).ToArray();
+                next_cast.RemoveWhere(a => allowed_consecutives.Any(c => c.IsAllowed(a)));
                 if (next_cast.Any())
                     yield return new ConsecutiveItemCast { Cast = next_cast, Item1 = this, Item2 = next };
             }

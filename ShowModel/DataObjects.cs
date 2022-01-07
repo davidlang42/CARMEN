@@ -27,6 +27,7 @@ namespace Carmen.ShowModel
         Roles = 1024,
         Abilities = 2048,
         Notes = 4096,
-        All = 8191
+        AllowedConsecutives = 8192,
+        All = 16383
     }
 }

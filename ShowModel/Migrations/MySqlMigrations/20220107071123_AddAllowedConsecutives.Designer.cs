@@ -3,14 +3,16 @@ using System;
 using Carmen.ShowModel;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Carmen.ShowModel.Migrations.MySqlMigrations
 {
     [DbContext(typeof(MySqlShowContext))]
-    partial class MySqlShowContextModelSnapshot : ModelSnapshot
+    [Migration("20220107071123_AddAllowedConsecutives")]
+    partial class AddAllowedConsecutives
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
