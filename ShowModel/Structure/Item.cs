@@ -107,6 +107,8 @@ namespace Carmen.ShowModel.Structure
                     .Where(r => !item_roles.Contains(r)) // a role is allowed to be in 2 consecutive items
                     .SelectMany(r => r.Cast).ToHashSet();
                 previous_cast.IntersectWith(item_cast); // result in previous_cast
+                var allowed_consecutives = AllowedConsecutives.Intersect(previous.AllowedConsecutives).ToArray();
+                previous_cast.RemoveWhere(a => allowed_consecutives.Any(c => c.IsAllowed(a)));
                 if (previous_cast.Any())
                     yield return new ConsecutiveItemCast { Cast = previous_cast, Item1 = previous, Item2 = this };
             }
