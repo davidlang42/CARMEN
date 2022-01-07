@@ -4,6 +4,7 @@ using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
+using CarmenUI.Converters;
 using CarmenUI.Windows;
 using System;
 using System.Collections.Generic;
@@ -54,12 +55,19 @@ namespace CarmenUI.ViewModels
             };
         }
 
-        public void ConfigureSorting()
+        public void ConfigureSorting(string sort_by = nameof(ApplicantForRole.Suitability), ListSortDirection direction = ListSortDirection.Descending)
         {
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
+            view.SortDescriptions.Clear();
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.CastGroup)}.{nameof(CastGroup.Order)}", ListSortDirection.Ascending));
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Cast)}.{nameof(AlternativeCast.Initial)}", ListSortDirection.Ascending));
-            view.SortDescriptions.Add(new(nameof(ApplicantForRole.Suitability), ListSortDirection.Descending));
+            if (sort_by == "CastNumberAndCast")
+                view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.Applicant)}.{nameof(Applicant.CastNumber)}", direction));
+            else if (sort_by == "Name")
+                foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions(direction))
+                    view.SortDescriptions.Add(sd);
+            else
+                view.SortDescriptions.Add(new(sort_by, direction));
         }
 
         public void ClearSelectedApplicants()

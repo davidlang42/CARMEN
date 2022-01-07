@@ -500,53 +500,20 @@ namespace CarmenUI.Pages
         ListSortDirection lastDirection = ListSortDirection.Ascending;
         private void GridViewColumnHeader_Clicked(object sender, RoutedEventArgs e)
         {
-            var list_view = (ListView)sender;
-            ListSortDirection direction;
-
             if (e.OriginalSource is GridViewColumnHeader header && header.Role != GridViewColumnHeaderRole.Padding)
             {
-                if (header != lastHeaderClicked)
-                {
+                ListSortDirection direction;
+                if (header != lastHeaderClicked || lastDirection == ListSortDirection.Ascending)
+                    direction = ListSortDirection.Descending;
+                else
                     direction = ListSortDirection.Ascending;
-                }
-                else
-                {
-                    if (lastDirection == ListSortDirection.Ascending)
-                    {
-                        direction = ListSortDirection.Descending;
-                    }
-                    else
-                    {
-                        direction = ListSortDirection.Ascending;
-                    }
-                }
 
-                var columnBinding = header.Column.DisplayMemberBinding as Binding;
-                var sortBy = columnBinding?.Path.Path ?? header.Column.Header as string;
+                var column_binding = header.Column.DisplayMemberBinding as Binding;
+                var sort_by = column_binding?.Path.Path ?? (string)header.Column.Header;
 
-                ICollectionView dataView = CollectionViewSource.GetDefaultView(list_view.ItemsSource);
-
-                dataView.SortDescriptions.Clear();
-                SortDescription sd = new SortDescription(sortBy, direction);
-                dataView.SortDescriptions.Add(sd);
-                dataView.Refresh();
-
-                if (direction == ListSortDirection.Ascending)
-                {
-                    header.Column.HeaderTemplate =
-                        Resources["HeaderTemplateArrowUp"] as DataTemplate;
-                }
-                else
-                {
-                    header.Column.HeaderTemplate =
-                        Resources["HeaderTemplateArrowDown"] as DataTemplate;
-                }
-
-                // Remove arrow from previously sorted header
-                if (lastHeaderClicked != null && lastHeaderClicked != header)
-                {
-                    lastHeaderClicked.Column.HeaderTemplate = null;
-                }
+                var list_view = (ListView)sender;
+                var view_model = (EditableRoleWithApplicantsView)list_view.DataContext;
+                view_model.ConfigureSorting(sort_by, direction);
 
                 lastHeaderClicked = header;
                 lastDirection = direction;

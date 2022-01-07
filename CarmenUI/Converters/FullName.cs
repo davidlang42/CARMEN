@@ -75,10 +75,7 @@ namespace CarmenUI.Converters
 
     public static class FullNameFormatExtensions
     {
-        private static readonly SortDescription sortByFirstName = new(nameof(Applicant.FirstName), ListSortDirection.Ascending);
-        private static readonly SortDescription sortByLastName = new(nameof(Applicant.LastName), ListSortDirection.Ascending);
-
-        public static IEnumerable<SortDescription> ToSortDescriptions(this FullNameFormat format)
+        public static IEnumerable<SortDescription> ToSortDescriptions(this FullNameFormat format, ListSortDirection direction = ListSortDirection.Ascending)
         {
             switch (format)
             {
@@ -87,11 +84,11 @@ namespace CarmenUI.Converters
                 case FullNameFormat.FirstInitialDot:
                 case FullNameFormat.Initials:
                 case FullNameFormat.InitialsDots:
-                    return new[] { sortByFirstName, sortByLastName };
+                    return new SortDescription[] { new(nameof(Applicant.FirstName), direction), new(nameof(Applicant.LastName), direction) };
                 case FullNameFormat.LastCommaFirst:
                 case FullNameFormat.LastCommaInitialDot:
                 case FullNameFormat.InitialDotCommaFirst:
-                    return new[] { sortByLastName, sortByFirstName };
+                    return new SortDescription[] { new(nameof(Applicant.LastName), direction), new(nameof(Applicant.FirstName), direction) };
                 default:
                     throw new NotImplementedException($"Enum not handled: {format}");
             }
