@@ -36,7 +36,7 @@ namespace Carmen.ShowModel.Structure
                 string s;
                 if (Cast.Count == 0)
                     s = "All applicants are";
-                if (Cast.Count == 1)
+                else if (Cast.Count == 1)
                     s = $"{Cast.First().FirstName} {Cast.First().LastName} is";
                 else if (Cast.Count <= 3)
                     s = string.Join(", ", Cast.Select(a => $"{a.FirstName} {a.LastName}")) + " are";

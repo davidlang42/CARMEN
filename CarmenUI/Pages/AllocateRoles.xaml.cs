@@ -484,5 +484,13 @@ namespace CarmenUI.Pages
                 e.Handled = true;
             }
         }
+
+        private void RemoveAllowedConsecutiveCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            var consecutive = (AllowedConsecutive)e.Parameter;
+            var changed_items = consecutive.Items.ToArray();
+            context.DeleteAllowedConsecutive(consecutive);
+            SaveChangesAfterErrorCorrection(changed_items, Enumerable.Empty<Role>());
+        }
     }
 }

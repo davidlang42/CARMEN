@@ -28,7 +28,11 @@
         <cv:BytesToImage x:Key="bytesToImage"/>
         <cv:FallbackValues x:Key="fallbackValues"/>
         <cv:HideIfEmpty x:Key="hideIfEmpty"/>
+        <RoutedUICommand x:Key="removeAllowedConsecutiveCommand"/>
     </Page.Resources>
+    <Page.CommandBindings>
+        <CommandBinding Command="{StaticResource removeAllowedConsecutiveCommand}" Executed="RemoveAllowedConsecutiveCommand_Executed"/>
+    </Page.CommandBindings>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="450"/>
@@ -155,6 +159,19 @@
                                  FontSize="14" MaxHeight="250"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding AllowedConsecutives}">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListBoxItem}">
+                                        <Setter Property="ContextMenu">
+                                            <Setter.Value>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Remove this allowed consecutive item"
+                                                              Command="{Binding Source={StaticResource removeAllowedConsecutiveCommand}}"
+                                                              CommandParameter="{Binding}"/>
+                                                </ContextMenu>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
                                 <ListBox.ItemTemplate>
                                     <DataTemplate>
                                         <TextBlock Text="{Binding Description}" FontSize="14" TextWrapping="Wrap"/>

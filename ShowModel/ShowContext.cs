@@ -330,6 +330,7 @@ namespace Carmen.ShowModel
             var entry = Entry(consecutive);
             if (entry.State != EntityState.Detached)
                 entry.State = EntityState.Deleted;
+            AllowedConsecutives.Remove(consecutive);
         }
 
         /// <summary>Removes the role from this item only, but if the role is no longer in any items, this also
@@ -343,6 +344,7 @@ namespace Carmen.ShowModel
                 var entry = Entry(role);
                 if (entry.State != EntityState.Detached)
                     entry.State = EntityState.Deleted;
+                Roles.Remove(role);
             }
         }
 
