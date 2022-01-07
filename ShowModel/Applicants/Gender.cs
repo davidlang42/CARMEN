@@ -17,5 +17,5 @@ namespace Carmen.ShowModel.Applicants
                 Gender.Female => 'F',
                 _ => throw new NotImplementedException($"Gender not handled: {gender}")
             };
-}
+    }
 }
