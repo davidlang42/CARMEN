@@ -74,6 +74,7 @@
                     <ContextMenu>
                         <MenuItem Header="Expand all" Click="ExpandAll_Click"/>
                         <MenuItem Header="Collapse all" Click="CollapseAll_Click"/>
+                        <MenuItem Header="Update all" Click="UpdateAll_Click"/>
                     </ContextMenu>
                 </TreeView.ContextMenu>
             </TreeView>

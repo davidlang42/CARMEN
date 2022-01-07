@@ -359,6 +359,9 @@ namespace CarmenUI.Pages
         private void CollapseAll_Click(object sender, RoutedEventArgs e)
             => rootNodeView.CollapseAll();
 
+        private async void UpdateAll_Click(object sender, RoutedEventArgs e)
+            => await rootNodeView.UpdateAllAsync();
+
         private void showCompleted_Checked(object sender, RoutedEventArgs e)
             => rootNodeView.SetShowCompleted(true);
 
