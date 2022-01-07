@@ -425,6 +425,7 @@
                             </Grid.ColumnDefinitions>
                             <ListView Grid.ColumnSpan="2" Initialized="ListView_Initialized" ItemsSource="{Binding Applicants}"
                                       KeyDown="ListView_KeyDown" PreviewKeyDown="ListView_PreviewKeyDown"
+                                      GridViewColumnHeader.Click="GridViewColumnHeader_Clicked"
                                       x:Name="EditableApplicantsListView">
                                 <ListView.ItemContainerStyle>
                                     <Style TargetType="{x:Type ListViewItem}">

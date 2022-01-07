@@ -495,5 +495,62 @@ namespace CarmenUI.Pages
             context.DeleteAllowedConsecutive(consecutive);
             SaveChangesAfterErrorCorrection(changed_items, Enumerable.Empty<Role>());
         }
+
+        GridViewColumnHeader? lastHeaderClicked = null;
+        ListSortDirection lastDirection = ListSortDirection.Ascending;
+        private void GridViewColumnHeader_Clicked(object sender, RoutedEventArgs e)
+        {
+            var list_view = (ListView)sender;
+            ListSortDirection direction;
+
+            if (e.OriginalSource is GridViewColumnHeader header && header.Role != GridViewColumnHeaderRole.Padding)
+            {
+                if (header != lastHeaderClicked)
+                {
+                    direction = ListSortDirection.Ascending;
+                }
+                else
+                {
+                    if (lastDirection == ListSortDirection.Ascending)
+                    {
+                        direction = ListSortDirection.Descending;
+                    }
+                    else
+                    {
+                        direction = ListSortDirection.Ascending;
+                    }
+                }
+
+                var columnBinding = header.Column.DisplayMemberBinding as Binding;
+                var sortBy = columnBinding?.Path.Path ?? header.Column.Header as string;
+
+                ICollectionView dataView = CollectionViewSource.GetDefaultView(list_view.ItemsSource);
+
+                dataView.SortDescriptions.Clear();
+                SortDescription sd = new SortDescription(sortBy, direction);
+                dataView.SortDescriptions.Add(sd);
+                dataView.Refresh();
+
+                if (direction == ListSortDirection.Ascending)
+                {
+                    header.Column.HeaderTemplate =
+                        Resources["HeaderTemplateArrowUp"] as DataTemplate;
+                }
+                else
+                {
+                    header.Column.HeaderTemplate =
+                        Resources["HeaderTemplateArrowDown"] as DataTemplate;
+                }
+
+                // Remove arrow from previously sorted header
+                if (lastHeaderClicked != null && lastHeaderClicked != header)
+                {
+                    lastHeaderClicked.Column.HeaderTemplate = null;
+                }
+
+                lastHeaderClicked = header;
+                lastDirection = direction;
+            }
+        }
     }
 }
