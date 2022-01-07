@@ -37,7 +37,7 @@ namespace Carmen.ShowModel.Reporting
                 else
                     throw new ApplicationException($"Type not handled: {criteria.GetType().Name}");
             yield return new Column<Applicant>("Overall Ability", a => OverallAbility(a, criterias));
-            yield return new Column<Applicant>("Notes", a => a.Notes);
+            yield return new Column<Applicant>("Notes", a => string.Join("\n", a.Notes.Select(n => $"{n.Author} [{n.Timestamp:g}]: {n.Text}")));
             yield return new Column<Applicant>("External Data", a => a.ExternalData);
             yield return new Column<Applicant>("Cast Group", a => a.CastGroup?.Name);
             yield return new Column<Applicant>("Cast Number", a => a.CastNumber);
