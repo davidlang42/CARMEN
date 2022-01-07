@@ -131,10 +131,16 @@
                         <ListBox Grid.Row="2" Grid.Column="3"
                                  Margin="0 0 0 10"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                 ItemsSource="{Binding ValidationErrors}">
+                                 ItemsSource="{Binding CastingErrors}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
+                                    <Setter Property="ContextMenu" Value="{Binding ContextMenu}"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <TextBlock Text="{Binding}" FontSize="14" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding Message}" FontSize="14" TextWrapping="Wrap"/>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>

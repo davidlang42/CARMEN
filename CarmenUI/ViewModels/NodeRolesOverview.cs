@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace CarmenUI.ViewModels
 {
@@ -16,7 +17,7 @@ namespace CarmenUI.ViewModels
         public Node Node { get; init; }
 
         public ObservableCollection<IncompleteRole> IncompleteRoles { get; init; } = new();
-        public ObservableCollection<string> ValidationErrors { get; init; } = new();
+        public ObservableCollection<CastingError> CastingErrors { get; init; } = new();
 
         public NodeRolesOverview(Node node, AlternativeCast[] alternative_casts, IEnumerable<Applicant> cast_members)
         {
@@ -30,23 +31,31 @@ namespace CarmenUI.ViewModels
                 if (!section.CastingMeetsSectionTypeRules(cast_members, out var no_roles, out var multi_roles))
                 {
                     foreach (var applicant in no_roles)
-                        ValidationErrors.Add($"{FullName.Format(applicant)} has no role in {section.Name}");
+                        CastingErrors.Add(new CastingError($"{FullName.Format(applicant)} has no role in {section.Name}"));
                     foreach (var applicant in multi_roles)
-                        ValidationErrors.Add($"{FullName.Format(applicant.Key)} has {applicant.Value} roles in {section.Name}");
+                        CastingErrors.Add(new CastingError($"{FullName.Format(applicant.Key)} has {applicant.Value} roles in {section.Name}"));
                 }
                 if (!section.VerifyConsecutiveItems(out var section_failures))
                     foreach (var failure in section_failures)
-                        ValidationErrors.Add($"{failure.Cast.Count.Plural("Applicant is", "Applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}");
+                        CastingErrors.Add(new CastingError($"{failure.Cast.Count.Plural("applicant is", "applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}", right_click: new()
+                        {
+                            { $"Allow {(failure.Cast.Count == 1 ? "this" : "these")} consecutive cast only", () => MessageBox.Show("test these") },//TODO real action
+                            { "Allow all consecutive cast between these items", () => MessageBox.Show("test all") }//TODO real action
+                        }));
             }
             else if (node is Item item)
             {
                 // check for cast with multiple roles in this item
                 foreach (var applicant in item.FindDuplicateCast())
-                    ValidationErrors.Add($"{FullName.Format(applicant.Key)} has {applicant.Value} roles in {item.Name}");
+                    CastingErrors.Add(new CastingError($"{FullName.Format(applicant.Key)} has {applicant.Value} roles in {item.Name}"));
                 // show showroot (and section) consecutive item errors in the item, because showroot isn't visible
                 foreach (var consecutive_cast in item.FindConsecutiveCast())
                     foreach (var cast in consecutive_cast.Cast)
-                        ValidationErrors.Add($"{cast.FirstName} {cast.LastName} is cast in {consecutive_cast.Item1.Name} and {consecutive_cast.Item2.Name}");
+                        CastingErrors.Add(new CastingError($"{FullName.Format(cast)} is cast in {consecutive_cast.Item1.Name} and {consecutive_cast.Item2.Name}", right_click: new()
+                        {
+                            { "Allow this consecutive cast only", () => MessageBox.Show("test these") },//TODO real action
+                            { "Allow all consecutive cast between these items", () => MessageBox.Show("test all") }//TODO real action
+                        }));
             }
         }
 

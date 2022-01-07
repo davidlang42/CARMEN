@@ -462,5 +462,15 @@ namespace CarmenUI.Pages
             }
             return selected_roles;
         }
+
+        private void ListBoxItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var list_box_item = (ListBoxItem)sender;
+            if (list_box_item.DataContext is CastingError casting_error)
+            {
+                casting_error.DoubleClick?.Invoke();
+                e.Handled = true;
+            }
+        }
     }
 }
