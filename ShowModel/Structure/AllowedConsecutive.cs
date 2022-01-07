@@ -16,8 +16,6 @@ namespace Carmen.ShowModel.Structure
     /// </summary>
     public class AllowedConsecutive
     {
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         [Key]
         public int AllowedConsecutiveId { get; private set; }
 
@@ -30,6 +28,30 @@ namespace Carmen.ShowModel.Structure
         /// <summary>A whitelist of applicants which are allowed to be consecutively cast between the given items.
         /// If empty, any applicants may be consecutively cast between the given items.</summary>
         public virtual ICollection<Applicant> Cast => cast;
+
+        public string Description
+        {
+            get
+            {
+                string s;
+                if (Cast.Count == 0)
+                    s = "All applicants are";
+                if (Cast.Count == 1)
+                    s = $"{Cast.First().FirstName} {Cast.First().LastName} is";
+                else if (Cast.Count <= 3)
+                    s = string.Join(", ", Cast.Select(a => $"{a.FirstName} {a.LastName}")) + " are";
+                else if (Cast.Count <= 6)
+                    s = string.Join(", ", Cast.Select(a => $"{a.FirstName} {a.LastName.Initial()}")) + " are";
+                else
+                    s = string.Join(", ", Cast.Select(a => $"{a.FirstName.Initial()}{a.LastName.Initial()}")) + " are";
+                s += " allowed to be cast in ";
+                if (Items.Count == 2)
+                    s += string.Join(" and ", Items.Select(i => i.Name));
+                else
+                    s += string.Join(", ", Items.Select(i => i.Name));
+                return s;
+            }
+        }
 
         public bool IsAllowed(Applicant applicant)
             => Cast.Count == 0 || Cast.Contains(applicant);

@@ -27,6 +27,7 @@
         </cv:MultiConverter>
         <cv:BytesToImage x:Key="bytesToImage"/>
         <cv:FallbackValues x:Key="fallbackValues"/>
+        <cv:HideIfEmpty x:Key="hideIfEmpty"/>
     </Page.Resources>
     <Grid Margin="5">
         <Grid.ColumnDefinitions>
@@ -101,6 +102,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="2*"/>
@@ -111,7 +113,7 @@
                         <TextBlock Grid.Row="1" Text="Roles not cast:" FontSize="18"/>
                         <TextBlock Grid.Row="1" Grid.Column="3" Text="Errors:" FontSize="18"/>
                         <ListBox Grid.Row="2" x:Name="incompleteRolesList"
-                                 FontSize="14" Margin="0 0 0 10"
+                                 FontSize="14"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding IncompleteRoles}">
                             <ListBox.ItemContainerStyle>
@@ -129,7 +131,6 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                         <ListBox Grid.Row="2" Grid.Column="3"
-                                 Margin="0 0 0 10"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding CastingErrors}">
                             <ListBox.ItemContainerStyle>
@@ -144,7 +145,24 @@
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
                         </ListBox>
-                        <Grid Grid.Row="3" Grid.ColumnSpan="3">
+                        <Grid Grid.Row="3" Grid.ColumnSpan="3" Visibility="{Binding AllowedConsecutives, Converter={StaticResource hideIfEmpty}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Allowed in consecutive items:" FontSize="18"/>
+                            <ListBox Grid.Row="1"
+                                 FontSize="14" MaxHeight="250"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding AllowedConsecutives}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Description}" FontSize="14" TextWrapping="Wrap"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                        <Grid Grid.Row="4" Grid.ColumnSpan="3" Margin="0 10 0 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>

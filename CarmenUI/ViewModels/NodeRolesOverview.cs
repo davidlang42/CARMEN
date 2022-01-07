@@ -20,6 +20,7 @@ namespace CarmenUI.ViewModels
 
         public ObservableCollection<IncompleteRole> IncompleteRoles { get; }
         public ObservableCollection<CastingError> CastingErrors { get; }
+        public ObservableCollection<AllowedConsecutive> AllowedConsecutives { get; }
 
         /// <summary>Node should be an Item or Section, NOT ShowRoot</summary>
         public NodeRolesOverview(Node node, AlternativeCast[] alternative_casts, IEnumerable<Applicant> cast_members, Action<IEnumerable<Item>, IEnumerable<Role>> callback_after_error_correction)
@@ -33,6 +34,7 @@ namespace CarmenUI.ViewModels
                 CastingErrors = FindItemCastingErrors(item).ToObservableCollection();
             else
                 throw new NotImplementedException($"Node type {node.GetType().Name} not handled.");
+            AllowedConsecutives = node.ItemsInOrder().SelectMany(i => i.AllowedConsecutives).Distinct().ToObservableCollection();
         }
 
         private static IEnumerable<IncompleteRole> FindIncompleteRoles(Node node, AlternativeCast[] alternative_casts)
