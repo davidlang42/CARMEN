@@ -142,7 +142,7 @@ namespace Carmen.ShowModel
             await Task.Run(() => Database.Migrate()); // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
         }
 
-        public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)//TODO copy AllowedConsecutives
+        public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)
         {
             Log.Information($"{nameof(ShowContext)}.{nameof(CopyDatabase)}");
             using var destination = Open(overwrite_database);
@@ -174,6 +174,8 @@ namespace Carmen.ShowModel
             destination.AddRange(await SectionTypes.ToArrayAsync());
             progress_callback?.Invoke(nameof(Nodes), "Nodes");
             destination.AddRange(await Nodes.ToArrayAsync());
+            progress_callback?.Invoke(nameof(AllowedConsecutives), "AllowedConsecutives");
+            destination.AddRange(await AllowedConsecutives.ToArrayAsync());
             progress_callback?.Invoke(nameof(Roles) + nameof(Role.Items), "Roles");
             destination.AddRange(await Roles.Include(r => r.Items).ToArrayAsync());
             progress_callback?.Invoke(nameof(SaveChanges), "Saving");
