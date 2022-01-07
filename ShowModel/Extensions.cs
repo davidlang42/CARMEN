@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -197,6 +198,9 @@ namespace Carmen.ShowModel
                 yield return item;
             }
         }
+
+        public static ObservableCollection<T> ToObservableCollection<T>(this IEnumerable<T> enumerable)
+            => new ObservableCollection<T>(enumerable);
     }
 
     public static class AsyncExtensions
