@@ -142,6 +142,8 @@ namespace CarmenUI.Windows
             MainData.Items.SortDescriptions.Clear();
             if (Report.GroupColumn != null)
                 MainData.Items.SortDescriptions.Add(new($"[{Report.IndexOf(Report.GroupColumn)}]", ListSortDirection.Ascending));
+            foreach (var column in MainData.Columns)
+                column.SortDirection = null;
             foreach (var sort_column in Report.SortColumns)
             {
                 var grid_column = MainData.Columns[sort_column.ColumnIndex];
@@ -248,6 +250,7 @@ namespace CarmenUI.Windows
         private void ClearSorting_Click(object sender, RoutedEventArgs e)
         {
             Report.SortColumns.Clear();
+            ConfigureSorting();
         }
 
         private async void ReportTypeCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
