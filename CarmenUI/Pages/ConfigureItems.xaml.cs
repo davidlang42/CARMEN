@@ -88,6 +88,8 @@ namespace CarmenUI.Pages
                     await context.Nodes.LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles), "Items"))
                     await context.Nodes.OfType<Item>().Include(i => i.Roles).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Items), "Roles"))
+                    await context.Roles.Include(r => r.Items).LoadAsync();
                 using (loading.Segment(nameof(ConfigureItems) + nameof(rootNodesViewSource), "Sorting"))
                 {
                     rootNodesViewSource.Source = context.Nodes.Local.ToObservableCollection();
