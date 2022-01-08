@@ -20,6 +20,7 @@ using CarmenUI.UserControls;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 using Serilog.Events;
+using WpfMessageBoxLibrary;
 
 namespace CarmenUI.Pages
 {
@@ -32,7 +33,8 @@ namespace CarmenUI.Pages
         private ShowContext? _context;
         protected readonly RecentShow connection;
         Window? windowWithEventsAttached;
-        DataObjects saved_changes = DataObjects.None;
+        DataObjects savedChanges = DataObjects.None;
+        MessageBoxResult? rememberedResult = null;
 
         protected ShowContext context => _context
             ?? throw new ApplicationException("Tried to use context after it was disposed.");
@@ -126,7 +128,7 @@ namespace CarmenUI.Pages
         protected async Task SaveChangesAndReturn(bool user_initiated = true)
         {
             if (await SaveChanges(user_initiated))
-                OnReturn(new ReturnEventArgs<DataObjects>(saved_changes));
+                OnReturn(new ReturnEventArgs<DataObjects>(savedChanges));
         }
 
         /// <summary>Save changes to the database and return true if succeeded</summary>
@@ -194,7 +196,7 @@ namespace CarmenUI.Pages
                     return false;
                 }
             }
-            saved_changes |= changes;
+            savedChanges |= changes;
             Log.Information($"{GetType().Name}.{nameof(SaveChanges)}({user_initiated}) SUCCESS");
             return true;
         }
@@ -207,7 +209,7 @@ namespace CarmenUI.Pages
         protected void CancelChangesAndReturn()
         {
             if (CancelChanges())
-                OnReturn(new ReturnEventArgs<DataObjects>(saved_changes));
+                OnReturn(new ReturnEventArgs<DataObjects>(savedChanges));
         }
 
         /// <summary>Confirms cancel with the user (if any changes have been made) and returns true if its okay to cancel</summary>
@@ -262,8 +264,31 @@ namespace CarmenUI.Pages
 
         protected bool NeuralEngineConfirm(string message)
         {
-            var result = MessageBox.Show(message, WindowTitle, MessageBoxButton.YesNo);
-            Log.Error($"{GetType().Name}.{nameof(NeuralEngineConfirm)}={result}");
+            var result = rememberedResult;
+            string source;
+            if (result == null)
+            {
+                var properties = new WpfMessageBoxProperties()
+                {
+                    Button = MessageBoxButton.YesNo,
+                    CheckBoxText = "Remember for this session",
+                    IsCheckBoxChecked = false,
+                    IsCheckBoxVisible = true,
+                    Text = message,
+                    Title = WindowTitle,
+                };
+                result = WpfMessageBox.Show(LoadingOverlay.CurrentOverlay ?? Window.GetWindow(this), ref properties);
+                if (properties.IsCheckBoxChecked)
+                {
+                    rememberedResult = result;
+                    source = "Remember";
+                }
+                else
+                    source = "DontRemember";
+            }
+            else
+                source = "AlreadyRemembered";
+            Log.Error($"{GetType().Name}.{nameof(NeuralEngineConfirm)}={result}[{source}]");
             return result == MessageBoxResult.Yes;
         }
 

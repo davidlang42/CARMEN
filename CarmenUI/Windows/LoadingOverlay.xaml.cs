@@ -22,6 +22,8 @@ namespace CarmenUI.Windows
     /// </summary>
     public partial class LoadingOverlay : Window, IDisposable
     {
+        public static LoadingOverlay? CurrentOverlay { get; private set; }
+
         public static readonly DependencyProperty MainTextProperty = DependencyProperty.Register(
             nameof(MainText), typeof(string), typeof(LoadingOverlay), new PropertyMetadata("Loading..."));
 
@@ -62,6 +64,9 @@ namespace CarmenUI.Windows
 
         public LoadingOverlay(Window owner)
         {
+            if (CurrentOverlay != null)
+                throw new ApplicationException("Tried to initialise overlay with an overlay already shown.");
+            CurrentOverlay = this;
             Log.Information(nameof(LoadingOverlay));
             Owner = owner;
             ownerHwnd = new WindowInteropHelper(owner).Handle;
@@ -83,6 +88,7 @@ namespace CarmenUI.Windows
             WinUser.EnableWindow(ownerHwnd, true);
             Owner.IsEnabled = true;
             Hide();
+            CurrentOverlay = null;
         }
 
         /// <summary>Creates a main LoadingSegment from which sub-segments can be specified.
