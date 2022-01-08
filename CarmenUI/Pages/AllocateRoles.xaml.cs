@@ -83,6 +83,8 @@ namespace CarmenUI.Pages
 
         private async void Page_Loaded(object sender, RoutedEventArgs e)
         {
+            DateTime start;//TODO remove
+            TimeSpan duration;//TODO remove
             using (var loading = new LoadingOverlay(this).AsSegment(nameof(AllocateRoles)))
             {
                 using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
@@ -95,13 +97,23 @@ namespace CarmenUI.Pages
                     _alternativeCasts = await context.AlternativeCasts.InNameOrder().ToArrayAsync();
                 _castGroupsByCast = CastGroupAndCast.Enumerate(cast_groups, _alternativeCasts).ToArray();
                 using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles), "Applicants"))
+                {
+                    start = DateTime.Now;
                     _applicantsInCast = await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).ToArrayAsync();
-                using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
-                    await context.Nodes.LoadAsync();
+                    duration = DateTime.Now - start;
+                    MessageBox.Show($"Applicants took {duration.TotalSeconds} seconds");//TODO 2.3s
+                }
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(InnerNode) + nameof(InnerNode.Children), "Nodes"))
+                    await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Requirements), "Requirements"))
                     _requirements = await context.Requirements.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Cast), "Roles"))
+                {
+                    start = DateTime.Now;
                     await context.Roles.Include(r => r.Cast).LoadAsync();
+                    duration = DateTime.Now - start;
+                    MessageBox.Show($"Roles took {duration.TotalSeconds} seconds");//TODO 1.7s
+                }
                 using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles), "Items"))
                     await context.Nodes.OfType<Item>().Include(i => i.Roles).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Items), "Items"))
@@ -129,7 +141,7 @@ namespace CarmenUI.Pages
                 rolesTreeView.ItemsSource = rootNodeView.ChildrenInOrder;
                 castingProgress.DataContext = rootNodeView;
             }
-            await rootNodeView.UpdateAllAsync();
+            _ = rootNodeView.UpdateAllAsync();
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

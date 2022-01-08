@@ -84,8 +84,8 @@ namespace CarmenUI.Pages
                     nonPrimaryRequirementsViewSource.Source = all_requirements.Where(r => !r.Primary).ToArray();
                     _primaryRequirements = all_requirements.Where(r => r.Primary).ToArray();
                 }
-                using (loading.Segment(nameof(ShowContext.Nodes), "Nodes"))
-                    await context.Nodes.LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(InnerNode) + nameof(InnerNode.Children), "Nodes"))
+                    await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.Roles), "Items"))
                     await context.Nodes.OfType<Item>().Include(i => i.Roles).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Items), "Roles"))
