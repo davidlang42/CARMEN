@@ -155,7 +155,7 @@ namespace CarmenUI.Windows
             using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
             using (var context = ShowContext.Open(connection))
             {
-                var applicants = await context.Applicants.ToArrayAsync();
+                var applicants = await context.Applicants.Include(a => a.Notes).ToArrayAsync();
                 report.SetData(applicants);
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
