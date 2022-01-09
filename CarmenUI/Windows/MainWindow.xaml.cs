@@ -89,11 +89,17 @@ namespace CarmenUI.Windows
                         report = existing_report;
                         break;
                     }
-            report ??= new ReportWindow(connection, $"Report #{reportCount++}", definition, !already_bookmarked)
+            if (report == null)
             {
-                Owner = this
-            };
-            report.Show(); //TODO make this focus the existing window if already open (currently doesn't work)
+                report = new ReportWindow(connection, $"Report #{reportCount++}", definition, !already_bookmarked)
+                {
+                    Owner = this
+                };
+                report.Show();
+            }
+            if (report.WindowState == WindowState.Minimized)
+                report.WindowState = WindowState.Normal;
+            report.Activate();
             Log.Information($"Opened report: {definition?.SavedName ?? reportCount.ToString()}");
         }
     }
