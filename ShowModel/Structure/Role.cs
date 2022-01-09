@@ -93,7 +93,7 @@ namespace Carmen.ShowModel.Structure
                 var required_count = CountFor(cast_group);
                 foreach (var alternative_cast in group_casts)
                 {
-                    var actual_count = cast_by_group.Where(a => a.AlternativeCast == alternative_cast).Count();
+                    var actual_count = cast_by_group.Where(a => a.AlternativeCast?.AlternativeCastId == alternative_cast?.AlternativeCastId).Count();
                     if (actual_count > required_count)
                         return RoleStatus.OverCast;
                     if (actual_count < required_count)
