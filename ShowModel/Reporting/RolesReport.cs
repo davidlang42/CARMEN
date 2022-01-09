@@ -39,8 +39,17 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<(Item Item, Role Role)>("Requirement Count", p => p.Role.Requirements.Count) { Show = false };
             yield return new Column<(Item Item, Role Role)>("Requirements", p => string.Join(", ", p.Role.Requirements.Select(r => r.Name)));
             yield return new Column<(Item Item, Role Role)>("Casting Status", p => p.Role.CastingStatus(alternative_casts));
-            //TODO cast counts by cast group and cast
-            yield return new Column<(Item Item, Role Role)>("Cast Count", p => p.Role.Cast.Count);
+            foreach (var cast_group in cast_groups.InOrder())
+            {
+                if (cast_group.AlternateCasts)
+                    foreach (var alternative_cast in alternative_casts)
+                        yield return new Column<(Item Item, Role Role)>($"Cast Count {cast_group.Abbreviation}-{alternative_cast.Initial}",
+                            p => p.Role.Cast.Where(a => a.CastGroup?.CastGroupId == cast_group.CastGroupId && a.AlternativeCast?.AlternativeCastId == alternative_cast.AlternativeCastId).Count());
+                else
+                    yield return new Column<(Item Item, Role Role)>($"Cast Count {cast_group.Abbreviation}",
+                            p => p.Role.Cast.Where(a => a.CastGroup?.CastGroupId == cast_group.CastGroupId && a.AlternativeCast == null).Count());
+            }
+            yield return new Column<(Item Item, Role Role)>("Cast Count Total", p => p.Role.Cast.Count);
             yield return new Column<(Item Item, Role Role)>("Cast List", p => string.Join(", ", p.Role.Cast.Select(a => $"#{a.CastNumberAndCast ?? "-"} {a.FirstName} {a.LastName}"))) { Show = false };
         }
     }
