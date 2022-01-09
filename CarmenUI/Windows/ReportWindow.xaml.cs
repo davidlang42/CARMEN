@@ -78,6 +78,7 @@ namespace CarmenUI.Windows
                         "Rejected Applicants" => new RejectedApplicantsReport(criterias, tags),
                         "Items" => new ItemsReport(cast_groups),
                         "Roles" => new RolesReport(cast_groups, alternative_casts),
+                        "Casting" => new CastingReport(cast_groups, alternative_casts, criterias, tags),
                         _ => throw new ApplicationException($"Report type combo not handled: {ReportTypeCombo.SelectedItem}")
                     };
                     if (reportDefinition != null)
@@ -142,6 +143,8 @@ namespace CarmenUI.Windows
                 await RefreshItemData(item_report);
             else if (Report is Report<(Item, Role)> roles_report)
                 await RefreshRolesData(roles_report);
+            else if (Report is Report<(Item, Role, Applicant)> casting_report)
+                await RefreshCastingData(casting_report);
             else
                 throw new ApplicationException("Report type not handled: " + Report.GetType().Name);
         }
@@ -193,6 +196,30 @@ namespace CarmenUI.Windows
             foreach (var item in items)
                 foreach (var role in item.Roles)
                     yield return (item, role);
+        }
+
+        public async Task RefreshCastingData(Report<(Item, Role, Applicant)> report)
+        {
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshCastingData));
+            using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item), "Casting"))//TODO this could be broken down better I think
+            using (var context = ShowContext.Open(connection))
+            {
+                await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).LoadAsync();
+                await context.Roles.Include(r => r.Items).LoadAsync();
+                await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
+                var items_in_order = context.ShowRoot.ItemsInOrder();
+                report.SetData(EnumerateCasting(items_in_order));
+            }
+            using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
+                ConfigureSorting(); // must be called every time ItemsSource changes
+        }
+
+        private static IEnumerable<(Item, Role, Applicant)> EnumerateCasting(IEnumerable<Item> items)
+        {
+            foreach (var item in items)
+                foreach (var role in item.Roles)
+                    foreach (var applicant in role.Cast)
+                        yield return (item, role, applicant);
         }
 
         private void ConfigureSorting()

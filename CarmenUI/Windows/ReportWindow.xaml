@@ -33,6 +33,7 @@
                     <ComboBoxItem Content="Rejected Applicants"/>
                     <ComboBoxItem Content="Items"/>
                     <ComboBoxItem Content="Roles"/>
+                    <ComboBoxItem Content="Casting"/>
                 </ComboBox.Items>
             </ComboBox>
             <TextBlock VerticalAlignment="Center" Text="with" FontStyle="Italic"/>
