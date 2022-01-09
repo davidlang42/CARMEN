@@ -66,6 +66,7 @@ namespace CarmenUI.Windows
                 Tag[] tags;
                 CastGroup[] cast_groups;
                 AlternativeCast[] alternative_casts;
+                List<int> item_ids_in_order;
                 using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
                     criterias = await context.Criterias.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
@@ -74,6 +75,11 @@ namespace CarmenUI.Windows
                     cast_groups = await context.CastGroups.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative Casts"))
                     alternative_casts = await context.AlternativeCasts.ToArrayAsync();
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.NodeId), "Items"))
+                {
+                    await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
+                    item_ids_in_order = context.ShowRoot.ItemsInOrder().Select(i => i.NodeId).ToList();
+                }
                 using (loading.Segment(nameof(AddGridColumns), "Report"))
                 {
                     if (ReportDefinition != null && ReportTypeCombo.Items.OfType<ComboBoxItem>().FirstOrDefault(cbi => ReportDefinition.ReportType.Equals(cbi.Content)) is ComboBoxItem item)
@@ -85,9 +91,9 @@ namespace CarmenUI.Windows
                         ApplicantsReport.DefaultReportType => new ApplicantsReport(criterias, tags),
                         AcceptedApplicantsReport.DefaultReportType => new AcceptedApplicantsReport(criterias, tags),
                         RejectedApplicantsReport.DefaultReportType => new RejectedApplicantsReport(criterias, tags),
-                        ItemsReport.DefaultReportType => new ItemsReport(cast_groups),
-                        RolesReport.DefaultReportType => new RolesReport(cast_groups, alternative_casts),
-                        CastingReport.DefaultReportType => new CastingReport(cast_groups, alternative_casts, criterias, tags),
+                        ItemsReport.DefaultReportType => new ItemsReport(item_ids_in_order, cast_groups),
+                        RolesReport.DefaultReportType => new RolesReport(item_ids_in_order, cast_groups, alternative_casts),
+                        CastingReport.DefaultReportType => new CastingReport(item_ids_in_order, cast_groups, alternative_casts, criterias, tags),
                         _ => throw new ApplicationException($"Report type combo not handled: {ReportTypeCombo.SelectedItem}")
                     };
                     if (ReportDefinition != null)

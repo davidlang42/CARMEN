@@ -14,12 +14,13 @@ namespace Carmen.ShowModel.Reporting
 
         public override string ReportType => DefaultReportType;
 
-        public ItemsReport(CastGroup[] cast_groups)
-            : base(AssignOrder(GenerateColumns(cast_groups)))
+        public ItemsReport(List<int> item_ids_in_order, CastGroup[] cast_groups)
+            : base(AssignOrder(GenerateColumns(item_ids_in_order, cast_groups)))
         { }
 
-        private static IEnumerable<Column<Item>> GenerateColumns(CastGroup[] cast_groups)
+        private static IEnumerable<Column<Item>> GenerateColumns(List<int> item_ids_in_order, CastGroup[] cast_groups)
         {
+            yield return new Column<Item>("Show Order", i => item_ids_in_order.IndexOf(i.NodeId)) { Show = false };
             yield return new Column<Item>("Section & Item Names", i => string.Join(" - ", i.Parents().Reverse().Skip(1).Select(n => n.Name).Concat(i.Name.Yield()))) { Show = false }; // skip ShowRoot
             yield return new Column<Item>("Name", i => i.Name);
             foreach (var cast_group in cast_groups.InOrder())

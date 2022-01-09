@@ -15,13 +15,14 @@ namespace Carmen.ShowModel.Reporting
 
         public override string ReportType => DefaultReportType;
 
-        public CastingReport(CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Criteria[] criterias, Tag[] tags)
-            : base(AssignOrder(GenerateColumns(cast_groups, alternative_casts, criterias, tags)))
+        public CastingReport(List<int> item_ids_in_order, CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Criteria[] criterias, Tag[] tags)
+            : base(AssignOrder(GenerateColumns(item_ids_in_order, cast_groups, alternative_casts, criterias, tags)))
         { }
 
-        private static IEnumerable<Column<(Item, Role, Applicant)>> GenerateColumns(CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Criteria[] criterias, Tag[] tags)
+        private static IEnumerable<Column<(Item, Role, Applicant)>> GenerateColumns(List<int> item_ids_in_order, CastGroup[] cast_groups, AlternativeCast[] alternative_casts, Criteria[] criterias, Tag[] tags)
         {
             // Item fields (duplicated from ItemsReport)
+            yield return new Column<(Item Item, Role Role, Applicant Applicant)>("Show Order", p => item_ids_in_order.IndexOf(p.Item.NodeId)) { Show = false };
             yield return new Column<(Item Item, Role Role, Applicant Applicant)>("Section & Item Names", p => string.Join(" - ", p.Item.Parents().Reverse().Skip(1).Select(n => n.Name).Concat(p.Item.Name.Yield()))) { Show = false }; // skip ShowRoot
             yield return new Column<(Item Item, Role Role, Applicant Applicant)>("Item Name", p => p.Item.Name);
             foreach (var cast_group in cast_groups.InOrder())
