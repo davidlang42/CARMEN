@@ -93,7 +93,7 @@ namespace CarmenUI.Windows
             {
                 Owner = this
             };
-            report.Show();
+            report.Show(); //TODO make this focus the existing window if already open (currently doesn't work)
             Log.Information($"Opened report: {definition?.SavedName ?? reportCount.ToString()}");
         }
     }
