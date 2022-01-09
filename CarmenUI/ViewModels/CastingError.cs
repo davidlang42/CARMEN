@@ -14,7 +14,7 @@ namespace CarmenUI.ViewModels
         public Action? DoubleClick { get; }
         public ContextMenu? ContextMenu { get; }
 
-        public CastingError(string message, Action? double_click = null, Dictionary<string, Action>? right_click = null)
+        public CastingError(string message, Action? double_click = null, IEnumerable<(string, Action)>? right_click = null)
         {
             Message = message;
             DoubleClick = double_click;
