@@ -50,10 +50,12 @@ namespace Carmen.CastingEngine.Allocation
         /// <summary>Determine if an applicant is eligible to be cast in a role
         /// (ie. whether all minimum requirements of the role are met)</summary>
         Eligibility EligibilityOf(Applicant applicant, Role role);
+        bool IsEligible(Applicant applicant, Role role);
 
         /// <summary>Determine if an applicant is available to be cast in a role
         /// (eg. already cast in the same item, an adjacent item, or within a section where AllowMultipleRoles==FALSE)</summary>
         Availability AvailabilityOf(Applicant applicant, Role role);
+        bool IsAvailable(Applicant applicant, Role role);
 
         #region Passthrough of IAuditionEngine functions
         /// <summary>The maximum value an applicant's overall ability can be</summary>

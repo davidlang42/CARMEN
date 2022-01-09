@@ -227,8 +227,8 @@ namespace CarmenUI.Pages
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
                 RoleNodeView role_node_view => new RoleWithApplicantsView(role_node_view.Role, castGroupsByCast),
-                ItemNodeView item_node_view => new NodeRolesOverview(item_node_view.Item, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection),
-                SectionNodeView section_node_view => new NodeRolesOverview(section_node_view.Section, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection),
+                ItemNodeView item_node_view => new NodeRolesOverview(item_node_view.Item, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection, allocationEngine),
+                SectionNodeView section_node_view => new NodeRolesOverview(section_node_view.Section, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection, allocationEngine),
                 _ => defaultPanelContent
             };
             return true;
@@ -263,7 +263,7 @@ namespace CarmenUI.Pages
                 rootNodeView.ItemCastingChanged(item);
             foreach (var role in changed_roles)
                 rootNodeView.RoleCastingChanged(role);
-            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection); // refresh
+            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection, allocationEngine); // refresh
         }
 
         protected override void DisposeInternal()
@@ -451,7 +451,7 @@ namespace CarmenUI.Pages
             await SaveChanges(false); // immediately save any automatic casting
             foreach (var role in selected_roles)
                 rootNodeView.RoleCastingChanged(role);
-            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection);
+            applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection, allocationEngine);
         }
 
         private List<Role>? ParseSelectedRoles(IEnumerable<IncompleteRole> incomplete_roles)

@@ -75,6 +75,9 @@ namespace Carmen.ShowModel.Structure
         public uint CountFor(CastGroup group)
             => CountByGroups.Where(c => c.CastGroup.CastGroupId == group.CastGroupId).Select(c => c.Count).SingleOrDefault(); // defaults to 0
 
+        public long RemainingSpacesFor(CastGroup group, AlternativeCast? alterative_cast)
+            => CountFor(group) - Cast.Where(a => a.CastGroup == group && a.AlternativeCast == alterative_cast).Count();
+
         public RoleStatus CastingStatus(AlternativeCast[] alternative_casts)
         {
             if (Cast.Count == 0)

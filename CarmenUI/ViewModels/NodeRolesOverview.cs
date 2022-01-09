@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel;
+﻿using Carmen.CastingEngine.Allocation;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
 using CarmenUI.Converters;
@@ -23,18 +24,28 @@ namespace CarmenUI.ViewModels
         public ObservableCollection<AllowedConsecutive> AllowedConsecutives { get; }
 
         /// <summary>Node should be an Item or Section, NOT ShowRoot</summary>
-        public NodeRolesOverview(Node node, AlternativeCast[] alternative_casts, IEnumerable<Applicant> cast_members, Action<IEnumerable<Item>, IEnumerable<Role>> callback_after_error_correction)
+        public NodeRolesOverview(Node node, AlternativeCast[] alternative_casts, IEnumerable<Applicant> cast_members, Action<IEnumerable<Item>, IEnumerable<Role>> callback_after_error_correction, IAllocationEngine engine)
         {
             callbackAfterErrorCorrection = callback_after_error_correction;
             Node = node;
             IncompleteRoles = FindIncompleteRoles(node, alternative_casts).ToObservableCollection();
             if (node is Section section)
-                CastingErrors = FindSectionCastingErrors(section, cast_members).ToObservableCollection();
+                CastingErrors = FindSectionCastingErrors(section, cast_members, engine).ToObservableCollection();
             else if (node is Item item)
                 CastingErrors = FindItemCastingErrors(item).ToObservableCollection();
             else
                 throw new NotImplementedException($"Node type {node.GetType().Name} not handled.");
             AllowedConsecutives = node.ItemsInOrder().SelectMany(i => i.AllowedConsecutives).Distinct().ToObservableCollection();
+        }
+
+        /// <summary>Find the given roles in the IncompleteRoles list, and mark them as selected.
+        /// Ignore any roles which are not found. Does not deselect other roles.</summary>
+        public void SelectRoles(IEnumerable<Role> roles)
+        {
+            var roles_to_select = roles.ToHashSet();
+            foreach (var incomplete_role in IncompleteRoles)
+                if (roles_to_select.Contains(incomplete_role.Role))
+                    incomplete_role.IsSelected = true;
         }
 
         private static IEnumerable<IncompleteRole> FindIncompleteRoles(Node node, AlternativeCast[] alternative_casts)
@@ -45,12 +56,12 @@ namespace CarmenUI.ViewModels
         }
 
         /// <summary>Show section type errors and section consecutive item errors (because they aren't shown anywhere else)</summary>
-        private IEnumerable<CastingError> FindSectionCastingErrors(Section section, IEnumerable<Applicant> cast_members)
+        private IEnumerable<CastingError> FindSectionCastingErrors(Section section, IEnumerable<Applicant> cast_members, IAllocationEngine engine)
         {
             if (!section.CastingMeetsSectionTypeRules(cast_members, out var no_roles, out var multi_roles))
             {
                 foreach (var applicant in no_roles)
-                    yield return new CastingError($"{FullName.Format(applicant)} has no role in {section.Name}");
+                    yield return new CastingError($"{FullName.Format(applicant)} has no role in {section.Name}", right_click: NoRoleFixes(applicant, section, engine));
                 foreach (var applicant in multi_roles)
                     yield return new CastingError($"{FullName.Format(applicant.Key)} has {applicant.Value} roles in {section.Name}");
             }
@@ -91,14 +102,29 @@ namespace CarmenUI.ViewModels
             callbackAfterErrorCorrection(new[] { item1, item2 }, Enumerable.Empty<Role>());
         }
 
-        /// <summary>Find the given roles in the IncompleteRoles list, and mark them as selected.
-        /// Ignore any roles which are not found. Does not deselect other roles.</summary>
-        public void SelectRoles(IEnumerable<Role> roles)
+        private Dictionary<string, Action> NoRoleFixes(Applicant applicant, Section section, IAllocationEngine engine)
         {
-            var roles_to_select = roles.ToHashSet();
-            foreach (var incomplete_role in IncompleteRoles)
-                if (roles_to_select.Contains(incomplete_role.Role))
-                    incomplete_role.IsSelected = true;
+            var applicant_name = $"{applicant.FirstName} {applicant.LastName}";
+            var items_in_section = section.ItemsInOrder().ToHashSet();
+            var available_roles = items_in_section
+                .SelectMany(i => i.Roles).Distinct()
+                .Where(r => r.RemainingSpacesFor(applicant.CastGroup!, applicant.AlternativeCast) > 0)
+                .Where(r => engine.IsEligible(applicant, r))
+                .Where(r => engine.IsAvailable(applicant, r));
+            var options = new Dictionary<string, Action>();
+            foreach (var role in available_roles)
+            {
+                var role_items = role.Items.Where(i => items_in_section.Contains(i));
+                var option = $"Cast {applicant_name} as {role.Name} in {string.Join(", ", role_items.Select(i => i.Name))}";
+                options.Add(option, () => {
+                    applicant.Roles.Add(role);
+                    role.Cast.Add(applicant);
+                    callbackAfterErrorCorrection(Enumerable.Empty<Item>(), role.Yield());
+                });
+            }
+            if (options.Count == 0)
+                options.Add($"No available roles for {applicant_name}", () => { });
+            return options;
         }
     }
 }
