@@ -87,7 +87,7 @@ namespace Carmen.ShowModel.Structure
         public abstract IEnumerable<Item> ItemsInOrder();
 
         public uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroup == group).SingleOrDefault()?.Count
+            => CountByGroups.Where(c => c.CastGroup.CastGroupId == group.CastGroupId).SingleOrDefault()?.Count
             ?? ItemsInOrder().SelectMany(i => i.Roles).Distinct().Select(r => r.CountFor(group)).Sum();
 
         /// <summary>Recursively enumerate all parents</summary>
