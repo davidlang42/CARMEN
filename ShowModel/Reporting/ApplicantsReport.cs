@@ -61,7 +61,7 @@ namespace Carmen.ShowModel.Reporting
 
         public async Task<int> ExportPhotos(string file_name, Applicant[] applicants, Action<int>? start_each_applicant_callback) // mostly copied from Report<T>.ExportCsv(), Group(), SetData()
         {
-            var ordered_columns = Columns.Where(c => c.Show).InOrder().ToArray();
+            var ordered_columns = columns.Where(c => c.Show).InOrder().ToArray();
             if (ordered_columns.Length == 0 || applicants.Length == 0)
                 return 0; // nothing to export
             int count = 0;
@@ -72,7 +72,7 @@ namespace Carmen.ShowModel.Reporting
                     start_each_applicant_callback?.Invoke(i);
                     if (await Task.Run(() => applicants[i].Photo) is Image image)
                     {
-                        var group_folder = FormatAsString(GroupColumn?.ValueGetter(applicants[i]));
+                        var group_folder = FormatAsString(groupColumn?.ValueGetter(applicants[i]));
                         if (!string.IsNullOrWhiteSpace(group_folder))
                             group_folder += Path.DirectorySeparatorChar;
                         var extension = Path.GetExtension(image.Name);

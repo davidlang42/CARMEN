@@ -13,26 +13,41 @@ using System.Threading.Tasks;
 
 namespace Carmen.ShowModel.Reporting
 {
-    public abstract class Report<T> : INotifyPropertyChanged
+    public abstract class Report<T> : IReport
     {
         const int MAX_DESCRIPTIONS = 3;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public abstract string ReportType { get; }
-        public Column<T>[] Columns { get; }
+
+        protected Column<T>[] columns;
+        public IColumn[] Columns => columns;
+
         public ObservableCollection<SortColumn> SortColumns { get; } = new();
 
-        private Column<T>? groupColumn;
-        public Column<T>? GroupColumn
+        protected Column<T>? groupColumn;
+        public IColumn? GroupColumn
         {
             get => groupColumn;
             set
             {
                 if (groupColumn == value)
                     return;
-                groupColumn = value;
-                OnPropertyChanged();
+                if (value == null)
+                {
+                    groupColumn = null;
+                    OnPropertyChanged();
+                    return;
+                }
+                foreach (var column in columns)
+                    if (column == value)
+                    {
+                        groupColumn = column;
+                        OnPropertyChanged();
+                        return;
+                    }
+                throw new ApplicationException("Tried to set GroupColumn to a column not in this report.");
             }
         }
 
@@ -66,7 +81,7 @@ namespace Carmen.ShowModel.Reporting
         {
             get
             {
-                var visible = Columns.Where(c => c.Show).InOrder().Select(c => c.Name).ToArray();
+                var visible = columns.Where(c => c.Show).InOrder().Select(c => c.Name).ToArray();
                 if (visible.Length == 0)
                     return "No columns";
                 else if (visible.Length <= MAX_DESCRIPTIONS)
@@ -83,9 +98,9 @@ namespace Carmen.ShowModel.Reporting
                 if (SortColumns.Count == 0)
                     return null;
                 else if (SortColumns.Count > MAX_DESCRIPTIONS)
-                    return string.Join(", ", SortColumns.Select(c => Columns[c.ColumnIndex].Name));
+                    return string.Join(", ", SortColumns.Select(c => columns[c.ColumnIndex].Name));
                 else
-                    return string.Join(", ", SortColumns.Select(c => $"{Columns[c.ColumnIndex].Name} {c.SortDirection.ToString().ToLower()}"));
+                    return string.Join(", ", SortColumns.Select(c => $"{columns[c.ColumnIndex].Name} {c.SortDirection.ToString().ToLower()}"));
             }
         }
 
@@ -104,7 +119,7 @@ namespace Carmen.ShowModel.Reporting
 
         public Report(Column<T>[] columns)
         {
-            Columns = columns;
+            this.columns = columns;
             foreach (var column in columns)
                 column.PropertyChanged += Column_PropertyChanged;
             SortColumns.CollectionChanged += SortColumns_CollectionChanged;
@@ -112,22 +127,22 @@ namespace Carmen.ShowModel.Reporting
 
         /// <summary>Finds the index of the given column in the current report.
         /// Throws an exception if not found, rather than returning an invalid index.</summary>
-        public int IndexOf(Column<T> column)
+        public int IndexOf(IColumn column)
         {
-            for (var c = 0; c < Columns.Length; c++)
-                if (Columns[c] == column)
+            for (var c = 0; c < columns.Length; c++)
+                if (columns[c] == column)
                     return c;
             throw new InvalidOperationException("Column not found.");
         }
 
         public virtual void SetData(IEnumerable<T> data)
         {   
-            Rows = data.Select(d => Columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();
+            Rows = data.Select(d => columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();
         }
 
         public int ExportCsv(string file_name)
         {
-            var ordered_columns = Columns.Where(c => c.Show).InOrder().ToArray();
+            var ordered_columns = columns.Where(c => c.Show).InOrder().ToArray();
             if (ordered_columns.Length == 0)
                 return 0; // nothing to export
             int count = 0;
@@ -201,7 +216,7 @@ namespace Carmen.ShowModel.Reporting
 
         private void Column_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            OnPropertyChanged(nameof(Columns));
+            OnPropertyChanged(nameof(columns));
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Column<T>.Show) || e.PropertyName == nameof(Column<T>.Order))
                 OnPropertyChanged(nameof(ColumnsDescription));
         }

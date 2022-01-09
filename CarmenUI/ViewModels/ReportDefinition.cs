@@ -31,7 +31,7 @@ namespace CarmenUI.ViewModels
             SortColumns = Array.Empty<SortColumn>();
         }
 
-        public static ReportDefinition FromReport<T>(Report<T> report, string saved_name)
+        public static ReportDefinition FromReport(IReport report, string saved_name)
             => new ReportDefinition
             {
                 SavedName = saved_name,
@@ -46,15 +46,15 @@ namespace CarmenUI.ViewModels
                 GroupColumnIndex = report.GroupColumn == null ? null : report.IndexOf(report.GroupColumn)
             };
 
-        public void Apply<T>(Report<T> report)
+        public void Apply(IReport report)
         {
             if (!ReportType.Equals(report.ReportType, StringComparison.OrdinalIgnoreCase))
                 throw new ApplicationException($"Report definition for '{ReportType}' is not valid for '{report.ReportType}' report.");
-            var columns = new Column<T>?[Columns.Length];
+            var columns = new IColumn?[Columns.Length];
             for (var i = 0; i < columns.Length; i++)
             {
                 var definition = Columns[i];
-                if (report.Columns.Where(c => c.Name.Equals(definition.Name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault() is Column<T> column)
+                if (report.Columns.Where(c => c.Name.Equals(definition.Name, StringComparison.OrdinalIgnoreCase)).FirstOrDefault() is IColumn column)
                 {
                     column.Order = definition.Order;
                     column.Show = definition.Show;
@@ -63,7 +63,7 @@ namespace CarmenUI.ViewModels
             }
             report.SortColumns.Clear();
             foreach (var sort_column in SortColumns)
-                if (columns[sort_column.ColumnIndex] is Column<T> column)
+                if (columns[sort_column.ColumnIndex] is IColumn column)
                     report.SortColumns.Add(new SortColumn
                     {
                         ColumnIndex = report.IndexOf(column),

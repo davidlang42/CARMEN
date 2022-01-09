@@ -2,6 +2,7 @@
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Reporting;
+using Carmen.ShowModel.Structure;
 using CarmenUI.Converters;
 using CarmenUI.ViewModels;
 using FontAwesome.WPF;
@@ -29,8 +30,8 @@ namespace CarmenUI.Windows
         ReportDefinition? reportDefinition;
         string defaultTitle;
 
-        private ApplicantsReport? report;
-        public ApplicantsReport Report => report ?? throw new ApplicationException("Attempted to access report before initializing.");
+        private IReport? report;
+        public IReport Report => report ?? throw new ApplicationException("Attempted to access report before initializing.");
 
         public ReportWindow(ShowConnection connection, string default_title, ReportDefinition? report_definition = null)
         {
@@ -55,10 +56,13 @@ namespace CarmenUI.Windows
             {
                 Criteria[] criterias;
                 Tag[] tags;
+                CastGroup[] cast_groups;
                 using (loading.Segment(nameof(ShowContext.Criterias), "Criteria"))
                     criterias = await context.Criterias.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
                     tags = await context.Tags.ToArrayAsync();
+                using (loading.Segment(nameof(ShowContext.CastGroups), "Cast Groups"))
+                    cast_groups = await context.CastGroups.ToArrayAsync(); //TODO pre-load conditionally based on which report
                 using (loading.Segment(nameof(AddGridColumns), "Report"))
                 {
                     if (reportDefinition != null && ReportTypeCombo.Items.OfType<ComboBoxItem>().FirstOrDefault(cbi => reportDefinition.ReportType.Equals(cbi.Content)) is ComboBoxItem item)
@@ -68,6 +72,7 @@ namespace CarmenUI.Windows
                         "All Applicants" => new ApplicantsReport(criterias, tags),
                         "Accepted Applicants" => new AcceptedApplicantsReport(criterias, tags),
                         "Rejected Applicants" => new RejectedApplicantsReport(criterias, tags),
+                        "Items" => new ItemsReport(cast_groups),
                         _ => throw new ApplicationException($"Report type combo not handled: {ReportTypeCombo.SelectedItem}")
                     };
                     if (reportDefinition != null)
@@ -92,7 +97,7 @@ namespace CarmenUI.Windows
             }
         }
 
-        private static void AddGridColumns(DataGrid data_grid, Column<Applicant>[] columns)
+        private static void AddGridColumns(DataGrid data_grid, IColumn[] columns)
         {
             data_grid.Columns.Clear();
             for (var c = 0; c < columns.Length; c++)
@@ -126,12 +131,36 @@ namespace CarmenUI.Windows
 
         public async Task RefreshData()
         {
-            using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshData));
+            if (Report is Report<Applicant> applicant_report)
+                await RefreshApplicantData(applicant_report);
+            else if (Report is Report<Item> item_report)
+                await RefreshItemData(item_report);
+            else
+                throw new ApplicationException("Report type not handled: " + Report.GetType().Name);
+        }
+
+        public async Task RefreshApplicantData(Report<Applicant> report)
+        {
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshApplicantData));
             using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
             using (var context = ShowContext.Open(connection))
             {
-                var data = await context.Applicants.ToArrayAsync();
-                Report.SetData(data);
+                var applicants = await context.Applicants.ToArrayAsync();
+                report.SetData(applicants);
+            }
+            using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
+                ConfigureSorting(); // must be called every time ItemsSource changes
+        }
+
+        public async Task RefreshItemData(Report<Item> report)
+        {
+            using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshItemData));
+            using (loading.Segment(nameof(ShowContext.Applicants), "Items"))
+            using (var context = ShowContext.Open(connection))
+            {
+                await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
+                var items_in_order = context.ShowRoot.ItemsInOrder();
+                report.SetData(items_in_order);
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
@@ -154,6 +183,8 @@ namespace CarmenUI.Windows
 
         private void GroupColumn_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (LoadingOverlay.CurrentOverlay != null)
+                return; // already loading something, which will call ConfigureSort/Group themselves
             using var loading = new LoadingOverlay(this).AsSegment(nameof(GroupColumn_SelectionChanged));
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting();
@@ -187,8 +218,10 @@ namespace CarmenUI.Windows
             }
         }
 
-        private async void ExportPhotos_Click(object sender, RoutedEventArgs e)
+        private async void ExportPhotos_Click(object sender, RoutedEventArgs e) //TODO hide export photos option when non-applicant report
         {
+            if (Report is not ApplicantsReport applicant_report)
+                return; // only applicant reports can export photos
             var default_file_name = (reportDefinition?.SavedName ?? Report.FullDescription).Replace(".", "") + ".zip";
             default_file_name = string.Concat(default_file_name.Split(Path.GetInvalidFileNameChars()));
             var file = new SaveFileDialog
@@ -207,7 +240,7 @@ namespace CarmenUI.Windows
                 {
                     loading.SubText = "Loading applicants";
                     var applicants = await context.Applicants.ToArrayAsync();
-                    count = await Report.ExportPhotos(file.FileName, applicants, i =>
+                    count = await applicant_report.ExportPhotos(file.FileName, applicants, i =>
                     {
                         loading.Progress = 100 * i / applicants.Length;
                         loading.SubText = $"Applicant {i + 1}/{applicants.Length}";

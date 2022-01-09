@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Carmen.ShowModel.Reporting
 {
-    public class Column<T> : IOrdered, INotifyPropertyChanged
+    public class Column<T> : INotifyPropertyChanged, IColumn
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
