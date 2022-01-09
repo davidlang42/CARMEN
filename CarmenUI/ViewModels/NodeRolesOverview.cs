@@ -62,8 +62,8 @@ namespace CarmenUI.ViewModels
             {
                 foreach (var applicant in no_roles)
                     yield return new CastingError($"{FullName.Format(applicant)} has no role in {section.Name}", right_click: NoRoleFixes(applicant, section, engine));
-                foreach (var applicant in multi_roles)
-                    yield return new CastingError($"{FullName.Format(applicant.Key)} has {applicant.Value} roles in {section.Name}");
+                foreach (var (applicant, count) in multi_roles)
+                    yield return new CastingError($"{FullName.Format(applicant)} has {count} roles in {section.Name}", right_click: MultiRoleFixes(applicant, section));
             }
             if (!section.VerifyConsecutiveItems(out var section_failures))
                 foreach (var failure in section_failures)
@@ -77,8 +77,8 @@ namespace CarmenUI.ViewModels
         /// <summary>Show cast with multiple roles in this item and showroot (and section) consecutive item errors in the item (because showroot isn't visible)</summary>
         private IEnumerable<CastingError> FindItemCastingErrors(Item item)
         {
-            foreach (var applicant in item.FindDuplicateCast())
-                yield return new CastingError($"{FullName.Format(applicant.Key)} has {applicant.Value} roles in {item.Name}");
+            foreach (var (applicant, count) in item.FindDuplicateCast())
+                yield return new CastingError($"{FullName.Format(applicant)} has {count} roles in {item.Name}", right_click: MultiRoleFixes(applicant, item));
             foreach (var consecutive_cast in item.FindConsecutiveCast())
                 foreach (var cast in consecutive_cast.Cast)
                     yield return new CastingError($"{FullName.Format(cast)} is cast in {consecutive_cast.Item1.Name} and {consecutive_cast.Item2.Name}", right_click: new()
@@ -124,6 +124,26 @@ namespace CarmenUI.ViewModels
             }
             if (options.Count == 0)
                 options.Add($"No available roles for {applicant_name}", () => { });
+            return options;
+        }
+
+        private Dictionary<string, Action> MultiRoleFixes(Applicant applicant, Node node)
+        {
+            var applicant_name = $"{applicant.FirstName} {applicant.LastName}";
+            var items_in_node = node.ItemsInOrder().ToHashSet();
+            var existing_roles = applicant.Roles
+                .Where(r => r.Items.Any(i => items_in_node.Contains(i)));
+            var options = new Dictionary<string, Action>();
+            foreach (var role in existing_roles)
+            {
+                var role_items = role.Items.Where(i => items_in_node.Contains(i));
+                var option = $"Remove {applicant_name} from {role.Name} in {string.Join(", ", role_items.Select(i => i.Name))}";
+                options.Add(option, () => {
+                    applicant.Roles.Remove(role);
+                    role.Cast.Remove(applicant);
+                    callbackAfterErrorCorrection(Enumerable.Empty<Item>(), role.Yield());
+                });
+            }
             return options;
         }
     }
