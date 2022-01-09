@@ -32,6 +32,7 @@
                     <ComboBoxItem Content="Accepted Applicants"/>
                     <ComboBoxItem Content="Rejected Applicants"/>
                     <ComboBoxItem Content="Items"/>
+                    <ComboBoxItem Content="Roles"/>
                 </ComboBox.Items>
             </ComboBox>
             <TextBlock VerticalAlignment="Center" Text="with" FontStyle="Italic"/>

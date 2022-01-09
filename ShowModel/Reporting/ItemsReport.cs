@@ -22,12 +22,12 @@ namespace Carmen.ShowModel.Reporting
             foreach (var cast_group in cast_groups.InOrder())
                 yield return new Column<Item>($"Required {cast_group.Name}", i => i.CountFor(cast_group));
             yield return new Column<Item>("Required Total", i => i.CountByGroups.Sum(cbg => cbg.Count));
-            yield return new Column<Item>("Section Depth", i => i.Parents().Count() - 1); // exclude ShowRoot
+            yield return new Column<Item>("Section Depth", i => i.Parents().Count() - 1) { Show = false }; // exclude ShowRoot
             yield return new Column<Item>("Sections", i => string.Join(", ", i.Parents().Reverse().Skip(1).Select(n => n.Name))); // skip ShowRoot
             yield return new Column<Item>("Role Count", i => i.Roles.Count);
-            yield return new Column<Item>("Roles", i => string.Join(", ", i.Roles.Select(r => r.Name)));
-            yield return new Column<Item>("Allowed Consecutives Count", i => i.AllowedConsecutives.Count);
-            yield return new Column<Item>("Allowed Consecutives", i => string.Join("\n", i.AllowedConsecutives.Select(c => c.Description)));
+            yield return new Column<Item>("Roles", i => string.Join(", ", i.Roles.Select(r => r.Name))) { Show = false };
+            yield return new Column<Item>("Allowed Consecutives Count", i => i.AllowedConsecutives.Count) { Show = false };
+            yield return new Column<Item>("Allowed Consecutives", i => string.Join("\n", i.AllowedConsecutives.Select(c => c.Description))) { Show = false };
         }
     }
 }

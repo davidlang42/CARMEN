@@ -73,7 +73,7 @@ namespace Carmen.ShowModel.Structure
             => OnPropertyChanged(nameof(CountByGroups));
 
         public uint CountFor(CastGroup group)
-            => CountByGroups.Where(c => c.CastGroup == group).Select(c => c.Count).SingleOrDefault(); // defaults to 0
+            => CountByGroups.Where(c => c.CastGroup.CastGroupId == group.CastGroupId).Select(c => c.Count).SingleOrDefault(); // defaults to 0
 
         public RoleStatus CastingStatus(AlternativeCast[] alternative_casts)
         {
