@@ -250,7 +250,10 @@ namespace CarmenUI.Windows
         private async void ExportPhotos_Click(object sender, RoutedEventArgs e) //TODO hide export photos option when non-applicant report
         {
             if (Report is not ApplicantsReport applicant_report)
-                return; // only applicant reports can export photos
+            {
+                MessageBox.Show("Only applicants reports can export as photos.", Title);
+                return;
+            }
             var default_file_name = (reportDefinition?.SavedName ?? Report.FullDescription).Replace(".", "") + ".zip";
             default_file_name = string.Concat(default_file_name.Split(Path.GetInvalidFileNameChars()));
             var file = new SaveFileDialog
