@@ -23,7 +23,7 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<Item>("Section & Item Names", i => string.Join(" - ", i.Parents().Reverse().Skip(1).Select(n => n.Name).Concat(i.Name.Yield()))) { Show = false }; // skip ShowRoot
             yield return new Column<Item>("Name", i => i.Name);
             foreach (var cast_group in cast_groups.InOrder())
-                yield return new Column<Item>($"Required {cast_group.Name}", i => i.CountFor(cast_group));
+                yield return new Column<Item>($"Required {cast_group.Abbreviation}", i => i.CountFor(cast_group));
             yield return new Column<Item>("Required Total", i => i.CountByGroups.Sum(cbg => cbg.Count));
             yield return new Column<Item>("Section Depth", i => i.Parents().Count() - 1) { Show = false }; // exclude ShowRoot
             yield return new Column<Item>("Sections", i => string.Join(", ", i.Parents().Reverse().Skip(1).Select(n => n.Name))); // skip ShowRoot

@@ -24,7 +24,7 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<(Item Item, Role Role)>("Section & Item Names", p => string.Join(" - ", p.Item.Parents().Reverse().Skip(1).Select(n => n.Name).Concat(p.Item.Name.Yield()))) { Show = false }; // skip ShowRoot
             yield return new Column<(Item Item, Role Role)>("Item Name", p => p.Item.Name);
             foreach (var cast_group in cast_groups.InOrder())
-                yield return new Column<(Item Item, Role Role)>($"Item Required {cast_group.Name}", p => p.Item.CountFor(cast_group)) { Show = false };
+                yield return new Column<(Item Item, Role Role)>($"Item Required {cast_group.Abbreviation}", p => p.Item.CountFor(cast_group)) { Show = false };
             yield return new Column<(Item Item, Role Role)>("Item Required Total", p => p.Item.CountByGroups.Sum(cbg => cbg.Count)) { Show = false };
             yield return new Column<(Item Item, Role Role)>("Item Section Depth", p => p.Item.Parents().Count() - 1) { Show = false }; // exclude ShowRoot
             yield return new Column<(Item Item, Role Role)>("Item Sections", p => string.Join(", ", p.Item.Parents().Reverse().Skip(1).Select(n => n.Name))) { Show = false }; // skip ShowRoot
@@ -33,7 +33,7 @@ namespace Carmen.ShowModel.Reporting
             yield return new Column<(Item Item, Role Role)>("Item & Role Names", p => $"{p.Item.Name} - {p.Role.Name}") { Show = false };
             yield return new Column<(Item Item, Role Role)>("Role Name", p => p.Role.Name);
             foreach (var cast_group in cast_groups.InOrder())
-                yield return new Column<(Item Item, Role Role)>($"Role Required {cast_group.Name}", p => p.Role.CountFor(cast_group));
+                yield return new Column<(Item Item, Role Role)>($"Role Required {cast_group.Abbreviation}", p => p.Role.CountFor(cast_group));
             yield return new Column<(Item Item, Role Role)>("Role Required Total", p => p.Role.CountByGroups.Sum(cbg => cbg.Count));
             yield return new Column<(Item Item, Role Role)>("Requirement Count", p => p.Role.Requirements.Count) { Show = false };
             yield return new Column<(Item Item, Role Role)>("Requirements", p => string.Join(", ", p.Role.Requirements.Select(r => r.Name)));
