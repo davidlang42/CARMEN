@@ -67,11 +67,8 @@ namespace CarmenUI.ViewModels
             }
             if (!section.VerifyConsecutiveItems(out var section_failures))
                 foreach (var failure in section_failures)
-                    yield return new CastingError($"{failure.Cast.Count.Plural("applicant is", "applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}", right_click: new()
-                    {
-                        { $"Allow {(failure.Cast.Count == 1 ? "this" : "these")} consecutive cast only", () => AllowConsecutive(failure.Item1, failure.Item2, failure.Cast) },
-                        { "Allow all consecutive cast between these items", () => AllowConsecutive(failure.Item1, failure.Item2) }
-                    });
+                    yield return new CastingError($"{failure.Cast.Count.Plural("applicant is", "applicants are")} in {failure.Item1.Name} and {failure.Item2.Name}",
+                        right_click: ConsecutiveItemFixes(failure.Item1, failure.Item2, failure.Cast));
         }
 
         /// <summary>Show cast with multiple roles in this item and showroot (and section) consecutive item errors in the item (because showroot isn't visible)</summary>
@@ -81,11 +78,49 @@ namespace CarmenUI.ViewModels
                 yield return new CastingError($"{FullName.Format(applicant)} has {count} roles in {item.Name}", right_click: MultiRoleFixes(applicant, item));
             foreach (var consecutive_cast in item.FindConsecutiveCast())
                 foreach (var cast in consecutive_cast.Cast)
-                    yield return new CastingError($"{FullName.Format(cast)} is cast in {consecutive_cast.Item1.Name} and {consecutive_cast.Item2.Name}", right_click: new()
-                    {
-                        { "Allow this consecutive cast only", () => AllowConsecutive(consecutive_cast.Item1, consecutive_cast.Item2, cast.Yield()) },
-                        { "Allow all consecutive cast between these items", () => AllowConsecutive(consecutive_cast.Item1, consecutive_cast.Item2) }
-                    });
+                    yield return new CastingError($"{FullName.Format(cast)} is cast in {consecutive_cast.Item1.Name} and {consecutive_cast.Item2.Name}",
+                        right_click: ConsecutiveItemFixes(consecutive_cast.Item1, consecutive_cast.Item2, new[] { cast }));
+        }
+
+        private Dictionary<string, Action> ConsecutiveItemFixes(Item item1, Item item2, IEnumerable<Applicant> applicants)
+        {
+            int count = applicants.Count();
+            string applicant_description;
+            string item1_description;
+            string item2_description;
+            if (count == 1)
+            {
+                var applicant = applicants.First();
+                applicant_description = $"{applicant.FirstName} {applicant.LastName}";
+                item1_description = $"{item1.Name} ({string.Join(", ", applicant.Roles.Intersect(item1.Roles).Select(r => r.Name))})";
+                item2_description = $"{item2.Name} ({string.Join(", ", applicant.Roles.Intersect(item2.Roles).Select(r => r.Name))})";
+            }
+            else
+            {
+                applicant_description = $"{count} applicants";
+                item1_description = item1.Name;
+                item2_description = item2.Name;
+            }
+            return new Dictionary<string, Action>()
+            {
+                { $"Allow {(count == 1 ? "this" : "these")} consecutive cast only", () => AllowConsecutive(item1, item2, applicants) },
+                { "Allow all consecutive cast between these items", () => AllowConsecutive(item1, item2) },
+                { $"Remove {applicant_description} from {item1_description}", () => RemoveFromItem(item1, applicants) },
+                { $"Remove {applicant_description} from {item2_description}", () => RemoveFromItem(item2, applicants) }
+            }; ;
+        }
+
+        private void RemoveFromItem(Item item, IEnumerable<Applicant> applicants)
+        {
+            var changed_roles = new HashSet<Role>();
+            foreach (var applicant in applicants)
+                foreach (var role in applicant.Roles.Intersect(item.Roles).ToArray())
+                {
+                    role.Cast.Remove(applicant);
+                    applicant.Roles.Remove(role);
+                    changed_roles.Add(role);
+                }
+            callbackAfterErrorCorrection(Enumerable.Empty<Item>(), changed_roles);
         }
 
         private void AllowConsecutive(Item item1, Item item2, IEnumerable<Applicant>? only_applicants = null)
