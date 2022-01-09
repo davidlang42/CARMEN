@@ -61,7 +61,6 @@ namespace CarmenUI.Windows
             using var loading = new LoadingOverlay(this).AsSegment(nameof(InitializeReport));
             using (var context = ShowContext.Open(connection))
             {
-                //TODO pre-load conditionally based on which report
                 Criteria[] criterias;
                 Tag[] tags;
                 CastGroup[] cast_groups;
@@ -71,11 +70,11 @@ namespace CarmenUI.Windows
                     criterias = await context.Criterias.ToArrayAsync();
                 using (loading.Segment(nameof(ShowContext.Tags), "Tags"))
                     tags = await context.Tags.ToArrayAsync();
-                using (loading.Segment(nameof(ShowContext.CastGroups), "Cast Groups"))
+                using (loading.Segment(nameof(ShowContext.CastGroups), "Cast groups"))
                     cast_groups = await context.CastGroups.ToArrayAsync();
-                using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative Casts"))
+                using (loading.Segment(nameof(ShowContext.AlternativeCasts), "Alternative casts"))
                     alternative_casts = await context.AlternativeCasts.ToArrayAsync();
-                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item) + nameof(Item.NodeId), "Items"))
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(InnerNode) + nameof(InnerNode.Children), "Nodes"))
                 {
                     await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
                     item_ids_in_order = context.ShowRoot.ItemsInOrder().Select(i => i.NodeId).ToList();
@@ -184,12 +183,12 @@ namespace CarmenUI.Windows
         public async Task RefreshItemData(Report<Item> report)
         {
             using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshItemData));
-            using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item), "Items"))//TODO this could be broken down better I think
             using (var context = ShowContext.Open(connection))
             {
-                await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
-                var items_in_order = context.ShowRoot.ItemsInOrder();
-                report.SetData(items_in_order);
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(InnerNode) + nameof(InnerNode.Children), "Nodes"))
+                    await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
+                using (loading.Segment(nameof(Report<Item>) + nameof(Report<Item>.SetData), "Items"))
+                    report.SetData(context.ShowRoot.ItemsInOrder());
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
@@ -198,13 +197,14 @@ namespace CarmenUI.Windows
         public async Task RefreshRolesData(Report<(Item, Role)> report)
         {
             using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshRolesData));
-            using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item), "Roles"))//TODO this could be broken down better I think
             using (var context = ShowContext.Open(connection))
             {
-                await context.Roles.Include(r => r.Items).LoadAsync();
-                await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
-                var items_in_order = context.ShowRoot.ItemsInOrder();
-                report.SetData(EnumerateRoles(items_in_order));
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(InnerNode) + nameof(InnerNode.Children), "Nodes"))
+                    await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Items), "Roles"))
+                    await context.Roles.Include(r => r.Items).LoadAsync();
+                using (loading.Segment(nameof(Report<(Item, Role)>) + nameof(Report<(Item, Role)>.SetData), "Items"))
+                    report.SetData(EnumerateRoles(context.ShowRoot.ItemsInOrder()));
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
@@ -220,14 +220,16 @@ namespace CarmenUI.Windows
         public async Task RefreshCastingData(Report<(Item, Role, Applicant)> report)
         {
             using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshCastingData));
-            using (loading.Segment(nameof(ShowContext.Nodes) + nameof(Item), "Casting"))//TODO this could be broken down better I think
             using (var context = ShowContext.Open(connection))
             {
-                await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).LoadAsync();
-                await context.Roles.Include(r => r.Items).LoadAsync();
-                await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
-                var items_in_order = context.ShowRoot.ItemsInOrder();
-                report.SetData(EnumerateCasting(items_in_order));
+                using (loading.Segment(nameof(ShowContext.Nodes) + nameof(InnerNode) + nameof(InnerNode.Children), "Nodes"))
+                    await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Items), "Roles"))
+                    await context.Roles.Include(r => r.Items).LoadAsync();
+                using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles), "Applicants"))
+                    await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).LoadAsync();
+                using (loading.Segment(nameof(Report<(Item, Role, Applicant)>) + nameof(Report<(Item, Role, Applicant)>.SetData), "Casting"))
+                    report.SetData(EnumerateCasting(context.ShowRoot.ItemsInOrder()));
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
