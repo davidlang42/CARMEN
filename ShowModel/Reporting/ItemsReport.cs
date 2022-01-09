@@ -18,6 +18,7 @@ namespace Carmen.ShowModel.Reporting
 
         private static IEnumerable<Column<Item>> GenerateColumns(CastGroup[] cast_groups)
         {
+            yield return new Column<Item>("Section & Item Names", i => string.Join(" - ", i.Parents().Reverse().Skip(1).Select(n => n.Name).Concat(i.Name.Yield()))) { Show = false }; // skip ShowRoot
             yield return new Column<Item>("Name", i => i.Name);
             foreach (var cast_group in cast_groups.InOrder())
                 yield return new Column<Item>($"Required {cast_group.Name}", i => i.CountFor(cast_group));

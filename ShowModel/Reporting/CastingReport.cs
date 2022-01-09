@@ -22,6 +22,7 @@ namespace Carmen.ShowModel.Reporting
             //TODO remove unused once sure
 
             // Item fields (duplicated from ItemsReport)
+            yield return new Column<(Item Item, Role Role, Applicant Applicant)>("Section & Item Names", p => string.Join(" - ", p.Item.Parents().Reverse().Skip(1).Select(n => n.Name).Concat(p.Item.Name.Yield()))) { Show = false }; // skip ShowRoot
             yield return new Column<(Item Item, Role Role, Applicant Applicant)>("Item Name", p => p.Item.Name);
             //foreach (var cast_group in cast_groups.InOrder())
             //    yield return new Column<(Item Item, Role Role, Applicant Applicant)>($"Item Required {cast_group.Name}", p => p.Item.CountFor(cast_group)) { Show = false };
@@ -30,6 +31,8 @@ namespace Carmen.ShowModel.Reporting
             //yield return new Column<(Item Item, Role Role, Applicant Applicant)>("Item Sections", p => string.Join(", ", p.Item.Parents().Reverse().Skip(1).Select(n => n.Name))) { Show = false }; // skip ShowRoot
 
             // Role fields (duplicated from RolesReport)
+            yield return new Column<(Item Item, Role Role, Applicant Applicant)>("Section, Item & Role Names", p => string.Join(" - ", p.Item.Parents().Reverse().Skip(1).Select(n => n.Name).Concat(p.Item.Name.Yield()).Concat(p.Role.Name.Yield()))) { Show = false }; // skip ShowRoot
+            yield return new Column<(Item Item, Role Role, Applicant Applicant)>("Item & Role Names", p => $"{p.Item.Name} - {p.Role.Name}") { Show = false };
             yield return new Column<(Item Item, Role Role, Applicant Applicant)>("Role Name", p => p.Role.Name);
             //foreach (var cast_group in cast_groups.InOrder())
             //    yield return new Column<(Item Item, Role Role, Applicant Applicant)>($"Role Required {cast_group.Name}", p => p.Role.CountFor(cast_group));
