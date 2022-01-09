@@ -71,6 +71,8 @@ namespace CarmenUI.Windows
                 {
                     if (reportDefinition != null && ReportTypeCombo.Items.OfType<ComboBoxItem>().FirstOrDefault(cbi => reportDefinition.ReportType.Equals(cbi.Content)) is ComboBoxItem item)
                         item.IsSelected = true;
+                    if (report != null)
+                        report.PropertyChanged -= Report_PropertyChanged;
                     report = (ReportTypeCombo.SelectedItem as ComboBoxItem)?.Content switch
                     {
                         "All Applicants" => new ApplicantsReport(criterias, tags),
@@ -83,20 +85,20 @@ namespace CarmenUI.Windows
                     };
                     if (reportDefinition != null)
                         reportDefinition.Apply(report);
-                    report.PropertyChanged += Report_PropertyChanged;
                     AddGridColumns(MainData, Report.Columns);
                     MainData.DataContext = report;
                     columnsCombo.Items.IsLiveSorting = true;
                     columnsCombo.Items.SortDescriptions.Add(StandardSort.For<Column<Applicant>>());
                     columnsCombo.SelectedIndex = 0;
                     ConfigureGrouping();
+                    report.PropertyChanged += Report_PropertyChanged;
                 }   
             }
         }
 
         private void Report_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName != nameof(Report<Applicant>.Rows))
+            if (e.PropertyName != nameof(IReport.Rows))
             {
                 reportDefinition = null;
                 UpdateBookmarkIconAndReportTitle();

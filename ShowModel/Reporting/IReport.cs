@@ -17,5 +17,6 @@ namespace Carmen.ShowModel.Reporting
         public string FullDescription { get; }
         public int ExportCsv(string file_name);
         public IColumn[] Columns { get; }
+        public object?[][] Rows { get; }
     }
 }
