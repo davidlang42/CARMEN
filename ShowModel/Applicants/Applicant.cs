@@ -171,8 +171,6 @@ namespace Carmen.ShowModel.Applicants
 
         public string? CastNumberAndCast => CastNumber == null ? null : $"{CastNumber}{AlternativeCast?.Initial}";
 
-        public CastGroupAndCast CastGroupAndCast => new(CastGroup ?? throw new ApplicationException("Applicant does not have a CastGroup."), AlternativeCast);
-
         private AlternativeCast? alternativeCast;
         public virtual AlternativeCast? AlternativeCast
         {

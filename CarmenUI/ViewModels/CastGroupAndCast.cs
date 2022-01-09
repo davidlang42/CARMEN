@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Carmen.ShowModel.Applicants;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Carmen.ShowModel.Applicants
+namespace CarmenUI.ViewModels
 {
     public struct CastGroupAndCast
     {
-        public CastGroup CastGroup { get; }
-        public AlternativeCast? Cast { get; }
+        public CastGroup CastGroup { get; set; }
+        public AlternativeCast? Cast { get; set; }
 
         public string Name => Cast == null ? CastGroup.Name : $"{CastGroup.Name} ({Cast.Name})";
         public string Abbreviation => Cast == null ? CastGroup.Abbreviation : $"{CastGroup.Abbreviation}-{Cast.Initial}";
@@ -19,6 +20,11 @@ namespace Carmen.ShowModel.Applicants
             CastGroup = cast_group;
             Cast = alternative_cast;
         }
+
+        public CastGroupAndCast(Applicant applicant)
+            : this(applicant.CastGroup ?? throw new ApplicationException("Applicant does not have a CastGroup."),
+                  applicant.AlternativeCast)
+        { }
 
         public static IEnumerable<CastGroupAndCast> Enumerate(IEnumerable<CastGroup> cast_groups, IEnumerable<AlternativeCast> alternative_casts)
         {

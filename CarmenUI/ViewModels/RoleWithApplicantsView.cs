@@ -20,7 +20,7 @@ namespace CarmenUI.ViewModels
         {
             get
             {
-                var dictionary = Role.Cast.OrderBy(a => a.CastNumber).GroupBy(a => a.CastGroupAndCast).ToDictionary(g => g.Key, g => g.ToArray());
+                var dictionary = Role.Cast.OrderBy(a => a.CastNumber).GroupBy(a => new CastGroupAndCast(a)).ToDictionary(g => g.Key, g => g.ToArray());
                 var result = new Applicant[CastGroupsByCast.Length][];
                 for (var i = 0; i < CastGroupsByCast.Length; i++)
                     if (dictionary.TryGetValue(CastGroupsByCast[i], out var group_cast))
