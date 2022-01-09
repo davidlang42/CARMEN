@@ -9,6 +9,12 @@ namespace CarmenUI.ViewModels
 {
     public class ReportDefinition
     {
+        public readonly static ReportDefinition DefaultApplicantsReport = new() { ReportType = ApplicantsReport.DefaultReportType };
+        public readonly static ReportDefinition DefaultAcceptedApplicantsReport = new() { ReportType = AcceptedApplicantsReport.DefaultReportType };
+        public readonly static ReportDefinition DefaultItemsReport = new() { ReportType = ItemsReport.DefaultReportType };
+        public readonly static ReportDefinition DefaultRolesReport = new() { ReportType = RolesReport.DefaultReportType };
+        public readonly static ReportDefinition DefaultCastingReport = new() { ReportType = CastingReport.DefaultReportType };
+
         public struct ColumnDefinition
         {
             public string Name;

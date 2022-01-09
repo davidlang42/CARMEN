@@ -61,17 +61,35 @@ namespace CarmenUI.Windows
         {
             if (Keyboard.Modifiers == ModifierKeys.Control && e.Key == Key.R && Properties.Settings.Default.ReportOnCtrlR)
             {
-                OpenReport(null);
+                var template = MainFrame.Content switch
+                {
+                    MainMenu => null,
+                    ConfigureShow => null,
+                    EditApplicants => ReportDefinition.DefaultApplicantsReport,
+                    SelectCast => ReportDefinition.DefaultAcceptedApplicantsReport,
+                    ConfigureItems => ReportDefinition.DefaultRolesReport,
+                    AllocateRoles => ReportDefinition.DefaultCastingReport,
+                    _ => throw new ApplicationException("Page not handled: " + MainFrame.Content.GetType().Name)
+                };
+                OpenReport(template, false);
                 e.Handled = true;
             }
         }
 
         private uint reportCount = 1;
-        public void OpenReport(ReportDefinition? definition)
+        public void OpenReport(ReportDefinition? definition, bool already_bookmarked)
         {
             if (reportCount == uint.MaxValue)
                 reportCount = 1;
-            var report = new ReportWindow(connection, $"Report #{reportCount++}", definition)
+            ReportWindow? report = null;
+            if (already_bookmarked)
+                foreach (var child in OwnedWindows)
+                    if (child is ReportWindow existing_report && existing_report.ReportDefinition == definition)
+                    {
+                        report = existing_report;
+                        break;
+                    }
+            report ??= new ReportWindow(connection, $"Report #{reportCount++}", definition, !already_bookmarked)
             {
                 Owner = this
             };

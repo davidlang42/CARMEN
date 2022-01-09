@@ -10,7 +10,9 @@ namespace Carmen.ShowModel.Reporting
 {
     public class AcceptedApplicantsReport : ApplicantsReport
     {
-        public override string ReportType => "Accepted Applicants";
+        public new const string DefaultReportType = "Accepted Applicants";
+
+        public override string ReportType => DefaultReportType;
 
         public AcceptedApplicantsReport(Criteria[] criterias, Tag[] tags)
             : base(criterias, tags)

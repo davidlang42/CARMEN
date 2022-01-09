@@ -10,7 +10,9 @@ namespace Carmen.ShowModel.Reporting
 {
     public class RolesReport : Report<(Item, Role)>
     {
-        public override string ReportType => "Roles";
+        public const string DefaultReportType = "Roles";
+
+        public override string ReportType => DefaultReportType;
 
         public RolesReport(CastGroup[] cast_groups, AlternativeCast[] alternative_casts)
             : base(AssignOrder(GenerateColumns(cast_groups, alternative_casts)))

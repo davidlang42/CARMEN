@@ -13,7 +13,9 @@ namespace Carmen.ShowModel.Reporting
 {
     public class ApplicantsReport : Report<Applicant>
     {
-        public override string ReportType => "All Applicants";
+        public const string DefaultReportType = "All Applicants";
+
+        public override string ReportType => DefaultReportType;
 
         public ApplicantsReport(Criteria[] criterias, Tag[] tags)
             : base(AssignOrder(GenerateColumns(criterias, tags)))

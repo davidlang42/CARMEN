@@ -233,7 +233,8 @@ namespace CarmenUI.Pages
         {
             if (!Keyboard.Modifiers.HasFlag(ModifierKeys.Control))
                 ReportsPopup.IsOpen = false;
-            ((MainWindow)Window.GetWindow(this)).OpenReport(e.Parameter as ReportDefinition);
+            var definition = e.Parameter as ReportDefinition;
+            ((MainWindow)Window.GetWindow(this)).OpenReport(definition, definition != null);
         }
 
         private void ReportsButton_Click(object sender, RoutedEventArgs e)
@@ -241,7 +242,7 @@ namespace CarmenUI.Pages
             if (Properties.Settings.Default.ReportDefinitions.Count == 0)
             {
                 ReportsPopup.IsOpen = false;
-                ((MainWindow)Window.GetWindow(this)).OpenReport(null);
+                ((MainWindow)Window.GetWindow(this)).OpenReport(null, false);
             }
         }
 

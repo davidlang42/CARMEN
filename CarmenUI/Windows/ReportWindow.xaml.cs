@@ -27,18 +27,25 @@ namespace CarmenUI.Windows
     public partial class ReportWindow : Window
     {
         ShowConnection connection;
-        ReportDefinition? reportDefinition;
+        bool clearDefinitionAfterLoading;
         string defaultTitle;
 
         private IReport? report;
         public IReport Report => report ?? throw new ApplicationException("Attempted to access report before initializing.");
 
-        public ReportWindow(ShowConnection connection, string default_title, ReportDefinition? report_definition = null)
+        public ReportDefinition? ReportDefinition { get; private set; }
+
+        public ReportWindow(ShowConnection connection, string default_title)
+            : this(connection, default_title, null, false)
+        { }
+
+        public ReportWindow(ShowConnection connection, string default_title, ReportDefinition? report_definition, bool clear_definition_after_loading)
         {
             Log.Information(nameof(ReportWindow));
             defaultTitle = default_title;
             this.connection = connection;
-            this.reportDefinition = report_definition;
+            ReportDefinition = report_definition;
+            clearDefinitionAfterLoading = clear_definition_after_loading;
             InitializeComponent();
             UpdateBookmarkIconAndReportTitle();
         }
@@ -69,22 +76,26 @@ namespace CarmenUI.Windows
                     alternative_casts = await context.AlternativeCasts.ToArrayAsync();
                 using (loading.Segment(nameof(AddGridColumns), "Report"))
                 {
-                    if (reportDefinition != null && ReportTypeCombo.Items.OfType<ComboBoxItem>().FirstOrDefault(cbi => reportDefinition.ReportType.Equals(cbi.Content)) is ComboBoxItem item)
+                    if (ReportDefinition != null && ReportTypeCombo.Items.OfType<ComboBoxItem>().FirstOrDefault(cbi => ReportDefinition.ReportType.Equals(cbi.Content)) is ComboBoxItem item)
                         item.IsSelected = true;
                     if (report != null)
                         report.PropertyChanged -= Report_PropertyChanged;
                     report = (ReportTypeCombo.SelectedItem as ComboBoxItem)?.Content switch
                     {
-                        "All Applicants" => new ApplicantsReport(criterias, tags),
-                        "Accepted Applicants" => new AcceptedApplicantsReport(criterias, tags),
-                        "Rejected Applicants" => new RejectedApplicantsReport(criterias, tags),
-                        "Items" => new ItemsReport(cast_groups),
-                        "Roles" => new RolesReport(cast_groups, alternative_casts),
-                        "Casting" => new CastingReport(cast_groups, alternative_casts, criterias, tags),
+                        ApplicantsReport.DefaultReportType => new ApplicantsReport(criterias, tags),
+                        AcceptedApplicantsReport.DefaultReportType => new AcceptedApplicantsReport(criterias, tags),
+                        RejectedApplicantsReport.DefaultReportType => new RejectedApplicantsReport(criterias, tags),
+                        ItemsReport.DefaultReportType => new ItemsReport(cast_groups),
+                        RolesReport.DefaultReportType => new RolesReport(cast_groups, alternative_casts),
+                        CastingReport.DefaultReportType => new CastingReport(cast_groups, alternative_casts, criterias, tags),
                         _ => throw new ApplicationException($"Report type combo not handled: {ReportTypeCombo.SelectedItem}")
                     };
-                    if (reportDefinition != null)
-                        reportDefinition.Apply(report);
+                    if (ReportDefinition != null)
+                    {
+                        ReportDefinition.Apply(report);
+                        if (clearDefinitionAfterLoading)
+                            ReportDefinition = null;
+                    }
                     AddGridColumns(MainData, Report.Columns);
                     MainData.DataContext = report;
                     columnsCombo.Items.IsLiveSorting = true;
@@ -100,7 +111,7 @@ namespace CarmenUI.Windows
         {
             if (e.PropertyName != nameof(IReport.Rows))
             {
-                reportDefinition = null;
+                ReportDefinition = null;
                 UpdateBookmarkIconAndReportTitle();
             }
         }
@@ -259,7 +270,7 @@ namespace CarmenUI.Windows
 
         private void ExportCsv_Click(object sender, RoutedEventArgs e)
         {
-            var default_file_name = (reportDefinition?.SavedName ?? Report.FullDescription).Replace(".","") + ".csv";
+            var default_file_name = (ReportDefinition?.SavedName ?? Report.FullDescription).Replace(".","") + ".csv";
             default_file_name = string.Concat(default_file_name.Split(Path.GetInvalidFileNameChars()));
             var file = new SaveFileDialog
             {
@@ -283,7 +294,7 @@ namespace CarmenUI.Windows
                 MessageBox.Show("Only applicants reports can export as photos.", Title);
                 return;
             }
-            var default_file_name = (reportDefinition?.SavedName ?? Report.FullDescription).Replace(".", "") + ".zip";
+            var default_file_name = (ReportDefinition?.SavedName ?? Report.FullDescription).Replace(".", "") + ".zip";
             default_file_name = string.Concat(default_file_name.Split(Path.GetInvalidFileNameChars()));
             var file = new SaveFileDialog
             {
@@ -351,7 +362,7 @@ namespace CarmenUI.Windows
         {
             if (report != null) // might still be loading
             {
-                reportDefinition = null;
+                ReportDefinition = null;
                 UpdateBookmarkIconAndReportTitle();
                 if (!report.ReportType.Equals((ReportTypeCombo.SelectedItem as ComboBoxItem)?.Content))
                     await InitializeReport();
@@ -361,7 +372,7 @@ namespace CarmenUI.Windows
 
         private void BookmarkButton_Click(object sender, RoutedEventArgs e)
         {
-            if (reportDefinition == null)
+            if (ReportDefinition == null || clearDefinitionAfterLoading)
                 AddBookmark();
             else
                 RemoveBookmark();
@@ -370,7 +381,7 @@ namespace CarmenUI.Windows
 
         private void UpdateBookmarkIconAndReportTitle()
         {
-            if (reportDefinition == null)
+            if (ReportDefinition == null || clearDefinitionAfterLoading)
             {
                 BookmarkIcon.Icon = FontAwesomeIcon.BookmarkOutline;
                 Title = defaultTitle;
@@ -378,7 +389,7 @@ namespace CarmenUI.Windows
             else
             {
                 BookmarkIcon.Icon = FontAwesomeIcon.Bookmark;
-                Title = "Report: " + reportDefinition.SavedName;
+                Title = "Report: " + ReportDefinition.SavedName;
             }
         }
 
@@ -387,17 +398,17 @@ namespace CarmenUI.Windows
             var name = Microsoft.VisualBasic.Interaction.InputBox("What should this saved report be called?", Title, Report.FullDescription); // I'm sorry
             if (!string.IsNullOrWhiteSpace(name))
             {
-                reportDefinition = ReportDefinition.FromReport(Report, name);
-                Properties.Settings.Default.ReportDefinitions.Add(reportDefinition);
+                ReportDefinition = ReportDefinition.FromReport(Report, name);
+                Properties.Settings.Default.ReportDefinitions.Add(ReportDefinition);
             }
         }
 
         private void RemoveBookmark()
         {
-            if (MessageBox.Show($"Are you sure you want to remove the '{reportDefinition?.SavedName}' saved report?", Title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+            if (MessageBox.Show($"Are you sure you want to remove the '{ReportDefinition?.SavedName}' saved report?", Title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
             {
-                Properties.Settings.Default.ReportDefinitions.Remove(reportDefinition);
-                reportDefinition = null;
+                Properties.Settings.Default.ReportDefinitions.Remove(ReportDefinition);
+                ReportDefinition = null;
             }
         }
 
@@ -410,7 +421,7 @@ namespace CarmenUI.Windows
             }
             else if (Properties.Settings.Default.ReportOnCtrlR && e.Key == Key.R && Keyboard.Modifiers == ModifierKeys.Control)
             {
-                ((MainWindow)Owner).OpenReport(null);
+                ((MainWindow)Owner).OpenReport(ReportDefinition.FromReport(Report, ""), false);
                 e.Handled = true;
             }
         }
