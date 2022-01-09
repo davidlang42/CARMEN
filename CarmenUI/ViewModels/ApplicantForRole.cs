@@ -63,7 +63,7 @@ namespace CarmenUI.ViewModels
 
         public string OverallAbility { get; init; }
 
-        public CastGroupAndCast CastGroupAndCast { get; init; }
+        public CastGroupAndCast CastGroupAndCast => Applicant.CastGroupAndCast;
 
         public Availability Availability { get; init; }
 
@@ -99,8 +99,7 @@ namespace CarmenUI.ViewModels
 
         public ApplicantForRole(IAllocationEngine engine, Applicant applicant, Role role, Criteria[] primary_criterias)
         {
-            this.Applicant = applicant;
-            CastGroupAndCast = new CastGroupAndCast(Applicant);
+            Applicant = applicant;
             this.role = role;
             PrimaryCriterias = primary_criterias;
             Suitability = engine.SuitabilityOf(applicant, role);
