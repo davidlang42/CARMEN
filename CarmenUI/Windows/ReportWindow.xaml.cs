@@ -170,11 +170,13 @@ namespace CarmenUI.Windows
         public async Task RefreshApplicantData(Report<Applicant> report)
         {
             using var loading = new LoadingOverlay(this).AsSegment(nameof(RefreshApplicantData));
-            using (loading.Segment(nameof(ShowContext.Applicants), "Applicants"))
             using (var context = ShowContext.Open(connection))
             {
-                var applicants = await context.Applicants.Include(a => a.Notes).ToArrayAsync();
-                report.SetData(applicants);
+                Applicant[] applicants;
+                using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Notes), "Applicants"))
+                    applicants = await context.Applicants.Include(a => a.Notes).ToArrayAsync();
+                using (loading.Segment(nameof(Report<Applicant>) + nameof(Applicant) + nameof(Report<Applicant>.SetData), "Applicants"))
+                    await report.SetData(applicants);
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
@@ -187,8 +189,8 @@ namespace CarmenUI.Windows
             {
                 using (loading.Segment(nameof(ShowContext.Nodes) + nameof(InnerNode) + nameof(InnerNode.Children), "Nodes"))
                     await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
-                using (loading.Segment(nameof(Report<Item>) + nameof(Report<Item>.SetData), "Items"))
-                    report.SetData(context.ShowRoot.ItemsInOrder());
+                using (loading.Segment(nameof(Report<Item>) + nameof(Item) + nameof(Report<Item>.SetData), "Items"))
+                    await report.SetData(context.ShowRoot.ItemsInOrder());
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
@@ -203,8 +205,8 @@ namespace CarmenUI.Windows
                     await context.Nodes.OfType<InnerNode>().Include(n => n.Children).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Roles) + nameof(Role.Items), "Roles"))
                     await context.Roles.Include(r => r.Items).LoadAsync();
-                using (loading.Segment(nameof(Report<(Item, Role)>) + nameof(Report<(Item, Role)>.SetData), "Items"))
-                    report.SetData(EnumerateRoles(context.ShowRoot.ItemsInOrder()));
+                using (loading.Segment(nameof(Report<(Item, Role)>) + nameof(Item) + nameof(Role) + nameof(Report<(Item, Role)>.SetData), "Items"))
+                    await report .SetData(EnumerateRoles(context.ShowRoot.ItemsInOrder()));
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
@@ -228,8 +230,8 @@ namespace CarmenUI.Windows
                     await context.Roles.Include(r => r.Items).LoadAsync();
                 using (loading.Segment(nameof(ShowContext.Applicants) + nameof(Applicant.Roles), "Applicants"))
                     await context.Applicants.Where(a => a.CastGroup != null).Include(a => a.Roles).LoadAsync();
-                using (loading.Segment(nameof(Report<(Item, Role, Applicant)>) + nameof(Report<(Item, Role, Applicant)>.SetData), "Casting"))
-                    report.SetData(EnumerateCasting(context.ShowRoot.ItemsInOrder()));
+                using (loading.Segment(nameof(Report<(Item, Role, Applicant)>) + nameof(Item) + nameof(Role) + nameof(Applicant) + nameof(Report<(Item, Role, Applicant)>.SetData), "Casting"))
+                    await report .SetData(EnumerateCasting(context.ShowRoot.ItemsInOrder()));
             }
             using (loading.Segment(nameof(ConfigureSorting), "Sorting"))
                 ConfigureSorting(); // must be called every time ItemsSource changes
@@ -295,7 +297,7 @@ namespace CarmenUI.Windows
             }
         }
 
-        private async void ExportPhotos_Click(object sender, RoutedEventArgs e) //TODO hide export photos option when non-applicant report
+        private async void ExportPhotos_Click(object sender, RoutedEventArgs e)
         {
             if (Report is not ApplicantsReport applicant_report)
             {

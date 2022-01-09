@@ -18,6 +18,6 @@ namespace Carmen.ShowModel.Reporting
             : base(criterias, tags)
         { }
 
-        public override void SetData(IEnumerable<Applicant> data) => base.SetData(data.Where(a => a.CastGroup == null));
+        public override Task SetData(IEnumerable<Applicant> data) => base.SetData(data.Where(a => a.CastGroup == null));
     }
 }

@@ -135,9 +135,9 @@ namespace Carmen.ShowModel.Reporting
             throw new InvalidOperationException("Column not found.");
         }
 
-        public virtual void SetData(IEnumerable<T> data)//TODO does this need to be async? why does it lag when updating and not show an overlay?
+        public async virtual Task SetData(IEnumerable<T> data)
         {   
-            Rows = data.Select(d => columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray();
+            Rows = await Task.Run(() => data.Select(d => columns.Select(c => c.ValueGetter(d)).ToArray()).ToArray());
         }
 
         public int ExportCsv(string file_name)
