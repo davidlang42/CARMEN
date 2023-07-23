@@ -153,7 +153,22 @@ namespace CarmenUI.Properties {
                 this["ShowIneligibleApplicants"] = value;
             }
         }
-        
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool ShowUnneededApplicants
+        {
+            get
+            {
+                return ((bool)(this["ShowUnneededApplicants"]));
+            }
+            set
+            {
+                this["ShowUnneededApplicants"] = value;
+            }
+        }
+
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("True")]

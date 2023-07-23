@@ -412,6 +412,10 @@
                                           IsChecked="{bd:SettingBinding ShowIneligibleApplicants}"
                                           Checked="showApplicants_Changed"
                                           Unchecked="showApplicants_Changed"/>
+                                <CheckBox Content="Show unneeded applicants" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                          IsChecked="{bd:SettingBinding ShowUnneededApplicants}"
+                                          Checked="showApplicants_Changed"
+                                          Unchecked="showApplicants_Changed"/>
                             </UniformGrid>
                         </Grid>
                         <Grid Grid.Row="2" Margin="0 5">

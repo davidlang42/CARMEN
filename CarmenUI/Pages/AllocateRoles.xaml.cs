@@ -246,7 +246,7 @@ namespace CarmenUI.Pages
             applicantsPanel.Content = rolesTreeView.SelectedItem switch
             {
                 RoleNodeView role_node_view => new EditableRoleWithApplicantsView(allocationEngine, role_node_view.Role, castGroupsByCast, primaryCriterias, applicantsInCast,
-                    Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants),
+                    Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants, Properties.Settings.Default.ShowUnneededApplicants),
                 _ => defaultPanelContent
             };
             if (applicantsPanel.VisualDescendants<CheckBox>().FirstOrDefault(chk => chk.Name == "showUnavailableApplicants") is CheckBox check_box)
@@ -324,7 +324,7 @@ namespace CarmenUI.Pages
         private void showApplicants_Changed(object sender, RoutedEventArgs e)
         {
             if (applicantsPanel.Content is EditableRoleWithApplicantsView current_view)
-                current_view.ConfigureFiltering(Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants);
+                current_view.ConfigureFiltering(Properties.Settings.Default.ShowUnavailableApplicants, Properties.Settings.Default.ShowIneligibleApplicants, Properties.Settings.Default.ShowUnneededApplicants);
         }
 
         private void ClearCastButton_Click(object sender, RoutedEventArgs e)

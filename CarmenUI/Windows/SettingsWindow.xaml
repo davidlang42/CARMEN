@@ -231,8 +231,10 @@
                         <TextBlock Margin="0 5" Text="Regardless of the settings below, an applicant will be shown in the list if they are currently allocated to the role you are editing." TextWrapping="Wrap"/>
                         <CheckBox Content="When editing the cast for a role, show applicants which are currently unavailable"
                                   IsChecked="{bd:SettingBinding ShowUnavailableApplicants}"/>
-                        <CheckBox Content="When editing the cast for a role, show applicants which don't meet the requirements of the role" Margin="0 5"
+                        <CheckBox Content="When editing the cast for a role, show applicants which don't meet the requirements of the role" Margin="0 5 0 0"
                                   IsChecked="{bd:SettingBinding ShowIneligibleApplicants}"/>
+                        <CheckBox Content="When editing the cast for a role, show applicants which are in a Cast Group which is not needed" Margin="0 5"
+                                  IsChecked="{bd:SettingBinding ShowUnneededApplicants}"/>
                         <TextBlock Margin="0 5 0 0" Text="When editing the cast for a role, you can change the width of each column of the applicants list. These widths are remembered." TextWrapping="Wrap"/>
                         <StackPanel Orientation="Horizontal">
                             <Button Content="Clear applicant list column widths" Width="190" HorizontalAlignment="Left" Margin="0 0 0 5" Click="ClearAllocateRolesWidthsButton_Click"/>

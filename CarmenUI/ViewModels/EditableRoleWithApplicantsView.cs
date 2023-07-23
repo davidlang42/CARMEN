@@ -25,13 +25,15 @@ namespace CarmenUI.ViewModels
 
         public ApplicantForRole[] Applicants { get; init; }
 
+        readonly HashSet<CastGroup> requiredCastGroups;
+
         /// <summary>Array arguments are not expected not to change over the lifetime of this View.
         /// Elements of the array may be monitored for changes, but the collection itself is not.</summary>
-        public EditableRoleWithApplicantsView(IAllocationEngine engine, Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] primary_criterias, Applicant[] applicants, bool show_unavailable, bool show_ineligible)
+        public EditableRoleWithApplicantsView(IAllocationEngine engine, Role role, CastGroupAndCast[] cast_groups_by_cast, Criteria[] primary_criterias, Applicant[] applicants, bool show_unavailable, bool show_ineligible, bool show_unneeded)
             : base(role, cast_groups_by_cast)
         {
-            var required_cast_groups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
-            Applicants = applicants.Where(a => required_cast_groups.Contains(a.CastGroup!) || role.Cast.Contains(a)).Select(a =>
+            requiredCastGroups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
+            Applicants = applicants.Select(a =>
             {
                 var av = new ApplicantForRole(engine, a, role, primary_criterias);
                 av.PropertyChanged += ApplicantForRole_PropertyChanged;
@@ -39,19 +41,23 @@ namespace CarmenUI.ViewModels
             }).ToArray();
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
-            ConfigureFiltering(show_unavailable, show_ineligible);
+            ConfigureFiltering(show_unavailable, show_ineligible, show_unneeded);
             ConfigureSorting();
         }
 
-        public void ConfigureFiltering(bool show_unavailable, bool show_ineligible)
+        public void ConfigureFiltering(bool show_unavailable, bool show_ineligible, bool show_unneeded)
         {
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
-            view.Filter = (show_unavailable, show_ineligible) switch
+            view.Filter = (show_unavailable, show_ineligible, show_unneeded) switch
             {
-                (false, false) => av => ((ApplicantForRole)av).IsSelected || (((ApplicantForRole)av).Availability.IsAvailable && ((ApplicantForRole)av).Eligibility.IsEligible),
-                (false, true) => av => ((ApplicantForRole)av).IsSelected || ((ApplicantForRole)av).Availability.IsAvailable,
-                (true, false) => av => ((ApplicantForRole)av).IsSelected || ((ApplicantForRole)av).Eligibility.IsEligible,
-                _ => null // (true, true)
+                (false, false, false) => av => ((ApplicantForRole)av).IsSelected || (requiredCastGroups.Contains(((ApplicantForRole)av).Applicant.CastGroup!) && ((ApplicantForRole)av).Availability.IsAvailable && ((ApplicantForRole)av).Eligibility.IsEligible),
+                (false, true, false) => av => ((ApplicantForRole)av).IsSelected || (requiredCastGroups.Contains(((ApplicantForRole)av).Applicant.CastGroup!) && ((ApplicantForRole)av).Availability.IsAvailable),
+                (true, false, false) => av => ((ApplicantForRole)av).IsSelected || (requiredCastGroups.Contains(((ApplicantForRole)av).Applicant.CastGroup!) && ((ApplicantForRole)av).Eligibility.IsEligible),
+                (true, true, false) => av => ((ApplicantForRole)av).IsSelected || requiredCastGroups.Contains(((ApplicantForRole)av).Applicant.CastGroup!),
+                (false, false, true) => av => ((ApplicantForRole)av).IsSelected || (((ApplicantForRole)av).Availability.IsAvailable && ((ApplicantForRole)av).Eligibility.IsEligible),
+                (false, true, true) => av => ((ApplicantForRole)av).IsSelected || ((ApplicantForRole)av).Availability.IsAvailable,
+                (true, false, true) => av => ((ApplicantForRole)av).IsSelected || ((ApplicantForRole)av).Eligibility.IsEligible,
+                (true, true, true) => null // show all
             };
         }
 
