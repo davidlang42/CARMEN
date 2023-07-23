@@ -496,27 +496,34 @@ namespace CarmenUI.Pages
             SaveChangesAfterErrorCorrection(changed_items, Enumerable.Empty<Role>());
         }
 
-        GridViewColumnHeader? lastHeaderClicked = null;
-        ListSortDirection lastDirection = ListSortDirection.Ascending;
+        List<(string, ListSortDirection)> sortFields = new();
         private void GridViewColumnHeader_Clicked(object sender, RoutedEventArgs e)
         {
             if (e.OriginalSource is GridViewColumnHeader header && header.Role != GridViewColumnHeaderRole.Padding)
             {
-                ListSortDirection direction;
-                if (header != lastHeaderClicked || lastDirection == ListSortDirection.Ascending)
-                    direction = ListSortDirection.Descending;
-                else
-                    direction = ListSortDirection.Ascending;
-
                 var column_binding = header.Column.DisplayMemberBinding as Binding;
                 var sort_by = column_binding?.Path.Path ?? (string)header.Column.Header;
 
+                var last_direction = ListSortDirection.Ascending;
+                for (var i = 0; i < sortFields.Count; i++)
+                {
+                    if (sortFields[i].Item1 == sort_by)
+                    {
+                        last_direction = sortFields[i].Item2;
+                        sortFields.RemoveAt(i);
+                        break;
+                    }
+                }
+
+                var direction = last_direction == ListSortDirection.Ascending ? ListSortDirection.Descending : ListSortDirection.Ascending;
+
+                if (Keyboard.Modifiers != ModifierKeys.Control)
+                    sortFields.Clear();
+                sortFields.Add((sort_by, direction));
+
                 var list_view = (ListView)sender;
                 var view_model = (EditableRoleWithApplicantsView)list_view.DataContext;
-                view_model.ConfigureSorting(sort_by, direction);
-
-                lastHeaderClicked = header;
-                lastDirection = direction;
+                view_model.ConfigureSorting(sortFields);
             }
         }
     }

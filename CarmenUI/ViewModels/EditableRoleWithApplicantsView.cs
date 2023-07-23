@@ -42,7 +42,7 @@ namespace CarmenUI.ViewModels
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
             ConfigureFiltering(show_unavailable, show_ineligible, show_unneeded);
-            ConfigureSorting();
+            ConfigureSorting(new[] { (nameof(ApplicantForRole.Suitability), ListSortDirection.Descending) });
         }
 
         public void ConfigureFiltering(bool show_unavailable, bool show_ineligible, bool show_unneeded)
@@ -61,19 +61,22 @@ namespace CarmenUI.ViewModels
             };
         }
 
-        public void ConfigureSorting(string sort_by = nameof(ApplicantForRole.Suitability), ListSortDirection direction = ListSortDirection.Descending)
+        public void ConfigureSorting(IEnumerable<(string, ListSortDirection)> sort_fields)
         {
             var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             view.SortDescriptions.Clear();
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.CastGroup)}.{nameof(CastGroup.Order)}", ListSortDirection.Ascending));
             view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Cast)}.{nameof(AlternativeCast.Initial)}", ListSortDirection.Ascending));
-            if (sort_by == "CastNumberAndCast")
-                view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.Applicant)}.{nameof(Applicant.CastNumber)}", direction));
-            else if (sort_by == "Name")
-                foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions(direction))
-                    view.SortDescriptions.Add(sd);
-            else
-                view.SortDescriptions.Add(new(sort_by, direction));
+            foreach ((string sort_by, ListSortDirection direction) in sort_fields)
+            {
+                if (sort_by == "CastNumberAndCast")
+                    view.SortDescriptions.Add(new($"{nameof(ApplicantForRole.Applicant)}.{nameof(Applicant.CastNumber)}", direction));
+                else if (sort_by == "Name")
+                    foreach (var sd in Properties.Settings.Default.FullNameFormat.ToSortDescriptions(direction))
+                        view.SortDescriptions.Add(sd);
+                else
+                    view.SortDescriptions.Add(new(sort_by, direction));
+            }
         }
 
         public void ClearSelectedApplicants()
