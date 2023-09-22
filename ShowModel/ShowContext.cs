@@ -123,7 +123,7 @@ namespace Carmen.ShowModel
             return await Task.Run(() => // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
             {
                 var all_migrations = Database.GetMigrations().ToList();
-                var applied_migrations = Database.GetAppliedMigrations().ToList();
+                var applied_migrations = Database.GetAppliedMigrations().ToList();//TODO handle database error (db name could be blank, or unauthorized)
                 if (all_migrations.Any() && !applied_migrations.Any())
                     return DatabaseState.Empty;
                 var pending_migrations = all_migrations.Except(applied_migrations);

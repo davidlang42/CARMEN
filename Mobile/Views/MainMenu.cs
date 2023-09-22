@@ -78,38 +78,19 @@ namespace Carmen.Mobile.Views
             return button;
         }
 
-        private async Task TestUi()
-        {
-            model.Loading("Connecting to server");
-            await Task.Run(() => Thread.Sleep(1000));
-            model.Loading("Preparing show model");
-            await Task.Run(() => Thread.Sleep(1000));
-            model.Loading("Checking database integrity");
-            var state = ShowContext.DatabaseState.SavedWithFutureVersion;
-            if (state == ShowContext.DatabaseState.Empty)
-            {
-                model.Loading("Creating new database");
-                await Task.Run(() => Thread.Sleep(1000));
-            }
-            else if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
-            {
-                model.Error("This database was saved with a newer version of CARMEN and cannot be opened. Please install the latest version.");
-                return;
-            }
-            else if (state == ShowContext.DatabaseState.SavedWithPreviousVersion)
-            {
-                model.Error("This database was saved with an older version of CARMEN and cannot be opened. Please upgrade it using CARMEN desktop.");
-                return;
-            }
-            model.Ready();
-        }
-
         private async void MainMenu_Loaded(object? sender, EventArgs e)
         {
-            await TestUi();
-            return;
-            //TODO
             model.Loading("Connecting to server");
+            if (!await Task.Run(connection.TryPing))
+            {
+                model.Error($"Ping failed to reach host:\n{connection.Host}");
+                return;
+            }
+            if (await Task.Run(() => connection.TryConnection(out var e) ? null : e) is string error)
+            {
+                model.Error($"Unable to connect to server:\n{connection.Description}\n\n{error}");
+                return;
+            }
             using (var context = ShowContext.Open(connection))
             {
                 model.Loading("Preparing show model");
@@ -123,12 +104,12 @@ namespace Carmen.Mobile.Views
                 }
                 else if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
                 {
-                    model.Error("This database was saved with a newer version of CARMEN and cannot be opened. Please install the latest version.");
+                    model.Error("This database was saved with a newer version of CARMEN and cannot be opened.\nPlease install the latest version.");
                     return;
                 }
                 else if (state == ShowContext.DatabaseState.SavedWithPreviousVersion)
                 {
-                    model.Error("This database was saved with an older version of CARMEN and cannot be opened. Please upgrade it using CARMEN desktop.");
+                    model.Error("This database was saved with an older version of CARMEN and cannot be opened.\nPlease upgrade the database using CARMEN desktop.");
                     return;
                 }
             }
@@ -137,10 +118,12 @@ namespace Carmen.Mobile.Views
 
         private static void ViewApplicants_Clicked(object? sender, EventArgs e)
         {
+            //TODO launch view page
         }
 
         private static void EditApplicants_Clicked(object? sender, EventArgs e)
         {
+            //TODO launch edit page
         }
     }
 }
