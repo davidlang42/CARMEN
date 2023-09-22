@@ -19,14 +19,14 @@ namespace Carmen.Mobile.Views
     {
         readonly ApplicantModel model;
         readonly ConnectionDetails show;
-        readonly Action onSave;
+        readonly Action onChange;
         ShowContext? context;
 
-        public ApplicantDetails(ConnectionDetails show, int id, string first, string last, Action on_save)
+        public ApplicantDetails(ConnectionDetails show, int id, string first, string last, Action on_change)
         {
             this.show = show;
             model = new(id, first, last);
-            onSave = on_save;
+            onChange = on_change;
             BindingContext = model;
             SetBinding(TitleProperty, new Binding(nameof(ApplicantModel.FullName)));
             Loaded += ViewApplicant_Loaded;
@@ -198,7 +198,7 @@ namespace Carmen.Mobile.Views
             if (!context.ChangeTracker.HasChanges())
                 await DisplayAlert($"No changes were made.", "", "Ok");//TODO dont wait if dont care about result
             await context.SaveChangesAsync();//TODO dont save if no changes
-            await Task.Run(onSave);
+            await Task.Run(onChange);
             await Navigation.PopAsync();
         }
 
@@ -210,6 +210,7 @@ namespace Carmen.Mobile.Views
             {
                 context.Applicants.Remove(model.Applicant);
                 await context.SaveChangesAsync();
+                await Task.Run(onChange);
                 await Navigation.PopAsync();
             }
         }

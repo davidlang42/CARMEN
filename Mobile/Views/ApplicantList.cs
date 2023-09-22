@@ -117,8 +117,14 @@ namespace Carmen.Mobile.Views
                 return;
             await Navigation.PushAsync(new ApplicantDetails(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName, () =>
             {
-                context?.Entry(applicant).Reload();
-                applicant.NotifyChanged();
+                if (context == null)
+                    return;
+                var entry = context.Entry(applicant);
+                entry.Reload();
+                if (entry.State == Microsoft.EntityFrameworkCore.EntityState.Detached)
+                    model.Loaded(context.Applicants.ToObservableCollection());
+                else
+                    applicant.NotifyChanged();
             }));
         }
     }
