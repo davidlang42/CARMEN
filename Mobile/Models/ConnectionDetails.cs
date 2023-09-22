@@ -44,7 +44,7 @@ namespace Carmen.Mobile.Models
         /// <summary>The default name for the show</summary>
         public string DefaultShowName => Database;
 
-        public bool TryPing()
+        public bool TryPing() //TODO (MVP) unable to ping (or connect) running in android emulator (maybe a permissions issue? maybe test on real device?)
         {
             try
             {

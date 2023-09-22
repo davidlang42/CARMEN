@@ -91,7 +91,7 @@ namespace Carmen.Mobile.Views
 
         private void AddButton_Clicked(object? sender, EventArgs e)
         {
-            //TODO (EDIT) add new applicant
+            //TODO (MVP) add new applicant
         }
 
         private object GenerateDataTemplate()

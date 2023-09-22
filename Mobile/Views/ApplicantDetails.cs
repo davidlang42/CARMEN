@@ -153,7 +153,7 @@ namespace Carmen.Mobile.Views
             };
             abilities.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Abilities))));
 
-            var notes = new ListView//TODO add some sort of placeholder/button to add notes if there are none
+            var notes = new ListView//TODO (MVP) add some sort of placeholder/button to add notes if there are none
             {
                 ItemTemplate = new DataTemplate(GenerateNoteDataTemplate),
             };
@@ -250,7 +250,7 @@ namespace Carmen.Mobile.Views
             var cell = new TextCell();
             cell.SetBinding(TextCell.TextProperty, new Binding($"{nameof(Ability.Criteria)}.{nameof(Criteria.Name)}"));
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Ability.Mark))); //TODO nicer formatting for marks
-            //TODO (EDIT) edit marks: cell.Tapped += FieldCell_Tapped;
+            //TODO (MVP) edit marks: cell.Tapped += FieldCell_Tapped;
             return cell;
         }
 
