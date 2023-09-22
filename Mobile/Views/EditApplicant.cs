@@ -19,7 +19,6 @@ namespace Carmen.Mobile.Views
 
         protected override View GenerateMainView()
         {
-            //TODO editable layout: first, last, gender, dob, criterias, notes, photo
             return new Label { Text = "TODO: editable layout" };
         }
 

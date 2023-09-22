@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -19,7 +20,11 @@ namespace Carmen.Mobile.Models
         public T Value
         {
             get => getter(Applicant);
-            set => setter(Applicant, value);
+            set
+            {
+                setter(Applicant, value);
+                OnPropertyChanged();
+            }
         }
 
         object? IApplicantField.Value
@@ -49,7 +54,7 @@ namespace Carmen.Mobile.Models
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected void OnPropertyChanged(string property)
+        protected void OnPropertyChanged([CallerMemberName]string property = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }

@@ -92,7 +92,6 @@ namespace Carmen.Mobile.Views
             //TODO unselect item
             if (sender is not Cell cell)
                 return;
-            //TODO (EDIT) handle date fields separately
             if (cell.BindingContext is ApplicantField<string> string_field)
             {
                 await Navigation.PushAsync(new EditStringField(string_field));
@@ -100,6 +99,10 @@ namespace Carmen.Mobile.Views
             else if (cell.BindingContext is ApplicantField<Gender?> gender_field)
             {
                 await Navigation.PushAsync(new EditGenderField(gender_field));
+            }
+            else if (cell.BindingContext is ApplicantField<DateTime?> date_field)
+            {
+                await Navigation.PushAsync(new EditDateField(date_field));
             }
         }
 

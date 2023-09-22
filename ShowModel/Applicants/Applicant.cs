@@ -75,8 +75,9 @@ namespace Carmen.ShowModel.Applicants
             get => dateOfBirth;
             set
             {
-                if (value > (ShowRoot?.ShowDate ?? DateTime.Now))
-                    value = null;
+                var max_date = (ShowRoot?.ShowDate ?? DateTime.Now);
+                if (value > max_date)
+                    value = max_date;
                 if (dateOfBirth == value)
                     return;
                 dateOfBirth = value;
