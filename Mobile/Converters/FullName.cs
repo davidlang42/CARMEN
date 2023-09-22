@@ -12,7 +12,7 @@ namespace Carmen.Mobile.Converters
     /// </summary>
     public class FullName : IMultiValueConverter
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        public object Convert(object?[] values, Type? targetType, object? parameter, CultureInfo? culture)
         {
             if (values.Length != 2)
                 throw new ApplicationException("Values must be {FirstName, LastName}");

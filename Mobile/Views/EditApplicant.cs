@@ -1,10 +1,12 @@
-﻿using Carmen.Mobile.Models;
+﻿using Carmen.Mobile.Converters;
+using Carmen.Mobile.Models;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Carmen.Mobile.Views
@@ -22,12 +24,19 @@ namespace Carmen.Mobile.Views
 
         protected override View GenerateMainView()
         {
-            //TODO editable layout
+            //TODO editable layout: first, last, gender, dob, criterias, notes, photo
             return new Label { Text = "TODO: editable layout" };
         }
 
         protected override IEnumerable<View> GenerateExtraButtons()
         {
+            var delete = new Button
+            {
+                Text = "Delete",
+                BackgroundColor = Colors.Red
+            };
+            delete.Clicked += Delete_Clicked; ;
+            yield return delete;
             var save = new Button
             {
                 Text = "Save",
@@ -35,6 +44,7 @@ namespace Carmen.Mobile.Views
             save.Clicked += Save_Clicked;
             yield return save;
         }
+
         private async void EditApplicant_Loaded(object? sender, EventArgs e)
         {
             context = ShowContext.Open(show);
@@ -51,8 +61,19 @@ namespace Carmen.Mobile.Views
 
         private async void Save_Clicked(object? sender, EventArgs e)
         {
-            if (context != null)
+            if (context == null)
+                return;
+            await context.SaveChangesAsync();
+            await Navigation.PopAsync();
+        }
+
+        private async void Delete_Clicked(object? sender, EventArgs e)
+        {
+            if (context == null)
+                return;
+            if (await DisplayAlert($"Are you sure you want to delete '{model.GetFullName()}'?", "This cannot be undone.", "Yes", "No"))
             {
+                //TODO actually delete
                 await context.SaveChangesAsync();
                 await Navigation.PopAsync();
             }

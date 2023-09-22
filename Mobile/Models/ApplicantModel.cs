@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.Mobile.Converters;
+using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -33,5 +34,8 @@ namespace Carmen.Mobile.Models
             OnPropertyChanged(nameof(Applicant));
             OnPropertyChanged(nameof(IsLoading));
         }
+
+        public string GetFullName()
+            => (string)new FullName().Convert(new[] { Applicant?.FirstName, Applicant?.LastName }, null, null, null);
     }
 }

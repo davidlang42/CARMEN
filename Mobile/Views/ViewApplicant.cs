@@ -24,7 +24,11 @@ namespace Carmen.Mobile.Views
             {
                 LabelledField("First name", nameof(Applicant.FirstName)),
                 LabelledField("Last name", nameof(Applicant.LastName)),
-                //TODO add other fields
+                LabelledField("Gender", nameof(Applicant.Gender)),
+                LabelledField("Date of birth", nameof(Applicant.DateOfBirth)),
+                //TODO view criterias
+                //TODO view notes
+                //TODO view photo
             };
         }
 
