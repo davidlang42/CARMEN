@@ -82,18 +82,21 @@ namespace Carmen.Mobile.Views
         {
             // BindingContext will be set to an ApplicantField
             var cell = new TextCell();
-            cell.SetBinding(TextCell.TextProperty, new Binding(nameof(ApplicantField.Label)));
-            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(ApplicantField.Value)));
+            cell.SetBinding(TextCell.TextProperty, new Binding(nameof(IApplicantField.Label)));
+            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(IApplicantField.Value)));
             cell.Tapped += FieldCell_Tapped;
             return cell;
         }
 
         private async void FieldCell_Tapped(object? sender, EventArgs e)
         {
-            //TODO handle enum & date fields separately to string (make ApplicantField<T>)
-            if (sender is Cell cell && cell.BindingContext is ApplicantField field && model.Applicant is Applicant applicant)
+            //TODO unselect item
+            if (sender is not Cell cell)
+                return;
+            //TODO (EDIT) handle enum & date fields separately
+            if (cell.BindingContext is ApplicantField<string> string_field)
             {
-                await Navigation.PushAsync(new EditField(applicant.FirstName, applicant.LastName, field));
+                await Navigation.PushAsync(new EditStringField(string_field));
             }
         }
 
@@ -103,7 +106,7 @@ namespace Carmen.Mobile.Views
             var cell = new TextCell();
             cell.SetBinding(TextCell.TextProperty, new Binding($"{nameof(Ability.Criteria)}.{nameof(Criteria.Name)}"));
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Ability.Mark))); //TODO nicer formatting for marks
-            //TODO edit marks: cell.Tapped += FieldCell_Tapped;
+            //TODO (EDIT) edit marks: cell.Tapped += FieldCell_Tapped;
             return cell;
         }
 
@@ -119,7 +122,7 @@ namespace Carmen.Mobile.Views
             description.Bindings.Add(new Binding(nameof(Note.Timestamp)));
             cell.SetBinding(TextCell.TextProperty, description);
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Note.Text)));
-            //TODO add notes: cell.Tapped += FieldCell_Tapped;
+            //TODO (EDIT) add notes: cell.Tapped += FieldCell_Tapped;
             return cell;
         }
     }

@@ -8,31 +8,37 @@ using System.Threading.Tasks;
 
 namespace Carmen.Mobile.Models
 {
-    internal class ApplicantField : INotifyPropertyChanged
+    internal class ApplicantField<T> : INotifyPropertyChanged, IApplicantField
     {
-        readonly Applicant applicant;
-        readonly Func<Applicant, object?> getter;
-        readonly Action<Applicant, object?> setter;
+        public Applicant Applicant { get; }
+
+        readonly Func<Applicant, T> getter;
+        readonly Action<Applicant, T> setter;
 
         public string Label { get; }
-        public object? Value
+        public T Value
         {
-            get => getter(applicant);
-            set => setter(applicant, value);
+            get => getter(Applicant);
+            set => setter(Applicant, value);
         }
-        
-        private ApplicantField(string label, Func<Applicant, object?> getter, Action<Applicant, object?> setter, Applicant applicant)
+
+        object? IApplicantField.Value
+        {
+            get => Value;
+            set
+            {
+                if (value is T typed)
+                    Value = typed;
+            }
+        }
+
+        public ApplicantField(string label, Func<Applicant, T> getter, Action<Applicant, T> setter, Applicant applicant)
         {
             Label = label;
             this.getter = getter;
             this.setter = setter;
-            this.applicant = applicant;
+            Applicant = applicant;
             applicant.PropertyChanged += Applicant_PropertyChanged;
-        }
-
-        public static ApplicantField New<T>(string label, Func<Applicant, T> getter, Action<Applicant, T> setter, Applicant applicant)
-        {
-            return new(label, a => getter(a), (a, v) => setter(a, (T?)v), applicant);
         }
 
         private void Applicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)

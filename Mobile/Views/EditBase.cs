@@ -1,5 +1,6 @@
 ﻿using Carmen.Mobile.Models;
 using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -11,9 +12,9 @@ namespace Carmen.Mobile.Views
 {
     internal abstract class EditBase : ContentPage
     {
-        public EditBase(string first, string last, View edit_view)
+        public EditBase(Applicant applicant, View edit_view)
         {
-            Title = $"{first} {last}";
+            Title = $"Editing {applicant.FirstName} {applicant.LastName}";
 
             var main = new ScrollView
             {

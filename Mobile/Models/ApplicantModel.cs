@@ -14,17 +14,17 @@ namespace Carmen.Mobile.Models
         public bool IsLoading { get; private set; } = true;
         public int ApplicantId { get; }
         public Applicant? Applicant { get; private set; }
-        public ApplicantField[] Fields
+        public IApplicantField[] Fields
         {
             get
             {
                 if (Applicant is not Applicant applicant)
-                    return Array.Empty<ApplicantField>();
-                return new[] {
-                    ApplicantField.New("First name", a => a.FirstName, (a, v) => a.FirstName = v, applicant),
-                    ApplicantField.New("Last name", a => a.LastName, (a, v) => a.LastName = v, applicant),
-                    ApplicantField.New("Gender", a => a.Gender, (a, v) => a.Gender = v, applicant),
-                    ApplicantField.New("Date of birth", a => a.DateOfBirth, (a, v) => a.DateOfBirth = v, applicant)
+                    return Array.Empty<IApplicantField>();
+                return new IApplicantField[] {
+                    new ApplicantField<string>("First name", a => a.FirstName, (a, v) => a.FirstName = v, applicant),
+                    new ApplicantField<string>("Last name", a => a.LastName, (a, v) => a.LastName = v, applicant),
+                    new ApplicantField<Gender?>("Gender", a => a.Gender, (a, v) => a.Gender = v, applicant),
+                    new ApplicantField<DateTime?>("Date of birth", a => a.DateOfBirth, (a, v) => a.DateOfBirth = v, applicant)
                 };
             }
         }

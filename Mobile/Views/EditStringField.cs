@@ -8,19 +8,19 @@ using System.Threading.Tasks;
 
 namespace Carmen.Mobile.Views
 {
-    internal class EditField : EditBase
+    internal class EditStringField : EditBase
     {
-        public EditField(string first, string last, ApplicantField model)
-            : base(first, last, GenerateEditView(model))
+        public EditStringField(ApplicantField<string> field)
+            : base(field.Applicant, GenerateEditView(field))
         {
-            BindingContext = model;
+            BindingContext = field;
         }
 
-        static View GenerateEditView(ApplicantField model)
+        static View GenerateEditView(ApplicantField<string> model)
         {
             var label = new Label { Text = model.Label };
             var entry = new Entry();
-            entry.SetBinding(Entry.TextProperty, new Binding(nameof(ApplicantField.Value)));
+            entry.SetBinding(Entry.TextProperty, new Binding(nameof(ApplicantField<string>.Value)));
             return new VerticalStackLayout()
             {
                 label,
