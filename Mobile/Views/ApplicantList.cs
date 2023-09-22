@@ -42,21 +42,42 @@ namespace Carmen.Mobile.Views
             {
                 Margin = 5,
                 RowSpacing = 5,
+                ColumnSpacing = 5,
                 RowDefinitions =
                 {
-                    new RowDefinition(GridLength.Star)
+                    new RowDefinition(GridLength.Star),
+                    new RowDefinition(GridLength.Auto)
+                },
+                ColumnDefinitions =
+                {
+                    new ColumnDefinition(GridLength.Star)
                 }
             };
             grid.Add(loading);
             grid.Add(list);
-            if (allowEditing)//TODO (NOW) add back button at the bottom always, in grey (similar to ApplicantBase)
+            var c = 0;
+            var back = new Button
             {
-                grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
-                var button = new Button { Text = "Add new applicant" };
-                button.Clicked += AddButton_Clicked;
-                grid.Add(button, row: 1);
+                Text = "Back",
+                BackgroundColor = Colors.Gray
+            };
+            back.Clicked += Back_Clicked; ;
+            grid.Add(back, row: 1, column: c++);
+            if (allowEditing)
+            {
+                var add = new Button { Text = "Add new applicant" };
+                add.Clicked += AddButton_Clicked;
+                grid.ColumnDefinitions.Add(new(GridLength.Star));
+                grid.Add(add, row: 1, column: c++);
+                grid.SetColumnSpan(loading, c);
+                grid.SetColumnSpan(list, c);
             }
             Content = grid;
+        }
+
+        private async void Back_Clicked(object? sender, EventArgs e)
+        {
+            await Navigation.PopAsync();
         }
 
         private async void ApplicantList_Loaded(object? sender, EventArgs e)
