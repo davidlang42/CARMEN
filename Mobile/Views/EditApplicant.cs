@@ -54,7 +54,6 @@ namespace Carmen.Mobile.Views
 
         private void EditApplicant_Unloaded(object? sender, EventArgs e)
         {
-            //TODO check when this is called
             context?.Dispose();
             context = null;
         }
