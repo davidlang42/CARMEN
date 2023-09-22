@@ -111,6 +111,10 @@ namespace Carmen.Mobile.Views
                 {
                     model.Error("This database was saved with an older version of CARMEN and cannot be opened.\nPlease upgrade the database using CARMEN desktop.");
                     return;
+                } else if (state == ShowContext.DatabaseState.ConnectionError)
+                {
+                    model.Error($"Could not open '{connection.Database}'.\nThis database either doesn't exist, or you don't have access to it.");
+                    return;
                 }
             }
             model.Ready();
