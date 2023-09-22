@@ -135,8 +135,7 @@ namespace Carmen.Mobile.Views
         {
             var button = new Button
             {
-                Text = "Connect",
-                BackgroundColor = Colors.Green
+                Text = "Connect"
             };
             button.Clicked += handler;
             return button;

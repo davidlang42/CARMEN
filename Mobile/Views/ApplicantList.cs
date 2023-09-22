@@ -49,7 +49,7 @@ namespace Carmen.Mobile.Views
             };
             grid.Add(loading);
             grid.Add(list);
-            if (allowEditing)
+            if (allowEditing)//TODO add back button at the bottom always, in grey (similar to ApplicantBase)
             {
                 grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
                 var button = new Button { Text = "Add new applicant" };
@@ -90,7 +90,19 @@ namespace Carmen.Mobile.Views
             full_name.Bindings.Add(new Binding(nameof(Applicant.LastName)));
             cell.SetBinding(TextCell.TextProperty, full_name);
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Applicant.Description)));
-            return cell;//TODO click to edit/view
+            cell.Tapped += Cell_Tapped;
+            return cell;
+        }
+
+        private async void Cell_Tapped(object? sender, EventArgs e)
+        {
+            var cell = (Cell)sender!;
+            if (cell.BindingContext is not Applicant applicant)
+                return;
+            if (allowEditing)
+                await Navigation.PushAsync(new EditApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName)); //TODO need to reload the edited entity on return
+            else
+                await Navigation.PushAsync(new ViewApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName));
         }
     }
 }
