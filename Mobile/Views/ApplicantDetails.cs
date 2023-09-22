@@ -153,7 +153,7 @@ namespace Carmen.Mobile.Views
             };
             abilities.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Abilities))));
 
-            var notes = new ListView
+            var notes = new ListView//TODO add some sort of placeholder/button to add notes if there are none
             {
                 ItemTemplate = new DataTemplate(GenerateNoteDataTemplate),
             };
@@ -266,8 +266,19 @@ namespace Carmen.Mobile.Views
             description.Bindings.Add(new Binding(nameof(Note.Timestamp)));
             cell.SetBinding(TextCell.TextProperty, description);
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Note.Text)));
-            //TODO (EDIT) add notes: cell.Tapped += FieldCell_Tapped;
+            cell.Tapped += NoteCell_Tapped; ;
             return cell;
+        }
+
+        private async void NoteCell_Tapped(object? sender, EventArgs e)
+        {
+            //TODO unselect item
+            if (sender is not Cell cell)
+                return;
+            if (cell.BindingContext is Note note)
+            {
+                await Navigation.PushAsync(new AddNote(note.Applicant, show.User));
+            }
         }
     }
 }
