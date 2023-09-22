@@ -33,7 +33,9 @@ namespace Carmen.Mobile.Views
             var loading = new ActivityIndicator { IsRunning = true };
             loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoading)));
 
-            var main = GenerateMainView();
+            var main = new ScrollView {
+                Content = GenerateMainView()
+            };
 
             var grid = new Grid
             {

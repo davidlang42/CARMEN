@@ -23,7 +23,9 @@ namespace Carmen.Mobile.Views
 
         protected override View GenerateMainView()
         {
-            var fields = new VerticalStackLayout //TODO add scrolling
+            //TODO (NOW) move fields into a ListView with TextCells to be more consistent
+            //TODO (EDIT) maybe remove the idea of edit/view and just make it view by default then edit INDIVIDUAL values by clicking the TextCells (which opens an editor in a new page)
+            var fields = new VerticalStackLayout
             {
                 LabelledField("First name", nameof(Applicant.FirstName)),
                 LabelledField("Last name", nameof(Applicant.LastName)),
@@ -45,7 +47,10 @@ namespace Carmen.Mobile.Views
 
             var activity = new ActivityIndicator();
             activity.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
-            var image = new MC.Image();
+            var image = new MC.Image()
+            {
+                WidthRequest = 300,
+            };
             image.SetBinding(MC.Image.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
             var photo = new Grid
             {
@@ -53,13 +58,23 @@ namespace Carmen.Mobile.Views
                 activity
             };
 
-            return new HorizontalStackLayout //TODO (NOW) flexlayout? and scroll if vital
+            var layout = new FlexLayout
             {
-                fields,
-                abilities,
-                notes,
-                photo
+                Padding = 10,
+                AlignContent = Microsoft.Maui.Layouts.FlexAlignContent.SpaceEvenly,
+                VerticalOptions = LayoutOptions.Start,
+                AlignItems = Microsoft.Maui.Layouts.FlexAlignItems.Start,
+                Direction = Microsoft.Maui.Layouts.FlexDirection.Row,
+                Wrap = Microsoft.Maui.Layouts.FlexWrap.Wrap,
+                Children =
+                {
+                    fields,
+                    abilities,
+                    notes,
+                    photo
+                }
             };
+            return layout;
         }
 
         protected override IEnumerable<View> GenerateExtraButtons() => Enumerable.Empty<View>();
