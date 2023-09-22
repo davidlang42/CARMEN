@@ -23,7 +23,6 @@ namespace Carmen.Mobile.Views
 
         protected override View GenerateMainView()
         {
-            //TODO (EDIT) maybe remove the idea of edit/view and just make it view by default then edit INDIVIDUAL values by clicking the TextCells (which opens an editor in a new page)
             //TODO (EDIT) put the delete button on ViewApplicant page
             //TODO (EDIT) move ApplicantBase code into ViewApplicant & remove EditApplicant/ApplicantBase
             var fields = new ListView
@@ -93,10 +92,14 @@ namespace Carmen.Mobile.Views
             //TODO unselect item
             if (sender is not Cell cell)
                 return;
-            //TODO (EDIT) handle enum & date fields separately
+            //TODO (EDIT) handle date fields separately
             if (cell.BindingContext is ApplicantField<string> string_field)
             {
                 await Navigation.PushAsync(new EditStringField(string_field));
+            }
+            else if (cell.BindingContext is ApplicantField<Gender?> gender_field)
+            {
+                await Navigation.PushAsync(new EditGenderField(gender_field));
             }
         }
 
