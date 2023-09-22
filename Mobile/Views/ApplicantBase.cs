@@ -6,6 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Serilog;
+using MC = Microsoft.Maui.Controls;
+using SM = Carmen.ShowModel;
 
 namespace Carmen.Mobile.Views
 {
@@ -13,6 +16,7 @@ namespace Carmen.Mobile.Views
     {
         protected readonly ApplicantModel model;
         protected readonly ConnectionDetails show;
+        protected ShowContext? context;
 
         protected abstract View GenerateMainView();
         protected abstract IEnumerable<View> GenerateExtraButtons();
@@ -23,6 +27,8 @@ namespace Carmen.Mobile.Views
             this.show = show;
             BindingContext = model;
             Title = $"{first} {last}";
+            Loaded += ApplicantBase_Loaded;
+            Unloaded += ApplicantBase_Unloaded;
 
             var loading = new ActivityIndicator { IsRunning = true };
             loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoading)));
@@ -64,9 +70,51 @@ namespace Carmen.Mobile.Views
             Content = grid;
         }
 
+        private async void ApplicantBase_Loaded(object? sender, EventArgs e)
+        {
+            context = ShowContext.Open(show);
+            var applicant = await Task.Run(() => context.Applicants.Single(a => a.ApplicantId == model.ApplicantId));
+            model.Loaded(applicant);
+            var image = await Task.Run(() => applicant.Photo); //TODO cache photos
+            var source = image == null ? null : await MauiImageSource(image);
+            model.LoadedPhoto(source);
+        }
+
+        private async Task<ImageSource?> MauiImageSource(SM.Image photo)
+        {
+            try
+            {
+                return await Task.Run(() =>
+                {
+                    Stream? stream = null;
+                    return ImageSource.FromStream(() =>
+                    {
+                        stream?.Dispose();
+                        stream = new MemoryStream(photo.ImageData);
+                        return stream;
+                    });
+                });
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, $"Invalid image data of length {photo.ImageData.Length}, id {photo.ImageId}, {photo.Name}");
+                return null;
+            }
+        }
+
+        private void ApplicantBase_Unloaded(object? sender, EventArgs e)
+        {
+            context?.Dispose();
+            context = null;
+        }
+
         private async void Back_Clicked(object? sender, EventArgs e)
         {
-            //TODO warn if going to lose any changes
+            if (context?.ChangeTracker.HasChanges() == true)
+            {
+                if (!await DisplayAlert($"Are you sure you want to discard your changes?", "", "Yes", "No"))
+                    return;
+            }
             await Navigation.PopAsync();
         }
     }

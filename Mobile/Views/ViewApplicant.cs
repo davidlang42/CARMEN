@@ -19,9 +19,7 @@ namespace Carmen.Mobile.Views
     {
         public ViewApplicant(ConnectionDetails show, int id, string first, string last)
             : base(show, id, first, last)
-        {
-            Loaded += ViewApplicant_Loaded;
-        }
+        { }
 
         protected override View GenerateMainView()
         {
@@ -71,38 +69,6 @@ namespace Carmen.Mobile.Views
             var label = new Label();
             label.SetBinding(Label.TextProperty, new Binding(ApplicantModel.Path(applicant_field_binding_path), stringFormat: label_text + ": {0}"));
             return label;
-        }
-
-        private async void ViewApplicant_Loaded(object? sender, EventArgs e)
-        {
-            using var context = ShowContext.Open(show);
-            var applicant = await Task.Run(() => context.Applicants.Single(a => a.ApplicantId == model.ApplicantId));
-            model.Loaded(applicant);
-            var image = await Task.Run(() => applicant.Photo); //TODO cache photos
-            var source = image == null ? null : await MauiImageSource(image);
-            model.LoadedPhoto(source);
-        }
-
-        private async Task<ImageSource?> MauiImageSource(SM.Image photo)
-        {
-            try
-            {
-                return await Task.Run(() =>
-                {
-                    Stream? stream = null;
-                    return ImageSource.FromStream(() =>
-                    {
-                        stream?.Dispose();
-                        stream = new MemoryStream(photo.ImageData);
-                        return stream;
-                    });
-                });
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex, $"Invalid image data of length {photo.ImageData.Length}, id {photo.ImageId}, {photo.Name}");
-                return null;
-            }
         }
 
         private object GenerateAbilityDataTemplate()

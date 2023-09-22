@@ -13,14 +13,9 @@ namespace Carmen.Mobile.Views
 {
     internal class EditApplicant : ApplicantBase
     {
-        ShowContext? context;
-
         public EditApplicant(ConnectionDetails show, int id, string first, string last)
             : base(show, id, first, last)
-        {
-            Loaded += EditApplicant_Loaded;
-            Unloaded += EditApplicant_Unloaded;
-        }
+        { }
 
         protected override View GenerateMainView()
         {
@@ -45,34 +40,23 @@ namespace Carmen.Mobile.Views
             yield return save;
         }
 
-        private async void EditApplicant_Loaded(object? sender, EventArgs e)
-        {
-            context = ShowContext.Open(show);
-            var applicant = await Task.Run(() => context.Applicants.Single(a => a.ApplicantId == model.ApplicantId));
-            model.Loaded(applicant);
-        }
-
-        private void EditApplicant_Unloaded(object? sender, EventArgs e)
-        {
-            context?.Dispose();
-            context = null;
-        }
-
         private async void Save_Clicked(object? sender, EventArgs e)
         {
             if (context == null)
                 return;
+            if (!context.ChangeTracker.HasChanges())
+                await DisplayAlert($"No changes were made.", "", "Ok");
             await context.SaveChangesAsync();
             await Navigation.PopAsync();
         }
 
         private async void Delete_Clicked(object? sender, EventArgs e)
         {
-            if (context == null)
+            if (context == null || model.Applicant == null)
                 return;
             if (await DisplayAlert($"Are you sure you want to delete '{model.GetFullName()}'?", "This cannot be undone.", "Yes", "No"))
             {
-                //TODO actually delete
+                context.Applicants.Remove(model.Applicant);
                 await context.SaveChangesAsync();
                 await Navigation.PopAsync();
             }

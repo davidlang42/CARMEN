@@ -20,7 +20,7 @@ namespace Carmen.Mobile.Converters
             var last = values[1] as string;
             if (first == null || last == null)
                 return "";
-            return $"{first} {last}"; //TODO implement as a user setting, similar to (or the same as) Carmen.Desktop.Converters.FullName
+            return $"{first} {last}";
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

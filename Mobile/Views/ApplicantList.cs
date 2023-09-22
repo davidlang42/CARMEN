@@ -98,7 +98,7 @@ namespace Carmen.Mobile.Views
             if (cell.BindingContext is not Applicant applicant)
                 return;
             if (allowEditing)
-                await Navigation.PushAsync(new EditApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName)); //TODO need to reload the edited entity on return
+                await Navigation.PushAsync(new EditApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName)); //TODO need to reload the edited entity on return: https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.changetracking.entityentry.reload?view=efcore-1.1
             else
                 await Navigation.PushAsync(new ViewApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName));
         }
