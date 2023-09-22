@@ -47,7 +47,7 @@ namespace CarmenUI.Pages
             RecreateContext();
         }
 
-        private async void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private async void Window_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             Log.Information($"{GetType().Name}.{nameof(Window_Closing)}");
             CommitTextboxValue();
