@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
@@ -16,8 +17,8 @@ namespace Carmen.Mobile.Views
 
         public Login()
         {
+            details = LoadLastConnectionDetails() ?? new();
             //TODO change app icon/splash/colours
-            //TODO load last used ConnectionDetails
             Title = "Connect to a CARMEN database";
             NavigatedTo += Page_NavigatedTo;
             BindingContext = details;
@@ -37,9 +38,34 @@ namespace Carmen.Mobile.Views
                 TextEntry(nameof(ConnectionDetails.User)), //TODO highlight red if empty
                 new Label { Text = "Password:" },
                 PasswordEntry(nameof(ConnectionDetails.Password)), //TODO highlight red if empty
+                CheckBoxAndLabel("Save login details", nameof(ConnectionDetails.SaveLogin)),
                 ConnectButton(Connect_Clicked)
             }
             };
+        }
+
+        const string LAST_CONNECTION_DETAILS = "LastConnectionDetails";
+
+        static void SaveLastConnectionDetails(ConnectionDetails details)
+        {
+            Preferences.Default.Set(LAST_CONNECTION_DETAILS, JsonSerializer.Serialize(details));
+        }
+
+        static ConnectionDetails? LoadLastConnectionDetails()
+        {
+            var json = Preferences.Default.Get(LAST_CONNECTION_DETAILS, "");
+            try
+            {
+                if (!string.IsNullOrEmpty(json))
+                    return JsonSerializer.Deserialize<ConnectionDetails>(json);
+            }
+            catch { }
+            return null;
+        }
+
+        static void ClearLastConnectionDetails()
+        {
+            Preferences.Default.Remove(LAST_CONNECTION_DETAILS);
         }
 
         private void Page_NavigatedTo(object? sender, NavigatedToEventArgs e)
@@ -116,9 +142,30 @@ namespace Carmen.Mobile.Views
             return button;
         }
 
+        static View CheckBoxAndLabel(string label, string binding_path)
+        {
+            var checkbox = new CheckBox();
+            checkbox.SetBinding(CheckBox.IsCheckedProperty, binding_path);
+            var layout = new Grid
+            {
+                Padding = 5,
+                ColumnDefinitions = new ColumnDefinitionCollection
+            {
+                new ColumnDefinition(GridLength.Auto),
+                new ColumnDefinition(GridLength.Star)
+            }
+            };
+            layout.Add(new Label { Text = label });
+            layout.Add(checkbox, 1);
+            return layout;
+        }
+
         private async void Connect_Clicked(object? sender, EventArgs e)
         {
-            //TODO save most recent connection details
+            if (details.SaveLogin)
+                SaveLastConnectionDetails(details);
+            else
+                ClearLastConnectionDetails();
             await Navigation.PushAsync(new MainMenu(details));
         }
     }

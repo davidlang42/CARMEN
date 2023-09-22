@@ -23,6 +23,8 @@ namespace Carmen.Mobile.Models
         public string User { get; set; } = "";
         public string Password { get; set; } = "";
 
+        public bool SaveLogin { get; set; } = true; // this shouldn't really be part of ConnectionDetails
+
         public ConnectionDetails() : base(DbProvider.MySql)
         { }
 
