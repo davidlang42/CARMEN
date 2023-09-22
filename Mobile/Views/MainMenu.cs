@@ -24,11 +24,10 @@ namespace Carmen.Mobile.Views
             var loading = new VerticalStackLayout
             {
                 Spacing = 5,
-                Margin = 5,
                 Children =
                 {
-                    LabelWithBinding(nameof(MainModel.LoadingMessage)),
-                    new ProgressBar()
+                    new ActivityIndicator { IsRunning = true },
+                    LabelWithBinding(nameof(MainModel.LoadingMessage))
                 }
             };
             loading.SetBinding(ProgressBar.IsVisibleProperty, new Binding(nameof(MainModel.IsLoading)));
@@ -40,7 +39,6 @@ namespace Carmen.Mobile.Views
             var buttons = new VerticalStackLayout
             {
                 Spacing = 5,
-                Margin = 5,
                 Children =
                 {
                     ButtonWithHandler("View Applicants", ViewApplicants_Clicked),
@@ -51,9 +49,15 @@ namespace Carmen.Mobile.Views
 
             Content = new Grid
             {
-                loading,
-                error,
-                buttons
+                HorizontalOptions = LayoutOptions.Center,
+                VerticalOptions = LayoutOptions.Center,
+                Margin = 10,
+                Children =
+                {
+                    loading,
+                    error,
+                    buttons
+                }
             };
         }
 
@@ -81,7 +85,7 @@ namespace Carmen.Mobile.Views
             model.Loading("Preparing show model");
             await Task.Run(() => Thread.Sleep(1000));
             model.Loading("Checking database integrity");
-            var state = ShowContext.DatabaseState.Empty;
+            var state = ShowContext.DatabaseState.SavedWithFutureVersion;
             if (state == ShowContext.DatabaseState.Empty)
             {
                 model.Loading("Creating new database");
