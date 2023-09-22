@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net7.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ApplicationIcon>Icons\CarmenC.ico</ApplicationIcon>
+    <PackageIcon>CarmenC.ico</PackageIcon>
+    <PackageIconUrl />
+    <PackageProjectUrl>https://github.com/davidlang42/CARMEN</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/davidlang42/CARMEN</RepositoryUrl>
+    <Deterministic>false</Deterministic>
+    <AssemblyName>Carmen.Desktop</AssemblyName>
+    <RootNamespace>Carmen.Desktop</RootNamespace>
+    <Authors>David Lang</Authors>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="FontAwesome.WPF" Version="4.7.0.9" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
+    <PackageReference Include="Serilog.Extensions.Logging.File" Version="2.0.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+    <PackageReference Include="WpfMessageBox" Version="1.2.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CastingEngine\CastingEngine.csproj" />
+    <ProjectReference Include="..\ShowModel\ShowModel.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Icons\CarmenC.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Properties\Settings.Designer.cs">
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Update="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+    <None Include="Icons\CarmenC.ico">
+      <Pack>True</Pack>
+      <PackagePath>
+      </PackagePath>
+    </None>
+  </ItemGroup>
+</Project>

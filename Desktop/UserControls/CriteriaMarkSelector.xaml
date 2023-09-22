@@ -1,0 +1,27 @@
+﻿<UserControl x:Class="Carmen.Desktop.UserControls.CriteriaMarkSelector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:modelCriterias="clr-namespace:Carmen.ShowModel.Criterias;assembly=Carmen.ShowModel"
+             xmlns:cv="clr-namespace:Carmen.Desktop.Converters"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             x:Name="ControlRoot">
+    <UserControl.Resources>
+        <cv:MatchUIntValue x:Key="matchUIntValue"/>
+    </UserControl.Resources>
+    <ContentControl Content="{Binding ElementName=ControlRoot, Path=Criteria}" KeyboardNavigation.IsTabStop="False">
+        <ContentControl.Resources>
+            <DataTemplate DataType="{x:Type modelCriterias:BooleanCriteria}">
+                <CheckBox IsChecked="{Binding ElementName=ControlRoot, Path=Mark, Converter={StaticResource matchUIntValue}, ConverterParameter=1}"/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type modelCriterias:NumericCriteria}">
+                <TextBox Text="{Binding ElementName=ControlRoot, Path=Mark, TargetNullValue=''}"/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type modelCriterias:SelectCriteria}">
+                <ComboBox SelectedIndex="{Binding ElementName=ControlRoot, Path=Mark, TargetNullValue='-1'}" ItemsSource="{Binding Options}"/>
+            </DataTemplate>
+        </ContentControl.Resources>
+    </ContentControl>
+</UserControl>

@@ -1,0 +1,108 @@
+﻿<Window x:Class="Carmen.Desktop.Windows.AutoSelectDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Carmen.Desktop.Windows"
+        mc:Ignorable="d"
+        xmlns:cv="clr-namespace:Carmen.Desktop.Converters"
+        ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        Title="Cast Selection Options" Height="320" Width="500">
+    <Window.Resources>
+        <cv:MultiConverter x:Key="showIfFalse">
+            <cv:InvertBoolean/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
+        <BooleanToVisibilityConverter x:Key="showIfTrue"/>
+        <cv:MultiConverter x:Key="showIfNull">
+            <cv:TrueIfNull/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
+    </Window.Resources>
+    <DockPanel>
+        <Grid DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button IsCancel="True" Width="100" Height="35" Margin="5">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Times" Width="12" Margin="2 0" Foreground="DimGray"/>
+                    <TextBlock Text="Cancel" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+            <Button IsDefault="True" Grid.Column="1" Width="100" Height="35" Margin="5" Click="SelectCast_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Magic" Width="12" Margin="2 0" Foreground="MediumBlue"/>
+                    <TextBlock Text="Select Cast" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+        <UniformGrid Margin="10" Columns="1" x:Name="MainGrid">
+            <StackPanel>
+                <CheckBox IsChecked="{Binding SelectCastGroups}" IsThreeState="True">
+                    <TextBlock TextWrapping="WrapWithOverflow">
+                        <Run>Select applicants into</Run>
+                        <Run FontWeight="Bold">cast groups</Run>
+                        <Run Text="{Binding ElementName=MainGrid, Path=DataContext.CastGroupNames, Mode=OneTime, StringFormat='(\{0\})'}"/>
+                    </TextBlock>
+                </CheckBox>
+                <TextBlock Visibility="{Binding SelectCastGroups, Converter={StaticResource showIfNull}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="This will maintain applicants already in cast groups, and fill in the gaps"/>
+                <TextBlock Visibility="{Binding SelectCastGroups, Converter={StaticResource showIfTrue}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="This will clear existing cast groups, and re-select cast from scratch"/>
+                <TextBlock Visibility="{Binding SelectCastGroups, Converter={StaticResource showIfFalse}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="No changes will be made to applicants in cast groups"/>
+            </StackPanel>
+            <StackPanel>
+                <CheckBox IsChecked="{Binding BalanceAlternativeCasts}" IsThreeState="True">
+                    <TextBlock TextWrapping="WrapWithOverflow">
+                        <Run>Balance talent between</Run>
+                        <Run FontWeight="Bold">alternative casts</Run>
+                        <Run Text="{Binding ElementName=MainGrid, Path=DataContext.AlternativeCastNames, Mode=OneTime, StringFormat='(\{0\})'}"/>
+                    </TextBlock>
+                </CheckBox>
+                <TextBlock Visibility="{Binding BalanceAlternativeCasts, Converter={StaticResource showIfNull}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="This will maintain applicants' alternative casts if already set, and fill in the gaps"/>
+                <TextBlock Visibility="{Binding BalanceAlternativeCasts, Converter={StaticResource showIfTrue}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="This will clear existing alternative casts, and re-balance cast from scratch"/>
+                <TextBlock Visibility="{Binding BalanceAlternativeCasts, Converter={StaticResource showIfFalse}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="No changes will be made to alternative casts"/>
+            </StackPanel>
+            <StackPanel>
+                <CheckBox IsChecked="{Binding ApplyTags}" IsThreeState="True">
+                    <TextBlock TextWrapping="WrapWithOverflow">
+                        <Run>Apply</Run>
+                        <Run FontWeight="Bold">tags</Run>
+                        <Run>to applicants</Run>
+                        <Run Text="{Binding ElementName=MainGrid, Path=DataContext.TagNames, Mode=OneTime, StringFormat='(\{0\})'}"/>
+                    </TextBlock>
+                </CheckBox>
+                <TextBlock Visibility="{Binding ApplyTags, Converter={StaticResource showIfNull}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="This will maintain tags already applied to applicants, and fill in the gaps"/>
+                <TextBlock Visibility="{Binding ApplyTags, Converter={StaticResource showIfTrue}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="This will clear existing tags, and re-apply tags from scratch"/>
+                <TextBlock Visibility="{Binding ApplyTags, Converter={StaticResource showIfFalse}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="No changes will be made to tags"/>
+            </StackPanel>
+            <StackPanel>
+                <CheckBox IsChecked="{Binding AllocateCastNumbers}" IsThreeState="True">
+                    <TextBlock TextWrapping="WrapWithOverflow">
+                        <Run>Allocate unique</Run>
+                        <Run FontWeight="Bold">cast numbers</Run>
+                        <Run>to selected applicants</Run>
+                        <Run Text="{Binding ElementName=MainGrid, Path=DataContext.CastNumberOrderName, Mode=OneTime, StringFormat='(\{0\})'}"/>
+                    </TextBlock>
+                </CheckBox>
+                <TextBlock Visibility="{Binding AllocateCastNumbers, Converter={StaticResource showIfNull}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="This will maintain cast numbers already allocated to applicants, and fill in the gaps"/>
+                <TextBlock Visibility="{Binding AllocateCastNumbers, Converter={StaticResource showIfTrue}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="This will clear existing cast numbers, and re-allocate them from scratch"/>
+                <TextBlock Visibility="{Binding AllocateCastNumbers, Converter={StaticResource showIfFalse}}" TextWrapping="Wrap" FontStyle="Italic"
+                           Text="No changes will be made to cast numbers"/>
+            </StackPanel>
+        </UniformGrid>
+    </DockPanel>
+</Window>

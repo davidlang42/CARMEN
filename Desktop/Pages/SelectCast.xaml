@@ -1,0 +1,551 @@
+﻿<local:SubPage
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    x:Class="Carmen.Desktop.Pages.SelectCast"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Carmen.Desktop.Pages"
+    xmlns:cv="clr-namespace:Carmen.Desktop.Converters"
+    xmlns:vm="clr-namespace:Carmen.Desktop.ViewModels"
+    xmlns:bd="clr-namespace:Carmen.Desktop.Bindings"
+    xmlns:fa="http://schemas.fontawesome.io/icons/"
+    xmlns:modelApplicants="clr-namespace:Carmen.ShowModel.Applicants;assembly=Carmen.ShowModel"
+    mc:Ignorable="d"
+    d:DesignHeight="600" d:DesignWidth="800"
+    Title="Select Cast" Loaded="Page_Loaded">
+    <Page.Resources>
+        <CollectionViewSource x:Key="castNumbersViewSource" IsLiveSortingRequested="True"/>
+        <CollectionViewSource x:Key="castNumberMissingViewSource" IsLiveSortingRequested="True"/>
+        <CollectionViewSource x:Key="selectedApplicantsViewSource"/>
+        <CollectionViewSource x:Key="allApplicantsViewSource"/>
+        <CollectionViewSource x:Key="castGroupsViewSource"/>
+        <CollectionViewSource x:Key="alternativeCastsViewSource"/>
+        <CollectionViewSource x:Key="sameCastSetsViewSource"/>
+        <CollectionViewSource x:Key="tagsViewSource"/>
+        <cv:SuitabilityCalculator x:Key="suitabilityCalculator"/>
+        <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
+        <ObjectDataProvider x:Key="castStatusEnumValues" MethodName="GetValues" ObjectType="{x:Type sys:Enum}">
+            <ObjectDataProvider.MethodParameters>
+                <x:Type TypeName="local:CastStatus"/>
+            </ObjectDataProvider.MethodParameters>
+        </ObjectDataProvider>
+        <cv:BytesToImage x:Key="bytesToImage"/>
+        <cv:FullName x:Key="fullName"/>
+        <cv:ApplicantDescription x:Key="applicantDescription"/>
+        <cv:MultiConverter x:Key="hideIfTrue">
+            <cv:InvertBoolean/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
+        <cv:HideIfNull x:Key="hideIfNull"/>
+        <cv:FallbackValues x:Key="fallbackValues"/>
+        <cv:MultiConverter x:Key="highlightIfFalse">
+            <cv:InvertBoolean/>
+            <cv:HighlightError/>
+        </cv:MultiConverter>
+        <cv:CheckRequiredCount x:Key="checkRequiredCount"/>
+        <cv:CheckSameCastSets x:Key="checkSameCastSets"/>
+    </Page.Resources>
+    <Grid Margin="5">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MaxWidth="400"/>
+            <ColumnDefinition Width="2*"/>
+        </Grid.ColumnDefinitions>
+        <ListBox x:Name="selectionList" FontSize="20" BorderThickness="0" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionChanged="selectionList_SelectionChanged">
+            <ItemsControl.ItemsSource>
+                <CompositeCollection>
+                    <ListBoxItem IsEnabled="False">
+                        <TextBlock Text="Cast Groups"/>
+                    </ListBoxItem>
+                    <CollectionContainer Collection="{Binding Source={StaticResource castGroupsViewSource}}" />
+                    <ListBoxItem x:Name="keepApplicantsTogether" Content="Keep Applicants Together" Margin="0 20 0 0"
+                                 DataContext="{Binding Source={StaticResource sameCastSetsViewSource}}"
+                                 Visibility="{Binding Source={StaticResource alternativeCastsViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}"/>
+                    <ListBoxItem IsEnabled="False" Margin="0 20 0 0"
+                                 Visibility="{Binding Source={StaticResource alternativeCastsViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
+                        <TextBlock Text="Alternative Casts"/>
+                    </ListBoxItem>
+                    <CollectionContainer Collection="{Binding Source={StaticResource alternativeCastsViewSource}}" />
+                    <ListBoxItem IsEnabled="False" Margin="0 20 0 0"
+                                 Visibility="{Binding Source={StaticResource tagsViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
+                        <TextBlock Text="Tags"/>
+                    </ListBoxItem>
+                    <CollectionContainer Collection="{Binding Source={StaticResource tagsViewSource}}" />
+                    <ListBoxItem x:Name="finalCastList" Content="Final Cast List" Margin="0 20 0 0"/>
+                </CompositeCollection>
+            </ItemsControl.ItemsSource>
+            <ListBox.Resources>
+                <DataTemplate DataType="{x:Type modelApplicants:CastGroup}">
+                    <StackPanel Orientation="Horizontal" Margin="20 0 0 0">
+                        <TextBlock Text="{Binding Name}"/>
+                        <TextBlock Text="{Binding RequiredCount, StringFormat=' (\{0\})', TargetNullValue=' '}"/>
+                        <TextBlock Visibility="{Binding AlternateCasts, Converter={StaticResource booleanToVisibility}}" Text="{Binding Source={StaticResource alternativeCastsViewSource}, Path=Count, StringFormat='x\{0\}'}"/>
+                    </StackPanel>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type modelApplicants:Tag}">
+                    <TextBlock Text="{Binding Name}" Margin="20 0 0 0"/>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type modelApplicants:AlternativeCast}">
+                    <TextBlock Text="{Binding Name}" Margin="20 0 0 0"/>
+                </DataTemplate>
+            </ListBox.Resources>
+        </ListBox>
+        <DockPanel x:Name="numbersPanel" Grid.Column="1" Margin="5" Visibility="Collapsed">
+            <Grid DockPanel.Dock="Top" Margin="7 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="#" FontSize="22"/>
+                <ItemsControl Grid.Column="1" ItemsSource="{Binding Source={StaticResource alternativeCastsViewSource}}" KeyboardNavigation.IsTabStop="False">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid Rows="1"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" FontSize="22"/>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+            <Grid DockPanel.Dock="Bottom" Margin="0 5 0 0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="5"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Button x:Name="moveUpButton" Height="30" Click="moveUpButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="ArrowUp" Width="12" Margin="5 0"/>
+                        <TextBlock Text="Move Up" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="2" x:Name="moveDownButton" Height="30" Click="moveDownButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="ArrowDown" Width="12" Margin="5 0"/>
+                        <TextBlock Text="Move Down" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="4" x:Name="mergeButton" Height="30" Click="mergeButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Compress" Width="12" Margin="5 0"/>
+                        <TextBlock Text="Merge" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+                <Button Grid.Column="6" x:Name="splitButton" Height="30" Click="splitButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Expand" Width="12" Margin="5 0"/>
+                        <TextBlock Text="Split" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
+            <Grid DockPanel.Dock="Bottom" Visibility="{Binding Source={StaticResource castNumberMissingViewSource}, Path=IsEmpty, Converter={StaticResource hideIfTrue}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Cast members without numbers:" FontSize="18"/>
+                <ItemsControl Grid.Row="1" ItemsSource="{Binding Source={StaticResource castNumberMissingViewSource}}" Background="LightCoral" KeyboardNavigation.IsTabStop="False">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <UniformGrid/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </Grid>
+            <Button Name="FillGapsButton" DockPanel.Dock="Bottom" Margin="0 5 0 0" Background="LightCoral" Click="FillGapsButton_Click">
+                <TextBlock Margin="5" Text="Gaps exist between cast numbers, click here to fill gaps"/>
+            </Button>
+            <ListBox ItemsSource="{Binding Source={StaticResource castNumbersViewSource}}" HorizontalContentAlignment="Stretch"
+                     x:Name="CastNumbersList" SelectionMode="Extended" PreviewKeyDown="CastNumbersList_PreviewKeyDown">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Number}" VerticalAlignment="Center"/>
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding Applicants}" Background="{Binding IsComplete, Converter={StaticResource highlightIfFalse}}" KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <UniformGrid Rows="1"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 2">
+                                            <ContentControl Content="{Binding}" KeyboardNavigation.IsTabStop="False"/>
+                                            <ItemsControl ItemsSource="{Binding Tags}" KeyboardNavigation.IsTabStop="False">
+                                                <ItemsControl.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal"/>
+                                                    </ItemsPanelTemplate>
+                                                </ItemsControl.ItemsPanel>
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Image Margin="5 0 0 0" Source="{Binding Icon.ImageData, Converter={StaticResource bytesToImage}}"
+                                                                   Height="{Binding ElementName=CastNumbersList, Path=FontSize}">
+                                                            <Image.ToolTip>
+                                                                <MultiBinding Converter="{StaticResource fallbackValues}">
+                                                                    <MultiBinding.Bindings>
+                                                                        <Binding Path="Description"/>
+                                                                        <Binding Path="Name"/>
+                                                                    </MultiBinding.Bindings>
+                                                                </MultiBinding>
+                                                            </Image.ToolTip>
+                                                        </Image>
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </DockPanel>
+        <Grid x:Name="selectionPanel" Grid.Column="1" Margin="5" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="Selected applicants" FontSize="18" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="1" Text="{Binding Source={StaticResource selectedApplicantsViewSource}, Path=Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center">
+                    <TextBlock.Background>
+                        <MultiBinding Converter="{StaticResource checkRequiredCount}">
+                            <MultiBinding.Bindings>
+                                <Binding Source="{StaticResource selectedApplicantsViewSource}" Path="Count"/>
+                                <Binding ElementName="selectionList" Path="SelectedItem"/>
+                            </MultiBinding.Bindings>
+                        </MultiBinding>
+                    </TextBlock.Background>
+                </TextBlock>
+            </Grid>
+            <ListBox x:Name="selectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="7"
+                     SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick"
+                     HorizontalContentAlignment="Stretch"
+                     ItemsSource="{Binding Source={StaticResource selectedApplicantsViewSource}}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Expander IsExpanded="True">
+                                                <Expander.Header>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name.Name}"/>
+                                                        <TextBlock Text="{Binding Items.Count, StringFormat=' ({0})'}"/>
+                                                    </StackPanel>
+                                                </Expander.Header>
+                                                <ItemsPresenter />
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ListBox.GroupStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type modelApplicants:Applicant}">
+                        <Grid>
+                            <Grid.Background>
+                                <MultiBinding Converter="{StaticResource checkSameCastSets}">
+                                    <MultiBinding.Bindings>
+                                        <Binding Path="AlternativeCast"/>
+                                        <Binding Path="SameCastSet"/>
+                                    </MultiBinding.Bindings>
+                                </MultiBinding>
+                            </Grid.Background>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource fullName}">
+                                        <MultiBinding.Bindings>
+                                            <Binding Path="FirstName"/>
+                                            <Binding Path="LastName"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Grid.Column="1">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource suitabilityCalculator}">
+                                        <MultiBinding.Bindings>
+                                            <Binding/>
+                                            <Binding ElementName="selectionList" Path="SelectedItem"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <Button Grid.Column="1" Grid.Row="1" Click="addButton_Click" Margin="5 0">
+                <TextBlock>&lt;</TextBlock>
+            </Button>
+            <Button Grid.Column="1" Grid.Row="3" Click="addAllButton_Click" Margin="5 0">
+                <TextBlock>&lt;&lt;</TextBlock>
+            </Button>
+            <Button Grid.Column="1" Grid.Row="5" Click="removeButton_Click" Margin="5 0">
+                <TextBlock>&gt;</TextBlock>
+            </Button>
+            <Button Grid.Column="1" Grid.Row="7" Click="removeAllButton_Click" Margin="5 0">
+                <TextBlock>&gt;&gt;</TextBlock>
+            </Button>
+            <Grid Grid.Column="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <ComboBox x:Name="castStatusCombo" FontSize="18" ItemsSource="{Binding Source={StaticResource castStatusEnumValues}}"
+                          SelectionChanged="castStatusCombo_SelectionChanged" MouseDoubleClick="castStatusCombo_MouseDoubleClick"/>
+                <TextBlock x:Name="castStatusNoun" Grid.Column="1" FontSize="18" VerticalAlignment="Center" Margin="5 0 0 0"/>
+                <TextBlock Grid.Column="2" Text="{Binding Source={StaticResource allApplicantsViewSource}, Path=Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
+            </Grid>
+            <ListBox x:Name="availableList" Grid.Column="2" Grid.Row="1" Grid.RowSpan="7"
+                     SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick"
+                     HorizontalContentAlignment="Stretch"
+                     ItemsSource="{Binding Source={StaticResource allApplicantsViewSource}}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+                <ListBox.GroupStyle>
+                    <GroupStyle>
+                        <GroupStyle.ContainerStyle>
+                            <Style TargetType="{x:Type GroupItem}">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate>
+                                            <Expander IsExpanded="True">
+                                                <Expander.Header>
+                                                    <StackPanel Orientation="Horizontal">
+                                                        <TextBlock Text="{Binding Name.Name}"/>
+                                                        <TextBlock Text="{Binding Items.Count, StringFormat=' ({0})'}"/>
+                                                    </StackPanel>
+                                                </Expander.Header>
+                                                <ItemsPresenter />
+                                            </Expander>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </GroupStyle.ContainerStyle>
+                    </GroupStyle>
+                </ListBox.GroupStyle>
+                <ListBox.ItemTemplate>
+                    <DataTemplate DataType="{x:Type modelApplicants:Applicant}">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock>
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource fullName}">
+                                        <MultiBinding.Bindings>
+                                            <Binding Path="FirstName"/>
+                                            <Binding Path="LastName"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                            <TextBlock Grid.Column="1">
+                                <TextBlock.Text>
+                                    <MultiBinding Converter="{StaticResource suitabilityCalculator}">
+                                        <MultiBinding.Bindings>
+                                            <Binding/>
+                                            <Binding ElementName="selectionList" Path="SelectedItem"/>
+                                        </MultiBinding.Bindings>
+                                    </MultiBinding>
+                                </TextBlock.Text>
+                            </TextBlock>
+                        </Grid>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+        <Grid x:Name="sameCastSetsPanel" Grid.Column="1" Margin="5" Visibility="Collapsed">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="1*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="1*" />
+                <ColumnDefinition Width="50"/>
+                <ColumnDefinition Width="1*" />
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+                <RowDefinition Height="5"/>
+                <RowDefinition/>
+            </Grid.RowDefinitions>
+            <StackPanel Grid.ColumnSpan="5" Margin="0 0 0 5">
+                <TextBlock FontSize="22" TextWrapping="Wrap"
+                       Text="Keep these sets of applicants together in the same alternative cast:" />
+                <TextBlock FontSize="14" TextWrapping="Wrap">
+                    Sometimes it is important that two or more applicants are allocated to the SAME alternative cast, but doesn't matter which cast that is.
+                    The most common example of this is keeping siblings within the same cast.
+                    In circumstances like this, rather than manually set the alternative cast of the applicants, you can add them to a set of "same-cast" applicants,
+                    which will keep them in the same alternative cast when automatically selecting casts.
+                    It is safe to add any applicant to these sets, even rejected applicants or those accepted into non-alternating cast groups, but each applicant can only be in one "same-cast" set (or none).
+                </TextBlock>
+            </StackPanel>
+            <TextBlock Grid.Row="1" Text="Same-cast sets" FontSize="18" VerticalAlignment="Center"/>
+            <DockPanel Grid.Row="2" Grid.RowSpan="7">
+                <Button DockPanel.Dock="Bottom" Height="30" Margin="0 5 0 0" Click="DetectSiblings_Click"
+                        Content="Detect siblings by last name"/>
+                <Button DockPanel.Dock="Bottom" Height="30" Margin="0 5 0 0" Click="AddSameCastSet_Click"
+                        Content="Add new set"/>
+                <ListBox x:Name="sameCastSetsList"
+                     SelectionMode="Extended" KeyDown="sameCastSetsList_KeyDown"
+                     ItemsSource="{Binding Source={StaticResource sameCastSetsViewSource}}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Applicants.Count}" Value="0">
+                                    <Setter Property="Background" Value="LightCoral"/>
+                                    <Setter Property="ToolTip" Value="A set must contain at least 2 applicants"/>
+                                </DataTrigger>
+                                <DataTrigger Binding="{Binding Applicants.Count}" Value="1">
+                                    <Setter Property="Background" Value="LightCoral"/>
+                                    <Setter Property="ToolTip" Value="A set must contain at least 2 applicants"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Description}"/>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+            <TextBlock Grid.Column="2" Grid.Row="1" FontSize="18" VerticalAlignment="Center"
+                       Text="Applicants in selected set"
+                       Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}"/>
+            <DockPanel Grid.Column="2" Grid.Row="2" Grid.RowSpan="7"
+                       Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
+                <Button DockPanel.Dock="Bottom" Height="30" Margin="0 5 0 0" Click="DeleteSameCastSet_Click"
+                        Content="Delete selected set"/>
+                <ListBox x:Name="selectedSameCastSetList" 
+                     SelectionMode="Extended" MouseDoubleClick="selectedSameCastSetList_MouseDoubleClick"
+                     ItemsSource="{Binding ElementName=sameCastSetsList, Path=SelectedItem.Applicants}">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
+                            <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            </DockPanel>
+            <Button Grid.Column="3" Grid.Row="2" Click="addSameCastSetButton_Click" Margin="5 0"
+                    Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
+                <TextBlock>&lt;</TextBlock>
+            </Button>
+            <Button Grid.Column="3" Grid.Row="4" Click="addAllSameCastSetButton_Click" Margin="5 0"
+                    Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
+                <TextBlock>&lt;&lt;</TextBlock>
+            </Button>
+            <Button Grid.Column="3" Grid.Row="6" Click="removeSameCastSetButton_Click" Margin="5 0"
+                    Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
+                <TextBlock>&gt;</TextBlock>
+            </Button>
+            <Button Grid.Column="3" Grid.Row="8" Click="removeAllSameCastSetButton_Click" Margin="5 0"
+                    Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
+                <TextBlock>&gt;&gt;</TextBlock>
+            </Button>
+            <TextBlock Grid.Column="4" Grid.Row="1" FontSize="18"
+                       Text="Available applicants"
+                       Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}"/>
+            <ListBox x:Name="availableSameCastSetList" Grid.Column="4" Grid.Row="2" Grid.RowSpan="7"
+                     SelectionMode="Extended" MouseDoubleClick="availableSameCastSetList_MouseDoubleClick"
+                     ItemsSource="{Binding Source={StaticResource allApplicantsViewSource}}"
+                     Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="{x:Type ListBoxItem}">
+                        <Setter Property="ToolTip" Value="{Binding Converter={StaticResource applicantDescription}}"/>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+        </Grid>
+        <Button Grid.Row="1" Width="200" Height="35" Margin="5" HorizontalAlignment="Left" Click="selectCastButton_Click">
+            <TextBlock Text="Automatically select cast"/>
+        </Button>
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <WrapPanel>
+                <CheckBox x:Name="sortBySuitabilityCheckbox" Visibility="Hidden" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5"
+                  IsChecked="{bd:SettingBinding SelectCastSortBySuitability}" Checked="SortBySuitabilityCheckbox_Changed" Unchecked="SortBySuitabilityCheckbox_Changed"
+                  Content="Sort applicants by suitability score"/>
+                <CheckBox x:Name="groupByCastGroupCheckbox" Visibility="Hidden" Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Margin="5"
+                  IsChecked="{bd:SettingBinding SelectCastGroupByCastGroup}" Checked="GroupByCastGroupCheckbox_Changed" Unchecked="GroupByCastGroupCheckbox_Changed"
+                  Content="Group applicants by cast group"/>
+            </WrapPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                <Button IsCancel="True" Width="100" Height="35" Margin="5" Click="CancelButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Times" Width="12" Margin="2 0" Foreground="DimGray"/>
+                        <TextBlock Text="Cancel" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+                <Button IsDefault="False" Width="100" Height="35" Margin="5" Click="SaveButton_Click">
+                    <StackPanel Orientation="Horizontal">
+                        <fa:ImageAwesome Icon="Check" Width="12" Margin="2 0" Foreground="MediumBlue"/>
+                        <TextBlock Text="Save" Margin="2 0"/>
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+        
+    </Grid>
+</local:SubPage>

@@ -1,0 +1,549 @@
+﻿<local:SubPage
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+    xmlns:fa="http://schemas.fontawesome.io/icons/"
+    x:Class="Carmen.Desktop.Pages.AllocateRoles"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:Carmen.Desktop.Pages"
+    xmlns:modelStructure="clr-namespace:Carmen.ShowModel.Structure;assembly=Carmen.ShowModel"
+    xmlns:cv="clr-namespace:Carmen.Desktop.Converters"
+    xmlns:vm="clr-namespace:Carmen.Desktop.ViewModels"
+    xmlns:bd="clr-namespace:Carmen.Desktop.Bindings"
+    mc:Ignorable="d"
+    d:DesignHeight="600" d:DesignWidth="800"
+    Title="Allocate Roles"
+    Loaded="Page_Loaded">
+    <Page.Resources>
+        <cv:FullName x:Key="fullName"/>
+        <cv:DoubleToPercentage x:Key="doubleToPercentage"/>
+        <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
+        <cv:TrueIfNull x:Key="trueIfNull"/>
+        <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
+        <cv:MultiConverter x:Key="inverseBooleanToVisibility">
+            <cv:InvertBoolean/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
+        <cv:BytesToImage x:Key="bytesToImage"/>
+        <cv:FallbackValues x:Key="fallbackValues"/>
+        <cv:HideIfEmpty x:Key="hideIfEmpty"/>
+        <RoutedUICommand x:Key="removeAllowedConsecutiveCommand"/>
+    </Page.Resources>
+    <Page.CommandBindings>
+        <CommandBinding Command="{StaticResource removeAllowedConsecutiveCommand}" Executed="RemoveAllowedConsecutiveCommand_Executed"/>
+    </Page.CommandBindings>
+    <Grid Margin="5">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" MinWidth="150" MaxWidth="450"/>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Grid Margin="5 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Text="Roles:" FontSize="22"/>
+            <Button Grid.Column="1" Content="Next" Width="60" Margin="0 0 0 5" Click="NextButton_Click"/>
+            <TreeView Grid.Row="1" Grid.ColumnSpan="2" x:Name="rolesTreeView"
+                       SelectedItemChanged="rolesTreeView_SelectedItemChanged"
+                      MouseDoubleClick="rolesTreeView_MouseDoubleClick">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="{x:Type TreeViewItem}">
+                        <Setter Property="IsSelected" Value="{Binding IsSelected}"/>
+                        <Setter Property="IsExpanded" Value="{Binding IsExpanded}"/>
+                        <Setter Property="Visibility" Value="{Binding IsVisible, Converter={StaticResource booleanToVisibility}}"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding ChildrenInOrder}">
+                        <StackPanel Orientation="Horizontal">
+                            <ContentControl Content="{Binding Status, Converter={StaticResource processStatusIcon}}" Width="12" Margin="3 2" IsTabStop="False"/>
+                            <TextBlock Text="{Binding Name}"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+                <TreeView.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Expand all" Click="ExpandAll_Click"/>
+                        <MenuItem Header="Collapse all" Click="CollapseAll_Click"/>
+                        <MenuItem Header="Update all" Click="UpdateAll_Click"/>
+                    </ContextMenu>
+                </TreeView.ContextMenu>
+            </TreeView>
+            <CheckBox Grid.Row="2" Grid.ColumnSpan="2" x:Name="showCompleted" Content="Show completed" Margin="0 5" Checked="showCompleted_Checked" Unchecked="showCompleted_Unchecked"/>
+            <Grid Grid.Row="3" Grid.ColumnSpan="2" x:Name="castingProgress" Margin="0 0 0 5">
+                <ProgressBar Maximum="1" Height="20" Value="{Binding Progress, TargetNullValue=0}" IsIndeterminate="{Binding Progress, Converter={StaticResource trueIfNull}}"/>
+                <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Text="{Binding Progress, Converter={StaticResource doubleToPercentage}}"/>
+            </Grid>
+        </Grid>
+        <GridSplitter Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Stretch" ShowsPreview="False" Width="5" KeyboardNavigation.IsTabStop="False"/>
+        <ContentControl x:Name="applicantsPanel" Grid.Column="2" Margin="5 0" KeyboardNavigation.IsTabStop="False">
+            <ContentControl.Content><!-- Default content for when nothing relevant is selected -->
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
+                               Text="Select a Role to cast" FontSize="20"/>
+                    <Button Grid.Row="1" HorizontalAlignment="Right" Width="160" Height="35" Margin="0 5"
+                            IsCancel="True" Content="Return to Main Menu"
+                            Click="MainMenuButton_Click" />
+                </Grid>
+            </ContentControl.Content>
+            <ContentControl.Resources>
+                <DataTemplate DataType="{x:Type vm:NodeRolesOverview}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.ColumnSpan="2" Text="{Binding Node.Name}" FontSize="22" Margin="0 0 0 10"/>
+                        <TextBlock Grid.Row="1" Text="Roles not cast:" FontSize="18"/>
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text="Errors:" FontSize="18"/>
+                        <ListBox Grid.Row="2" x:Name="incompleteRolesList"
+                                 FontSize="14"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding IncompleteRoles}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding IsSelected}"
+                                                  VerticalAlignment="Center">
+                                        <TextBlock Text="{Binding Role.Name}" TextWrapping="Wrap"/>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <ListBox Grid.Row="2" Grid.Column="3"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding CastingErrors}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
+                                    <Setter Property="ContextMenu" Value="{Binding ContextMenu}"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Message}" FontSize="14" TextWrapping="Wrap"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <Grid Grid.Row="3" Grid.ColumnSpan="3" Visibility="{Binding AllowedConsecutives, Converter={StaticResource hideIfEmpty}}">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="Allowed in consecutive items:" FontSize="18"/>
+                            <ListBox Grid.Row="1"
+                                 FontSize="14" MaxHeight="250"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding AllowedConsecutives}">
+                                <ListBox.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListBoxItem}">
+                                        <Setter Property="ContextMenu">
+                                            <Setter.Value>
+                                                <ContextMenu>
+                                                    <MenuItem Header="Remove this allowed consecutive item"
+                                                              Command="{Binding Source={StaticResource removeAllowedConsecutiveCommand}}"
+                                                              CommandParameter="{Binding}"/>
+                                                </ContextMenu>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </Style>
+                                </ListBox.ItemContainerStyle>
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Description}" FontSize="14" TextWrapping="Wrap"/>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+                        </Grid>
+                        <Grid Grid.Row="4" Grid.ColumnSpan="3" Margin="0 10 0 0">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button HorizontalAlignment="Left" Width="250" Height="35" Margin="0 0 0 5"
+                                Content="Allocate balanced cast to selected roles"
+                                Click="BalanceCastButton_Click" />
+                            <Button Grid.Column="1" Width="160" Height="35" Margin="0 0 0 5"
+                                IsCancel="True" Content="Return to Main Menu"
+                                Click="MainMenuButton_Click" />
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:RoleWithApplicantsView}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Role.Name}" FontSize="22"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, TargetNullValue='', StringFormat='  requires \{0\}'}" FontSize="16" VerticalAlignment="Bottom"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="85"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Grid.Row="1" Text="Required" FontSize="14"/>
+                            <TextBlock Grid.Row="2" Text="Selected" FontSize="14"/>
+                            <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Abbreviation}" Width="60" FontSize="14"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RequiredCast}" KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding}" Width="60" FontSize="14"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SelectedCast}" KeyboardNavigation.IsTabStop="False">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <StackPanel Orientation="Horizontal"/>
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Length}" Width="60" FontSize="14"/>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Grid>
+                        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5"
+                                Visibility="{Binding AnyCastSelected, Converter={StaticResource inverseBooleanToVisibility}}">
+                            <ItemsControl KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick"
+                                          Background="White" HorizontalContentAlignment="Center" VerticalContentAlignment="Center">
+                                <TextBlock FontSize="16" Margin="5 10 5 5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    No cast allocated to this role.
+                                </TextBlock>
+                                <TextBlock FontSize="16" Margin="5" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                    Double click to start casting.
+                                </TextBlock>
+                            </ItemsControl>
+                        </Border>
+                        <Border Grid.Row="2" BorderBrush="Black" BorderThickness="1" Margin="0 5"
+                                Visibility="{Binding AnyCastSelected, Converter={StaticResource booleanToVisibility}}">
+                            <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+                                <DockPanel Margin="5">
+                                    <ItemsControl DockPanel.Dock="Top" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick" Background="White">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="1"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding Name}" TextDecorations="Underline" Margin="0 0 0 5"/>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <ItemsControl ItemsSource="{Binding SelectedCast}" KeyboardNavigation.IsTabStop="False" MouseDoubleClick="ViewOnlyApplicantsList_MouseDoubleClick" Background="White">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate>
+                                                <UniformGrid Rows="1"/>
+                                            </ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <ItemsControl ItemsSource="{Binding}" KeyboardNavigation.IsTabStop="False">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <StackPanel Orientation="Horizontal">
+                                                                <TextBlock Text="{Binding CastNumberAndCast, StringFormat='#\{0\} '}"/>
+                                                                <TextBlock>
+                                                                    <TextBlock.Text>
+                                                                        <MultiBinding Converter="{StaticResource fullName}">
+                                                                            <MultiBinding.Bindings>
+                                                                                <Binding Path="FirstName"/>
+                                                                                <Binding Path="LastName"/>
+                                                                            </MultiBinding.Bindings>
+                                                                        </MultiBinding>
+                                                                    </TextBlock.Text>
+                                                                </TextBlock>
+                                                            </StackPanel>
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </DockPanel>
+                            </ScrollViewer>
+                        </Border>
+                        <Grid Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Button HorizontalAlignment="Left" Width="110" Height="35" Margin="0 0 0 5"
+                                Content="Edit casting"
+                                Click="EditCastButton_Click" />
+                            <Button Grid.Column="1" Width="160" Height="35" Margin="0 0 0 5"
+                                IsCancel="True" Content="Return to Main Menu"
+                                Click="MainMenuButton_Click" />
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:EditableRoleWithApplicantsView}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Role.Name}" FontSize="22"/>
+                            <TextBlock Grid.Column="1" Text="{Binding CommaSeparatedRequirements, TargetNullValue='', StringFormat='  requires \{0\}'}" FontSize="16" VerticalAlignment="Bottom"/>
+                        </Grid>
+                        <Grid Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="85"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Grid.Row="1" Text="Required" FontSize="14"/>
+                                <TextBlock Grid.Row="2" Text="Selected" FontSize="14"/>
+                                <ItemsControl Grid.Column="1" ItemsSource="{Binding CastGroupsByCast}" KeyboardNavigation.IsTabStop="False">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Abbreviation}" Width="60" FontSize="14"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <ItemsControl Grid.Row="1" Grid.Column="1" ItemsSource="{Binding RequiredCast}" KeyboardNavigation.IsTabStop="False">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}" Width="60" FontSize="14"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <ItemsControl Grid.Row="2" Grid.Column="1" ItemsSource="{Binding SelectedCast}" KeyboardNavigation.IsTabStop="False">
+                                    <ItemsControl.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <StackPanel Orientation="Horizontal"/>
+                                        </ItemsPanelTemplate>
+                                    </ItemsControl.ItemsPanel>
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding Length}" Width="60" FontSize="14"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Grid>
+                            <UniformGrid Grid.Column="1" Columns="1">
+                                <CheckBox Content="Show unavailable applicants" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                          IsChecked="{bd:SettingBinding ShowUnavailableApplicants}"
+                                          Checked="showApplicants_Changed"
+                                          Unchecked="showApplicants_Changed"/>
+                                <CheckBox Content="Show ineligible applicants" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                          IsChecked="{bd:SettingBinding ShowIneligibleApplicants}"
+                                          Checked="showApplicants_Changed"
+                                          Unchecked="showApplicants_Changed"/>
+                                <CheckBox Content="Show unneeded applicants" FontSize="14" VerticalAlignment="Center" VerticalContentAlignment="Center"
+                                          IsChecked="{bd:SettingBinding ShowUnneededApplicants}"
+                                          Checked="showApplicants_Changed"
+                                          Unchecked="showApplicants_Changed"/>
+                            </UniformGrid>
+                        </Grid>
+                        <Grid Grid.Row="2" Margin="0 5">
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <ListView Grid.ColumnSpan="2" Initialized="ListView_Initialized" ItemsSource="{Binding Applicants}"
+                                      KeyDown="ListView_KeyDown" PreviewKeyDown="ListView_PreviewKeyDown"
+                                      GridViewColumnHeader.Click="GridViewColumnHeader_Clicked"
+                                      x:Name="EditableApplicantsListView">
+                                <ListView.ItemContainerStyle>
+                                    <Style TargetType="{x:Type ListViewItem}">
+                                        <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Eligibility.IsEligible}" Value="False">
+                                                <Setter Property="Background" Value="LightCoral" />
+                                                <Setter Property="ToolTip" Value="{Binding CommaSeparatedIneligibilityReason}"/>
+                                            </DataTrigger>
+                                            <DataTrigger Binding="{Binding Availability.IsAvailable}" Value="False">
+                                                <!-- Unavailable listed last to give precedence -->
+                                                <Setter Property="Background" Value="LightGray" />
+                                                <Setter Property="ToolTip" Value="{Binding CommaSeparatedUnavailabilityReason}"/>
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </ListView.ItemContainerStyle>
+                                <ListView.View>
+                                    <GridView AllowsColumnReorder="False">
+                                        <GridView.Columns>
+                                            <GridViewColumn Width="{bd:WidthBinding AllocateRolesGrid[Selected]}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <CheckBox IsChecked="{Binding IsSelected}"/>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <GridViewColumn Header="Suitability" DisplayMemberBinding="{Binding Suitability, Converter={StaticResource doubleToPercentage}}"
+                                                             Width="{bd:WidthBinding AllocateRolesGrid[Suitability]}"/>
+                                            <GridViewColumn Header="Cast Number" DisplayMemberBinding="{Binding CastNumberAndCast}"
+                                                             Width="{bd:WidthBinding AllocateRolesGrid[CastNumber]}"/>
+                                            <GridViewColumn Header="Name"
+                                                             Width="{bd:WidthBinding AllocateRolesGrid[Name]}">
+                                                <GridViewColumn.CellTemplate>
+                                                    <DataTemplate>
+                                                        <StackPanel Orientation="Horizontal">
+                                                            <ContentControl Content="{Binding Applicant}"/>
+                                                            <ItemsControl ItemsSource="{Binding Applicant.Tags}">
+                                                                <ItemsControl.ItemsPanel>
+                                                                    <ItemsPanelTemplate>
+                                                                        <StackPanel Orientation="Horizontal"/>
+                                                                    </ItemsPanelTemplate>
+                                                                </ItemsControl.ItemsPanel>
+                                                                <ItemsControl.ItemTemplate>
+                                                                    <DataTemplate>
+                                                                        <Image Margin="5 0 0 0" Source="{Binding Icon.ImageData, Converter={StaticResource bytesToImage}}"
+                                                                            Height="{Binding ElementName=EditableApplicantsListView, Path=FontSize}">
+                                                                            <Image.ToolTip>
+                                                                                <MultiBinding Converter="{StaticResource fallbackValues}">
+                                                                                    <MultiBinding.Bindings>
+                                                                                        <Binding Path="Description"/>
+                                                                                        <Binding Path="Name"/>
+                                                                                    </MultiBinding.Bindings>
+                                                                                </MultiBinding>
+                                                                            </Image.ToolTip>
+                                                                        </Image>
+                                                                    </DataTemplate>
+                                                                </ItemsControl.ItemTemplate>
+                                                            </ItemsControl>
+                                                        </StackPanel>
+                                                    </DataTemplate>
+                                                </GridViewColumn.CellTemplate>
+                                            </GridViewColumn>
+                                            <!-- Criteria columns are added here dynamically -->
+                                            <GridViewColumn Header="Overall" DisplayMemberBinding="{Binding OverallAbility}"
+                                                             Width="{bd:WidthBinding AllocateRolesGrid[Overall]}"/>
+                                        </GridView.Columns>
+                                    </GridView>
+                                </ListView.View>
+                                <ListView.GroupStyle>
+                                    <GroupStyle>
+                                        <GroupStyle.ContainerStyle>
+                                            <Style TargetType="{x:Type GroupItem}">
+                                                <Setter Property="Template">
+                                                    <Setter.Value>
+                                                        <ControlTemplate>
+                                                            <Expander IsExpanded="True">
+                                                                <Expander.Header>
+                                                                    <TextBlock FontWeight="Bold" FontSize="14" Text="{Binding Name}"/>
+                                                                </Expander.Header>
+                                                                <ItemsPresenter/>
+                                                            </Expander>
+                                                        </ControlTemplate>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Style>
+                                        </GroupStyle.ContainerStyle>
+                                    </GroupStyle>
+                                </ListView.GroupStyle>
+                            </ListView>
+                            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                                <Button x:Name="AutoCastButton" Width="200" Height="35" Margin="0 5 5 0" Click="AutoCastButton_Click"
+                                    HorizontalAlignment="Left" Content="Allocate most suitable cast"/>
+                                <Button x:Name="ClearCastButton" Width="100" Height="35" Margin="5 5 5 0" Click="ClearCastButton_Click"
+                                    HorizontalAlignment="Left" Content="Clear cast"/>
+                            </StackPanel>
+                            <StackPanel Grid.Row="1" Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button IsCancel="True" Width="100" Height="35" Margin="5 5 5 0" Click="CancelButton_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="Times" Width="12" Margin="2 0" Foreground="DimGray"/>
+                                        <TextBlock Text="Cancel" Margin="2 0"/>
+                                    </StackPanel>
+                                </Button>
+                                <Button IsDefault="False" Width="100" Height="35" Margin="5 5 0 0" Click="SaveButton_Click">
+                                    <StackPanel Orientation="Horizontal">
+                                        <fa:ImageAwesome Icon="Check" Width="12" Margin="2 0" Foreground="MediumBlue"/>
+                                        <TextBlock Text="Save" Margin="2 0"/>
+                                    </StackPanel>
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </DataTemplate>
+            </ContentControl.Resources>
+        </ContentControl>
+    </Grid>
+</local:SubPage>
