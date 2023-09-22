@@ -15,18 +15,18 @@ using SM = Carmen.ShowModel;
 
 namespace Carmen.Mobile.Views
 {
-    internal class ViewApplicant : ContentPage
+    internal class ApplicantDetails : ContentPage
     {
         protected readonly ApplicantModel model;
         protected readonly ConnectionDetails show;
         protected ShowContext? context;
 
-        public ViewApplicant(ConnectionDetails show, int id, string first, string last)
+        public ApplicantDetails(ConnectionDetails show, int id, string first, string last)
         {
             model = new(id);
             this.show = show;
             BindingContext = model;
-            Title = $"{first} {last}";
+            Title = $"{first} {last}";//TODO bind to model with the default value of existing
             Loaded += ViewApplicant_Loaded;
             Unloaded += ViewApplicant_Unloaded;
 
@@ -133,7 +133,6 @@ namespace Carmen.Mobile.Views
 
         private View GenerateMainView()
         {
-            //TODO (EDIT) ViewApplicant to ApplicantDetails
             var fields = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateFieldDataTemplate),
