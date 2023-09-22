@@ -9,16 +9,17 @@ using System.Threading.Tasks;
 
 namespace CarmenUI.Properties
 {
-    internal abstract class JsonApplicationSettings : ApplicationSettingsBase
+    internal abstract class JsonApplicationSettingsBase : ApplicationSettingsBase
     {
-        private readonly Dictionary<string, (Func<object> getter, Action<object> setter)> jsonProperties = new();
+        readonly Dictionary<string, (Func<object> getter, Action<object> setter)> jsonProperties = new();
+        readonly SettingsProvider firstProvider;
 
-        private SettingsProvider GetFirstProvider()
+        protected JsonApplicationSettingsBase()
         {
             var e = Providers.GetEnumerator();
             if (!e.MoveNext())
                 throw new ApplicationException("JsonApplicationSettings must have at least 1 generated setting, so that ApplicationSettingsBase constructs a provider");
-            return (SettingsProvider)e.Current;
+            firstProvider = (SettingsProvider)e.Current;
         }
 
         protected void RegisterJsonProperty<T>(string name, Func<T> getter, Action<T> setter) where T : class, new()
@@ -29,7 +30,7 @@ namespace CarmenUI.Properties
                 IsReadOnly = false,
                 SerializeAs = SettingsSerializeAs.String,
                 PropertyType = typeof(string),
-                Provider = GetFirstProvider(),
+                Provider = firstProvider,
                 Attributes =
                 {
                     { typeof(UserScopedSettingAttribute) , new UserScopedSettingAttribute() }
@@ -67,5 +68,12 @@ namespace CarmenUI.Properties
                 StoreJson(property);
             base.Save();
         }
+    }
+
+    /// <summary>For use when a properties class will have ONLY json backed properties</summary>
+    internal class OnlyJsonApplicationSettingsBase : JsonApplicationSettingsBase
+    {
+        [UserScopedSetting]
+        public object? _generateProvider => null; // makes sure the ApplicationSettingsBase generates a default provider
     }
 }
