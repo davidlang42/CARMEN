@@ -30,7 +30,8 @@ namespace Carmen.Mobile.Views
             var loading = new ActivityIndicator { IsRunning = true };
             loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(Applicants.IsLoading)));
 
-            //TODO add list filtering
+            //TODO add list filtering & sorting
+            //TODO some way to group by audition group
             var list = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateDataTemplate),
@@ -48,7 +49,7 @@ namespace Carmen.Mobile.Views
             };
             grid.Add(loading);
             grid.Add(list);
-            if (allowEditing)//TODO add back button at the bottom always, in grey (similar to ApplicantBase)
+            if (allowEditing)//TODO (NOW) add back button at the bottom always, in grey (similar to ApplicantBase)
             {
                 grid.RowDefinitions.Add(new RowDefinition(GridLength.Auto));
                 var button = new Button { Text = "Add new applicant" };
@@ -73,7 +74,7 @@ namespace Carmen.Mobile.Views
 
         private void AddButton_Clicked(object? sender, EventArgs e)
         {
-            //TODO add new applicant
+            //TODO (NEXT) add new applicant
         }
 
         private object GenerateDataTemplate()
@@ -98,7 +99,7 @@ namespace Carmen.Mobile.Views
             if (cell.BindingContext is not Applicant applicant)
                 return;
             if (allowEditing)
-                await Navigation.PushAsync(new EditApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName)); //TODO need to reload the edited entity on return: https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.changetracking.entityentry.reload?view=efcore-1.1
+                await Navigation.PushAsync(new EditApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName)); //TODO (NEXT) need to reload the edited entity on return: https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.changetracking.entityentry.reload?view=efcore-1.1
             else
                 await Navigation.PushAsync(new ViewApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName));
         }

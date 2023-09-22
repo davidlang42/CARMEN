@@ -23,7 +23,7 @@ namespace Carmen.Mobile.Views
 
         protected override View GenerateMainView()
         {
-            var fields = new VerticalStackLayout //TODO scroll?
+            var fields = new VerticalStackLayout //TODO add scrolling
             {
                 LabelledField("First name", nameof(Applicant.FirstName)),
                 LabelledField("Last name", nameof(Applicant.LastName)),
@@ -53,7 +53,7 @@ namespace Carmen.Mobile.Views
                 activity
             };
 
-            return new HorizontalStackLayout //TODO flexlayout?
+            return new HorizontalStackLayout //TODO (NOW) flexlayout? and scroll if vital
             {
                 fields,
                 abilities,
