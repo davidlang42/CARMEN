@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -10,12 +11,38 @@ namespace CarmenUI.Properties
 {
     internal abstract class JsonApplicationSettings : ApplicationSettingsBase
     {
-        /// <summary>Call StoreJson() for each object which is backed by a Json string.
-        /// NOTE: Constructor must call LoadJson() for each object which is backed by a Json string.</summary>
-        protected abstract void UpdateJsonStrings();
+        private readonly Dictionary<string, (Func<object> getter, Action<object> setter)> jsonProperties = new();
 
-        protected T LoadJson<T>(string? json) where T : class, new()
+        private SettingsProvider GetFirstProvider()
         {
+            var e = Providers.GetEnumerator();
+            if (!e.MoveNext())
+                throw new ApplicationException("JsonApplicationSettings must have at least 1 generated setting, so that ApplicationSettingsBase constructs a provider");
+            return (SettingsProvider)e.Current;
+        }
+
+        protected void RegisterJsonProperty<T>(string name, Func<T> getter, Action<T> setter) where T : class, new()
+        {
+            jsonProperties.Add(name, (() => getter(), o => setter((T)o)));
+            Properties.Add(new SettingsProperty(name)
+            {
+                IsReadOnly = false,
+                SerializeAs = SettingsSerializeAs.String,
+                PropertyType = typeof(string),
+                Provider = GetFirstProvider(),
+                Attributes =
+                {
+                    { typeof(UserScopedSettingAttribute) , new UserScopedSettingAttribute() }
+                }
+            });
+            LoadJson<T>(name);
+        }
+
+        private void LoadJson<T>(string name) where T : class, new()
+        {
+            if (!jsonProperties.TryGetValue(name, out var details))
+                throw new ApplicationException($"Json property '{name}' not found.");
+            var json = (string)this[name];
             T? obj = null;
             try
             {
@@ -23,14 +50,21 @@ namespace CarmenUI.Properties
                     obj = JsonSerializer.Deserialize<T>(json);
             }
             catch { }
-            return obj ?? new();
+            details.setter(obj ?? new());
         }
 
-        protected string StoreJson<T>(T obj) => JsonSerializer.Serialize(obj);
+        private void StoreJson(string name)
+        {
+            if (!jsonProperties.TryGetValue(name, out var details))
+                throw new ApplicationException($"Json property '{name}' not found.");
+            var obj = details.getter();
+            this[name] = JsonSerializer.Serialize(obj);
+        }
 
         public override void Save()
         {
-            UpdateJsonStrings();
+            foreach (var property in jsonProperties.Keys)
+                StoreJson(property);
             base.Save();
         }
     }

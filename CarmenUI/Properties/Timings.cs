@@ -4,6 +4,7 @@ using System.Configuration;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CarmenUI.Properties
@@ -19,35 +20,18 @@ namespace CarmenUI.Properties
 
         private Timings()
         {
-            TotalTime = LoadJson<Dictionary<string, int>>(Json_TotalTime);
-            SubSegments = LoadJson<Dictionary<string, string[]>>(Json_SubSegments);
+            RegisterJsonProperty(nameof(TotalTime), () => TotalTime, o => TotalTime = o);
+            RegisterJsonProperty(nameof(SubSegments), () => SubSegments, o => SubSegments = o);
         }
 
-        protected override void UpdateJsonStrings()
-        {
-            Json_TotalTime = StoreJson(TotalTime);
-            Json_SubSegments = StoreJson(SubSegments);
-        }
+        [UserScopedSetting]
+        public object? _generateProvider => null;
 
         /// <summary>The total milliseconds taken for a segment with the given key</summary>
-        public Dictionary<string, int> TotalTime { get; private set; }
-
-        [UserScopedSetting]
-        public string Json_TotalTime
-        {
-            get => (string)this[nameof(Json_TotalTime)];
-            private set => this[nameof(Json_TotalTime)] = value;
-        }
+        public Dictionary<string, int> TotalTime { get; private set; } = null!;
 
         /// <summary>A list of sub-segments within the segment of the given key</summary>
-        public Dictionary<string, string[]> SubSegments { get; private set; }
-
-        [UserScopedSetting]
-        public string Json_SubSegments
-        {
-            get => (string)this[nameof(Json_SubSegments)];
-            private set => this[nameof(Json_SubSegments)] = value;
-        }
+        public Dictionary<string, string[]> SubSegments { get; private set; } = null!;
 
         public void ClearTimings()
         {
