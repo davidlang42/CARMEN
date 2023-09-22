@@ -23,14 +23,16 @@ namespace Carmen.Mobile.Views
 
         protected override View GenerateMainView()
         {
-            //TODO (NOW) move fields into a ListView with TextCells to be more consistent
             //TODO (EDIT) maybe remove the idea of edit/view and just make it view by default then edit INDIVIDUAL values by clicking the TextCells (which opens an editor in a new page)
-            var fields = new VerticalStackLayout
+            var fields = new ListView
             {
-                LabelledField("First name", nameof(Applicant.FirstName)),
-                LabelledField("Last name", nameof(Applicant.LastName)),
-                LabelledField("Gender", nameof(Applicant.Gender)),
-                LabelledField("Date of birth", nameof(Applicant.DateOfBirth)),
+                ItemsSource = new[] {
+                    new ApplicantField("First name", a => a.FirstName, model),
+                    new ApplicantField("Last name", a => a.LastName, model),
+                    new ApplicantField("Gender", a => a.Gender, model),
+                    new ApplicantField("Date of birth", a => a.DateOfBirth, model)
+                },
+                ItemTemplate = new DataTemplate(GenerateFieldDataTemplate),
             };
 
             var abilities = new ListView
@@ -79,11 +81,13 @@ namespace Carmen.Mobile.Views
 
         protected override IEnumerable<View> GenerateExtraButtons() => Enumerable.Empty<View>();
 
-        static Label LabelledField(string label_text, string applicant_field_binding_path)
+        private object GenerateFieldDataTemplate()
         {
-            var label = new Label();
-            label.SetBinding(Label.TextProperty, new Binding(ApplicantModel.Path(applicant_field_binding_path), stringFormat: label_text + ": {0}"));
-            return label;
+            // BindingContext will be set to an ApplicantField
+            var cell = new TextCell();
+            cell.SetBinding(TextCell.TextProperty, new Binding(nameof(ApplicantField.Label)));
+            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(ApplicantField.Value)));
+            return cell;
         }
 
         private object GenerateAbilityDataTemplate()
