@@ -1,6 +1,8 @@
-﻿using Carmen.Mobile.Models;
+﻿using Carmen.Mobile.Converters;
+using Carmen.Mobile.Models;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -103,38 +105,28 @@ namespace Carmen.Mobile.Views
             }
         }
 
-        private object GenerateAbilityDataTemplate()//TODO
+        private object GenerateAbilityDataTemplate()
         {
-            return null;
             // BindingContext will be set to an Ability
-            //var cell = new TextCell();
-            //var full_name = new MultiBinding
-            //{
-            //    Converter = new FullName()
-            //};
-            //full_name.Bindings.Add(new Binding(nameof(Applicant.FirstName)));
-            //full_name.Bindings.Add(new Binding(nameof(Applicant.LastName)));
-            //cell.SetBinding(TextCell.TextProperty, full_name);
-            //cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Applicant.Description)));
-            //cell.Tapped += Cell_Tapped;
-            //return cell;
+            var cell = new TextCell();
+            cell.SetBinding(TextCell.TextProperty, new Binding($"{nameof(Ability.Criteria)}.{nameof(Criteria.Name)}"));
+            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Ability.Mark))); //TODO nicer formatting for marks
+            return cell;
         }
 
-        private object GenerateNoteDataTemplate()//TODO
+        private object GenerateNoteDataTemplate()
         {
-            return null;
             // BindingContext will be set to a Note
-            //var cell = new TextCell();
-            //var full_name = new MultiBinding
-            //{
-            //    Converter = new FullName()
-            //};
-            //full_name.Bindings.Add(new Binding(nameof(Applicant.FirstName)));
-            //full_name.Bindings.Add(new Binding(nameof(Applicant.LastName)));
-            //cell.SetBinding(TextCell.TextProperty, full_name);
-            //cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Applicant.Description)));
-            //cell.Tapped += Cell_Tapped;
-            //return cell;
+            var cell = new TextCell();
+            var description = new MultiBinding
+            {
+                Converter = new NoteDescription()
+            };
+            description.Bindings.Add(new Binding(nameof(Note.Author)));
+            description.Bindings.Add(new Binding(nameof(Note.Timestamp)));
+            cell.SetBinding(TextCell.TextProperty, description);
+            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Note.Text)));
+            return cell;
         }
     }
 }
