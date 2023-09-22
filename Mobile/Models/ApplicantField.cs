@@ -12,16 +12,37 @@ namespace Carmen.Mobile.Models
     {
         readonly ApplicantModel model;
         readonly Func<Applicant, object?> getter;
+        readonly Action<Applicant, object?> setter;
 
         public string Label { get; }
-        public object? Value => model.Applicant == null ? null : getter(model.Applicant);
+        public object? Value
+        {
+            get
+            {
+                if (model.Applicant == null)
+                    return null;
+                return getter(model.Applicant);
+            }
+            set
+            {
+                if (model.Applicant == null)
+                    return;
+                setter(model.Applicant, value);
+            }
+        }
         
-        public ApplicantField(string label, Func<Applicant, object?> getter, ApplicantModel model)
+        private ApplicantField(string label, Func<Applicant, object?> getter, Action<Applicant, object?> setter, ApplicantModel model)
         {
             Label = label;
             this.getter = getter;
+            this.setter = setter;
             this.model = model;
             model.PropertyChanged += Model_PropertyChanged;
+        }
+
+        public static ApplicantField New<T>(string label, Func<Applicant, T> getter, Action<Applicant, T> setter, ApplicantModel model)
+        {
+            return new(label, a => getter(a), (a, v) => setter(a, (T?)v), model);
         }
 
         private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)

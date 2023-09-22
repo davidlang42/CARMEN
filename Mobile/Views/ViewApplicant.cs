@@ -24,13 +24,15 @@ namespace Carmen.Mobile.Views
         protected override View GenerateMainView()
         {
             //TODO (EDIT) maybe remove the idea of edit/view and just make it view by default then edit INDIVIDUAL values by clicking the TextCells (which opens an editor in a new page)
+            //TODO (EDIT) put the delete button on ViewApplicant page
+            //TODO (EDIT) move ApplicantBase code into ViewApplicant & remove EditApplicant/ApplicantBase
             var fields = new ListView
             {
                 ItemsSource = new[] {
-                    new ApplicantField("First name", a => a.FirstName, model),
-                    new ApplicantField("Last name", a => a.LastName, model),
-                    new ApplicantField("Gender", a => a.Gender, model),
-                    new ApplicantField("Date of birth", a => a.DateOfBirth, model)
+                    ApplicantField.New("First name", a => a.FirstName, (a, v) => a.FirstName = v, model),
+                    ApplicantField.New("Last name", a => a.LastName, (a, v) => a.LastName = v, model),
+                    ApplicantField.New("Gender", a => a.Gender, (a, v) => a.Gender = v, model),
+                    ApplicantField.New("Date of birth", a => a.DateOfBirth, (a, v) => a.DateOfBirth = v, model)
                 },
                 ItemTemplate = new DataTemplate(GenerateFieldDataTemplate),
             };
@@ -87,7 +89,17 @@ namespace Carmen.Mobile.Views
             var cell = new TextCell();
             cell.SetBinding(TextCell.TextProperty, new Binding(nameof(ApplicantField.Label)));
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(ApplicantField.Value)));
+            cell.Tapped += FieldCell_Tapped;
             return cell;
+        }
+
+        private async void FieldCell_Tapped(object? sender, EventArgs e)
+        {
+            //TODO handle enum & date fields separately to string (make ApplicantField<T>)
+            if (sender is Cell cell && cell.BindingContext is ApplicantField field && model.Applicant is Applicant applicant)
+            {
+                await Navigation.PushAsync(new EditField(applicant.FirstName, applicant.LastName, field));
+            }
         }
 
         private object GenerateAbilityDataTemplate()
@@ -96,6 +108,7 @@ namespace Carmen.Mobile.Views
             var cell = new TextCell();
             cell.SetBinding(TextCell.TextProperty, new Binding($"{nameof(Ability.Criteria)}.{nameof(Criteria.Name)}"));
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Ability.Mark))); //TODO nicer formatting for marks
+            //TODO edit marks: cell.Tapped += FieldCell_Tapped;
             return cell;
         }
 
@@ -111,6 +124,7 @@ namespace Carmen.Mobile.Views
             description.Bindings.Add(new Binding(nameof(Note.Timestamp)));
             cell.SetBinding(TextCell.TextProperty, description);
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Note.Text)));
+            //TODO add notes: cell.Tapped += FieldCell_Tapped;
             return cell;
         }
     }
