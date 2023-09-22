@@ -14,6 +14,8 @@ namespace Carmen.Mobile.Models
         public bool IsLoading { get; private set; } = true;
         public int ApplicantId { get; }
         public Applicant? Applicant { get; private set; }
+        public bool IsLoadingPhoto { get; private set; } = true;
+        public ImageSource? Photo { get; private set; }
 
         public ApplicantModel(int applicant_id)
         {
@@ -35,7 +37,17 @@ namespace Carmen.Mobile.Models
             OnPropertyChanged(nameof(IsLoading));
         }
 
+        public void LoadedPhoto(ImageSource? photo)
+        {
+            Photo = photo;
+            IsLoadingPhoto = false;
+            OnPropertyChanged(nameof(Photo));
+            OnPropertyChanged(nameof(IsLoadingPhoto));
+        }
+
         public string GetFullName()
             => (string)new FullName().Convert(new[] { Applicant?.FirstName, Applicant?.LastName }, null, null, null);
+
+        public static string Path(string applicant_field_path) => $"{nameof(Applicant)}.{applicant_field_path}";
     }
 }

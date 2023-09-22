@@ -2,7 +2,6 @@
 using Carmen.Mobile.Models;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
-using Microsoft.Graphics.Canvas.Text;
 using System;
 using System.Collections.Generic;
 using System.Linq;
