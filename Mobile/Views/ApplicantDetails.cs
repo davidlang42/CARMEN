@@ -17,14 +17,16 @@ namespace Carmen.Mobile.Views
 {
     internal class ApplicantDetails : ContentPage
     {
-        protected readonly ApplicantModel model;
-        protected readonly ConnectionDetails show;
-        protected ShowContext? context;
+        readonly ApplicantModel model;
+        readonly ConnectionDetails show;
+        readonly Action onSave;
+        ShowContext? context;
 
-        public ApplicantDetails(ConnectionDetails show, int id, string first, string last)
+        public ApplicantDetails(ConnectionDetails show, int id, string first, string last, Action on_save)
         {
-            model = new(id, first, last);
             this.show = show;
+            model = new(id, first, last);
+            onSave = on_save;
             BindingContext = model;
             SetBinding(TitleProperty, new Binding(nameof(ApplicantModel.FullName)));
             Loaded += ViewApplicant_Loaded;
@@ -86,7 +88,13 @@ namespace Carmen.Mobile.Views
         private async void ViewApplicant_Loaded(object? sender, EventArgs e)
         {
             context = ShowContext.Open(show);
-            var applicant = await Task.Run(() => context.Applicants.Single(a => a.ApplicantId == model.ApplicantId));
+            var applicant = await Task.Run(() => context.Applicants.SingleOrDefault(a => a.ApplicantId == model.ApplicantId));
+            if (applicant == null)
+            {
+                await DisplayAlert("Applicant does not exist", "This is probably because someone else has deleted them.", "Ok");
+                await Navigation.PopAsync();
+                return;
+            }
             model.Loaded(applicant);
             var image = await Task.Run(() => applicant.Photo); //TODO cache photos
             var source = image == null ? null : await MauiImageSource(image);
@@ -190,6 +198,7 @@ namespace Carmen.Mobile.Views
             if (!context.ChangeTracker.HasChanges())
                 await DisplayAlert($"No changes were made.", "", "Ok");//TODO dont wait if dont care about result
             await context.SaveChangesAsync();//TODO dont save if no changes
+            await Task.Run(onSave);
             await Navigation.PopAsync();
         }
 

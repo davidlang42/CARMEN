@@ -312,6 +312,10 @@ namespace Carmen.ShowModel.Applicants
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
 
+        /// <summary>This really shouldn't be required, but after EntityEntry.Reload() is called,
+        /// you need to manually trigger the PropertyChanged event.</summary>
+        public void NotifyChanged() => OnPropertyChanged("");
+
         public int CompareTo(Applicant? other) => ApplicantId.CompareTo(other?.ApplicantId);
     }
 }

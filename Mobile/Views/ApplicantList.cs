@@ -4,6 +4,7 @@ using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -114,8 +115,11 @@ namespace Carmen.Mobile.Views
             var cell = (Cell)sender!;
             if (cell.BindingContext is not Applicant applicant)
                 return;
-            //TODO (EDIT) need to reload the entity on return in case it was edited or deleted: https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.changetracking.entityentry.reload?view=efcore-1.1
-            await Navigation.PushAsync(new ApplicantDetails(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName));
+            await Navigation.PushAsync(new ApplicantDetails(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName, () =>
+            {
+                context?.Entry(applicant).Reload();
+                applicant.NotifyChanged();
+            }));
         }
     }
 }
