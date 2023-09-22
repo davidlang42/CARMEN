@@ -41,8 +41,7 @@ namespace Carmen.Mobile.Views
                 Spacing = 5,
                 Children =
                 {
-                    ButtonWithHandler("View Applicants", ViewApplicants_Clicked),
-                    ButtonWithHandler("Edit Applicants", EditApplicants_Clicked),
+                    ButtonWithHandler("View Applicants", ViewApplicants_Clicked)
                 }
             };
             buttons.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(MainModel.IsReady)));
@@ -123,12 +122,8 @@ namespace Carmen.Mobile.Views
 
         private async void ViewApplicants_Clicked(object? sender, EventArgs e)
         {
-            await Navigation.PushAsync(new ApplicantList(connection, model.ShowName!, false)); // not null when show ready
-        }
-
-        private async void EditApplicants_Clicked(object? sender, EventArgs e)
-        {
-            await Navigation.PushAsync(new ApplicantList(connection, model.ShowName!, true)); // not null when show ready
+            //TODO better null handling
+            await Navigation.PushAsync(new ApplicantList(connection, model.ShowName!)); // not null when show ready
         }
     }
 }

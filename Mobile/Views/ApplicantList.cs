@@ -14,14 +14,12 @@ namespace Carmen.Mobile.Views
     {
         readonly Applicants model;
         readonly ConnectionDetails show;
-        readonly bool allowEditing;
         ShowContext? context;
 
-        public ApplicantList(ConnectionDetails show, string show_name, bool allow_editing)
+        public ApplicantList(ConnectionDetails show, string show_name)
         {
             model = new();
             this.show = show;
-            allowEditing = allow_editing;
             Loaded += ApplicantList_Loaded;
             this.Unloaded += ApplicantList_Unloaded;
             BindingContext = model;
@@ -63,15 +61,12 @@ namespace Carmen.Mobile.Views
             };
             back.Clicked += Back_Clicked; ;
             grid.Add(back, row: 1, column: c++);
-            if (allowEditing)
-            {
-                var add = new Button { Text = "Add new applicant" };
-                add.Clicked += AddButton_Clicked;
-                grid.ColumnDefinitions.Add(new(GridLength.Star));
-                grid.Add(add, row: 1, column: c++);
-                grid.SetColumnSpan(loading, c);
-                grid.SetColumnSpan(list, c);
-            }
+            var add = new Button { Text = "Add new applicant" };
+            add.Clicked += AddButton_Clicked;
+            grid.ColumnDefinitions.Add(new(GridLength.Star));
+            grid.Add(add, row: 1, column: c++);
+            grid.SetColumnSpan(loading, c);
+            grid.SetColumnSpan(list, c);
             Content = grid;
         }
 
@@ -119,11 +114,8 @@ namespace Carmen.Mobile.Views
             var cell = (Cell)sender!;
             if (cell.BindingContext is not Applicant applicant)
                 return;
-            if (allowEditing)
-                await Navigation.PushAsync(new EditApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName));
-            else
-                //TODO (EDIT) need to reload the entity on return in case it was edited or deleted: https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.changetracking.entityentry.reload?view=efcore-1.1
-                await Navigation.PushAsync(new ViewApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName));
+            //TODO (EDIT) need to reload the entity on return in case it was edited or deleted: https://learn.microsoft.com/en-us/dotnet/api/microsoft.entityframeworkcore.changetracking.entityentry.reload?view=efcore-1.1
+            await Navigation.PushAsync(new ViewApplicant(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName));
         }
     }
 }
