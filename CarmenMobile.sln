@@ -3,20 +3,58 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.7.34031.279
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mobile", "Mobile\Mobile.csproj", "{EE17094A-B3EB-442A-953E-44F9106F37C7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mobile", "Mobile\Mobile.csproj", "{EE17094A-B3EB-442A-953E-44F9106F37C7}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShowModel", "ShowModel\ShowModel.csproj", "{C47BD08E-22B6-4718-ABFA-A2395C9A58AF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CastingEngine", "CastingEngine\CastingEngine.csproj", "{D894494A-C2D0-4F57-9A4A-4B0B8A214965}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{A047BE2F-472F-4C77-9118-A6B6E267C0CE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Benchmark|Any CPU = Benchmark|Any CPU
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
+		Slow DB|Any CPU = Slow DB|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Benchmark|Any CPU.ActiveCfg = Release|Any CPU
+		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Benchmark|Any CPU.Build.0 = Release|Any CPU
+		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Benchmark|Any CPU.Deploy.0 = Release|Any CPU
 		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
 		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Slow DB|Any CPU.ActiveCfg = Release|Any CPU
+		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Slow DB|Any CPU.Build.0 = Release|Any CPU
+		{EE17094A-B3EB-442A-953E-44F9106F37C7}.Slow DB|Any CPU.Deploy.0 = Release|Any CPU
+		{C47BD08E-22B6-4718-ABFA-A2395C9A58AF}.Benchmark|Any CPU.ActiveCfg = Debug|Any CPU
+		{C47BD08E-22B6-4718-ABFA-A2395C9A58AF}.Benchmark|Any CPU.Build.0 = Debug|Any CPU
+		{C47BD08E-22B6-4718-ABFA-A2395C9A58AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C47BD08E-22B6-4718-ABFA-A2395C9A58AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C47BD08E-22B6-4718-ABFA-A2395C9A58AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C47BD08E-22B6-4718-ABFA-A2395C9A58AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C47BD08E-22B6-4718-ABFA-A2395C9A58AF}.Slow DB|Any CPU.ActiveCfg = Slow DB|Any CPU
+		{C47BD08E-22B6-4718-ABFA-A2395C9A58AF}.Slow DB|Any CPU.Build.0 = Slow DB|Any CPU
+		{D894494A-C2D0-4F57-9A4A-4B0B8A214965}.Benchmark|Any CPU.ActiveCfg = Debug|Any CPU
+		{D894494A-C2D0-4F57-9A4A-4B0B8A214965}.Benchmark|Any CPU.Build.0 = Debug|Any CPU
+		{D894494A-C2D0-4F57-9A4A-4B0B8A214965}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D894494A-C2D0-4F57-9A4A-4B0B8A214965}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D894494A-C2D0-4F57-9A4A-4B0B8A214965}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D894494A-C2D0-4F57-9A4A-4B0B8A214965}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D894494A-C2D0-4F57-9A4A-4B0B8A214965}.Slow DB|Any CPU.ActiveCfg = Debug|Any CPU
+		{D894494A-C2D0-4F57-9A4A-4B0B8A214965}.Slow DB|Any CPU.Build.0 = Debug|Any CPU
+		{A047BE2F-472F-4C77-9118-A6B6E267C0CE}.Benchmark|Any CPU.ActiveCfg = Benchmark|Any CPU
+		{A047BE2F-472F-4C77-9118-A6B6E267C0CE}.Benchmark|Any CPU.Build.0 = Benchmark|Any CPU
+		{A047BE2F-472F-4C77-9118-A6B6E267C0CE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A047BE2F-472F-4C77-9118-A6B6E267C0CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A047BE2F-472F-4C77-9118-A6B6E267C0CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A047BE2F-472F-4C77-9118-A6B6E267C0CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A047BE2F-472F-4C77-9118-A6B6E267C0CE}.Slow DB|Any CPU.ActiveCfg = Debug|Any CPU
+		{A047BE2F-472F-4C77-9118-A6B6E267C0CE}.Slow DB|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
