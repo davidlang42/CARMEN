@@ -124,7 +124,7 @@
         {
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_E38BE7713B1E4194925E8B77E5C7E700"
             {
-            "SourcePath" = "8:..\\Carmen.Desktop\\Icons\\CarmenC.ico"
+            "SourcePath" = "8:..\\Desktop\\Icons\\CarmenC.ico"
             "TargetName" = "8:CarmenC.ico"
             "Tag" = "8:"
             "Folder" = "8:_6C9730BB8C4B45A3881433C0DE2D1DAF"
@@ -745,7 +745,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_F331B30318EE45C992DEB7C6F266D877"
             {
-            "SourcePath" = "8:..\\Carmen.Desktop\\obj\\Debug\\net5.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\Desktop\\obj\\Debug\\net5.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_6C9730BB8C4B45A3881433C0DE2D1DAF"
