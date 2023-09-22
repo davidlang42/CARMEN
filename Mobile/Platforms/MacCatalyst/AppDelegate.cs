@@ -1,6 +1,6 @@
 ﻿using Foundation;
 
-namespace Mobile
+namespace Carmen.Mobile
 {
     [Register("AppDelegate")]
     public class AppDelegate : MauiUIApplicationDelegate

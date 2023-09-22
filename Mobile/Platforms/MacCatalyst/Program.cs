@@ -1,7 +1,7 @@
 ﻿using ObjCRuntime;
 using UIKit;
 
-namespace Mobile
+namespace Carmen.Mobile
 {
     public class Program
     {

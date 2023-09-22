@@ -1,4 +1,6 @@
-﻿namespace Mobile
+﻿using Carmen.Mobile.Views;
+
+namespace Carmen.Mobile
 {
     public partial class App : Application
     {
@@ -6,7 +8,7 @@
         {
             InitializeComponent();
 
-            MainPage = new AppShell();
+            MainPage = new NavigationPage(new Login());
         }
     }
 }
