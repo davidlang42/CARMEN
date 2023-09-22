@@ -14,6 +14,20 @@ namespace Carmen.Mobile.Models
         public bool IsLoading { get; private set; } = true;
         public int ApplicantId { get; }
         public Applicant? Applicant { get; private set; }
+        public ApplicantField[] Fields
+        {
+            get
+            {
+                if (Applicant is not Applicant applicant)
+                    return Array.Empty<ApplicantField>();
+                return new[] {
+                    ApplicantField.New("First name", a => a.FirstName, (a, v) => a.FirstName = v, applicant),
+                    ApplicantField.New("Last name", a => a.LastName, (a, v) => a.LastName = v, applicant),
+                    ApplicantField.New("Gender", a => a.Gender, (a, v) => a.Gender = v, applicant),
+                    ApplicantField.New("Date of birth", a => a.DateOfBirth, (a, v) => a.DateOfBirth = v, applicant)
+                };
+            }
+        }
         public bool IsLoadingPhoto { get; private set; } = true;
         public ImageSource? Photo { get; private set; }
 
@@ -34,6 +48,7 @@ namespace Carmen.Mobile.Models
             Applicant = applicant;
             IsLoading = false;
             OnPropertyChanged(nameof(Applicant));
+            OnPropertyChanged(nameof(Fields));
             OnPropertyChanged(nameof(IsLoading));
         }
 

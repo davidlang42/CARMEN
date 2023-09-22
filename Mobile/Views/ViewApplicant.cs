@@ -28,14 +28,9 @@ namespace Carmen.Mobile.Views
             //TODO (EDIT) move ApplicantBase code into ViewApplicant & remove EditApplicant/ApplicantBase
             var fields = new ListView
             {
-                ItemsSource = new[] {
-                    ApplicantField.New("First name", a => a.FirstName, (a, v) => a.FirstName = v, model),
-                    ApplicantField.New("Last name", a => a.LastName, (a, v) => a.LastName = v, model),
-                    ApplicantField.New("Gender", a => a.Gender, (a, v) => a.Gender = v, model),
-                    ApplicantField.New("Date of birth", a => a.DateOfBirth, (a, v) => a.DateOfBirth = v, model)
-                },
                 ItemTemplate = new DataTemplate(GenerateFieldDataTemplate),
             };
+            fields.SetBinding(ListView.ItemsSourceProperty, new Binding(nameof(ApplicantModel.Fields)));
 
             var abilities = new ListView
             {

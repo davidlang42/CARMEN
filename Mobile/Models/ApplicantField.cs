@@ -10,53 +10,34 @@ namespace Carmen.Mobile.Models
 {
     internal class ApplicantField : INotifyPropertyChanged
     {
-        readonly ApplicantModel model;
+        readonly Applicant applicant;
         readonly Func<Applicant, object?> getter;
         readonly Action<Applicant, object?> setter;
 
         public string Label { get; }
         public object? Value
         {
-            get
-            {
-                if (model.Applicant == null)
-                    return null;
-                return getter(model.Applicant);
-            }
-            set
-            {
-                if (model.Applicant == null)
-                    return;
-                setter(model.Applicant, value);
-            }
+            get => getter(applicant);
+            set => setter(applicant, value);
         }
         
-        private ApplicantField(string label, Func<Applicant, object?> getter, Action<Applicant, object?> setter, ApplicantModel model)
+        private ApplicantField(string label, Func<Applicant, object?> getter, Action<Applicant, object?> setter, Applicant applicant)
         {
             Label = label;
             this.getter = getter;
             this.setter = setter;
-            this.model = model;
-            model.PropertyChanged += Model_PropertyChanged;
+            this.applicant = applicant;
+            applicant.PropertyChanged += Applicant_PropertyChanged;
         }
 
-        public static ApplicantField New<T>(string label, Func<Applicant, T> getter, Action<Applicant, T> setter, ApplicantModel model)
+        public static ApplicantField New<T>(string label, Func<Applicant, T> getter, Action<Applicant, T> setter, Applicant applicant)
         {
-            return new(label, a => getter(a), (a, v) => setter(a, (T?)v), model);
-        }
-
-        private void Model_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName == nameof(ApplicantModel.Applicant))
-            {
-                OnPropertyChanged(nameof(Value));
-                if (model.Applicant is Applicant applicant)
-                    applicant.PropertyChanged += Applicant_PropertyChanged;
-            }
+            return new(label, a => getter(a), (a, v) => setter(a, (T?)v), applicant);
         }
 
         private void Applicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            // this assume any applicant change is changing this field, which isn't true but isn't worth worrying about
             OnPropertyChanged(nameof(Value));
         }
 
