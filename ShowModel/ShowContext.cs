@@ -541,8 +541,8 @@ namespace Carmen.ShowModel
             modelBuilder.Entity<NumericCriteria>();
             modelBuilder.Entity<SelectCriteria>()
                 .Property(sc => sc.Options)
-                .HasConversion(obj => JsonSerializer.Serialize(obj, null), // store array as json
-                      json => JsonSerializer.Deserialize<string[]>(json, null) ?? SelectCriteria.DEFAULT_OPTIONS);
+                .HasConversion(obj => JsonSerializer.Serialize(obj, (JsonSerializerOptions?)null), // store array as json
+                      json => JsonSerializer.Deserialize<string[]>(json, (JsonSerializerOptions?)null) ?? SelectCriteria.DEFAULT_OPTIONS);
             modelBuilder.Entity<BooleanCriteria>();
 
             // Auto-include entities for normal use cases

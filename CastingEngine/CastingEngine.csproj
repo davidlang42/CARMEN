@@ -1,20 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <Deterministic>false</Deterministic>
     <AssemblyName>Carmen.CastingEngine</AssemblyName>
     <RootNamespace>Carmen.CastingEngine</RootNamespace>
     <Authors>David Lang</Authors>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\ShowModel\ShowModel.csproj" />
   </ItemGroup>
-
 </Project>

@@ -1,8 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-	  <Nullable>enable</Nullable>
+    <TargetFramework>net7.0</TargetFramework>
+    <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
     <Deterministic>false</Deterministic>
     <AssemblyName>UnitTests</AssemblyName>
@@ -10,11 +9,9 @@
     <Authors>David Lang</Authors>
     <Configurations>Debug;Release;Benchmark</Configurations>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.1.1" />
     <PackageReference Include="FluentAssertions" Version="5.10.3" />
@@ -26,10 +23,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\CastingEngine\CastingEngine.csproj" />
     <ProjectReference Include="..\ShowModel\ShowModel.csproj" />
   </ItemGroup>
-
 </Project>

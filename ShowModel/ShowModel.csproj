@@ -1,7 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
     <Configurations>Debug;Release;Slow DB</Configurations>
     <Deterministic>false</Deterministic>
@@ -9,15 +8,12 @@
     <RootNamespace>Carmen.ShowModel</RootNamespace>
     <Authors>David Lang</Authors>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Slow DB|AnyCPU'">
     <DefineConstants>DEBUG;TRACE;SLOW_DATABASE</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Include="..\GlobalAssemblyInfo.cs" Link="GlobalAssemblyInfo.cs" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="CsvHelper" Version="27.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.10" />
@@ -30,5 +26,4 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="5.0.3" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.1.0" />
   </ItemGroup>
-
 </Project>
