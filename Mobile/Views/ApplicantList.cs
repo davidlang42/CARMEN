@@ -99,7 +99,7 @@ namespace Carmen.Mobile.Views
             var cell = new TextCell();
             var full_name = new MultiBinding
             {
-                Converter = new FullName()
+                Converter = new FullNameFormatter()
             };
             full_name.Bindings.Add(new Binding(nameof(Applicant.FirstName)));
             full_name.Bindings.Add(new Binding(nameof(Applicant.LastName)));

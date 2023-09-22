@@ -23,10 +23,10 @@ namespace Carmen.Mobile.Views
 
         public ApplicantDetails(ConnectionDetails show, int id, string first, string last)
         {
-            model = new(id);
+            model = new(id, first, last);
             this.show = show;
             BindingContext = model;
-            Title = $"{first} {last}";//TODO bind to model with the default value of existing
+            SetBinding(TitleProperty, new Binding(nameof(ApplicantModel.FullName)));
             Loaded += ViewApplicant_Loaded;
             Unloaded += ViewApplicant_Unloaded;
 
@@ -197,7 +197,7 @@ namespace Carmen.Mobile.Views
         {
             if (context == null || model.Applicant == null)
                 return;
-            if (await DisplayAlert($"Are you sure you want to delete '{model.GetFullName()}'?", "This cannot be undone.", "Yes", "No"))
+            if (await DisplayAlert($"Are you sure you want to delete '{model.FullName}'?", "This cannot be undone.", "Yes", "No"))
             {
                 context.Applicants.Remove(model.Applicant);
                 await context.SaveChangesAsync();

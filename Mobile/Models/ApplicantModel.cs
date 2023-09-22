@@ -28,12 +28,19 @@ namespace Carmen.Mobile.Models
                 };
             }
         }
+        public string FullName
+            => FullNameFormatter.Format(Applicant?.FirstName ?? originalFirstName, Applicant?.LastName ?? originalLastName);
         public bool IsLoadingPhoto { get; private set; } = true;
         public ImageSource? Photo { get; private set; }
 
-        public ApplicantModel(int applicant_id)
+        readonly string originalFirstName;
+        readonly string originalLastName;
+
+        public ApplicantModel(int applicant_id, string original_first_name, string original_last_name)
         {
             ApplicantId = applicant_id;
+            originalFirstName = original_first_name;
+            originalLastName = original_last_name;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
@@ -46,10 +53,17 @@ namespace Carmen.Mobile.Models
         public void Loaded(Applicant applicant)
         {
             Applicant = applicant;
+            applicant.PropertyChanged += Applicant_PropertyChanged; ;
             IsLoading = false;
             OnPropertyChanged(nameof(Applicant));
+            OnPropertyChanged(nameof(FullName));
             OnPropertyChanged(nameof(Fields));
             OnPropertyChanged(nameof(IsLoading));
+        }
+
+        private void Applicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            OnPropertyChanged(nameof(FullName));
         }
 
         public void LoadedPhoto(ImageSource? photo)
@@ -59,9 +73,6 @@ namespace Carmen.Mobile.Models
             OnPropertyChanged(nameof(Photo));
             OnPropertyChanged(nameof(IsLoadingPhoto));
         }
-
-        public string GetFullName()
-            => (string)new FullName().Convert(new[] { Applicant?.FirstName, Applicant?.LastName }, null, null, null);
 
         public static string Path(string applicant_field_path) => $"{nameof(Applicant)}.{applicant_field_path}";
     }

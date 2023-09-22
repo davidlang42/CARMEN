@@ -10,7 +10,7 @@ namespace Carmen.Mobile.Converters
     /// <summary>
     /// Convert {FirstName, LastName} into a formatted name string.
     /// </summary>
-    public class FullName : IMultiValueConverter
+    public class FullNameFormatter : IMultiValueConverter
     {
         public object Convert(object?[] values, Type? targetType, object? parameter, CultureInfo? culture)
         {
@@ -20,8 +20,11 @@ namespace Carmen.Mobile.Converters
             var last = values[1] as string;
             if (first == null || last == null)
                 return "";
-            return $"{first} {last}";
+            return Format(first, last);
         }
+
+        public static string Format(string first, string last)
+            => $"{first} {last}";
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
             => throw new NotImplementedException();
