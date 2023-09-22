@@ -117,6 +117,11 @@ namespace Carmen.Desktop.Windows
                     using (new LoadingOverlay(this) { SubText = "Creating new database" })
                         await context.CreateNewDatabase(show.DefaultShowName);
                 }
+                else if (state == ShowContext.DatabaseState.ConnectionError)
+                {
+                    MessageBox.Show("This database doesn't exist or you do not have access to it.", Title);
+                    return;
+                }
                 else if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
                 {
                     MessageBox.Show("This database was saved with a newer version of CARMEN and cannot be opened. Please install the latest version.", Title);

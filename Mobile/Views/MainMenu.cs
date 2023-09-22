@@ -102,6 +102,11 @@ namespace Carmen.Mobile.Views
                     model.Loading("Creating new database");
                     await context.CreateNewDatabase(connection.DefaultShowName);
                 }
+                else if (state == ShowContext.DatabaseState.ConnectionError)
+                {
+                    model.Error($"Could not open '{connection.Database}'.\nThis database either doesn't exist, or you don't have access to it.");
+                    return;
+                }
                 else if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
                 {
                     model.Error("This database was saved with a newer version of CARMEN and cannot be opened.\nPlease install the latest version.");
@@ -110,10 +115,6 @@ namespace Carmen.Mobile.Views
                 else if (state == ShowContext.DatabaseState.SavedWithPreviousVersion)
                 {
                     model.Error("This database was saved with an older version of CARMEN and cannot be opened.\nPlease upgrade the database using CARMEN desktop.");
-                    return;
-                } else if (state == ShowContext.DatabaseState.ConnectionError)
-                {
-                    model.Error($"Could not open '{connection.Database}'.\nThis database either doesn't exist, or you don't have access to it.");
                     return;
                 }
                 model.Ready(context.ShowRoot.Name);
