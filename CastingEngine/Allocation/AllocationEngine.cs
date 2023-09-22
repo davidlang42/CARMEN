@@ -125,7 +125,7 @@ namespace Carmen.CastingEngine.Allocation
                 // select the required number of cast in the priority order, prioritising alternative cast buddies of those already selected
                 var picked_cast = new List<Applicant>();
                 var buddy_numbers = existing_cast // existing cast
-                    .Where(p => p.Key.Item1.AlternateCasts) // in a cast group which alternates
+                    .Where(p => p.Key.Item1?.AlternateCasts == true) // in a cast group which alternates
                     .SelectMany(p => p.Value.Select(a => a.CastNumber)) // get cast number
                     .ToHashSet();
                 foreach (var (cast_group_and_cast, potential_cast) in potential_cast_by_group)

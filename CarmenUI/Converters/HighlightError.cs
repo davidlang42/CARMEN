@@ -22,7 +22,10 @@ namespace CarmenUI.Converters
         BrushConverter brushConverter = new();
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-            => brushConverter.ConvertFromString((value is bool b && b) ? ERROR_COLOR : TRANSPARENT_COLOR);
+        {
+            var brush_name = (value is bool b && b) ? ERROR_COLOR : TRANSPARENT_COLOR;
+            return brushConverter.ConvertFromString(brush_name) ?? throw new ApplicationException($"Invalid brush: {brush_name}");
+        }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
             => throw new NotImplementedException();

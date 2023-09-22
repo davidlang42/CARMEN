@@ -332,9 +332,10 @@ namespace CarmenUI.Pages
             this.Close();
         }
 
-        private void Settings_Closing(object sender, EventArgs e)
+        private void Settings_Closing(object? sender, EventArgs e)
         {
-            var settings = (SettingsWindow)sender;
+            if (sender is not SettingsWindow settings)
+                throw new ApplicationException("Sender was not a SettingsWindow");
             using var loading = new LoadingOverlay(settings);
             var new_main_window = new MainWindow(connection);
             new_main_window.Show();
