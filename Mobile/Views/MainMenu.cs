@@ -30,7 +30,7 @@ namespace Carmen.Mobile.Views
                     LabelWithBinding(nameof(MainModel.LoadingMessage))
                 }
             };
-            loading.SetBinding(ProgressBar.IsVisibleProperty, new Binding(nameof(MainModel.IsLoading)));
+            loading.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(MainModel.IsLoading)));
 
             var error = LabelWithBinding(nameof(MainModel.ErrorMessage));
             error.TextColor = Colors.DarkRed;
@@ -116,18 +116,18 @@ namespace Carmen.Mobile.Views
                     model.Error($"Could not open '{connection.Database}'.\nThis database either doesn't exist, or you don't have access to it.");
                     return;
                 }
+                model.Ready(context.ShowRoot.Name);
             }
-            model.Ready();
         }
 
-        private static void ViewApplicants_Clicked(object? sender, EventArgs e)
+        private async void ViewApplicants_Clicked(object? sender, EventArgs e)
         {
-            //TODO launch view page
+            await Navigation.PushAsync(new ApplicantList(connection, model.ShowName!, false)); // not null when show ready
         }
 
-        private static void EditApplicants_Clicked(object? sender, EventArgs e)
+        private async void EditApplicants_Clicked(object? sender, EventArgs e)
         {
-            //TODO launch edit page
+            await Navigation.PushAsync(new ApplicantList(connection, model.ShowName!, true)); // not null when show ready
         }
     }
 }

@@ -7,12 +7,14 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Carmen.Mobile.Models
 {
     internal class MainModel : INotifyPropertyChanged
     {
-        public string PageTitle { get; private set; } = "CARMEN";
+        public string? ShowName { get; private set; }
+        public string PageTitle => ShowName == null ? "CARMEN" : $"CARMEN: {ShowName}";
 
         public bool IsLoading => LoadingMessage != null;
         public string? LoadingMessage { get; private set; } = ""; // default state is loading with no message
@@ -52,17 +54,14 @@ namespace Carmen.Mobile.Models
             MessagesChanged();
         }
 
-        public void Ready()
+        public void Ready(string show_name)
         {
+            ShowName = show_name;
+            OnPropertyChanged(nameof(ShowName));
+            OnPropertyChanged(nameof(PageTitle));
             LoadingMessage = null;
             ErrorMessage = null;
             MessagesChanged();
-        }
-
-        public void SetShowName(string name)
-        {
-            PageTitle = $"CARMEN: {name}";
-            OnPropertyChanged(nameof(PageTitle));
         }
     }
 }

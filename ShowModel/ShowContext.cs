@@ -31,7 +31,7 @@ namespace Carmen.ShowModel
             UpToDate,
             SavedWithPreviousVersion,
             SavedWithFutureVersion,
-            ConnectionError
+            ConnectionError//TODO handle this in other places
         }
 
         #region Database collections
