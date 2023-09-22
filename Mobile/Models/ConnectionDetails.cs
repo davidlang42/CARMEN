@@ -20,7 +20,6 @@ namespace Carmen.Mobile.Models
         public uint? Port { get; set; }
         public string User { get; set; } = "";
         public string Password { get; set; } = "";
-        public bool AllowEditing { get; set; } = true;
 
         public ConnectionDetails() : base(DbProvider.MySql)
         { }

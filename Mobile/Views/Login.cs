@@ -37,7 +37,6 @@ namespace Carmen.Mobile.Views
                 TextEntry(nameof(ConnectionDetails.User)), //TODO highlight red if empty
                 new Label { Text = "Password:" },
                 PasswordEntry(nameof(ConnectionDetails.Password)), //TODO highlight red if empty
-                CheckBoxAndLabel("Allow editing:", nameof(ConnectionDetails.AllowEditing)),
                 ConnectButton(Connect_Clicked)
             }
             };
@@ -117,109 +116,10 @@ namespace Carmen.Mobile.Views
             return button;
         }
 
-        static View CheckBoxAndLabel(string label, string binding_path)
-        {
-            var checkbox = new CheckBox();
-            checkbox.SetBinding(CheckBox.IsCheckedProperty, binding_path);
-            var layout = new Grid
-            {
-                Padding = 5,
-                ColumnDefinitions = new ColumnDefinitionCollection
-            {
-                new ColumnDefinition(GridLength.Auto),
-                new ColumnDefinition(GridLength.Star)
-            }
-            };
-            layout.Add(new Label { Text = label });
-            layout.Add(checkbox, 1);
-            return layout;
-        }
-
         private async void Connect_Clicked(object? sender, EventArgs e)
         {
-            //TODO save most recent (successful) connection details
-            //TODO remove stub & implement connection
-            await DisplayAlert("CARMEN", $"Looks like you want to connect to a db with connection string: {details.ConnectionString}", "Ok");
-
-            //TODO Open_Clicked()
-            //if (!File.Exists(files.SchemaFile))
-            //{
-            //    await DisplayAlert("Error", $"The schema file does not exist: {files.SchemaFile}", "Ok");
-            //    return;
-            //}
-            //if (!File.Exists(files.JsonFile))
-            //{
-            //    await DisplayAlert("Error", $"The JSON file does not exist: {files.JsonFile}", "Ok");
-            //    return;
-            //}
-            //Regex? hide_regex = null;
-            //if (!string.IsNullOrEmpty(files.HidePropertiesRegex))
-            //{
-            //    try
-            //    {
-            //        hide_regex = new Regex(files.HidePropertiesRegex, RegexOptions.Compiled);
-            //    }
-            //    catch (ArgumentException)
-            //    {
-            //        await DisplayAlert("Error", $"The pattern for hiding properties is not a valid Regular Expression: {files.HidePropertiesRegex}\nLeave this blank to show all properties.", "Ok");
-            //        return;
-            //    }
-            //}
-            //Regex? name_regex = null;
-            //if (!string.IsNullOrEmpty(files.NamePropertiesRegex))
-            //{
-            //    try
-            //    {
-            //        name_regex = new Regex(files.NamePropertiesRegex, RegexOptions.Compiled);
-            //    }
-            //    catch (ArgumentException)
-            //    {
-            //        await DisplayAlert("Error", $"The pattern for finding name properties is not a valid Regular Expression: {files.NamePropertiesRegex}\nLeave this blank to show all properties.", "Ok");
-            //        return;
-            //    }
-            //}
-            //files.SaveToUserPreferences();
-            //var json_file = JsonFile.Load(files.SchemaFile, files.JsonFile, hide_regex, name_regex, !files.OfferCommonObjectUpdates, files.ShortcutSingleObjectProperties);
-            //var json_model = new JsonModel(json_file, new(json_file.Schema.Title ?? "Root"), json_file.Root, json_file.Schema);
-            //await Navigation.PushAsync(new EditJson(json_model));
-
-            //TODO OpenShow()
-            //ShowContext.DatabaseState state;
-            //using (var context = ShowContext.Open(show))
-            //{
-            //    using (var loading = new LoadingOverlay(this).AsSegment(nameof(StartWindow) + nameof(OpenShow)))
-            //    {
-            //        using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.PreloadModel), "Preparing show model"))
-            //            await context.PreloadModel(); // do this here while the overlay is shown to avoid a synchronous delay when the MainMenu is loaded
-            //        using (loading.Segment(nameof(StartWindow) + nameof(ShowContext.CheckDatabaseState), "Checking database integrity"))
-            //            state = await context.CheckDatabaseState();
-            //    }
-            //    if (state == ShowContext.DatabaseState.Empty)
-            //    {
-            //        using (new LoadingOverlay(this) { SubText = "Creating new database" })
-            //            await context.CreateNewDatabase(show.DefaultShowName);
-            //    }
-            //    else if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
-            //    {
-            //        MessageBox.Show("This database was saved with a newer version of CARMEN and cannot be opened. Please install the latest version.", Title);
-            //        return;
-            //    }
-            //    else if (state == ShowContext.DatabaseState.SavedWithPreviousVersion)
-            //    {
-            //        if (MessageBox.Show("This database was saved with an older version of CARMEN, would you like to upgrade it?\nNOTE: Once upgraded, older versions will no longer be able to read this database.", Title, MessageBoxButton.YesNo) == MessageBoxResult.Yes)
-            //        {
-            //            using (new LoadingOverlay(this) { SubText = "Upgrading database" })
-            //            {
-            //                show.CreateBackupIfFile();
-            //                await context.UpgradeDatabase();
-            //            }
-            //        }
-            //        else
-            //            return;
-            //    }
-            //}
-            //using (new LoadingOverlay(this) { SubText = "Opening show" })
-            //    LaunchMainWindow(show);
+            //TODO save most recent connection details
+            await Navigation.PushAsync(new MainMenu(details));
         }
     }
 }
