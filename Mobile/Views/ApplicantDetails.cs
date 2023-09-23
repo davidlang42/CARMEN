@@ -148,6 +148,7 @@ namespace Carmen.Mobile.Views
             };
             fields.SetBinding(ListView.ItemsSourceProperty, new Binding(nameof(ApplicantModel.Fields)));
 
+            //TODO make a way to add abilities which aren't set yet, and delete (clear) ones which are
             var abilities = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateAbilityDataTemplate),
