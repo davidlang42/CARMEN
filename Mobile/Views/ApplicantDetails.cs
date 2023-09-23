@@ -159,7 +159,7 @@ namespace Carmen.Mobile.Views
                 ItemTemplate = new DataTemplate(GenerateNoteDataTemplate),
             };
             existing.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Notes))));
-            var empty = new ListView//TODO (MVP) doesn't hide when a note is added
+            var empty = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateEmptyNoteDataTemplate),
                 ItemsSource = new[] { "Add notes" }

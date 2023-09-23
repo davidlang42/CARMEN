@@ -247,6 +247,7 @@ namespace Carmen.ShowModel.Applicants
             abilities.CollectionChanged += Abilities_CollectionChanged;
             tags.CollectionChanged += Tags_CollectionChanged;
             roles.CollectionChanged += Roles_CollectionChanged;
+            notes.CollectionChanged += Notes_CollectionChanged;
         }
 
         private void Abilities_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -271,6 +272,9 @@ namespace Carmen.ShowModel.Applicants
 
         private void Roles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(Roles));
+
+        private void Notes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => OnPropertyChanged(nameof(Notes));
 
         public uint? AgeAt(DateTime date)
         {

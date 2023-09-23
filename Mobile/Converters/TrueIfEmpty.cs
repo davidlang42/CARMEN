@@ -1,7 +1,9 @@
-﻿using Castle.Core.Internal;
+﻿using Carmen.ShowModel.Applicants;
+using Castle.Core.Internal;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -14,7 +16,7 @@ namespace Carmen.Mobile.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is ICollection collection)
-                return collection.IsNullOrEmpty();
+                return collection.Count == 0;
             return false; // false if collection not loaded yet
         }
 
