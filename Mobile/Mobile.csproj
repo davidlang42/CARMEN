@@ -22,7 +22,7 @@
 		<ApplicationIdGuid>70e89470-ecd1-485a-a82b-7c6b38777460</ApplicationIdGuid>
 
 		<!-- Versions -->
-		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
+		<ApplicationDisplayVersion>0.1</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
@@ -40,6 +40,14 @@
   </PropertyGroup>
   <PropertyGroup Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows' and '$(RuntimeIdentifierOverride)' != ''">
     <RuntimeIdentifier>$(RuntimeIdentifierOverride)</RuntimeIdentifier>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="$(TargetFramework.Contains('-android')) and '$(Configuration)' == 'Release'">
+    <AndroidKeyStore>true</AndroidKeyStore>
+    <AndroidSigningKeyStore>CarmenMobile.keystore</AndroidSigningKeyStore>
+    <AndroidSigningKeyAlias>CarmenMobile</AndroidSigningKeyAlias>
+    <AndroidSigningKeyPass>env:AndroidSigningPassword</AndroidSigningKeyPass>
+    <AndroidSigningStorePass>env:AndroidSigningPassword</AndroidSigningStorePass>
   </PropertyGroup>
 
 	<ItemGroup>
