@@ -14,7 +14,7 @@ namespace Carmen.Mobile.Views
         readonly string author;
 
         public Applicant Applicant { get; }
-        public string NewNote { get; set; }
+        public string NewNote { get; set; } = "";
 
         public AddNote(Applicant applicant, string author)
         {

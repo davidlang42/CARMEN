@@ -3,6 +3,7 @@ using Carmen.Mobile.Models;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
+using Carmen.ShowModel.Structure;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -152,12 +153,23 @@ namespace Carmen.Mobile.Views
                 ItemTemplate = new DataTemplate(GenerateAbilityDataTemplate),
             };
             abilities.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Abilities))));
-
-            var notes = new ListView//TODO (MVP) add some sort of placeholder/button to add notes if there are none
+            
+            var existing = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateNoteDataTemplate),
             };
-            notes.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Notes))));
+            existing.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Notes))));
+            var empty = new ListView//TODO (MVP) doesn't hide when a note is added
+            {
+                ItemTemplate = new DataTemplate(GenerateEmptyNoteDataTemplate),
+                ItemsSource = new[] { "Add notes" }
+            };
+            empty.SetBinding(ListView.IsVisibleProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Notes)), converter: new TrueIfEmpty()));
+            var notes = new Grid
+            {
+                existing,
+                empty
+            };
 
             var activity = new ActivityIndicator();
             activity.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
@@ -266,19 +278,24 @@ namespace Carmen.Mobile.Views
             description.Bindings.Add(new Binding(nameof(Note.Timestamp)));
             cell.SetBinding(TextCell.TextProperty, description);
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Note.Text)));
-            cell.Tapped += NoteCell_Tapped; ;
+            cell.Tapped += NoteCell_Tapped;
+            return cell;
+        }
+
+        private object GenerateEmptyNoteDataTemplate()
+        {
+            // BindingContext will be set to a String
+            var cell = new TextCell();
+            cell.SetBinding(TextCell.TextProperty, new Binding());
+            cell.Tapped += NoteCell_Tapped;
             return cell;
         }
 
         private async void NoteCell_Tapped(object? sender, EventArgs e)
         {
             //TODO unselect item
-            if (sender is not Cell cell)
-                return;
-            if (cell.BindingContext is Note note)
-            {
-                await Navigation.PushAsync(new AddNote(note.Applicant, show.User));
-            }
+            if (model.Applicant is Applicant applicant)
+                await Navigation.PushAsync(new AddNote(applicant, show.User));
         }
     }
 }
