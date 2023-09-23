@@ -194,7 +194,7 @@ namespace Carmen.Mobile.Views
                 activity
             };
 
-            var layout = new FlexLayout
+            var layout = new FlexLayout //TODO only fields are visible on android
             {
                 Padding = 10,
                 AlignContent = Microsoft.Maui.Layouts.FlexAlignContent.SpaceEvenly,
