@@ -271,8 +271,31 @@ namespace Carmen.Mobile.Views
             var cell = new TextCell();
             cell.SetBinding(TextCell.TextProperty, new Binding($"{nameof(Ability.Criteria)}.{nameof(Criteria.Name)}"));
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Ability.Mark))); //TODO nicer formatting for marks
-            //TODO (MVP) edit marks: cell.Tapped += FieldCell_Tapped;
+            cell.Tapped += AbilityCell_Tapped;
             return cell;
+        }
+
+        private async void AbilityCell_Tapped(object? sender, EventArgs e)
+        {
+            //TODO unselect item
+            if (sender is not Cell cell)
+                return;
+            if (cell.BindingContext is not Ability ability)
+                return;
+            if (ability.Criteria is BooleanCriteria boolean)
+            {
+                await Navigation.PushAsync(new EditBooleanAbility(boolean, ability));
+            }
+            //TODO (MVP) edit numeric ability
+            //else if (ability.Criteria is NumericCriteria numeric)
+            //{
+            //    await Navigation.PushAsync(new EditNumericAbility(numeric, ability));
+            //}
+            //TODO (MVP) edit select ability
+            //else if (ability.Criteria is SelectCriteria select)
+            //{
+            //    await Navigation.PushAsync(new EditSelectAbility(select, ability));
+            //}
         }
 
         private object GenerateNoteDataTemplate()
