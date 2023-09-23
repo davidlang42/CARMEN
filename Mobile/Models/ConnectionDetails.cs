@@ -31,7 +31,18 @@ namespace Carmen.Mobile.Models
         /// <summary>The database connection string</summary>
         public override string ConnectionString => Provider switch
         {
-            DbProvider.MySql => new MySqlConnectionStringBuilder { Server = Host, Database = Database, UserID = User, Password = Password, Port = Port ?? DEFAULT_PORT, SslMode = MySqlSslMode.VerifyFull }.ToString(),
+            DbProvider.MySql => new MySqlConnectionStringBuilder {
+                Server = Host,
+                Database = Database,
+                UserID = User,
+                Password = Password,
+                Port = Port ?? DEFAULT_PORT,
+#if ANDROID
+                SslMode = MySqlSslMode.VerifyCA // VerifyFull fails on Android
+#else
+                SslMode = MySqlSslMode.VerifyFull
+#endif
+            }.ToString(),
             _ => throw new NotImplementedException($"Provider not implemented: {Provider}")
         };
 
@@ -44,8 +55,11 @@ namespace Carmen.Mobile.Models
         /// <summary>The default name for the show</summary>
         public string DefaultShowName => Database;
 
-        public bool TryPing() //TODO (MVP) unable to ping (or connect) running in android emulator (maybe a permissions issue? maybe test on real device?)
+        public bool TryPing()
         {
+#if ANDROID
+            return true; // Ping always fails on Android, therefore skip
+#else
             try
             {
                 return new Ping().Send(Host, 500).Status == IPStatus.Success;
@@ -55,6 +69,7 @@ namespace Carmen.Mobile.Models
                 Log.Warning(ex, $"Ping failed: {Host}");
                 return false;
             }
+#endif
         }
 
         public bool TryConnection(out string? error)
