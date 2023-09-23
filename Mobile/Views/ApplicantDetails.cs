@@ -164,7 +164,16 @@ namespace Carmen.Mobile.Views
                 ItemTemplate = new DataTemplate(GenerateEmptyNoteDataTemplate),
                 ItemsSource = new[] { "Add notes" }
             };
-            empty.SetBinding(ListView.IsVisibleProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Notes)), converter: new TrueIfEmpty()));
+            var multi = new MultiBinding
+            {
+                Converter = new AndBooleans(),
+                Bindings =
+                {
+                    new Binding(ApplicantModel.Path(nameof(Applicant.Notes)), converter: new TrueIfEmpty()),
+                    new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean())
+                }
+            };
+            empty.SetBinding(ListView.IsVisibleProperty, multi);
             var notes = new Grid
             {
                 existing,
