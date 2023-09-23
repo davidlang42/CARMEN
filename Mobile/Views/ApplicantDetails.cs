@@ -290,11 +290,10 @@ namespace Carmen.Mobile.Views
             {
                 await Navigation.PushAsync(new EditNumericAbility(numeric, ability));
             }
-            //TODO (MVP) edit select ability
-            //else if (ability.Criteria is SelectCriteria select)
-            //{
-            //    await Navigation.PushAsync(new EditSelectAbility(select, ability));
-            //}
+            else if (ability.Criteria is SelectCriteria select)
+            {
+                await Navigation.PushAsync(new EditSelectAbility(select, ability));
+            }
         }
 
         private object GenerateNoteDataTemplate()
