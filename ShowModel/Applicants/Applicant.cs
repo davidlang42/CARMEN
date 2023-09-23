@@ -213,12 +213,14 @@ namespace Carmen.ShowModel.Applicants
         /// <summary>Calculates the applicant's age at the show date, if set, otherwise age as of today</summary>
         public uint? Age => ShowRoot.ShowDate.HasValue ? AgeAt(ShowRoot.ShowDate.Value) : AgeAt(DateTime.Now);
 
-        public string Description
+        public string? Description
         {
             get
             {
                 var gender = Gender?.ToString();
                 var age = Age?.Plural("year old", "years old");
+                if (gender == null && age == null)
+                    return null;
                 return string.Join(", ", new[] { gender, age }.Where(s => !string.IsNullOrEmpty(s)));
             }
         }

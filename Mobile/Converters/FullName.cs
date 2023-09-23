@@ -12,15 +12,18 @@ namespace Carmen.Mobile.Converters
     /// </summary>
     public class FullNameFormatter : IMultiValueConverter
     {
-        public object Convert(object?[] values, Type? targetType, object? parameter, CultureInfo? culture)
+        public object? Convert(object?[] values, Type? targetType, object? parameter, CultureInfo? culture)
         {
             if (values.Length != 2)
                 throw new ApplicationException("Values must be {FirstName, LastName}");
             var first = values[0] as string;
             var last = values[1] as string;
             if (first == null || last == null)
-                return "";
-            return Format(first, last);
+                return null;
+            var formatted = Format(first, last);
+            if (string.IsNullOrWhiteSpace(formatted))
+                return null;
+            return formatted;
         }
 
         public static string Format(string first, string last)

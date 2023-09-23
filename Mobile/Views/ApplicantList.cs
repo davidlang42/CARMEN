@@ -106,12 +106,13 @@ namespace Carmen.Mobile.Views
             var cell = new TextCell();
             var full_name = new MultiBinding
             {
-                Converter = new FullNameFormatter()
+                Converter = new FullNameFormatter(),
+                TargetNullValue = "(name not set)"
             };
             full_name.Bindings.Add(new Binding(nameof(Applicant.FirstName)));
             full_name.Bindings.Add(new Binding(nameof(Applicant.LastName)));
             cell.SetBinding(TextCell.TextProperty, full_name);
-            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Applicant.Description)));
+            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Applicant.Description)) { TargetNullValue = "(details not set)" });
             cell.Tapped += Cell_Tapped;
             return cell;
         }
