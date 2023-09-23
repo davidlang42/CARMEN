@@ -286,11 +286,10 @@ namespace Carmen.Mobile.Views
             {
                 await Navigation.PushAsync(new EditBooleanAbility(boolean, ability));
             }
-            //TODO (MVP) edit numeric ability
-            //else if (ability.Criteria is NumericCriteria numeric)
-            //{
-            //    await Navigation.PushAsync(new EditNumericAbility(numeric, ability));
-            //}
+            else if (ability.Criteria is NumericCriteria numeric)
+            {
+                await Navigation.PushAsync(new EditNumericAbility(numeric, ability));
+            }
             //TODO (MVP) edit select ability
             //else if (ability.Criteria is SelectCriteria select)
             //{
