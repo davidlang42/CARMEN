@@ -50,6 +50,18 @@
     <AndroidSigningStorePass>env:AndroidSigningPassword</AndroidSigningStorePass>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
+	<MtouchLink>SdkOnly</MtouchLink>
+	<EnableCodeSigning>True</EnableCodeSigning>
+	<EnablePackageSigning>true</EnablePackageSigning>
+	<CreatePackage>true</CreatePackage>
+	<CodesignKey>Developer ID Application: David Lang (45435R99CA)</CodesignKey>
+	<CodesignProvision>CARMEN</CodesignProvision>
+	<CodesignEntitlements>Platforms\MacCatalyst\Entitlements.plist</CodesignEntitlements>
+	<PackageSigningKey>Developer ID Installer: David Lang (45435R99CA)</PackageSigningKey>
+	<UseHardenedRuntime>true</UseHardenedRuntime>
+  </PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#512BD4" />
@@ -78,4 +90,9 @@
 	  <ProjectReference Include="..\ShowModel\ShowModel.csproj" />
 	</ItemGroup>
 
+  <Target Name="_SkipCodesignVerify" BeforeTargets="_CodesignVerify" AfterTargets="_CodesignAppBundle">  
+    <PropertyGroup>    
+      <_RequireCodeSigning>false</_RequireCodeSigning>  
+    </PropertyGroup>
+  </Target>
 </Project>
