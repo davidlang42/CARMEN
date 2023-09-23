@@ -20,8 +20,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Desktop", "Desktop\Desktop.
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "Setup", "Setup\Setup.vdproj", "{2647799D-C38B-4231-8961-B43DC22747EE}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mobile", "Mobile\Mobile.csproj", "{5AFB789D-568D-4155-9873-13F39094C3FC}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,15 +55,6 @@ Global
 		{2647799D-C38B-4231-8961-B43DC22747EE}.Release|Any CPU.ActiveCfg = Release
 		{2647799D-C38B-4231-8961-B43DC22747EE}.Release|Any CPU.Build.0 = Release
 		{2647799D-C38B-4231-8961-B43DC22747EE}.Slow DB|Any CPU.ActiveCfg = Debug
-		{5AFB789D-568D-4155-9873-13F39094C3FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5AFB789D-568D-4155-9873-13F39094C3FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5AFB789D-568D-4155-9873-13F39094C3FC}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{5AFB789D-568D-4155-9873-13F39094C3FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5AFB789D-568D-4155-9873-13F39094C3FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5AFB789D-568D-4155-9873-13F39094C3FC}.Release|Any CPU.Deploy.0 = Release|Any CPU
-		{5AFB789D-568D-4155-9873-13F39094C3FC}.Slow DB|Any CPU.ActiveCfg = Debug|Any CPU
-		{5AFB789D-568D-4155-9873-13F39094C3FC}.Slow DB|Any CPU.Build.0 = Debug|Any CPU
-		{5AFB789D-568D-4155-9873-13F39094C3FC}.Slow DB|Any CPU.Deploy.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

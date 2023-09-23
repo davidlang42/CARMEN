@@ -483,6 +483,13 @@ namespace Carmen.Desktop.Pages
                     MessageBox.Show("The selected database is empty.", Title);
                     return;
                 }
+                else if (state == ShowContext.DatabaseState.ConnectionError)
+                {
+                    loading.Dispose();
+                    await import.DisposeAsync();
+                    MessageBox.Show("The selected database doesn't exist or you do not have access to it.", Title);
+                    return;
+                }
                 else if (state == ShowContext.DatabaseState.SavedWithFutureVersion)
                 {
                     loading.Dispose();

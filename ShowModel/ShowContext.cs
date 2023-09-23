@@ -30,7 +30,8 @@ namespace Carmen.ShowModel
             Empty,
             UpToDate,
             SavedWithPreviousVersion,
-            SavedWithFutureVersion
+            SavedWithFutureVersion,
+            ConnectionError
         }
 
         #region Database collections
@@ -123,7 +124,15 @@ namespace Carmen.ShowModel
             return await Task.Run(() => // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
             {
                 var all_migrations = Database.GetMigrations().ToList();
-                var applied_migrations = Database.GetAppliedMigrations().ToList();
+                List<string> applied_migrations;
+                try
+                {
+                    applied_migrations = Database.GetAppliedMigrations().ToList();
+                }
+                catch
+                {
+                    return DatabaseState.ConnectionError; // likely unauthorised or the database doesn't exist
+                }
                 if (all_migrations.Any() && !applied_migrations.Any())
                     return DatabaseState.Empty;
                 var pending_migrations = all_migrations.Except(applied_migrations);

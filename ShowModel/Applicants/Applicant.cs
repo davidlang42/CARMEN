@@ -75,8 +75,9 @@ namespace Carmen.ShowModel.Applicants
             get => dateOfBirth;
             set
             {
-                if (value > (ShowRoot?.ShowDate ?? DateTime.Now))
-                    value = null;
+                var max_date = (ShowRoot?.ShowDate ?? DateTime.Now);
+                if (value > max_date)
+                    value = max_date;
                 if (dateOfBirth == value)
                     return;
                 dateOfBirth = value;
@@ -212,12 +213,14 @@ namespace Carmen.ShowModel.Applicants
         /// <summary>Calculates the applicant's age at the show date, if set, otherwise age as of today</summary>
         public uint? Age => ShowRoot.ShowDate.HasValue ? AgeAt(ShowRoot.ShowDate.Value) : AgeAt(DateTime.Now);
 
-        public string Description
+        public string? Description
         {
             get
             {
                 var gender = Gender?.ToString();
                 var age = Age?.Plural("year old", "years old");
+                if (gender == null && age == null)
+                    return null;
                 return string.Join(", ", new[] { gender, age }.Where(s => !string.IsNullOrEmpty(s)));
             }
         }
@@ -246,6 +249,7 @@ namespace Carmen.ShowModel.Applicants
             abilities.CollectionChanged += Abilities_CollectionChanged;
             tags.CollectionChanged += Tags_CollectionChanged;
             roles.CollectionChanged += Roles_CollectionChanged;
+            notes.CollectionChanged += Notes_CollectionChanged;
         }
 
         private void Abilities_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
@@ -270,6 +274,9 @@ namespace Carmen.ShowModel.Applicants
 
         private void Roles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
             => OnPropertyChanged(nameof(Roles));
+
+        private void Notes_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e)
+            => OnPropertyChanged(nameof(Notes));
 
         public uint? AgeAt(DateTime date)
         {
@@ -310,6 +317,10 @@ namespace Carmen.ShowModel.Applicants
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
         }
+
+        /// <summary>This really shouldn't be required, but after EntityEntry.Reload() is called,
+        /// you need to manually trigger the PropertyChanged event.</summary>
+        public void NotifyChanged() => OnPropertyChanged("");
 
         public int CompareTo(Applicant? other) => ApplicantId.CompareTo(other?.ApplicantId);
     }
