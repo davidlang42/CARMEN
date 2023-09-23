@@ -89,9 +89,15 @@ namespace Carmen.Mobile.Views
             context = null;
         }
 
-        private void AddButton_Clicked(object? sender, EventArgs e)
+        private async void AddButton_Clicked(object? sender, EventArgs e)
         {
-            //TODO (MVP) add new applicant
+            if (context == null)
+                return;
+            var applicant = new Applicant { ShowRoot = context.ShowRoot };
+            context.Applicants.Add(applicant);
+            await context.SaveChangesAsync(); //TODO show some sort of loading while this happens (there is a noticable lag)
+            await EditApplicant(applicant);
+            model.Loaded(context.Applicants.ToObservableCollection());
         }
 
         private object GenerateDataTemplate()
@@ -115,6 +121,11 @@ namespace Carmen.Mobile.Views
             var cell = (Cell)sender!;
             if (cell.BindingContext is not Applicant applicant)
                 return;
+            await EditApplicant(applicant);
+        }
+
+        private async Task EditApplicant(Applicant applicant)
+        {
             await Navigation.PushAsync(new ApplicantDetails(show, applicant.ApplicantId, applicant.FirstName, applicant.LastName, () =>
             {
                 if (context == null)
