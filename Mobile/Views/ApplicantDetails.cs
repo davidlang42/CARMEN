@@ -39,10 +39,31 @@ namespace Carmen.Mobile.Views
             var loading = new ActivityIndicator { IsRunning = true };
             loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoading)));
 
+#if ANDROID || IOS
             var main = new ScrollView
             {
-                Content = GenerateMainView()
+                Content = new VerticalStackLayout
+                {
+                    GenerateMainView(),
+                    GenerateSideView()
+                }
             };
+#else
+            var main = new Grid
+            {
+                ColumnSpacing = 5,
+                ColumnDefinitions = new()
+                {
+                    new(GridLength.Star),
+                    new(GridLength.Auto)
+                }
+            };
+            main.Add(new ScrollView
+            {
+                Content = GenerateMainView()
+            });
+            main.Add(GenerateSideView(), column: 1);
+#endif
 
             var grid = new Grid
             {
@@ -147,6 +168,7 @@ namespace Carmen.Mobile.Views
 
         private View GenerateMainView()
         {
+            //TODO remove list view scroll bars
             var fields = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateFieldDataTemplate),
@@ -186,36 +208,25 @@ namespace Carmen.Mobile.Views
                 empty
             };
 
+            return new VerticalStackLayout
+            {
+                fields,
+                abilities,
+                notes
+            };
+        }
+
+        private View GenerateSideView()
+        {
             var activity = new ActivityIndicator();
             activity.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
-            var image = new MC.Image()
-            {
-                WidthRequest = 300,
-            };
+            var image = new MC.Image();
             image.SetBinding(MC.Image.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
-            var photo = new Grid
+            return new Grid
             {
                 image,
                 activity
             };
-
-            var layout = new FlexLayout //TODO (NOW) only fields are visible on android
-            {
-                Padding = 10,
-                AlignContent = Microsoft.Maui.Layouts.FlexAlignContent.SpaceEvenly,
-                VerticalOptions = LayoutOptions.Start,
-                AlignItems = Microsoft.Maui.Layouts.FlexAlignItems.Start,
-                Direction = Microsoft.Maui.Layouts.FlexDirection.Row,
-                Wrap = Microsoft.Maui.Layouts.FlexWrap.Wrap,
-                Children =
-                {
-                    fields,
-                    abilities,
-                    notes,
-                    photo
-                }
-            };
-            return layout;
         }
 
         private async void Save_Clicked(object? sender, EventArgs e)
