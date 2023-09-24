@@ -22,25 +22,27 @@ namespace Carmen.Mobile.Views
             Title = "Connect to a CARMEN database";
             NavigatedTo += Page_NavigatedTo;
             BindingContext = details;
-            Content = new VerticalStackLayout //TODO add scrolling
-            {
-                Spacing = 5,
-                Margin = 5,
-                Children =
-            {
-                new Label { Text = "Server Host:" },
-                TextEntry(nameof(ConnectionDetails.Host)), //TODO highlight red if empty or malformed
-                new Label { Text = "Server Port:" },
-                PortEntry(nameof(ConnectionDetails.Port)), //TODO allow blank port, show 3306 as placeholder
-                new Label { Text = "Database Name:" },
-                TextEntry(nameof(ConnectionDetails.Database)), //TODO highlight red if empty
-                new Label { Text = "Username:" },
-                TextEntry(nameof(ConnectionDetails.User)), //TODO highlight red if empty
-                new Label { Text = "Password:" },
-                PasswordEntry(nameof(ConnectionDetails.Password)), //TODO highlight red if empty
-                CheckBoxAndLabel("Save login details", nameof(ConnectionDetails.SaveLogin)),
-                ConnectButton(Connect_Clicked)
-            }
+            Content = new ScrollView {
+                Content = new VerticalStackLayout
+                    {
+                        Spacing = 5,
+                        Margin = 5,
+                        Children =
+                    {
+                        new Label { Text = "Server Host:" },
+                        TextEntry(nameof(ConnectionDetails.Host)), //TODO highlight red if empty or malformed
+                        new Label { Text = "Server Port:" },
+                        PortEntry(nameof(ConnectionDetails.Port)), //TODO allow blank port, show 3306 as placeholder
+                        new Label { Text = "Database Name:" },
+                        TextEntry(nameof(ConnectionDetails.Database)), //TODO highlight red if empty
+                        new Label { Text = "Username:" },
+                        TextEntry(nameof(ConnectionDetails.User)), //TODO highlight red if empty
+                        new Label { Text = "Password:" },
+                        PasswordEntry(nameof(ConnectionDetails.Password)), //TODO highlight red if empty
+                        CheckBoxAndLabel("Save login details", nameof(ConnectionDetails.SaveLogin)),
+                        ConnectButton(Connect_Clicked)
+                    }
+                }
             };
         }
 
