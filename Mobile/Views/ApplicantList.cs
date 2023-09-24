@@ -30,8 +30,8 @@ namespace Carmen.Mobile.Views
             var loading = new ActivityIndicator { IsRunning = true };
             loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(Applicants.IsLoading)));
 
-            //TODO add list filtering & sorting
-            //TODO some way to group by audition group
+            //TODO (NEXT) add list filtering & sorting
+            //TODO (NEXT) some way to group/filter by a criteria (eg. audition group) for auditions workflow
             list = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateDataTemplate),
