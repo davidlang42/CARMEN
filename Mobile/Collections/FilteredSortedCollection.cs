@@ -12,7 +12,6 @@ namespace Carmen.Mobile.Collections
 {
     internal class FilteredSortedCollection<T> : ICollection<T>, INotifyCollectionChanged where T : INotifyPropertyChanged
     {
-        //TODO actually filter
         readonly List<T> items;
 
         private IComparer<T>? sortBy = null;
@@ -24,6 +23,19 @@ namespace Carmen.Mobile.Collections
                     return;
                 sortBy = value;
                 items.Sort(sortBy);
+                OnCollectionChanged();
+            }
+        }
+
+        private Func<T, bool>? filter = null;
+        public Func<T, bool>? Filter
+        {
+            get => filter;
+            set
+            {
+                if (filter == value)
+                    return;
+                filter = value;
                 OnCollectionChanged();
             }
         }
@@ -54,7 +66,7 @@ namespace Carmen.Mobile.Collections
 
         public event NotifyCollectionChangedEventHandler? CollectionChanged;
 
-        public IEnumerator<T> GetEnumerator() => items.GetEnumerator();
+        public IEnumerator<T> GetEnumerator() => (filter == null ? items : items.Where(filter)).GetEnumerator();
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
