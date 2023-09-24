@@ -28,7 +28,7 @@ namespace Carmen.Mobile.Views
                     new Label { Text = criteria.Name },
                     checkbox
                 }
-            }; ;
+            };
         }
     }
 }

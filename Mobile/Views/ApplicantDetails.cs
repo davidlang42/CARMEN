@@ -68,19 +68,21 @@ namespace Carmen.Mobile.Views
             };
             back.Clicked += Back_Clicked;
             grid.Add(back, row: 1, column: c++);
-            var delete = new Button //TODO (NOW) disable if IsLoading
+            var delete = new Button
             {
                 Text = "Delete",
                 BackgroundColor = Colors.Red
             };
-            delete.Clicked += Delete_Clicked; ;
+            delete.Clicked += Delete_Clicked;
+            delete.SetBinding(Button.IsEnabledProperty, new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean()));
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(delete, row: 1, column: c++);
-            var save = new Button //TODO (NOW) disable if IsLoading
+            var save = new Button
             {
                 Text = "Save",
             };
             save.Clicked += Save_Clicked;
+            save.SetBinding(Button.IsEnabledProperty, new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean()));
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(save, row: 1, column: c++);
             grid.SetColumnSpan(loading, c);

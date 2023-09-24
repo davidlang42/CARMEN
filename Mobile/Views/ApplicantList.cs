@@ -60,7 +60,7 @@ namespace Carmen.Mobile.Views
                 Text = "Back",
                 BackgroundColor = Colors.Gray
             };
-            back.Clicked += Back_Clicked; ;
+            back.Clicked += Back_Clicked;
             grid.Add(back, row: 1, column: c++);
             var add = new Button { Text = "Add new applicant" };
             add.Clicked += AddButton_Clicked;
