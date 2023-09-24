@@ -1,7 +1,9 @@
 ﻿using Carmen.Mobile.Converters;
 using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Text;
@@ -28,6 +30,16 @@ namespace Carmen.Mobile.Models
                 };
             }
         }
+        public Criteria[] MissingCriterias
+        {
+            get
+            {
+                if (Applicant is not Applicant applicant || allCriterias is not Criteria[] all_criterias)
+                    return Array.Empty<Criteria>();
+                var has_criterias = applicant.Abilities.Select(a => a.Criteria).ToHashSet();
+                return all_criterias.Where(c => !has_criterias.Contains(c)).ToArray();
+            }
+        }
         public string FullName
             => FullNameFormatter.Format(Applicant?.FirstName ?? originalFirstName, Applicant?.LastName ?? originalLastName);
         public bool IsLoadingPhoto { get; private set; } = true;
@@ -35,6 +47,7 @@ namespace Carmen.Mobile.Models
 
         readonly string originalFirstName;
         readonly string originalLastName;
+        Criteria[]? allCriterias;
 
         public ApplicantModel(int applicant_id, string original_first_name, string original_last_name)
         {
@@ -50,20 +63,25 @@ namespace Carmen.Mobile.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 
-        public void Loaded(Applicant applicant)
+        public void Loaded(Applicant applicant, Criteria[] all_criterias)
         {
             Applicant = applicant;
+            allCriterias = all_criterias;
             applicant.PropertyChanged += Applicant_PropertyChanged;
             IsLoading = false;
             OnPropertyChanged(nameof(Applicant));
             OnPropertyChanged(nameof(FullName));
             OnPropertyChanged(nameof(Fields));
+            OnPropertyChanged(nameof(MissingCriterias));
             OnPropertyChanged(nameof(IsLoading));
         }
 
         private void Applicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            OnPropertyChanged(nameof(FullName));
+            if (e.PropertyName == nameof(Applicant.FirstName) || e.PropertyName == nameof(Applicant.LastName) || string.IsNullOrEmpty(e.PropertyName))
+                OnPropertyChanged(nameof(FullName));
+            if (e.PropertyName == nameof(Applicant.Abilities) || string.IsNullOrEmpty(e.PropertyName))
+                OnPropertyChanged(nameof(MissingCriterias));
         }
 
         public void LoadedPhoto(ImageSource? photo)

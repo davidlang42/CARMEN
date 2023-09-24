@@ -122,7 +122,8 @@ namespace Carmen.Mobile.Views
                 await Navigation.PopAsync();
                 return;
             }
-            model.Loaded(applicant);
+            var criterias = await context.Criterias.ToArrayAsync();
+            model.Loaded(applicant, criterias);
             var image = await Task.Run(() => applicant.Photo); //TODO cache photos, and/or load only if internet is not restricted (or the user clicks load)
             var source = image == null ? null : await MauiImageSource(image);
             model.LoadedPhoto(source);
@@ -168,9 +169,18 @@ namespace Carmen.Mobile.Views
 
         private View GenerateMainView()
         {
-            //TODO (NOW) make a way to add abilities which aren't set yet, and delete (clear) ones which are
+            //TODO (NOW) some way to delete (clear) abilities which are set
             var fields = ListViewNoScroll(GenerateFieldDataTemplate, nameof(ApplicantModel.Fields));
             var abilities = ListViewNoScroll(GenerateAbilityDataTemplate, ApplicantModel.Path(nameof(Applicant.Abilities)));
+            var no_abilities = ListViewNoScroll(GenerateCriteriaDataTemplate, nameof(ApplicantModel.MissingCriterias));
+            abilities.ItemAppearing += (_, e) =>
+            {
+                if (addingAbility == e.Item) // if the item appear is the one we know we are adding
+                {
+                    addingAbility = null;
+                    abilities.SelectedItem = e.Item; // then select the new ability
+                }
+            };
             var notes = ListViewNoScroll(GenerateNoteDataTemplate, ApplicantModel.Path(nameof(Applicant.Notes)));
             var no_notes = ListViewNoScroll(GenerateEmptyNoteDataTemplate);
             no_notes.ItemsSource = new[] { "Add notes" };
@@ -194,6 +204,7 @@ namespace Carmen.Mobile.Views
             {
                 fields,
                 abilities,
+                no_abilities,
                 notes,
                 no_notes
             };
@@ -314,6 +325,11 @@ namespace Carmen.Mobile.Views
             ClearOtherSelections(list);
             if (cell.BindingContext is not Ability ability)
                 return;
+            await EditAbility(ability);
+        }
+
+        private async Task EditAbility(Ability ability)
+        {
             if (ability.Criteria is BooleanCriteria boolean)
             {
                 await Navigation.PushAsync(new EditBooleanAbility(boolean, ability));
@@ -326,6 +342,35 @@ namespace Carmen.Mobile.Views
             {
                 await Navigation.PushAsync(new EditSelectAbility(select, ability));
             }
+        }
+
+        private object GenerateCriteriaDataTemplate()
+        {
+            // BindingContext will be set to a Criteria (which this applicant doesn't have an Ability for)
+            var cell = new TextCell();
+            cell.SetBinding(TextCell.TextProperty, new Binding(nameof(Criteria.Name), stringFormat: "Add {0}"));
+            cell.Tapped += CriteriaCell_Tapped;
+            return cell;
+        }
+
+        Ability? addingAbility = null;
+        private async void CriteriaCell_Tapped(object? sender, EventArgs e)
+        {
+            if (sender is not Cell cell || cell.Parent is not ListView list)
+                return;
+            ClearOtherSelections(list);
+            if (cell.BindingContext is not Criteria criteria)
+                return;
+            if (model.Applicant is not Applicant applicant)
+                return;
+            var ability = new Ability
+            {
+                Criteria = criteria,
+                Applicant = applicant
+            };
+            addingAbility = ability;
+            applicant.Abilities.Add(ability);
+            await EditAbility(ability);
         }
 
         private object GenerateNoteDataTemplate()
