@@ -44,6 +44,7 @@ namespace Carmen.Mobile.Views
                 Children =
                 {
                     ButtonWithHandler("View Applicants by Name", ViewApplicantsName_Clicked),
+                    ButtonWithHandler("View Applicants by Age/Gender", ViewApplicantsAgeGender_Clicked),
                     ButtonWithHandlerAndDropdown("View Applicants by: ", ViewApplicantsCriteria_Clicked, nameof(MainModel.Criterias), nameof(Criteria.Name))
                 }
             };
@@ -154,6 +155,13 @@ namespace Carmen.Mobile.Views
             await Navigation.PushAsync(new ApplicantList(connection, show_name, "Name", FilterByName));
         }
 
+        private async void ViewApplicantsAgeGender_Clicked(object? sender, EventArgs e)
+        {
+            if (model.ShowName is not string show_name)
+                return;
+            await Navigation.PushAsync(new ApplicantList(connection, show_name, "Age, Gender", FilterByDescription));
+        }
+
         private async void ViewApplicantsCriteria_Clicked(object? sender, EventArgs e, object selected_item)
         {
             if (model.ShowName is not string show_name || selected_item is not Criteria criteria)
@@ -163,6 +171,24 @@ namespace Carmen.Mobile.Views
 
         static bool FilterByName(Applicant a, string filter)
             => $"{a.FirstName} {a.LastName}".Contains(filter, StringComparison.OrdinalIgnoreCase);
+
+        static bool FilterByDescription(Applicant a, string filter)
+        {
+            var desc = a.Description;
+            if (filter.Length == 1)
+            {
+                switch (filter[0])
+                {
+                    case '=':
+                        return desc != null;
+                    case '!':
+                        return desc == null;
+                }
+            }
+            if (desc == null)
+                return false;
+            return desc.Contains(filter, StringComparison.OrdinalIgnoreCase);
+        }
 
         static bool FilterByCriteria(Criteria c, Applicant a, string filter)
         {
