@@ -24,14 +24,16 @@ namespace Carmen.Mobile.Views
 
             Title = $"Add note to {applicant.FirstName} {applicant.LastName}";
 
-            var existing = new ListView
+            var existing = new ListView //TODO Fix new note editor UI issues
             {
                 ItemTemplate = new DataTemplate(GenerateNoteDataTemplate),
             };
             existing.SetBinding(ListView.ItemsSourceProperty, new Binding($"{nameof(Applicant)}.{nameof(Applicant.Notes)}"));
-            var editor = new Editor //TODO make entry get bigger (up to a max number of lines) if you type extra text in it
+            var editor = new Editor
             {
-                Placeholder = "Add your comments here"
+                Placeholder = "Add your comments here",
+                AutoSize = EditorAutoSizeOption.TextChanges,
+                MaximumHeightRequest = 200 // ~10 lines
             };
             editor.SetBinding(Entry.TextProperty, new Binding(nameof(NewNote)));
             var main = new ScrollView
