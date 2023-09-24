@@ -9,7 +9,7 @@ namespace Carmen.Mobile.Collections
 {
     internal class ApplicantComparer : IComparer<Applicant>
     {
-        public List<Func<Applicant, IComparable>> ByFields { get; set; } = new();
+        public List<Func<Applicant, IComparable?>> ByFields { get; set; } = new();
 
         public int Compare(Applicant? x, Applicant? y)
         {
@@ -23,6 +23,12 @@ namespace Carmen.Mobile.Collections
             {
                 var x_field = getter(x);
                 var y_field = getter(y);
+                if (x_field == null && y_field == null)
+                    continue;
+                if (x_field == null)
+                    return -1; // order null first
+                if (y_field == null)
+                    return 1;
                 var result = x_field.CompareTo(y_field);
                 if (result != 0)
                     return result;

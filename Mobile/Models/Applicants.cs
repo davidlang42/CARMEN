@@ -48,11 +48,11 @@ namespace Carmen.Mobile.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 
-        public void Loaded(Applicant[] collection)
+        public void Loaded(Applicant[] collection, IComparer<Applicant> sort_by)
         {
             Collection = new FilteredSortedCollection<Applicant>(collection)
             {
-                SortBy = ApplicantComparer.NameFirstLast
+                SortBy = sort_by
             };
             IsLoading = false;
             OnPropertyChanged(nameof(Collection));

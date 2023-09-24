@@ -1,4 +1,5 @@
-﻿using Carmen.Mobile.Converters;
+﻿using Carmen.Mobile.Collections;
+using Carmen.Mobile.Converters;
 using Carmen.Mobile.Models;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
@@ -17,13 +18,24 @@ namespace Carmen.Mobile.Views
         readonly ConnectionDetails show;
         readonly ListView list;
         readonly FieldGetter<Applicant> detailGetter;
+        readonly ApplicantComparer sortBy;
         ShowContext? context;
 
-        public ApplicantList(ConnectionDetails show, string show_name, string filter_name, Func<Applicant, string, bool> filter_function, Func<Applicant, string> detail_getter)
+        public ApplicantList(ConnectionDetails show, string show_name, string filter_name, Func<Applicant, string, bool> filter_function, Func<Applicant, string> detail_getter, Func<Applicant, IComparable?>? sort_getter = null)
         {
             model = new(filter_function);
             this.show = show;
             detailGetter = new FieldGetter<Applicant>(detail_getter);
+            sortBy = new ApplicantComparer
+            {
+                ByFields =
+                {
+                    a => a.FirstName,
+                    a => a.LastName
+                }
+            };
+            if (sort_getter != null)
+                sortBy.ByFields.Insert(0, sort_getter);
             Loaded += ApplicantList_Loaded;
             this.Unloaded += ApplicantList_Unloaded;
             BindingContext = model;
@@ -93,7 +105,7 @@ namespace Carmen.Mobile.Views
         {
             context = ShowContext.Open(show);
             var collection = await context.Applicants.Include(a => a.Abilities).ToArrayAsync();
-            model.Loaded(collection);
+            model.Loaded(collection, sortBy);
         }
 
         private void ApplicantList_Unloaded(object? sender, EventArgs e)

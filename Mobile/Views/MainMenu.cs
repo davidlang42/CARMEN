@@ -167,7 +167,7 @@ namespace Carmen.Mobile.Views
         {
             if (model.ShowName is not string show_name || selected_item is not Criteria criteria)
                 return;
-            await Navigation.PushAsync(new ApplicantList(connection, show_name, criteria.Name, (a, f) => FilterByCriteria(criteria, a, f), a => CriteriaDetail(criteria, a)));
+            await Navigation.PushAsync(new ApplicantList(connection, show_name, criteria.Name, (a, f) => FilterByCriteria(criteria, a, f), a => CriteriaDetail(criteria, a), a => SortByCriteria(criteria, a)));
         }
 
         static string? DescriptionDetail(Applicant a) => a.Description ?? "(Age/Gender not set)";
@@ -246,6 +246,12 @@ namespace Carmen.Mobile.Views
                 }
             }
             return c.Format(mark.Value).Contains(filter, StringComparison.OrdinalIgnoreCase);
+        }
+
+        static uint? SortByCriteria(Criteria c, Applicant a)
+        {
+            var mark = a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == c.CriteriaId)?.Mark; // don't use MarkFor() because reference equal doesn't work across contexts
+            return mark;
         }
     }
 }
