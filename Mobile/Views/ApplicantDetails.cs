@@ -225,7 +225,7 @@ namespace Carmen.Mobile.Views
             }
             else
             {
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync(); //TODO show loading while this happens?
                 await Task.Run(onChange);
             }
             await Navigation.PopAsync();
@@ -238,7 +238,7 @@ namespace Carmen.Mobile.Views
             if (await DisplayAlert($"Are you sure you want to delete '{model.FullName}'?", "This cannot be undone.", "Yes", "No"))
             {
                 context.Applicants.Remove(model.Applicant);
-                await context.SaveChangesAsync();
+                await context.SaveChangesAsync();//TODO show loading?
                 await Task.Run(onChange);
                 await Navigation.PopAsync();
             }
