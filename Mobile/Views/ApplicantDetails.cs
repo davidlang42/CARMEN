@@ -1,4 +1,5 @@
-﻿using Carmen.Mobile.Converters;
+﻿using Carmen.Desktop.Converters;
+using Carmen.Mobile.Converters;
 using Carmen.Mobile.Models;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
@@ -283,7 +284,19 @@ namespace Carmen.Mobile.Views
             // BindingContext will be set to an Ability
             var cell = new TextCell();
             cell.SetBinding(TextCell.TextProperty, new Binding($"{nameof(Ability.Criteria)}.{nameof(Criteria.Name)}"));
-            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Ability.Mark))); //TODO (NOW) nicer formatting for marks
+            var multi = new MultiBinding
+            {
+                Converter = new FakeItTilYouUpdateIt
+                {
+                    new AbilityMarkFormatter()
+                },
+                Bindings =
+                {
+                    new Binding(),
+                    new Binding(nameof(Ability.Mark))
+                }
+            };
+            cell.SetBinding(TextCell.DetailProperty, multi);
             cell.Tapped += AbilityCell_Tapped;
             return cell;
         }
