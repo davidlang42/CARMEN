@@ -95,7 +95,7 @@ namespace Carmen.Mobile.Views
                 return;
             var applicant = new Applicant { ShowRoot = context.ShowRoot };
             context.Applicants.Add(applicant);
-            await context.SaveChangesAsync(); //TODO show some sort of loading while this happens (there is a noticable lag)
+            await context.SaveChangesAsync(); //TODO (NOW) show some sort of loading while this happens (there is a noticable lag)
             await EditApplicant(applicant);
             model.Loaded(context.Applicants.ToObservableCollection());
         }

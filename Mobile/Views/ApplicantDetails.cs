@@ -68,7 +68,7 @@ namespace Carmen.Mobile.Views
             };
             back.Clicked += Back_Clicked;
             grid.Add(back, row: 1, column: c++);
-            var delete = new Button //TODO disable if IsLoading
+            var delete = new Button //TODO (NOW) disable if IsLoading
             {
                 Text = "Delete",
                 BackgroundColor = Colors.Red
@@ -76,7 +76,7 @@ namespace Carmen.Mobile.Views
             delete.Clicked += Delete_Clicked; ;
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(delete, row: 1, column: c++);
-            var save = new Button //TODO disable if IsLoading
+            var save = new Button //TODO (NOW) disable if IsLoading
             {
                 Text = "Save",
             };
@@ -196,7 +196,7 @@ namespace Carmen.Mobile.Views
                 activity
             };
 
-            var layout = new FlexLayout //TODO only fields are visible on android
+            var layout = new FlexLayout //TODO (NOW) only fields are visible on android
             {
                 Padding = 10,
                 AlignContent = Microsoft.Maui.Layouts.FlexAlignContent.SpaceEvenly,
@@ -281,7 +281,7 @@ namespace Carmen.Mobile.Views
             // BindingContext will be set to an Ability
             var cell = new TextCell();
             cell.SetBinding(TextCell.TextProperty, new Binding($"{nameof(Ability.Criteria)}.{nameof(Criteria.Name)}"));
-            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Ability.Mark))); //TODO nicer formatting for marks
+            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Ability.Mark))); //TODO (NOW) nicer formatting for marks
             cell.Tapped += AbilityCell_Tapped;
             return cell;
         }
