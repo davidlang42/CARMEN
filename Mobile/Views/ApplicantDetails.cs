@@ -17,7 +17,7 @@ using SM = Carmen.ShowModel;
 namespace Carmen.Mobile.Views
 {
     //TODO change app icon/splash/colours
-    //TODO handle crashes when back (button or arrow) is pressed while still loading
+    //TODO handle crashes when back (button or arrow) is pressed while still loading, probably requires moving loading into model and having a cancel method
     internal class ApplicantDetails : ContentPage
     {
         readonly ApplicantModel model;
@@ -94,12 +94,12 @@ namespace Carmen.Mobile.Views
             var applicant = await Task.Run(() => context.Applicants.SingleOrDefault(a => a.ApplicantId == model.ApplicantId));
             if (applicant == null)
             {
-                await DisplayAlert("Applicant does not exist", "This is probably because someone else has deleted them.", "Ok");
+                DisplayAlert("Applicant does not exist", "This is probably because someone else has deleted them.", "Ok");
                 await Navigation.PopAsync();
                 return;
             }
             model.Loaded(applicant);
-            var image = await Task.Run(() => applicant.Photo); //TODO cache photos
+            var image = await Task.Run(() => applicant.Photo); //TODO cache photos, and/or load only if internet is not restricted (or the user clicks load)
             var source = image == null ? null : await MauiImageSource(image);
             model.LoadedPhoto(source);
         }
@@ -220,9 +220,14 @@ namespace Carmen.Mobile.Views
             if (context == null)
                 return;
             if (!context.ChangeTracker.HasChanges())
-                await DisplayAlert($"No changes were made.", "", "Ok");//TODO dont wait if dont care about result
-            await context.SaveChangesAsync();//TODO dont save if no changes
-            await Task.Run(onChange);
+            {
+                DisplayAlert($"No changes were made.", "", "Ok");
+            }
+            else
+            {
+                await context.SaveChangesAsync();
+                await Task.Run(onChange);
+            }
             await Navigation.PopAsync();
         }
 

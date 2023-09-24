@@ -102,7 +102,7 @@ namespace Carmen.Mobile.Views
         {
             if (string.IsNullOrWhiteSpace(NewNote))
             {
-                await DisplayAlert("Type your comments into the box above", "", "Ok");
+                DisplayAlert("Type your comments into the box above", "", "Ok");
                 return;
             }
             Applicant.Notes.Add(new Note

@@ -165,17 +165,17 @@ namespace Carmen.Mobile.Views
         {
             if (string.IsNullOrWhiteSpace(details.Host))
             {
-                await DisplayAlert("Please enter the server's Hostname or IP address", "", "Ok");
+                DisplayAlert("Please enter the server's Hostname or IP address", "", "Ok");
                 return;
             }
             if (string.IsNullOrWhiteSpace(details.Database))
             {
-                await DisplayAlert("Please enter the Database name", "", "Ok");
+                DisplayAlert("Please enter the Database name", "", "Ok");
                 return;
             }
             if (string.IsNullOrWhiteSpace(details.User))
             {
-                await DisplayAlert("Please enter your User and Password", "", "Ok");
+                DisplayAlert("Please enter your User and Password", "", "Ok");
                 return;
             }
             if (details.SaveLogin)
