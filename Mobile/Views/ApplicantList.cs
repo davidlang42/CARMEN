@@ -30,7 +30,6 @@ namespace Carmen.Mobile.Views
             var loading = new ActivityIndicator { IsRunning = true };
             loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(Applicants.IsLoading)));
 
-            //TODO (NEXT) some way to group/filter by a criteria (eg. audition group) for auditions workflow
             var search = new Entry
             {
                 Placeholder = $"Filter by {filter_name}"
@@ -69,7 +68,8 @@ namespace Carmen.Mobile.Views
             };
             back.Clicked += Back_Clicked;
             grid.Add(back, row: 2, column: c++);
-            var add = new Button {
+            var add = new Button
+            {
                 Text = "Add new applicant"
             };
             add.Clicked += AddButton_Clicked;
@@ -90,7 +90,7 @@ namespace Carmen.Mobile.Views
         private async void ApplicantList_Loaded(object? sender, EventArgs e)
         {
             context = ShowContext.Open(show);
-            var collection = await context.Applicants.ToArrayAsync();
+            var collection = await context.Applicants.Include(a => a.Abilities).ToArrayAsync();
             model.Loaded(collection);
         }
 
@@ -126,6 +126,7 @@ namespace Carmen.Mobile.Views
             full_name.Bindings.Add(new Binding(nameof(Applicant.FirstName)));
             full_name.Bindings.Add(new Binding(nameof(Applicant.LastName)));
             cell.SetBinding(TextCell.TextProperty, full_name);
+            //TODO (NEXT) show details as the thing we are filtering by
             cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Applicant.Description)) { TargetNullValue = "(details not set)" });
             cell.Tapped += Cell_Tapped;
             return cell;

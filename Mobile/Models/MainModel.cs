@@ -1,4 +1,5 @@
 ﻿using Carmen.ShowModel;
+using Carmen.ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
@@ -14,6 +15,7 @@ namespace Carmen.Mobile.Models
     internal class MainModel : INotifyPropertyChanged
     {
         public string? ShowName { get; private set; }
+        public Criteria[]? Criterias { get; private set; }
         public string PageTitle => ShowName == null ? "CARMEN" : $"CARMEN: {ShowName}";
 
         public bool IsLoading => LoadingMessage != null;
@@ -54,11 +56,13 @@ namespace Carmen.Mobile.Models
             MessagesChanged();
         }
 
-        public void Ready(string show_name)
+        public void Ready(string show_name, Criteria[] criterias)
         {
             ShowName = show_name;
+            Criterias = criterias;
             OnPropertyChanged(nameof(ShowName));
             OnPropertyChanged(nameof(PageTitle));
+            OnPropertyChanged(nameof(Criterias));
             LoadingMessage = null;
             ErrorMessage = null;
             MessagesChanged();
