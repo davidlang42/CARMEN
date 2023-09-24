@@ -168,30 +168,13 @@ namespace Carmen.Mobile.Views
 
         private View GenerateMainView()
         {
-            //TODO remove list view scroll bars
-            var fields = new ListView
-            {
-                ItemTemplate = new DataTemplate(GenerateFieldDataTemplate),
-            };
-            fields.SetBinding(ListView.ItemsSourceProperty, new Binding(nameof(ApplicantModel.Fields)));
-
+            //TODO (NOW) refactor into single list view with datatemplateselector
             //TODO (NOW) make a way to add abilities which aren't set yet, and delete (clear) ones which are
-            var abilities = new ListView
-            {
-                ItemTemplate = new DataTemplate(GenerateAbilityDataTemplate),
-            };
-            abilities.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Abilities))));
-            
-            var existing = new ListView
-            {
-                ItemTemplate = new DataTemplate(GenerateNoteDataTemplate),
-            };
-            existing.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Notes))));
-            var empty = new ListView
-            {
-                ItemTemplate = new DataTemplate(GenerateEmptyNoteDataTemplate),
-                ItemsSource = new[] { "Add notes" }
-            };
+            var fields = ListViewNoScroll(GenerateFieldDataTemplate, nameof(ApplicantModel.Fields));
+            var abilities = ListViewNoScroll(GenerateAbilityDataTemplate, ApplicantModel.Path(nameof(Applicant.Abilities)));
+            var existing = ListViewNoScroll(GenerateNoteDataTemplate, ApplicantModel.Path(nameof(Applicant.Notes)));
+            var empty = ListViewNoScroll(GenerateEmptyNoteDataTemplate);
+            empty.ItemsSource = new[] { "Add notes" };
             var multi = new MultiBinding
             {
                 Converter = new AndBooleans(),
@@ -214,6 +197,19 @@ namespace Carmen.Mobile.Views
                 abilities,
                 notes
             };
+        }
+
+        static ListView ListViewNoScroll(Func<object> item_template_generator, string? items_source_binding_path = null)
+        {
+            var list = new ListView
+            {
+                VerticalScrollBarVisibility = ScrollBarVisibility.Never,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Never,
+                ItemTemplate = new DataTemplate(item_template_generator)
+            };
+            if (items_source_binding_path != null)
+                list.SetBinding(ListView.ItemsSourceProperty, new Binding(items_source_binding_path));
+            return list;
         }
 
         private View GenerateSideView()
@@ -275,7 +271,7 @@ namespace Carmen.Mobile.Views
             if (sender is not Cell cell)
                 return;
             if (cell.Parent is ListView list)
-                list.SelectedItem = null;
+                list.SelectedItem = null;//TODO (NOW) dont clear the last edit click, but clear the other ones
             if (cell.BindingContext is ApplicantField<string> string_field)
             {
                 await Navigation.PushAsync(new EditStringField(string_field));
@@ -317,7 +313,7 @@ namespace Carmen.Mobile.Views
             if (sender is not Cell cell)
                 return;
             if (cell.Parent is ListView list)
-                list.SelectedItem = null;
+                list.SelectedItem = null;//TODO (NOW) dont clear the last edit click, but clear the other ones
             if (cell.BindingContext is not Ability ability)
                 return;
             if (ability.Criteria is BooleanCriteria boolean)
@@ -364,7 +360,7 @@ namespace Carmen.Mobile.Views
             if (sender is not Cell cell)
                 return;
             if (cell.Parent is ListView list)
-                list.SelectedItem = null;
+                list.SelectedItem = null;//TODO (NOW) dont clear the last edit click, but clear the other ones
             if (model.Applicant is Applicant applicant)
                 await Navigation.PushAsync(new AddNote(applicant, show.User));
         }

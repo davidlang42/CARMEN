@@ -150,7 +150,7 @@ namespace Carmen.Mobile.Views
             return button;
         }
 
-        static View CheckBoxAndLabel(string label, string binding_path)
+        static View CheckBoxAndLabel(string label, string binding_path) //TODO (NOW) make label centred in parent to match checkbox
         {
             var checkbox = new CheckBox();
             checkbox.SetBinding(CheckBox.IsCheckedProperty, binding_path);
