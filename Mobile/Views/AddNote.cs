@@ -24,7 +24,7 @@ namespace Carmen.Mobile.Views
 
             Title = $"Add note to {applicant.FirstName} {applicant.LastName}";
 
-            var existing = new ListView //TODO Fix new note editor UI issues
+            var existing = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateNoteDataTemplate),
             };
@@ -38,7 +38,14 @@ namespace Carmen.Mobile.Views
             editor.SetBinding(Entry.TextProperty, new Binding(nameof(NewNote)));
             var main = new ScrollView
             {
-                Content = existing
+                Content = new VerticalStackLayout
+                {
+                    Spacing = 5,
+                    Children = {
+                        existing,
+                        editor
+                    }
+                }
             };
 
             var grid = new Grid
@@ -49,7 +56,6 @@ namespace Carmen.Mobile.Views
                 RowDefinitions =
                 {
                     new RowDefinition(GridLength.Star),
-                    new RowDefinition(GridLength.Auto),
                     new RowDefinition(GridLength.Auto)
                 },
                 ColumnDefinitions =
@@ -59,7 +65,6 @@ namespace Carmen.Mobile.Views
                 }
             };
             grid.Add(main);
-            grid.Add(editor, row: 1);
             var c = 0;
             var back = new Button
             {
@@ -67,15 +72,14 @@ namespace Carmen.Mobile.Views
                 BackgroundColor = Colors.Gray
             };
             back.Clicked += Back_Clicked;
-            grid.Add(back, row: 2, column: c++);
+            grid.Add(back, row: 1, column: c++);
             var add = new Button
             {
                 Text = "Add note"
             };
             add.Clicked += Add_Clicked;
-            grid.Add(add, row: 2, column: c++);
+            grid.Add(add, row: 1, column: c++);
             grid.SetColumnSpan(main, c);
-            grid.SetColumnSpan(editor, c);
             Content = grid;
         }
 
