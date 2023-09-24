@@ -83,7 +83,7 @@ namespace Carmen.Mobile.Views
         private async void ApplicantList_Loaded(object? sender, EventArgs e)
         {
             context = ShowContext.Open(show);
-            var collection = await Task.Run(() => context.Applicants.ToObservableCollection());
+            var collection = await context.Applicants.ToArrayAsync();
             model.Loaded(collection);
         }
 
@@ -101,8 +101,7 @@ namespace Carmen.Mobile.Views
             var applicant = new Applicant { ShowRoot = context.ShowRoot };
             context.Applicants.Add(applicant);
             await context.SaveChangesAsync();
-            var collection = await Task.Run(() => context.Applicants.ToObservableCollection());
-            model.Loaded(collection);
+            model.Added(applicant);
             list.SelectedItem = applicant;
             list.ScrollTo(applicant, ScrollToPosition.MakeVisible, true);
             await EditApplicant(applicant);
@@ -141,7 +140,7 @@ namespace Carmen.Mobile.Views
                 var entry = context.Entry(applicant);
                 entry.Reload();
                 if (entry.State == Microsoft.EntityFrameworkCore.EntityState.Detached)
-                    model.Loaded(context.Applicants.ToObservableCollection());
+                    model.Removed(applicant);
                 else
                     applicant.NotifyChanged();
             }));

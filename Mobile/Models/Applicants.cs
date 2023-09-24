@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel;
+﻿using Carmen.Mobile.Collections;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Microsoft.VisualBasic;
 using System;
@@ -15,7 +16,7 @@ namespace Carmen.Mobile.Models
     internal class Applicants : INotifyPropertyChanged
     {
         public bool IsLoading { get; private set; } = true;
-        public ObservableCollection<Applicant>? Collection { get; private set; }
+        public FilteredSortedCollection<Applicant>? Collection { get; private set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -24,20 +25,30 @@ namespace Carmen.Mobile.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
 
-        public void Loaded(ObservableCollection<Applicant> collection)
+        public void Loaded(Applicant[] collection)
         {
-            Collection = collection;
+            Collection = new FilteredSortedCollection<Applicant>(collection);
             IsLoading = false;
             OnPropertyChanged(nameof(Collection));
             OnPropertyChanged(nameof(IsLoading));
         }
 
+        public void Added(Applicant applicant)
+        {
+            Collection?.Add(applicant);
+            IsLoading = false;
+            OnPropertyChanged(nameof(IsLoading));
+        }
+
         public void Adding()
         {
-            Collection = null;
             IsLoading = true;
-            OnPropertyChanged(nameof(Collection));
             OnPropertyChanged(nameof(IsLoading));
+        }
+
+        public void Removed(Applicant applicant)
+        {
+            Collection?.Remove(applicant);
         }
     }
 }
