@@ -18,7 +18,6 @@ namespace Carmen.Mobile.Views
         public Login()
         {
             details = LoadLastConnectionDetails() ?? new();
-            //TODO change app icon/splash/colours
             Title = "Connect to a CARMEN database";
             NavigatedTo += Page_NavigatedTo;
             BindingContext = details;
@@ -30,15 +29,15 @@ namespace Carmen.Mobile.Views
                         Children =
                     {
                         new Label { Text = "Server Host:" },
-                        TextEntry(nameof(ConnectionDetails.Host)), //TODO highlight red if empty or malformed
+                        TextEntry(nameof(ConnectionDetails.Host)),
                         new Label { Text = "Server Port:" },
-                        PortEntry(nameof(ConnectionDetails.Port)), //TODO allow blank port, show 3306 as placeholder
+                        PortEntry(nameof(ConnectionDetails.Port)),
                         new Label { Text = "Database Name:" },
-                        TextEntry(nameof(ConnectionDetails.Database)), //TODO highlight red if empty
+                        TextEntry(nameof(ConnectionDetails.Database)),
                         new Label { Text = "Username:" },
-                        TextEntry(nameof(ConnectionDetails.User)), //TODO highlight red if empty
+                        TextEntry(nameof(ConnectionDetails.User)),
                         new Label { Text = "Password:" },
-                        PasswordEntry(nameof(ConnectionDetails.Password)), //TODO highlight red if empty
+                        PasswordEntry(nameof(ConnectionDetails.Password)),
                         CheckBoxAndLabel("Save login details", nameof(ConnectionDetails.SaveLogin)),
                         ConnectButton(Connect_Clicked)
                     }
@@ -79,6 +78,13 @@ namespace Carmen.Mobile.Views
         {
             var entry = new Entry();
             entry.SetBinding(Entry.TextProperty, path);
+            entry.Behaviors.Add(new TextValidationBehavior
+            {
+                InvalidStyle = InvalidStyle(),
+                ValidStyle = ValidStyle(),
+                Flags = ValidationFlags.ValidateOnValueChanged,
+                MinimumLength = 1
+            });
             return entry;
         }
 
@@ -97,6 +103,7 @@ namespace Carmen.Mobile.Views
             var entry = new Entry
             {
                 Keyboard = Keyboard.Numeric,
+                Placeholder = ConnectionDetails.DEFAULT_PORT.ToString()
             };
             entry.Behaviors.Add(new NumericValidationBehavior
             {
@@ -156,6 +163,21 @@ namespace Carmen.Mobile.Views
 
         private async void Connect_Clicked(object? sender, EventArgs e)
         {
+            if (string.IsNullOrWhiteSpace(details.Host))
+            {
+                await DisplayAlert("Please enter the server's Hostname or IP address", "", "Ok");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(details.Database))
+            {
+                await DisplayAlert("Please enter the Database name", "", "Ok");
+                return;
+            }
+            if (string.IsNullOrWhiteSpace(details.User))
+            {
+                await DisplayAlert("Please enter your User and Password", "", "Ok");
+                return;
+            }
             if (details.SaveLogin)
                 SaveLastConnectionDetails(details);
             else
