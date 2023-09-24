@@ -147,18 +147,11 @@ namespace Carmen.Mobile.Views
         {
             var checkbox = new CheckBox();
             checkbox.SetBinding(CheckBox.IsCheckedProperty, binding_path);
-            var layout = new Grid
+            return new HorizontalStackLayout
             {
-                Padding = 5,
-                ColumnDefinitions = new ColumnDefinitionCollection
-            {
-                new ColumnDefinition(GridLength.Auto),
-                new ColumnDefinition(GridLength.Star)
-            }
+                new Label { Text = label },
+                checkbox
             };
-            layout.Add(new Label { Text = label });
-            layout.Add(checkbox, 1);
-            return layout;
         }
 
         private async void Connect_Clicked(object? sender, EventArgs e)
