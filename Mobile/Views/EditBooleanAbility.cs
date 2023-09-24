@@ -21,18 +21,14 @@ namespace Carmen.Mobile.Views
         {
             var checkbox = new CheckBox();
             checkbox.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(Ability.Mark), converter: new MatchUIntValue(), converterParameter: 1));
-            var layout = new Grid //TODO make checkbox not appear in the centre vertically
+            return new VerticalStackLayout
             {
                 Padding = 5,
-                ColumnDefinitions = new ColumnDefinitionCollection
-            {
-                new ColumnDefinition(GridLength.Auto),
-                new ColumnDefinition(GridLength.Star)
-            }
-            };
-            layout.Add(new Label { Text = criteria.Name });
-            layout.Add(checkbox, 1);
-            return layout;
+                Children = {
+                    new Label { Text = criteria.Name },
+                    checkbox
+                }
+            }; ;
         }
     }
 }
