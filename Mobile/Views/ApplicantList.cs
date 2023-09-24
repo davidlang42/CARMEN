@@ -16,6 +16,7 @@ namespace Carmen.Mobile.Views
         readonly Applicants model;
         readonly ConnectionDetails show;
         ShowContext? context;
+        ListView list;
 
         public ApplicantList(ConnectionDetails show, string show_name)
         {
@@ -31,7 +32,7 @@ namespace Carmen.Mobile.Views
 
             //TODO add list filtering & sorting
             //TODO some way to group by audition group
-            var list = new ListView
+            list = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateDataTemplate),
             };
@@ -102,7 +103,8 @@ namespace Carmen.Mobile.Views
             await context.SaveChangesAsync();
             var collection = await Task.Run(() => context.Applicants.ToObservableCollection());
             model.Loaded(collection);
-            //TODO (NOW) scroll to (and select) the new applicant in the list view
+            list.SelectedItem = applicant;
+            list.ScrollTo(applicant, ScrollToPosition.MakeVisible, true);
             await EditApplicant(applicant);
         }
 
