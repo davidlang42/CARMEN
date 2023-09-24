@@ -18,9 +18,9 @@ namespace Carmen.Mobile.Views
         readonly ListView list;
         ShowContext? context;
 
-        public ApplicantList(ConnectionDetails show, string show_name)
+        public ApplicantList(ConnectionDetails show, string show_name, string filter_name, Func<Applicant, string, bool> filter_function)
         {
-            model = new();
+            model = new(filter_function);
             this.show = show;
             Loaded += ApplicantList_Loaded;
             this.Unloaded += ApplicantList_Unloaded;
@@ -33,9 +33,9 @@ namespace Carmen.Mobile.Views
             //TODO (NEXT) some way to group/filter by a criteria (eg. audition group) for auditions workflow
             var search = new Entry
             {
-                Placeholder = "Filter by name"
+                Placeholder = $"Filter by {filter_name}"
             };
-            search.SetBinding(Entry.TextProperty, new Binding(nameof(Applicants.NameContains)));
+            search.SetBinding(Entry.TextProperty, new Binding(nameof(Applicants.FilterText)));
             list = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateDataTemplate),

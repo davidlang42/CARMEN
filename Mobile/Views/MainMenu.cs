@@ -1,5 +1,6 @@
 ﻿using Carmen.Mobile.Models;
 using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -124,7 +125,10 @@ namespace Carmen.Mobile.Views
         {
             if (model.ShowName is not string show_name)
                 return;
-            await Navigation.PushAsync(new ApplicantList(connection, show_name));
+            await Navigation.PushAsync(new ApplicantList(connection, show_name, "Name", FilterByName));
         }
+
+        static bool FilterByName(Applicant a, string filter)
+            => $"{a.FirstName} {a.LastName}".Contains(filter, StringComparison.OrdinalIgnoreCase);
     }
 }

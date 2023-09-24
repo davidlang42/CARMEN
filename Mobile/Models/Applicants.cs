@@ -16,22 +16,29 @@ namespace Carmen.Mobile.Models
 {
     internal class Applicants : INotifyPropertyChanged
     {
+        readonly Func<Applicant, string, bool> filterFunction;
+
         public bool IsLoading { get; private set; } = true;
         public FilteredSortedCollection<Applicant>? Collection { get; private set; }
 
-        private string nameContains = "";
-        public string NameContains
+        private string filterText = "";
+        public string FilterText
         {
-            get => nameContains;
+            get => filterText;
             set
             {
-                if (nameContains == value)
+                if (filterText == value)
                     return;
-                nameContains = value;
+                filterText = value;
                 if (Collection != null)
-                    Collection.Filter = value == "" ? null : a => $"{a.FirstName} {a.LastName}".Contains(value, StringComparison.OrdinalIgnoreCase);
+                    Collection.Filter = value == "" ? null : a => filterFunction(a, value);
                 OnPropertyChanged();
             }
+        }
+
+        public Applicants(Func<Applicant, string, bool> filter_function)
+        {
+            this.filterFunction = filter_function;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged;
