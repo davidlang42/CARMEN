@@ -94,7 +94,11 @@ namespace Carmen.Mobile.Views
 
         private async void Add_Clicked(object? sender, EventArgs e)
         {
-            //TODO check note is not blank, warn & abort
+            if (string.IsNullOrWhiteSpace(NewNote))
+            {
+                await DisplayAlert("Type your comments into the box above", "", "Ok");
+                return;
+            }
             Applicant.Notes.Add(new Note
             {
                 Applicant = Applicant,
