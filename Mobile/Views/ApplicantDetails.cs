@@ -251,9 +251,10 @@ namespace Carmen.Mobile.Views
 
         private async void FieldCell_Tapped(object? sender, EventArgs e)
         {
-            //TODO unselect item
             if (sender is not Cell cell)
                 return;
+            if (cell.Parent is ListView list)
+                list.SelectedItem = null;
             if (cell.BindingContext is ApplicantField<string> string_field)
             {
                 await Navigation.PushAsync(new EditStringField(string_field));
@@ -280,9 +281,10 @@ namespace Carmen.Mobile.Views
 
         private async void AbilityCell_Tapped(object? sender, EventArgs e)
         {
-            //TODO unselect item
             if (sender is not Cell cell)
                 return;
+            if (cell.Parent is ListView list)
+                list.SelectedItem = null;
             if (cell.BindingContext is not Ability ability)
                 return;
             if (ability.Criteria is BooleanCriteria boolean)
@@ -326,7 +328,10 @@ namespace Carmen.Mobile.Views
 
         private async void NoteCell_Tapped(object? sender, EventArgs e)
         {
-            //TODO unselect item
+            if (sender is not Cell cell)
+                return;
+            if (cell.Parent is ListView list)
+                list.SelectedItem = null;
             if (model.Applicant is Applicant applicant)
                 await Navigation.PushAsync(new AddNote(applicant, show.User));
         }
