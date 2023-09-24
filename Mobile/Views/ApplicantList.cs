@@ -16,12 +16,14 @@ namespace Carmen.Mobile.Views
         readonly Applicants model;
         readonly ConnectionDetails show;
         readonly ListView list;
+        readonly FieldGetter<Applicant> detailGetter;
         ShowContext? context;
 
-        public ApplicantList(ConnectionDetails show, string show_name, string filter_name, Func<Applicant, string, bool> filter_function)
+        public ApplicantList(ConnectionDetails show, string show_name, string filter_name, Func<Applicant, string, bool> filter_function, Func<Applicant, string> detail_getter)
         {
             model = new(filter_function);
             this.show = show;
+            detailGetter = new FieldGetter<Applicant>(detail_getter);
             Loaded += ApplicantList_Loaded;
             this.Unloaded += ApplicantList_Unloaded;
             BindingContext = model;
@@ -121,13 +123,15 @@ namespace Carmen.Mobile.Views
             var full_name = new MultiBinding
             {
                 Converter = new FullNameFormatter(),
-                TargetNullValue = "(name not set)"
+                TargetNullValue = "(Name not set)"
             };
             full_name.Bindings.Add(new Binding(nameof(Applicant.FirstName)));
             full_name.Bindings.Add(new Binding(nameof(Applicant.LastName)));
             cell.SetBinding(TextCell.TextProperty, full_name);
-            //TODO (NEXT) show details as the thing we are filtering by
-            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Applicant.Description)) { TargetNullValue = "(details not set)" });
+            cell.SetBinding(TextCell.DetailProperty, new Binding() {
+                Converter = detailGetter,
+                TargetNullValue = "(details not set)"
+            });
             cell.Tapped += Cell_Tapped;
             return cell;
         }

@@ -1,4 +1,5 @@
-﻿using Carmen.Mobile.Models;
+﻿using Carmen.Mobile.Converters;
+using Carmen.Mobile.Models;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
@@ -152,25 +153,50 @@ namespace Carmen.Mobile.Views
         {
             if (model.ShowName is not string show_name)
                 return;
-            await Navigation.PushAsync(new ApplicantList(connection, show_name, "Name", FilterByName));
+            await Navigation.PushAsync(new ApplicantList(connection, show_name, "Name", FilterByName, DescriptionDetail));
         }
 
         private async void ViewApplicantsAgeGender_Clicked(object? sender, EventArgs e)
         {
             if (model.ShowName is not string show_name)
                 return;
-            await Navigation.PushAsync(new ApplicantList(connection, show_name, "Age, Gender", FilterByDescription));
+            await Navigation.PushAsync(new ApplicantList(connection, show_name, "Age, Gender", FilterByDescription, DescriptionDetail));
         }
 
         private async void ViewApplicantsCriteria_Clicked(object? sender, EventArgs e, object selected_item)
         {
             if (model.ShowName is not string show_name || selected_item is not Criteria criteria)
                 return;
-            await Navigation.PushAsync(new ApplicantList(connection, show_name, criteria.Name, (a, f) => FilterByCriteria(criteria, a, f)));
+            await Navigation.PushAsync(new ApplicantList(connection, show_name, criteria.Name, (a, f) => FilterByCriteria(criteria, a, f), a => CriteriaDetail(criteria, a)));
+        }
+
+        static string? DescriptionDetail(Applicant a) => a.Description ?? "(Age/Gender not set)";
+
+        static string? CriteriaDetail(Criteria c, Applicant a)
+        {
+            var mark = a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == c.CriteriaId)?.Mark; // don't use MarkFor() because reference equal doesn't work across contexts
+            if (!mark.HasValue)
+                return $"({c.Name} not set)";
+            return $"{c.Name}: {c.Format(mark.Value)}";
         }
 
         static bool FilterByName(Applicant a, string filter)
-            => $"{a.FirstName} {a.LastName}".Contains(filter, StringComparison.OrdinalIgnoreCase);
+        {
+            var name = FullNameFormatter.Format(a.FirstName, a.LastName);
+            if (filter.Length == 1)
+            {
+                switch (filter[0])
+                {
+                    case '=':
+                        return !string.IsNullOrEmpty(name);
+                    case '!':
+                        return string.IsNullOrEmpty(name);
+                }
+            }
+            if (string.IsNullOrEmpty(name))
+                return false;
+            return name.Contains(filter, StringComparison.OrdinalIgnoreCase);
+        }
 
         static bool FilterByDescription(Applicant a, string filter)
         {
@@ -187,7 +213,7 @@ namespace Carmen.Mobile.Views
             }
             if (desc == null)
                 return false;
-            return desc.Contains(filter, StringComparison.OrdinalIgnoreCase);
+            return desc.Contains(filter); // case sensitive compare, otherwise 'Female' will always contain 'Male'
         }
 
         static bool FilterByCriteria(Criteria c, Applicant a, string filter)
