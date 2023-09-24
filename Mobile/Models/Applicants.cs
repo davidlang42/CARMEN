@@ -27,7 +27,10 @@ namespace Carmen.Mobile.Models
 
         public void Loaded(Applicant[] collection)
         {
-            Collection = new FilteredSortedCollection<Applicant>(collection);
+            Collection = new FilteredSortedCollection<Applicant>(collection)
+            {
+                SortBy = ApplicantComparer.NameFirstLast
+            };
             IsLoading = false;
             OnPropertyChanged(nameof(Collection));
             OnPropertyChanged(nameof(IsLoading));
