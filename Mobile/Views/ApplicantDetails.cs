@@ -68,7 +68,7 @@ namespace Carmen.Mobile.Views
             };
             back.Clicked += Back_Clicked;
             grid.Add(back, row: 1, column: c++);
-            var delete = new Button
+            var delete = new Button //TODO disable if IsLoading
             {
                 Text = "Delete",
                 BackgroundColor = Colors.Red
@@ -76,7 +76,7 @@ namespace Carmen.Mobile.Views
             delete.Clicked += Delete_Clicked; ;
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(delete, row: 1, column: c++);
-            var save = new Button
+            var save = new Button //TODO disable if IsLoading
             {
                 Text = "Save",
             };
@@ -225,7 +225,8 @@ namespace Carmen.Mobile.Views
             }
             else
             {
-                await context.SaveChangesAsync(); //TODO show loading while this happens?
+                model.Saving();
+                await context.SaveChangesAsync();
                 await Task.Run(onChange);
             }
             await Navigation.PopAsync();
@@ -233,12 +234,13 @@ namespace Carmen.Mobile.Views
 
         private async void Delete_Clicked(object? sender, EventArgs e)
         {
-            if (context == null || model.Applicant == null)
+            if (context == null || model.Applicant is not Applicant applicant)
                 return;
             if (await DisplayAlert($"Are you sure you want to delete '{model.FullName}'?", "This cannot be undone.", "Yes", "No"))
             {
-                context.Applicants.Remove(model.Applicant);
-                await context.SaveChangesAsync();//TODO show loading?
+                model.Saving();
+                context.Applicants.Remove(applicant);
+                await context.SaveChangesAsync();
                 await Task.Run(onChange);
                 await Navigation.PopAsync();
             }

@@ -53,7 +53,7 @@ namespace Carmen.Mobile.Models
         public void Loaded(Applicant applicant)
         {
             Applicant = applicant;
-            applicant.PropertyChanged += Applicant_PropertyChanged; ;
+            applicant.PropertyChanged += Applicant_PropertyChanged;
             IsLoading = false;
             OnPropertyChanged(nameof(Applicant));
             OnPropertyChanged(nameof(FullName));
@@ -70,6 +70,20 @@ namespace Carmen.Mobile.Models
         {
             Photo = photo;
             IsLoadingPhoto = false;
+            OnPropertyChanged(nameof(Photo));
+            OnPropertyChanged(nameof(IsLoadingPhoto));
+        }
+
+        public void Saving()
+        {
+            IsLoading = true;
+            Applicant = null;
+            OnPropertyChanged(nameof(Applicant));
+            OnPropertyChanged(nameof(FullName));
+            OnPropertyChanged(nameof(Fields));
+            OnPropertyChanged(nameof(IsLoading));
+            Photo = null;
+            IsLoadingPhoto = true;
             OnPropertyChanged(nameof(Photo));
             OnPropertyChanged(nameof(IsLoadingPhoto));
         }
