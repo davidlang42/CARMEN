@@ -12,8 +12,8 @@ namespace Carmen.Mobile.Views
 {
     internal class EditNumericAbility : EditAbility<NumericCriteria>
     {
-        public EditNumericAbility(NumericCriteria criteria, Ability ability)
-            : base(criteria, ability, GenerateEditView(criteria))
+        public EditNumericAbility(NumericCriteria criteria, Ability ability, Action delete)
+            : base(criteria, ability, GenerateEditView(criteria), delete)
         { }
 
         static View GenerateEditView(NumericCriteria criteria)

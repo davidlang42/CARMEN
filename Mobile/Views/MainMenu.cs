@@ -1,5 +1,8 @@
-﻿using Carmen.Mobile.Models;
+﻿using Carmen.Mobile.Converters;
+using Carmen.Mobile.Models;
 using Carmen.ShowModel;
+using Carmen.ShowModel.Applicants;
+using Carmen.ShowModel.Criterias;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,7 +44,9 @@ namespace Carmen.Mobile.Views
                 Spacing = 5,
                 Children =
                 {
-                    ButtonWithHandler("View Applicants", ViewApplicants_Clicked)
+                    ButtonWithHandler("View Applicants by Name", ViewApplicantsName_Clicked),
+                    ButtonWithHandler("View Applicants by Age/Gender", ViewApplicantsAgeGender_Clicked),
+                    ButtonWithHandlerAndDropdown("View Applicants by: ", ViewApplicantsCriteria_Clicked, nameof(MainModel.Criterias), nameof(Criteria.Name))
                 }
             };
             buttons.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(MainModel.IsReady)));
@@ -75,6 +80,29 @@ namespace Carmen.Mobile.Views
             };
             button.Clicked += handler;
             return button;
+        }
+
+        static View ButtonWithHandlerAndDropdown(string text, Action<object?, EventArgs, object> handler, string dropdown_items_binding, string item_display_binding)
+        {
+            var button = new Button
+            {
+                Text = text,
+            };
+            var dropdown = new Picker
+            {
+                ItemDisplayBinding = new Binding(item_display_binding)
+            };
+            dropdown.SetBinding(Picker.ItemsSourceProperty, new Binding(dropdown_items_binding));
+            button.Clicked += (s, e) => handler(s, e, dropdown.SelectedItem);
+            return new HorizontalStackLayout
+            {
+                Spacing = 5,
+                Children =
+                {
+                    button,
+                    dropdown
+                }
+            };
         }
 
         private async void MainMenu_Loaded(object? sender, EventArgs e)
@@ -116,14 +144,114 @@ namespace Carmen.Mobile.Views
                     model.Error("This database was saved with an older version of CARMEN and cannot be opened.\nPlease upgrade the database using CARMEN desktop.");
                     return;
                 }
-                model.Ready(context.ShowRoot.Name);
+                var criterias = await context.Criterias.ToArrayAsync();
+                model.Ready(context.ShowRoot.Name, criterias);
             }
         }
 
-        private async void ViewApplicants_Clicked(object? sender, EventArgs e)
+        private async void ViewApplicantsName_Clicked(object? sender, EventArgs e)
         {
-            //TODO better null handling
-            await Navigation.PushAsync(new ApplicantList(connection, model.ShowName!)); // not null when show ready
+            if (model.ShowName is not string show_name)
+                return;
+            await Navigation.PushAsync(new ApplicantList(connection, show_name, "Name", FilterByName, DescriptionDetail));
+        }
+
+        private async void ViewApplicantsAgeGender_Clicked(object? sender, EventArgs e)
+        {
+            if (model.ShowName is not string show_name)
+                return;
+            await Navigation.PushAsync(new ApplicantList(connection, show_name, "Age, Gender", FilterByDescription, DescriptionDetail));
+        }
+
+        private async void ViewApplicantsCriteria_Clicked(object? sender, EventArgs e, object selected_item)
+        {
+            if (model.ShowName is not string show_name || selected_item is not Criteria criteria)
+                return;
+            await Navigation.PushAsync(new ApplicantList(connection, show_name, criteria.Name, (a, f) => FilterByCriteria(criteria, a, f), a => CriteriaDetail(criteria, a), a => SortByCriteria(criteria, a)));
+        }
+
+        static string? DescriptionDetail(Applicant a) => a.Description ?? "(Age/Gender not set)";
+
+        static string? CriteriaDetail(Criteria c, Applicant a)
+        {
+            var mark = a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == c.CriteriaId)?.Mark; // don't use MarkFor() because reference equal doesn't work across contexts
+            if (!mark.HasValue)
+                return $"({c.Name} not set)";
+            return $"{c.Name}: {c.Format(mark.Value)}";
+        }
+
+        static bool FilterByName(Applicant a, string filter)
+        {
+            var name = FullNameFormatter.Format(a.FirstName, a.LastName);
+            if (filter.Length == 1)
+            {
+                switch (filter[0])
+                {
+                    case '=':
+                        return !string.IsNullOrEmpty(name);
+                    case '!':
+                        return string.IsNullOrEmpty(name);
+                }
+            }
+            if (string.IsNullOrEmpty(name))
+                return false;
+            return name.Contains(filter, StringComparison.OrdinalIgnoreCase);
+        }
+
+        static bool FilterByDescription(Applicant a, string filter)
+        {
+            var desc = a.Description;
+            if (filter.Length == 1)
+            {
+                switch (filter[0])
+                {
+                    case '=':
+                        return desc != null;
+                    case '!':
+                        return desc == null;
+                }
+            }
+            if (desc == null)
+                return false;
+            return desc.Contains(filter); // case sensitive compare, otherwise 'Female' will always contain 'Male'
+        }
+
+        static bool FilterByCriteria(Criteria c, Applicant a, string filter)
+        {
+            var mark = a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == c.CriteriaId)?.Mark; // don't use MarkFor() because reference equal doesn't work across contexts
+            if (filter.Length == 1)
+            {
+                switch (filter[0])
+                {
+                    case '=':
+                        return mark != null;
+                    case '!':
+                        return mark == null;
+                }
+            }
+            if (!mark.HasValue)
+                return false;
+            if (filter.Length > 1 && uint.TryParse(filter[1..], out var number))
+            {
+                switch (filter[0])
+                {
+                    case '<':
+                        return mark < number;
+                    case '>':
+                        return mark > number;
+                    case '=':
+                        return mark == number;
+                    case '!':
+                        return mark != number;
+                }
+            }
+            return c.Format(mark.Value).Contains(filter, StringComparison.OrdinalIgnoreCase);
+        }
+
+        static uint? SortByCriteria(Criteria c, Applicant a)
+        {
+            var mark = a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == c.CriteriaId)?.Mark; // don't use MarkFor() because reference equal doesn't work across contexts
+            return mark;
         }
     }
 }

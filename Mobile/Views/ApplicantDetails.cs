@@ -1,4 +1,5 @@
-﻿using Carmen.Mobile.Converters;
+﻿using Carmen.Desktop.Converters;
+using Carmen.Mobile.Converters;
 using Carmen.Mobile.Models;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
@@ -36,10 +37,31 @@ namespace Carmen.Mobile.Views
             var loading = new ActivityIndicator { IsRunning = true };
             loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoading)));
 
+#if ANDROID || IOS
             var main = new ScrollView
             {
-                Content = GenerateMainView()
+                Content = new VerticalStackLayout
+                {
+                    GenerateMainView(),
+                    GenerateSideView()
+                }
             };
+#else
+            var main = new Grid
+            {
+                ColumnSpacing = 5,
+                ColumnDefinitions = new()
+                {
+                    new(GridLength.Star),
+                    new(GridLength.Auto)
+                }
+            };
+            main.Add(new ScrollView
+            {
+                Content = GenerateMainView()
+            });
+            main.Add(GenerateSideView(), column: 1);
+#endif
 
             var grid = new Grid
             {
@@ -50,10 +72,6 @@ namespace Carmen.Mobile.Views
                 {
                     new RowDefinition(GridLength.Star),
                     new RowDefinition(GridLength.Auto)
-                },
-                ColumnDefinitions =
-                {
-                    new(GridLength.Star)
                 }
             };
             grid.Add(loading);
@@ -61,24 +79,27 @@ namespace Carmen.Mobile.Views
             var c = 0;
             var back = new Button
             {
-                Text = "Back",
-                BackgroundColor = Colors.Gray
+                Text = "Back"
             };
             back.Clicked += Back_Clicked;
+            grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(back, row: 1, column: c++);
             var delete = new Button
             {
                 Text = "Delete",
-                BackgroundColor = Colors.Red
+                BackgroundColor = Colors.LightCoral
             };
-            delete.Clicked += Delete_Clicked; ;
+            delete.Clicked += Delete_Clicked;
+            delete.SetBinding(Button.IsEnabledProperty, new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean()));
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(delete, row: 1, column: c++);
             var save = new Button
             {
                 Text = "Save",
+                BackgroundColor = Colors.SeaGreen
             };
             save.Clicked += Save_Clicked;
+            save.SetBinding(Button.IsEnabledProperty, new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean()));
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(save, row: 1, column: c++);
             grid.SetColumnSpan(loading, c);
@@ -92,17 +113,41 @@ namespace Carmen.Mobile.Views
             var applicant = await Task.Run(() => context.Applicants.SingleOrDefault(a => a.ApplicantId == model.ApplicantId));
             if (applicant == null)
             {
-                await DisplayAlert("Applicant does not exist", "This is probably because someone else has deleted them.", "Ok");
+                DisplayAlert("Applicant does not exist", "This is probably because someone else has deleted them.", "Ok");
                 await Navigation.PopAsync();
                 return;
             }
-            model.Loaded(applicant);
-            var image = await Task.Run(() => applicant.Photo); //TODO cache photos
-            var source = image == null ? null : await MauiImageSource(image);
+            var criterias = await context.Criterias.ToArrayAsync();
+            model.Loaded(applicant, criterias);
+            ImageSource? source;
+            if (applicant.PhotoImageId is int image_id)
+                source = await CachedImage(image_id, applicant.ShowRoot, () => applicant.Photo ?? throw new ApplicationException("Applicant photo not set, but photo ID was."));
+            else if (await Task.Run(() => applicant.Photo) is SM.Image image)
+                source = await ActualImage(image);
+            else
+                source = null;
             model.LoadedPhoto(source);
         }
 
-        static async Task<ImageSource?> MauiImageSource(SM.Image photo)
+        const string ImageCacheExtension = "BMP";
+        static string GetCachePath(ShowRoot show)
+            => $"{FileSystem.Current.CacheDirectory}{Path.DirectorySeparatorChar}{string.Concat(show.Name.Split(Path.GetInvalidFileNameChars()))}{Path.DirectorySeparatorChar}";
+
+        static async Task<ImageSource> CachedImage(int image_id, ShowRoot show, Func<SM.Image> lazy_loading_photo_getter)
+        {
+            var cache_path = GetCachePath(show);
+            var filename = $"{cache_path}{image_id}.{ImageCacheExtension}";
+            if (!File.Exists(filename))
+                await Task.Run(() =>
+                {
+                    if (!Directory.Exists(cache_path))
+                        UserException.Handle(() => Directory.CreateDirectory(cache_path), "Error creating image cache path.");
+                    UserException.Handle(() => File.WriteAllBytes(filename, lazy_loading_photo_getter().ImageData), "Error caching image.");
+                });
+            return ImageSource.FromFile(filename);
+        }
+
+        static async Task<ImageSource?> ActualImage(SM.Image photo)
         {
             try
             {
@@ -142,28 +187,20 @@ namespace Carmen.Mobile.Views
 
         private View GenerateMainView()
         {
-            var fields = new ListView
+            var fields = ListViewNoScroll(GenerateFieldDataTemplate, nameof(ApplicantModel.Fields));
+            var abilities = ListViewNoScroll(GenerateAbilityDataTemplate, ApplicantModel.Path(nameof(Applicant.Abilities)));
+            var no_abilities = ListViewNoScroll(GenerateCriteriaDataTemplate, nameof(ApplicantModel.MissingCriterias));
+            abilities.ItemAppearing += (_, e) =>
             {
-                ItemTemplate = new DataTemplate(GenerateFieldDataTemplate),
+                if (addingAbility == e.Item) // if the item appear is the one we know we are adding
+                {
+                    addingAbility = null;
+                    abilities.SelectedItem = e.Item; // then select the new ability
+                }
             };
-            fields.SetBinding(ListView.ItemsSourceProperty, new Binding(nameof(ApplicantModel.Fields)));
-
-            var abilities = new ListView
-            {
-                ItemTemplate = new DataTemplate(GenerateAbilityDataTemplate),
-            };
-            abilities.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Abilities))));
-            
-            var existing = new ListView
-            {
-                ItemTemplate = new DataTemplate(GenerateNoteDataTemplate),
-            };
-            existing.SetBinding(ListView.ItemsSourceProperty, new Binding(ApplicantModel.Path(nameof(Applicant.Notes))));
-            var empty = new ListView
-            {
-                ItemTemplate = new DataTemplate(GenerateEmptyNoteDataTemplate),
-                ItemsSource = new[] { "Add notes" }
-            };
+            var notes = ListViewNoScroll(GenerateNoteDataTemplate, ApplicantModel.Path(nameof(Applicant.Notes)));
+            var no_notes = ListViewNoScroll(GenerateEmptyNoteDataTemplate);
+            no_notes.ItemsSource = new[] { "Add notes" };
             var multi = new MultiBinding
             {
                 Converter = new AndBooleans(),
@@ -173,43 +210,47 @@ namespace Carmen.Mobile.Views
                     new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean())
                 }
             };
-            empty.SetBinding(ListView.IsVisibleProperty, multi);
-            var notes = new Grid
+            no_notes.SetBinding(ListView.IsVisibleProperty, multi);
+            notes.ItemAppearing += (_, e) =>
             {
-                existing,
-                empty
+                if (notes.SelectedItem != null // if another note was selected
+                    || no_notes.SelectedItem != null) // or "add notes" was selected
+                    notes.SelectedItem = e.Item; // then select the new note
             };
+            return new VerticalStackLayout
+            {
+                fields,
+                abilities,
+                no_abilities,
+                notes,
+                no_notes
+            };
+        }
 
+        static ListView ListViewNoScroll(Func<object> item_template_generator, string? items_source_binding_path = null)
+        {
+            var list = new ListView
+            {
+                VerticalScrollBarVisibility = ScrollBarVisibility.Never,
+                HorizontalScrollBarVisibility = ScrollBarVisibility.Never,
+                ItemTemplate = new DataTemplate(item_template_generator)
+            };
+            if (items_source_binding_path != null)
+                list.SetBinding(ListView.ItemsSourceProperty, new Binding(items_source_binding_path));
+            return list;
+        }
+
+        private View GenerateSideView()
+        {
             var activity = new ActivityIndicator();
             activity.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
-            var image = new MC.Image()
-            {
-                WidthRequest = 300,
-            };
+            var image = new MC.Image();
             image.SetBinding(MC.Image.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
-            var photo = new Grid
+            return new Grid
             {
                 image,
                 activity
             };
-
-            var layout = new FlexLayout
-            {
-                Padding = 10,
-                AlignContent = Microsoft.Maui.Layouts.FlexAlignContent.SpaceEvenly,
-                VerticalOptions = LayoutOptions.Start,
-                AlignItems = Microsoft.Maui.Layouts.FlexAlignItems.Start,
-                Direction = Microsoft.Maui.Layouts.FlexDirection.Row,
-                Wrap = Microsoft.Maui.Layouts.FlexWrap.Wrap,
-                Children =
-                {
-                    fields,
-                    abilities,
-                    notes,
-                    photo
-                }
-            };
-            return layout;
         }
 
         private async void Save_Clicked(object? sender, EventArgs e)
@@ -217,19 +258,26 @@ namespace Carmen.Mobile.Views
             if (context == null)
                 return;
             if (!context.ChangeTracker.HasChanges())
-                await DisplayAlert($"No changes were made.", "", "Ok");//TODO dont wait if dont care about result
-            await context.SaveChangesAsync();//TODO dont save if no changes
-            await Task.Run(onChange);
+            {
+                DisplayAlert($"No changes were made.", "", "Ok");
+            }
+            else
+            {
+                model.Saving();
+                await context.SaveChangesAsync();
+                await Task.Run(onChange);
+            }
             await Navigation.PopAsync();
         }
 
         private async void Delete_Clicked(object? sender, EventArgs e)
         {
-            if (context == null || model.Applicant == null)
+            if (context == null || model.Applicant is not Applicant applicant)
                 return;
             if (await DisplayAlert($"Are you sure you want to delete '{model.FullName}'?", "This cannot be undone.", "Yes", "No"))
             {
-                context.Applicants.Remove(model.Applicant);
+                model.Saving();
+                context.Applicants.Remove(applicant);
                 await context.SaveChangesAsync();
                 await Task.Run(onChange);
                 await Navigation.PopAsync();
@@ -248,9 +296,9 @@ namespace Carmen.Mobile.Views
 
         private async void FieldCell_Tapped(object? sender, EventArgs e)
         {
-            //TODO unselect item
-            if (sender is not Cell cell)
+            if (sender is not Cell cell || cell.Parent is not ListView list)
                 return;
+            ClearOtherSelections(list);
             if (cell.BindingContext is ApplicantField<string> string_field)
             {
                 await Navigation.PushAsync(new EditStringField(string_field));
@@ -270,30 +318,83 @@ namespace Carmen.Mobile.Views
             // BindingContext will be set to an Ability
             var cell = new TextCell();
             cell.SetBinding(TextCell.TextProperty, new Binding($"{nameof(Ability.Criteria)}.{nameof(Criteria.Name)}"));
-            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(Ability.Mark))); //TODO nicer formatting for marks
+            var multi = new MultiBinding
+            {
+                Converter = new FakeItTilYouUpdateIt
+                {
+                    new AbilityMarkFormatter()
+                },
+                Bindings =
+                {
+                    new Binding(),
+                    new Binding(nameof(Ability.Mark))
+                }
+            };
+            cell.SetBinding(TextCell.DetailProperty, multi);
             cell.Tapped += AbilityCell_Tapped;
             return cell;
         }
 
         private async void AbilityCell_Tapped(object? sender, EventArgs e)
         {
-            //TODO unselect item
-            if (sender is not Cell cell)
+            if (sender is not Cell cell || cell.Parent is not ListView list)
                 return;
+            ClearOtherSelections(list);
             if (cell.BindingContext is not Ability ability)
                 return;
+            await EditAbility(ability);
+        }
+
+        private void DeleteAbility(Ability ability)
+        {
+            if (model.Applicant is not Applicant applicant)
+                return;
+            applicant.Abilities.Remove(ability);
+        }
+
+        private async Task EditAbility(Ability ability)
+        {
             if (ability.Criteria is BooleanCriteria boolean)
             {
-                await Navigation.PushAsync(new EditBooleanAbility(boolean, ability));
+                await Navigation.PushAsync(new EditBooleanAbility(boolean, ability, () => DeleteAbility(ability)));
             }
             else if (ability.Criteria is NumericCriteria numeric)
             {
-                await Navigation.PushAsync(new EditNumericAbility(numeric, ability));
+                await Navigation.PushAsync(new EditNumericAbility(numeric, ability, () => DeleteAbility(ability)));
             }
             else if (ability.Criteria is SelectCriteria select)
             {
-                await Navigation.PushAsync(new EditSelectAbility(select, ability));
+                await Navigation.PushAsync(new EditSelectAbility(select, ability, () => DeleteAbility(ability)));
             }
+        }
+
+        private object GenerateCriteriaDataTemplate()
+        {
+            // BindingContext will be set to a Criteria (which this applicant doesn't have an Ability for)
+            var cell = new TextCell();
+            cell.SetBinding(TextCell.TextProperty, new Binding(nameof(Criteria.Name), stringFormat: "Add {0}"));
+            cell.Tapped += CriteriaCell_Tapped;
+            return cell;
+        }
+
+        Ability? addingAbility = null;
+        private async void CriteriaCell_Tapped(object? sender, EventArgs e)
+        {
+            if (sender is not Cell cell || cell.Parent is not ListView list)
+                return;
+            ClearOtherSelections(list);
+            if (cell.BindingContext is not Criteria criteria)
+                return;
+            if (model.Applicant is not Applicant applicant)
+                return;
+            var ability = new Ability
+            {
+                Criteria = criteria,
+                Applicant = applicant
+            };
+            addingAbility = ability;
+            applicant.Abilities.Add(ability);
+            await EditAbility(ability);
         }
 
         private object GenerateNoteDataTemplate()
@@ -323,9 +424,18 @@ namespace Carmen.Mobile.Views
 
         private async void NoteCell_Tapped(object? sender, EventArgs e)
         {
-            //TODO unselect item
+            if (sender is not Cell cell || cell.Parent is not ListView list)
+                return;
+            ClearOtherSelections(list);
             if (model.Applicant is Applicant applicant)
                 await Navigation.PushAsync(new AddNote(applicant, show.User));
+        }
+
+        private void ClearOtherSelections(ListView list)
+        {
+            if (list.Parent is IContainer container)
+                foreach (var other_list in container.OfType<ListView>().Where(l => l != list))
+                    other_list.SelectedItem = null;
         }
     }
 }

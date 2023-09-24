@@ -11,7 +11,7 @@ namespace Carmen.Mobile.Converters
     /// Compare the value to a fixed value and return true if it matches.
     /// When converting back, true will return the fixed value, false will return the default value for type T.
     /// </summary>
-    public class MatchValue<T> : IValueConverter where T : struct//TODO copied from Carmen.Desktop.Converters
+    public class MatchValue<T> : IValueConverter where T : struct
     {
         public delegate bool ParseFunction(string? str, out T value);
 

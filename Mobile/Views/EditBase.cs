@@ -25,6 +25,7 @@ namespace Carmen.Mobile.Views
             {
                 Margin = 5,
                 RowSpacing = 5,
+                ColumnSpacing = 5,
                 RowDefinitions =
                 {
                     new RowDefinition(GridLength.Star),
@@ -32,13 +33,24 @@ namespace Carmen.Mobile.Views
                 }
             };
             grid.Add(main);
+            var c = 0;
+            foreach (var button in GenerateButtons())
+            {
+                grid.ColumnDefinitions.Add(new(GridLength.Star));
+                grid.Add(button, row: 1, column: c++);
+            }
+            grid.SetColumnSpan(main, c);
+            Content = grid;
+        }
+
+        protected virtual IEnumerable<View> GenerateButtons()
+        {
             var back = new Button
             {
                 Text = "Back"
             };
             back.Clicked += Back_Clicked;
-            grid.Add(back, row: 1);
-            Content = grid;
+            yield return back;
         }
 
         private async void Back_Clicked(object? sender, EventArgs e)

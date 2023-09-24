@@ -13,26 +13,22 @@ namespace Carmen.Mobile.Views
 {
     internal class EditBooleanAbility : EditAbility<BooleanCriteria>
     {
-        public EditBooleanAbility(BooleanCriteria criteria, Ability ability)
-            : base(criteria, ability, GenerateEditView(criteria))
+        public EditBooleanAbility(BooleanCriteria criteria, Ability ability, Action delete)
+            : base(criteria, ability, GenerateEditView(criteria), delete)
         { }
 
         static View GenerateEditView(BooleanCriteria criteria)
         {
             var checkbox = new CheckBox();
             checkbox.SetBinding(CheckBox.IsCheckedProperty, new Binding(nameof(Ability.Mark), converter: new MatchUIntValue(), converterParameter: 1));
-            var layout = new Grid //TODO make checkbox not appear in the centre vertically
+            return new VerticalStackLayout
             {
                 Padding = 5,
-                ColumnDefinitions = new ColumnDefinitionCollection
-            {
-                new ColumnDefinition(GridLength.Auto),
-                new ColumnDefinition(GridLength.Star)
-            }
+                Children = {
+                    new Label { Text = criteria.Name },
+                    checkbox
+                }
             };
-            layout.Add(new Label { Text = criteria.Name });
-            layout.Add(checkbox, 1);
-            return layout;
         }
     }
 }

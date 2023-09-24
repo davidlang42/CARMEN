@@ -29,14 +29,23 @@ namespace Carmen.Mobile.Views
                 ItemTemplate = new DataTemplate(GenerateNoteDataTemplate),
             };
             existing.SetBinding(ListView.ItemsSourceProperty, new Binding($"{nameof(Applicant)}.{nameof(Applicant.Notes)}"));
-            var editor = new Editor //TODO make entry get bigger (up to a max number of lines) if you type extra text in it
+            var editor = new Editor
             {
-                Placeholder = "Add your comments here"
+                Placeholder = "Add your comments here",
+                AutoSize = EditorAutoSizeOption.TextChanges,
+                MaximumHeightRequest = 200 // ~10 lines
             };
             editor.SetBinding(Entry.TextProperty, new Binding(nameof(NewNote)));
             var main = new ScrollView
             {
-                Content = existing
+                Content = new VerticalStackLayout
+                {
+                    Spacing = 5,
+                    Children = {
+                        existing,
+                        editor
+                    }
+                }
             };
 
             var grid = new Grid
@@ -47,7 +56,6 @@ namespace Carmen.Mobile.Views
                 RowDefinitions =
                 {
                     new RowDefinition(GridLength.Star),
-                    new RowDefinition(GridLength.Auto),
                     new RowDefinition(GridLength.Auto)
                 },
                 ColumnDefinitions =
@@ -57,23 +65,20 @@ namespace Carmen.Mobile.Views
                 }
             };
             grid.Add(main);
-            grid.Add(editor, row: 1);
             var c = 0;
             var back = new Button
             {
-                Text = "Back",
-                BackgroundColor = Colors.Gray
+                Text = "Back"
             };
             back.Clicked += Back_Clicked;
-            grid.Add(back, row: 2, column: c++);
+            grid.Add(back, row: 1, column: c++);
             var add = new Button
             {
                 Text = "Add note"
             };
             add.Clicked += Add_Clicked;
-            grid.Add(add, row: 2, column: c++);
+            grid.Add(add, row: 1, column: c++);
             grid.SetColumnSpan(main, c);
-            grid.SetColumnSpan(editor, c);
             Content = grid;
         }
 
@@ -94,7 +99,11 @@ namespace Carmen.Mobile.Views
 
         private async void Add_Clicked(object? sender, EventArgs e)
         {
-            //TODO check note is not blank, warn & abort
+            if (string.IsNullOrWhiteSpace(NewNote))
+            {
+                DisplayAlert("Type your comments into the box above", "", "Ok");
+                return;
+            }
             Applicant.Notes.Add(new Note
             {
                 Applicant = Applicant,

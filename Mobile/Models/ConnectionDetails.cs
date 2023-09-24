@@ -14,7 +14,7 @@ namespace Carmen.Mobile.Models
 {
     internal class ConnectionDetails : ShowConnection
     {
-        const uint DEFAULT_PORT = 3306;
+        public const uint DEFAULT_PORT = 3306;
 
         public string Host { get; set; } = "";
         public string Database { get; set; } = "";
