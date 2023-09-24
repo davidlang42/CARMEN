@@ -17,7 +17,6 @@ using SM = Carmen.ShowModel;
 
 namespace Carmen.Mobile.Views
 {
-    //TODO change app icon/splash/colours
     //TODO handle crashes when back (button or arrow) is pressed while still loading, probably requires moving loading into model and having a cancel method
     internal class ApplicantDetails : ContentPage
     {
