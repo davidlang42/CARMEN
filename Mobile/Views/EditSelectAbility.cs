@@ -20,7 +20,11 @@ namespace Carmen.Mobile.Views
             var label = new Label { Text = criteria.Name };
             var picker = new Picker
             {
-                ItemsSource = criteria.Options //TODO if blank string is an option, it shows in the list as "Microsoft.Maui.Picker"
+                ItemsSource = criteria.Options,
+                ItemDisplayBinding = new Binding
+                {
+                    StringFormat = "{0} " // this avoids a completely blank string as an option, which gets displayed as "Microsoft.Maui.Picker"
+                }
             };
             picker.SetBinding(Picker.SelectedIndexProperty, new Binding(nameof(Ability.Mark)));
             return new VerticalStackLayout()
