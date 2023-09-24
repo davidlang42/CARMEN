@@ -168,13 +168,12 @@ namespace Carmen.Mobile.Views
 
         private View GenerateMainView()
         {
-            //TODO (NOW) refactor into single list view with datatemplateselector
             //TODO (NOW) make a way to add abilities which aren't set yet, and delete (clear) ones which are
             var fields = ListViewNoScroll(GenerateFieldDataTemplate, nameof(ApplicantModel.Fields));
             var abilities = ListViewNoScroll(GenerateAbilityDataTemplate, ApplicantModel.Path(nameof(Applicant.Abilities)));
-            var existing = ListViewNoScroll(GenerateNoteDataTemplate, ApplicantModel.Path(nameof(Applicant.Notes)));
-            var empty = ListViewNoScroll(GenerateEmptyNoteDataTemplate);
-            empty.ItemsSource = new[] { "Add notes" };
+            var notes = ListViewNoScroll(GenerateNoteDataTemplate, ApplicantModel.Path(nameof(Applicant.Notes)));
+            var no_notes = ListViewNoScroll(GenerateEmptyNoteDataTemplate);
+            no_notes.ItemsSource = new[] { "Add notes" };
             var multi = new MultiBinding
             {
                 Converter = new AndBooleans(),
@@ -184,18 +183,13 @@ namespace Carmen.Mobile.Views
                     new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean())
                 }
             };
-            empty.SetBinding(ListView.IsVisibleProperty, multi);
-            var notes = new Grid
-            {
-                existing,
-                empty
-            };
-
+            no_notes.SetBinding(ListView.IsVisibleProperty, multi);
             return new VerticalStackLayout
             {
                 fields,
                 abilities,
-                notes
+                notes,
+                no_notes
             };
         }
 
@@ -268,10 +262,9 @@ namespace Carmen.Mobile.Views
 
         private async void FieldCell_Tapped(object? sender, EventArgs e)
         {
-            if (sender is not Cell cell)
+            if (sender is not Cell cell || cell.Parent is not ListView list)
                 return;
-            if (cell.Parent is ListView list)
-                list.SelectedItem = null;//TODO (NOW) dont clear the last edit click, but clear the other ones
+            ClearOtherSelections(list);
             if (cell.BindingContext is ApplicantField<string> string_field)
             {
                 await Navigation.PushAsync(new EditStringField(string_field));
@@ -310,10 +303,9 @@ namespace Carmen.Mobile.Views
 
         private async void AbilityCell_Tapped(object? sender, EventArgs e)
         {
-            if (sender is not Cell cell)
+            if (sender is not Cell cell || cell.Parent is not ListView list)
                 return;
-            if (cell.Parent is ListView list)
-                list.SelectedItem = null;//TODO (NOW) dont clear the last edit click, but clear the other ones
+            ClearOtherSelections(list);
             if (cell.BindingContext is not Ability ability)
                 return;
             if (ability.Criteria is BooleanCriteria boolean)
@@ -357,12 +349,18 @@ namespace Carmen.Mobile.Views
 
         private async void NoteCell_Tapped(object? sender, EventArgs e)
         {
-            if (sender is not Cell cell)
+            if (sender is not Cell cell || cell.Parent is not ListView list)
                 return;
-            if (cell.Parent is ListView list)
-                list.SelectedItem = null;//TODO (NOW) dont clear the last edit click, but clear the other ones
+            ClearOtherSelections(list);
             if (model.Applicant is Applicant applicant)
                 await Navigation.PushAsync(new AddNote(applicant, show.User));
+        }
+
+        private void ClearOtherSelections(ListView list)
+        {
+            if (list.Parent is IContainer container)
+                foreach (var other_list in container.OfType<ListView>().Where(l => l != list))
+                    other_list.SelectedItem = null;
         }
     }
 }
