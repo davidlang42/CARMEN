@@ -11,8 +11,8 @@ namespace Carmen.Mobile.Views
 {
     internal class EditSelectAbility : EditAbility<SelectCriteria>
     {
-        public EditSelectAbility(SelectCriteria criteria, Ability ability)
-            : base(criteria, ability, GenerateEditView(criteria))
+        public EditSelectAbility(SelectCriteria criteria, Ability ability, Action delete)
+            : base(criteria, ability, GenerateEditView(criteria), delete)
         { }
 
         static View GenerateEditView(SelectCriteria criteria)

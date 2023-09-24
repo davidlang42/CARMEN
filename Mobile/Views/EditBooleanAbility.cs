@@ -13,8 +13,8 @@ namespace Carmen.Mobile.Views
 {
     internal class EditBooleanAbility : EditAbility<BooleanCriteria>
     {
-        public EditBooleanAbility(BooleanCriteria criteria, Ability ability)
-            : base(criteria, ability, GenerateEditView(criteria))
+        public EditBooleanAbility(BooleanCriteria criteria, Ability ability, Action delete)
+            : base(criteria, ability, GenerateEditView(criteria), delete)
         { }
 
         static View GenerateEditView(BooleanCriteria criteria)

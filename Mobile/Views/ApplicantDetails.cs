@@ -74,10 +74,6 @@ namespace Carmen.Mobile.Views
                 {
                     new RowDefinition(GridLength.Star),
                     new RowDefinition(GridLength.Auto)
-                },
-                ColumnDefinitions =
-                {
-                    new(GridLength.Star)
                 }
             };
             grid.Add(loading);
@@ -89,6 +85,7 @@ namespace Carmen.Mobile.Views
                 BackgroundColor = Colors.Gray
             };
             back.Clicked += Back_Clicked;
+            grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(back, row: 1, column: c++);
             var delete = new Button
             {
@@ -169,7 +166,6 @@ namespace Carmen.Mobile.Views
 
         private View GenerateMainView()
         {
-            //TODO (NOW) some way to delete (clear) abilities which are set
             var fields = ListViewNoScroll(GenerateFieldDataTemplate, nameof(ApplicantModel.Fields));
             var abilities = ListViewNoScroll(GenerateAbilityDataTemplate, ApplicantModel.Path(nameof(Applicant.Abilities)));
             var no_abilities = ListViewNoScroll(GenerateCriteriaDataTemplate, nameof(ApplicantModel.MissingCriterias));
@@ -328,19 +324,26 @@ namespace Carmen.Mobile.Views
             await EditAbility(ability);
         }
 
+        private void DeleteAbility(Ability ability)
+        {
+            if (model.Applicant is not Applicant applicant)
+                return;
+            applicant.Abilities.Remove(ability);
+        }
+
         private async Task EditAbility(Ability ability)
         {
             if (ability.Criteria is BooleanCriteria boolean)
             {
-                await Navigation.PushAsync(new EditBooleanAbility(boolean, ability));
+                await Navigation.PushAsync(new EditBooleanAbility(boolean, ability, () => DeleteAbility(ability)));
             }
             else if (ability.Criteria is NumericCriteria numeric)
             {
-                await Navigation.PushAsync(new EditNumericAbility(numeric, ability));
+                await Navigation.PushAsync(new EditNumericAbility(numeric, ability, () => DeleteAbility(ability)));
             }
             else if (ability.Criteria is SelectCriteria select)
             {
-                await Navigation.PushAsync(new EditSelectAbility(select, ability));
+                await Navigation.PushAsync(new EditSelectAbility(select, ability, () => DeleteAbility(ability)));
             }
         }
 
