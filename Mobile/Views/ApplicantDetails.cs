@@ -121,12 +121,35 @@ namespace Carmen.Mobile.Views
             }
             var criterias = await context.Criterias.ToArrayAsync();
             model.Loaded(applicant, criterias);
-            var image = await Task.Run(() => applicant.Photo); //TODO cache photos, and/or load only if internet is not restricted (or the user clicks load)
-            var source = image == null ? null : await MauiImageSource(image);
+            ImageSource? source;
+            if (applicant.PhotoImageId is int image_id)
+                source = await CachedImage(image_id, applicant.ShowRoot, () => applicant.Photo ?? throw new ApplicationException("Applicant photo not set, but photo ID was."));
+            else if (await Task.Run(() => applicant.Photo) is SM.Image image)
+                source = await ActualImage(image);
+            else
+                source = null;
             model.LoadedPhoto(source);
         }
 
-        static async Task<ImageSource?> MauiImageSource(SM.Image photo)
+        const string ImageCacheExtension = "BMP";
+        static string GetCachePath(ShowRoot show)
+            => $"{FileSystem.Current.CacheDirectory}{Path.DirectorySeparatorChar}{string.Concat(show.Name.Split(Path.GetInvalidFileNameChars()))}{Path.DirectorySeparatorChar}";
+
+        static async Task<ImageSource> CachedImage(int image_id, ShowRoot show, Func<SM.Image> lazy_loading_photo_getter)
+        {
+            var cache_path = GetCachePath(show);
+            var filename = $"{cache_path}{image_id}.{ImageCacheExtension}";
+            if (!File.Exists(filename))
+                await Task.Run(() =>
+                {
+                    if (!Directory.Exists(cache_path))
+                        UserException.Handle(() => Directory.CreateDirectory(cache_path), "Error creating image cache path.");
+                    UserException.Handle(() => File.WriteAllBytes(filename, lazy_loading_photo_getter().ImageData), "Error caching image.");
+                });
+            return ImageSource.FromFile(filename);
+        }
+
+        static async Task<ImageSource?> ActualImage(SM.Image photo)
         {
             try
             {
