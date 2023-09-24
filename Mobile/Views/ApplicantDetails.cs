@@ -80,8 +80,7 @@ namespace Carmen.Mobile.Views
             var c = 0;
             var back = new Button
             {
-                Text = "Back",
-                BackgroundColor = Colors.Gray
+                Text = "Back"
             };
             back.Clicked += Back_Clicked;
             grid.ColumnDefinitions.Add(new(GridLength.Star));
@@ -89,7 +88,7 @@ namespace Carmen.Mobile.Views
             var delete = new Button
             {
                 Text = "Delete",
-                BackgroundColor = Colors.Red
+                BackgroundColor = Colors.LightCoral
             };
             delete.Clicked += Delete_Clicked;
             delete.SetBinding(Button.IsEnabledProperty, new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean()));
@@ -98,6 +97,7 @@ namespace Carmen.Mobile.Views
             var save = new Button
             {
                 Text = "Save",
+                BackgroundColor = Colors.SeaGreen
             };
             save.Clicked += Save_Clicked;
             save.SetBinding(Button.IsEnabledProperty, new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean()));

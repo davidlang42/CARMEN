@@ -68,8 +68,7 @@ namespace Carmen.Mobile.Views
             var c = 0;
             var back = new Button
             {
-                Text = "Back",
-                BackgroundColor = Colors.Gray
+                Text = "Back"
             };
             back.Clicked += Back_Clicked;
             grid.Add(back, row: 1, column: c++);

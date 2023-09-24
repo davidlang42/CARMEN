@@ -65,14 +65,14 @@ namespace Carmen.Mobile.Views
             var c = 0;
             var back = new Button
             {
-                Text = "Back",
-                BackgroundColor = Colors.Gray
+                Text = "Back"
             };
             back.Clicked += Back_Clicked;
             grid.Add(back, row: 2, column: c++);
             var add = new Button
             {
-                Text = "Add new applicant"
+                Text = "Add new applicant",
+                BackgroundColor = Colors.SeaGreen
             };
             add.Clicked += AddButton_Clicked;
             add.SetBinding(Button.IsEnabledProperty, new Binding(nameof(Applicants.IsLoading), converter: new InvertBoolean()));

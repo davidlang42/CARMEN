@@ -30,8 +30,7 @@ namespace Carmen.Mobile.Views
                 yield return button;
             var clear = new Button
             {
-                Text = "Clear",
-                BackgroundColor = Colors.Red
+                Text = "Clear"
             };
             clear.Clicked += Clear_Clicked;
             yield return clear;
