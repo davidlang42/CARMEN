@@ -184,6 +184,12 @@ namespace Carmen.Mobile.Views
                 }
             };
             no_notes.SetBinding(ListView.IsVisibleProperty, multi);
+            notes.ItemAppearing += (_, e) =>
+            {
+                if (notes.SelectedItem != null // if another note was selected
+                    || no_notes.SelectedItem != null) // or "add notes" was selected
+                    notes.SelectedItem = e.Item; // then select the new note
+            };
             return new VerticalStackLayout
             {
                 fields,
