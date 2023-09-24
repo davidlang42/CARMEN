@@ -1,5 +1,6 @@
 ﻿using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
+using Microsoft.VisualBasic;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,6 +28,14 @@ namespace Carmen.Mobile.Models
         {
             Collection = collection;
             IsLoading = false;
+            OnPropertyChanged(nameof(Collection));
+            OnPropertyChanged(nameof(IsLoading));
+        }
+
+        public void Adding()
+        {
+            Collection = null;
+            IsLoading = true;
             OnPropertyChanged(nameof(Collection));
             OnPropertyChanged(nameof(IsLoading));
         }

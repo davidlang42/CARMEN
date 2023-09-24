@@ -62,8 +62,11 @@ namespace Carmen.Mobile.Views
             };
             back.Clicked += Back_Clicked;
             grid.Add(back, row: 1, column: c++);
-            var add = new Button { Text = "Add new applicant" };
+            var add = new Button {
+                Text = "Add new applicant"
+            };
             add.Clicked += AddButton_Clicked;
+            add.SetBinding(Button.IsEnabledProperty, new Binding(nameof(Applicants.IsLoading), converter: new InvertBoolean()));
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(add, row: 1, column: c++);
             grid.SetColumnSpan(loading, c);
@@ -93,11 +96,14 @@ namespace Carmen.Mobile.Views
         {
             if (context == null)
                 return;
+            model.Adding();
             var applicant = new Applicant { ShowRoot = context.ShowRoot };
             context.Applicants.Add(applicant);
-            await context.SaveChangesAsync(); //TODO (NOW) show some sort of loading while this happens (there is a noticable lag)
+            await context.SaveChangesAsync();
+            var collection = await Task.Run(() => context.Applicants.ToObservableCollection());
+            model.Loaded(collection);
+            //TODO (NOW) scroll to (and select) the new applicant in the list view
             await EditApplicant(applicant);
-            model.Loaded(context.Applicants.ToObservableCollection());
         }
 
         private object GenerateDataTemplate()
@@ -119,8 +125,7 @@ namespace Carmen.Mobile.Views
 
         private async void Cell_Tapped(object? sender, EventArgs e)
         {
-            var cell = (Cell)sender!;
-            if (cell.BindingContext is not Applicant applicant)
+            if (sender is not Cell cell || cell.BindingContext is not Applicant applicant)
                 return;
             await EditApplicant(applicant);
         }
