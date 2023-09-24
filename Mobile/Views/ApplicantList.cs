@@ -15,8 +15,8 @@ namespace Carmen.Mobile.Views
     {
         readonly Applicants model;
         readonly ConnectionDetails show;
+        readonly ListView list;
         ShowContext? context;
-        ListView list;
 
         public ApplicantList(ConnectionDetails show, string show_name)
         {
@@ -30,8 +30,12 @@ namespace Carmen.Mobile.Views
             var loading = new ActivityIndicator { IsRunning = true };
             loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(Applicants.IsLoading)));
 
-            //TODO (NEXT) add list filtering & sorting
             //TODO (NEXT) some way to group/filter by a criteria (eg. audition group) for auditions workflow
+            var search = new Entry
+            {
+                Placeholder = "Filter by name"
+            };
+            search.SetBinding(Entry.TextProperty, new Binding(nameof(Applicants.NameContains)));
             list = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateDataTemplate),
@@ -45,6 +49,7 @@ namespace Carmen.Mobile.Views
                 ColumnSpacing = 5,
                 RowDefinitions =
                 {
+                    new RowDefinition(GridLength.Auto),
                     new RowDefinition(GridLength.Star),
                     new RowDefinition(GridLength.Auto)
                 },
@@ -53,8 +58,9 @@ namespace Carmen.Mobile.Views
                     new ColumnDefinition(GridLength.Star)
                 }
             };
-            grid.Add(loading);
-            grid.Add(list);
+            grid.Add(search);
+            grid.Add(loading, row: 1);
+            grid.Add(list, row: 1);
             var c = 0;
             var back = new Button
             {
@@ -62,15 +68,16 @@ namespace Carmen.Mobile.Views
                 BackgroundColor = Colors.Gray
             };
             back.Clicked += Back_Clicked;
-            grid.Add(back, row: 1, column: c++);
+            grid.Add(back, row: 2, column: c++);
             var add = new Button {
                 Text = "Add new applicant"
             };
             add.Clicked += AddButton_Clicked;
             add.SetBinding(Button.IsEnabledProperty, new Binding(nameof(Applicants.IsLoading), converter: new InvertBoolean()));
             grid.ColumnDefinitions.Add(new(GridLength.Star));
-            grid.Add(add, row: 1, column: c++);
+            grid.Add(add, row: 2, column: c++);
             grid.SetColumnSpan(loading, c);
+            grid.SetColumnSpan(search, c);
             grid.SetColumnSpan(list, c);
             Content = grid;
         }

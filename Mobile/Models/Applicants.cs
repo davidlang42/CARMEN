@@ -8,6 +8,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -18,9 +19,24 @@ namespace Carmen.Mobile.Models
         public bool IsLoading { get; private set; } = true;
         public FilteredSortedCollection<Applicant>? Collection { get; private set; }
 
+        private string nameContains = "";
+        public string NameContains
+        {
+            get => nameContains;
+            set
+            {
+                if (nameContains == value)
+                    return;
+                nameContains = value;
+                if (Collection != null)
+                    Collection.Filter = value == "" ? null : a => $"{a.FirstName} {a.LastName}".Contains(value, StringComparison.OrdinalIgnoreCase);
+                OnPropertyChanged();
+            }
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        protected void OnPropertyChanged(string property)
+        protected void OnPropertyChanged([CallerMemberName]string property = "")
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property));
         }
