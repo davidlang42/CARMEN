@@ -122,8 +122,9 @@ namespace Carmen.Mobile.Views
 
         private async void ViewApplicants_Clicked(object? sender, EventArgs e)
         {
-            //TODO better null handling
-            await Navigation.PushAsync(new ApplicantList(connection, model.ShowName!)); // not null when show ready
+            if (model.ShowName is not string show_name)
+                return;
+            await Navigation.PushAsync(new ApplicantList(connection, show_name));
         }
     }
 }
