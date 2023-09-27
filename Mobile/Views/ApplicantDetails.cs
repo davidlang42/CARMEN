@@ -1,10 +1,12 @@
 ﻿using Carmen.Desktop.Converters;
 using Carmen.Mobile.Converters;
 using Carmen.Mobile.Models;
+using Carmen.Mobile.Popups;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
+using CommunityToolkit.Maui.Views;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -244,13 +246,56 @@ namespace Carmen.Mobile.Views
         {
             var activity = new ActivityIndicator();
             activity.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
-            var image = new MC.Image();
-            image.SetBinding(MC.Image.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
+            var image = new ImageButton();
+            image.SetBinding(ImageButton.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
+            image.Clicked += Image_Clicked;
             return new Grid
             {
                 image,
                 activity
             };
+        }
+
+        private async void Image_Clicked(object? sender, EventArgs e)
+        {
+            // choose how we get the image
+            Func<MediaPickerOptions?, Task<FileResult?>> getter;
+            if (MediaPicker.Default.IsCaptureSupported)
+            {
+                var options = new[]
+                {
+                    "Take a photo",
+                    "Pick an existing photo"
+                };
+                var popup = new ListPopup<string>(options, () => new Binding());
+                var result = await this.ShowPopupAsync(popup);
+                if (result == options[0])
+                    getter = MediaPicker.Default.CapturePhotoAsync;
+                else if (result == options[1])
+                    getter = MediaPicker.Default.PickPhotoAsync;
+                else
+                    return;
+            }
+            else
+            {
+                getter = MediaPicker.Default.PickPhotoAsync;
+            }
+            // actually get the image
+            if (await getter(null) is FileResult photo)
+            {
+                // save the file into local storage
+                string localFilePath = Path.Combine(FileSystem.CacheDirectory, photo.FileName);
+
+                using Stream sourceStream = await photo.OpenReadAsync();
+                using FileStream localFileStream = File.OpenWrite(localFilePath);
+
+                await sourceStream.CopyToAsync(localFileStream);//TODO avoid copying
+
+                //TODO save the image, and cache it
+                var image = (ImageButton)sender;
+                image.Source = ImageSource.FromFile(localFilePath);
+                //model.SetPhoto(new_image);
+            }
         }
 
         private async void Save_Clicked(object? sender, EventArgs e)
