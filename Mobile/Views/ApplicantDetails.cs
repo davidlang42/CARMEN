@@ -10,6 +10,7 @@ using CommunityToolkit.Maui.Views;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -258,6 +259,8 @@ namespace Carmen.Mobile.Views
 
         private async void Image_Clicked(object? sender, EventArgs e)
         {
+            if (model.Applicant == null)
+                return;
             // choose how we get the image
             Func<MediaPickerOptions?, Task<FileResult?>> getter;
             if (MediaPicker.Default.IsCaptureSupported)
@@ -281,20 +284,20 @@ namespace Carmen.Mobile.Views
                 getter = MediaPicker.Default.PickPhotoAsync;
             }
             // actually get the image
-            if (await getter(null) is FileResult photo)
+            if (await getter(null) is FileResult file)
             {
-                // save the file into local storage
-                string localFilePath = Path.Combine(FileSystem.CacheDirectory, photo.FileName);
-
-                using Stream sourceStream = await photo.OpenReadAsync();
-                using FileStream localFileStream = File.OpenWrite(localFilePath);
-
-                await sourceStream.CopyToAsync(localFileStream);//TODO avoid copying
-
-                //TODO save the image, and cache it
-                var image = (ImageButton)sender;
-                image.Source = ImageSource.FromFile(localFilePath);
-                //model.SetPhoto(new_image);
+                var photo = new SM.Image
+                {
+                    Name = file.FileName
+                };
+                using Stream source_stream = await file.OpenReadAsync();
+                using (var memory_stream = new MemoryStream())
+                {
+                    source_stream.CopyTo(memory_stream);
+                    photo.ImageData = memory_stream.ToArray();
+                }
+                model.Applicant.Photo = photo;
+                model.LoadedPhoto(await ActualImage(photo));
             }
         }
 
