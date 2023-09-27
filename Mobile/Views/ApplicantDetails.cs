@@ -1,5 +1,6 @@
 ﻿using Carmen.Desktop.Converters;
 using Carmen.Mobile.Converters;
+using Carmen.Mobile.Extensions;
 using Carmen.Mobile.Models;
 using Carmen.Mobile.Popups;
 using Carmen.ShowModel;
@@ -247,9 +248,9 @@ namespace Carmen.Mobile.Views
         {
             var activity = new ActivityIndicator();
             activity.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
-            var image = new ImageButton();
-            image.SetBinding(ImageButton.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
-            image.Clicked += Image_Clicked;
+            var image = new MC.Image();
+            image.SetBinding(MC.Image.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
+            image.AddTapHandler(Image_Clicked);
             return new Grid
             {
                 image,
