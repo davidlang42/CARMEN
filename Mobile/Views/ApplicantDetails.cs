@@ -1,13 +1,17 @@
 ﻿using Carmen.Desktop.Converters;
 using Carmen.Mobile.Converters;
+using Carmen.Mobile.Extensions;
 using Carmen.Mobile.Models;
+using Carmen.Mobile.Popups;
 using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
+using CommunityToolkit.Maui.Views;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -125,7 +129,7 @@ namespace Carmen.Mobile.Views
             else if (await Task.Run(() => applicant.Photo) is SM.Image image)
                 source = await ActualImage(image);
             else
-                source = null;
+                source = ImageSource.FromFile("no_photo.png");
             model.LoadedPhoto(source);
         }
 
@@ -246,11 +250,56 @@ namespace Carmen.Mobile.Views
             activity.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
             var image = new MC.Image();
             image.SetBinding(MC.Image.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
+            image.AddTapHandler(Image_Clicked);
             return new Grid
             {
                 image,
                 activity
             };
+        }
+
+        private async void Image_Clicked(object? sender, EventArgs e)
+        {
+            if (model.Applicant == null)
+                return;
+            // choose how we get the image
+            Func<MediaPickerOptions?, Task<FileResult?>> getter;
+            if (MediaPicker.Default.IsCaptureSupported)
+            {
+                var options = new[]
+                {
+                    "Take a photo",
+                    "Pick an existing photo"
+                };
+                var popup = new ListPopup<string>(options, s => s);
+                var result = await this.ShowPopupAsync(popup);
+                if (result == options[0])
+                    getter = MediaPicker.Default.CapturePhotoAsync;
+                else if (result == options[1])
+                    getter = MediaPicker.Default.PickPhotoAsync;
+                else
+                    return;
+            }
+            else
+            {
+                getter = MediaPicker.Default.PickPhotoAsync;
+            }
+            // actually get the image
+            if (await getter(null) is FileResult file)
+            {
+                var photo = new SM.Image
+                {
+                    Name = file.FileName
+                };
+                using Stream source_stream = await file.OpenReadAsync();
+                using (var memory_stream = new MemoryStream())
+                {
+                    source_stream.CopyTo(memory_stream);
+                    photo.ImageData = memory_stream.ToArray();
+                }
+                model.Applicant.Photo = photo;
+                model.LoadedPhoto(await ActualImage(photo));
+            }
         }
 
         private async void Save_Clicked(object? sender, EventArgs e)
