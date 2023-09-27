@@ -128,7 +128,7 @@ namespace Carmen.Mobile.Views
             else if (await Task.Run(() => applicant.Photo) is SM.Image image)
                 source = await ActualImage(image);
             else
-                source = null;
+                source = null; //TODO make a "no photo" default image, so something is clickable to change it
             model.LoadedPhoto(source);
         }
 

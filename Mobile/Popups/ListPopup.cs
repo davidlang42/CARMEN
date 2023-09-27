@@ -13,7 +13,7 @@ namespace Carmen.Mobile.Popups
         public ListPopup(T[] items, Func<Binding> display_binding)
         {
             displayBinding = display_binding;
-            Content = new ListView //TODO this UI could be nicer
+            Content = new ListView //TODO this UI could be nicer, especially on android
             {
                 ItemsSource = items,
                 ItemTemplate = new DataTemplate(GenerateDataTemplate)
