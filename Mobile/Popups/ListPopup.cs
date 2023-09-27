@@ -9,30 +9,25 @@ namespace Carmen.Mobile.Popups
 {
     internal class ListPopup<T> : Popup
     {
-        Func<Binding> displayBinding;
-        public ListPopup(T[] items, Func<Binding> display_binding)
+        public ListPopup(T[] items, Func<T, string> display_getter)
         {
-            displayBinding = display_binding;
-            Content = new ListView //TODO this UI could be nicer, especially on android
+            var layout = new VerticalStackLayout
             {
-                ItemsSource = items,
-                ItemTemplate = new DataTemplate(GenerateDataTemplate)
+                Spacing = 5
             };
-        }
-
-        private object GenerateDataTemplate()
-        {
-            var cell = new TextCell();
-            cell.SetBinding(TextCell.TextProperty, displayBinding());
-            cell.Tapped += Cell_Tapped;
-            return cell;
-        }
-
-        private async void Cell_Tapped(object? sender, EventArgs e)
-        {
-            var cell = (Cell)sender;
-            var list = (ListView)cell.Parent;
-            await CloseAsync(list.SelectedItem);
+            foreach (var item in items)
+            {
+                var button = new Button
+                {
+                    Text = display_getter(item)
+                };
+                button.Clicked += (s, e) =>
+                {
+                    Close(item);
+                };
+                layout.Children.Add(button);
+            }
+            Content = layout;
         }
     }
 }

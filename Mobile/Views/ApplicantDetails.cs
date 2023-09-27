@@ -271,7 +271,7 @@ namespace Carmen.Mobile.Views
                     "Take a photo",
                     "Pick an existing photo"
                 };
-                var popup = new ListPopup<string>(options, () => new Binding());
+                var popup = new ListPopup<string>(options, s => s);
                 var result = await this.ShowPopupAsync(popup);
                 if (result == options[0])
                     getter = MediaPicker.Default.CapturePhotoAsync;
