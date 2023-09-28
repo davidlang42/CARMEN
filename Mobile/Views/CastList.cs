@@ -39,6 +39,17 @@ namespace Carmen.Mobile.Views
             };
             detail.SetBinding(Picker.ItemsSourceProperty, new Binding(nameof(Cast.DetailOptions)));
             detail.SetBinding(Picker.SelectedItemProperty, new Binding(nameof(Cast.SelectedOption)));
+            var top_bar = new Grid
+            {
+                ColumnSpacing = 5,
+                ColumnDefinitions = new()
+                {
+                    new(GridLength.Star),
+                    new(GridLength.Auto)
+                }
+            };
+            top_bar.Add(search);
+            top_bar.Add(detail, column: 1);
             var list = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateDataTemplate),
@@ -49,22 +60,15 @@ namespace Carmen.Mobile.Views
             {
                 Margin = 5,
                 RowSpacing = 5,
-                ColumnSpacing = 5,
+                
                 RowDefinitions =
                 {
                     new RowDefinition(GridLength.Auto),
                     new RowDefinition(GridLength.Star),
                     new RowDefinition(GridLength.Auto)
-                },
-                ColumnDefinitions =
-                {
-                    new ColumnDefinition(GridLength.Star)
                 }
             };
-            var c = 0;
-            grid.Add(search, column: c++);
-            grid.ColumnDefinitions.Add(new ColumnDefinition(GridLength.Auto));
-            grid.Add(detail, column: c++);
+            grid.Add(top_bar);
             grid.Add(loading, row: 1);
             grid.Add(list, row: 1);
             var back = new Button
@@ -73,9 +77,6 @@ namespace Carmen.Mobile.Views
             };
             back.Clicked += Back_Clicked;
             grid.Add(back, row: 2);
-            grid.SetColumnSpan(loading, c);
-            grid.SetColumnSpan(list, c);
-            grid.SetColumnSpan(back, c);
             Content = grid;
         }
 
