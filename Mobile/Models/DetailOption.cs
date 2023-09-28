@@ -39,10 +39,18 @@ namespace Carmen.Mobile.Models
             {
                 ByFields =
                     {
-                        a => a.Tags.Contains(tag),
+                        a => a.Tags.Contains(tag) ? 0 : 1,
                         a => a.CastNumber,
                         a => a.AlternativeCast?.Initial
                     }
-            }, new FieldGetter<Applicant>(a => $"#{a.CastNumberAndCast} ({string.Join(", ", a.Tags.Select(t => t.Name))})"));
+            }, new FieldGetter<Applicant>(DetailsGetterTags));
+
+        static string DetailsGetterTags(Applicant a)
+        {
+            var s = $"#{a.CastNumberAndCast}";
+            if (a.Tags.Count > 0)
+                s += $" ({string.Join(", ", a.Tags.Select(t => t.Name))})";
+            return s;
+        }
     }
 }
