@@ -44,9 +44,10 @@ namespace Carmen.Mobile.Views
                 Spacing = 5,
                 Children =
                 {
-                    ButtonWithHandler("View Applicants by Name", ViewApplicantsName_Clicked),
-                    ButtonWithHandler("View Applicants by Age/Gender", ViewApplicantsAgeGender_Clicked),
-                    ButtonWithHandlerAndDropdown("View Applicants by: ", ViewApplicantsCriteria_Clicked, nameof(MainModel.Criterias), nameof(Criteria.Name))
+                    ButtonWithHandler("Edit Applicants by Name", ViewApplicantsName_Clicked),
+                    ButtonWithHandler("Edit Applicants by Age/Gender", ViewApplicantsAgeGender_Clicked),
+                    ButtonWithHandlerAndDropdown("Edit Applicants by: ", ViewApplicantsCriteria_Clicked, nameof(MainModel.Criterias), nameof(Criteria.Name)),
+                    ButtonWithHandler("View Cast List", ViewCastList_Clicked)
                 }
             };
             buttons.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(MainModel.IsReady)));
@@ -252,6 +253,13 @@ namespace Carmen.Mobile.Views
         {
             var mark = a.Abilities.SingleOrDefault(ab => ab.Criteria.CriteriaId == c.CriteriaId)?.Mark; // don't use MarkFor() because reference equal doesn't work across contexts
             return mark;
+        }
+
+        private async void ViewCastList_Clicked(object? sender, EventArgs e)
+        {
+            if (model.ShowName is not string show_name)
+                return;
+            await Navigation.PushAsync(new CastList(connection, show_name));
         }
     }
 }

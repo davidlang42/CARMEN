@@ -104,7 +104,7 @@ namespace Carmen.Mobile.Views
         private async void ApplicantList_Loaded(object? sender, EventArgs e)
         {
             context = ShowContext.Open(show);
-            var collection = await context.Applicants.Include(a => a.Abilities).ToArrayAsync();
+            var collection = await context.Applicants.ToArrayAsync();
             model.Loaded(collection, sortBy);
         }
 
