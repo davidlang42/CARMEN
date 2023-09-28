@@ -104,10 +104,14 @@ namespace Carmen.Mobile.Views
             full_name.Bindings.Add(new Binding(nameof(Applicant.FirstName)));
             full_name.Bindings.Add(new Binding(nameof(Applicant.LastName)));
             cell.SetBinding(TextCell.TextProperty, full_name);
-            cell.SetBinding(TextCell.DetailProperty, new Binding()
+            var detail = new MultiBinding
             {
-                Converter = detailGetter
-            });
+                Converter = new DynamicConverter(),
+                TargetNullValue = "(Detail not set)"
+            };
+            detail.Bindings.Add(new Binding());
+            detail.Bindings.Add(new Binding($"{nameof(Cast.SelectedOption)}.{nameof(DetailOption.DetailGetter)}", source: model));
+            cell.SetBinding(TextCell.DetailProperty, detail);
             return cell;
         }
     }

@@ -19,10 +19,10 @@ namespace Carmen.Mobile.Models
         {
             ByFields =
             {
-                a => a.FirstName,
-                a => a.LastName
+                a => a.CastNumber,
+                a => a.AlternativeCast?.Initial
             }
-        }); //TODO default detail is #1 SG G etc
+        }, new FieldGetter<Applicant>(a => $"#{a.CastNumberAndCast} ({a.CastGroup?.Name})"));
 
         public DetailOption[] DetailOptions { get; private set; } = new[] { defaultOption };
 
