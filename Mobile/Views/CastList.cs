@@ -16,7 +16,6 @@ namespace Carmen.Mobile.Views
     {
         readonly Cast model;
         readonly ConnectionDetails show;
-        readonly ListView list;
 
         public CastList(ConnectionDetails show, string show_name)
         {
@@ -39,7 +38,8 @@ namespace Carmen.Mobile.Views
                 ItemDisplayBinding = new Binding(nameof(DetailOption.Name))
             };
             detail.SetBinding(Picker.ItemsSourceProperty, new Binding(nameof(Cast.DetailOptions)));
-            list = new ListView
+            detail.SetBinding(Picker.SelectedItemProperty, new Binding(nameof(Cast.SelectedOption)));
+            var list = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateDataTemplate),
             };
@@ -75,6 +75,7 @@ namespace Carmen.Mobile.Views
             grid.Add(back, row: 2);
             grid.SetColumnSpan(loading, c);
             grid.SetColumnSpan(list, c);
+            grid.SetColumnSpan(back, c);
             Content = grid;
         }
 

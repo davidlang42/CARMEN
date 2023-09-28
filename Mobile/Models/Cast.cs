@@ -34,7 +34,8 @@ namespace Carmen.Mobile.Models
             {
                 if (selectedOption == value)
                     return;
-                selectedOption = value;
+                if (value != null)
+                    selectedOption = value;
                 OnPropertyChanged();
                 if (Collection is FilteredSortedCollection<Applicant> collection)
                 {
