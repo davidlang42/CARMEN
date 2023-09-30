@@ -16,7 +16,7 @@ namespace Carmen.Mobile.Views
 {
     internal class ItemList : ContentPage
     {
-        readonly Items model;
+        readonly ListModel<ItemDetail> model;
         readonly ConnectionDetails show;
         ShowContext? context;
 
@@ -30,16 +30,16 @@ namespace Carmen.Mobile.Views
             Title = show_name;
 
             var loading = new ActivityIndicator { IsRunning = true };
-            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(Items.IsLoading)));
+            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ListModel<ItemDetail>.IsLoading)));
 
             var empty = new Label { Text = "No items" };
-            empty.SetBinding(Label.IsVisibleProperty, new Binding(nameof(Items.IsEmpty)));
+            empty.SetBinding(Label.IsVisibleProperty, new Binding(nameof(ListModel<ItemDetail>.IsEmpty)));
 
             var list = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateDataTemplate),
             };
-            list.SetBinding(ListView.ItemsSourceProperty, new Binding(nameof(Items.Collection)));
+            list.SetBinding(ListView.ItemsSourceProperty, new Binding(nameof(ListModel<ItemDetail>.Collection)));
 
             var grid = new Grid
             {
@@ -72,7 +72,7 @@ namespace Carmen.Mobile.Views
         {
             context = ShowContext.Open(show);
             await context.Nodes.LoadAsync();
-            var items = context.ShowRoot.ItemsInOrder().ToArray();
+            var items = context.ShowRoot.ItemsInOrder().Select(i => new ItemDetail { Item = i }).ToArray();
             model.Loaded(items);
         }
 
@@ -84,20 +84,20 @@ namespace Carmen.Mobile.Views
 
         private object GenerateDataTemplate()
         {
-            // BindingContext will be set to an Item
+            // BindingContext will be set to an ItemDetail
             var cell = new TextCell();
-            cell.SetBinding(TextCell.TextProperty, new Binding(nameof(Item.Name)));
-            //TODO item details: cell.SetBinding(TextCell.DetailProperty, new Binding());
+            cell.SetBinding(TextCell.TextProperty, new Binding(nameof(IBasicListItem.MainText)));
+            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(IBasicListItem.DetailText)));
             cell.Tapped += Cell_Tapped;
             return cell;
         }
 
         private async void Cell_Tapped(object? sender, EventArgs e)
         {
-            if (sender is not Cell cell || cell.BindingContext is not Item item || context == null)
+            if (sender is not Cell cell || cell.BindingContext is not ItemDetail item || context == null)
                 return;
-            await Navigation.PushAsync(new BasicList<RoleDetail>($"Roles in {item.Name}", "No roles",
-                item.Roles.InNameOrder().Select(r => new RoleDetail { Role = r }).ToArray));
+            await Navigation.PushAsync(new BasicList<RoleDetail>($"Roles in {item.Item.Name}", "No roles",
+                item.Item.Roles.InNameOrder().Select(r => new RoleDetail { Role = r }).ToArray));//TODO handle click
         }
     }
 }
