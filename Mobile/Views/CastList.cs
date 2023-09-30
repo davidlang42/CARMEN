@@ -16,12 +16,14 @@ namespace Carmen.Mobile.Views
     {
         readonly Cast model;
         readonly ConnectionDetails show;
+        ShowContext? context;
 
         public CastList(ConnectionDetails show, string show_name)
         {
             model = new();
             this.show = show;
             Loaded += CastList_Loaded;
+            Unloaded += CastList_Unloaded;
             BindingContext = model;
             Title = "Cast of " + show_name;
 
@@ -87,11 +89,17 @@ namespace Carmen.Mobile.Views
 
         private async void CastList_Loaded(object? sender, EventArgs e)
         {
-            using var context = ShowContext.Open(show);
+            context = ShowContext.Open(show);
             var criterias = await context.Criterias.ToArrayAsync();
             var tags = await context.Tags.ToArrayAsync();
             var collection = await context.Applicants.Where(a => a.CastGroup != null).ToArrayAsync();
             model.Loaded(collection, criterias, tags);
+        }
+
+        private void CastList_Unloaded(object? sender, EventArgs e)
+        {
+            context?.Dispose();
+            context = null;
         }
 
         private object GenerateDataTemplate()
@@ -114,7 +122,24 @@ namespace Carmen.Mobile.Views
             detail.Bindings.Add(new Binding());
             detail.Bindings.Add(new Binding($"{nameof(Cast.SelectedOption)}.{nameof(DetailOption.DetailGetter)}", source: model));
             cell.SetBinding(TextCell.DetailProperty, detail);
+            cell.Tapped += Cell_Tapped;
             return cell;
+        }
+
+        private async void Cell_Tapped(object? sender, EventArgs e)
+        {
+            if (sender is not Cell cell || cell.BindingContext is not Applicant applicant || context == null)
+                return;
+            await Navigation.PushAsync(new RoleList($"Roles for {applicant.FirstName} {applicant.LastName}", () =>
+            {
+                context.Nodes.Load();
+                var roles = applicant.Roles.ToArray();
+                var item_roles = new List<ItemRole>();
+                foreach (var item in context.ShowRoot.ItemsInOrder())
+                    foreach (var role in roles.Where(r => r.Items.Contains(item)))
+                        item_roles.Add(new ItemRole { Item = item, Role = role });
+                return item_roles.ToArray();
+            }));
         }
     }
 }

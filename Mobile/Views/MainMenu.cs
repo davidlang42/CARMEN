@@ -47,7 +47,7 @@ namespace Carmen.Mobile.Views
                     ButtonWithHandler("Edit Applicants by Name", ViewApplicantsName_Clicked),
                     ButtonWithHandler("Edit Applicants by Age/Gender", ViewApplicantsAgeGender_Clicked),
                     ButtonWithHandlerAndDropdown("Edit Applicants by: ", ViewApplicantsCriteria_Clicked, nameof(MainModel.Criterias), nameof(Criteria.Name)),
-                    ButtonWithHandler("View Cast List", ViewCastList_Clicked)
+                    ButtonWithHandler("View Casting by Name", ViewCastList_Clicked)
                 }
             };
             buttons.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(MainModel.IsReady)));
