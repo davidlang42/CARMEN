@@ -62,7 +62,6 @@ namespace Carmen.Mobile.Views
             {
                 Margin = 5,
                 RowSpacing = 5,
-                
                 RowDefinitions =
                 {
                     new RowDefinition(GridLength.Auto),
@@ -130,7 +129,7 @@ namespace Carmen.Mobile.Views
         {
             if (sender is not Cell cell || cell.BindingContext is not Applicant applicant || context == null)
                 return;
-            await Navigation.PushAsync(new BasicList<ItemRole>($"Roles for {applicant.FirstName} {applicant.LastName}", () =>
+            await Navigation.PushAsync(new BasicList<ItemRole>($"Roles for {applicant.FirstName} {applicant.LastName}", "No roles allocated", () =>
             {
                 context.Nodes.Load();
                 var roles = applicant.Roles.ToArray();

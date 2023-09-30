@@ -47,7 +47,8 @@ namespace Carmen.Mobile.Views
                     ButtonWithHandler("Edit Applicants by Name", ViewApplicantsName_Clicked),
                     ButtonWithHandler("Edit Applicants by Age/Gender", ViewApplicantsAgeGender_Clicked),
                     ButtonWithHandlerAndDropdown("Edit Applicants by: ", ViewApplicantsCriteria_Clicked, nameof(MainModel.Criterias), nameof(Criteria.Name)),
-                    ButtonWithHandler("View Casting by Name", ViewCastList_Clicked)
+                    ButtonWithHandler("View Casting by Name", ViewCastList_Clicked),
+                    ButtonWithHandler("View Casting by Item", ViewItems_Clicked)
                 }
             };
             buttons.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(MainModel.IsReady)));
@@ -260,6 +261,13 @@ namespace Carmen.Mobile.Views
             if (model.ShowName is not string show_name)
                 return;
             await Navigation.PushAsync(new CastList(connection, show_name));
+        }
+
+        private async void ViewItems_Clicked(object? sender, EventArgs e)
+        {
+            if (model.ShowName is not string show_name)
+                return;
+            await Navigation.PushAsync(new ItemList(connection, show_name));
         }
     }
 }

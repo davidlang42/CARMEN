@@ -16,7 +16,7 @@ namespace Carmen.Mobile.Views
         readonly Func<T[]> loader;
         readonly Action<T>? tap_action;
 
-        public BasicList(string title, Func<T[]> loader, Action<T>? tap_action = null)
+        public BasicList(string title, string empty_list, Func<T[]> loader, Action<T>? tap_action = null)
         {
             model = new();
             BindingContext = model;
@@ -28,7 +28,7 @@ namespace Carmen.Mobile.Views
             var loading = new ActivityIndicator { IsRunning = true };
             loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ListModel<T>.IsLoading)));
 
-            var empty = new Label { Text = "No roles" };
+            var empty = new Label { Text = empty_list };
             empty.SetBinding(Label.IsVisibleProperty, new Binding(nameof(ListModel<T>.IsEmpty)));
 
             var list = new ListView
