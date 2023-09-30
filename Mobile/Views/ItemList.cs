@@ -97,7 +97,7 @@ namespace Carmen.Mobile.Views
             if (sender is not Cell cell || cell.BindingContext is not Item item || context == null)
                 return;
             await Navigation.PushAsync(new BasicList<RoleDetail>($"Roles in {item.Name}", "No roles",
-                item.Roles.Select(r => new RoleDetail { Role = r }).ToArray));
+                item.Roles.InNameOrder().Select(r => new RoleDetail { Role = r }).ToArray));
         }
     }
 }
