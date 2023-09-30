@@ -1,5 +1,4 @@
-﻿using Android.Content;
-using Carmen.Mobile.Models;
+﻿using Carmen.Mobile.Models;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
 using System;
