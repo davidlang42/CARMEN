@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace Carmen.Mobile.Models
 {
-    internal class Roles : INotifyPropertyChanged
+    internal class ListModel<T> : INotifyPropertyChanged
     {
         public bool IsLoading { get; private set; } = true;
         public bool IsEmpty { get; private set; }
-        public ItemRole[]? Collection { get; private set; }
+        public T[]? Collection { get; private set; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -22,7 +22,7 @@ namespace Carmen.Mobile.Models
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(property_name));
         }
 
-        public void Loaded(ItemRole[] collection)
+        public void Loaded(T[] collection)
         {
             Collection = collection;
             IsLoading = false;

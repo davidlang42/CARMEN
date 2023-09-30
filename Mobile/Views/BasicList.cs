@@ -1,4 +1,6 @@
-﻿using Carmen.Mobile.Models;
+﻿using Android.Content;
+using Carmen.Mobile.Models;
+using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
 using System;
 using System.Collections.Generic;
@@ -8,30 +10,33 @@ using System.Threading.Tasks;
 
 namespace Carmen.Mobile.Views
 {
-    internal class RoleList : ContentPage
+    internal class BasicList<T> : ContentPage
+        where T : IBasicListItem
     {
-        readonly Roles model;
-        readonly Func<ItemRole[]> loader;
+        readonly ListModel<T> model;
+        readonly Func<T[]> loader;
+        readonly Action<T>? tap_action;
 
-        public RoleList(string title, Func<ItemRole[]> loader)
+        public BasicList(string title, Func<T[]> loader, Action<T>? tap_action = null)
         {
             model = new();
             BindingContext = model;
             Title = title;
             this.loader = loader;
-            Loaded += RoleList_Loaded;
+            this.tap_action = tap_action;
+            Loaded += BasicList_Loaded;
 
             var loading = new ActivityIndicator { IsRunning = true };
-            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(Roles.IsLoading)));
+            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ListModel<T>.IsLoading)));
 
             var empty = new Label { Text = "No roles" };
-            empty.SetBinding(Label.IsVisibleProperty, new Binding(nameof(Roles.IsEmpty)));
+            empty.SetBinding(Label.IsVisibleProperty, new Binding(nameof(ListModel<T>.IsEmpty)));
 
             var list = new ListView
             {
                 ItemTemplate = new DataTemplate(GenerateDataTemplate),
             };
-            list.SetBinding(ListView.ItemsSourceProperty, new Binding(nameof(Roles.Collection)));
+            list.SetBinding(ListView.ItemsSourceProperty, new Binding(nameof(ListModel<T>.Collection)));
 
             var grid = new Grid
             {
@@ -55,7 +60,7 @@ namespace Carmen.Mobile.Views
             Content = grid;
         }
 
-        private async void RoleList_Loaded(object? sender, EventArgs e)
+        private async void BasicList_Loaded(object? sender, EventArgs e)
         {
             var roles = await Task.Run(loader);
             model.Loaded(roles);
@@ -68,11 +73,19 @@ namespace Carmen.Mobile.Views
 
         private object GenerateDataTemplate()
         {
-            // BindingContext will be set to an ItemRole
+            // BindingContext will be set to an IBasicListItem
             var cell = new TextCell();
-            cell.SetBinding(TextCell.TextProperty, new Binding(nameof(ItemRole.MainText)));
-            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(ItemRole.DetailText)));
+            cell.SetBinding(TextCell.TextProperty, new Binding(nameof(IBasicListItem.MainText)));
+            cell.SetBinding(TextCell.DetailProperty, new Binding(nameof(IBasicListItem.DetailText)));
+            cell.Tapped += Cell_Tapped;
             return cell;
+        }
+
+        private void Cell_Tapped(object? sender, EventArgs e)
+        {
+            if (tap_action == null || sender is not Cell cell || cell.BindingContext is not T obj)
+                return;
+            tap_action(obj);
         }
     }
 }

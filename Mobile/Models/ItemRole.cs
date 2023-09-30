@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Carmen.Mobile.Models
 {
-    internal class ItemRole
+    internal class ItemRole : IBasicListItem
     {
         public Role Role { get; init; }
         public Item Item { get; init; }
