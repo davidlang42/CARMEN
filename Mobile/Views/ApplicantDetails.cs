@@ -38,8 +38,11 @@ namespace Carmen.Mobile.Views
             Loaded += ViewApplicant_Loaded;
             Unloaded += ViewApplicant_Unloaded;
 
-            var loading = new ActivityIndicator { IsRunning = true };
-            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoading)));
+            var loading = new VerticalStackLayout
+            {
+                new ActivityIndicator { IsRunning = true }
+            };
+            loading.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoading)));
 
 #if ANDROID || IOS
             var main = new ScrollView
@@ -246,15 +249,18 @@ namespace Carmen.Mobile.Views
 
         private View GenerateSideView()
         {
-            var activity = new ActivityIndicator();
-            activity.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
+            var loading = new VerticalStackLayout
+            {
+                new ActivityIndicator { IsRunning = true }
+            };
+            loading.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
             var image = new MC.Image();
             image.SetBinding(MC.Image.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
             image.AddTapHandler(Image_Clicked);
             return new Grid
             {
                 image,
-                activity
+                loading
             };
         }
 

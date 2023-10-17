@@ -27,8 +27,11 @@ namespace Carmen.Mobile.Views
             BindingContext = model;
             Title = "Cast of " + show_name;
 
-            var loading = new ActivityIndicator { IsRunning = true };
-            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(Applicants.IsLoading)));
+            var loading = new VerticalStackLayout
+            {
+                new ActivityIndicator { IsRunning = true }
+            };
+            loading.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(Applicants.IsLoading)));
 
             var search = new Entry
             {
