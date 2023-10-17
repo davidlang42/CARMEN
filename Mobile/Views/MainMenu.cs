@@ -27,6 +27,7 @@ namespace Carmen.Mobile.Views
             var loading = new VerticalStackLayout
             {
                 Spacing = 5,
+                HorizontalOptions = LayoutOptions.Center,
                 Children =
                 {
                     new ActivityIndicator { IsRunning = true },
@@ -42,6 +43,12 @@ namespace Carmen.Mobile.Views
             var buttons = new VerticalStackLayout
             {
                 Spacing = 5,
+#if IOS
+                // iOS doesn't expand properly when larger options are chosen, therefore its better to always fill the width
+                HorizontalOptions = LayoutOptions.Fill,
+#else
+                HorizontalOptions = LayoutOptions.Center,
+#endif
                 Children =
                 {
                     ButtonWithHandler("Edit Applicants by Name", ViewApplicantsName_Clicked),
@@ -55,7 +62,7 @@ namespace Carmen.Mobile.Views
 
             Content = new Grid
             {
-                HorizontalOptions = LayoutOptions.Center,
+                HorizontalOptions = LayoutOptions.Fill,
                 VerticalOptions = LayoutOptions.Center,
                 Margin = 10,
                 Children =
@@ -96,15 +103,18 @@ namespace Carmen.Mobile.Views
             };
             dropdown.SetBinding(Picker.ItemsSourceProperty, new Binding(dropdown_items_binding));
             button.Clicked += (s, e) => handler(s, e, dropdown.SelectedItem);
-            return new HorizontalStackLayout
+            var grid = new Grid
             {
-                Spacing = 5,
-                Children =
+                ColumnSpacing = 5,
+                ColumnDefinitions = new ColumnDefinitionCollection
                 {
-                    button,
-                    dropdown
+                    new ColumnDefinition(GridLength.Auto),
+                    new ColumnDefinition(GridLength.Star)
                 }
             };
+            grid.Add(button);
+            grid.Add(dropdown, 1);
+            return grid;
         }
 
         private async void MainMenu_Loaded(object? sender, EventArgs e)
