@@ -167,9 +167,12 @@ namespace Carmen.Mobile.Views
 
         private async void ViewApplicantsCriteria_Clicked(object? sender, EventArgs e, object selected_item)
         {
-            if (model.ShowName is not string show_name || selected_item is not Criteria criteria)
+            if (model.ShowName is not string show_name)
                 return;
-            await Navigation.PushAsync(new ApplicantList(connection, show_name, criteria.Name, (a, f) => FilterByCriteria(criteria, a, f), a => CriteriaDetail(criteria, a), a => SortByCriteria(criteria, a)));
+            if (selected_item is not Criteria criteria)
+                await DisplayAlert("CARMEN", "Please select a Criteria from the list next to the 'Edit Applicants By:' button.", "Ok");
+            else
+                await Navigation.PushAsync(new ApplicantList(connection, show_name, criteria.Name, (a, f) => FilterByCriteria(criteria, a, f), a => CriteriaDetail(criteria, a), a => SortByCriteria(criteria, a)));
         }
 
         static string? DescriptionDetail(Applicant a) => a.Description ?? "(Age/Gender not set)";
