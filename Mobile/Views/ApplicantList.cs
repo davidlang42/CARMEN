@@ -41,8 +41,11 @@ namespace Carmen.Mobile.Views
             BindingContext = model;
             Title = "Applicants for " + show_name;
 
-            var loading = new ActivityIndicator { IsRunning = true };
-            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(Applicants.IsLoading)));
+            var loading = new VerticalStackLayout
+            {
+                new ActivityIndicator { IsRunning = true }
+            };
+            loading.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(Applicants.IsLoading)));
 
             var search = new Entry
             {
@@ -87,7 +90,10 @@ namespace Carmen.Mobile.Views
                 BackgroundColor = Colors.SeaGreen
             };
             add.Clicked += AddButton_Clicked;
+#if !IOS
+            // iOS doesn't change text color back to normal when enabled, so never disable it
             add.SetBinding(Button.IsEnabledProperty, new Binding(nameof(Applicants.IsLoading), converter: new InvertBoolean()));
+#endif
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(add, row: 2, column: c++);
             grid.SetColumnSpan(loading, c);
@@ -116,7 +122,7 @@ namespace Carmen.Mobile.Views
 
         private async void AddButton_Clicked(object? sender, EventArgs e)
         {
-            if (context == null)
+            if (context == null || model.IsLoading)
                 return;
             model.Adding();
             var applicant = new Applicant { ShowRoot = context.ShowRoot };

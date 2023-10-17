@@ -29,8 +29,11 @@ namespace Carmen.Mobile.Views
             BindingContext = model;
             Title = show_name;
 
-            var loading = new ActivityIndicator { IsRunning = true };
-            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ListModel<ItemDetail>.IsLoading)));
+            var loading = new VerticalStackLayout
+            {
+                new ActivityIndicator { IsRunning = true }
+            };
+            loading.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(ListModel<ItemDetail>.IsLoading)));
 
             var empty = new Label { Text = "No items" };
             empty.SetBinding(Label.IsVisibleProperty, new Binding(nameof(ListModel<ItemDetail>.IsEmpty)));
@@ -97,9 +100,9 @@ namespace Carmen.Mobile.Views
             if (sender is not Cell cell || cell.BindingContext is not ItemDetail item || context == null)
                 return;
             await Navigation.PushAsync(new BasicList<RoleDetail>($"Roles in {item.Item.Name}", "No roles",
-                item.Item.Roles.InNameOrder().Select(r => new RoleDetail { Role = r }).ToArray,
+                () => item.Item.Roles.InNameOrder().Select(r => new RoleDetail { Role = r }).ToArray(),
                 rd => Navigation.PushAsync(new BasicList<ApplicantDetail>($"Cast for {rd.Role.Name}", "No cast",
-                    rd.Role.Cast.OrderBy(c => c.CastNumber).ThenBy(c => c.AlternativeCast?.Initial).Select(c => new ApplicantDetail { Applicant = c }).ToArray))));
+                    () => rd.Role.Cast.OrderBy(c => c.CastNumber).ThenBy(c => c.AlternativeCast?.Initial).Select(c => new ApplicantDetail { Applicant = c }).ToArray()))));
         }
     }
 }

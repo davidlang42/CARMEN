@@ -38,8 +38,11 @@ namespace Carmen.Mobile.Views
             Loaded += ViewApplicant_Loaded;
             Unloaded += ViewApplicant_Unloaded;
 
-            var loading = new ActivityIndicator { IsRunning = true };
-            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoading)));
+            var loading = new VerticalStackLayout
+            {
+                new ActivityIndicator { IsRunning = true }
+            };
+            loading.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoading)));
 
 #if ANDROID || IOS
             var main = new ScrollView
@@ -94,7 +97,10 @@ namespace Carmen.Mobile.Views
                 BackgroundColor = Colors.LightCoral
             };
             delete.Clicked += Delete_Clicked;
+#if !IOS
+            // iOS doesn't change text color back to normal when enabled, so never disable it
             delete.SetBinding(Button.IsEnabledProperty, new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean()));
+#endif
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(delete, row: 1, column: c++);
             var save = new Button
@@ -103,7 +109,10 @@ namespace Carmen.Mobile.Views
                 BackgroundColor = Colors.SeaGreen
             };
             save.Clicked += Save_Clicked;
+#if !IOS
+            // iOS doesn't change text color back to normal when enabled, so never disable it
             save.SetBinding(Button.IsEnabledProperty, new Binding(nameof(ApplicantModel.IsLoading), converter: new InvertBoolean()));
+#endif
             grid.ColumnDefinitions.Add(new(GridLength.Star));
             grid.Add(save, row: 1, column: c++);
             grid.SetColumnSpan(loading, c);
@@ -246,15 +255,18 @@ namespace Carmen.Mobile.Views
 
         private View GenerateSideView()
         {
-            var activity = new ActivityIndicator();
-            activity.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
+            var loading = new VerticalStackLayout
+            {
+                new ActivityIndicator { IsRunning = true }
+            };
+            loading.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(ApplicantModel.IsLoadingPhoto)));
             var image = new MC.Image();
             image.SetBinding(MC.Image.SourceProperty, new Binding(nameof(ApplicantModel.Photo)));
             image.AddTapHandler(Image_Clicked);
             return new Grid
             {
                 image,
-                activity
+                loading
             };
         }
 
@@ -304,7 +316,7 @@ namespace Carmen.Mobile.Views
 
         private async void Save_Clicked(object? sender, EventArgs e)
         {
-            if (context == null)
+            if (context == null || model.IsLoading)
                 return;
             if (!context.ChangeTracker.HasChanges())
             {
@@ -321,7 +333,7 @@ namespace Carmen.Mobile.Views
 
         private async void Delete_Clicked(object? sender, EventArgs e)
         {
-            if (context == null || model.Applicant is not Applicant applicant)
+            if (context == null || model.IsLoading || model.Applicant is not Applicant applicant)
                 return;
             if (await DisplayAlert($"Are you sure you want to delete '{model.FullName}'?", "This cannot be undone.", "Yes", "No"))
             {

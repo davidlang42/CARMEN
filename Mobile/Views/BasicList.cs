@@ -25,8 +25,11 @@ namespace Carmen.Mobile.Views
             this.tap_action = tap_action;
             Loaded += BasicList_Loaded;
 
-            var loading = new ActivityIndicator { IsRunning = true };
-            loading.SetBinding(ActivityIndicator.IsVisibleProperty, new Binding(nameof(ListModel<T>.IsLoading)));
+            var loading = new VerticalStackLayout
+            {
+                new ActivityIndicator { IsRunning = true }
+            };
+            loading.SetBinding(VerticalStackLayout.IsVisibleProperty, new Binding(nameof(ListModel<T>.IsLoading)));
 
             var empty = new Label { Text = empty_list };
             empty.SetBinding(Label.IsVisibleProperty, new Binding(nameof(ListModel<T>.IsEmpty)));
