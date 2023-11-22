@@ -68,6 +68,9 @@
 	<CodesignKey>Apple Distribution: David Lang (45435R99CA)</CodesignKey>
 	<CodesignProvision>CARMEN (Ad-Hoc)</CodesignProvision>
 	<ArchiveOnBuild>true</ArchiveOnBuild>
+	
+	<!-- https://github.com/dotnet/maui/issues/9176 -->
+	<UseInterpreter>true</UseInterpreter>
   </PropertyGroup>
 
 	<ItemGroup>
