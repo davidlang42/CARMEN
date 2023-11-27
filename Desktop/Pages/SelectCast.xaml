@@ -251,7 +251,7 @@
                 </TextBlock>
             </Grid>
             <ListBox x:Name="selectedList" Grid.Column="0" Grid.Row="1" Grid.RowSpan="7"
-                     SelectionMode="Extended" MouseDoubleClick="selectedList_MouseDoubleClick"
+                     SelectionMode="Extended" MouseDoubleClick="List_MouseDoubleClick"
                      HorizontalContentAlignment="Stretch"
                      ItemsSource="{Binding Source={StaticResource selectedApplicantsViewSource}}">
                 <ListBox.ItemContainerStyle>
@@ -345,7 +345,7 @@
                 <TextBlock Grid.Column="2" Text="{Binding Source={StaticResource allApplicantsViewSource}, Path=Count}" Margin="10 0" FontSize="18" VerticalAlignment="Center"/>
             </Grid>
             <ListBox x:Name="availableList" Grid.Column="2" Grid.Row="1" Grid.RowSpan="7"
-                     SelectionMode="Extended" MouseDoubleClick="availableList_MouseDoubleClick"
+                     SelectionMode="Extended" MouseDoubleClick="List_MouseDoubleClick"
                      HorizontalContentAlignment="Stretch"
                      ItemsSource="{Binding Source={StaticResource allApplicantsViewSource}}">
                 <ListBox.ItemContainerStyle>
@@ -476,7 +476,7 @@
                 <Button DockPanel.Dock="Bottom" Height="30" Margin="0 5 0 0" Click="DeleteSameCastSet_Click"
                         Content="Delete selected set"/>
                 <ListBox x:Name="selectedSameCastSetList" 
-                     SelectionMode="Extended" MouseDoubleClick="selectedSameCastSetList_MouseDoubleClick"
+                     SelectionMode="Extended"
                      ItemsSource="{Binding ElementName=sameCastSetsList, Path=SelectedItem.Applicants}">
                     <ListBox.ItemContainerStyle>
                         <Style TargetType="{x:Type ListBoxItem}">
@@ -505,7 +505,7 @@
                        Text="Available applicants"
                        Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}"/>
             <ListBox x:Name="availableSameCastSetList" Grid.Column="4" Grid.Row="2" Grid.RowSpan="7"
-                     SelectionMode="Extended" MouseDoubleClick="availableSameCastSetList_MouseDoubleClick"
+                     SelectionMode="Extended"
                      ItemsSource="{Binding Source={StaticResource allApplicantsViewSource}}"
                      Visibility="{Binding ElementName=sameCastSetsList, Path=SelectedItem, Converter={StaticResource hideIfNull}}">
                 <ListBox.ItemContainerStyle>

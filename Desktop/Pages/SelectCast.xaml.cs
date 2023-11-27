@@ -435,11 +435,41 @@ namespace Carmen.Desktop.Pages
                 overlay.Dispose();
         }
 
-        private void availableList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => addButton_Click(sender, e);
+        private void List_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var list_box = (ListBox)sender;
+            if (list_box.SelectedItem is not Applicant applicant)
+                return;
+            if (selectionList.SelectedItem is CastGroup cg)
+            {
+                //view.ShowDetailsWindow(connection, afr, Window.GetWindow(this), criterias, auditionEngine);
+                e.Handled = true;
+            }
+            else if (selectionList.SelectedItem is AlternativeCast ac)
+            {
+                e.Handled = true;
+            }
+            else if (selectionList.SelectedItem is Tag tag)
+            {
+                e.Handled = true;
+            }
+        }
 
-        private void selectedList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => removeButton_Click(sender, e);
+        //public void ShowDetailsWindow(ShowConnection connection, ApplicantForRole afr, Window owner, Criteria[] criterias, IAuditionEngine audition_engine)
+        //{
+        //    if (!detailsWindows.TryGetValue(afr, out var window) || window.IsClosed)
+        //    {
+        //        window = new ApplicantDetailsWindow(connection, criterias, audition_engine, afr)
+        //        {
+        //            Owner = owner
+        //        };
+        //        detailsWindows[afr] = window;
+        //        window.Show();
+        //    }
+        //    if (window.WindowState == WindowState.Minimized)
+        //        window.WindowState = WindowState.Normal;
+        //    window.Activate();
+        //}
 
         private void castStatusCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
             => ConfigureAllApplicantsFiltering();
@@ -490,12 +520,6 @@ namespace Carmen.Desktop.Pages
                 applicant.SameCastSet = null;
             }
         }
-
-        private void availableSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => addSameCastSetButton_Click(sender, e);
-
-        private void selectedSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => removeSameCastSetButton_Click(sender, e);
 
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
