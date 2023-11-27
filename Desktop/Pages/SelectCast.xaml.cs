@@ -464,7 +464,7 @@ namespace Carmen.Desktop.Pages
 
         Dictionary<Applicant, ApplicantDetailsWindow> detailsWindows = new();
 
-        void CloseDetailsWindows() //TODO exiting page by any means needs to close applicant details windows
+        void CloseDetailsWindows()
         {
             foreach (var window in detailsWindows.Values)
             {
@@ -487,6 +487,12 @@ namespace Carmen.Desktop.Pages
             if (window.WindowState == WindowState.Minimized)
                 window.WindowState = WindowState.Normal;
             window.Activate();
+        }
+
+        protected override void DisposeInternal()
+        {
+            CloseDetailsWindows();
+            base.DisposeInternal();
         }
 
         private void castStatusCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)

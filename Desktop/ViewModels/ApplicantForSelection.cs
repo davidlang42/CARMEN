@@ -26,8 +26,8 @@ namespace Carmen.Desktop.ViewModels
         public string LastName => Applicant.LastName;
 
         public IEnumerable<string> ExistingRoles => Enumerable.Empty<string>();
-        public IEnumerable<string> UnavailabilityReasons => Enumerable.Empty<string>(); //TODO anything to populate here?
-        public IEnumerable<string> IneligibilityReasons => Enumerable.Empty<string>(); //TODO anything to populate here?
+        public IEnumerable<string> UnavailabilityReasons => Enumerable.Empty<string>();
+        public IEnumerable<string> IneligibilityReasons => Enumerable.Empty<string>(); //TODO populate ineligability
 
         public abstract string SelectionText { get; }
 
