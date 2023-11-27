@@ -10,6 +10,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Carmen.Desktop.Windows
 {
@@ -59,9 +61,21 @@ namespace Carmen.Desktop.Windows
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (applicant.PhotoImageId is int photo_id)
-                ImageControl.Source = await ApplicantImage.CachedImage(applicant.PhotoImageId.Value, applicant.ShowRoot, LoadApplicantImage);
+            {
+                var source = await ApplicantImage.CachedImage(applicant.PhotoImageId.Value, applicant.ShowRoot, LoadApplicantImage);
+                ImageControl.Source = source;
+                var grey = new FormatConvertedBitmap();
+                grey.BeginInit();
+                grey.Source = (BitmapSource)source;
+                grey.DestinationFormat = PixelFormats.Gray32Float;
+                grey.EndInit();
+                ImageControlGrey.Source = grey;
+            }
             else
+            {
                 ImageControl.Source = null;
+                ImageControlGrey.Source = null;
+            }
         }
 
         /// <summary>Loads the applicant's photo in a dedicated db context to avoid concurrency issues</summary>

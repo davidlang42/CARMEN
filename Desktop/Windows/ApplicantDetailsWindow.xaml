@@ -19,6 +19,11 @@
         </cv:MultiConverter>
         <cv:HideIfEmpty x:Key="hideIfEmpty"/>
         <cv:AbilityMarkFormatter x:Key="abilityMarkFormatter"/>
+        <cv:MultiConverter x:Key="showIfFalse">
+            <cv:InvertBoolean/>
+            <BooleanToVisibilityConverter/>
+        </cv:MultiConverter>
+        <BooleanToVisibilityConverter x:Key="showIfTrue"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -161,6 +166,7 @@
                 </TextBlock>
             </CheckBox>
         </Grid>
-        <Image Grid.Column="1" Grid.RowSpan="3" x:Name="ImageControl" MouseLeftButtonDown="ImageControl_MouseLeftButtonDown"/>
+        <Image Grid.Column="1" Grid.RowSpan="3" x:Name="ImageControl" MouseLeftButtonDown="ImageControl_MouseLeftButtonDown" Visibility="{Binding IsSelected, Converter={StaticResource showIfTrue}}"/>
+        <Image Grid.Column="1" Grid.RowSpan="3" x:Name="ImageControlGrey" MouseLeftButtonDown="ImageControl_MouseLeftButtonDown" Visibility="{Binding IsSelected, Converter={StaticResource showIfFalse}}"/>
     </Grid>
 </Window>
