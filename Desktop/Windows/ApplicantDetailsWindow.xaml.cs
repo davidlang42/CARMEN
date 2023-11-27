@@ -28,17 +28,17 @@ namespace Carmen.Desktop.Windows
 
         public bool IsClosed { get; private set; } = false;
 
-        public ApplicantDetailsWindow(ShowConnection connection, Criteria[] criterias, IAuditionEngine audition_engine, ApplicantForRole applicant_for_role)
+        public ApplicantDetailsWindow(ShowConnection connection, Criteria[] criterias, IAuditionEngine audition_engine, ISelectableApplicant selectable_applicant)
         {
             this.connection = connection;
-            this.applicant = applicant_for_role.Applicant;
+            this.applicant = selectable_applicant.Applicant;
             Title = WindowTitleFor(applicant);
             InitializeComponent();
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
             criteriasViewSource.Source = criterias;
             overallAbilityCalculator = (OverallAbilityCalculator)FindResource(nameof(overallAbilityCalculator));
             overallAbilityCalculator.AuditionEngine = audition_engine;
-            DataContext = applicant_for_role; // must be done after setting up overallAbilityCalculator
+            DataContext = selectable_applicant; // must be done after setting up overallAbilityCalculator
         }
 
         private static string WindowTitleFor(Applicant a)
@@ -96,9 +96,9 @@ namespace Carmen.Desktop.Windows
 
         private void ImageControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (DataContext is ApplicantForRole afr)
+            if (DataContext is ISelectableApplicant sa)
             {
-                afr.IsSelected = !afr.IsSelected;
+                sa.IsSelected = !sa.IsSelected;
             }
         }
     }

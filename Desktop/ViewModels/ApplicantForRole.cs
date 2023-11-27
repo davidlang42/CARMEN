@@ -14,7 +14,7 @@ using System.Windows;
 
 namespace Carmen.Desktop.ViewModels
 {
-    public class ApplicantForRole : INotifyPropertyChanged
+    public class ApplicantForRole : ISelectableApplicant, INotifyPropertyChanged
     {
         public Applicant Applicant { get; init; }
         public Criteria[] PrimaryCriterias { get; init; }
@@ -96,6 +96,8 @@ namespace Carmen.Desktop.ViewModels
         public string CommaSeparatedUnavailabilityReason => string.Join(", ", UnavailabilityReasons);
 
         public string CommaSeparatedIneligibilityReason => string.Join(", ", IneligibilityReasons);
+
+        public string SelectionText => $"Allocate {RoleName} to {FirstName}";
 
         public ApplicantForRole(IAllocationEngine engine, Applicant applicant, Role role, Criteria[] primary_criterias)
         {
