@@ -452,12 +452,12 @@ namespace Carmen.Desktop.Pages
             }
             else if (selectionList.SelectedItem is AlternativeCast ac)
             {
-                //TODO ApplicantForAlternativeCast
+                ShowDetailsWindow(new ApplicantForAlternativeCast(applicant, criterias, ac));
                 e.Handled = true;
             }
             else if (selectionList.SelectedItem is Tag tag)
             {
-                //TODO ApplicantForAlternativeTag
+                ShowDetailsWindow(new ApplicantForTag(applicant, criterias, tag));
                 e.Handled = true;
             }
         }
