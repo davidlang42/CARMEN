@@ -79,5 +79,13 @@ namespace Carmen.Desktop.Windows
                 Close();
             }
         }
+
+        private void ImageControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is ApplicantForRole afr)
+            {
+                afr.IsSelected = !afr.IsSelected;
+            }
+        }
     }
 }

@@ -161,6 +161,6 @@
                 </TextBlock>
             </CheckBox>
         </Grid>
-        <Image Grid.Column="1" Grid.RowSpan="3" x:Name="ImageControl"/>
+        <Image Grid.Column="1" Grid.RowSpan="3" x:Name="ImageControl" MouseLeftButtonDown="ImageControl_MouseLeftButtonDown"/>
     </Grid>
 </Window>
