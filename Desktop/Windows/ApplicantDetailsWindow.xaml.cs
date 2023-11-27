@@ -10,6 +10,8 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 
 namespace Carmen.Desktop.Windows
 {
@@ -26,17 +28,17 @@ namespace Carmen.Desktop.Windows
 
         public bool IsClosed { get; private set; } = false;
 
-        public ApplicantDetailsWindow(ShowConnection connection, Criteria[] criterias, IAuditionEngine audition_engine, ApplicantForRole applicant_for_role)
+        public ApplicantDetailsWindow(ShowConnection connection, Criteria[] criterias, IAuditionEngine audition_engine, ISelectableApplicant selectable_applicant)
         {
             this.connection = connection;
-            this.applicant = applicant_for_role.Applicant;
+            this.applicant = selectable_applicant.Applicant;
             Title = WindowTitleFor(applicant);
             InitializeComponent();
             criteriasViewSource = (CollectionViewSource)FindResource(nameof(criteriasViewSource));
             criteriasViewSource.Source = criterias;
             overallAbilityCalculator = (OverallAbilityCalculator)FindResource(nameof(overallAbilityCalculator));
             overallAbilityCalculator.AuditionEngine = audition_engine;
-            DataContext = applicant_for_role; // must be done after setting up overallAbilityCalculator
+            DataContext = selectable_applicant; // must be done after setting up overallAbilityCalculator
         }
 
         private static string WindowTitleFor(Applicant a)
@@ -59,9 +61,21 @@ namespace Carmen.Desktop.Windows
         private async void Window_Loaded(object sender, RoutedEventArgs e)
         {
             if (applicant.PhotoImageId is int photo_id)
-                ImageControl.Source = await ApplicantImage.CachedImage(applicant.PhotoImageId.Value, applicant.ShowRoot, LoadApplicantImage);
+            {
+                var source = await ApplicantImage.CachedImage(applicant.PhotoImageId.Value, applicant.ShowRoot, LoadApplicantImage);
+                ImageControl.Source = source;
+                var grey = new FormatConvertedBitmap();
+                grey.BeginInit();
+                grey.Source = (BitmapSource)source;
+                grey.DestinationFormat = PixelFormats.Gray32Float;
+                grey.EndInit();
+                ImageControlGrey.Source = grey;
+            }
             else
+            {
                 ImageControl.Source = null;
+                ImageControlGrey.Source = null;
+            }
         }
 
         /// <summary>Loads the applicant's photo in a dedicated db context to avoid concurrency issues</summary>
@@ -77,6 +91,14 @@ namespace Carmen.Desktop.Windows
             {
                 e.Handled = true;
                 Close();
+            }
+        }
+
+        private void ImageControl_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (DataContext is ISelectableApplicant sa)
+            {
+                sa.IsSelected = !sa.IsSelected;
             }
         }
     }

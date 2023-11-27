@@ -64,9 +64,13 @@ namespace Carmen.Desktop.Pages
         private Tag[] tags => _tags
             ?? throw new ApplicationException($"Tried to used {nameof(tags)} before it was loaded.");
 
-        private ISelectionEngine? _engine;
-        private ISelectionEngine engine => _engine
-            ?? throw new ApplicationException($"Tried to used {nameof(engine)} before it was loaded.");
+        private IAuditionEngine? _auditionEngine;
+        private IAuditionEngine auditionEngine => _auditionEngine
+            ?? throw new ApplicationException($"Tried to used {nameof(auditionEngine)} before it was loaded.");
+
+        private ISelectionEngine? _selectionEngine;
+        private ISelectionEngine selectionEngine => _selectionEngine
+            ?? throw new ApplicationException($"Tried to used {nameof(selectionEngine)} before it was loaded.");
 
         private CastList? _castList;
         private CastList castList => _castList
@@ -141,22 +145,22 @@ namespace Carmen.Desktop.Pages
             using (loading.Segment(nameof(ISelectionEngine), "Selection engine"))
             {
                 var show_root = context.ShowRoot;
-                IAuditionEngine audition_engine = ParseAuditionEngine() switch
+                _auditionEngine = ParseAuditionEngine() switch
                 {
                     nameof(NeuralAuditionEngine) => new NeuralAuditionEngine(criterias, NeuralEngineConfirm),
                     nameof(WeightedSumEngine) => new WeightedSumEngine(criterias),
                     _ => throw new ArgumentException($"Audition engine not handled: {ParseAuditionEngine()}")
                 };
-                applicantDescription.AuditionEngine = audition_engine;
-                _engine = suitabilityCalculator.SelectionEngine = ParseSelectionEngine() switch
+                applicantDescription.AuditionEngine = _auditionEngine;
+                _selectionEngine = suitabilityCalculator.SelectionEngine = ParseSelectionEngine() switch
                 {
-                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
-                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(TopPairsSatEngine) => new TopPairsSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
-                    nameof(BestPairsSatEngine) => new BestPairsSatEngine(audition_engine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(HeuristicSelectionEngine) => new HeuristicSelectionEngine(_auditionEngine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection),
+                    nameof(ChunkedPairsSatEngine) => new ChunkedPairsSatEngine(_auditionEngine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(TopPairsSatEngine) => new TopPairsSatEngine(_auditionEngine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(ThreesACrowdSatEngine) => new ThreesACrowdSatEngine(_auditionEngine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(HybridPairsSatEngine) => new HybridPairsSatEngine(_auditionEngine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(RankDifferenceSatEngine) => new RankDifferenceSatEngine(_auditionEngine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
+                    nameof(BestPairsSatEngine) => new BestPairsSatEngine(_auditionEngine, alternativeCasts, show_root.CastNumberOrderBy, show_root.CastNumberOrderDirection, criterias),
                     _ => throw new ArgumentException($"Allocation engine not handled: {ParseSelectionEngine()}")
                 };
             }
@@ -191,9 +195,9 @@ namespace Carmen.Desktop.Pages
                     using (var processing = new LoadingOverlay(this).AsSegment(nameof(SelectCast) + nameof(PreSaveChecks), "Processing..."))
                     {
                         using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
-                            await engine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
+                            await selectionEngine.BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
                         using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
-                            await engine.AllocateCastNumbers(applicants);
+                            await selectionEngine.AllocateCastNumbers(applicants);
                     }
                     var updated_inconsistent_applicants = applicants
                         .Where(a => a.CastGroup is CastGroup cg && (a.CastNumber == null || cg.AlternateCasts != (a.AlternativeCast != null)));
@@ -211,7 +215,7 @@ namespace Carmen.Desktop.Pages
                 }
             }
             using (new LoadingOverlay(this).AsSegment(nameof(IAuditionEngine) + nameof(IAuditionEngine.UserSelectedCast), "Learning...", "Cast selected by the user"))
-                await engine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted));
+                await selectionEngine.UserSelectedCast(applicants.Where(a => a.IsAccepted), applicants.Where(a => !a.IsAccepted));
             return true;
         }
 
@@ -230,28 +234,28 @@ namespace Carmen.Desktop.Pages
                 if (settings.SelectCastGroups == true)
                     ClearCastGroups();
                 if (settings.SelectCastGroups != false)
-                    await engine.SelectCastGroups(applicants, castGroups);
+                    await selectionEngine.SelectCastGroups(applicants, castGroups);
             }
             using (processing.Segment(nameof(ISelectionEngine.BalanceAlternativeCasts), "Balancing alternating casts"))
             {
                 if (settings.BalanceAlternativeCasts == true)
                     ClearAlternativeCasts();
                 if (settings.BalanceAlternativeCasts != false)
-                    await engine .BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
+                    await selectionEngine .BalanceAlternativeCasts(applicants, context.SameCastSets.Local);
             }
             using (processing.Segment(nameof(ISelectionEngine.AllocateCastNumbers), "Allocating cast numbers"))
             {
                 if (settings.AllocateCastNumbers == true)
                     ClearCastNumbers();
                 if (settings.AllocateCastNumbers != false)
-                    await engine.AllocateCastNumbers(applicants);
+                    await selectionEngine.AllocateCastNumbers(applicants);
             }
             using (processing.Segment(nameof(ISelectionEngine.ApplyTags), "Applying tags"))
             {
                 if (settings.ApplyTags == true)
                     ClearTags();
                 if (settings.ApplyTags != false)
-                    await engine.ApplyTags(applicants, tags);
+                    await selectionEngine.ApplyTags(applicants, tags);
             }
         }
 
@@ -435,11 +439,43 @@ namespace Carmen.Desktop.Pages
                 overlay.Dispose();
         }
 
-        private void availableList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => addButton_Click(sender, e);
+        private void List_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var list_box = (ListBox)sender;
+            if (list_box.SelectedItem is Applicant applicant)
+            {
+                ShowDetailsWindow(new ApplicantForSelection(applicant, criterias));
+                e.Handled = true;
+            }
+        }
 
-        private void selectedList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => removeButton_Click(sender, e);
+        Dictionary<Applicant, ApplicantDetailsWindow> detailsWindows = new();
+
+        void ShowDetailsWindow(ApplicantForSelection afs)
+        {
+            if (!detailsWindows.TryGetValue(afs.Applicant, out var window) || window.IsClosed)
+            {
+                window = new ApplicantDetailsWindow(connection, criterias, auditionEngine, afs)
+                {
+                    Owner = Window.GetWindow(this)
+                };
+                detailsWindows[afs.Applicant] = window;
+                window.Show();
+            }
+            if (window.WindowState == WindowState.Minimized)
+                window.WindowState = WindowState.Normal;
+            window.Activate();
+        }
+
+        protected override void DisposeInternal()
+        {
+            foreach (var window in detailsWindows.Values)
+            {
+                window.Close();
+            }
+            detailsWindows.Clear();
+            base.DisposeInternal();
+        }
 
         private void castStatusCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
             => ConfigureAllApplicantsFiltering();
@@ -490,12 +526,6 @@ namespace Carmen.Desktop.Pages
                 applicant.SameCastSet = null;
             }
         }
-
-        private void availableSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => addSameCastSetButton_Click(sender, e);
-
-        private void selectedSameCastSetList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
-            => removeSameCastSetButton_Click(sender, e);
 
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
@@ -566,7 +596,7 @@ namespace Carmen.Desktop.Pages
         {
             IEnumerable<SameCastSet> new_same_cast_sets;
             using (new LoadingOverlay(this).AsSegment(nameof(SelectCast) + nameof(PreSaveChecks), "Processing...", "Detecting siblings"))
-                new_same_cast_sets = await engine.DetectFamilies(applicants);
+                new_same_cast_sets = await selectionEngine.DetectFamilies(applicants);
             var list = (IList)sameCastSetsViewSource.Source;
             foreach (var new_same_cast_set in new_same_cast_sets)
                 list.Add(new_same_cast_set);
