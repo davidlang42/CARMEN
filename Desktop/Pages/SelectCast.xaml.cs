@@ -441,37 +441,15 @@ namespace Carmen.Desktop.Pages
 
         private void List_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            //TODO changing the selection status via >/>>/</<< doesn't update details window
             var list_box = (ListBox)sender;
-            if (list_box.SelectedItem is not Applicant applicant)
-                return;
-            if (selectionList.SelectedItem is CastGroup cg)
+            if (list_box.SelectedItem is Applicant applicant)
             {
-                ShowDetailsWindow(new ApplicantForCastGroup(applicant, criterias, cg));
-                e.Handled = true;
-            }
-            else if (selectionList.SelectedItem is AlternativeCast ac)
-            {
-                ShowDetailsWindow(new ApplicantForAlternativeCast(applicant, criterias, ac));
-                e.Handled = true;
-            }
-            else if (selectionList.SelectedItem is Tag tag)
-            {
-                ShowDetailsWindow(new ApplicantForTag(applicant, criterias, tag));
+                ShowDetailsWindow(new ApplicantForSelection(applicant, criterias));
                 e.Handled = true;
             }
         }
 
         Dictionary<Applicant, ApplicantDetailsWindow> detailsWindows = new();
-
-        void CloseDetailsWindows()
-        {
-            foreach (var window in detailsWindows.Values)
-            {
-                window.Close();
-            }
-            detailsWindows.Clear();
-        }
 
         void ShowDetailsWindow(ApplicantForSelection afs)
         {
@@ -491,7 +469,11 @@ namespace Carmen.Desktop.Pages
 
         protected override void DisposeInternal()
         {
-            CloseDetailsWindows();
+            foreach (var window in detailsWindows.Values)
+            {
+                window.Close();
+            }
+            detailsWindows.Clear();
             base.DisposeInternal();
         }
 
@@ -549,7 +531,6 @@ namespace Carmen.Desktop.Pages
         {
             if (suitabilityComparer != null)
                 suitabilityComparer.SelectedCastGroupOrTag = selectionList.SelectedItem;
-            CloseDetailsWindows();
             RefreshMainPanel();
         }
 

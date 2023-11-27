@@ -15,7 +15,7 @@ namespace Carmen.Desktop.ViewModels
         bool IsSelected { get; set; }
         string FirstName { get; }
         string LastName { get; }
-        string SelectionText { get; }
+        string? SelectionText { get; }
         IEnumerable<string> ExistingRoles { get; }
         IEnumerable<string> UnavailabilityReasons { get; }
         IEnumerable<string> IneligibilityReasons { get; }

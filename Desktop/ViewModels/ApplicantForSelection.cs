@@ -13,23 +13,27 @@ using System.Threading.Tasks;
 
 namespace Carmen.Desktop.ViewModels
 {
-    public abstract class ApplicantForSelection : ISelectableApplicant, INotifyPropertyChanged
+    public class ApplicantForSelection : ISelectableApplicant, INotifyPropertyChanged
     {
         public Applicant Applicant { get; init; }
         public Criteria[] PrimaryCriterias { get; init; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public abstract bool IsSelected { get; set; }
+        public bool IsSelected
+        {
+            get => true; // so that colour images are shown
+            set => throw new InvalidOperationException();
+        }
 
         public string FirstName => Applicant.FirstName;
         public string LastName => Applicant.LastName;
 
         public IEnumerable<string> ExistingRoles => Enumerable.Empty<string>();
         public IEnumerable<string> UnavailabilityReasons => Enumerable.Empty<string>();
-        public IEnumerable<string> IneligibilityReasons => Enumerable.Empty<string>(); //TODO populate ineligability
+        public IEnumerable<string> IneligibilityReasons => Enumerable.Empty<string>();
 
-        public abstract string SelectionText { get; }
+        public string? SelectionText => null; // this hides the checkbox completely
 
         public ApplicantForSelection(Applicant applicant, Criteria[] criterias)
         {

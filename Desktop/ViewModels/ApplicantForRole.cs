@@ -97,7 +97,7 @@ namespace Carmen.Desktop.ViewModels
 
         public string CommaSeparatedIneligibilityReason => string.Join(", ", IneligibilityReasons);
 
-        public string SelectionText => $"Allocate {RoleName} to {FirstName}";
+        public string? SelectionText => $"Allocate {RoleName} to {FirstName}";
 
         public ApplicantForRole(IAllocationEngine engine, Applicant applicant, Role role, Criteria[] primary_criterias)
         {

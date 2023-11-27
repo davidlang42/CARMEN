@@ -24,6 +24,7 @@
             <BooleanToVisibilityConverter/>
         </cv:MultiConverter>
         <BooleanToVisibilityConverter x:Key="showIfTrue"/>
+        <cv:CollapsedIfNull x:Key="collapsedIfNull"/>
     </Window.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -157,7 +158,7 @@
             </StackPanel>
         </ScrollViewer>
         <Grid Grid.Row="2" Margin="5">
-            <CheckBox IsChecked="{Binding IsSelected}">
+            <CheckBox IsChecked="{Binding IsSelected}" Visibility="{Binding SelectionText, Converter={StaticResource collapsedIfNull}}">
                 <TextBlock>
                     <Run Text="{Binding SelectionText, Mode=OneWay}"/>
                 </TextBlock>
