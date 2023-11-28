@@ -228,6 +228,7 @@ namespace Carmen.Desktop.Pages
             };
             if (dialog.ShowDialog() != true)
                 return;
+            ClearMainPanel();
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
             {
@@ -527,6 +528,12 @@ namespace Carmen.Desktop.Pages
             }
         }
 
+        private void ClearMainPanel()
+        {
+            selectionList.SelectedItem = null;
+            RefreshMainPanel();
+        }
+
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (suitabilityComparer != null)
@@ -749,7 +756,7 @@ namespace Carmen.Desktop.Pages
             if (collection.View is ListCollectionView view)
                 view.CustomSort = suitabilityComparer;
         }
-
+                
         private void GroupByCastGroupCheckbox_Changed(object sender, RoutedEventArgs e)
         {
             if (selectionList?.SelectedItem != null)
@@ -778,13 +785,12 @@ namespace Carmen.Desktop.Pages
             // sort by cast group (if grouping)
             if (GroupByCastGroup)
             {
-                if (a1.CastGroup is not CastGroup cg1)
-                    return int.MinValue;
-                if (a2.CastGroup is not CastGroup cg2)
-                    return int.MaxValue;
-                if (cg1.Order > cg2.Order)
+                // Note: if CastGroup.Order somehow gets set to int.MinValue, it will be considered the same ordering as no cast group
+                var cg1 = a1.CastGroup?.Order ?? int.MinValue;
+                var cg2 = a2.CastGroup?.Order ?? int.MinValue;
+                if (cg1 > cg2)
                     return 1;
-                if (cg1.Order < cg2.Order)
+                if (cg1 < cg2)
                     return -1;
             }
             // sort by suitability

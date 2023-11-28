@@ -1,6 +1,7 @@
 ﻿using Carmen.Desktop.ViewModels;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Structure;
+using Carmen.ShowModel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace Carmen.Desktop.Converters
             if (parameter is not CollectionViewSource view_source)
                 throw new ApplicationException("ConverterParameter must be a CollectionViewSource representing the CastGroups.");
             if (value is ObservableCollection<CountByGroup> collection && view_source.Source is IList list)
-                return list.OfType<CastGroup>().Select(g => new NullableCountByGroup(collection, g)).ToList();
+                return list.OfType<CastGroup>().InOrder().Select(g => new NullableCountByGroup(collection, g)).ToList();
             return value;
         }
 

@@ -23,7 +23,7 @@ namespace Carmen.Desktop.ViewModels
         public bool IsSelected
         {
             get => true; // so that colour images are shown
-            set => throw new InvalidOperationException();
+            set { }
         }
 
         public string FirstName => Applicant.FirstName;
