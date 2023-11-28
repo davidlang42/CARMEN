@@ -228,6 +228,7 @@ namespace Carmen.Desktop.Pages
             };
             if (dialog.ShowDialog() != true)
                 return;
+            ClearMainPanel();
             using var processing = new LoadingOverlay(this).AsSegment(nameof(selectCastButton_Click), "Processing...");
             using (processing.Segment(nameof(ISelectionEngine.SelectCastGroups), "Selecting applicants"))
             {
@@ -525,6 +526,12 @@ namespace Carmen.Desktop.Pages
                 set.Applicants.Remove(applicant);
                 applicant.SameCastSet = null;
             }
+        }
+
+        private void ClearMainPanel()
+        {
+            selectionList.SelectedItem = null;
+            RefreshMainPanel();
         }
 
         private void selectionList_SelectionChanged(object sender, SelectionChangedEventArgs e)
