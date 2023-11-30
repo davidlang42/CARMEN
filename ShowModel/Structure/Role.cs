@@ -82,12 +82,15 @@ namespace Carmen.ShowModel.Structure
         {
             if (Cast.Count == 0)
                 return RoleStatus.NotCast;
-            if (CountByGroups.Count == 0 || CountByGroups.All(cbg => cbg.Count == 0))
+            var required_cast_groups = CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
+            if (required_cast_groups.Count == 0)
                 return RoleStatus.OverCast;
             bool under_cast = false;
             foreach (var cast_by_group in Cast.GroupBy(a => a.CastGroup))
             {
                 if (cast_by_group.Key is not CastGroup cast_group)
+                    return RoleStatus.OverCast;
+                if (!required_cast_groups.Remove(cast_group)) // if this cast_group isn't required
                     return RoleStatus.OverCast;
                 var group_casts = cast_group.AlternateCasts ? alternative_casts : new AlternativeCast?[] { null };
                 var required_count = CountFor(cast_group);
@@ -100,7 +103,7 @@ namespace Carmen.ShowModel.Structure
                         under_cast = true; // don't return yet, because if any count is over cast, we want to return that first
                 }
             }
-            if (under_cast)
+            if (under_cast || required_cast_groups.Count > 0)
                 return RoleStatus.UnderCast;
             return RoleStatus.FullyCast;
         }
