@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace Carmen.CastingEngine
     public class FunctionCache<T, U>
         where T : notnull
     {
-        readonly Dictionary<T, U> cache = new();
+        readonly ConcurrentDictionary<T, U> cache = new();
 
         public Func<T, U>? Function { get; set; }
 
@@ -24,7 +25,7 @@ namespace Carmen.CastingEngine
             {
                 var function = Function ?? function_override ?? throw new ArgumentException("Function not set");
                 value = function(input);
-                cache.Add(input, value);
+                cache[input] = value;
             }
             return value;
         }
@@ -34,7 +35,7 @@ namespace Carmen.CastingEngine
 
     public class FunctionCache<T1, T2, U>
     {
-        readonly Dictionary<(T1, T2), U> cache = new();
+        readonly ConcurrentDictionary<(T1, T2), U> cache = new();
 
         public Func<T1, T2, U>? Function { get; set; }
 
@@ -49,7 +50,7 @@ namespace Carmen.CastingEngine
             {
                 var function = Function ?? function_override ?? throw new ArgumentException("Function not set");
                 value = function(input1, input2);
-                cache.Add((input1, input2), value);
+                cache[(input1, input2)] = value;
             }
             return value;
         }
