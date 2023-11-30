@@ -33,7 +33,7 @@ namespace Carmen.Desktop.ViewModels
             : base(role, cast_groups_by_cast)
         {
             requiredCastGroups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
-            Applicants = applicants.Select(a =>
+            Applicants = applicants.AsParallel().Select(a =>
             {
                 var av = new ApplicantForRole(engine, a, role, primary_criterias);
                 av.PropertyChanged += ApplicantForRole_PropertyChanged;
