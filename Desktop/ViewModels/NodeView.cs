@@ -28,6 +28,7 @@ namespace Carmen.Desktop.ViewModels
             {
                 SetValue(IsSelectedProperty, value);
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(IsVisible));
             }
         }
 
@@ -79,7 +80,7 @@ namespace Carmen.Desktop.ViewModels
 
         public NodeView[] ChildrenInOrder { get; init; }
 
-        public bool IsVisible => (ShowCompleted || Status != ProcessStatus.Complete)
+        public bool IsVisible => IsSelected || (ShowCompleted || Status != ProcessStatus.Complete)
             && (Name.Contains(FilterText, StringComparison.OrdinalIgnoreCase) || ChildrenInOrder.Any(c => c.IsVisible));
 
         private bool showCompleted = true;
@@ -123,6 +124,8 @@ namespace Carmen.Desktop.ViewModels
 
         private async void Child_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(IsVisible))
+                OnPropertyChanged(nameof(IsVisible));
             if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(Status))
                 await UpdateAsync();
         }
