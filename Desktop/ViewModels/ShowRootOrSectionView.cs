@@ -103,10 +103,11 @@ namespace Carmen.Desktop.ViewModels
         {
             get
             {
+                uint[]? sum_of_roles_count = null;
                 var colors = new string[castGroups.Length];
                 for (var i = 0; i < colors.Length; i++)
                     if (CountByGroups[i].Count is uint required_count
-                        && SumOfRolesCount[i] != required_count)
+                        && (sum_of_roles_count ??= SumOfRolesCount)[i] != required_count) // avoid repeated calculation of SumOfRolesCount, but also only calculate if needed
                         colors[i] = HighlightError.ERROR_COLOR;
                     else
                         colors[i] = HighlightError.TEXTBOX_COLOR;
