@@ -368,6 +368,9 @@ namespace Carmen.Desktop.Pages
         private void showCompleted_Unchecked(object sender, RoutedEventArgs e)
             => rootNodeView.SetShowCompleted(false);
 
+        private void rolesFilterText_TextChanged(object sender, TextChangedEventArgs e)
+            => rootNodeView.SetFilterText(rolesFilterText.Text);
+
         private void ListViewItem_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             var list_view_item = (ListViewItem)sender;

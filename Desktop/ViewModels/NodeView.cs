@@ -79,7 +79,8 @@ namespace Carmen.Desktop.ViewModels
 
         public NodeView[] ChildrenInOrder { get; init; }
 
-        public bool IsVisible => ShowCompleted || Status != ProcessStatus.Complete;
+        public bool IsVisible => (ShowCompleted || Status != ProcessStatus.Complete)
+            && (Name.Contains(FilterText, StringComparison.OrdinalIgnoreCase) || ChildrenInOrder.Any(c => c.IsVisible));
 
         private bool showCompleted = true;
         public bool ShowCompleted
@@ -90,6 +91,19 @@ namespace Carmen.Desktop.ViewModels
                 if (showCompleted == value)
                     return;
                 showCompleted = value;
+                OnPropertyChanged(nameof(IsVisible));
+            }
+        }
+
+        private string filterText = "";
+        public string FilterText
+        {
+            get => filterText;
+            set
+            {
+                if (filterText == value)
+                    return;
+                filterText = value;
                 OnPropertyChanged(nameof(IsVisible));
             }
         }
@@ -160,6 +174,14 @@ namespace Carmen.Desktop.ViewModels
             foreach (var child in ChildrenInOrder)
                 child.SetShowCompleted(value);
             ShowCompleted = value;
+        }
+
+        /// <summary>Recursively set FilterText to the given value</summary>
+        public void SetFilterText(string value)
+        {
+            foreach (var child in ChildrenInOrder)
+                child.SetFilterText(value);
+            FilterText = value;
         }
 
         /// <summary>Searches recursively for the RoleNodeView representing the given Role, and marks it as selected.
