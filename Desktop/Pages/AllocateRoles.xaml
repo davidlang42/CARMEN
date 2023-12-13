@@ -248,16 +248,19 @@
                                 <DataTemplate>
                                     <CheckBox IsChecked="{Binding SelectedRole.IsSelected}" IsEnabled="{Binding SelectedRole, Converter={StaticResource falseIfNull}}"
               VerticalAlignment="Center">
-                                        <TextBlock TextWrapping="Wrap">
-                                            <TextBlock.Text>
-                                                <MultiBinding Converter="{StaticResource fullName}">
-                                                    <MultiBinding.Bindings>
-                                                        <Binding Path="Applicant.FirstName"/>
-                                                        <Binding Path="Applicant.LastName"/>
-                                                    </MultiBinding.Bindings>
-                                                </MultiBinding>
-                                            </TextBlock.Text>
-                                        </TextBlock>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock TextWrapping="Wrap" Text="{Binding SelectedRole.Suitability, Converter={StaticResource doubleToPercentage}, StringFormat='(\{0\}) '}"/>
+                                            <TextBlock TextWrapping="Wrap">
+                                                <TextBlock.Text>
+                                                    <MultiBinding Converter="{StaticResource fullName}">
+                                                        <MultiBinding.Bindings>
+                                                            <Binding Path="Applicant.FirstName"/>
+                                                            <Binding Path="Applicant.LastName"/>
+                                                        </MultiBinding.Bindings>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </StackPanel>
                                     </CheckBox>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
