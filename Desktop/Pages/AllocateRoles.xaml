@@ -185,15 +185,93 @@
                         <Grid Grid.Row="4" Grid.ColumnSpan="3" Margin="0 10 0 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Button HorizontalAlignment="Left" Width="250" Height="35" Margin="0 0 0 5"
                                 Content="Allocate balanced cast to selected roles"
                                 Click="BalanceCastButton_Click" />
-                            <Button Grid.Column="1" Width="160" Height="35" Margin="0 0 0 5"
+                            <Button Grid.Column="1" HorizontalAlignment="Left" Width="250" Height="35" Margin="0 0 0 5"
+                                Content="Allocate selected roles in parallel"
+                                Click="ParallelCastingButton_Click" />
+                            <Button Grid.Column="2" Width="160" Height="35" Margin="0 0 0 5"
                                 IsCancel="True" Content="Return to Main Menu"
                                 Click="MainMenuButton_Click" />
                         </Grid>
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:ParallelCastingView}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.ColumnSpan="2" Text="{Binding Title}" FontSize="22" Margin="0 0 0 10"/>
+                        <TextBlock Grid.Row="1" Text="Roles:" FontSize="18"/>
+                        <TextBlock Grid.Row="1" Grid.Column="3" Text="Available Applicants:" FontSize="18"/>
+                        <ListBox Grid.Row="2" SelectedItem="{Binding SelectedRole}"
+                 FontSize="14"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ItemsSource="{Binding Roles}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <ListBox Grid.Row="2" Grid.Column="3"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                 ItemsSource="{Binding Applicants}">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
+                                    <Setter Property="ContextMenu" Value="{Binding ContextMenu}"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.ItemTemplate>
+                                <DataTemplate>
+                                    <CheckBox IsChecked="{Binding SelectedRole.IsSelected}"
+              VerticalAlignment="Center">
+                                        <TextBlock TextWrapping="Wrap">
+                                            <TextBlock.Text>
+                                                <MultiBinding Converter="{StaticResource fullName}">
+                                                    <MultiBinding.Bindings>
+                                                        <Binding Path="Applicant.FirstName"/>
+                                                        <Binding Path="Applicant.LastName"/>
+                                                    </MultiBinding.Bindings>
+                                                </MultiBinding>
+                                            </TextBlock.Text>
+                                        </TextBlock>
+                                    </CheckBox>
+                                </DataTemplate>
+                            </ListBox.ItemTemplate>
+                        </ListBox>
+                        <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button IsCancel="True" Width="100" Height="35" Margin="5 5 5 0" Click="ParallelCancelButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Times" Width="12" Margin="2 0" Foreground="DimGray"/>
+                                    <TextBlock Text="Cancel" Margin="2 0"/>
+                                </StackPanel>
+                            </Button>
+                            <Button IsDefault="False" Width="100" Height="35" Margin="5 5 0 0" Click="ParallelSaveButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Check" Width="12" Margin="2 0" Foreground="MediumBlue"/>
+                                    <TextBlock Text="Save" Margin="2 0"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:RoleWithApplicantsView}">
