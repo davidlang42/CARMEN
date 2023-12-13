@@ -575,5 +575,13 @@ namespace Carmen.Desktop.Pages
         {
             //TODO
         }
+
+        private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (applicantsPanel.Content is ParallelCastingView view)
+            {
+                view.SelectedRole = null;
+            }
+        }
     }
 }

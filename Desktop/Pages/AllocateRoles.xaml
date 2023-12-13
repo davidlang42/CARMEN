@@ -20,6 +20,10 @@
         <cv:DoubleToPercentage x:Key="doubleToPercentage"/>
         <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
         <cv:TrueIfNull x:Key="trueIfNull"/>
+        <cv:MultiConverter x:Key="falseIfNull">
+            <cv:TrueIfNull/>
+            <cv:InvertBoolean/>
+        </cv:MultiConverter>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <cv:MultiConverter x:Key="inverseBooleanToVisibility">
             <cv:InvertBoolean/>
@@ -201,7 +205,7 @@
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:ParallelCastingView}">
-                    <Grid>
+                    <Grid MouseDown="ParallelCastingView_MouseDown">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -242,7 +246,7 @@
                             </ListBox.ItemContainerStyle>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <CheckBox IsChecked="{Binding SelectedRole.IsSelected}"
+                                    <CheckBox IsChecked="{Binding SelectedRole.IsSelected}" IsEnabled="{Binding SelectedRole, Converter={StaticResource falseIfNull}}"
               VerticalAlignment="Center">
                                         <TextBlock TextWrapping="Wrap">
                                             <TextBlock.Text>
