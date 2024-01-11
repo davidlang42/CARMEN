@@ -49,6 +49,19 @@ namespace Carmen.Desktop.ViewModels
             }
         }
 
+        private int selectedApplicantIndex = -1;
+        public int SelectedApplicantIndex
+        {
+            get => selectedApplicantIndex;
+            set
+            {
+                if (selectedApplicantIndex == value)
+                    return;
+                selectedApplicantIndex = value;
+                OnPropertyChanged();
+            }
+        }
+
         public ParallelApplicant[] Applicants { get; }
 
         public ListBoxItem[] ApplicantItems { get; }
@@ -141,10 +154,11 @@ namespace Carmen.Desktop.ViewModels
                         Converter = new BooleanToVisibilityConverter()
                     });
                     var r_copy = r;
+                    var a_copy = a;
                     line.MouseDown += (o, e) =>
                     {
                         SelectedRoleIndex = r_copy;
-                        //TODO (optional) select applicant which the line joins
+                        SelectedApplicantIndex = a_copy;
                         e.Handled = true;
                     };
                     Canvas.Children.Add(line);
