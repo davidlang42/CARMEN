@@ -244,6 +244,7 @@
                                 <Style TargetType="{x:Type ListBoxItem}">
                                     <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
                                     <Setter Property="ToolTip" Value="{Binding Applicant, Converter={StaticResource applicantDescription}}"/>
+                                    <EventSetter Event="MouseDoubleClick" Handler="ParallelApplicant_MouseDoubleClick" />
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>

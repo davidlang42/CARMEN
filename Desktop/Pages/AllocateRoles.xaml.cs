@@ -589,5 +589,15 @@ namespace Carmen.Desktop.Pages
                 view.UpdateLinePositions();
             }
         }
+
+        private void ParallelApplicant_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var list_box_item = (ListBoxItem)sender;
+            if (applicantsPanel.Content is ParallelCastingView view && list_box_item.DataContext is ParallelApplicant pa)
+            {
+                view.ShowDetailsWindow(connection, pa, Window.GetWindow(this), criterias, auditionEngine);
+                e.Handled = true;
+            }
+        }
     }
 }

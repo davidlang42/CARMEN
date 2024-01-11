@@ -1,5 +1,8 @@
 ﻿using Carmen.CastingEngine.Allocation;
+using Carmen.CastingEngine.Audition;
 using Carmen.Desktop.Converters;
+using Carmen.Desktop.Windows;
+using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
@@ -21,8 +24,12 @@ using System.Windows.Shapes;
 
 namespace Carmen.Desktop.ViewModels
 {
-    public class ParallelCastingView : INotifyPropertyChanged
+    public class ParallelCastingView : IDisposable, INotifyPropertyChanged
     {
+        Dictionary<ParallelApplicant, ApplicantDetailsWindow> detailsWindows = new();
+
+        bool disposed;
+
         readonly ContentControl parent;
         readonly AlternativeCast[] alternativeCasts;
 
@@ -72,7 +79,6 @@ namespace Carmen.Desktop.ViewModels
         {
             //TODO sort applicants by suitability
             //TODO (later) grey / strikethrough applicants which aren't elligible (but still allow selection)
-            //TODO (last) double click applicants to see details
             alternativeCasts = alternative_casts;
             parent = applicants_panel;
             Node = node;
@@ -87,7 +93,7 @@ namespace Carmen.Desktop.ViewModels
                 {
                     afrs[r] = new ApplicantForRole(engine, a, Roles[r].Role, primary_criterias);
                 }
-                var pa = new ParallelApplicant(this, a, afrs);
+                var pa = new ParallelApplicant(this, a, afrs, primary_criterias);
                 //TODO remove if unused
                 //pa.PropertyChanged += ParallelApplicant_PropertyChanged;
                 return pa;
@@ -209,6 +215,33 @@ namespace Carmen.Desktop.ViewModels
                 }
             });
             return check;
+        }
+
+        public void Dispose()
+        {
+            if (!disposed)
+            {
+                foreach (var window in detailsWindows.Values)
+                    window.Close();
+                detailsWindows.Clear();
+                disposed = true;
+            }
+        }
+
+        public void ShowDetailsWindow(ShowConnection connection, ParallelApplicant pa, Window owner, Criteria[] criterias, IAuditionEngine audition_engine)
+        {
+            if (!detailsWindows.TryGetValue(pa, out var window) || window.IsClosed)
+            {
+                window = new ApplicantDetailsWindow(connection, criterias, audition_engine, pa)
+                {
+                    Owner = owner
+                };
+                detailsWindows[pa] = window;
+                window.Show();
+            }
+            if (window.WindowState == WindowState.Minimized)
+                window.WindowState = WindowState.Normal;
+            window.Activate();
         }
     }
 }
