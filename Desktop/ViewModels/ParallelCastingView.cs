@@ -109,23 +109,18 @@ namespace Carmen.Desktop.ViewModels
                         Y2 = applicant_point.Y + ApplicantItems[r].ActualHeight / 2 - canvas_point.Y,
                         DataContext = Applicants[a]
                     };
-                    line.SetBinding(Line.StrokeProperty, new MultiBinding
+                    var line_color = new MultiBinding
                     {
-                        Converter = new FakeItTilYouUpdateIt
-                        {
-                            //TODO bind colours:
-                            // - default black
-                            // - red if one applicant has 2+ roles
-                            // - green if role is fully cast
-                            new RoleFullyCast(alternativeCasts),
-                            new BooleanToValue(new SolidColorBrush { Color = Colors.Green }, new SolidColorBrush { Color = Colors.Black })
-                        },
-                        Bindings =
-                        {
-                            new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}"), // the real binding
-                            new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}.{nameof(Role.Cast)}.{nameof(ICollection<Applicant>.Count)}") // to make it update when IsSelected is changed on *any* instance of this Role
-                        }
-                    });
+                        Converter = new ParallelLineColorSelector(alternativeCasts, Colors.Red, Colors.Green, Colors.Black),
+                    };
+                    line_color.Bindings.Add(new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}")); // the real binding for "Role Fully Cast"
+                    line_color.Bindings.Add(new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}.{nameof(Role.Cast)}.{nameof(ICollection<Applicant>.Count)}")); // the fake to make it update when IsSelected is changed on *any* instance of this Role
+                    for (var i = 0; i < Roles.Length; i++)
+                    {
+                        // many bindings for all the roles this applicant could be selected in
+                        line_color.Bindings.Add(new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{i}].{nameof(ApplicantForRole.IsSelected)}"));
+                    }
+                    line.SetBinding(Line.StrokeProperty, line_color);
                     line.SetBinding(Line.StrokeThicknessProperty, new Binding(nameof(ParallelApplicant.SelectedRole))
                     {
                         ConverterParameter = Applicants[a].ApplicantForRoles[r],
