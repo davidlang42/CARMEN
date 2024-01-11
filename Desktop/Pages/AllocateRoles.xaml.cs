@@ -583,5 +583,13 @@ namespace Carmen.Desktop.Pages
                 view.SelectedRole = null;
             }
         }
+
+        private void ParallelLists_LayoutUpdated(object sender, EventArgs e)
+        {
+            if (applicantsPanel.Content is ParallelCastingView view)
+            {
+                view.UpdateLines();
+            }
+        }
     }
 }

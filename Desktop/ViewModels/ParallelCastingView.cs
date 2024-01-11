@@ -10,7 +10,10 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace Carmen.Desktop.ViewModels
 {
@@ -39,6 +42,8 @@ namespace Carmen.Desktop.ViewModels
 
         public ParallelApplicant[] Applicants { get; }
 
+        public Canvas Canvas { get; } = new Canvas();
+
         public ParallelCastingView(IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias)
         {
             Node = node;
@@ -51,13 +56,42 @@ namespace Carmen.Desktop.ViewModels
                 {
                     afrs.Add(pr, new ApplicantForRole(engine, a, pr.Role, primary_criterias));
                 }
-                //av.PropertyChanged += ApplicantForRole_PropertyChanged;
-                return new ParallelApplicant(this, a, afrs);
+                var pa = new ParallelApplicant(this, a, afrs);
+                pa.PropertyChanged += ParallelApplicant_PropertyChanged;
+                return pa;
             }).ToArray();
             //var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             //view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
             //ConfigureFiltering(show_unavailable, show_ineligible, show_unneeded);
             //ConfigureSorting(new[] { (nameof(ApplicantForRole.Suitability), ListSortDirection.Descending) });
+        }
+
+        private void ParallelApplicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ParallelApplicant.SelectedForRoles))
+            {
+                UpdateLines();
+            }
+        }
+
+        public void UpdateLines()
+        {
+            Canvas.Children.Clear();
+            var r = new Random();
+            for (var i = 0; i< 5; i++)
+            {
+                Canvas.Children.Add(new Line
+                {
+                    X1 = r.Next(1, 1000),
+                    X2 = r.Next(1, 1000),
+                    Y1 = r.Next(1, 1000),
+                    Y2 = r.Next(1, 1000),
+                    Stroke = new SolidColorBrush
+                    {
+                        Color = Colors.Black
+                    }
+                });
+            }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)

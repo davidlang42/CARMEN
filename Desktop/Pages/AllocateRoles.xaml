@@ -217,13 +217,14 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+                        <ContentControl Content="{Binding Canvas}" Grid.RowSpan="4" Grid.ColumnSpan="3"/>
                         <TextBlock Grid.ColumnSpan="3" Text="{Binding Title}" FontSize="22" Margin="0 0 0 10"/>
                         <TextBlock Grid.Row="1" Text="Roles:" FontSize="18"/>
                         <TextBlock Grid.Row="1" Grid.Column="3" Text="Available Applicants:" FontSize="18"/>
                         <ListBox Grid.Row="2" SelectedItem="{Binding SelectedRole}"
-                 FontSize="14"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ItemsSource="{Binding Roles}">
+                                 FontSize="14"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding Roles}">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
                                     <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
@@ -236,8 +237,8 @@
                             </ListBox.ItemTemplate>
                         </ListBox>
                         <ListBox Grid.Row="2" Grid.Column="3"
-                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                 ItemsSource="{Binding Applicants}">
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding Applicants}">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
                                     <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
