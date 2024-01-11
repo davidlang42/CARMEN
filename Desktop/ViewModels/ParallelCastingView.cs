@@ -1,4 +1,5 @@
 ﻿using Carmen.CastingEngine.Allocation;
+using Carmen.Desktop.Converters;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
@@ -10,6 +11,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
@@ -44,13 +46,15 @@ namespace Carmen.Desktop.ViewModels
 
         public ParallelApplicant[] Applicants { get; }
 
+        public ListBoxItem[] ApplicantItems { get; }
+
         public Canvas Canvas { get; } = new Canvas();
 
         public ParallelCastingView(IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias)
         {
             Node = node;
             Roles = roles.Select(r => new ParallelRole(r)).ToArray();
-            RoleItems = Roles.Select(pr => new ListBoxItem { Content = new TextBlock { Text = pr.Description } }).ToArray();
+            RoleItems = Roles.Select(pr => new ListBoxItem { Content = ControlForRoleItem(pr) }).ToArray();
             //requiredCastGroups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
             Applicants = applicants.AsParallel().Select(a =>
             {
@@ -63,6 +67,7 @@ namespace Carmen.Desktop.ViewModels
                 //pa.PropertyChanged += ParallelApplicant_PropertyChanged;
                 return pa;
             }).ToArray();
+            ApplicantItems = Applicants.Select(pa => new ListBoxItem { Content = ControlForApplicantItem(pa) }).ToArray();
             //var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             //view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
             //ConfigureFiltering(show_unavailable, show_ineligible, show_unneeded);
@@ -100,6 +105,49 @@ namespace Carmen.Desktop.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        private TextBlock ControlForRoleItem(ParallelRole pr)
+        {
+            return new TextBlock { Text = pr.Description };
+        }
+
+        private CheckBox ControlForApplicantItem(ParallelApplicant pa)
+        {
+            var suitability = new TextBlock { TextWrapping = TextWrapping.Wrap };
+            suitability.SetBinding(TextBlock.TextProperty, new Binding($"{nameof(ParallelApplicant.SelectedRole)}.{nameof(ApplicantForRole.Suitability)}")
+            {
+                Converter = new DoubleToPercentage(),
+                StringFormat = "({0})"
+            });
+            var check = new CheckBox
+            {
+                DataContext = pa,
+                VerticalAlignment = VerticalAlignment.Center,
+                Content = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    Children =
+                    {
+                        suitability,
+                        new TextBlock
+                        {
+                            TextWrapping = TextWrapping.Wrap,
+                            Text = FullName.Format(pa.Applicant)
+                        }
+                    }
+                }
+            };
+            check.SetBinding(CheckBox.IsCheckedProperty, new Binding($"{nameof(ParallelApplicant.SelectedRole)}.{nameof(ApplicantForRole.IsSelected)}"));
+            check.SetBinding(CheckBox.IsEnabledProperty, new Binding(nameof(ParallelApplicant.SelectedRole))
+            {
+                Converter = new MultiConverter
+                {
+                    new TrueIfNull(),
+                    new InvertBoolean()
+                }
+            });
+            return check;
         }
     }
 }

@@ -233,33 +233,12 @@
                         </ListBox>
                         <ListBox Grid.Row="2" Grid.Column="3"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                 ItemsSource="{Binding Applicants}">
+                                 ItemsSource="{Binding ApplicantItems}">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
-                                    <EventSetter Event="MouseDoubleClick" Handler="ListBoxItem_MouseDoubleClick"/>
                                     <Setter Property="ContextMenu" Value="{Binding ContextMenu}"/>
                                 </Style>
                             </ListBox.ItemContainerStyle>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <CheckBox IsChecked="{Binding SelectedRole.IsSelected}" IsEnabled="{Binding SelectedRole, Converter={StaticResource falseIfNull}}"
-              VerticalAlignment="Center">
-                                        <StackPanel Orientation="Horizontal">
-                                            <TextBlock TextWrapping="Wrap" Text="{Binding SelectedRole.Suitability, Converter={StaticResource doubleToPercentage}, StringFormat='(\{0\}) '}"/>
-                                            <TextBlock TextWrapping="Wrap">
-                                                <TextBlock.Text>
-                                                    <MultiBinding Converter="{StaticResource fullName}">
-                                                        <MultiBinding.Bindings>
-                                                            <Binding Path="Applicant.FirstName"/>
-                                                            <Binding Path="Applicant.LastName"/>
-                                                        </MultiBinding.Bindings>
-                                                    </MultiBinding>
-                                                </TextBlock.Text>
-                                            </TextBlock>
-                                        </StackPanel>
-                                    </CheckBox>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
                         </ListBox>
                         <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
                             <Button IsCancel="True" Width="100" Height="35" Margin="5 5 5 0" Click="ParallelCancelButton_Click">

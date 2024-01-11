@@ -23,7 +23,7 @@ namespace Carmen.Desktop.ViewModels
 
         public ApplicantForRole? SelectedRole => castingView.SelectedRoleIndex is int r ? applicantForRoles[r] : null;
 
-        public ContextMenu? ContextMenu { get; }
+        public ContextMenu? ContextMenu { get; }//TODO is this needed? remove from xaml as well
 
         //public IEnumerable<ParallelRole> SelectedForRoles => applicantForRoles.Where(kvp => kvp.Value.IsSelected).Select(kvp => kvp.Key);
 
