@@ -608,7 +608,15 @@ namespace Carmen.Desktop.Pages
             if (applicantsPanel.VisualDescendants<ListBox>().FirstOrDefault(lb => lb.Name == "ParallelApplicantsList") is ListBox list)
             {
                 list.Items.SortDescriptions.Clear();
-                list.Items.SortDescriptions.Add(new SortDescription($"{nameof(ListBoxItem.Content)}.{nameof(FrameworkElement.DataContext)}", ListSortDirection.Descending));
+                var prefix_to_parallel_applicant = $"{nameof(ListBoxItem.Content)}.{nameof(FrameworkElement.DataContext)}";
+                list.Items.SortDescriptions.Add(new SortDescription($"{prefix_to_parallel_applicant}.{nameof(ParallelApplicant.SelectedRole)}.{nameof(ApplicantForRole.Suitability)}", ListSortDirection.Descending));
+                var sorts = Properties.Settings.Default.FullNameFormat.ToSortDescriptions(ListSortDirection.Ascending);
+                for (var s =  0; s < sorts.Length; s++)
+                {
+                    var sort = sorts[s];
+                    sort.PropertyName = $"{prefix_to_parallel_applicant}.{sort.PropertyName}"; // this works because both Applicant and ParallelApplicant have FirstName/LastName fields
+                    list.Items.SortDescriptions.Add(sort);
+                }
             }
         }
     }
