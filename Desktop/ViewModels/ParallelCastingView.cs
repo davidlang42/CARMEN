@@ -27,15 +27,17 @@ namespace Carmen.Desktop.ViewModels
 
         public ParallelRole[] Roles { get; }
 
-        private ParallelRole? selectedRole = null;
-        public ParallelRole? SelectedRole
+        public ListBoxItem[] RoleItems { get; }
+
+        private int? selectedRoleIndex = null;
+        public int? SelectedRoleIndex
         {
-            get => selectedRole;
+            get => selectedRoleIndex;
             set
             {
-                if (selectedRole == value)
+                if (selectedRoleIndex == value)
                     return;
-                selectedRole = value;
+                selectedRoleIndex = value;
                 OnPropertyChanged();
             }
         }
@@ -48,16 +50,17 @@ namespace Carmen.Desktop.ViewModels
         {
             Node = node;
             Roles = roles.Select(r => new ParallelRole(r)).ToArray();
+            RoleItems = Roles.Select(pr => new ListBoxItem { Content = new TextBlock { Text = pr.Description } }).ToArray();
             //requiredCastGroups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
             Applicants = applicants.AsParallel().Select(a =>
             {
-                var afrs = new Dictionary<ParallelRole, ApplicantForRole>();
-                foreach (var pr in Roles)
+                var afrs = new ApplicantForRole[Roles.Length];
+                for (var r = 0; r < Roles.Length; r++)
                 {
-                    afrs.Add(pr, new ApplicantForRole(engine, a, pr.Role, primary_criterias));
+                    afrs[r] = new ApplicantForRole(engine, a, Roles[r].Role, primary_criterias);
                 }
                 var pa = new ParallelApplicant(this, a, afrs);
-                pa.PropertyChanged += ParallelApplicant_PropertyChanged;
+                //pa.PropertyChanged += ParallelApplicant_PropertyChanged;
                 return pa;
             }).ToArray();
             //var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
@@ -66,13 +69,13 @@ namespace Carmen.Desktop.ViewModels
             //ConfigureSorting(new[] { (nameof(ApplicantForRole.Suitability), ListSortDirection.Descending) });
         }
 
-        private void ParallelApplicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ParallelApplicant.SelectedForRoles))
-            {
-                UpdateLines();
-            }
-        }
+        //private void ParallelApplicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        //{
+        //    if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ParallelApplicant.SelectedForRoles))
+        //    {
+        //        UpdateLines();
+        //    }
+        //}
 
         public void UpdateLines()
         {

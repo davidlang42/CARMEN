@@ -576,19 +576,11 @@ namespace Carmen.Desktop.Pages
             //TODO
         }
 
-        private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)
+        private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)//TODO this isn't triggered when canvas is clicked
         {
             if (applicantsPanel.Content is ParallelCastingView view)
             {
-                view.SelectedRole = null;
-            }
-        }
-
-        private void ParallelLists_LayoutUpdated(object sender, EventArgs e)
-        {
-            if (applicantsPanel.Content is ParallelCastingView view)
-            {
-                view.UpdateLines();
+                view.SelectedRoleIndex = null;
             }
         }
     }

@@ -17,25 +17,25 @@ namespace Carmen.Desktop.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
 
         readonly ParallelCastingView castingView;
-        readonly Dictionary<ParallelRole, ApplicantForRole> applicantForRoles;
+        readonly ApplicantForRole[] applicantForRoles;
 
         public Applicant Applicant { get; }
 
-        public ApplicantForRole? SelectedRole => castingView.SelectedRole is ParallelRole role ? applicantForRoles[role] : null;
+        public ApplicantForRole? SelectedRole => castingView.SelectedRoleIndex is int r ? applicantForRoles[r] : null;
 
         public ContextMenu? ContextMenu { get; }
 
-        public IEnumerable<ParallelRole> SelectedForRoles => applicantForRoles.Where(kvp => kvp.Value.IsSelected).Select(kvp => kvp.Key);
+        //public IEnumerable<ParallelRole> SelectedForRoles => applicantForRoles.Where(kvp => kvp.Value.IsSelected).Select(kvp => kvp.Key);
 
-        public ParallelApplicant(ParallelCastingView casting_view, Applicant applicant, Dictionary<ParallelRole, ApplicantForRole> applicant_for_roles)
+        public ParallelApplicant(ParallelCastingView casting_view, Applicant applicant, ApplicantForRole[] applicant_for_roles)
         {
             castingView = casting_view;
             Applicant = applicant;
             applicantForRoles = applicant_for_roles;
-            foreach (var afr in applicantForRoles.Values)
-            {
-                afr.PropertyChanged += ApplicantForRole_PropertyChanged;
-            }
+            //foreach (var afr in applicantForRoles.Values)
+            //{
+            //    afr.PropertyChanged += ApplicantForRole_PropertyChanged;
+            //}
             castingView.PropertyChanged += CastingView_PropertyChanged;
             //Action? double_click = null, IEnumerable<(string, Action)>? right_click = null
             //DoubleClick = double_click;
@@ -51,17 +51,17 @@ namespace Carmen.Desktop.ViewModels
             //}
         }
 
-        private void ApplicantForRole_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        {
-            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ApplicantForRole.IsSelected))
-            {
-                OnPropertyChanged(nameof(SelectedForRoles));
-            }
-        }
+        //private void ApplicantForRole_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        //{
+        //    if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ApplicantForRole.IsSelected))
+        //    {
+        //        OnPropertyChanged(nameof(SelectedForRoles));
+        //    }
+        //}
 
         private void CastingView_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ParallelCastingView.SelectedRole))
+            if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ParallelCastingView.SelectedRoleIndex))
             {
                 OnPropertyChanged(nameof(SelectedRole));
             }

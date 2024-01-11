@@ -221,20 +221,15 @@
                         <TextBlock Grid.ColumnSpan="3" Text="{Binding Title}" FontSize="22" Margin="0 0 0 10"/>
                         <TextBlock Grid.Row="1" Text="Roles:" FontSize="18"/>
                         <TextBlock Grid.Row="1" Grid.Column="3" Text="Available Applicants:" FontSize="18"/>
-                        <ListBox Grid.Row="2" SelectedItem="{Binding SelectedRole}"
+                        <ListBox Grid.Row="2" SelectedIndex="{Binding SelectedRoleIndex}"
                                  FontSize="14"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                                 ItemsSource="{Binding Roles}">
+                                 ItemsSource="{Binding RoleItems}">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
                                     <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
                                 </Style>
                             </ListBox.ItemContainerStyle>
-                            <ListBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Description}" TextWrapping="Wrap"/>
-                                </DataTemplate>
-                            </ListBox.ItemTemplate>
                         </ListBox>
                         <ListBox Grid.Row="2" Grid.Column="3"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
