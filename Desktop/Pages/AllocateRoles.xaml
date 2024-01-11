@@ -226,6 +226,7 @@
                                  FontSize="14"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding RoleItems}"
+                                 VirtualizingStackPanel.IsVirtualizing="False"
                                  LayoutUpdated="ParallelCastingList_LayoutUpdated">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
@@ -236,6 +237,7 @@
                         <ListBox Grid.Row="2" Grid.Column="3"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding ApplicantItems}"
+                                 VirtualizingStackPanel.IsVirtualizing="False"
                                  LayoutUpdated="ParallelCastingList_LayoutUpdated">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
