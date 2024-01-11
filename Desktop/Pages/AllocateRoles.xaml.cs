@@ -563,7 +563,7 @@ namespace Carmen.Desktop.Pages
                 return;
             }
             using var loading = new LoadingOverlay(this) { MainText = "Processing...", SubText = "Calculating applicant suitabilities" };
-            applicantsPanel.Content = new ParallelCastingView(allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias);
+            applicantsPanel.Content = new ParallelCastingView(applicantsPanel, allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias);
         }
 
         private void ParallelSaveButton_Click(object sender, RoutedEventArgs e)
@@ -581,7 +581,16 @@ namespace Carmen.Desktop.Pages
             if (applicantsPanel.Content is ParallelCastingView view)
             {
                 view.SelectedRoleIndex = null;
+                view.UpdateLines();
             }
+        }
+
+        private void ParallelCastingList_LayoutUpdated(object sender, EventArgs e)
+        {
+            //if (applicantsPanel.Content is ParallelCastingView view)
+            //{
+            //    view.UpdateLines();
+            //}
         }
     }
 }

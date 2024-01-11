@@ -21,6 +21,8 @@ namespace Carmen.Desktop.ViewModels
 {
     public class ParallelCastingView : INotifyPropertyChanged
     {
+        readonly ContentControl parent;
+
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public string Title => $"Parallel casting {Roles.Length} roles in {Node.Name}";
@@ -50,8 +52,9 @@ namespace Carmen.Desktop.ViewModels
 
         public Canvas Canvas { get; } = new Canvas();
 
-        public ParallelCastingView(IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias)
+        public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias)
         {
+            parent = applicants_panel;
             Node = node;
             Roles = roles.Select(r => new ParallelRole(r)).ToArray();
             RoleItems = Roles.Select(pr => new ListBoxItem { Content = ControlForRoleItem(pr) }).ToArray();
@@ -82,23 +85,31 @@ namespace Carmen.Desktop.ViewModels
         //    }
         //}
 
-        public void UpdateLines()
+        public int UpdateLinesCount { get; private set; } = 0;
+
+        public void UpdateLines()//TODO UpdateLinePositions
         {
+            UpdateLinesCount += 1;
+            OnPropertyChanged(nameof(UpdateLinesCount));
             Canvas.Children.Clear();
-            var r = new Random();
-            for (var i = 0; i< 5; i++)
+            for (var r = 0; r < Roles.Length; r++)
             {
-                Canvas.Children.Add(new Line
+                for (var a = 0; a < Applicants.Length; a++)
                 {
-                    X1 = r.Next(1, 1000),
-                    X2 = r.Next(1, 1000),
-                    Y1 = r.Next(1, 1000),
-                    Y2 = r.Next(1, 1000),
-                    Stroke = new SolidColorBrush
+                    var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0));
+                    var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0));
+                    Canvas.Children.Add(new Line
                     {
-                        Color = Colors.Black
-                    }
-                });
+                        X1 = role_point.X,
+                        Y1 = role_point.Y,
+                        X2 = applicant_point.X,
+                        Y2 = applicant_point.Y,
+                        Stroke = new SolidColorBrush
+                        {
+                            Color = Colors.Black
+                        }
+                    });
+                }
             }
         }
 
