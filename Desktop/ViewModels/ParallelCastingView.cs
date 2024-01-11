@@ -70,7 +70,6 @@ namespace Carmen.Desktop.ViewModels
 
         public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias, AlternativeCast[] alternative_casts)
         {
-            //TODO mouseover role to see requirements(at least cast groups)
             //TODO sort applicants by suitability
             //TODO (later) grey / strikethrough applicants which aren't elligible (but still allow selection)
             //TODO (last) double click applicants to see details
