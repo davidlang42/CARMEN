@@ -89,35 +89,31 @@ namespace Carmen.Desktop.ViewModels
 
         public void UpdateLinePositions()
         {
-            UpdateLinesCount += 1;
+            UpdateLinesCount += 1;//TODO remove test code here and in AllocateRoles.xaml
             OnPropertyChanged(nameof(UpdateLinesCount));
             Canvas.Children.Clear();
-            try
+            for (var r = 0; r < Roles.Length; r++)
             {
-                for (var r = 0; r < Roles.Length; r++)
+                for (var a = 0; a < Applicants.Length; a++)
                 {
-                    for (var a = 0; a < Applicants.Length; a++)
+                    var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
+                    var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
+                    var line = new Line
                     {
-                        var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
-                        var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
-                        var line = new Line
+                        X1 = role_point.X + RoleItems[r].ActualWidth,
+                        Y1 = role_point.Y + RoleItems[r].ActualHeight / 2,
+                        X2 = applicant_point.X,
+                        Y2 = applicant_point.Y + ApplicantItems[r].ActualHeight / 2,
+                        Stroke = new SolidColorBrush
                         {
-                            X1 = role_point.X + RoleItems[r].ActualWidth,
-                            Y1 = role_point.Y + RoleItems[r].ActualHeight / 2,
-                            X2 = applicant_point.X,
-                            Y2 = applicant_point.Y + ApplicantItems[r].ActualHeight / 2,
-                            Stroke = new SolidColorBrush
-                            {
-                                Color = Colors.Black
-                            },
-                            DataContext = Applicants[a].ApplicantForRoles[r]
-                        };
-                        line.SetBinding(Line.VisibilityProperty, new Binding(nameof(ApplicantForRole.IsSelected)) { Converter = new BooleanToVisibilityConverter() });
-                        Canvas.Children.Add(line);
-                    }
+                            Color = Colors.Black
+                        },
+                        DataContext = Applicants[a].ApplicantForRoles[r]
+                    };
+                    line.SetBinding(Line.VisibilityProperty, new Binding(nameof(ApplicantForRole.IsSelected)) { Converter = new BooleanToVisibilityConverter() });
+                    Canvas.Children.Add(line);
                 }
             }
-            catch (InvalidOperationException) { }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
