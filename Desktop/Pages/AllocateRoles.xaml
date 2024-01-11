@@ -227,6 +227,7 @@
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding RoleItems}"
                                  VirtualizingStackPanel.IsVirtualizing="False"
+                                 SelectionChanged="ParallelRolesList_SelectionChanged"
                                  ScrollViewer.ScrollChanged="ParallelCastingList_ScrollChanged">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
@@ -240,6 +241,7 @@
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding ApplicantItems}"
                                  VirtualizingStackPanel.IsVirtualizing="False"
+                                 Name="ParallelApplicantsList"
                                  ScrollViewer.ScrollChanged="ParallelCastingList_ScrollChanged">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">

@@ -14,7 +14,7 @@ using System.Windows;
 
 namespace Carmen.Desktop.ViewModels
 {
-    public class ApplicantForRole : ISelectableApplicant, INotifyPropertyChanged
+    public class ApplicantForRole : ISelectableApplicant, INotifyPropertyChanged, IComparable<ApplicantForRole>, IComparable
     {
         public Applicant Applicant { get; init; }
         public Criteria[] PrimaryCriterias { get; init; }
@@ -125,6 +125,20 @@ namespace Carmen.Desktop.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public int CompareTo(ApplicantForRole? other)
+        {
+            if (other == null)
+                return -1;
+            return Suitability.CompareTo(other.Suitability);
+        }
+
+        public int CompareTo(object? obj)
+        {
+            if (obj is not ApplicantForRole other)
+                return -1;
+            return CompareTo(other);
         }
     }
 }

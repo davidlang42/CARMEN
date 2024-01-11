@@ -602,5 +602,14 @@ namespace Carmen.Desktop.Pages
                 e.Handled = true;
             }
         }
+
+        private void ParallelRolesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (applicantsPanel.VisualDescendants<ListBox>().FirstOrDefault(lb => lb.Name == "ParallelApplicantsList") is ListBox list)
+            {
+                list.Items.SortDescriptions.Clear();
+                list.Items.SortDescriptions.Add(new SortDescription("Content.DataContext.SelectedRole", ListSortDirection.Descending));
+            }
+        }
     }
 }

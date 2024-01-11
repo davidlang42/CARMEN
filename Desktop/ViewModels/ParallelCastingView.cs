@@ -78,7 +78,6 @@ namespace Carmen.Desktop.ViewModels
 
         public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias, AlternativeCast[] alternative_casts)
         {
-            //TODO sort applicants by suitability
             alternativeCasts = alternative_casts;
             parent = applicants_panel;
             Node = node;
@@ -94,11 +93,6 @@ namespace Carmen.Desktop.ViewModels
                 return new ParallelApplicant(this, a, afrs, primary_criterias);
             }).ToArray();
             ApplicantItems = Applicants.Select(pa => new ListBoxItem { DataContext = pa, Content = ControlForApplicantItem(pa) }).ToArray();
-            //TODO remove if unused
-            //var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
-            //view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
-            //ConfigureFiltering(show_unavailable, show_ineligible, show_unneeded);
-            //ConfigureSorting(new[] { (nameof(ApplicantForRole.Suitability), ListSortDirection.Descending) });
         }
 
         public void UpdateLinePositions()
