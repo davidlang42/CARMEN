@@ -84,8 +84,6 @@ namespace Carmen.Desktop.ViewModels
             Node = node;
             Roles = roles.Select(r => new ParallelRole(r)).ToArray();
             RoleItems = Roles.Select(pr => new ListBoxItem { DataContext = pr, Content = ControlForRoleItem(pr) }).ToArray();
-            //TODO remove if unused
-            //requiredCastGroups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
             Applicants = applicants.AsParallel().Select(a =>
             {
                 var afrs = new ApplicantForRole[Roles.Length];
@@ -93,10 +91,7 @@ namespace Carmen.Desktop.ViewModels
                 {
                     afrs[r] = new ApplicantForRole(engine, a, Roles[r].Role, primary_criterias);
                 }
-                var pa = new ParallelApplicant(this, a, afrs, primary_criterias);
-                //TODO remove if unused
-                //pa.PropertyChanged += ParallelApplicant_PropertyChanged;
-                return pa;
+                return new ParallelApplicant(this, a, afrs, primary_criterias);
             }).ToArray();
             ApplicantItems = Applicants.Select(pa => new ListBoxItem { DataContext = pa, Content = ControlForApplicantItem(pa) }).ToArray();
             //TODO remove if unused
