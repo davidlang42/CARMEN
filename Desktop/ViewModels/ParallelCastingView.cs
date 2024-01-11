@@ -106,15 +106,6 @@ namespace Carmen.Desktop.ViewModels
             //ConfigureSorting(new[] { (nameof(ApplicantForRole.Suitability), ListSortDirection.Descending) });
         }
 
-        //TODO remove if unused
-        //private void ParallelApplicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        //{
-        //    if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ParallelApplicant.SelectedForRoles))
-        //    {
-        //        UpdateLines();
-        //    }
-        //}
-
         public void UpdateLinePositions()
         {
             Canvas.Children.Clear();

@@ -25,9 +25,6 @@ namespace Carmen.Desktop.ViewModels
 
         public ApplicantForRole? SelectedRole => castingView.SelectedRoleIndex == -1 ? null : ApplicantForRoles[castingView.SelectedRoleIndex];
 
-        //TODO remove if unused
-        //public IEnumerable<ParallelRole> SelectedForRoles => applicantForRoles.Where(kvp => kvp.Value.IsSelected).Select(kvp => kvp.Key);
-
         public ParallelApplicant(ParallelCastingView casting_view, Applicant applicant, ApplicantForRole[] applicant_for_roles, Criteria[] primary_criterias)
         {
             PrimaryCriterias = primary_criterias;
@@ -36,22 +33,9 @@ namespace Carmen.Desktop.ViewModels
             ApplicantForRoles = applicant_for_roles;
             foreach (var afr in ApplicantForRoles)
             {
-                afr.PropertyChanged += ApplicantForRole_PropertyChanged; ;
+                afr.PropertyChanged += ApplicantForRole_PropertyChanged;
             }
             castingView.PropertyChanged += CastingView_PropertyChanged;
-            //TODO remove if unused
-            //Action? double_click = null, IEnumerable<(string, Action)>? right_click = null
-            //DoubleClick = double_click;
-            //if (right_click != null)
-            //{
-            //    ContextMenu = new ContextMenu();
-            //    foreach (var (text, action) in right_click)
-            //    {
-            //        var menu_item = new MenuItem() { Header = text };
-            //        menu_item.Click += (s, e) => action();
-            //        ContextMenu.Items.Add(menu_item);
-            //    }
-            //}
         }
 
         private void ApplicantForRole_PropertyChanged(object? sender, PropertyChangedEventArgs e)
@@ -63,15 +47,6 @@ namespace Carmen.Desktop.ViewModels
                 OnPropertyChanged(nameof(IsSelected));
             }
         }
-
-        //TODO remove if unused
-        //private void ApplicantForRole_PropertyChanged(object? sender, PropertyChangedEventArgs e)
-        //{
-        //    if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ApplicantForRole.IsSelected))
-        //    {
-        //        OnPropertyChanged(nameof(SelectedForRoles));
-        //    }
-        //}
 
         private void CastingView_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
