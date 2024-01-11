@@ -562,6 +562,8 @@ namespace Carmen.Desktop.Pages
             applicantsPanel.Content = new ParallelCastingView(applicantsPanel, allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias, alternativeCasts);
         }
 
+        //TODO (OR ADD ISSUE) Change error message "Parallel casting is only applicable to sections which don't allow applicants to have multiple roles within them." into a disabled button with a tooltip
+        //TODO (OR ADD ISSUE) Revise how IdealCastingOrder works, so that it recommends using parallel casting for high (but similar) priority roles within single-role sections
         private void ParallelSaveButton_Click(object sender, RoutedEventArgs e)
         {
             //TODO save (and confirm that detail windows close)
