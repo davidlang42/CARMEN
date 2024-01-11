@@ -22,6 +22,7 @@ namespace Carmen.Desktop.ViewModels
     public class ParallelCastingView : INotifyPropertyChanged
     {
         readonly ContentControl parent;
+        readonly AlternativeCast[] alternativeCasts;
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -52,8 +53,9 @@ namespace Carmen.Desktop.ViewModels
 
         public Canvas Canvas { get; } = new() { ClipToBounds = true };
 
-        public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias)
+        public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias, AlternativeCast[] alternative_casts)
         {
+            alternativeCasts = alternative_casts;
             parent = applicants_panel;
             Node = node;
             Roles = roles.Select(r => new ParallelRole(r)).ToArray();
@@ -105,16 +107,25 @@ namespace Carmen.Desktop.ViewModels
                         Y1 = role_point.Y + RoleItems[r].ActualHeight / 2 - canvas_point.Y,
                         X2 = Canvas.ActualWidth,
                         Y2 = applicant_point.Y + ApplicantItems[r].ActualHeight / 2 - canvas_point.Y,
-                        Stroke = new SolidColorBrush
+                        DataContext = Applicants[a]
+                    };
+                    line.SetBinding(Line.StrokeProperty, new MultiBinding
+                    {
+                        Converter = new FakeItTilYouUpdateIt
                         {
-                            Color = Colors.Black
                             //TODO bind colours:
                             // - default black
                             // - red if one applicant has 2+ roles
                             // - green if role is fully cast
+                            new RoleFullyCast(alternativeCasts),
+                            new BooleanToValue(new SolidColorBrush { Color = Colors.Green }, new SolidColorBrush { Color = Colors.Black })
                         },
-                        DataContext = Applicants[a]
-                    };
+                        Bindings =
+                        {
+                            new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}"), // the real binding
+                            new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}.{nameof(Role.Cast)}.{nameof(ICollection<Applicant>.Count)}") // to make it update when IsSelected is changed on *any* instance of this Role
+                        }
+                    });
                     line.SetBinding(Line.StrokeThicknessProperty, new Binding(nameof(ParallelApplicant.SelectedRole))
                     {
                         ConverterParameter = Applicants[a].ApplicantForRoles[r],

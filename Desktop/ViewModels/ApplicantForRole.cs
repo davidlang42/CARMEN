@@ -18,25 +18,24 @@ namespace Carmen.Desktop.ViewModels
     {
         public Applicant Applicant { get; init; }
         public Criteria[] PrimaryCriterias { get; init; }
-
-        private readonly Role role;
+        public Role Role { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
         public bool IsSelected
         {
-            get => role.Cast.Contains(Applicant);
+            get => Role.Cast.Contains(Applicant);
             set
             {
                 if (value)
                 {
-                    if (!role.Cast.Contains(Applicant))
-                        role.Cast.Add(Applicant);
+                    if (!Role.Cast.Contains(Applicant))
+                        Role.Cast.Add(Applicant);
                 }
                 else
                 {
-                    if (role.Cast.Contains(Applicant))
-                        role.Cast.Remove(Applicant);
+                    if (Role.Cast.Contains(Applicant))
+                        Role.Cast.Remove(Applicant);
                 }
                 OnPropertyChanged();
             }
@@ -46,7 +45,7 @@ namespace Carmen.Desktop.ViewModels
         public string FirstName => Applicant.FirstName;
         public string LastName => Applicant.LastName;
 
-        public string RoleName => role.Name;
+        public string RoleName => Role.Name;
 
         public string? CastNumberAndCast => Applicant.CastNumberAndCast;
 
@@ -58,7 +57,7 @@ namespace Carmen.Desktop.ViewModels
 
         /// <summary>Not including this role, even if already cast in it.</summary>
         public IEnumerable<string> ExistingRoles
-            => Applicant.Roles.Where(r => r != role)
+            => Applicant.Roles.Where(r => r != Role)
             .Select(r => $"'{r.Name}' in {string.Join(", ", r.Items.Select(i => i.Name))}");
 
         public string OverallAbility { get; init; }
@@ -103,7 +102,7 @@ namespace Carmen.Desktop.ViewModels
         {
             this.Applicant = applicant;
             CastGroupAndCast = new CastGroupAndCast(Applicant);
-            this.role = role;
+            this.Role = role;
             PrimaryCriterias = primary_criterias;
             Suitability = engine.SuitabilityOf(applicant, role);
             OverallAbility = engine.OverallAbility(applicant).ToString();
