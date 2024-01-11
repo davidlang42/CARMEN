@@ -10,10 +10,12 @@ using System.Data;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
@@ -55,6 +57,11 @@ namespace Carmen.Desktop.ViewModels
 
         public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias, AlternativeCast[] alternative_casts)
         {
+            //TODO mouseover role to see requirements(at least cast groups)
+            //TODO mouseover applicants to see their cast group
+            //TODO sort applicants by suitability
+            //TODO double click applicants to see details
+            //TODO grey / strikethrough applicants which aren't elligible (but still allow selection)
             alternativeCasts = alternative_casts;
             parent = applicants_panel;
             Node = node;
