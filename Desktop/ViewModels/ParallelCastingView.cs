@@ -33,8 +33,8 @@ namespace Carmen.Desktop.ViewModels
 
         public ListBoxItem[] RoleItems { get; }
 
-        private int? selectedRoleIndex = null;
-        public int? SelectedRoleIndex
+        private int selectedRoleIndex = -1;
+        public int SelectedRoleIndex
         {
             get => selectedRoleIndex;
             set
@@ -50,7 +50,7 @@ namespace Carmen.Desktop.ViewModels
 
         public ListBoxItem[] ApplicantItems { get; }
 
-        public Canvas Canvas { get; } = new Canvas();//TODO move canvas to only the middle quadrant
+        public Canvas Canvas { get; } = new();
 
         public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias)
         {
@@ -92,6 +92,7 @@ namespace Carmen.Desktop.ViewModels
         public void UpdateLinePositions()
         {
             Canvas.Children.Clear();
+            var canvas_point = Canvas.TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
             for (var r = 0; r < Roles.Length; r++)
             {
                 for (var a = 0; a < Applicants.Length; a++)
@@ -100,10 +101,10 @@ namespace Carmen.Desktop.ViewModels
                     var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
                     var line = new Line//TODO (optional) handle line click to select the role (and applican) which the line joins
                     {
-                        X1 = role_point.X + RoleItems[r].ActualWidth,
-                        Y1 = role_point.Y + RoleItems[r].ActualHeight / 2,
-                        X2 = applicant_point.X,
-                        Y2 = applicant_point.Y + ApplicantItems[r].ActualHeight / 2,
+                        X1 = 0,
+                        Y1 = role_point.Y + RoleItems[r].ActualHeight / 2 - canvas_point.Y,
+                        X2 = Canvas.ActualWidth,
+                        Y2 = applicant_point.Y + ApplicantItems[r].ActualHeight / 2 - canvas_point.Y,
                         Stroke = new SolidColorBrush
                         {
                             Color = Colors.Black

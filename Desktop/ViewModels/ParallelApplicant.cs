@@ -22,7 +22,7 @@ namespace Carmen.Desktop.ViewModels
 
         public Applicant Applicant { get; }
 
-        public ApplicantForRole? SelectedRole => castingView.SelectedRoleIndex is int r ? ApplicantForRoles[r] : null;
+        public ApplicantForRole? SelectedRole => castingView.SelectedRoleIndex == -1 ? null : ApplicantForRoles[castingView.SelectedRoleIndex];
 
         //public IEnumerable<ParallelRole> SelectedForRoles => applicantForRoles.Where(kvp => kvp.Value.IsSelected).Select(kvp => kvp.Key);
 

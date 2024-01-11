@@ -217,10 +217,9 @@
                             <ColumnDefinition Width="*"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
-                        <ContentControl Content="{Binding Canvas}" Grid.RowSpan="4" Grid.ColumnSpan="3"/>
                         <TextBlock Grid.ColumnSpan="3" Text="{Binding Title}" FontSize="22" Margin="0 0 0 10"/>
                         <TextBlock Grid.Row="1" Text="Roles:" FontSize="18"/>
-                        <TextBlock Grid.Row="1" Grid.Column="3" Text="Available Applicants:" FontSize="18"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="Available Applicants:" FontSize="18"/>
                         <ListBox Grid.Row="2" SelectedIndex="{Binding SelectedRoleIndex}"
                                  FontSize="14"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -233,7 +232,8 @@
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>
-                        <ListBox Grid.Row="2" Grid.Column="3"
+                        <ContentControl Grid.Row="2" Grid.Column="1" Content="{Binding Canvas}"/>
+                        <ListBox Grid.Row="2" Grid.Column="2"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding ApplicantItems}"
                                  VirtualizingStackPanel.IsVirtualizing="False"
