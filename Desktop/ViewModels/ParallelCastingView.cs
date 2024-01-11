@@ -92,25 +92,29 @@ namespace Carmen.Desktop.ViewModels
             UpdateLinesCount += 1;
             OnPropertyChanged(nameof(UpdateLinesCount));
             Canvas.Children.Clear();
-            for (var r = 0; r < Roles.Length; r++)
+            try
             {
-                for (var a = 0; a < Applicants.Length; a++)
+                for (var r = Roles.Length - 1; r < Roles.Length; r++)
                 {
-                    var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0));
-                    var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0));
-                    Canvas.Children.Add(new Line
+                    for (var a = Applicants.Length - 1; a < Applicants.Length; a++)
                     {
-                        X1 = role_point.X,
-                        Y1 = role_point.Y,
-                        X2 = applicant_point.X,
-                        Y2 = applicant_point.Y,
-                        Stroke = new SolidColorBrush
+                        var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
+                        var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
+                        Canvas.Children.Add(new Line
                         {
-                            Color = Colors.Black
-                        }
-                    });
+                            X1 = role_point.X + RoleItems[r].ActualWidth,
+                            Y1 = role_point.Y + RoleItems[r].ActualHeight / 2,
+                            X2 = applicant_point.X,
+                            Y2 = applicant_point.Y + ApplicantItems[r].ActualHeight / 2,
+                            Stroke = new SolidColorBrush
+                            {
+                                Color = Colors.Black
+                            }
+                        });
+                    }
                 }
             }
+            catch (InvalidOperationException) { }
         }
 
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
