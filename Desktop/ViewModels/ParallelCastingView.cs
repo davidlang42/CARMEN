@@ -112,10 +112,17 @@ namespace Carmen.Desktop.ViewModels
                             // - default black
                             // - red if one applicant has 2+ roles
                             // - green if role is fully cast
-                            // - semi-transparent if the lines are not the selected role (optional), or do this by thickness
                         },
                         DataContext = Applicants[a]
                     };
+                    line.SetBinding(Line.StrokeThicknessProperty, new Binding(nameof(ParallelApplicant.SelectedRole))
+                    {
+                        ConverterParameter = Applicants[a].ApplicantForRoles[r],
+                        Converter = new MultiConverter() {
+                            new EqualityConverter(),
+                            new BooleanToValue(2, 1)
+                        }
+                    });
                     line.SetBinding(Line.VisibilityProperty, new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.IsSelected)}")
                     {
                         Converter = new BooleanToVisibilityConverter()
