@@ -71,7 +71,6 @@ namespace Carmen.Desktop.ViewModels
         public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias, AlternativeCast[] alternative_casts)
         {
             //TODO mouseover role to see requirements(at least cast groups)
-            //TODO mouseover applicants to see their cast group
             //TODO sort applicants by suitability
             //TODO (later) grey / strikethrough applicants which aren't elligible (but still allow selection)
             //TODO (last) double click applicants to see details
@@ -79,7 +78,7 @@ namespace Carmen.Desktop.ViewModels
             parent = applicants_panel;
             Node = node;
             Roles = roles.Select(r => new ParallelRole(r)).ToArray();
-            RoleItems = Roles.Select(pr => new ListBoxItem { Content = ControlForRoleItem(pr) }).ToArray();
+            RoleItems = Roles.Select(pr => new ListBoxItem { DataContext = pr, Content = ControlForRoleItem(pr) }).ToArray();
             //TODO remove if unused
             //requiredCastGroups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
             Applicants = applicants.AsParallel().Select(a =>
@@ -94,7 +93,7 @@ namespace Carmen.Desktop.ViewModels
                 //pa.PropertyChanged += ParallelApplicant_PropertyChanged;
                 return pa;
             }).ToArray();
-            ApplicantItems = Applicants.Select(pa => new ListBoxItem { Content = ControlForApplicantItem(pa) }).ToArray();
+            ApplicantItems = Applicants.Select(pa => new ListBoxItem { DataContext = pa, Content = ControlForApplicantItem(pa) }).ToArray();
             //TODO remove if unused
             //var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             //view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
@@ -186,7 +185,6 @@ namespace Carmen.Desktop.ViewModels
             });
             var check = new CheckBox
             {
-                DataContext = pa,
                 VerticalAlignment = VerticalAlignment.Center,
                 Content = new StackPanel
                 {

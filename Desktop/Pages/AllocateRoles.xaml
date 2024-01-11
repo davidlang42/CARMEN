@@ -32,6 +32,7 @@
         <cv:BytesToImage x:Key="bytesToImage"/>
         <cv:FallbackValues x:Key="fallbackValues"/>
         <cv:HideIfEmpty x:Key="hideIfEmpty"/>
+        <cv:ApplicantDescription x:Key="applicantDescription"/>
         <RoutedUICommand x:Key="removeAllowedConsecutiveCommand"/>
     </Page.Resources>
     <Page.CommandBindings>
@@ -241,6 +242,7 @@
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
                                     <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                    <Setter Property="ToolTip" Value="{Binding Applicant, Converter={StaticResource applicantDescription}}"/>
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>
