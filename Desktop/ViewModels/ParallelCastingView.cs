@@ -50,7 +50,7 @@ namespace Carmen.Desktop.ViewModels
 
         public ListBoxItem[] ApplicantItems { get; }
 
-        public Canvas Canvas { get; } = new Canvas();
+        public Canvas Canvas { get; } = new Canvas();//TODO move canvas to only the middle quadrant
 
         public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias)
         {
@@ -89,12 +89,8 @@ namespace Carmen.Desktop.ViewModels
         //    }
         //}
 
-        public int UpdateLinesCount { get; private set; } = 0;
-
         public void UpdateLinePositions()
         {
-            UpdateLinesCount += 1;//TODO remove test code here and in AllocateRoles.xaml
-            OnPropertyChanged(nameof(UpdateLinesCount));
             Canvas.Children.Clear();
             for (var r = 0; r < Roles.Length; r++)
             {

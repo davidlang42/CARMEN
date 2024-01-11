@@ -205,7 +205,7 @@
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:ParallelCastingView}">
-                    <Grid MouseDown="ParallelCastingView_MouseDown" Loaded="ParallelCastingView_Loaded">
+                    <Grid MouseDown="ParallelCastingView_MouseDown">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
@@ -218,7 +218,6 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <ContentControl Content="{Binding Canvas}" Grid.RowSpan="4" Grid.ColumnSpan="3"/>
-                        <TextBlock Text="{Binding UpdateLinesCount}"/>
                         <TextBlock Grid.ColumnSpan="3" Text="{Binding Title}" FontSize="22" Margin="0 0 0 10"/>
                         <TextBlock Grid.Row="1" Text="Roles:" FontSize="18"/>
                         <TextBlock Grid.Row="1" Grid.Column="3" Text="Available Applicants:" FontSize="18"/>
@@ -227,7 +226,7 @@
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding RoleItems}"
                                  VirtualizingStackPanel.IsVirtualizing="False"
-                                 LayoutUpdated="ParallelCastingList_LayoutUpdated">
+                                 ScrollViewer.ScrollChanged="ParallelCastingList_ScrollChanged">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
                                     <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
@@ -238,7 +237,7 @@
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding ApplicantItems}"
                                  VirtualizingStackPanel.IsVirtualizing="False"
-                                 LayoutUpdated="ParallelCastingList_LayoutUpdated">
+                                 ScrollViewer.ScrollChanged="ParallelCastingList_ScrollChanged">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
                                     <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
