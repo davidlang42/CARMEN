@@ -205,7 +205,7 @@
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:ParallelCastingView}">
-                    <Grid MouseDown="ParallelCastingView_MouseDown">
+                    <Grid MouseDown="ParallelCastingView_MouseDown" Background="White">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>

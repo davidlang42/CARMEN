@@ -572,11 +572,12 @@ namespace Carmen.Desktop.Pages
             //TODO cancel
         }
 
-        private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)//TODO make this get triggered when canvas is clicked
+        private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (applicantsPanel.Content is ParallelCastingView view)
             {
                 view.SelectedRoleIndex = -1;
+                e.Handled = true;
             }
         }
 
