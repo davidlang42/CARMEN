@@ -94,9 +94,9 @@ namespace Carmen.Desktop.ViewModels
             Canvas.Children.Clear();
             try
             {
-                for (var r = Roles.Length - 1; r < Roles.Length; r++)
+                for (var r = 0; r < Roles.Length; r++)
                 {
-                    for (var a = Applicants.Length - 1; a < Applicants.Length; a++)
+                    for (var a = 0; a < Applicants.Length; a++)
                     {
                         var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
                         var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
