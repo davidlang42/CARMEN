@@ -239,7 +239,7 @@
                                  LayoutUpdated="ParallelCastingList_LayoutUpdated">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
-                                    <Setter Property="ContextMenu" Value="{Binding ContextMenu}"/>
+                                    <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>
