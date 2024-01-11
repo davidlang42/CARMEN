@@ -100,7 +100,7 @@ namespace Carmen.Desktop.ViewModels
                     {
                         var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
                         var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
-                        Canvas.Children.Add(new Line
+                        var line = new Line
                         {
                             X1 = role_point.X + RoleItems[r].ActualWidth,
                             Y1 = role_point.Y + RoleItems[r].ActualHeight / 2,
@@ -109,8 +109,11 @@ namespace Carmen.Desktop.ViewModels
                             Stroke = new SolidColorBrush
                             {
                                 Color = Colors.Black
-                            }
-                        });
+                            },
+                            DataContext = Applicants[a].ApplicantForRoles[r]
+                        };
+                        line.SetBinding(Line.VisibilityProperty, new Binding(nameof(ApplicantForRole.IsSelected)) { Converter = new BooleanToVisibilityConverter() });
+                        Canvas.Children.Add(line);
                     }
                 }
             }

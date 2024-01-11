@@ -17,11 +17,12 @@ namespace Carmen.Desktop.ViewModels
         public event PropertyChangedEventHandler? PropertyChanged;
 
         readonly ParallelCastingView castingView;
-        readonly ApplicantForRole[] applicantForRoles;
+
+        public ApplicantForRole[] ApplicantForRoles { get; }
 
         public Applicant Applicant { get; }
 
-        public ApplicantForRole? SelectedRole => castingView.SelectedRoleIndex is int r ? applicantForRoles[r] : null;
+        public ApplicantForRole? SelectedRole => castingView.SelectedRoleIndex is int r ? ApplicantForRoles[r] : null;
 
         //public IEnumerable<ParallelRole> SelectedForRoles => applicantForRoles.Where(kvp => kvp.Value.IsSelected).Select(kvp => kvp.Key);
 
@@ -29,7 +30,7 @@ namespace Carmen.Desktop.ViewModels
         {
             castingView = casting_view;
             Applicant = applicant;
-            applicantForRoles = applicant_for_roles;
+            ApplicantForRoles = applicant_for_roles;
             //foreach (var afr in applicantForRoles.Values)
             //{
             //    afr.PropertyChanged += ApplicantForRole_PropertyChanged;
