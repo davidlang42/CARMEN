@@ -108,7 +108,7 @@ namespace Carmen.Desktop.ViewModels
                 {
                     var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
                     var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
-                    var line = new Line//TODO (optional) handle line click to select the role (and applican) which the line joins
+                    var line = new Line
                     {
                         X1 = 0,
                         Y1 = role_point.Y + RoleItems[r].ActualHeight / 2 - canvas_point.Y,
@@ -140,6 +140,13 @@ namespace Carmen.Desktop.ViewModels
                     {
                         Converter = new BooleanToVisibilityConverter()
                     });
+                    var r_copy = r;
+                    line.MouseDown += (o, e) =>
+                    {
+                        SelectedRoleIndex = r_copy;
+                        //TODO (optional) select applicant which the line joins
+                        e.Handled = true;
+                    };
                     Canvas.Children.Add(line);
                 }
             }
