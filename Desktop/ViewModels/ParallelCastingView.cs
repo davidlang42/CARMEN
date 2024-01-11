@@ -6,6 +6,7 @@ using Carmen.ShowModel;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -78,7 +79,6 @@ namespace Carmen.Desktop.ViewModels
         public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias, AlternativeCast[] alternative_casts)
         {
             //TODO sort applicants by suitability
-            //TODO (later) grey / strikethrough applicants which aren't elligible (but still allow selection)
             alternativeCasts = alternative_casts;
             parent = applicants_panel;
             Node = node;
@@ -179,6 +179,19 @@ namespace Carmen.Desktop.ViewModels
                 Converter = new DoubleToPercentage(),
                 StringFormat = "({0})"
             });
+            suitability.SetBinding(TextBlock.TextDecorationsProperty, new Binding($"{nameof(ParallelApplicant.SelectedRole)}.{nameof(ApplicantForRole.IsCastGroupNeeded)}")
+            {
+                Converter = new StrikeThroughIfFalse()
+            });
+            var name = new TextBlock
+            {
+                TextWrapping = TextWrapping.Wrap,
+                Text = FullName.Format(pa.Applicant)
+            };
+            name.SetBinding(TextBlock.TextDecorationsProperty, new Binding($"{nameof(ParallelApplicant.SelectedRole)}.{nameof(ApplicantForRole.IsCastGroupNeeded)}")
+            {
+                Converter = new StrikeThroughIfFalse()
+            });
             var check = new CheckBox
             {
                 VerticalAlignment = VerticalAlignment.Center,
@@ -188,11 +201,7 @@ namespace Carmen.Desktop.ViewModels
                     Children =
                     {
                         suitability,
-                        new TextBlock
-                        {
-                            TextWrapping = TextWrapping.Wrap,
-                            Text = FullName.Format(pa.Applicant)
-                        }
+                        name
                     }
                 }
             };

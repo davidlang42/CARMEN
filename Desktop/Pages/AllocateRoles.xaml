@@ -245,6 +245,20 @@
                                     <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
                                     <Setter Property="ToolTip" Value="{Binding Applicant, Converter={StaticResource applicantDescription}}"/>
                                     <EventSetter Event="MouseDoubleClick" Handler="ParallelApplicant_MouseDoubleClick" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedRole.IsCastGroupNeeded}" Value="False">
+                                            <Setter Property="ToolTip" Value="{Binding SelectedRole.CastGroupNotNeededReason}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedRole.Eligibility.IsEligible}" Value="False">
+                                            <Setter Property="Background" Value="LightCoral" />
+                                            <Setter Property="ToolTip" Value="{Binding SelectedRole.CommaSeparatedIneligibilityReason}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedRole.Availability.IsAvailable}" Value="False">
+                                            <!-- Unavailable listed last to give precedence -->
+                                            <Setter Property="Background" Value="LightGray" />
+                                            <Setter Property="ToolTip" Value="{Binding SelectedRole.CommaSeparatedUnavailabilityReason}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
                                 </Style>
                             </ListBox.ItemContainerStyle>
                         </ListBox>

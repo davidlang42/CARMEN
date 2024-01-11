@@ -22,6 +22,10 @@ namespace Carmen.Desktop.ViewModels
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public bool IsCastGroupNeeded => Role.CountFor(Applicant.CastGroup!) > 0;
+
+        public string CastGroupNotNeededReason => IsCastGroupNeeded ? "" : $"{Applicant.CastGroup!.Abbreviation} are not needed for {Role.Name}";
+
         public bool IsSelected
         {
             get => Role.Cast.Contains(Applicant);
