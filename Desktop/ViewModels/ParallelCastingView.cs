@@ -73,8 +73,8 @@ namespace Carmen.Desktop.ViewModels
             //TODO mouseover role to see requirements(at least cast groups)
             //TODO mouseover applicants to see their cast group
             //TODO sort applicants by suitability
-            //TODO double click applicants to see details
-            //TODO grey / strikethrough applicants which aren't elligible (but still allow selection)
+            //TODO (later) grey / strikethrough applicants which aren't elligible (but still allow selection)
+            //TODO (last) double click applicants to see details
             alternativeCasts = alternative_casts;
             parent = applicants_panel;
             Node = node;
