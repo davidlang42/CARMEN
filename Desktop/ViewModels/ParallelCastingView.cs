@@ -87,7 +87,7 @@ namespace Carmen.Desktop.ViewModels
 
         public int UpdateLinesCount { get; private set; } = 0;
 
-        public void UpdateLines()//TODO UpdateLinePositions
+        public void UpdateLinePositions()
         {
             UpdateLinesCount += 1;
             OnPropertyChanged(nameof(UpdateLinesCount));

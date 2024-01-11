@@ -581,7 +581,7 @@ namespace Carmen.Desktop.Pages
             if (applicantsPanel.Content is ParallelCastingView view)
             {
                 view.SelectedRoleIndex = null;
-                view.UpdateLines();
+                view.UpdateLinePositions();
             }
         }
 
