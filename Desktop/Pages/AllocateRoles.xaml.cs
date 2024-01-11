@@ -19,10 +19,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Carmen.Desktop.Bindings;
 using Carmen.CastingEngine.Audition;
 using Carmen.CastingEngine.Allocation;
@@ -564,33 +560,41 @@ namespace Carmen.Desktop.Pages
             }
             using var loading = new LoadingOverlay(this) { MainText = "Processing...", SubText = "Calculating applicant suitabilities" };
             applicantsPanel.Content = new ParallelCastingView(applicantsPanel, allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias);
+
         }
 
         private void ParallelSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            //TODO save
         }
 
         private void ParallelCancelButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO
+            //TODO cancel
         }
 
         private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)//TODO this isn't triggered when canvas is clicked
         {
             if (applicantsPanel.Content is ParallelCastingView view)
             {
-                view.SelectedRoleIndex = null;
-                view.UpdateLinePositions();
+                view.SelectedRoleIndex = -1;
             }
         }
 
-        private void ParallelCastingList_LayoutUpdated(object sender, EventArgs e)
+        private void ParallelCastingList_LayoutUpdated(object sender, EventArgs e)//TODO clean up unused
         {
             //if (applicantsPanel.Content is ParallelCastingView view)
             //{
             //    view.UpdateLines();
             //}
+        }
+
+        private void ParallelCastingView_Loaded(object sender, RoutedEventArgs e)
+        {
+            if (applicantsPanel.Content is ParallelCastingView view)
+            {
+                view.UpdateLinePositions();
+            }
         }
     }
 }

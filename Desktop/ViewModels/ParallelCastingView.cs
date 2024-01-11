@@ -58,6 +58,7 @@ namespace Carmen.Desktop.ViewModels
             Node = node;
             Roles = roles.Select(r => new ParallelRole(r)).ToArray();
             RoleItems = Roles.Select(pr => new ListBoxItem { Content = ControlForRoleItem(pr) }).ToArray();
+            //TODO remove if unused
             //requiredCastGroups = role.CountByGroups.Where(cbg => cbg.Count != 0).Select(cbg => cbg.CastGroup).ToHashSet();
             Applicants = applicants.AsParallel().Select(a =>
             {
@@ -67,16 +68,19 @@ namespace Carmen.Desktop.ViewModels
                     afrs[r] = new ApplicantForRole(engine, a, Roles[r].Role, primary_criterias);
                 }
                 var pa = new ParallelApplicant(this, a, afrs);
+                //TODO remove if unused
                 //pa.PropertyChanged += ParallelApplicant_PropertyChanged;
                 return pa;
             }).ToArray();
             ApplicantItems = Applicants.Select(pa => new ListBoxItem { Content = ControlForApplicantItem(pa) }).ToArray();
+            //TODO remove if unused
             //var view = (CollectionView)CollectionViewSource.GetDefaultView(Applicants);
             //view.GroupDescriptions.Add(new PropertyGroupDescription($"{nameof(ApplicantForRole.CastGroupAndCast)}.{nameof(CastGroupAndCast.Name)}"));
             //ConfigureFiltering(show_unavailable, show_ineligible, show_unneeded);
             //ConfigureSorting(new[] { (nameof(ApplicantForRole.Suitability), ListSortDirection.Descending) });
         }
 
+        //TODO remove if unused
         //private void ParallelApplicant_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         //{
         //    if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ParallelApplicant.SelectedForRoles))
@@ -98,7 +102,7 @@ namespace Carmen.Desktop.ViewModels
                 {
                     var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
                     var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
-                    var line = new Line
+                    var line = new Line//TODO (optional) handle line click to select the role (and applican) which the line joins
                     {
                         X1 = role_point.X + RoleItems[r].ActualWidth,
                         Y1 = role_point.Y + RoleItems[r].ActualHeight / 2,
@@ -107,6 +111,11 @@ namespace Carmen.Desktop.ViewModels
                         Stroke = new SolidColorBrush
                         {
                             Color = Colors.Black
+                            //TODO bind colours:
+                            // - default black
+                            // - red if one applicant has 2+ roles
+                            // - green if role is fully cast
+                            // - semi-transparent if the lines are not the selected role (optional), or do this by thickness
                         },
                         DataContext = Applicants[a].ApplicantForRoles[r]
                     };
