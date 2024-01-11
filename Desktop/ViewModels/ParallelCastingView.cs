@@ -114,9 +114,12 @@ namespace Carmen.Desktop.ViewModels
                             // - green if role is fully cast
                             // - semi-transparent if the lines are not the selected role (optional), or do this by thickness
                         },
-                        DataContext = Applicants[a].ApplicantForRoles[r]
+                        DataContext = Applicants[a]
                     };
-                    line.SetBinding(Line.VisibilityProperty, new Binding(nameof(ApplicantForRole.IsSelected)) { Converter = new BooleanToVisibilityConverter() });
+                    line.SetBinding(Line.VisibilityProperty, new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.IsSelected)}")
+                    {
+                        Converter = new BooleanToVisibilityConverter()
+                    });
                     Canvas.Children.Add(line);
                 }
             }
