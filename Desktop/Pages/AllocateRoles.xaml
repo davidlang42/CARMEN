@@ -17,6 +17,7 @@
     Loaded="Page_Loaded">
     <Page.Resources>
         <cv:FullName x:Key="fullName"/>
+        <cv:StrikeThroughIfFalse x:Key="strikeThroughIfFalse"/>
         <cv:DoubleToPercentage x:Key="doubleToPercentage"/>
         <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
         <cv:TrueIfNull x:Key="trueIfNull"/>
@@ -519,6 +520,9 @@
                                     <Style TargetType="{x:Type ListViewItem}">
                                         <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
                                         <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCastGroupNeeded}" Value="False">
+                                                <Setter Property="ToolTip" Value="{Binding CastGroupNotNeededReason}"/>
+                                            </DataTrigger>
                                             <DataTrigger Binding="{Binding Eligibility.IsEligible}" Value="False">
                                                 <Setter Property="Background" Value="LightCoral" />
                                                 <Setter Property="ToolTip" Value="{Binding CommaSeparatedIneligibilityReason}"/>
@@ -550,7 +554,16 @@
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <ContentControl Content="{Binding Applicant}"/>
+                                                            <TextBlock TextDecorations="{Binding IsCastGroupNeeded, Converter={StaticResource strikeThroughIfFalse}}">
+                                                                <TextBlock.Text>
+                                                                    <MultiBinding Converter="{StaticResource fullName}">
+                                                                        <MultiBinding.Bindings>
+                                                                            <Binding Path="FirstName"/>
+                                                                            <Binding Path="LastName"/>
+                                                                        </MultiBinding.Bindings>
+                                                                    </MultiBinding>
+                                                                </TextBlock.Text>
+                                                            </TextBlock>
                                                             <ItemsControl ItemsSource="{Binding Applicant.Tags}">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
