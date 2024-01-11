@@ -50,7 +50,7 @@ namespace Carmen.Desktop.ViewModels
 
         public ListBoxItem[] ApplicantItems { get; }
 
-        public Canvas Canvas { get; } = new();
+        public Canvas Canvas { get; } = new() { ClipToBounds = true };
 
         public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias)
         {
