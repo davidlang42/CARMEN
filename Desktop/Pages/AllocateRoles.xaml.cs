@@ -564,12 +564,13 @@ namespace Carmen.Desktop.Pages
 
         private void ParallelSaveButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO save
+            //TODO save (and confirm that detail windows close)
         }
 
         private void ParallelCancelButton_Click(object sender, RoutedEventArgs e)
         {
-            //TODO cancel
+            //TODO cancel (and confirm that detail windows close)
+            //TODO also check leaving edit mode with Esc key, window cross, double clicking another role (and confirm that detail windows close)
         }
 
         private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)
