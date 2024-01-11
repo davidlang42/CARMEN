@@ -1,5 +1,6 @@
 ﻿using Carmen.CastingEngine;
 using Carmen.CastingEngine.Allocation;
+using Carmen.Desktop.Converters;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
@@ -131,7 +132,10 @@ namespace Carmen.Desktop.ViewModels
         {
             if (other == null)
                 return -1;
-            return Suitability.CompareTo(other.Suitability);
+            var c = Suitability.CompareTo(other.Suitability);
+            if (c != 0)
+                return c;
+            return FullName.Format(Applicant).CompareTo(FullName.Format(other.Applicant));
         }
 
         public int CompareTo(object? obj)

@@ -1,4 +1,5 @@
-﻿using Carmen.ShowModel.Applicants;
+﻿using Carmen.Desktop.Converters;
+using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
 using System;
@@ -13,7 +14,7 @@ using System.Windows.Shapes;
 
 namespace Carmen.Desktop.ViewModels
 {
-    public class ParallelApplicant : INotifyPropertyChanged, ISelectableApplicant
+    public class ParallelApplicant : INotifyPropertyChanged, ISelectableApplicant, IComparable<ParallelApplicant>, IComparable
     {
         public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -65,6 +66,26 @@ namespace Carmen.Desktop.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public int CompareTo(object? obj)
+        {
+            if (obj is not ParallelApplicant other)
+                return -1;
+            return CompareTo(other);
+        }
+
+        public int CompareTo(ParallelApplicant? other)
+        {
+            if (other == null)
+                return -1;
+            return (SelectedRole, other.SelectedRole) switch
+            {
+                (null, null) => FullName.Format(Applicant).CompareTo(FullName.Format(other.Applicant)),
+                (null, _) => -1,
+                (_, null) => 1,
+                (var a, var b) => a.CompareTo(b)
+            };
         }
 
         #region ISelectableApplicant
