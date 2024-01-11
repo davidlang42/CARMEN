@@ -237,7 +237,7 @@
                             </ListBox.ItemContainerStyle>
                         </ListBox>
                         <ContentControl Grid.Row="2" Grid.Column="1" Content="{Binding Canvas}"/>
-                        <ListBox Grid.Row="2" Grid.Column="2" SelectedIndex="{Binding SelectedApplicantIndex, Mode=TwoWay}"
+                        <ListBox Grid.Row="2" Grid.Column="2"
                                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
                                  ItemsSource="{Binding ApplicantItems}"
                                  VirtualizingStackPanel.IsVirtualizing="False"

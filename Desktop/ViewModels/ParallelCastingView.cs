@@ -57,19 +57,6 @@ namespace Carmen.Desktop.ViewModels
             }
         }
 
-        private int selectedApplicantIndex = -1;
-        public int SelectedApplicantIndex
-        {
-            get => selectedApplicantIndex;
-            set
-            {
-                if (selectedApplicantIndex == value)
-                    return;
-                selectedApplicantIndex = value;
-                OnPropertyChanged();
-            }
-        }
-
         public ParallelApplicant[] Applicants { get; }
 
         public ListBoxItem[] ApplicantItems { get; }
@@ -110,7 +97,7 @@ namespace Carmen.Desktop.ViewModels
                         X1 = 0,
                         Y1 = role_point.Y + RoleItems[r].ActualHeight / 2 - canvas_point.Y,
                         X2 = Canvas.ActualWidth,
-                        Y2 = applicant_point.Y + ApplicantItems[r].ActualHeight / 2 - canvas_point.Y,
+                        Y2 = applicant_point.Y + ApplicantItems[a].ActualHeight / 2 - canvas_point.Y,
                         DataContext = Applicants[a]
                     };
                     var line_color = new MultiBinding
@@ -138,11 +125,9 @@ namespace Carmen.Desktop.ViewModels
                         Converter = new BooleanToVisibilityConverter()
                     });
                     var r_copy = r;
-                    var a_copy = a;
                     line.MouseDown += (o, e) =>
                     {
                         SelectedRoleIndex = r_copy;
-                        SelectedApplicantIndex = a_copy;
                         e.Handled = true;
                     };
                     Canvas.Children.Add(line);
