@@ -130,14 +130,11 @@ namespace Carmen.Desktop.Pages
         private void CancelButton_Click(object sender, RoutedEventArgs e)
             => ChangeToViewMode();
 
-
-
         //TODO (OR ADD ISSUE) Change error message "Parallel casting is only applicable to sections which don't allow applicants to have multiple roles within them." into a disabled button with a tooltip
         //TODO (OR ADD ISSUE) Revise how IdealCastingOrder works, so that it recommends using parallel casting for high (but similar) priority roles within single-role sections
         //TODO (OR ADD ISSUE) Speed up line generation: generate lines only when IsSelected is true, keep a reference to them, remove them when IsSelected is false
-        //TODO save (and confirm that detail windows close)
-        //TODO cancel (and confirm that detail windows close)
-        //TODO also check leaving edit mode with Esc key, window cross, double clicking another role (and confirm that detail windows close)
+        //TODO always include any applicants currently cast in the selected roles
+
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (await SaveChanges())
