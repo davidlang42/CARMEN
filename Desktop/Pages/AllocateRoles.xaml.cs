@@ -592,7 +592,7 @@ namespace Carmen.Desktop.Pages
                 return;
             }
             using var loading = new LoadingOverlay(this) { MainText = "Processing...", SubText = "Calculating applicant suitabilities" };
-            applicantsPanel.Content = new ParallelCastingView(applicantsPanel, allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias, alternativeCasts);
+            applicantsPanel.Content = new ParallelCastingView(applicantsPanel, () => FindParallelApplicantsList()?.Focus(), allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias, alternativeCasts);
         }
 
         private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)
@@ -600,6 +600,7 @@ namespace Carmen.Desktop.Pages
             if (applicantsPanel.Content is ParallelCastingView view)
             {
                 view.SelectedRoleIndex = -1;
+                view.SelectedApplicantItem = null;
                 e.Handled = true;
             }
         }
@@ -624,7 +625,7 @@ namespace Carmen.Desktop.Pages
 
         private async void ParallelRolesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (applicantsPanel.VisualDescendants<ListBox>().FirstOrDefault(lb => lb.Name == "ParallelApplicantsList") is ListBox list)
+            if (FindParallelApplicantsList() is ListBox list)
             {
                 list.Items.SortDescriptions.Clear();
                 var prefix_to_parallel_applicant = $"{nameof(ListBoxItem.Content)}.{nameof(FrameworkElement.DataContext)}";
@@ -645,5 +646,7 @@ namespace Carmen.Desktop.Pages
                 }
             }
         }
+
+        ListBox? FindParallelApplicantsList() => applicantsPanel.VisualDescendants<ListBox>().FirstOrDefault(lb => lb.Name == "ParallelApplicantsList");
     }
 }

@@ -76,8 +76,11 @@ namespace Carmen.Desktop.ViewModels
 
         public Canvas Canvas { get; }
 
-        public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias, AlternativeCast[] alternative_casts)
+        readonly Action focusApplicantsList;
+
+        public ParallelCastingView(ContentControl applicants_panel, Action focus_applicants_list, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias, AlternativeCast[] alternative_casts)
         {
+            focusApplicantsList = focus_applicants_list;
             Canvas = new() {
                 ClipToBounds = true,
                 Background = new SolidColorBrush { Color = Colors.White }
@@ -188,6 +191,7 @@ namespace Carmen.Desktop.ViewModels
             {
                 SelectedRoleIndex = r_copy;
                 SelectedApplicantItem = applicant_item_copy;
+                focusApplicantsList();
                 e.Handled = true;
             };
             lines[afr] = line;
