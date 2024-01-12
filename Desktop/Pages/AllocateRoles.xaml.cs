@@ -645,7 +645,7 @@ namespace Carmen.Desktop.Pages
                 if (applicantsPanel.Content is ParallelCastingView view)
                 {
                     view.ClearLines();
-                    await Task.Run(() => Thread.Sleep(10)); // nessesary hack to let the ListBox render, so TransformToAncestor() can work
+                    await Task.Run(() => Thread.Sleep(50)); // nessesary hack to let the ListBox render, so TransformToAncestor() can work
                     view.RedrawLines();
                 }
             }
