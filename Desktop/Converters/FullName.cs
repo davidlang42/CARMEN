@@ -75,7 +75,7 @@ namespace Carmen.Desktop.Converters
 
     public static class FullNameFormatExtensions
     {
-        public static IEnumerable<SortDescription> ToSortDescriptions(this FullNameFormat format, ListSortDirection direction = ListSortDirection.Ascending)
+        public static SortDescription[] ToSortDescriptions(this FullNameFormat format, ListSortDirection direction = ListSortDirection.Ascending)
         {
             switch (format)
             {

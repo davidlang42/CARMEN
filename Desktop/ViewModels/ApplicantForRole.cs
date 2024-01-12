@@ -1,5 +1,6 @@
 ﻿using Carmen.CastingEngine;
 using Carmen.CastingEngine.Allocation;
+using Carmen.Desktop.Converters;
 using Carmen.ShowModel.Applicants;
 using Carmen.ShowModel.Criterias;
 using Carmen.ShowModel.Structure;
@@ -14,29 +15,32 @@ using System.Windows;
 
 namespace Carmen.Desktop.ViewModels
 {
-    public class ApplicantForRole : ISelectableApplicant, INotifyPropertyChanged
+    public class ApplicantForRole : ISelectableApplicant, INotifyPropertyChanged, IComparable<ApplicantForRole>, IComparable
     {
         public Applicant Applicant { get; init; }
         public Criteria[] PrimaryCriterias { get; init; }
-
-        private readonly Role role;
+        public Role Role { get; }
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
+        public bool IsCastGroupNeeded => Role.CountFor(Applicant.CastGroup!) > 0;
+
+        public string CastGroupNotNeededReason => IsCastGroupNeeded ? "" : $"{Applicant.CastGroup!.Abbreviation} are not needed for {Role.Name}";
+
         public bool IsSelected
         {
-            get => role.Cast.Contains(Applicant);
+            get => Role.Cast.Contains(Applicant);
             set
             {
                 if (value)
                 {
-                    if (!role.Cast.Contains(Applicant))
-                        role.Cast.Add(Applicant);
+                    if (!Role.Cast.Contains(Applicant))
+                        Role.Cast.Add(Applicant);
                 }
                 else
                 {
-                    if (role.Cast.Contains(Applicant))
-                        role.Cast.Remove(Applicant);
+                    if (Role.Cast.Contains(Applicant))
+                        Role.Cast.Remove(Applicant);
                 }
                 OnPropertyChanged();
             }
@@ -46,7 +50,7 @@ namespace Carmen.Desktop.ViewModels
         public string FirstName => Applicant.FirstName;
         public string LastName => Applicant.LastName;
 
-        public string RoleName => role.Name;
+        public string RoleName => Role.Name;
 
         public string? CastNumberAndCast => Applicant.CastNumberAndCast;
 
@@ -58,7 +62,7 @@ namespace Carmen.Desktop.ViewModels
 
         /// <summary>Not including this role, even if already cast in it.</summary>
         public IEnumerable<string> ExistingRoles
-            => Applicant.Roles.Where(r => r != role)
+            => Applicant.Roles.Where(r => r != Role)
             .Select(r => $"'{r.Name}' in {string.Join(", ", r.Items.Select(i => i.Name))}");
 
         public string OverallAbility { get; init; }
@@ -103,7 +107,7 @@ namespace Carmen.Desktop.ViewModels
         {
             this.Applicant = applicant;
             CastGroupAndCast = new CastGroupAndCast(Applicant);
-            this.role = role;
+            this.Role = role;
             PrimaryCriterias = primary_criterias;
             Suitability = engine.SuitabilityOf(applicant, role);
             OverallAbility = engine.OverallAbility(applicant).ToString();
@@ -122,6 +126,23 @@ namespace Carmen.Desktop.ViewModels
         protected void OnPropertyChanged([CallerMemberName] string? name = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        }
+
+        public int CompareTo(ApplicantForRole? other)
+        {
+            if (other == null)
+                return -1;
+            var c = Suitability.CompareTo(other.Suitability);
+            if (c != 0)
+                return c;
+            return FullName.Format(Applicant).CompareTo(FullName.Format(other.Applicant));
+        }
+
+        public int CompareTo(object? obj)
+        {
+            if (obj is not ApplicantForRole other)
+                return -1;
+            return CompareTo(other);
         }
     }
 }

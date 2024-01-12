@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Carmen.Desktop.ViewModels
 {
@@ -22,6 +23,9 @@ namespace Carmen.Desktop.ViewModels
         public ObservableCollection<IncompleteRole> IncompleteRoles { get; }
         public ObservableCollection<CastingError> CastingErrors { get; }
         public ObservableCollection<AllowedConsecutive> AllowedConsecutives { get; }
+
+        public bool AllowParallelCasting => Node is Section section && !section.SectionType.AllowMultipleRoles || Node is Item;
+        public string? ParallelCastingToolTip => AllowParallelCasting ? null : "Parallel casting is only applicable to sections which don't allow applicants to have multiple roles within them";
 
         /// <summary>Node should be an Item or Section, NOT ShowRoot</summary>
         public NodeRolesOverview(Node node, AlternativeCast[] alternative_casts, IEnumerable<Applicant> cast_members, Action<IEnumerable<Item>, IEnumerable<Role>> callback_after_error_correction, IAllocationEngine engine)

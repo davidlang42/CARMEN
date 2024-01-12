@@ -18,15 +18,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 using Carmen.Desktop.Bindings;
 using Carmen.CastingEngine.Audition;
 using Carmen.CastingEngine.Allocation;
+using System.Data;
 
 namespace Carmen.Desktop.Pages
 {
@@ -148,6 +144,24 @@ namespace Carmen.Desktop.Pages
                         .Select(afr => afr.Applicant);
                     using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Learning...", "Roles allocated by the user"))
                         await allocationEngine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
+                    await SaveChanges(false); // to save any weights updated by the engine
+                }
+                else if (applicantsPanel.Content is ParallelCastingView parallel_view)
+                {
+                    rootNodeView.RoleCastingChanged(parallel_view.Roles.Select(pr => pr.Role));
+                    using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast) + parallel_view.Roles.Length, "Learning...", "Roles allocated by the user"))
+                    {
+                        for (var r = 0; r < parallel_view.Roles.Length; r++)
+                        {
+                            var role = parallel_view.Roles[r].Role;
+                            var applicants_not_picked = parallel_view.Applicants
+                                .Select(pa => pa.ApplicantForRoles[r])
+                                .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
+                                .Where(afr => !afr.IsSelected)
+                                .Select(afr => afr.Applicant);
+                            await allocationEngine.UserPickedCast(role.Cast, applicants_not_picked, role);
+                        }
+                    }
                     await SaveChanges(false); // to save any weights updated by the engine
                 }
                 ChangeToViewMode();
@@ -424,30 +438,7 @@ namespace Carmen.Desktop.Pages
         {
             if (applicantsPanel.Content is not NodeRolesOverview current_view)
                 return;
-            if (current_view.IncompleteRoles.Count == 0)
-            {
-                MessageBox.Show("There are no incomplete roles to cast.");
-                return;
-            }
-            if (ParseSelectedRoles(current_view.IncompleteRoles) is not List<Role> selected_roles)
-                return;
-            if (selected_roles.Count == 0)
-            {
-                if (MessageBox.Show("No roles are selected. Would you like to select them all?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
-                    return;
-                foreach (var ir in current_view.IncompleteRoles)
-                    ir.IsSelected = true;
-                if (ParseSelectedRoles(current_view.IncompleteRoles) is not List<Role> all_selected_roles)
-                    return;
-                if (all_selected_roles.Count == 0)
-                {
-                    MessageBox.Show("No roles are selected.", WindowTitle);
-                    return;
-                }
-                selected_roles = all_selected_roles;
-            }
-            if (selected_roles.Count == 1 && MessageBox.Show("Only 1 role is selected, so no balancing will occur."
-                + "\nDo you still want to automatically cast this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
+            if (GetSelectedRoles(current_view, "balancing", "automatically cast", SelectRolesForBalancing) is not List<Role> selected_roles)
                 return;
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.BalanceCast), "Processing...", "Balancing cast between roles"))
                 await allocationEngine.BalanceCast(applicantsInCast, selected_roles);
@@ -457,7 +448,37 @@ namespace Carmen.Desktop.Pages
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection, allocationEngine);
         }
 
-        private List<Role>? ParseSelectedRoles(IEnumerable<IncompleteRole> incomplete_roles)
+        private List<Role>? GetSelectedRoles(NodeRolesOverview current_view, string operation_noun, string operation_verb, Func<IEnumerable<IncompleteRole>, List<Role>?> parse_selected_roles)
+        {
+            if (current_view.IncompleteRoles.Count == 0)
+            {
+                MessageBox.Show("There are no incomplete roles to cast.");
+                return null;
+            }
+            if (parse_selected_roles(current_view.IncompleteRoles) is not List<Role> selected_roles)
+                return null;
+            if (selected_roles.Count == 0)
+            {
+                if (MessageBox.Show("No roles are selected. Would you like to select them all?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
+                    return null;
+                foreach (var ir in current_view.IncompleteRoles)
+                    ir.IsSelected = true;
+                if (parse_selected_roles(current_view.IncompleteRoles) is not List<Role> all_selected_roles)
+                    return null;
+                if (all_selected_roles.Count == 0)
+                {
+                    MessageBox.Show("No roles are selected.", WindowTitle);
+                    return null;
+                }
+                selected_roles = all_selected_roles;
+            }
+            if (selected_roles.Count == 1 && MessageBox.Show($"Only 1 role is selected, so no {operation_noun} will occur."
+                + $"\nDo you still want to {operation_verb} this role?", WindowTitle, MessageBoxButton.YesNo) == MessageBoxResult.No)
+                return null;
+            return selected_roles;
+        }
+
+        private List<Role>? SelectRolesForBalancing(IEnumerable<IncompleteRole> incomplete_roles)
         {
             var selected_roles = new List<Role>();
             foreach (var incomplete_role in incomplete_roles)
@@ -475,6 +496,17 @@ namespace Carmen.Desktop.Pages
                     else
                         return null;
                 }
+                if (incomplete_role.IsSelected)
+                    selected_roles.Add(incomplete_role.Role);
+            }
+            return selected_roles;
+        }
+
+        private List<Role>? SelectRolesForParallel(IEnumerable<IncompleteRole> incomplete_roles)
+        {
+            var selected_roles = new List<Role>();
+            foreach (var incomplete_role in incomplete_roles)
+            {
                 if (incomplete_role.IsSelected)
                     selected_roles.Add(incomplete_role.Role);
             }
@@ -527,6 +559,83 @@ namespace Carmen.Desktop.Pages
                 var list_view = (ListView)sender;
                 var view_model = (EditableRoleWithApplicantsView)list_view.DataContext;
                 view_model.ConfigureSorting(sortFields);
+            }
+        }
+
+        private void ParallelCastingButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (applicantsPanel.Content is not NodeRolesOverview current_view)
+                return;            
+            if ((current_view.Node is not Section section || section.SectionType.AllowMultipleRoles) && current_view.Node is not Item)
+            {
+                MessageBox.Show("Parallel casting is only applicable to sections which don't allow applicants to have multiple roles within them.");
+                return;
+            }
+            if (GetSelectedRoles(current_view, "parallel casting", "allocate", SelectRolesForParallel) is not List<Role> selected_roles)
+                return;
+            var applicants_already_cast_in_selected_roles = selected_roles
+                .SelectMany(r => r.Cast).ToHashSet();
+            var applicants_already_cast_in_section = current_view.Node.ItemsInOrder()
+                .SelectMany(i => i.Roles).Distinct()
+                .SelectMany(r => r.Cast).ToHashSet();
+            // include applicants already cast in the selected roles, or not cast in this section
+            var available_applicants = applicantsInCast.Where(a => applicants_already_cast_in_selected_roles.Contains(a) || !applicants_already_cast_in_section.Contains(a)).ToArray();
+            if (available_applicants.Length == 0)
+            {
+                var section_name = current_view.Node switch
+                {
+                    Section s => s.SectionType.Name,
+                    Item => "item",
+                    _ => "section"
+                };
+                MessageBox.Show($"All applicants already have a role in this {section_name}, so there is no one left to parallel cast.");
+                return;
+            }
+            using var loading = new LoadingOverlay(this) { MainText = "Processing...", SubText = "Calculating applicant suitabilities" };
+            applicantsPanel.Content = new ParallelCastingView(applicantsPanel, allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias, alternativeCasts);
+        }
+
+        private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (applicantsPanel.Content is ParallelCastingView view)
+            {
+                view.SelectedRoleIndex = -1;
+                e.Handled = true;
+            }
+        }
+
+        private void ParallelCastingList_ScrollChanged(object sender, ScrollChangedEventArgs e)
+        {
+            if (applicantsPanel.Content is ParallelCastingView view)
+            {
+                view.UpdateLinePositions();
+            }
+        }
+
+        private void ParallelApplicant_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var list_box_item = (ListBoxItem)sender;
+            if (applicantsPanel.Content is ParallelCastingView view && list_box_item.DataContext is ParallelApplicant pa)
+            {
+                view.ShowDetailsWindow(connection, pa, Window.GetWindow(this), criterias, auditionEngine);
+                e.Handled = true;
+            }
+        }
+
+        private void ParallelRolesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (applicantsPanel.VisualDescendants<ListBox>().FirstOrDefault(lb => lb.Name == "ParallelApplicantsList") is ListBox list)
+            {
+                list.Items.SortDescriptions.Clear();
+                var prefix_to_parallel_applicant = $"{nameof(ListBoxItem.Content)}.{nameof(FrameworkElement.DataContext)}";
+                list.Items.SortDescriptions.Add(new SortDescription($"{prefix_to_parallel_applicant}.{nameof(ParallelApplicant.SelectedRole)}.{nameof(ApplicantForRole.Suitability)}", ListSortDirection.Descending));
+                var sorts = Properties.Settings.Default.FullNameFormat.ToSortDescriptions(ListSortDirection.Ascending);
+                for (var s =  0; s < sorts.Length; s++)
+                {
+                    var sort = sorts[s];
+                    sort.PropertyName = $"{prefix_to_parallel_applicant}.{sort.PropertyName}"; // this works because both Applicant and ParallelApplicant have FirstName/LastName fields
+                    list.Items.SortDescriptions.Add(sort);
+                }
             }
         }
     }

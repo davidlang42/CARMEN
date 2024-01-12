@@ -17,9 +17,14 @@
     Loaded="Page_Loaded">
     <Page.Resources>
         <cv:FullName x:Key="fullName"/>
+        <cv:StrikeThroughIfFalse x:Key="strikeThroughIfFalse"/>
         <cv:DoubleToPercentage x:Key="doubleToPercentage"/>
         <cv:ProcessStatusIcon x:Key="processStatusIcon"/>
         <cv:TrueIfNull x:Key="trueIfNull"/>
+        <cv:MultiConverter x:Key="falseIfNull">
+            <cv:TrueIfNull/>
+            <cv:InvertBoolean/>
+        </cv:MultiConverter>
         <BooleanToVisibilityConverter x:Key="booleanToVisibility"/>
         <cv:MultiConverter x:Key="inverseBooleanToVisibility">
             <cv:InvertBoolean/>
@@ -28,6 +33,7 @@
         <cv:BytesToImage x:Key="bytesToImage"/>
         <cv:FallbackValues x:Key="fallbackValues"/>
         <cv:HideIfEmpty x:Key="hideIfEmpty"/>
+        <cv:ApplicantDescription x:Key="applicantDescription"/>
         <RoutedUICommand x:Key="removeAllowedConsecutiveCommand"/>
     </Page.Resources>
     <Page.CommandBindings>
@@ -185,15 +191,97 @@
                         <Grid Grid.Row="4" Grid.ColumnSpan="3" Margin="0 10 0 0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
                             <Button HorizontalAlignment="Left" Width="250" Height="35" Margin="0 0 0 5"
                                 Content="Allocate balanced cast to selected roles"
                                 Click="BalanceCastButton_Click" />
-                            <Button Grid.Column="1" Width="160" Height="35" Margin="0 0 0 5"
+                            <Button Grid.Column="1" HorizontalAlignment="Left" Width="250" Height="35" Margin="0 0 0 5"
+                                Content="Allocate selected roles in parallel"
+                                IsEnabled="{Binding AllowParallelCasting}"
+                                ToolTipService.ShowOnDisabled="True"
+                                ToolTip="{Binding ParallelCastingToolTip}"
+                                Click="ParallelCastingButton_Click" />
+                            <Button Grid.Column="2" Width="160" Height="35" Margin="0 0 0 5"
                                 IsCancel="True" Content="Return to Main Menu"
                                 Click="MainMenuButton_Click" />
                         </Grid>
+                    </Grid>
+                </DataTemplate>
+                <DataTemplate DataType="{x:Type vm:ParallelCastingView}">
+                    <Grid MouseDown="ParallelCastingView_MouseDown" Background="White">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Grid.ColumnSpan="3" Text="{Binding Title}" FontSize="22" Margin="0 0 0 10"/>
+                        <TextBlock Grid.Row="1" Text="Roles:" FontSize="18"/>
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="Available Applicants:" FontSize="18"/>
+                        <ListBox Grid.Row="2" SelectedIndex="{Binding SelectedRoleIndex, Mode=TwoWay}"
+                                 FontSize="14"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding RoleItems}"
+                                 VirtualizingStackPanel.IsVirtualizing="False"
+                                 SelectionChanged="ParallelRolesList_SelectionChanged"
+                                 ScrollViewer.ScrollChanged="ParallelCastingList_ScrollChanged">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                    <Setter Property="ToolTip" Value="{Binding ToolTip}"/>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                        <ContentControl Grid.Row="2" Grid.Column="1" Content="{Binding Canvas}"/>
+                        <ListBox Grid.Row="2" Grid.Column="2"
+                                 ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                                 ItemsSource="{Binding ApplicantItems}"
+                                 VirtualizingStackPanel.IsVirtualizing="False"
+                                 Name="ParallelApplicantsList"
+                                 ScrollViewer.ScrollChanged="ParallelCastingList_ScrollChanged">
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <Setter Property="KeyboardNavigation.IsTabStop" Value="False"/>
+                                    <Setter Property="ToolTip" Value="{Binding Applicant, Converter={StaticResource applicantDescription}}"/>
+                                    <EventSetter Event="MouseDoubleClick" Handler="ParallelApplicant_MouseDoubleClick" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding SelectedRole.IsCastGroupNeeded}" Value="False">
+                                            <Setter Property="ToolTip" Value="{Binding SelectedRole.CastGroupNotNeededReason}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedRole.Eligibility.IsEligible}" Value="False">
+                                            <Setter Property="Background" Value="LightCoral" />
+                                            <Setter Property="ToolTip" Value="{Binding SelectedRole.CommaSeparatedIneligibilityReason}"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding SelectedRole.Availability.IsAvailable}" Value="False">
+                                            <!-- Unavailable listed last to give precedence -->
+                                            <Setter Property="Background" Value="LightGray" />
+                                            <Setter Property="ToolTip" Value="{Binding SelectedRole.CommaSeparatedUnavailabilityReason}"/>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                        </ListBox>
+                        <StackPanel Grid.Row="3" Grid.ColumnSpan="3" Orientation="Horizontal" HorizontalAlignment="Right">
+                            <Button IsCancel="True" Width="100" Height="35" Margin="5 5 5 0" Click="CancelButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Times" Width="12" Margin="2 0" Foreground="DimGray"/>
+                                    <TextBlock Text="Cancel" Margin="2 0"/>
+                                </StackPanel>
+                            </Button>
+                            <Button IsDefault="False" Width="100" Height="35" Margin="5 5 0 0" Click="SaveButton_Click">
+                                <StackPanel Orientation="Horizontal">
+                                    <fa:ImageAwesome Icon="Check" Width="12" Margin="2 0" Foreground="MediumBlue"/>
+                                    <TextBlock Text="Save" Margin="2 0"/>
+                                </StackPanel>
+                            </Button>
+                        </StackPanel>
                     </Grid>
                 </DataTemplate>
                 <DataTemplate DataType="{x:Type vm:RoleWithApplicantsView}">
@@ -437,6 +525,9 @@
                                     <Style TargetType="{x:Type ListViewItem}">
                                         <EventSetter Event="MouseDoubleClick" Handler="ListViewItem_MouseDoubleClick" />
                                         <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsCastGroupNeeded}" Value="False">
+                                                <Setter Property="ToolTip" Value="{Binding CastGroupNotNeededReason}"/>
+                                            </DataTrigger>
                                             <DataTrigger Binding="{Binding Eligibility.IsEligible}" Value="False">
                                                 <Setter Property="Background" Value="LightCoral" />
                                                 <Setter Property="ToolTip" Value="{Binding CommaSeparatedIneligibilityReason}"/>
@@ -468,7 +559,16 @@
                                                 <GridViewColumn.CellTemplate>
                                                     <DataTemplate>
                                                         <StackPanel Orientation="Horizontal">
-                                                            <ContentControl Content="{Binding Applicant}"/>
+                                                            <TextBlock TextDecorations="{Binding IsCastGroupNeeded, Converter={StaticResource strikeThroughIfFalse}}">
+                                                                <TextBlock.Text>
+                                                                    <MultiBinding Converter="{StaticResource fullName}">
+                                                                        <MultiBinding.Bindings>
+                                                                            <Binding Path="FirstName"/>
+                                                                            <Binding Path="LastName"/>
+                                                                        </MultiBinding.Bindings>
+                                                                    </MultiBinding>
+                                                                </TextBlock.Text>
+                                                            </TextBlock>
                                                             <ItemsControl ItemsSource="{Binding Applicant.Tags}">
                                                                 <ItemsControl.ItemsPanel>
                                                                     <ItemsPanelTemplate>
