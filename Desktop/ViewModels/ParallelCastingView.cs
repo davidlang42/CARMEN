@@ -109,6 +109,7 @@ namespace Carmen.Desktop.ViewModels
                     {
                         if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ApplicantForRole.IsSelected))
                         {
+                            SelectedApplicantItem = ApplicantItems[a_copy];
                             if (afr.IsSelected)
                             {
                                 var canvas_point = Canvas.TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
