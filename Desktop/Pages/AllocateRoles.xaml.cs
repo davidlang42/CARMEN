@@ -147,16 +147,21 @@ namespace Carmen.Desktop.Pages
                 }
                 else if (applicantsPanel.Content is ParallelCastingView parallel_view)
                 {
-                    foreach (var role in parallel_view.Roles)
-                        rootNodeView.RoleCastingChanged(role.Role); //TODO could be smarter about this
-                    //TODO update weights
-                    //var applicants_not_picked = editable_view.Applicants
-                    //    .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
-                    //    .Where(afr => !afr.IsSelected)
-                    //    .Select(afr => afr.Applicant);
-                    //using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Learning...", "Roles allocated by the user"))
-                    //    await allocationEngine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
-                    //await SaveChanges(false); // to save any weights updated by the engine
+                    using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast) + parallel_view.Roles.Length, "Learning...", "Roles allocated by the user"))
+                    {
+                        for (var r = 0; r < parallel_view.Roles.Length; r++)
+                        {
+                            var role = parallel_view.Roles[r].Role;
+                            rootNodeView.RoleCastingChanged(role); //TODO could be smarter about this
+                            var applicants_not_picked = parallel_view.Applicants
+                                .Select(pa => pa.ApplicantForRoles[r])
+                                .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
+                                .Where(afr => !afr.IsSelected)
+                                .Select(afr => afr.Applicant);
+                            await allocationEngine.UserPickedCast(role.Cast, applicants_not_picked, role);
+                        }
+                    }
+                    await SaveChanges(false); // to save any weights updated by the engine
                 }
                 ChangeToViewMode();
             }
