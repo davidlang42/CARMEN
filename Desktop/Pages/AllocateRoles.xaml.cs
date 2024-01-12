@@ -592,7 +592,7 @@ namespace Carmen.Desktop.Pages
                 return;
             }
             using var loading = new LoadingOverlay(this) { MainText = "Processing...", SubText = "Calculating applicant suitabilities" };
-            applicantsPanel.Content = new ParallelCastingView(applicantsPanel, allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias, alternativeCasts);
+            applicantsPanel.Content = new ParallelCastingView(applicantsPanel, () => FindParallelApplicantsList()?.Focus(), allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias, alternativeCasts);
         }
 
         private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)
@@ -600,6 +600,7 @@ namespace Carmen.Desktop.Pages
             if (applicantsPanel.Content is ParallelCastingView view)
             {
                 view.SelectedRoleIndex = -1;
+                view.SelectedApplicantItem = null;
                 e.Handled = true;
             }
         }
@@ -608,7 +609,7 @@ namespace Carmen.Desktop.Pages
         {
             if (applicantsPanel.Content is ParallelCastingView view)
             {
-                view.UpdateLinePositions();
+                view.RedrawLines();
             }
         }
 
@@ -622,9 +623,9 @@ namespace Carmen.Desktop.Pages
             }
         }
 
-        private void ParallelRolesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ParallelRolesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (applicantsPanel.VisualDescendants<ListBox>().FirstOrDefault(lb => lb.Name == "ParallelApplicantsList") is ListBox list)
+            if (FindParallelApplicantsList() is ListBox list)
             {
                 list.Items.SortDescriptions.Clear();
                 var prefix_to_parallel_applicant = $"{nameof(ListBoxItem.Content)}.{nameof(FrameworkElement.DataContext)}";
@@ -636,7 +637,20 @@ namespace Carmen.Desktop.Pages
                     sort.PropertyName = $"{prefix_to_parallel_applicant}.{sort.PropertyName}"; // this works because both Applicant and ParallelApplicant have FirstName/LastName fields
                     list.Items.SortDescriptions.Add(sort);
                 }
+                if (list.SelectedItem != null)
+                {
+                    list.ScrollIntoView(list.SelectedItem);
+                    list.Focus();
+                }
+                if (applicantsPanel.Content is ParallelCastingView view)
+                {
+                    view.ClearLines();
+                    await Task.Run(() => Thread.Sleep(50)); // nessesary hack to let the ListBox render, so TransformToAncestor() can work
+                    view.RedrawLines();
+                }
             }
         }
+
+        ListBox? FindParallelApplicantsList() => applicantsPanel.VisualDescendants<ListBox>().FirstOrDefault(lb => lb.Name == "ParallelApplicantsList");
     }
 }
