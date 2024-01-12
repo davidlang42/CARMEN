@@ -440,7 +440,7 @@ namespace Carmen.Desktop.Pages
         {
             if (applicantsPanel.Content is not NodeRolesOverview current_view)
                 return;
-            if (GetSelectedRoles(current_view, "balancing", "automatically cast") is not List<Role> selected_roles)
+            if (GetSelectedRoles(current_view, "balancing", "automatically cast", SelectRolesForBalancing) is not List<Role> selected_roles)
                 return;
             using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.BalanceCast), "Processing...", "Balancing cast between roles"))
                 await allocationEngine.BalanceCast(applicantsInCast, selected_roles);
@@ -450,14 +450,14 @@ namespace Carmen.Desktop.Pages
             applicantsPanel.Content = new NodeRolesOverview(current_view.Node, alternativeCasts, applicantsInCast, SaveChangesAfterErrorCorrection, allocationEngine);
         }
 
-        private List<Role>? GetSelectedRoles(NodeRolesOverview current_view, string operation_noun, string operation_verb)
+        private List<Role>? GetSelectedRoles(NodeRolesOverview current_view, string operation_noun, string operation_verb, Func<IEnumerable<IncompleteRole>, List<Role>?> parse_selected_roles)
         {
             if (current_view.IncompleteRoles.Count == 0)
             {
                 MessageBox.Show("There are no incomplete roles to cast.");
                 return null;
             }
-            if (ParseSelectedRoles(current_view.IncompleteRoles) is not List<Role> selected_roles)
+            if (parse_selected_roles(current_view.IncompleteRoles) is not List<Role> selected_roles)
                 return null;
             if (selected_roles.Count == 0)
             {
@@ -465,7 +465,7 @@ namespace Carmen.Desktop.Pages
                     return null;
                 foreach (var ir in current_view.IncompleteRoles)
                     ir.IsSelected = true;
-                if (ParseSelectedRoles(current_view.IncompleteRoles) is not List<Role> all_selected_roles)
+                if (parse_selected_roles(current_view.IncompleteRoles) is not List<Role> all_selected_roles)
                     return null;
                 if (all_selected_roles.Count == 0)
                 {
@@ -480,7 +480,7 @@ namespace Carmen.Desktop.Pages
             return selected_roles;
         }
 
-        private List<Role>? ParseSelectedRoles(IEnumerable<IncompleteRole> incomplete_roles)
+        private List<Role>? SelectRolesForBalancing(IEnumerable<IncompleteRole> incomplete_roles)
         {
             var selected_roles = new List<Role>();
             foreach (var incomplete_role in incomplete_roles)
@@ -498,6 +498,17 @@ namespace Carmen.Desktop.Pages
                     else
                         return null;
                 }
+                if (incomplete_role.IsSelected)
+                    selected_roles.Add(incomplete_role.Role);
+            }
+            return selected_roles;
+        }
+
+        private List<Role>? SelectRolesForParallel(IEnumerable<IncompleteRole> incomplete_roles)
+        {
+            var selected_roles = new List<Role>();
+            foreach (var incomplete_role in incomplete_roles)
+            {
                 if (incomplete_role.IsSelected)
                     selected_roles.Add(incomplete_role.Role);
             }
@@ -562,7 +573,7 @@ namespace Carmen.Desktop.Pages
                 MessageBox.Show("Parallel casting is only applicable to sections which don't allow applicants to have multiple roles within them.");
                 return;
             }
-            if (GetSelectedRoles(current_view, "parallel casting", "allocate") is not List<Role> selected_roles)
+            if (GetSelectedRoles(current_view, "parallel casting", "allocate", SelectRolesForParallel) is not List<Role> selected_roles)
                 return;
             var applicants_already_cast_in_section = current_view.Node.ItemsInOrder()
                 .SelectMany(i => i.Roles).Distinct()
