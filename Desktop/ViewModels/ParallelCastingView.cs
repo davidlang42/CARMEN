@@ -80,58 +80,100 @@ namespace Carmen.Desktop.ViewModels
                 return new ParallelApplicant(this, a, afrs, primary_criterias);
             }).ToArray();
             ApplicantItems = Applicants.Select(pa => new ListBoxItem { DataContext = pa, Content = ControlForApplicantItem(pa) }).ToArray();
+            for (var r = 0; r < Roles.Length; r++)
+            {
+                for (var a = 0; a < Applicants.Length; a++)
+                {
+                    var r_copy = r;
+                    var a_copy = a;
+                    var afr = Applicants[a].ApplicantForRoles[r];
+                    afr.PropertyChanged += (o, e) =>
+                    {
+                        if (string.IsNullOrEmpty(e.PropertyName) || e.PropertyName == nameof(ApplicantForRole.IsSelected))
+                        {
+                            if (afr.IsSelected)
+                            {
+                                var canvas_point = Canvas.TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
+                                AddLine(r_copy, a_copy, canvas_point, afr);
+                            }
+                            else
+                            {
+                                RemoveLine(afr);
+                            }
+                        }
+                    };
+                }
+            }
         }
 
-        public void UpdateLinePositions()
+        private readonly Dictionary<ApplicantForRole, Line> lines = new();
+
+        public void RedrawLines()
         {
             Canvas.Children.Clear();
+            lines.Clear();
             var canvas_point = Canvas.TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
             for (var r = 0; r < Roles.Length; r++)
             {
                 for (var a = 0; a < Applicants.Length; a++)
                 {
-                    var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
-                    var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
-                    var line = new Line
+                    var afr = Applicants[a].ApplicantForRoles[r];
+                    if (afr.IsSelected)
                     {
-                        X1 = 0,
-                        Y1 = role_point.Y + RoleItems[r].ActualHeight / 2 - canvas_point.Y,
-                        X2 = Canvas.ActualWidth,
-                        Y2 = applicant_point.Y + ApplicantItems[a].ActualHeight / 2 - canvas_point.Y,
-                        DataContext = Applicants[a]
-                    };
-                    var line_color = new MultiBinding
-                    {
-                        Converter = new ParallelLineColorSelector(alternativeCasts, Colors.Red, Colors.Green, Colors.Black),
-                    };
-                    line_color.Bindings.Add(new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}")); // the real binding for "Role Fully Cast"
-                    line_color.Bindings.Add(new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}.{nameof(Role.Cast)}.{nameof(ICollection<Applicant>.Count)}")); // the fake to make it update when IsSelected is changed on *any* instance of this Role
-                    for (var i = 0; i < Roles.Length; i++)
-                    {
-                        // many bindings for all the roles this applicant could be selected in
-                        line_color.Bindings.Add(new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{i}].{nameof(ApplicantForRole.IsSelected)}"));
+                        AddLine(r, a, canvas_point, afr);
                     }
-                    line.SetBinding(Line.StrokeProperty, line_color);
-                    line.SetBinding(Line.StrokeThicknessProperty, new Binding(nameof(ParallelApplicant.SelectedRole))
-                    {
-                        ConverterParameter = Applicants[a].ApplicantForRoles[r],
-                        Converter = new MultiConverter() {
+                }
+            }
+        }
+
+        private void AddLine(int r, int a, Point canvas_point, ApplicantForRole afr)
+        {
+            var role_point = RoleItems[r].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
+            var applicant_point = ApplicantItems[a].TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
+            var line = new Line
+            {
+                X1 = 0,
+                Y1 = role_point.Y + RoleItems[r].ActualHeight / 2 - canvas_point.Y,
+                X2 = Canvas.ActualWidth,
+                Y2 = applicant_point.Y + ApplicantItems[a].ActualHeight / 2 - canvas_point.Y,
+                DataContext = Applicants[a]
+            };
+            var line_color = new MultiBinding
+            {
+                Converter = new ParallelLineColorSelector(alternativeCasts, Colors.Red, Colors.Green, Colors.Black),
+            };
+            line_color.Bindings.Add(new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}")); // the real binding for "Role Fully Cast"
+            line_color.Bindings.Add(new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.Role)}.{nameof(Role.Cast)}.{nameof(ICollection<Applicant>.Count)}")); // the fake to make it update when IsSelected is changed on *any* instance of this Role
+            for (var i = 0; i < Roles.Length; i++)
+            {
+                // many bindings for all the roles this applicant could be selected in
+                line_color.Bindings.Add(new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{i}].{nameof(ApplicantForRole.IsSelected)}"));
+            }
+            line.SetBinding(Line.StrokeProperty, line_color);
+            line.SetBinding(Line.StrokeThicknessProperty, new Binding(nameof(ParallelApplicant.SelectedRole))
+            {
+                ConverterParameter = Applicants[a].ApplicantForRoles[r],
+                Converter = new MultiConverter() {
                             new EqualityConverter(),
                             new BooleanToValue(2, 1)
                         }
-                    });
-                    line.SetBinding(Line.VisibilityProperty, new Binding($"{nameof(ParallelApplicant.ApplicantForRoles)}[{r}].{nameof(ApplicantForRole.IsSelected)}")
-                    {
-                        Converter = new BooleanToVisibilityConverter()
-                    });
-                    var r_copy = r;
-                    line.MouseDown += (o, e) =>
-                    {
-                        SelectedRoleIndex = r_copy;
-                        e.Handled = true;
-                    };
-                    Canvas.Children.Add(line);
-                }
+            });
+            var r_copy = r;
+            line.MouseDown += (o, e) =>
+            {
+                SelectedRoleIndex = r_copy;
+                e.Handled = true;
+            };
+            lines[afr] = line;
+            Canvas.Children.Add(line);
+        }
+
+        private void RemoveLine(ApplicantForRole afr)
+        {
+            if (lines.TryGetValue(afr, out var line))
+            {
+                lines.Remove(afr);
+                Canvas.Children.Remove(line);
             }
         }
 

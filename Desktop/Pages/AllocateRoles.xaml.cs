@@ -608,7 +608,7 @@ namespace Carmen.Desktop.Pages
         {
             if (applicantsPanel.Content is ParallelCastingView view)
             {
-                view.UpdateLinePositions();
+                view.RedrawLines();
             }
         }
 
