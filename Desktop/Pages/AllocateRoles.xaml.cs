@@ -130,6 +130,14 @@ namespace Carmen.Desktop.Pages
         private void CancelButton_Click(object sender, RoutedEventArgs e)
             => ChangeToViewMode();
 
+
+
+        //TODO (OR ADD ISSUE) Change error message "Parallel casting is only applicable to sections which don't allow applicants to have multiple roles within them." into a disabled button with a tooltip
+        //TODO (OR ADD ISSUE) Revise how IdealCastingOrder works, so that it recommends using parallel casting for high (but similar) priority roles within single-role sections
+        //TODO (OR ADD ISSUE) Speed up line generation: generate lines only when IsSelected is true, keep a reference to them, remove them when IsSelected is false
+        //TODO save (and confirm that detail windows close)
+        //TODO cancel (and confirm that detail windows close)
+        //TODO also check leaving edit mode with Esc key, window cross, double clicking another role (and confirm that detail windows close)
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (await SaveChanges())
@@ -144,6 +152,18 @@ namespace Carmen.Desktop.Pages
                     using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Learning...", "Roles allocated by the user"))
                         await allocationEngine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
                     await SaveChanges(false); // to save any weights updated by the engine
+                }
+                else if (applicantsPanel.Content is ParallelCastingView parallel_view)
+                {
+                    rootNodeView.RoleCastingChanged(editable_view.Role);
+                    //TODO update weights
+                    //var applicants_not_picked = editable_view.Applicants
+                    //    .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
+                    //    .Where(afr => !afr.IsSelected)
+                    //    .Select(afr => afr.Applicant);
+                    //using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast), "Learning...", "Roles allocated by the user"))
+                    //    await allocationEngine.UserPickedCast(editable_view.Role.Cast, applicants_not_picked, editable_view.Role);
+                    //await SaveChanges(false); // to save any weights updated by the engine
                 }
                 ChangeToViewMode();
             }
@@ -560,20 +580,6 @@ namespace Carmen.Desktop.Pages
             }
             using var loading = new LoadingOverlay(this) { MainText = "Processing...", SubText = "Calculating applicant suitabilities" };
             applicantsPanel.Content = new ParallelCastingView(applicantsPanel, allocationEngine, current_view.Node, selected_roles, available_applicants, primaryCriterias, alternativeCasts);
-        }
-
-        //TODO (OR ADD ISSUE) Change error message "Parallel casting is only applicable to sections which don't allow applicants to have multiple roles within them." into a disabled button with a tooltip
-        //TODO (OR ADD ISSUE) Revise how IdealCastingOrder works, so that it recommends using parallel casting for high (but similar) priority roles within single-role sections
-        //TODO (OR ADD ISSUE) Speed up line generation: generate lines only when IsSelected is true, keep a reference to them, remove them when IsSelected is false
-        private void ParallelSaveButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO save (and confirm that detail windows close)
-        }
-
-        private void ParallelCancelButton_Click(object sender, RoutedEventArgs e)
-        {
-            //TODO cancel (and confirm that detail windows close)
-            //TODO also check leaving edit mode with Esc key, window cross, double clicking another role (and confirm that detail windows close)
         }
 
         private void ParallelCastingView_MouseDown(object sender, MouseButtonEventArgs e)
