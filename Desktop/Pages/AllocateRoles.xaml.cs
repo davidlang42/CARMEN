@@ -155,7 +155,8 @@ namespace Carmen.Desktop.Pages
                 }
                 else if (applicantsPanel.Content is ParallelCastingView parallel_view)
                 {
-                    rootNodeView.RoleCastingChanged(editable_view.Role);
+                    foreach (var role in parallel_view.Roles)
+                        rootNodeView.RoleCastingChanged(role.Role); //TODO could be smarter about this
                     //TODO update weights
                     //var applicants_not_picked = editable_view.Applicants
                     //    .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)
