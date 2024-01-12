@@ -209,15 +209,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:CARMEN"
-        "ProductCode" = "8:{D853E882-16BF-4A77-BC5B-569A4D232EDC}"
-        "PackageCode" = "8:{4F9EC1EB-BA0C-454B-9839-7E2024AC8172}"
+        "ProductCode" = "8:{3C62AAC2-35E5-481C-A6B3-9983EDB20A68}"
+        "PackageCode" = "8:{6E39C928-C54B-468C-94D5-674B8D3B1A4A}"
         "UpgradeCode" = "8:{961EC686-F4E0-4766-BB8B-8C8B95B0289D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:TRUE"
-        "ProductVersion" = "8:1.3"
+        "ProductVersion" = "8:1.4"
         "Manufacturer" = "8:David Lang"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:https://github.com/davidlang42/CARMEN"
@@ -745,7 +745,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_F331B30318EE45C992DEB7C6F266D877"
             {
-            "SourcePath" = "8:..\\Desktop\\obj\\Debug\\net5.0-windows\\apphost.exe"
+            "SourcePath" = "8:..\\Desktop\\obj\\Debug\\net7.0-windows\\apphost.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_6C9730BB8C4B45A3881433C0DE2D1DAF"
