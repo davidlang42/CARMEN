@@ -199,6 +199,9 @@
                                 Click="BalanceCastButton_Click" />
                             <Button Grid.Column="1" HorizontalAlignment="Left" Width="250" Height="35" Margin="0 0 0 5"
                                 Content="Allocate selected roles in parallel"
+                                IsEnabled="{Binding AllowParallelCasting}"
+                                ToolTipService.ShowOnDisabled="True"
+                                ToolTip="{Binding ParallelCastingToolTip}"
                                 Click="ParallelCastingButton_Click" />
                             <Button Grid.Column="2" Width="160" Height="35" Margin="0 0 0 5"
                                 IsCancel="True" Content="Return to Main Menu"
