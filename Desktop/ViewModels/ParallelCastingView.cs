@@ -127,10 +127,15 @@ namespace Carmen.Desktop.ViewModels
 
         private readonly Dictionary<ApplicantForRole, Line> lines = new();
 
-        public void RedrawLines()
+        public void ClearLines()
         {
             Canvas.Children.Clear();
             lines.Clear();
+        }
+
+        public void RedrawLines()
+        {
+            ClearLines();
             var canvas_point = Canvas.TransformToAncestor(parent).Transform(new Point(0, 0)); // by top left points
             for (var r = 0; r < Roles.Length; r++)
             {

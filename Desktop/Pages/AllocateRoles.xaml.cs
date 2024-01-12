@@ -622,7 +622,7 @@ namespace Carmen.Desktop.Pages
             }
         }
 
-        private void ParallelRolesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private async void ParallelRolesList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (applicantsPanel.VisualDescendants<ListBox>().FirstOrDefault(lb => lb.Name == "ParallelApplicantsList") is ListBox list)
             {
@@ -639,7 +639,9 @@ namespace Carmen.Desktop.Pages
                 list.ScrollIntoView(list.SelectedItem);
                 if (applicantsPanel.Content is ParallelCastingView view)
                 {
-                    //TODO view.RedrawLines();
+                    view.ClearLines();
+                    await Task.Run(() => Thread.Sleep(1)); // nessesary hack to let the ListBox render, so TransformToAncestor() can work
+                    view.RedrawLines();
                 }
             }
         }
