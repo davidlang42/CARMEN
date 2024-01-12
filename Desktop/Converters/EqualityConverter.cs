@@ -8,6 +8,9 @@ using System.Windows.Data;
 
 namespace Carmen.Desktop.Converters
 {
+    /// <summary>
+    /// Converts a single-value or multi-value input into a boolean of whether or not all input values match the parameter
+    /// </summary>
     internal class EqualityConverter : IMultiValueConverter, IValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)

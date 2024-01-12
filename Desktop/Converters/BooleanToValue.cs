@@ -8,6 +8,9 @@ using System.Windows.Data;
 
 namespace Carmen.Desktop.Converters
 {
+    /// <summary>
+    /// Converts a boolean into preset values based on whether it is true or false
+    /// </summary>
     internal class BooleanToValue : IValueConverter
     {
         object valueIfTrue, valueIfFalse;

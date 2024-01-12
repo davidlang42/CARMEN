@@ -9,6 +9,9 @@ using System.Windows.Data;
 
 namespace Carmen.Desktop.Converters
 {
+    /// <summary>
+    /// Converts a boolean into null if true, or TextDecorations.Strikethrough if false
+    /// </summary>
     internal class StrikeThroughIfFalse : IValueConverter
     {
         public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
