@@ -74,10 +74,15 @@ namespace Carmen.Desktop.ViewModels
 
         public ListBoxItem[] ApplicantItems { get; }
 
-        public Canvas Canvas { get; } = new() { ClipToBounds = true };
+        public Canvas Canvas { get; }
 
         public ParallelCastingView(ContentControl applicants_panel, IAllocationEngine engine, Node node, IEnumerable<Role> roles, IEnumerable<Applicant> applicants, Criteria[] primary_criterias, AlternativeCast[] alternative_casts)
         {
+            Canvas = new() {
+                ClipToBounds = true,
+                Background = new SolidColorBrush { Color = Colors.White }
+            };
+            Canvas.MouseDown += (o, e) => e.Handled = true; // ignore clicks
             alternativeCasts = alternative_casts;
             parent = applicants_panel;
             Node = node;
