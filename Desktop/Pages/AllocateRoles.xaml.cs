@@ -133,8 +133,6 @@ namespace Carmen.Desktop.Pages
         //TODO (OR ADD ISSUE) Change error message "Parallel casting is only applicable to sections which don't allow applicants to have multiple roles within them." into a disabled button with a tooltip
         //TODO (OR ADD ISSUE) Revise how IdealCastingOrder works, so that it recommends using parallel casting for high (but similar) priority roles within single-role sections
         //TODO (OR ADD ISSUE) Speed up line generation: generate lines only when IsSelected is true, keep a reference to them, remove them when IsSelected is false
-        //TODO always include any applicants currently cast in the selected roles
-
         private async void SaveButton_Click(object sender, RoutedEventArgs e)
         {
             if (await SaveChanges())
@@ -572,10 +570,13 @@ namespace Carmen.Desktop.Pages
             }
             if (GetSelectedRoles(current_view, "parallel casting", "allocate", SelectRolesForParallel) is not List<Role> selected_roles)
                 return;
+            var applicants_already_cast_in_selected_roles = selected_roles
+                .SelectMany(r => r.Cast).ToHashSet();
             var applicants_already_cast_in_section = current_view.Node.ItemsInOrder()
                 .SelectMany(i => i.Roles).Distinct()
                 .SelectMany(r => r.Cast).ToHashSet();
-            var available_applicants = applicantsInCast.Where(a => !applicants_already_cast_in_section.Contains(a)).ToArray();
+            // include applicants already cast in the selected roles, or not cast in this section
+            var available_applicants = applicantsInCast.Where(a => applicants_already_cast_in_selected_roles.Contains(a) || !applicants_already_cast_in_section.Contains(a)).ToArray();
             if (available_applicants.Length == 0)
             {
                 var section_name = current_view.Node switch
