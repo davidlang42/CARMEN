@@ -637,7 +637,11 @@ namespace Carmen.Desktop.Pages
                     sort.PropertyName = $"{prefix_to_parallel_applicant}.{sort.PropertyName}"; // this works because both Applicant and ParallelApplicant have FirstName/LastName fields
                     list.Items.SortDescriptions.Add(sort);
                 }
-                list.ScrollIntoView(list.SelectedItem);
+                if (list.SelectedItem != null)
+                {
+                    list.ScrollIntoView(list.SelectedItem);
+                    list.Focus();
+                }
                 if (applicantsPanel.Content is ParallelCastingView view)
                 {
                     view.ClearLines();
