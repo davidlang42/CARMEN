@@ -637,6 +637,10 @@ namespace Carmen.Desktop.Pages
                     list.Items.SortDescriptions.Add(sort);
                 }
                 list.ScrollIntoView(list.SelectedItem);
+                if (applicantsPanel.Content is ParallelCastingView view)
+                {
+                    //TODO view.RedrawLines();
+                }
             }
         }
     }

@@ -245,6 +245,7 @@
                                  ItemsSource="{Binding ApplicantItems}"
                                  VirtualizingStackPanel.IsVirtualizing="False"
                                  Name="ParallelApplicantsList"
+                                 SelectedItem="{Binding SelectedApplicantItem, Mode=TwoWay}"
                                  ScrollViewer.ScrollChanged="ParallelCastingList_ScrollChanged">
                             <ListBox.ItemContainerStyle>
                                 <Style TargetType="{x:Type ListBoxItem}">
