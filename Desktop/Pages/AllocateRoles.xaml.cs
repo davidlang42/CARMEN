@@ -22,6 +22,7 @@ using System.Windows.Input;
 using Carmen.Desktop.Bindings;
 using Carmen.CastingEngine.Audition;
 using Carmen.CastingEngine.Allocation;
+using System.Data;
 
 namespace Carmen.Desktop.Pages
 {
@@ -147,12 +148,12 @@ namespace Carmen.Desktop.Pages
                 }
                 else if (applicantsPanel.Content is ParallelCastingView parallel_view)
                 {
+                    rootNodeView.RoleCastingChanged(parallel_view.Roles.Select(pr => pr.Role));
                     using (new LoadingOverlay(this).AsSegment(nameof(IAllocationEngine) + nameof(IAllocationEngine.UserPickedCast) + parallel_view.Roles.Length, "Learning...", "Roles allocated by the user"))
                     {
                         for (var r = 0; r < parallel_view.Roles.Length; r++)
                         {
                             var role = parallel_view.Roles[r].Role;
-                            rootNodeView.RoleCastingChanged(role); //TODO could be smarter about this
                             var applicants_not_picked = parallel_view.Applicants
                                 .Select(pa => pa.ApplicantForRoles[r])
                                 .Where(afr => afr.Eligibility.IsEligible && afr.Availability.IsAvailable)

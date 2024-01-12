@@ -30,29 +30,38 @@ namespace Carmen.Desktop.ViewModels
 
         /// <summary>Updates any node which may need updating due to casting changes of the given role</summary>
         public void RoleCastingChanged(Role role)
+            => RoleCastingChanged(role.Yield());
+
+        /// <summary>Updates any node which may need updating due to casting changes of the given roles</summary>
+        public void RoleCastingChanged(IEnumerable<Role> roles)
         {
+            var roles_set = roles.ToHashSet();
             ItemNodeView? current_item = null;
             ItemNodeView? previous_item = null;
-            bool update_next_item = false;
+            bool update_next_and_previous_items = false;
             foreach (var node_view in Recurse())
             {
                 if (node_view is ItemNodeView next_item_view)
                 {
-                    if (update_next_item)
+                    if (update_next_and_previous_items)
                     {
                         _ = next_item_view.UpdateAsync();
-                        update_next_item = false;
+                        if (previous_item != null)
+                            _ = previous_item.UpdateAsync();
+                        update_next_and_previous_items = false;
                     }
                     previous_item = current_item;
                     current_item = next_item_view;
                 }
-                else if (node_view is RoleNodeView role_view && role_view.Role == role)
+                else if (node_view is RoleNodeView role_view && roles_set.Contains(role_view.Role))
                 {
-                    _ = role_view.UpdateAsync(); // this is the role that changed
-                    if (previous_item != null)
-                        _ = previous_item.UpdateAsync(); // previous item might have consecutive item errors
-                    update_next_item = true; // next item might have consecutive item errors
+                    _ = role_view.UpdateAsync(); // this is a role that changed, a bi-product of this updating is that its parent (the current item) will update
+                    update_next_and_previous_items = true; // next & previous items might have consecutive item errors
                 }
+            }
+            if (update_next_and_previous_items && previous_item != null)
+            {
+                _ = previous_item.UpdateAsync();
             }
         }
 
