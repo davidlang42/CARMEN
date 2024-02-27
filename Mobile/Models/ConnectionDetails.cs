@@ -57,9 +57,7 @@ namespace Carmen.Mobile.Models
 
         public bool TryPing()
         {
-#if ANDROID || IOS
-            return true; // Ping always fails on Android, and sometimes on iOS, therefore skip
-#else
+#if WINDOWS
             try
             {
                 return new Ping().Send(Host, 500).Status == IPStatus.Success;
@@ -69,6 +67,8 @@ namespace Carmen.Mobile.Models
                 Log.Warning(ex, $"Ping failed: {Host}");
                 return false;
             }
+#else
+            return true; // Ping always fails on Android, and sometimes on macOS & iOS, therefore skip
 #endif
         }
 
