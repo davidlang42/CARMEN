@@ -57,8 +57,8 @@ namespace Carmen.Mobile.Models
 
         public bool TryPing()
         {
-#if ANDROID
-            return true; // Ping always fails on Android, therefore skip
+#if ANDROID || IOS
+            return true; // Ping always fails on Android, and sometimes on iOS, therefore skip
 #else
             try
             {
