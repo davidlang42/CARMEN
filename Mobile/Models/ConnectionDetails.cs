@@ -39,6 +39,8 @@ namespace Carmen.Mobile.Models
                 Port = Port ?? DEFAULT_PORT,
 #if ANDROID
                 SslMode = MySqlSslMode.VerifyCA // VerifyFull fails on Android
+#elif IOS
+                SslMode = MySqlSslMode.Required // VerifyFull works in test but not in production on iOS
 #else
                 SslMode = MySqlSslMode.VerifyFull
 #endif
