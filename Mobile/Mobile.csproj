@@ -96,8 +96,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="CommunityToolkit.Maui" Version="6.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="9.0.3" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -112,6 +112,10 @@
   </Target>
 
   <ItemGroup>
-    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.82" />
+    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.90" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.Maui.Controls.Compatibility" Version="8.0.90" />
   </ItemGroup>
 </Project>
