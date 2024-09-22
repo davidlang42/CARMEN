@@ -2,11 +2,11 @@
 
 	<PropertyGroup>
 		<!-- You won't believe this, but in order to build for Android in Release mode on Windows using Visual Studio you need to untarget iOS -->
-		<!--<TargetFrameworks>net7.0-android;net7.0-maccatalyst</TargetFrameworks>-->
-		<TargetFrameworks>net7.0-android;net7.0-ios;net7.0-maccatalyst</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net7.0-windows10.0.19041.0</TargetFrameworks>
+		<!--<TargetFrameworks>net8.0-android;net8.0-maccatalyst</TargetFrameworks>-->
+		<TargetFrameworks>net8.0-android;net8.0-ios;net8.0-maccatalyst</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
-		<!-- <TargetFrameworks>$(TargetFrameworks);net7.0-tizen</TargetFrameworks> -->
+		<!-- <TargetFrameworks>$(TargetFrameworks);net8.0-tizen</TargetFrameworks> -->
 		
 		<OutputType>Exe</OutputType>
     	<AssemblyName>Carmen.Mobile</AssemblyName>
@@ -55,7 +55,7 @@
     <AndroidSigningStorePass>env:AndroidSigningPassword</AndroidSigningStorePass>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net7.0-maccatalyst|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
 	<MtouchLink>SdkOnly</MtouchLink>
 	<EnableCodeSigning>True</EnableCodeSigning>
 	<EnablePackageSigning>true</EnablePackageSigning>
@@ -110,4 +110,8 @@
       <_RequireCodeSigning>false</_RequireCodeSigning>  
     </PropertyGroup>
   </Target>
+
+  <ItemGroup>
+    <PackageReference Update="Microsoft.Maui.Controls" Version="8.0.82" />
+  </ItemGroup>
 </Project>
