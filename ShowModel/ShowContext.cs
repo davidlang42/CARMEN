@@ -104,7 +104,14 @@ namespace Carmen.ShowModel
         /// which takes ~1s synchronously. This runs it in a separate thread to avoid a synchronous delay.</summary>
         public async Task PreloadModel()
         {
-            await Task.Run(() => _ = this.Model);
+            try
+            {
+                await Task.Run(() => _ = this.Model);
+            }
+            catch (Exception ex)
+            {
+                throw new ApplicationException("Failed to preload model", ex);
+            }
         }
 
         public async Task CreateNewDatabase(string default_show_name)
