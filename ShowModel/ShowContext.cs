@@ -226,12 +226,12 @@ namespace Carmen.ShowModel
                 else if (entry.Entity is Image)
                     changes |= DataObjects.Images;
                 else if (entry.Entity is CountByGroup)
-                    changes |= entry.Metadata.DefiningEntityType.ClrType switch
+                    changes |= entry.Metadata.Name switch
                     {
-                        Type t when t == typeof(Node) => DataObjects.Nodes,
-                        Type t when t == typeof(Role) => DataObjects.Roles,
-                        Type t when t == typeof(Tag) => DataObjects.Tags,
-                        _ => throw new NotImplementedException($"Owner of CountByGroup not handled: {entry.Metadata.DefiningEntityType.ClrType.Name}")
+                        $"Carmen.ShowModel.Structure.{nameof(Carmen.ShowModel.Structure.Node)}.{nameof(Node.CountByGroups)}#{nameof(CountByGroup)}" => DataObjects.Nodes,
+                        $"Carmen.ShowModel.Structure.{nameof(Carmen.ShowModel.Structure.Role)}.{nameof(Role.CountByGroups)}#{nameof(CountByGroup)}" => DataObjects.Roles,
+                        $"Carmen.ShowModel.Applicants.{nameof(Carmen.ShowModel.Applicants.Tag)}.{nameof(Tag.CountByGroups)}#{nameof(CountByGroup)}" => DataObjects.Tags,
+                        _ => throw new NotImplementedException($"Owner of CountByGroup not handled: {entry.Metadata.Name}")
                     };
                 else if (entry.Entity is Dictionary<string, object> linking_table)
                 {
