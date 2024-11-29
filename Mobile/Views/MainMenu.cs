@@ -130,7 +130,7 @@ namespace Carmen.Mobile.Views
                 model.Error($"Unable to connect to server:\n{connection.Description}\n\n{error}");
                 return;
             }
-            using (var context = ShowContext.Open(connection))
+            using (var context = ShowContext.Open(connection, MauiProgram.USE_LAZY_LOAD_PROXIES))
             {
                 model.Loading("Preparing show model");
                 await context.PreloadModel(); // do this here while the overlay is shown to avoid a synchronous delay when the MainMenu is loaded

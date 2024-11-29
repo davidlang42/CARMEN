@@ -109,7 +109,7 @@ namespace Carmen.Mobile.Views
 
         private async void ApplicantList_Loaded(object? sender, EventArgs e)
         {
-            context = ShowContext.Open(show);
+            context = ShowContext.Open(show, MauiProgram.USE_LAZY_LOAD_PROXIES);
             var collection = await context.Applicants.ToArrayAsync();
             model.Loaded(collection, sortBy);
         }

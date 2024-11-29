@@ -73,7 +73,7 @@ namespace Carmen.Mobile.Views
 
         private async void ItemList_Loaded(object? sender, EventArgs e)
         {
-            context = ShowContext.Open(show);
+            context = ShowContext.Open(show, MauiProgram.USE_LAZY_LOAD_PROXIES);
             await context.Nodes.LoadAsync();
             var items = context.ShowRoot.ItemsInOrder().Select(i => new ItemDetail { Item = i }).ToArray();
             model.Loaded(items);

@@ -25,6 +25,8 @@ namespace Carmen.ShowModel
     {
         static readonly ILoggerFactory loggerFactory = LoggerFactory.Create(factory => factory.AddSerilog());
 
+        public bool UseLazyLoadProxies { get; set; } = true;
+
         public enum DatabaseState
         {
             Empty,
@@ -89,15 +91,17 @@ namespace Carmen.ShowModel
         /// <summary>The root node of the show structure</summary>
         public ShowRoot ShowRoot => showRoot ??= Nodes.OfType<ShowRoot>().SingleOrDefault() ?? Add(new ShowRoot()).Entity;
 
-        public static ShowContext Open(ShowConnection show)
+        public static ShowContext Open(ShowConnection show, bool use_lazy_load_proxies = true)
         {
             Log.Information($"{nameof(ShowContext)}.{nameof(Open)}: {show.ConnectionString}");
-            return show.Provider switch
+            ShowContext context = show.Provider switch
             {
                 DbProvider.MySql => new MySqlShowContext(show.ConnectionString),
                 null => new SqliteShowContext(show.ConnectionString),
                 _ => throw new NotImplementedException($"Database provider {show.Provider} not implemented.")
             };
+            context.UseLazyLoadProxies = use_lazy_load_proxies;
+            return context;
         }
 
         /// <summary>Accessing any model or entity related property on the context causes the model to be build,
@@ -158,7 +162,7 @@ namespace Carmen.ShowModel
             await Task.Run(() => Database.Migrate()); // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
         }
 
-        public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)
+        public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)//TODO confirm never called from Android
         {
             Log.Information($"{nameof(ShowContext)}.{nameof(CopyDatabase)}");
             using var destination = Open(overwrite_database);
@@ -466,8 +470,11 @@ namespace Carmen.ShowModel
             // Using LazyLoadingProxies will have a huge performance hit if I forget to include
             // the right objects in my queries, however the alternative is that if I forget to
             // include something then I get incorrect values (eg. nulls and empty collections)
-            optionsBuilder.UseLazyLoadingProxies()
-                .UseLoggerFactory(loggerFactory)
+            if (UseLazyLoadProxies) {
+                optionsBuilder.UseLazyLoadingProxies();
+            }
+
+            optionsBuilder.UseLoggerFactory(loggerFactory)
                 .EnableSensitiveDataLogging();
 #if SLOW_DATABASE
             // Due to risks of LazyLoadingProxies above, it is best to always debug with SLOW_DATABASE
