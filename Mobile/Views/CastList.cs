@@ -135,7 +135,7 @@ namespace Carmen.Mobile.Views
             await Navigation.PushAsync(new BasicList<ItemRole>($"Roles for {applicant.FirstName} {applicant.LastName}", "No roles allocated", () =>
             {
                 context.Nodes.Load();
-                var roles = applicant.Roles.ToArray();
+                var roles = applicant.Roles.ToArray();//TODO wont work without lazy loading (applicant.Roles, role.Items)
                 var item_roles = new List<ItemRole>();
                 foreach (var item in context.ShowRoot.ItemsInOrder())
                     foreach (var role in roles.Where(r => r.Items.Contains(item)))

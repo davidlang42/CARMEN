@@ -91,7 +91,7 @@ namespace Carmen.ShowModel.Structure
             ?? ItemsInOrder().SelectMany(i => i.Roles).Distinct().Select(r => r.CountFor(group)).Sum();
 
         /// <summary>Recursively enumerate all parents</summary>
-        public IEnumerable<InnerNode> Parents()
+        public IEnumerable<InnerNode> Parents()//TODO wont work without lazy loading
         {
             var parent = Parent;
             while (parent != null)
