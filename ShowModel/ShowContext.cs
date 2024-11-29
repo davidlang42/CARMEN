@@ -162,7 +162,7 @@ namespace Carmen.ShowModel
             await Task.Run(() => Database.Migrate()); // see EntityFrameworkQueryableExtensionsWithGuaranteedAsync
         }
 
-        public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)//TODO confirm never called from Android
+        public async Task CopyDatabase(ShowConnection overwrite_database, Action<string, string>? progress_callback = null)
         {
             Log.Information($"{nameof(ShowContext)}.{nameof(CopyDatabase)}");
             using var destination = Open(overwrite_database);

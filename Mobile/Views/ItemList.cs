@@ -75,6 +75,7 @@ namespace Carmen.Mobile.Views
         {
             context = ShowContext.Open(show, MauiProgram.USE_LAZY_LOAD_PROXIES);
             await context.Nodes.LoadAsync();
+            await context.Nodes.OfType<Item>().Include(i => i.Roles).ThenInclude(r => r.Cast).LoadAsync();
             var items = context.ShowRoot.ItemsInOrder().Select(i => new ItemDetail { Item = i }).ToArray();
             model.Loaded(items);
         }
@@ -100,9 +101,9 @@ namespace Carmen.Mobile.Views
             if (sender is not Cell cell || cell.BindingContext is not ItemDetail item || context == null)
                 return;
             await Navigation.PushAsync(new BasicList<RoleDetail>($"Roles in {item.Item.Name}", "No roles",
-                () => item.Item.Roles.InNameOrder().Select(r => new RoleDetail { Role = r }).ToArray(),//TODO wont work without lazy loading: item.Roles
+                () => item.Item.Roles.InNameOrder().Select(r => new RoleDetail { Role = r }).ToArray(),
                 rd => Navigation.PushAsync(new BasicList<ApplicantDetail>($"Cast for {rd.Role.Name}", "No cast",
-                    () => rd.Role.Cast.OrderBy(c => c.CastNumber).ThenBy(c => c.AlternativeCast?.Initial).Select(c => new ApplicantDetail { Applicant = c }).ToArray()))));//TODO wont work without lazy loading: role.Cast
+                    () => rd.Role.Cast.OrderBy(c => c.CastNumber).ThenBy(c => c.AlternativeCast?.Initial).Select(c => new ApplicantDetail { Applicant = c }).ToArray()))));
         }
     }
 }

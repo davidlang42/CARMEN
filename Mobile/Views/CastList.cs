@@ -94,7 +94,7 @@ namespace Carmen.Mobile.Views
             context = ShowContext.Open(show, MauiProgram.USE_LAZY_LOAD_PROXIES);
             var criterias = await context.Criterias.ToArrayAsync();
             var tags = await context.Tags.ToArrayAsync();
-            var collection = await context.Applicants.Where(a => a.CastGroup != null).ToArrayAsync();
+            var collection = await context.Applicants.Include(a => a.Roles).ThenInclude(r => r.Items).Where(a => a.CastGroup != null).ToArrayAsync();
             model.Loaded(collection, criterias, tags);
         }
 
@@ -135,7 +135,7 @@ namespace Carmen.Mobile.Views
             await Navigation.PushAsync(new BasicList<ItemRole>($"Roles for {applicant.FirstName} {applicant.LastName}", "No roles allocated", () =>
             {
                 context.Nodes.Load();
-                var roles = applicant.Roles.ToArray();//TODO wont work without lazy loading (applicant.Roles, role.Items)
+                var roles = applicant.Roles.ToArray();
                 var item_roles = new List<ItemRole>();
                 foreach (var item in context.ShowRoot.ItemsInOrder())
                     foreach (var role in roles.Where(r => r.Items.Contains(item)))
