@@ -134,7 +134,7 @@ namespace Carmen.Mobile.Views
             model.Loaded(applicant, criterias);
             ImageSource? source;
             if (applicant.PhotoImageId is int image_id)
-                source = await CachedImage(image_id, applicant.ShowRoot, () => applicant.Photo ?? throw new ApplicationException("Applicant photo not set, but photo ID was."));
+                source = await CachedImage(image_id, applicant.ShowRoot, () => context.Images.Where(i => i.ImageId == image_id).Single() ?? throw new ApplicationException("Applicant photo not set, but photo ID was."));
             else if (await Task.Run(() => applicant.Photo) is SM.Image image)
                 source = await ActualImage(image);
             else
