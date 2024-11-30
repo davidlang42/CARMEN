@@ -65,6 +65,7 @@
 	<CodesignEntitlements>Platforms\MacCatalyst\Entitlements.plist</CodesignEntitlements>
 	<PackageSigningKey>Developer ID Installer: David Lang (45435R99CA)</PackageSigningKey>
 	<UseHardenedRuntime>true</UseHardenedRuntime>
+	<RuntimeIdentifier>maccatalyst-x64</RuntimeIdentifier>
   </PropertyGroup>
 
   <PropertyGroup Condition="$(TargetFramework.Contains('-ios')) and '$(Configuration)' == 'Release'">
