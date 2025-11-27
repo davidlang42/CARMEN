@@ -28,4 +28,7 @@
     <ProjectReference Include="..\CastingEngine\CastingEngine.csproj" />
     <ProjectReference Include="..\ShowModel\ShowModel.csproj" />
   </ItemGroup>
+  <PropertyGroup>
+    <SuppressTfmSupportBuildErrors>true</SuppressTfmSupportBuildErrors>
+  </PropertyGroup>
 </Project>
