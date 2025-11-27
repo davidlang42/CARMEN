@@ -161,7 +161,7 @@ namespace UnitTests.Database
             using var context = ShowContext.Open(connection);
             var req = context.Requirements.OfType<CombinedRequirement>().First();
             req.RequirementId.Should().NotBe(0);
-            req.SubRequirements.Count.Should().BeGreaterOrEqualTo(2);
+            req.SubRequirements.Count.Should().BeGreaterThanOrEqualTo(2);
             var sub_req = req.SubRequirements.First();
             sub_req.RequirementId.Should().NotBe(0);
             sub_req.RequirementId.Should().NotBe(req.RequirementId);
