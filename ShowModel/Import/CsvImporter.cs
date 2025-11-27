@@ -19,10 +19,10 @@ namespace Carmen.ShowModel.Import
     public class CsvImporter : IDisposable
     {
         bool disposed;
-        CastGroup[] castGroups;
-        AlternativeCast[] alternativeCasts;
-        CsvReader csv;
-        string importPath; // with trailing backslash
+        readonly CastGroup[] castGroups;
+        readonly AlternativeCast[] alternativeCasts;
+        readonly CsvReader csv;
+        readonly string importPath; // with trailing backslash
 
         public InputColumn[] InputColumns { get; }
         public ImportColumn[] ImportColumns { get; }
@@ -46,6 +46,9 @@ namespace Carmen.ShowModel.Import
             {
                 throw new UserException(ex, $"Error reading CSV file.");
             }
+            if (csv.HeaderRecord is not string[] header) {
+                throw new UserException("Failed to read header");
+            }
             InputColumns = csv.HeaderRecord.Select((h, i) => new InputColumn(i, h)).ToArray();
             ImportColumns = GenerateColumns(criterias, tags, delete_image, current_user_name).ToArray();
             LoadColumnMap(InputColumns.ToDictionary(c => c.Header, new FilteredStringComparer(char.IsLetterOrDigit, StringComparison.InvariantCultureIgnoreCase)));
@@ -55,8 +58,9 @@ namespace Carmen.ShowModel.Import
         {
             if (disposed)
                 throw new InvalidOperationException("Tried to use after dispose");
-            var result = new ImportResult();
-            result.ParseErrors = new();
+            var result = new ImportResult {
+                ParseErrors = new()
+            };
             var match_columns = ImportColumns.Where(c => c.MatchExisting && c.SelectedInput != null).ToArray();
             while (csv.Read())
             {
@@ -65,7 +69,7 @@ namespace Carmen.ShowModel.Import
                 {
                     IEnumerable<Applicant> existing = applicant_collection;
                     foreach (var column in ImportColumns.Where(c => c.MatchExisting && c.SelectedInput != null))
-                        existing = existing.Where(a => column.ValueComparer(a, csv.GetField(column.SelectedInput!.Index)));
+                        existing = existing.Where(a => column.ValueComparer(a, csv.GetField(column.SelectedInput!.Index) ?? throw new Exception("Field not found.")));
                     applicants = existing.ToArray();
                 }
                 else
@@ -77,7 +81,7 @@ namespace Carmen.ShowModel.Import
                     foreach (var column in ImportColumns.Where(c => c.SelectedInput != null))
                         try
                         {
-                            column.ValueSetter(applicant, csv.GetField(column.SelectedInput!.Index));
+                            column.ValueSetter(applicant, csv.GetField(column.SelectedInput!.Index) ?? throw new Exception("Field not found."));
                         }
                         catch (ParseException ex)
                         {
@@ -93,7 +97,7 @@ namespace Carmen.ShowModel.Import
                     bool changed = false;
                     foreach (var column in ImportColumns.Where(c => c.SelectedInput != null))
                     {
-                        var value = csv.GetField(column.SelectedInput!.Index);
+                        var value = csv.GetField(column.SelectedInput!.Index) ?? throw new Exception("Field not found.");
                         if (!column.ValueComparer(applicants[0], value))
                         {
                             try
@@ -200,7 +204,7 @@ namespace Carmen.ShowModel.Import
             throw new ParseException("date of birth", value, "dd/mm/yyyy");
         }
 
-        private uint? ParseCriteriaMark(Criteria criteria, string value)
+        private static uint? ParseCriteriaMark(Criteria criteria, string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
@@ -271,7 +275,7 @@ namespace Carmen.ShowModel.Import
             throw new ParseException("alternative cast", value, string.Join(", ", alternativeCasts.Select(cg => cg.Name)));
         }
 
-        public bool? ParseTagFlag(Applicant applicant, Tag tag, string value)
+        public static bool? ParseTagFlag(Applicant applicant, Tag tag, string value)
         {
             if (string.IsNullOrWhiteSpace(value))
                 return null;
@@ -288,7 +292,7 @@ namespace Carmen.ShowModel.Import
             return apply_tag;
         }
 
-        public void SetTag(Applicant applicant, Tag tag, bool? value)
+        public static void SetTag(Applicant applicant, Tag tag, bool? value)
         {
             if (value == null)
                 return; // nothing to do
@@ -310,6 +314,7 @@ namespace Carmen.ShowModel.Import
             {
                 disposed = true;
                 csv.Dispose();
+                GC.SuppressFinalize(this);
             }
         }
     }
