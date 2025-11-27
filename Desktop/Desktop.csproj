@@ -50,4 +50,8 @@
       </PackagePath>
     </None>
   </ItemGroup>
+  <PropertyGroup>
+    <!-- net7.0 is EOL but issues with EFCore prevent upgrading -->
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
 </Project>
