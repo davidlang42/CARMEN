@@ -12,8 +12,9 @@ namespace Carmen.Desktop.ViewModels
         
         public string Host { get; }
 
-        /// <summary>Null means exactly the current database name</summary>
-        public string? Database { get; }
+        public string Database { get; }
+
+        public bool HideDatabase { get; }
 
         public bool IsAdmin { get; }
 
@@ -25,7 +26,8 @@ namespace Carmen.Desktop.ViewModels
         {
             Name = name;
             Host = host;
-            Database = database == current_database ? null : database;
+            Database = database;
+            HideDatabase = database == current_database;
             //TODO set IsAdmin/CanWrite/CanRead from grants
         }
 
@@ -37,9 +39,9 @@ namespace Carmen.Desktop.ViewModels
                 if (Host == "%") {
                     sb.Append(Name);
                 } else {
-                    sb.Append($"'{Name}'@'{Host}'");
+                    sb.Append($"{Name}@{Host}");
                 }
-                if (Database != null) {
+                if (!HideDatabase) {
                     sb.Append($" ({Database})");
                 }
                 if (IsAdmin) {
@@ -55,20 +57,16 @@ namespace Carmen.Desktop.ViewModels
             }
         }
 
-        public void GrantRead()
-        {
-            //TODO GRANT SELECT ON `cgs_2026`.* TO 'USERNAME'@'%';
-        }
+        public string SqlToDeleteUser() => $"DROP USER '{Name}'@'{Host}';";
 
-        public void GrantWrite()
-        {
-            //TODO GRANT ALL ON `cgs_2026`.* TO 'USERNAME'@'%';
-        }
+        public string SqlToGrantRead() => $"GRANT SELECT ON `{Database}`.* TO '{Name}'@'{Host}';";
 
-        public void GrantAdmin()
+        public string SqlToGrantWrite() => $"GRANT ALL ON `{Database}`.* TO '{Name}'@'{Host}';";
+
+        public IEnumerable<string> SqlToGrantAdmin()
         {
-            //TODO GRANT CREATE USER ON *.* TO 'USERNAME'@'%' IDENTIFIED BY 'PASSWORD' REQUIRE SSL WITH GRANT OPTION;
-            //TODO GRANT SELECT ON mysql.* TO 'USERNAME'@'%';
+            yield return $"GRANT SELECT ON mysql.* TO '{Name}'@'{Host}';";
+            yield return $"GRANT CREATE USER ON *.* TO '{Name}'@'{Host}' WITH GRANT OPTION;"; //TODO this grant option doesn't look right
         }
     }
 }

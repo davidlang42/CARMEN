@@ -18,6 +18,7 @@ using Carmen.Desktop.ViewModels;
 using MySqlConnector;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Carmen.ShowModel;
+using Carmen.ShowModel.Reporting;
 
 namespace Carmen.Desktop.Windows
 {
@@ -90,33 +91,57 @@ namespace Carmen.Desktop.Windows
             return grants.ToArray();
         }
 
+        void ExecuteSql(string sql)
+        {
+            using var connection = OpenDatabase();
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = sql;
+            cmd.ExecuteNonQuery();
+        }
+
         private void AddUser_Click(object sender, RoutedEventArgs e)
         {
-            //TODO prompt for user & password
-            //TODO CREATE USER 'USERNAME'@'%' IDENTIFIED BY 'PASSWORD' REQUIRE SSL;
-            //TODO user.GrantRead();
+            var name = Microsoft.VisualBasic.Interaction.InputBox("Username?", "Add user"); // I'm sorry
+            if (string.IsNullOrEmpty(name)) {
+                return;
+            }
+            var password = Microsoft.VisualBasic.Interaction.InputBox("Password?", "Add user"); // I'm sorry
+            var host = "%";
+            using var connection = OpenDatabase();
+            var cmd = connection.CreateCommand();
+            cmd.CommandText = "CREATE USER @user@@host IDENTIFIED BY @password REQUIRE SSL;";
+            cmd.Parameters.AddWithValue("@user", name);
+            cmd.Parameters.AddWithValue("@password", password);
+            cmd.Parameters.AddWithValue("@host", host);
+            cmd.ExecuteNonQuery();
+            var user = new DatabaseUser(name, host, databaseName, databaseName, Array.Empty<string>());
+            ExecuteSql(user.SqlToGrantRead());
             RefreshList();
         }
 
         private void GrantWrite_Click(object sender, RoutedEventArgs e)
         {
-            if (UserList.SelectedItem is not DatabaseUser user)
-            {
+            if (UserList.SelectedItem is not DatabaseUser user) {
                 throw new UserException("Please select a user"); //TODO make disabled if no selection
             }
-            //TODO confirm grant
-            user.GrantWrite();
+            if (MessageBox.Show($"Are you sure you want to grant user '{user.Name}' write access?\nNOTE: This will allow this user to write to any database they currently have read access to.", "Grant write access", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
+                return;
+            }
+            ExecuteSql(user.SqlToGrantWrite());
             RefreshList();
         }
 
         private void GrantAdmin_Click(object sender, RoutedEventArgs e)
         {
-            if (UserList.SelectedItem is not DatabaseUser user)
-            {
+            if (UserList.SelectedItem is not DatabaseUser user) {
                 throw new UserException("Please select a user"); //TODO make disabled if no selection
             }
-            //TODO confirm grant
-            user.GrantAdmin();
+            if (MessageBox.Show($"Are you sure you want to grant user '{user.Name}' ADMIN access?\nNOTE: This will allow this user to manage users for any database they have write access to.", "Grant admin access", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
+                return;
+            }
+            foreach (var sql in user.SqlToGrantAdmin()) {
+                ExecuteSql(sql);
+            }
             RefreshList();
         }
 
@@ -129,8 +154,10 @@ namespace Carmen.Desktop.Windows
                 MessageBox.Show("You cannot delete the user you are currently logged in as.");
                 return;
             }
-            //TODO confirm delete
-            //TODO DROP USER 'USERNAME'@'%';
+            if (MessageBox.Show($"Are you sure you want to delete user '{user.Name}'?\nNOTE: This will delete this user for all databases.", "Delete user", MessageBoxButton.YesNo,MessageBoxImage.Question) == MessageBoxResult.No) {
+                return;
+            }
+            ExecuteSql(user.SqlToDeleteUser());
             RefreshList();
         }
     }
