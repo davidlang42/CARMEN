@@ -124,7 +124,7 @@ namespace Carmen.Desktop.Windows
         private void GrantWrite_Click(object sender, RoutedEventArgs e)
         {
             if (UserList.SelectedItem is not DatabaseUser user) {
-                throw new UserException("Please select a user"); //TODO make disabled if no selection
+                throw new UserException("Please select a user");
             }
             var msg = $"Are you sure you want to grant user '{user.Name}' write access?";
             if (user.Database != databaseName) {
@@ -140,7 +140,7 @@ namespace Carmen.Desktop.Windows
         private void GrantAdmin_Click(object sender, RoutedEventArgs e)
         {
             if (UserList.SelectedItem is not DatabaseUser user) {
-                throw new UserException("Please select a user"); //TODO make disabled if no selection
+                throw new UserException("Please select a user");
             }
             var msg = $"Are you sure you want to grant user '{user.Name}' ADMIN access?";
             if (user.Database != databaseName) {
@@ -158,7 +158,7 @@ namespace Carmen.Desktop.Windows
         private void DeleteUser_Click(object sender, RoutedEventArgs e)
         {
             if (UserList.SelectedItem is not DatabaseUser user) {
-                throw new UserException("Please select a user"); //TODO make disabled if no selection
+                throw new UserException("Please select a user");
             }
             if (user.Name == currentUser) {
                 MessageBox.Show("You cannot delete the user you are currently logged in as.");
