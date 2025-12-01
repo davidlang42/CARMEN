@@ -1,0 +1,60 @@
+﻿<Window x:Class="Carmen.Desktop.Windows.UsersWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Carmen.Desktop.ViewModels"
+        mc:Ignorable="d"
+        xmlns:cv="clr-namespace:Carmen.Desktop.Converters"
+        xmlns:fa="http://schemas.fontawesome.io/icons/"
+        MinHeight="300" MinWidth="400"
+        WindowStartupLocation="CenterOwner"
+        Title="Import marks from another show" Height="480" Width="640">
+    <DockPanel>
+        <Grid DockPanel.Dock="Bottom" HorizontalAlignment="Right">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button Height="35" Margin="5" Click="AddUser_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Plus" Width="12" Margin="2 0" Foreground="DimGray"/>
+                    <TextBlock Text="Add User" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="1" Height="35" Margin="5" Click="DeleteUser_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Minus" Width="12" Margin="2 0" Foreground="DimGray"/>
+                    <TextBlock Text="Delete User" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="2" Height="35" Margin="5" Click="GrantWrite_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Pencil" Width="12" Margin="2 0" Foreground="DimGray"/>
+                    <TextBlock Text="Grant Write Access" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="3" Height="35" Margin="5" Click="GrantAdmin_Click">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Lock" Width="12" Margin="2 0" Foreground="DimGray"/>
+                    <TextBlock Text="Grant Admin Access" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+        <ListBox x:Name="UserList" Margin="5 5 5 0">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock>
+                        <Run FontWeight="SemiBold">
+                            <Run.Text>
+                                <Binding Mode="OneWay" Path="Description"/>
+                            </Run.Text>
+                        </Run>
+                    </TextBlock>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </DockPanel>
+</Window>

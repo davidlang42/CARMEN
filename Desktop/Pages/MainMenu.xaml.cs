@@ -16,6 +16,7 @@ using Microsoft.VisualBasic.FileIO;
 using Carmen.Desktop.UserControls;
 using System.Threading.Tasks;
 using Serilog;
+using Carmen.ShowModel.Applicants;
 
 namespace Carmen.Desktop.Pages
 {
@@ -244,6 +245,15 @@ namespace Carmen.Desktop.Pages
                 ReportsPopup.IsOpen = false;
                 ((MainWindow)Window.GetWindow(this)).OpenReport(null, false);
             }
+        }
+
+        private void ManageUsers_Click(object sender, RoutedEventArgs e)
+        {
+            var users  = new UsersWindow(connection)
+            {
+                Owner = Window.GetWindow(this) //TODO is this needed?
+            };
+            users.ShowDialog(); //TODO is this the only way to show modal?
         }
 
         private async void ImportButton_Click(object sender, RoutedEventArgs e)
