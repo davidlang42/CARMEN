@@ -22,6 +22,7 @@
     <PackageReference Include="Serilog.Extensions.Logging" Version="7.0.0" />
     <PackageReference Include="Serilog.Extensions.Logging.File" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="6.0.0" />
+    <PackageReference Include="System.Text.Json" Version="8.0.5" />
     <PackageReference Include="WpfMessageBox" Version="1.2.0" />
   </ItemGroup>
   <ItemGroup>
@@ -49,4 +50,8 @@
       </PackagePath>
     </None>
   </ItemGroup>
+  <PropertyGroup>
+    <!-- net7.0 is EOL but issues with EFCore prevent upgrading -->
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
 </Project>

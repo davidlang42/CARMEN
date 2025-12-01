@@ -41,8 +41,8 @@ namespace UnitTests.Neural
             var percent_order = 100.0 * success_order / total;
             var percent_lies = 100.0 * success_lies / total;
             Console.WriteLine($"---------- Better Than Order: {percent_order:0.0}%, Better Than Lies: {percent_lies:0.0}%,  ----------");
-            percent_order.Should().BeGreaterOrEqualTo(90);
-            percent_lies.Should().BeGreaterOrEqualTo(99);
+            percent_order.Should().BeGreaterThanOrEqualTo(90);
+            percent_lies.Should().BeGreaterThanOrEqualTo(99);
         }
 
         private (bool BetterThanOrder, bool BetterThanLies) TestIntegers(int n_max, int seed)

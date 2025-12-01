@@ -134,6 +134,12 @@
                             <TextBlock Text="Refresh photo cache" FontSize="14" Margin="2" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
+                    <Button Background="White" BorderThickness="0" HorizontalAlignment="Stretch" Click="ManageUsers_Click">
+                        <StackPanel Orientation="Horizontal">
+                            <fa:ImageAwesome Icon="Users" Height="14" Margin="2" VerticalAlignment="Center"/>
+                            <TextBlock Text="Manage database users" FontSize="14" Margin="2" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Border>
         </Popup>

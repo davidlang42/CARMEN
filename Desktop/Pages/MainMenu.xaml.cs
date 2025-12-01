@@ -16,6 +16,7 @@ using Microsoft.VisualBasic.FileIO;
 using Carmen.Desktop.UserControls;
 using System.Threading.Tasks;
 using Serilog;
+using Carmen.ShowModel.Applicants;
 
 namespace Carmen.Desktop.Pages
 {
@@ -243,6 +244,18 @@ namespace Carmen.Desktop.Pages
             {
                 ReportsPopup.IsOpen = false;
                 ((MainWindow)Window.GetWindow(this)).OpenReport(null, false);
+            }
+        }
+
+        private void ManageUsers_Click(object sender, RoutedEventArgs e)
+        {
+            try {
+                var users = new UsersWindow(connection) {
+                    Owner = Window.GetWindow(this)
+                };
+                users.ShowDialog();
+            } catch (Exception ex) {
+                MessageBox.Show($"Error while reading users: {ex.InnermostException().Message}\nUsers can only be managed by an ADMIN.");
             }
         }
 
