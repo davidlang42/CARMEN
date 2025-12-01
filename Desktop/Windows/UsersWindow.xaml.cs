@@ -13,7 +13,6 @@ namespace Carmen.Desktop.Windows
     /// </summary>
     public partial class UsersWindow : Window
     {
-        //readonly CollectionViewSource applicantsViewSource;
         readonly string connectionString;
         readonly string databaseName;
         readonly string currentUser;
@@ -33,7 +32,12 @@ namespace Carmen.Desktop.Windows
 
         void RefreshList()
         {
-            UserList.ItemsSource = QueryUsers();
+            try {
+                UserList.ItemsSource = QueryUsers();
+            } catch (Exception ex) {
+                MessageBox.Show($"Error while reading users: {ex.InnermostException().Message}\nUsers can only be managed by an ADMIN.");
+                Close(); //TODO confirm this closes window
+            }
         }
 
         MySqlConnection OpenDatabase()
@@ -77,12 +81,33 @@ namespace Carmen.Desktop.Windows
             return grants.ToArray();
         }
 
-        void ExecuteSql(string sql)
+        void ExecuteGrantSql(string sql)
         {
-            using var connection = OpenDatabase();
-            var cmd = connection.CreateCommand();
-            cmd.CommandText = sql;
-            cmd.ExecuteNonQuery();
+            try {
+                using var connection = OpenDatabase();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = sql;
+                cmd.ExecuteNonQuery();
+            } catch (Exception ex) {
+                MessageBox.Show($"Error while granting access: {ex.InnermostException().Message}\nAccess not granted.");
+            }
+        }
+
+        DatabaseUser? AddUser(string name, string password, string host)
+        {
+            try {
+                using var connection = OpenDatabase();
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = "CREATE USER @user@@host IDENTIFIED BY @password REQUIRE SSL;";
+                cmd.Parameters.AddWithValue("@user", name);
+                cmd.Parameters.AddWithValue("@password", password);
+                cmd.Parameters.AddWithValue("@host", host);
+                cmd.ExecuteNonQuery();
+                return new DatabaseUser(name, host, databaseName, databaseName, Array.Empty<string>());
+            } catch (Exception ex) {
+                MessageBox.Show($"Error while adding user: {ex.InnermostException().Message}\nUser not added.");
+                return null;
+            }
         }
 
         private void AddUser_Click(object sender, RoutedEventArgs e)
@@ -92,16 +117,12 @@ namespace Carmen.Desktop.Windows
                 return;
             }
             var password = Microsoft.VisualBasic.Interaction.InputBox("Password?", "Add user"); // I'm sorry
-            var host = "%";
-            using var connection = OpenDatabase();
-            var cmd = connection.CreateCommand();
-            cmd.CommandText = "CREATE USER @user@@host IDENTIFIED BY @password REQUIRE SSL;";
-            cmd.Parameters.AddWithValue("@user", name);
-            cmd.Parameters.AddWithValue("@password", password);
-            cmd.Parameters.AddWithValue("@host", host);
-            cmd.ExecuteNonQuery();
-            var user = new DatabaseUser(name, host, databaseName, databaseName, Array.Empty<string>());
-            ExecuteSql(user.SqlToGrantRead());
+            if (string.IsNullOrEmpty(password)) {
+                return;
+            }
+            if (AddUser(name, password, "%") is DatabaseUser user) {
+                ExecuteGrantSql(user.SqlToGrantRead());
+            }
             RefreshList();
         }
 
@@ -110,10 +131,14 @@ namespace Carmen.Desktop.Windows
             if (UserList.SelectedItem is not DatabaseUser user) {
                 throw new UserException("Please select a user"); //TODO make disabled if no selection
             }
-            if (MessageBox.Show($"Are you sure you want to grant user '{user.Name}' write access?\nNOTE: This will allow this user to write to any database they currently have read access to.", "Grant write access", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
+            var msg = $"Are you sure you want to grant user '{user.Name}' write access?";
+            if (user.Database != databaseName) {
+                msg += "\nNOTE: This will allow this user to write to any database they currently have read access to.";
+            }
+            if (MessageBox.Show(msg, "Grant write access", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
                 return;
             }
-            ExecuteSql(user.SqlToGrantWrite());
+            ExecuteGrantSql(user.SqlToGrantWrite());
             RefreshList();
         }
 
@@ -122,11 +147,15 @@ namespace Carmen.Desktop.Windows
             if (UserList.SelectedItem is not DatabaseUser user) {
                 throw new UserException("Please select a user"); //TODO make disabled if no selection
             }
-            if (MessageBox.Show($"Are you sure you want to grant user '{user.Name}' ADMIN access?\nNOTE: This will allow this user to manage users for any database they have write access to.", "Grant admin access", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
+            var msg = $"Are you sure you want to grant user '{user.Name}' ADMIN access?";
+            if (user.Database != databaseName) {
+                msg += "\nNOTE: This will allow this user to manage users for any database they have write access to.";
+            }
+            if (MessageBox.Show(msg, "Grant admin access", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
                 return;
             }
             foreach (var sql in user.SqlToGrantAdmin()) {
-                ExecuteSql(sql);
+                ExecuteGrantSql(sql);
             }
             RefreshList();
         }
@@ -140,10 +169,10 @@ namespace Carmen.Desktop.Windows
                 MessageBox.Show("You cannot delete the user you are currently logged in as.");
                 return;
             }
-            if (MessageBox.Show($"Are you sure you want to delete user '{user.Name}'?\nNOTE: This will delete this user for all databases.", "Delete user", MessageBoxButton.YesNo,MessageBoxImage.Question) == MessageBoxResult.No) {
+            if (MessageBox.Show($"Are you sure you want to delete user '{user.Name}'?\nNOTE: This will delete this user for all databases.", "Delete user", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
                 return;
             }
-            ExecuteSql(user.SqlToDeleteUser());
+            ExecuteGrantSql(user.SqlToDeleteUser());
             RefreshList();
         }
     }
