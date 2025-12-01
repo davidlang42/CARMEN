@@ -249,11 +249,14 @@ namespace Carmen.Desktop.Pages
 
         private void ManageUsers_Click(object sender, RoutedEventArgs e)
         {
-            var users  = new UsersWindow(connection)
-            {
-                Owner = Window.GetWindow(this) //TODO is this needed?
-            };
-            users.ShowDialog(); //TODO is this the only way to show modal?
+            try {
+                var users = new UsersWindow(connection) {
+                    Owner = Window.GetWindow(this)
+                };
+                users.ShowDialog();
+            } catch (Exception ex) {
+                MessageBox.Show($"Error while reading users: {ex.InnermostException().Message}\nUsers can only be managed by an ADMIN.");
+            }
         }
 
         private async void ImportButton_Click(object sender, RoutedEventArgs e)

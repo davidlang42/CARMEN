@@ -32,12 +32,7 @@ namespace Carmen.Desktop.Windows
 
         void RefreshList()
         {
-            try {
-                UserList.ItemsSource = QueryUsers();
-            } catch (Exception ex) {
-                MessageBox.Show($"Error while reading users: {ex.InnermostException().Message}\nUsers can only be managed by an ADMIN.");
-                Close(); //TODO confirm this closes window
-            }
+            UserList.ItemsSource = QueryUsers();
         }
 
         MySqlConnection OpenDatabase()
@@ -53,7 +48,7 @@ namespace Carmen.Desktop.Windows
             var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT User, Host, db FROM mysql.db WHERE @database LIKE db;";
             cmd.Parameters.AddWithValue("@database", databaseName);
-            using var res = cmd.ExecuteReader();//TODO handle access crash (it handled it in save applicants)
+            using var res = cmd.ExecuteReader();
             var users = new List<DatabaseUser>();
             while (res.Read()) {
                 var name = res.GetString("User");
