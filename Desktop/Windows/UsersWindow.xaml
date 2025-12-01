@@ -10,6 +10,12 @@
         MinHeight="300" MinWidth="400"
         WindowStartupLocation="CenterOwner"
         Title="Manage database users" Height="480" Width="640">
+    <Window.Resources>
+        <cv:MultiConverter x:Key="falseIfNull">
+            <cv:TrueIfNull/>
+            <cv:InvertBoolean/>
+        </cv:MultiConverter>
+    </Window.Resources>
     <DockPanel>
         <Grid DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
@@ -24,19 +30,19 @@
                     <TextBlock Text="Add User" Margin="2 0"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Column="1" Height="35" Margin="5" Click="DeleteUser_Click">
+            <Button Grid.Column="1" Height="35" Margin="5" Click="DeleteUser_Click" IsEnabled="{Binding ElementName=UserList, Path=SelectedItem, Converter={StaticResource falseIfNull}}">
                 <StackPanel Orientation="Horizontal">
                     <fa:ImageAwesome Icon="Minus" Width="12" Margin="2 0" Foreground="DimGray"/>
                     <TextBlock Text="Delete User" Margin="2 0"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Column="2" Height="35" Margin="5" Click="GrantWrite_Click">
+            <Button Grid.Column="2" Height="35" Margin="5" Click="GrantWrite_Click" IsEnabled="{Binding ElementName=UserList, Path=SelectedItem, Converter={StaticResource falseIfNull}}">
                 <StackPanel Orientation="Horizontal">
                     <fa:ImageAwesome Icon="Pencil" Width="12" Margin="2 0" Foreground="DimGray"/>
                     <TextBlock Text="Grant Write Access" Margin="2 0"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Column="3" Height="35" Margin="5" Click="GrantAdmin_Click">
+            <Button Grid.Column="3" Height="35" Margin="5" Click="GrantAdmin_Click" IsEnabled="{Binding ElementName=UserList, Path=SelectedItem, Converter={StaticResource falseIfNull}}">
                 <StackPanel Orientation="Horizontal">
                     <fa:ImageAwesome Icon="Lock" Width="12" Margin="2 0" Foreground="DimGray"/>
                     <TextBlock Text="Grant Admin Access" Margin="2 0"/>
