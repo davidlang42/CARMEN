@@ -9,7 +9,7 @@
         xmlns:fa="http://schemas.fontawesome.io/icons/"
         MinHeight="300" MinWidth="400"
         WindowStartupLocation="CenterOwner"
-        Title="Import marks from another show" Height="480" Width="640">
+        Title="Manage database users" Height="480" Width="640">
     <DockPanel>
         <Grid DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>

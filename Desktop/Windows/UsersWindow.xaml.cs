@@ -1,29 +1,15 @@
-﻿using Carmen.ShowModel.Applicants;
-using Carmen.Desktop.Converters;
-using Serilog;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Carmen.Desktop.ViewModels;
 using MySqlConnector;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using Carmen.ShowModel;
-using Carmen.ShowModel.Reporting;
 
 namespace Carmen.Desktop.Windows
 {
     /// <summary>
-    /// Interaction logic for ApplicantPickerDialog.xaml
+    /// Interaction logic for UserWindow.xaml
     /// </summary>
     public partial class UsersWindow : Window
     {
@@ -63,7 +49,7 @@ namespace Carmen.Desktop.Windows
             var cmd = connection.CreateCommand();
             cmd.CommandText = "SELECT User, Host, db FROM mysql.db WHERE @database LIKE db;";
             cmd.Parameters.AddWithValue("@database", databaseName);
-            using var res = cmd.ExecuteReader();
+            using var res = cmd.ExecuteReader();//TODO handle access crash (it handled it in save applicants)
             var users = new List<DatabaseUser>();
             while (res.Read()) {
                 var name = res.GetString("User");
