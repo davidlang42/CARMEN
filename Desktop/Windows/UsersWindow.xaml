@@ -20,9 +20,10 @@
         <Grid DockPanel.Dock="Bottom" HorizontalAlignment="Right">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Button Height="35" Margin="5" Click="AddUser_Click">
                 <StackPanel Orientation="Horizontal">
@@ -36,19 +37,26 @@
                     <TextBlock Text="Delete User" Margin="2 0"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Column="2" Height="35" Margin="5" Click="GrantWrite_Click" IsEnabled="{Binding ElementName=UserList, Path=SelectedItem, Converter={StaticResource falseIfNull}}">
+            <Button Grid.Column="2" Height="35" Margin="5" Click="GrantRead_Click" IsEnabled="{Binding ElementName=UserList, Path=SelectedItem, Converter={StaticResource falseIfNull}}">
+                <StackPanel Orientation="Horizontal">
+                    <fa:ImageAwesome Icon="Eye" Width="12" Margin="2 0" Foreground="DimGray"/>
+                    <TextBlock Text="Grant Read Access" Margin="2 0"/>
+                </StackPanel>
+            </Button>
+            <Button Grid.Column="3" Height="35" Margin="5" Click="GrantWrite_Click" IsEnabled="{Binding ElementName=UserList, Path=SelectedItem, Converter={StaticResource falseIfNull}}">
                 <StackPanel Orientation="Horizontal">
                     <fa:ImageAwesome Icon="Pencil" Width="12" Margin="2 0" Foreground="DimGray"/>
                     <TextBlock Text="Grant Write Access" Margin="2 0"/>
                 </StackPanel>
             </Button>
-            <Button Grid.Column="3" Height="35" Margin="5" Click="GrantAdmin_Click" IsEnabled="{Binding ElementName=UserList, Path=SelectedItem, Converter={StaticResource falseIfNull}}">
+            <Button Grid.Column="4" Height="35" Margin="5" Click="GrantAdmin_Click" IsEnabled="{Binding ElementName=UserList, Path=SelectedItem, Converter={StaticResource falseIfNull}}">
                 <StackPanel Orientation="Horizontal">
                     <fa:ImageAwesome Icon="Lock" Width="12" Margin="2 0" Foreground="DimGray"/>
                     <TextBlock Text="Grant Admin Access" Margin="2 0"/>
                 </StackPanel>
             </Button>
         </Grid>
+        <CheckBox Margin="5 5 5 5" x:Name="AllUsersCheckBox" DockPanel.Dock="Bottom" Content="Show all users (including other databases in the same server)" Checked="AllUsersCheckBox_Changed" Unchecked="AllUsersCheckBox_Changed"/>
         <ListBox x:Name="UserList" Margin="5 5 5 0">
             <ListBox.ItemTemplate>
                 <DataTemplate>

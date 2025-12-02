@@ -32,7 +32,7 @@ namespace Carmen.Desktop.Windows
 
         void RefreshList()
         {
-            UserList.ItemsSource = QueryUsers();
+            UserList.ItemsSource = QueryUsers(AllUsersCheckBox.IsChecked ?? false);
         }
 
         MySqlConnection OpenDatabase()
@@ -42,12 +42,19 @@ namespace Carmen.Desktop.Windows
             return connection;
         }
 
-        DatabaseUser[] QueryUsers()
+        DatabaseUser[] QueryUsers(bool include_all_users)
         {
             using var connection = OpenDatabase();
             var cmd = connection.CreateCommand();
-            cmd.CommandText = "SELECT User, Host, db FROM mysql.db WHERE @database LIKE db;";
-            cmd.Parameters.AddWithValue("@database", databaseName);
+            string? effective_db;
+            if (include_all_users) {
+                cmd.CommandText = $"SELECT User, Host, db FROM mysql.db WHERE db <> 'mysql' ORDER BY User;";
+                effective_db = null;
+            } else {
+                cmd.CommandText = $"SELECT User, Host, db FROM mysql.db WHERE @database LIKE db ORDER BY User;";
+                cmd.Parameters.AddWithValue("@database", databaseName);
+                effective_db = databaseName;
+            }
             using var res = cmd.ExecuteReader();
             var users = new List<DatabaseUser>();
             while (res.Read()) {
@@ -55,7 +62,7 @@ namespace Carmen.Desktop.Windows
                 var host = res.GetString("Host");
                 var grants = QueryGrants(name, host);
                 var db = res.GetString("db");
-                users.Add(new(name, host, db, databaseName, grants));
+                users.Add(new(name, host, db, effective_db, grants));
             }
             return users.ToArray();
         }
@@ -121,19 +128,29 @@ namespace Carmen.Desktop.Windows
             RefreshList();
         }
 
+        private void GrantRead_Click(object sender, RoutedEventArgs e)
+        {
+            if (UserList.SelectedItem is not DatabaseUser user) {
+                throw new UserException("Please select a user");
+            }
+            var msg = $"Are you sure you want to grant user '{user.Name}' read access to '{databaseName}'?";
+            if (MessageBox.Show(msg, "Grant read access", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
+                return;
+            }
+            ExecuteGrantSql(user.SqlToGrantRead(databaseName));
+            RefreshList();
+        }
+
         private void GrantWrite_Click(object sender, RoutedEventArgs e)
         {
             if (UserList.SelectedItem is not DatabaseUser user) {
                 throw new UserException("Please select a user");
             }
-            var msg = $"Are you sure you want to grant user '{user.Name}' write access?";
-            if (user.Database != databaseName) {
-                msg += "\nNOTE: This will allow this user to write to any database they currently have read access to.";
-            }
+            var msg = $"Are you sure you want to grant user '{user.Name}' write access to '{databaseName}'?";
             if (MessageBox.Show(msg, "Grant write access", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
                 return;
             }
-            ExecuteGrantSql(user.SqlToGrantWrite());
+            ExecuteGrantSql(user.SqlToGrantWrite(databaseName));
             RefreshList();
         }
 
@@ -144,7 +161,7 @@ namespace Carmen.Desktop.Windows
             }
             var msg = $"Are you sure you want to grant user '{user.Name}' ADMIN access?";
             if (user.Database != databaseName) {
-                msg += "\nNOTE: This will allow this user to manage users for any database they have write access to.";
+                msg += "\nNOTE: This will allow this user to manage users for any database they have access to.";
             }
             if (MessageBox.Show(msg, "Grant admin access", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.No) {
                 return;
@@ -168,6 +185,11 @@ namespace Carmen.Desktop.Windows
                 return;
             }
             ExecuteGrantSql(user.SqlToDeleteUser());
+            RefreshList();
+        }
+
+        private void AllUsersCheckBox_Changed(object sender, RoutedEventArgs e)
+        {
             RefreshList();
         }
     }

@@ -28,15 +28,15 @@ namespace Carmen.Desktop.ViewModels
         static string adminStart = "GRANT CREATE USER ON *.* ";
         static string adminEnd = "WITH GRANT OPTION";
 
-        public DatabaseUser(string name, string host, string database, string current_database, string[] grants)
+        public DatabaseUser(string name, string host, string database, string? current_database, string[] grants)
         {
             Name = name;
             Host = host;
             Database = database;
             HideDatabase = database == current_database;
             IsAdmin = grants.Any(g => g.StartsWith(adminStart) && g.EndsWith(adminEnd));
-            CanWrite = FindMatch(grants, writeRegex, current_database);
-            CanRead = FindMatch(grants, readRegex, current_database) || CanWrite;
+            CanWrite = FindMatch(grants, writeRegex, current_database ?? database);
+            CanRead = FindMatch(grants, readRegex, current_database ?? database) || CanWrite;
         }
 
         bool FindMatch(string[] grants, Regex db_getter, string db_match)
@@ -87,9 +87,9 @@ namespace Carmen.Desktop.ViewModels
 
         public string SqlToDeleteUser() => $"DROP USER '{Name}'@'{Host}';";
 
-        public string SqlToGrantRead() => $"GRANT SELECT ON `{Database}`.* TO '{Name}'@'{Host}';";
+        public string SqlToGrantRead(string? override_database = null) => $"GRANT SELECT ON `{override_database ?? Database}`.* TO '{Name}'@'{Host}';";
 
-        public string SqlToGrantWrite() => $"GRANT ALL ON `{Database}`.* TO '{Name}'@'{Host}';";
+        public string SqlToGrantWrite(string? override_database = null) => $"GRANT ALL ON `{override_database ?? Database}`.* TO '{Name}'@'{Host}';";
 
         public IEnumerable<string> SqlToGrantAdmin()
         {
