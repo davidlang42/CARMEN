@@ -41,7 +41,7 @@ namespace Carmen.CastingEngine.Allocation
             score += overall_weight * overall_suitability;
             max += overall_weight;
             foreach (var cr in role.Requirements.OfType<ICriteriaRequirement>())
-                score -= CostToWeight(cr.ExistingRoleCost, cr.SuitabilityWeight, max) * CountRoles(applicant, cr.Criteria, role);
+                score += CostToWeight(cr.ExistingRoleCost, cr.SuitabilityWeight, max) * CountRoles(applicant, cr.Criteria, role);
             if (score <= 0)
                 return 0; // never return a negative suitability
             return score / max;
